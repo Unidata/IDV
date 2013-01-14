@@ -206,24 +206,6 @@ public class GridTrajectoryControl extends DrawingControl {
     public static class MyTrackControl extends TrackControl {
 
         /** _more_ */
-        private DisplayableData timesHolder = null;
-
-        /** _more_ */
-        private StationModelDisplayable indicator = null;
-
-        /** _more_ */
-        private double timeDeclutterMinutes = 1;
-
-        /** _more_ */
-        private boolean useTrackTimes = true;
-
-        /** _more_ */
-        private boolean timeDeclutterEnabled = true;
-
-        /** _more_ */
-        private EarthLocationLite lastIndicatorPosition;
-
-        /** _more_ */
         private float markerScale = 1.0f;
 
         /** _more_ */
@@ -247,6 +229,7 @@ public class GridTrajectoryControl extends DrawingControl {
                               | FLAG_DISPLAYUNIT | FLAG_TIMERANGE
                               | FLAG_SELECTRANGE);
             this.gtc = gtc;
+            setUseTrackTimes(true);
         }
 
         /**
@@ -256,6 +239,7 @@ public class GridTrajectoryControl extends DrawingControl {
             setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
                               | FLAG_DISPLAYUNIT | FLAG_TIMERANGE
                               | FLAG_SELECTRANGE);
+            setUseTrackTimes(true);
         }
 
 
@@ -269,10 +253,7 @@ public class GridTrajectoryControl extends DrawingControl {
             return true;
         }
 
-        /**
-         * _more_
-         */
-        protected void addToControlContext() {}
+
 
         /**
          * Get the track width property.  Used by persistence
@@ -309,8 +290,9 @@ public class GridTrajectoryControl extends DrawingControl {
         public void setDataTimeRange(DataTimeRange range) {
             ///if(range == null && gtc!= null)
             //    range = gtc.getTrjDataTimeRange();
-            super.setDataTimeRange(range);
-            if (gtc != null) {
+            if(range != super.getDataTimeRange())
+                super.setDataTimeRange(range);
+            if (gtc != null && range != gtc.getTrjDataTimeRange()) {
                 range.setStartOffsetMinutes(range.getStartOffsetMinutes());
                 gtc.setTrjDataTimeRange(range);
             }
@@ -332,7 +314,6 @@ public class GridTrajectoryControl extends DrawingControl {
 
         }
 
-
         /**
          * _more_
          *
@@ -342,121 +323,9 @@ public class GridTrajectoryControl extends DrawingControl {
             return false;
         }
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean getUseTrackTimes() {
-            return useTrackTimes;
-        }
 
-        /**
-         * _more_
-         *
-         * @throws RemoteException _more_
-         * @throws VisADException _more_
-         */
-        private void setTrackTimes() throws VisADException, RemoteException {
-            if ((trackDisplay == null)) {
-                return;
-            }
-            Data d = trackDisplay.getData();
-            if (d.equals(DUMMY_DATA)) {
-                return;
-            }
-            if ( !getUseTrackTimes()) {
-                timesHolder.setData(DUMMY_DATA);
-                return;
-            }
-            FlatField f;
-            try {
-                f = (FlatField) ((FieldImpl) d).getSample(0);
-            } catch (ClassCastException e) {
-                f = (FlatField) d;
-            }
 
-            //System.out.println(f.getType());
-            double[][] samples  = f.getValues(false);
-            int        numTimes = samples[1].length;
-            if ( !getTimeDeclutterEnabled()) {
-                if ( !getAskedUserToDeclutterTime() && (numTimes > 1000)) {
-                    int success =
-                        GuiUtils
-                            .showYesNoCancelDialog(getWindow(), "<html>There are "
-                                + numTimes
-                                + " time steps in the data.<br>Do you want to show them all?</html>", "Time Declutter", GuiUtils
-                                    .CMD_NO);
-                    if (success == JOptionPane.CANCEL_OPTION) {
-                        return;
-                    } else {
-                        setAskedUserToDeclutterTime(true);
-                        setTimeDeclutterEnabled(success
-                                == JOptionPane.NO_OPTION);
-                    }
-                }
-            }
 
-            double[] times = samples[1];
-            if ( !Util.isStrictlySorted(times)) {
-                int[] indexes = Util.strictlySortedIndexes(times, true);
-                times = Util.take(times, indexes);
-
-            }
-            if (getTimeDeclutterEnabled()) {
-                LogUtil.message("Track display: subsetting times");
-                Trace.call1("declutterTime");
-                times = declutterTime(times);
-                Trace.call2("declutterTime");
-                LogUtil.message("");
-            }
-            Unit[] units = f.getDefaultRangeUnits();
-            Gridded1DDoubleSet timeSet =
-                new Gridded1DDoubleSet(RealTupleType.Time1DTuple,
-                                       new double[][] {
-                times
-            }, times.length, (CoordinateSystem) null,
-               new Unit[] { units[1] }, (ErrorEstimate[]) null,
-               false /*don't copy*/);
-            if (timeSet != null) {
-                timesHolder.setData(timeSet);
-            }
-        }
-
-        /**
-         * _more_
-         *
-         * @param times _more_
-         *
-         * @return _more_
-         *
-         * @throws RemoteException _more_
-         * @throws VisADException _more_
-         */
-        private double[] declutterTime(double[] times)
-                throws VisADException, RemoteException {
-            int numTimes = times.length;
-            int seconds  = (int) (timeDeclutterMinutes * 60);
-            if (seconds == 0) {
-                seconds = 1;
-            }
-            double[]  tmpTimes = new double[times.length];
-            int       numFound = 0;
-            Hashtable seenTime = new Hashtable();
-            for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
-                Integer timeKey = new Integer((int) (times[timeIdx]
-                                      / seconds));
-                if ((timeIdx < numTimes - 1)
-                        && (seenTime.get(timeKey) != null)) {
-                    continue;
-                }
-                seenTime.put(timeKey, timeKey);
-                tmpTimes[numFound++] = times[timeIdx];
-            }
-            double[] newTimes = new double[numFound];
-            System.arraycopy(tmpTimes, 0, newTimes, 0, numFound);
-            return newTimes;
-        }
 
         /**
          * _more_
@@ -515,59 +384,6 @@ public class GridTrajectoryControl extends DrawingControl {
         }
 
 
-
-        /**
-         * _more_
-         *
-         * @throws RemoteException _more_
-         * @throws VisADException _more_
-         */
-        private void setScaleOnMarker()
-                throws RemoteException, VisADException {
-            setScaleOnMarker(getDisplayScale() * markerScale);
-        }
-
-        /**
-         * Get the TimeDeclutterEnabled property.
-         *
-         * @return The TimeDeclutterEnabled
-         */
-        public boolean getTimeDeclutterEnabled() {
-            return timeDeclutterEnabled;
-        }
-
-        /**
-         *  A utility to set the scale on the marker dislayable
-         *
-         * @param f The new scale value
-         *
-         * @throws RemoteException When bad things happen
-         * @throws VisADException When bad things happen
-         */
-        private void setScaleOnMarker(float f)
-                throws RemoteException, VisADException {
-            if (indicator != null) {
-                indicator.setScale(f);
-            }
-        }
-
-        /**
-         * _more_
-         */
-        private void updateIndicator() {
-            if (indicator != null) {
-                try {
-                    lastIndicatorPosition = null;
-                    indicator.setStationModel(getMarkerLayout());
-                    indicator.setVisible(getMarkerVisible());
-                    setScaleOnMarker();
-                    // applyTimeRange();
-                } catch (Exception exc) {
-                    logException("Updating indicator", exc);
-                }
-            }
-        }
-
         /**
          * _more_
          */
@@ -617,7 +433,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 dtr.setStartOffsetMinutes(
                     getDataTimeRange().getStartOffsetMinutes());
                 if ((dtr != null) && (trackDisplay != null)
-                        && useTrackTimes) {
+                        && getUseTrackTimes()) {
                     dtr.setEndMode(dtr.MODE_ANIMATION);
                     trackDisplay.setSelectedRange(startDate, aniDate);
                 }
@@ -670,58 +486,11 @@ public class GridTrajectoryControl extends DrawingControl {
          *
          * @return _more_
          */
-        protected int getColorRangeIndex() {
+        protected int getColorRangeIndex1() {
             return 0;
         }
 
-        /**
-         * _more_
-         */
-        private void updateTimeSelectRange() {
-            try {
-                Range r = getRangeForTimeSelect();
-                if (r == null) {
-                    return;
-                }
-                if (trackDisplay != null) {
-                    trackDisplay.setRangeForSelect(r.getMin(), r.getMax());
-                }
-            } catch (Exception e) {
-                logException("updateTimeSelectRange", e);
-            }
-        }
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         *
-         * @throws RemoteException _more_
-         * @throws VisADException _more_
-         */
-        private Range getRangeForTimeSelect()
-                throws VisADException, RemoteException {
-            Range            range = getRange();
-            GridDataInstance gdi   = getGridDataInstance();
-            if ((gdi != null) && (gdi.getNumRealTypes() > 1)) {
-                range = gdi.getRange(1);
-            }
-            return range;
-        }
-
-        public void initAfterUnPersistence(ControlContext vc,
-                                           Hashtable properties,
-                                           List preSelectedDataChoices) {
-
-                DataTimeRange dtr = getDataTimeRange();
-                dtr.setEndMode(getUseTrackTimes()
-                        ? dtr.MODE_DATA
-                        : dtr.MODE_ANIMATION);
-                dtr.setStartMode(dtr.MODE_RELATIVE);
-                dtr.setStartOffsetMinutes(dtr.getStartOffsetMinutes());
-                setDataTimeRange(dtr);
-
-        }
     }
 
     /**
@@ -769,6 +538,9 @@ public class GridTrajectoryControl extends DrawingControl {
     public void setTrjDataTimeRange(DataTimeRange range) {
         if (range != null) {
             trjDataTimeRange = range;
+            if(gridTrackControl != null)
+                gridTrackControl.setDataTimeRange(range);
+            super.setDataTimeRange(range);
         }
     }
 
@@ -940,6 +712,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     try {
                         createTrjBtnClicked = true;
                         createTrajectoryControl();
+                        gridTrackControl.setLineWidth(trackLineWidth);
                     } catch (VisADException ee) {}
                     catch (RemoteException er) {}
                     catch (Exception exr) {}

@@ -158,10 +158,10 @@ public class TrackControl extends GridDisplayControl {
     private String trackType = CMD_RANGE;
 
     /** selector point */
-    private StationModelDisplayable indicator = null;
+    protected StationModelDisplayable indicator = null;
 
     /** the displayable that holdss the times */
-    private DisplayableData timesHolder = null;
+    protected DisplayableData timesHolder = null;
 
 
 
@@ -352,7 +352,7 @@ public class TrackControl extends GridDisplayControl {
     /**
      * Update the indicator with new shapes
      */
-    private void updateIndicator() {
+    protected void updateIndicator() {
         if (indicator != null) {
             try {
                 lastIndicatorPosition = null;
@@ -604,8 +604,8 @@ public class TrackControl extends GridDisplayControl {
      * @throws RemoteException   Java RMI problem
      * @throws VisADException    VisAD problem
      */
-    private void setTrackTimes() throws VisADException, RemoteException {
-        if ( !(trackType.equals(CMD_RANGE) || (trackDisplay == null))) {
+    protected void setTrackTimes() throws VisADException, RemoteException {
+        if ( !(trackType.equals(CMD_RANGE)) || (trackDisplay == null)) {
             return;
         }
         Data d = trackDisplay.getData();
@@ -1097,7 +1097,7 @@ public class TrackControl extends GridDisplayControl {
     /**
      * Update the select range for the widget with the data's range
      */
-    private void updateTimeSelectRange() {
+    protected void updateTimeSelectRange() {
         try {
             Range r = getRangeForTimeSelect();
             if (r == null) {
