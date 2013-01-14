@@ -230,6 +230,7 @@ public class GridTrajectoryControl extends DrawingControl {
                               | FLAG_SELECTRANGE);
             this.gtc = gtc;
             setUseTrackTimes(true);
+            setTimeDeclutterEnabled(true);
         }
 
         /**
@@ -240,6 +241,7 @@ public class GridTrajectoryControl extends DrawingControl {
                               | FLAG_DISPLAYUNIT | FLAG_TIMERANGE
                               | FLAG_SELECTRANGE);
             setUseTrackTimes(true);
+            setTimeDeclutterEnabled(true);
         }
 
 
@@ -584,6 +586,8 @@ public class GridTrajectoryControl extends DrawingControl {
         u  = (FieldImpl) udc.getData(null);
         v  = (FieldImpl) vdc.getData(null);
         pw = (FieldImpl) wdc.getData(null);
+        if(sdc == null)
+            return false;
         s  = (FieldImpl) sdc.getData(null);
         doMakeDataInstance(sdc);
 
