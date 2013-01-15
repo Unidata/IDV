@@ -217,7 +217,7 @@ public class GridTrajectoryControl extends DrawingControl {
         /** _more_ */
         GridTrajectoryControl gtc = null;
 
-
+        FieldImpl trackGrid;
 
         /**
          * _more_
@@ -344,7 +344,7 @@ public class GridTrajectoryControl extends DrawingControl {
             if (trackDisplay == null) {
                 return true;
             }
-
+            trackGrid = fi;
             Unit newUnit = getDisplayUnit();
             //TODO: use the right index
             if ((newUnit != null) && !newUnit.equals(getDisplayUnit())
@@ -484,12 +484,43 @@ public class GridTrajectoryControl extends DrawingControl {
         }
 
         /**
-         * _more_
+         * Make the time option widget
          *
-         * @return _more_
+         * @return  the time option widget
          */
-        protected int getColorRangeIndex1() {
-            return 0;
+        protected Component doMakeTimeOptionWidget() {
+            JComboBox box = new JComboBox(TIMES_TO_USE);
+            box.setSelectedIndex(getUseTrackTimes()
+                    ? 1
+                    : 0);
+            box.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    setUseTrackTimes(
+                            ((JComboBox) e.getSource()).getSelectedIndex() == 1);
+                    FieldImpl grid = trackGrid;
+                    try {
+                        if (getUseTrackTimes()) {
+                            // System.out.println("Use track points times\n");
+                            trackDisplay.setTrack(mergeGrid(grid));
+                        } else {
+                            // System.out.println("Use track nominal times\n");
+                            trackDisplay.setTrack(grid);
+                        }
+                        setTrackTimes();
+                    } catch (Exception e1) {}
+
+                }
+            });
+
+            JComponent[] timeDeclutterComps = getTimeDeclutterComps();
+            JPanel timeDeclutter =
+                    GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
+                            box, new JLabel(" Show Every: "), timeDeclutterComps[1],
+                            new JLabel(" minutes "), timeDeclutterComps[0],
+                            new JLabel("enabled")
+                    }), 2, 1));
+            return timeDeclutter;
+
         }
 
 

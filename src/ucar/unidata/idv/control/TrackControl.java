@@ -220,7 +220,7 @@ public class TrackControl extends GridDisplayControl {
     private float markerScale = 1.0f;
 
     /** Time strings */
-    private final static String[] TIMES_TO_USE = { "Nominal Time",
+    protected final static String[] TIMES_TO_USE = { "Nominal Time",
             "Track Times" };
 
     //J-
@@ -796,7 +796,7 @@ public class TrackControl extends GridDisplayControl {
      *
      * @return The time declutter panel
      */
-    private JComponent[] getTimeDeclutterComps() {
+    protected JComponent[] getTimeDeclutterComps() {
         if (timeDeclutterComps != null) {
             return timeDeclutterComps;
         }
@@ -884,7 +884,7 @@ public class TrackControl extends GridDisplayControl {
      *
      * @return  the time option widget
      */
-    private Component doMakeTimeOptionWidget() {
+    protected Component doMakeTimeOptionWidget() {
         JComboBox box = new JComboBox(TIMES_TO_USE);
         box.setSelectedIndex(getUseTrackTimes()
                              ? 1
