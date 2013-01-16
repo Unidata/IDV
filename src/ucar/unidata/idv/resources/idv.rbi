@@ -520,7 +520,7 @@
     </resource>
     <resource
        label="ISL"
-       location="%IDVPATH%/isl.py">
+       location="%IDVPATH%/python/isl.py">
       <property
          name="category"
          value="System"/>
