@@ -1322,7 +1322,7 @@ public class DerivedGridFactory {
         FieldImpl         s        = future4.get();
 
 
-        List flist = new ArrayList();
+        List              flist    = new ArrayList();
         flist.add(u);
         flist.add(v);
         flist.add(pw);
@@ -1331,8 +1331,21 @@ public class DerivedGridFactory {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param grid1 _more_
+     * @param grid2 _more_
+     * @param grid3 _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public static List<FieldImpl> combineGridsArray(FieldImpl grid1,
-                                                    FieldImpl grid2, FieldImpl grid3)
+            FieldImpl grid2, FieldImpl grid3)
             throws VisADException, RemoteException, Exception {
 
         ExecutorService   executor = Executors.newFixedThreadPool(4);
@@ -1353,13 +1366,14 @@ public class DerivedGridFactory {
         FieldImpl         s        = future3.get();
 
 
-        List flist = new ArrayList();
+        List              flist    = new ArrayList();
         flist.add(u);
         flist.add(v);
         flist.add(s);
         return flist;
 
     }
+
     /**
      * Combine two Fields into one.  If the grids are on different
      * time domains, the second is resampled to the domain of the first.
@@ -4159,13 +4173,13 @@ public class DerivedGridFactory {
 
 
         boolean  normalizeLon = true;
-      //  start = System.currentTimeMillis();
+        //  start = System.currentTimeMillis();
         //first step  init  u,v, w, and s at all initial points
         List<TrajInfo> tj = calculateTrackPoints(uFI, vFI, wFI, sFI, ttts,
                                 geoVals, numPoints, numTimes, latIndex,
                                 lonIndex, haveAlt, normalizeLon);
 
-       // System.out.println("Time used to compute = "
+        // System.out.println("Time used to compute = "
         //                   + (System.currentTimeMillis() - start) / 1000.0);
         // now cal every point at each following time step
 
@@ -4217,8 +4231,8 @@ public class DerivedGridFactory {
 
         tracks = createTracks(paramName, tj, timeSet, ft, paramUnit,
                               numParcels);
-      //  System.out.println("Time used to compute = "
-      //                     + (System.currentTimeMillis() - start) / 1000.0);
+        //  System.out.println("Time used to compute = "
+        //                     + (System.currentTimeMillis() - start) / 1000.0);
         FlatField mergedTracks = mergeTracks(tracks);
 
         FunctionType fiType = new FunctionType(RealType.Time,
