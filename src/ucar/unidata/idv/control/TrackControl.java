@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -518,10 +518,11 @@ public class TrackControl extends GridDisplayControl {
         Unit[]          ut     = fi.getDomainUnits();
         float[][]       t      = st.getSamples();
         DateTime[]      times  = new DateTime[1];
-        if(t[0].length > 2)
+        if (t[0].length > 2) {
             times[0] = new DateTime(t[0][2], ut[0]);
-        else
+        } else {
             times[0] = new DateTime(t[0][0], ut[0]);
+        }
 
         for (int i = 0; i < len; i++) {
             datas.add((FlatField) fi.getSample(i));
@@ -591,7 +592,8 @@ public class TrackControl extends GridDisplayControl {
         }
         // end merge
 
-        FieldImpl fi0 = new FieldImpl(fiType, CalendarDateTime.makeTimeSet(times));
+        FieldImpl fi0 = new FieldImpl(fiType,
+                                      CalendarDateTime.makeTimeSet(times));
         fi0.setSample(0, retField, false);
 
         return fi0;
@@ -616,11 +618,11 @@ public class TrackControl extends GridDisplayControl {
             timesHolder.setData(DUMMY_DATA);
             return;
         }
-        FlatField f ;
+        FlatField f;
         try {
-            f = (FlatField)((FieldImpl) d).getSample(0);
+            f = (FlatField) ((FieldImpl) d).getSample(0);
         } catch (ClassCastException e) {
-            f = (FlatField)d;
+            f = (FlatField) d;
         }
 
         //System.out.println(f.getType());
@@ -893,7 +895,7 @@ public class TrackControl extends GridDisplayControl {
             public void actionPerformed(ActionEvent e) {
                 setUseTrackTimes(
                     ((JComboBox) e.getSource()).getSelectedIndex() == 1);
-                FieldImpl grid = getGridDataInstance().getGrid(false);
+                FieldImpl grid = getTrjGridDataInstance();
                 try {
                     if (useTrackTimes) {
                         // System.out.println("Use track points times\n");
@@ -917,6 +919,15 @@ public class TrackControl extends GridDisplayControl {
         }), 2, 1));
         return timeDeclutter;
 
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected FieldImpl getTrjGridDataInstance() {
+        return getGridDataInstance().getGrid(false);
     }
 
     /**
@@ -1039,7 +1050,7 @@ public class TrackControl extends GridDisplayControl {
                              ? ((Real) aniValue).getValue(dataTimeUnit)
                              : endDate;
             DataTimeRange dtr = getDataTimeRange();
-            if(dtr != null && trackDisplay != null && useTrackTimes){
+            if ((dtr != null) && (trackDisplay != null) && useTrackTimes) {
                 dtr.setEndMode(dtr.MODE_ANIMATION);
                 trackDisplay.setSelectedRange(startDate, aniDate);
             }
@@ -1293,7 +1304,8 @@ public class TrackControl extends GridDisplayControl {
     protected Set getDataTimeSet() throws RemoteException, VisADException {
         return (lastIndicatorTime == null)
                ? null
-               : CalendarDateTime.makeTimeSet(new DateTime[] { lastIndicatorTime });
+               : CalendarDateTime.makeTimeSet(new DateTime[] {
+                   lastIndicatorTime });
     }
 
     /**

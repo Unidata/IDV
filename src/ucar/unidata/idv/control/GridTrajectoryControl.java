@@ -185,6 +185,9 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     private DataTimeRange trjDataTimeRange;
 
+    /** _more_ */
+    boolean is2D = false;
+
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -217,6 +220,7 @@ public class GridTrajectoryControl extends DrawingControl {
         /** _more_ */
         GridTrajectoryControl gtc = null;
 
+        /** _more_ */
         FieldImpl trackGrid;
 
         /**
@@ -292,9 +296,10 @@ public class GridTrajectoryControl extends DrawingControl {
         public void setDataTimeRange(DataTimeRange range) {
             ///if(range == null && gtc!= null)
             //    range = gtc.getTrjDataTimeRange();
-            if(range != super.getDataTimeRange())
+            if (range != super.getDataTimeRange()) {
                 super.setDataTimeRange(range);
-            if (gtc != null && range != gtc.getTrjDataTimeRange()) {
+            }
+            if ((gtc != null) && (range != gtc.getTrjDataTimeRange())) {
                 range.setStartOffsetMinutes(range.getStartOffsetMinutes());
                 gtc.setTrjDataTimeRange(range);
             }
@@ -396,7 +401,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     gtc.setTrjDataTimeRange(dataTimeRange);
                 }
                 GridDataInstance gridDataInstance = getGridDataInstance();
-                if (gridDataInstance == null || dataTimeRange == null) {
+                if ((gridDataInstance == null) || (dataTimeRange == null)) {
                     return;
                 }
                 Unit       dataTimeUnit;
@@ -484,45 +489,13 @@ public class GridTrajectoryControl extends DrawingControl {
         }
 
         /**
-         * Make the time option widget
+         * _more_
          *
-         * @return  the time option widget
+         * @return _more_
          */
-        protected Component doMakeTimeOptionWidget() {
-            JComboBox box = new JComboBox(TIMES_TO_USE);
-            box.setSelectedIndex(getUseTrackTimes()
-                    ? 1
-                    : 0);
-            box.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    setUseTrackTimes(
-                            ((JComboBox) e.getSource()).getSelectedIndex() == 1);
-                    FieldImpl grid = trackGrid;
-                    try {
-                        if (getUseTrackTimes()) {
-                            // System.out.println("Use track points times\n");
-                            trackDisplay.setTrack(mergeGrid(grid));
-                        } else {
-                            // System.out.println("Use track nominal times\n");
-                            trackDisplay.setTrack(grid);
-                        }
-                        setTrackTimes();
-                    } catch (Exception e1) {}
-
-                }
-            });
-
-            JComponent[] timeDeclutterComps = getTimeDeclutterComps();
-            JPanel timeDeclutter =
-                    GuiUtils.left(GuiUtils.hflow(Misc.newList(new Component[] {
-                            box, new JLabel(" Show Every: "), timeDeclutterComps[1],
-                            new JLabel(" minutes "), timeDeclutterComps[0],
-                            new JLabel("enabled")
-                    }), 2, 1));
-            return timeDeclutter;
-
+        protected FieldImpl getTrjGridDataInstance() {
+            return trackGrid;
         }
-
 
     }
 
@@ -571,8 +544,9 @@ public class GridTrajectoryControl extends DrawingControl {
     public void setTrjDataTimeRange(DataTimeRange range) {
         if (range != null) {
             trjDataTimeRange = range;
-            if(gridTrackControl != null)
+            if (gridTrackControl != null) {
                 gridTrackControl.setDataTimeRange(range);
+            }
             super.setDataTimeRange(range);
         }
     }
@@ -596,11 +570,15 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl = new MyTrackControl(this);
         // super.init(dataChoice);
         this.dataChoice = dataChoice;
-        DataInstance      di      = getDataInstance();
-        DerivedDataChoice ddc     = (DerivedDataChoice) dataChoice;
+        DataInstance      di         = getDataInstance();
+        DerivedDataChoice ddc        = (DerivedDataChoice) dataChoice;
 
 
-        Hashtable         choices = ddc.getUserSelectedChoices();
+        Hashtable         choices    = ddc.getUserSelectedChoices();
+        int               numChoices = choices.size();
+        if (numChoices == 3) {
+            is2D = true;
+        }
         DirectDataChoice udc =
             (DirectDataChoice) choices.get(new String("D1"));
         DirectDataChoice vdc =
@@ -611,15 +589,20 @@ public class GridTrajectoryControl extends DrawingControl {
             (DirectDataChoice) choices.get(new String("scaler"));
         addDataChoice(udc);
         addDataChoice(vdc);
-        addDataChoice(wdc);
+        if (wdc != null) {
+            addDataChoice(wdc);
+        }
 
 
-        u  = (FieldImpl) udc.getData(null);
-        v  = (FieldImpl) vdc.getData(null);
-        pw = (FieldImpl) wdc.getData(null);
-        if(sdc == null)
+        u = (FieldImpl) udc.getData(null);
+        v = (FieldImpl) vdc.getData(null);
+        if (wdc != null) {
+            pw = (FieldImpl) wdc.getData(null);
+        }
+        if (sdc == null) {
             return false;
-        s  = (FieldImpl) sdc.getData(null);
+        }
+        s = (FieldImpl) sdc.getData(null);
         doMakeDataInstance(sdc);
 
 
@@ -746,7 +729,11 @@ public class GridTrajectoryControl extends DrawingControl {
                 if (cmd.equals(CMD_createTrj)) {
                     try {
                         createTrjBtnClicked = true;
-                        createTrajectoryControl();
+                        if ( !is2D) {
+                            createTrajectoryControl();
+                        } else {
+                            create2DTrajectoryControl();
+                        }
                         gridTrackControl.setLineWidth(trackLineWidth);
                     } catch (VisADException ee) {}
                     catch (RemoteException er) {}
@@ -787,7 +774,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 // setCurrentCommand(getCurrentCmd());
                 createTrjBtn.doClick();
                 gridTrackControl.setLineWidth(getTrackLineWidth());
-               // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
+                // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
                 gridTrackControl.getDataTimeRange(true).getTimeModeLabel();
             }
         }
@@ -1087,7 +1074,113 @@ public class GridTrajectoryControl extends DrawingControl {
 
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    void create2DTrajectoryControl()
+            throws VisADException, RemoteException, Exception {
 
+        Unit dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
+        gridTrackControl.setDisplayUnit(dUnit);
+
+
+        final Set timeSet  = s.getDomainSet();
+        int       numTimes = timeSet.getLength();
+        Unit      timeUnit = timeSet.getSetUnits()[0];
+        final Unit paramUnit =
+            ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
+        FunctionType rt =
+            (FunctionType) ((FlatField) s.getSample(0)).getType();
+        final String paramName =
+            rt.getFlatRange().getRealComponents()[0].getName();
+
+        double[]   timeVals     = timeSet.getDoubles()[0];
+
+        SampledSet domain0      = GridUtil.getSpatialDomain(s);
+        SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
+        double[]   ttts         = timeSet.getDoubles()[0];
+        boolean    normalizeLon = true;
+
+        boolean    isLatLon     = GridUtil.isLatLonOrder(domain0);
+        int        latIndex     = isLatLon
+                                  ? 0
+                                  : 1;
+        int        lonIndex     = isLatLon
+                                  ? 1
+                                  : 0;
+        float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
+                                domain2D);
+        int  numPoints = geoVals[0].length;
+        Real clevel    = null;
+        if (currentLevel instanceof Real) {
+            clevel = ((Real) currentLevel);
+        } else if (currentLevel instanceof TwoFacedObject) {
+            clevel = (Real) ((TwoFacedObject) currentLevel).getId();
+
+        }
+        FieldImpl u1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(u,
+                           clevel));
+        FieldImpl v1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(v,
+                           clevel));
+        FieldImpl s1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(s,
+                           clevel));
+        //first step  init  u,v, w, and s at all initial points
+        List<DerivedGridFactory.TrajInfo> tj =
+            DerivedGridFactory.calculateTrackPoints(u1, v1, null, s1, ttts,
+                geoVals, numPoints, numTimes, latIndex, lonIndex, true,
+                normalizeLon);
+
+        int numParcels = numPoints;  //10;
+        final FunctionType ft = new FunctionType(
+                                    RealType.Generic,
+                                    new FunctionType(
+                                        RealTupleType.SpatialEarth3DTuple,
+                                        RealType.getRealType(paramName)));
+
+        List tracks;
+
+        tracks = DerivedGridFactory.createTracks(paramName, tj, timeSet, ft,
+                paramUnit, numParcels);
+        FlatField mergedTracks = DerivedGridFactory.mergeTracks(tracks);
+
+        FunctionType fiType = new FunctionType(RealType.Time,
+                                  mergedTracks.getType());
+
+        DateTime endTime = new DateTime(timeVals[numTimes - 1], timeUnit);
+
+        FieldImpl fi =
+            new FieldImpl(fiType,
+                          new SingletonSet(new RealTuple(new Real[] {
+                              endTime })));
+        fi.setSample(0, mergedTracks, false);
+
+        //super.init(fi)
+
+        // gridTrackControl.setLineWidth(gridTrackControl.getTrackWidth());
+        // gridTrackControl.setDataTimeRange(gridTrackControl.getDataTimeRange());
+        gridTrackControl.setData(fi);
+        Range range = gridTrackControl.getGridDataInstance().getRange(
+                          gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
+        gridTrackControl.setRange(range);
+        Set[]         rset = mergedTracks.getRangeSets();
+        DoubleSet     ds   = (DoubleSet) rset[0];
+
+        SetType       st   = (SetType) ds.getType();
+        RealTupleType rtt  = st.getDomain();
+
+        RealType      rt0  = (RealType) rtt.getRealComponents()[0];
+        super.setDataInstance(getDataInstance());
+        gridTrackControl.selectRangeDisplay.setSelectRealType(rt0);
+        //super.initializationDone = true;
+        super.paramName = paramName;
+        controlPane.setVisible(true);
+        controlPane.add(gridTrackControl.doMakeContents());
+
+    }
 
 
 
@@ -1149,7 +1242,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 float[][] lls = glyph.getLatLons();
                 float[][] tmp = glyph.getLatLons();
                 if (du[lonIndex].isConvertible(CommonUnit.radian)) {
-                    lls[1] = ucar.visad.GeoUtils.normalizeLongitude( lls[1]);
+                    lls[1] = ucar.visad.GeoUtils.normalizeLongitude(lls[1]);
 
                 } else if (du[lonIndex].isConvertible(
                         CommonUnits.KILOMETER)) {
@@ -1365,6 +1458,17 @@ public class GridTrajectoryControl extends DrawingControl {
     private void setCursor(Cursor c) {
         getViewManager().setCursorInDisplay(c);
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getCoordType() {
+        return DrawingGlyph.COORD_XY;
+    }
+
+
     /*
    public void setGridTrackControl(MyTrackControl mtc) {
        gridTrackControl = mtc;
@@ -1407,9 +1511,8 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param command _more_
      */
     public void setCurrentCmd(String command) {
-        if (command.contains(
-                GlyphCreatorCommand.CMD_SMOOTHPOLYGON.getLabel())) {
-            currentCmd = GlyphCreatorCommand.CMD_SMOOTHPOLYGON;
+        if (command.contains(GlyphCreatorCommand.CMD_RECTANGLE.getLabel())) {
+            currentCmd = GlyphCreatorCommand.CMD_RECTANGLE;
         } else if (command.contains(
                 GlyphCreatorCommand.CMD_SYMBOL.getLabel())) {
             currentCmd = GlyphCreatorCommand.CMD_SYMBOL;
