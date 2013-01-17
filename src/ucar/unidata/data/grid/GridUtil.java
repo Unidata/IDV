@@ -439,8 +439,8 @@ public class GridUtil {
             throw new VisADException("new domain is not the right length");
         }
 
-        TupleType    paramType = getParamType(grid);
-        FunctionType rangeFT   =
+        TupleType paramType = getParamType(grid);
+        FunctionType rangeFT =
             new FunctionType(((SetType) newDomain.getType()).getDomain(),
                              paramType);
 
@@ -453,8 +453,8 @@ public class GridUtil {
 
             try {
 
-                Set      sequenceSet  = Util.getDomainSet(grid);
-                int      numSteps     = sequenceSet.getLength();
+                Set sequenceSet = Util.getDomainSet(grid);
+                int numSteps    = sequenceSet.getLength();
                 MathType sequenceType =
                     ((SetType) sequenceSet.getType()).getDomain();
 
@@ -470,7 +470,7 @@ public class GridUtil {
 
                 } else {
 
-                    hasInnerSteps  = true;
+                    hasInnerSteps = true;
                     innerFieldType = new FunctionType(
                         ((FunctionType) firstSample.getType()).getDomain(),
                         rangeFT);
@@ -1255,10 +1255,11 @@ public class GridUtil {
             int         numSteps = 1 + (xSet.getLength() - 1) / skipx;
             Linear1DSet newX     = (skipx == 1)
                                    ? xSet
-                                   : new Linear1DSet(xSet.getType(), xSet
-                                       .getFirst(), xSet.getFirst()
-                                           + (numSteps - 1) * xSet.getStep()
-                                             * skipx, numSteps);
+                                   : new Linear1DSet(xSet.getType(),
+                                       xSet.getFirst(),
+                                       xSet.getFirst()
+                                       + (numSteps - 1) * xSet.getStep()
+                                         * skipx, numSteps);
             numSteps = 1 + (ySet.getLength() - 1) / skipy;
             Linear1DSet newY = (skipy == 1)
                                ? ySet
@@ -1298,12 +1299,12 @@ public class GridUtil {
                                           domainSet.getSetUnits(),
                                           domainSet.getSetErrors());
                 } else {  // single level 3D grid
-                    float[][] samples    = domainSet.getSamples(false);
-                    int       sizeX      = domainSet.getLength(0);
-                    int       sizeY      = domainSet.getLength(1);
-                    int       sizeZ      = 1;
-                    int       newSizeX   = 1 + (sizeX - 1) / skipx;
-                    int       newSizeY   = 1 + (sizeY - 1) / skipy;
+                    float[][] samples  = domainSet.getSamples(false);
+                    int       sizeX    = domainSet.getLength(0);
+                    int       sizeY    = domainSet.getLength(1);
+                    int       sizeZ    = 1;
+                    int       newSizeX = 1 + (sizeX - 1) / skipx;
+                    int       newSizeY = 1 + (sizeY - 1) / skipy;
 
                     float[][] subSamples =
                         new float[domainSet.getDimension()][newSizeX * newSizeY * sizeZ];
@@ -1331,15 +1332,15 @@ public class GridUtil {
             }
 
         } else {  // GriddedSet
-            float[][] samples    = domainSet.getSamples(false);
-            int       sizeX      = domainSet.getLength(0);
-            int       sizeY      = domainSet.getLength(1);
-            int       sizeZ      = (domainSet.getManifoldDimension() == 3)
-                                   ? domainSet.getLength(2)
-                                   : 1;
-            int       newSizeX   = 1 + (sizeX - 1) / skipx;
-            int       newSizeY   = 1 + (sizeY - 1) / skipy;
-            int       newSizeZ   = 1 + (sizeZ - 1) / skipz;
+            float[][] samples  = domainSet.getSamples(false);
+            int       sizeX    = domainSet.getLength(0);
+            int       sizeY    = domainSet.getLength(1);
+            int       sizeZ    = (domainSet.getManifoldDimension() == 3)
+                                 ? domainSet.getLength(2)
+                                 : 1;
+            int       newSizeX = 1 + (sizeX - 1) / skipx;
+            int       newSizeY = 1 + (sizeY - 1) / skipy;
+            int       newSizeZ = 1 + (sizeZ - 1) / skipz;
 
             float[][] subSamples =
                 new float[domainSet.getDimension()][newSizeX * newSizeY * newSizeZ];
@@ -1789,7 +1790,7 @@ public class GridUtil {
             return (Gridded2DSet) domainSet;
         }
         Gridded2DSet  newDomainSet = null;
-        RealTupleType domainType   =
+        RealTupleType domainType =
             ((SetType) domainSet.getType()).getDomain();
         RealTupleType    newType = null;
         CoordinateSystem cs      = domainSet.getCoordinateSystem();
@@ -1799,7 +1800,7 @@ public class GridUtil {
                 domainSet =
                     ((EmpiricalCoordinateSystem) cs).getReferenceSet();
                 domainType = ((SetType) domainSet.getType()).getDomain();
-                newType    =
+                newType =
                     new RealTupleType((RealType) domainType.getComponent(0),
                                       (RealType) domainType.getComponent(1));
             } else {
@@ -2343,8 +2344,8 @@ public class GridUtil {
         if (spatialSet.getManifoldDimension() != 3) {
             throw new IllegalArgumentException("Grid must be 3D");
         }
-        RealTuple point     = null;
-        Real      longitude = normalizeLongitude(spatialSet,
+        RealTuple point = null;
+        Real longitude = normalizeLongitude(spatialSet,
                                             location.getLongitude());
         try {
             if (isLatLonOrder(grid)) {
@@ -2810,7 +2811,7 @@ public class GridUtil {
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         FieldImpl indexField = (FieldImpl) grid.getSample(i,
                                                    false);
-                        Set       indexSet = Util.getDomainSet(indexField);
+                        Set indexSet = Util.getDomainSet(indexField);
                         FieldImpl newIndexField = new FieldImpl(indexRange,
                                                       indexSet);
                         for (int j = 0; j < indexSet.getLength(); j++) {
@@ -3052,7 +3053,7 @@ public class GridUtil {
                     for (int i = 0; i < timeDomain.getLength(); i++) {
                         FieldImpl indexField = (FieldImpl) grid.getSample(i,
                                                    false);
-                        Set       indexSet = Util.getDomainSet(indexField);
+                        Set indexSet = Util.getDomainSet(indexField);
                         FieldImpl newIndexField = new FieldImpl(indexRange,
                                                       indexSet);
                         for (int j = 0; j < indexSet.getLength(); j++) {
@@ -3273,7 +3274,7 @@ public class GridUtil {
 
 
         // check the level type against the domain type and reference
-        RealType      type        = (RealType) level.getType();  // level type
+        RealType type = (RealType) level.getType();  // level type
 
         RealTupleType spatialType =
             ((SetType) spatialSet.getType()).getDomain();
@@ -3291,10 +3292,10 @@ public class GridUtil {
             level = new Real(zType, level.getValue(), zUnit);
         }
 
-        RealType zRefType  = (spatialReferenceType != null)
-                             ? (RealType) spatialReferenceType.getComponent(2)
-                             : null;  // ref Z
-        boolean  isRefType = !type.equals(zType)
+        RealType zRefType = (spatialReferenceType != null)
+                            ? (RealType) spatialReferenceType.getComponent(2)
+                            : null;  // ref Z
+        boolean isRefType = !type.equals(zType)
                             && type.equalsExceptNameButUnits(zRefType);
 
 
@@ -3513,8 +3514,8 @@ public class GridUtil {
 
         if ( !isLatLonDomain) {  // convert to native
             CoordinateSystem cs = spatialSet.getCoordinateSystem();
-            endpoints       = cs.fromReference(endpoints);
-            refUnits        = cs.getReferenceUnits();
+            endpoints = cs.fromReference(endpoints);
+            refUnits  = cs.getReferenceUnits();
             compatibleUnits = Unit.canConvertArray(new Unit[] {
                 setUnits[latIndex],
                 setUnits[lonIndex] }, new Unit[] { refUnits[latIndex],
@@ -3766,7 +3767,7 @@ public class GridUtil {
         try {
             if ( !isSequence(grid)) {
                 Data value = grid.evaluate(point, samplingMode, errorMode);
-                RealType     index = RealType.getRealType("index");
+                RealType index = RealType.getRealType("index");
                 SingletonSet ss = new SingletonSet(new RealTuple(new Real[] {
                                       new Real(index, 0) }));
                 sampledFI = new FieldImpl(new FunctionType(index,
@@ -3849,7 +3850,7 @@ public class GridUtil {
      * @throws VisADException   problem accessing set
      */
     public static double normalizeLongitude(SampledSet domain, double lon,
-                                             Unit lonUnit)
+                                            Unit lonUnit)
             throws VisADException {
         int lonindex = isLatLonOrder(domain)
                        ? 1
@@ -4121,7 +4122,7 @@ public class GridUtil {
                                          SampledSet subDomain,
                                          int samplingMode, int errorMode)
             throws VisADException {
-        long      t1     = System.currentTimeMillis();
+        long t1 = System.currentTimeMillis();
         FieldImpl result = resampleGridInner(grid, subDomain, samplingMode,
                                              errorMode);
         long t2 = System.currentTimeMillis();
@@ -4390,8 +4391,8 @@ public class GridUtil {
                                           float[][] values, int skipx,
                                           int skipy)
             throws VisADException {
-        int       sizeX      = ((GriddedSet) domainSet).getLength(0);
-        int       sizeY      = ((GriddedSet) domainSet).getLength(1);
+        int sizeX = ((GriddedSet) domainSet).getLength(0);
+        int sizeY = ((GriddedSet) domainSet).getLength(1);
         float[][] subSamples =
             new float[values.length][(1 + (sizeX - 1) / skipx) * (1 + (sizeY - 1) / skipy)];
         for (int m = 0; m < values.length; m++) {
@@ -4901,7 +4902,7 @@ public class GridUtil {
                 double[][]   times        = timeSet.getDoubles(false);
                 Unit         timeUnit     = timeSet.getSetUnits()[0];
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    DateTime  dt = new DateTime(times[0][i], timeUnit);
+                    DateTime dt = new DateTime(times[0][i], timeUnit);
                     FieldImpl ff =
                         makePointObs((FlatField) grid.getSample(i), dt);
                     if (ff == null) {
@@ -4939,11 +4940,11 @@ public class GridUtil {
         if (timeStep == null) {
             return null;
         }
-        SampledSet   domain    = getSpatialDomain(timeStep);
-        int          numPoints = domain.getLength();
+        SampledSet domain    = getSpatialDomain(timeStep);
+        int        numPoints = domain.getLength();
         Integer1DSet points = new Integer1DSet(RealType.getRealType("index"),
                                   numPoints);
-        TupleType tt        = getParamType(timeStep);
+        TupleType tt = getParamType(timeStep);
         TupleType rangeType = new TupleType(new MathType[] {
                                   RealTupleType.LatitudeLongitudeAltitude,
                                   RealType.Time, tt });
@@ -4998,7 +4999,7 @@ public class GridUtil {
         }
         RealTupleType refType  = cs.getReference();
         Unit[]        refUnits = cs.getReferenceUnits();
-        float[][]     points   = CoordinateSystem.transformCoordinates(refType,
+        float[][] points = CoordinateSystem.transformCoordinates(refType,
                                null, refUnits, null,
                                ((SetType) domain.getType()).getDomain(), cs,
                                domain.getSetUnits(), domain.getSetErrors(),
@@ -5453,7 +5454,7 @@ public class GridUtil {
         }
 
         //normalize lon
-        values[1]  =   ucar.visad.GeoUtils.normalizeLongitude(values[1]);
+        values[1] = ucar.visad.GeoUtils.normalizeLongitude(values[1]);
 
         return values;
     }
@@ -5523,7 +5524,7 @@ public class GridUtil {
             HSSFRow         row;
             int             sheetIdx = -1;
             List<HSSFSheet> sheets   = new ArrayList<HSSFSheet>();
-            OutputStream    fileOut  =
+            OutputStream fileOut =
                 new BufferedOutputStream(new FileOutputStream(filename),
                                          1000000);
 
@@ -5701,7 +5702,7 @@ public class GridUtil {
                 ncfile.addVariable(null, timeVar);
             }
             GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
-            CoordinateSystem         cs      = domainSet.getCoordinateSystem();
+            CoordinateSystem cs = domainSet.getCoordinateSystem();
             boolean haveEmpirical = cs instanceof EmpiricalCoordinateSystem;
             HashMap<Variable, Array> varData = addSpatialVars(ncfile,
                                                    domainSet, dims);
@@ -5723,7 +5724,8 @@ public class GridUtil {
             RealType[] rTypes = tType.getRealComponents();
             for (int i = 0; i < rTypes.length; i++) {
                 RealType rt = rTypes[i];
-                Variable v  = new Variable(ncfile, null, null, getVarName(rt));
+                Variable v  = new Variable(ncfile, null, null,
+                                           getVarName(rt));
                 Unit     u  = rt.getDefaultUnit();
                 if (u != null) {
                     v.addAttribute(new Attribute("units",
@@ -5751,7 +5753,7 @@ public class GridUtil {
             if (isTimeSequence) {
                 Variable   timeVar  = ncfile.findVariable("time");
                 double[][] timeVals = timeSet.getDoubles(false);
-                Array      varArray = Array.factory(DataType.DOUBLE,
+                Array varArray = Array.factory(DataType.DOUBLE,
                                      new int[] { numTimes }, timeVals[0]);
                 ncfile.write(timeVar.getName(), varArray);
             }
@@ -5831,7 +5833,8 @@ public class GridUtil {
 
         HashMap<Variable, Array> varToArray = new HashMap<Variable, Array>();
         int                      dim        = domainSet.getDimension();
-        int                      mdim       = domainSet.getManifoldDimension();
+        int                      mdim       =
+            domainSet.getManifoldDimension();
 
         CoordinateSystem         cs         = domainSet.getCoordinateSystem();
         boolean haveEmpirical = cs instanceof EmpiricalCoordinateSystem;
@@ -5903,8 +5906,8 @@ public class GridUtil {
             // make variable for the projection
             Variable projVar = makeProjectionVar(ncfile, mp);
             if (projVar != null) {
-                char[] data      = new char[] { 'd' };
-                Array  dataArray = Array.factory(DataType.CHAR, new int[0],
+                char[] data = new char[] { 'd' };
+                Array dataArray = Array.factory(DataType.CHAR, new int[0],
                                       data);
                 varToArray.put(projVar, dataArray);
             }
@@ -5975,9 +5978,9 @@ public class GridUtil {
             ncfile.addVariable(null, zVar);
 
             if (haveEmpirical) {
-                String   dimString = zName + " yc xc";
-                String   altName   = "height";
-                Variable altVar    = new Variable(ncfile, null, null, altName,
+                String dimString = zName + " yc xc";
+                String altName   = "height";
+                Variable altVar = new Variable(ncfile, null, null, altName,
                                       DataType.FLOAT, dimString);
                 EmpiricalCoordinateSystem ecs =
                     (EmpiricalCoordinateSystem) cs;
@@ -6241,7 +6244,8 @@ public class GridUtil {
         }
         float[][]        setVals   = domainSet.getSamples(true);
         float[][]        refVals   = null;
-        RealTupleType    setType = ((SetType) domainSet.getType()).getDomain();
+        RealTupleType    setType =
+            ((SetType) domainSet.getType()).getDomain();
         CoordinateSystem cs        = domainSet.getCoordinateSystem();
         RealTupleType    refType   = (cs != null)
                                      ? cs.getReference()
@@ -6308,10 +6312,10 @@ public class GridUtil {
             new EmpiricalCoordinateSystem(domainSet, newDomain);
 
 
-        CoordinateSystem gcs        = ecs;
+        CoordinateSystem gcs = ecs;
 
 
-        RealTupleType    newSetType =
+        RealTupleType newSetType =
             new RealTupleType(setType.getRealComponents(), gcs, null);
 
         Trace.call1("GeoGridAdapter final GriddedSet");
@@ -7229,8 +7233,8 @@ public class GridUtil {
                     is = jw;
                 }
                 for (iw = is; iw <= nr + 1; iw++) {
-                    x                 = iw - 1;
-                    y                 = jw - 1;
+                    x = iw - 1;
+                    y = jw - 1;
                     w[iw - 1][jw - 1] = (float) (aa
                             * Math.exp(-(x * x + y * y) / sig2));
                     w[jw - 1][iw - 1] = w[iw - 1][jw - 1];
@@ -7439,7 +7443,7 @@ public class GridUtil {
                                 psindex = ireg * njx + jreg;
                                 if ( !Float.isNaN(pslab[psindex])) {
                                     totwt = totwt + fprint[jfp][ifp];
-                                    tot   = tot
+                                    tot = tot
                                           + fprint[jfp][ifp] * pslab[psindex];
                                 }
                             }
@@ -7507,7 +7511,7 @@ public class GridUtil {
         float rint = 0.f;
         float u;
         for (int i = 0; i < 1000; i++) {
-            u    = i * .001f - .0005f;
+            u = i * .001f - .0005f;
             rint = rint
                    + (float) (Math.sqrt(1. - u * u) * Math.cos(x * u) * .001);
         }
@@ -7846,7 +7850,7 @@ public class GridUtil {
         if ((domainSet instanceof LinearSet) && false) {
             //TODO: figure out LinearSet
         } else {  // griddedNDSet
-            float[][] samples    = domainSet.getSamples(false);
+            float[][] samples = domainSet.getSamples(false);
             float[][] newSamples =
                 new float[samples.length][samples[0].length];
             for (int k = 0; k < sizeZ; k++) {
