@@ -2068,7 +2068,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 sideText.append("<br>");
             }
             if (i < 8) {
-                sideText.append(dataInstance.getDataChoice().getName());
+                //sideText.append(dataInstance.getDataChoice().getName());
+                sideText.append(getFieldName(i));
                 String levString = null;
                 if (haveLevelsAtRow(i)) {
                     Real level = info.getLevel();
