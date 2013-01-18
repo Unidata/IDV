@@ -30,14 +30,17 @@ import visad.CommonUnit;
 import visad.CoordinateSystem;
 import visad.DateTime;
 import visad.ErrorEstimate;
-import visad.Gridded1DSet;
 import visad.RealType;
+import visad.SampledSet;
+import visad.Set;
 import visad.Unit;
 import visad.VisADException;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 
@@ -235,17 +238,21 @@ public class CalendarDateTime extends visad.DateTime {
     }
 
     /**
-     * Create an array of DateTimes from a Gridded1DSet of times.
+     * Get the list of DateTime objects from the domain of the given grid
      *
-     * @param  timeSet   Gridded1DSet of times
+     * @param timeSet  time set to check
      *
-     * @return an array of CalendarDateTime's
+     * @return list of times or null if no times.
      *
-     * @throws VisADException  invalid time set or couldn't create DateTimes
+     * @throws VisADException   problem determining this
      */
-    public static CalendarDateTime[] timeSetToArray(Gridded1DSet timeSet)
+    public static List<DateTime> getDateTimeList(Set timeSet)
             throws VisADException {
-        Calendar cal = null;
+        if ( !(timeSet instanceof SampledSet)) {
+            throw new VisADException("timeSet is not a SampledSet");
+        }
+        List<DateTime> timeList = new ArrayList<DateTime>();
+        Calendar       cal      = null;
         if (timeSet instanceof CalendarDateTimeSet) {
             cal = ((CalendarDateTimeSet) timeSet).getCalendar();
         }
@@ -259,12 +266,34 @@ public class CalendarDateTime extends visad.DateTime {
                 timeSet.getDoubles(), new Unit[] { unit },
                 new Unit[] { CommonUnit.secondsSinceTheEpoch }, false);
         } else {
-            values = timeSet.getDoubles();
+            values = timeSet.getDoubles(false);
         }
-        CalendarDateTime[] times = new CalendarDateTime[timeSet.getLength()];
 
         for (int i = 0; i < timeSet.getLength(); i++) {
-            times[i] = new CalendarDateTime(values[0][i], cal);
+            timeList.add(new CalendarDateTime(values[0][i], cal));
+        }
+        return timeList;
+    }
+
+    /**
+     * Create an array of DateTimes from a Gridded1DSet of times.
+     *
+     * @param  timeSet   Gridded1DSet of times
+     *
+     * @return an array of CalendarDateTime's
+     *
+     * @throws VisADException  invalid time set or couldn't create DateTimes
+     */
+    public static CalendarDateTime[] timeSetToArray(Set timeSet)
+            throws VisADException {
+        List<DateTime> timeList = getDateTimeList(timeSet);
+        if (timeList.isEmpty()) {
+            return null;
+        }
+        CalendarDateTime[] times = new CalendarDateTime[timeList.size()];
+
+        for (int i = 0; i < timeList.size(); i++) {
+            times[i] = (CalendarDateTime) timeList.get(i);
         }
         return times;
     }

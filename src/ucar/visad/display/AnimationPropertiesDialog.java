@@ -21,6 +21,8 @@
 package ucar.visad.display;
 
 
+import ucar.nc2.time.Calendar;
+
 import ucar.unidata.ui.DateTimePicker;
 import ucar.unidata.ui.TimeLengthField;
 import ucar.unidata.ui.Timeline;
@@ -29,6 +31,8 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
+
+import ucar.visad.data.CalendarDateTime;
 
 import visad.CommonUnit;
 import visad.DateTime;
@@ -380,25 +384,30 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
                 return;
             }
             updateTimeline();
-            DateTime[] timesArray  = getAnimationTimes();
+            DateTime[] timesArray = getAnimationTimes();
+            Calendar   cal        = null;
+            if (timesArray[0] instanceof CalendarDateTime) {
+                cal = ((CalendarDateTime) timesArray[0]).getCalendar();
+            }
 
-            double     startOffset = startOffsetField.getTime() * 60;
-            double     endOffset   = endOffsetField.getTime() * 60;
-            DateTime   min         = null;
-            DateTime   max         = null;
+            double   startOffset = startOffsetField.getTime() * 60;
+            double   endOffset   = endOffsetField.getTime() * 60;
+            DateTime min         = null;
+            DateTime max         = null;
             if (timesArray.length > 0) {
                 min = timesArray[0];
                 max = timesArray[timesArray.length - 1];
                 double minSeconds =
                     min.getValue(CommonUnit.secondsSinceTheEpoch);
-                min = new DateTime(
+                min = new CalendarDateTime(
                     AnimationSetInfo.roundTo(
-                        roundToField.getTime(), minSeconds) + startOffset);
+                        roundToField.getTime(),
+                        minSeconds) + startOffset, cal);
                 double maxSeconds =
                     max.getValue(CommonUnit.secondsSinceTheEpoch);
-                max = new DateTime(
+                max = new CalendarDateTime(
                     AnimationSetInfo.roundTo(
-                        roundToField.getTime(), maxSeconds) + endOffset);
+                        roundToField.getTime(), maxSeconds) + endOffset, cal);
             }
 
 
