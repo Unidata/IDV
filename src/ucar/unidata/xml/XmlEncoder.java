@@ -1632,7 +1632,7 @@ public class XmlEncoder extends XmlUtil {
         ArrayList v       = new ArrayList();
         for (int i = 0; i < methods.length; i++) {
             Method propMethod = methods[i];
-            String name   = propMethod.getName();
+            String name       = propMethod.getName();
             if ( !name.startsWith("get") && !name.startsWith("is")) {
                 continue;
             }
@@ -2651,8 +2651,8 @@ public class XmlEncoder extends XmlUtil {
                             valueElement));
                 }
             } catch (Exception exc) {
-                logException("Error evaluating method: " + propMethod.getName()
-                             + "\n", exc);
+                logException("Error evaluating method: "
+                             + propMethod.getName() + "\n", exc);
 
             }
         }
