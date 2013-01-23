@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="ncIdv">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../lib/ncIdv.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
