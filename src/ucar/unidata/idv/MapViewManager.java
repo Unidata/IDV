@@ -101,9 +101,8 @@ import java.awt.geom.Rectangle2D;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
+import java.text.Collator;
+import java.util.*;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -1365,18 +1364,20 @@ public class MapViewManager extends NavigatedViewManager {
         final Hashtable<String, Object> projMap = new Hashtable<String,
                                                       Object>();
 
+        Collection<String> projNames =
+                new TreeSet<String>(Collator.getInstance());
+
         for (int p = 0; p < projections.size(); p++) {
             String projName = ((ProjectionImpl) projections.get(p)).getName();
             projMap.put(projName, projections.get(p));
+            projNames.add(projName);
         }
 
-        //GuiUtils.setListData(projBox, projections.toArray());
-        List<String> projNames = new ArrayList<String>(projMap.keySet());
-        GuiUtils.setListData(projBox, projNames);
+        GuiUtils.setListData(projBox, projNames.toArray());
         Object defaultProj = getDefaultProjection();
         if (defaultProj != null) {
-            if (defaultProj instanceof String) {
-                projBox.setSelectedItem(projMap.get(defaultProj));
+            if (defaultProj instanceof ProjectionImpl) {
+                projBox.setSelectedItem(((ProjectionImpl) defaultProj).getName());
             } else {
                 projBox.setSelectedItem(defaultProj);
             }
