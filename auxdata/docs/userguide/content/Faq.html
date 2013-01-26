@@ -548,6 +548,19 @@ for  starting the IDV, add in the <b>-Dj3d.rend=d3d</b> option
 to your start line (before -jar or class name).  
 </faqitem>
 
+<faqitem q="On windows, it appears as though the IDV 
+starts up correctly but the Map View is blank (black) and I get this error: 
+Java3d  Warning: Fail to lock Vertex Buffer - D3DERR_DRIVERINTERNALERROR." 
+id="d3dvertex">
+First, you will need to switch the Java3D backend from OpenGL to 
+<a class="faq-question-link" href="#d3d">Direct-X</a>.  If you are using 
+runIDV.bat to start the IDV, edit that file, uncomment the appropriate line 
+for Direct-X and add the <b>-Dj3d.d3dVertexProcess=software</b> after the 
+ <b>-Dj3d.rend=d3d</b> option. If you have your own script for starting the 
+ IDV, add in the <b>-Dj3d.rend=d3d -Dj3d.d3dVertexProcess=software</b> options 
+to your start line (before -jar or class name).  
+</faqitem>
+
 <faqitem q="Does the IDV support 3D Stereo?" id="stereo">
 
 The Java 3D library which the IDV uses supports stereo on properly

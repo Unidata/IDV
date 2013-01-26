@@ -21,22 +21,29 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.beans.*;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.visad.data.CalendarDateTime;
-import ucar.visad.display.AnimationInfo;
 
+import visad.AnimationControl;
+import visad.ControlEvent;
+import visad.ControlListener;
+import visad.DateTime;
+import visad.Display;
+import visad.DisplayImpl;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.Set;
+import visad.VisADException;
 
-
-import visad.*;
-
-import visad.util.DataUtility;
 
 import java.rmi.RemoteException;
-
-import java.util.Arrays;
 
 
 /**
@@ -1116,16 +1123,8 @@ public class Animation extends Displayable {
             return new DateTime[] {};
         }
         try {
-            if (timeSet instanceof Gridded1DSet) {
-                return CalendarDateTime.timeSetToArray((Gridded1DSet) timeSet);
-            } else if (timeSet instanceof SingletonSet) {
-                return new DateTime[] { new DateTime(
-                    (Real) ((SingletonSet) timeSet).getData().getComponent(
-                        0)) };
-            }
+            return CalendarDateTime.timeSetToArray(timeSet);
         } catch (VisADException excp) {
-            ;
-        } catch (RemoteException re) {
             ;
         }
         return new DateTime[] {};

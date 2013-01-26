@@ -35,6 +35,7 @@ import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 import ucar.nc2.constants.CF;
 import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
+import ucar.nc2.time.Calendar;
 
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.point.PointObTuple;
@@ -51,8 +52,11 @@ import ucar.unidata.util.Parameter;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
+import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
+import ucar.visad.data.CalendarDateTimeSet;
 import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 
@@ -700,7 +704,7 @@ public class GridUtil {
      *
      * @param grid  grid to check
      *
-     * @return list of times or null if no times.
+     * @return list of times or null list if no times.
      *
      * @throws VisADException   problem determining this
      */
@@ -710,6 +714,8 @@ public class GridUtil {
         if (timeSet == null) {
             return null;
         }
+        return CalendarDateTime.getDateTimeList(timeSet);
+        /*
         double[][]     times    = timeSet.getDoubles(false);
         Unit           timeUnit = timeSet.getSetUnits()[0];
         List<DateTime> result   = new ArrayList<DateTime>();
@@ -717,6 +723,7 @@ public class GridUtil {
             result.add(new DateTime(times[0][i], timeUnit));
         }
         return result;
+        */
     }
 
 
@@ -4901,8 +4908,18 @@ public class GridUtil {
                 FunctionType retFieldType = null;
                 double[][]   times        = timeSet.getDoubles(false);
                 Unit         timeUnit     = timeSet.getSetUnits()[0];
+                if ( !timeUnit.equals(CommonUnit.secondsSinceTheEpoch)) {
+                    Unit.convertTuple(
+                        times, timeSet.getSetUnits(),
+                        new Unit[] { CommonUnit.secondsSinceTheEpoch }, true);
+                }
+                Calendar cal = null;
+                if (timeSet instanceof CalendarDateTimeSet) {
+                    cal = ((CalendarDateTimeSet) timeSet).getCalendar();
+                }
                 for (int i = 0; i < timeSet.getLength(); i++) {
-                    DateTime dt = new DateTime(times[0][i], timeUnit);
+                    CalendarDateTime dt = new CalendarDateTime(times[0][i],
+                                              cal);
                     FieldImpl ff =
                         makePointObs((FlatField) grid.getSample(i), dt);
                     if (ff == null) {
@@ -5454,7 +5471,7 @@ public class GridUtil {
         }
 
         //normalize lon
-        values[1] = ucar.visad.GeoUtils.normalizeLongitude(values[1]);
+        values[1] = GeoUtils.normalizeLongitude(values[1]);
 
         return values;
     }
@@ -5539,6 +5556,7 @@ public class GridUtil {
             HSSFSheet       sheet = null;
 
             if (isTimeSequence(grid)) {
+                // TODO:  handle calendars
                 SampledSet timeSet    = (SampledSet) getTimeSet(grid);
                 double[][] timeValues = timeSet.getDoubles(false);
                 Unit       timeUnit   = timeSet.getSetUnits()[0];

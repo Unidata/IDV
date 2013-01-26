@@ -288,7 +288,7 @@ public class AnimationSetInfo {
         }
         while (startSeconds <= endSeconds) {
             //      System.err.print (" " + startSeconds);
-            dateTimes.add(0, new DateTime(startSeconds));
+            dateTimes.add(0, new CalendarDateTime(startSeconds, null));
             startSeconds += interval;
         }
         //      System.err.println ("");

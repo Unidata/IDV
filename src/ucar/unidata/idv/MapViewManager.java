@@ -101,9 +101,8 @@ import java.awt.geom.Rectangle2D;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
+import java.text.Collator;
+import java.util.*;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -1362,10 +1361,26 @@ public class MapViewManager extends NavigatedViewManager {
 
         List            projections = getProjectionList();
         final JComboBox projBox     = new JComboBox();
-        GuiUtils.setListData(projBox, projections.toArray());
+        final Hashtable<String, Object> projMap = new Hashtable<String,
+                                                      Object>();
+
+        Collection<String> projNames =
+                new TreeSet<String>(Collator.getInstance());
+
+        for (int p = 0; p < projections.size(); p++) {
+            String projName = ((ProjectionImpl) projections.get(p)).getName();
+            projMap.put(projName, projections.get(p));
+            projNames.add(projName);
+        }
+
+        GuiUtils.setListData(projBox, projNames.toArray());
         Object defaultProj = getDefaultProjection();
         if (defaultProj != null) {
-            projBox.setSelectedItem(defaultProj);
+            if (defaultProj instanceof ProjectionImpl) {
+                projBox.setSelectedItem(((ProjectionImpl) defaultProj).getName());
+            } else {
+                projBox.setSelectedItem(defaultProj);
+            }
         }
 
         final JCheckBox logoVizBox = new JCheckBox(
@@ -1438,7 +1453,12 @@ public class MapViewManager extends NavigatedViewManager {
             public void applyPreference(XmlObjectStore theStore,
                                         Object data) {
                 IdvPreferenceManager.applyWidgets((Hashtable) data, theStore);
-                theStore.put(PREF_PROJ_DFLT, projBox.getSelectedItem());
+                if (projBox.getSelectedItem() instanceof String) {
+                    theStore.put(PREF_PROJ_DFLT,
+                                 projMap.get(projBox.getSelectedItem()));
+                } else {
+                    theStore.put(PREF_PROJ_DFLT, projBox.getSelectedItem());
+                }
                 theStore.put(PREF_BGCOLOR, bgComps[0].getBackground());
                 theStore.put(PREF_GLOBEBACKGROUND,
                              globeComps[0].getBackground());
@@ -3750,11 +3770,11 @@ public class MapViewManager extends NavigatedViewManager {
      * @throws VisADException
      *             the VisAD exception
      * @deprecated
-    public void setLatAxisScaleInfo(AxisScaleInfo axisScaleInfo)
-            throws RemoteException, VisADException {
-
-        setLatAxisScaleInfo((LatLonAxisScaleInfo) axisScaleInfo);
-    }
+     * public void setLatAxisScaleInfo(AxisScaleInfo axisScaleInfo)
+     *       throws RemoteException, VisADException {
+     *
+     *   setLatAxisScaleInfo((LatLonAxisScaleInfo) axisScaleInfo);
+     * }
      */
 
     /**
@@ -3812,10 +3832,10 @@ public class MapViewManager extends NavigatedViewManager {
      * @throws VisADException
      *             the vis ad exception
      * @deprecated
-    public void setLonAxisScaleInfo(AxisScaleInfo axisScaleInfo)
-            throws RemoteException, VisADException {
-        setLonAxisScaleInfo((LatLonAxisScaleInfo) axisScaleInfo);
-    }
+     * public void setLonAxisScaleInfo(AxisScaleInfo axisScaleInfo)
+     *       throws RemoteException, VisADException {
+     *   setLonAxisScaleInfo((LatLonAxisScaleInfo) axisScaleInfo);
+     * }
      */
 
     /**
