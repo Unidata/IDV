@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2010 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -264,6 +264,7 @@ public class GuiUtils extends LayoutUtil {
         defaultTimeZone = tz;
     }
 
+    /** _more_ */
     public static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
 
@@ -1504,7 +1505,22 @@ public class GuiUtils extends LayoutUtil {
         return bg;
     }
 
-
+    /**
+     * Create a button group and add the three buttons to it.
+     *
+     * @param b1 Button 1
+     * @param b2 Button 2
+     * @param b3 Button 3
+     * @param b4 Button 3
+     * @return The created button group.
+     */
+    public static ButtonGroup buttonGroup(JToggleButton b1, JToggleButton b2,
+                                          JToggleButton b3,
+                                          JToggleButton b4) {
+        ButtonGroup bg = buttonGroup(b1, b2, b3);
+        bg.add(b4);
+        return bg;
+    }
 
     /**
      * This makes a component that contains a jlabel.  The jlabel is inset with some padding at the top and the outer component is aligned to the top. It is intended to be used when doing a form layout and the
@@ -2283,7 +2299,7 @@ public class GuiUtils extends LayoutUtil {
         JDialog              dialog   = createDialog(f, title, true);
         final ObjectListener listener = getCloseDialogListener(dialog);
         JPanel buttons = makeButtons(listener, buttonLabels, buttonLabels);
-        packDialog(dialog, centerBottom(contents, inset(buttons,5)));
+        packDialog(dialog, centerBottom(contents, inset(buttons, 5)));
         if (src != null) {
             dialog.setLocation(getLocation(src));
         } else {
@@ -6788,7 +6804,7 @@ public class GuiUtils extends LayoutUtil {
      * @return _more_
      */
     public static boolean isControlKey(InputEvent event) {
-        if (!isMac()) {
+        if ( !isMac()) {
             return event.isControlDown();
         }
         //Don't do this for now
@@ -6797,8 +6813,18 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param event _more_
+     * @param keyCode _more_
+     *
+     * @return _more_
+     */
     public static boolean isControlKey(KeyEvent event, int keyCode) {
-        if(!isControlKey(event)) return false;
+        if ( !isControlKey(event)) {
+            return false;
+        }
         return event.getKeyCode() == keyCode;
     }
 
