@@ -74,6 +74,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.Action;
 
 
 
@@ -148,11 +149,25 @@ public class GridTrajectoryControl extends DrawingControl {
     /** streamlines button */
     private JRadioButton pointsBtn;
 
+    /** streamlines button */
+    private JRadioButton hiddenBtn;
+
     /** vector/barb button */
     private JRadioButton rectangleBtn;
 
+    /** streamlines button */
+    private JRadioButton closePolygonBtn;
+
     /** flag for streamlines */
     boolean isPoints = true;
+
+    /** flag for streamlines */
+    boolean isRectangle = false;
+
+    boolean isSelector = false;
+
+    /** flag for streamlines */
+    boolean isClosePlgn = true;
 
     /** _more_ */
     private JButton createTrjBtn;
@@ -1228,6 +1243,9 @@ public class GridTrajectoryControl extends DrawingControl {
                     glyph.getLatLons()[1][0]);
                 points[2][i] = z;
             }
+            setCurrentCommand(CMD_SELECT);
+            hiddenBtn.doClick();;
+
             return points;
         } else {
 
@@ -1267,6 +1285,8 @@ public class GridTrajectoryControl extends DrawingControl {
                     (float) LatLonPointImpl.lonNormal(latlons[0][1][i]);
                 points[2][i] = z;
             }
+            setCurrentCommand(CMD_SELECT);
+            hiddenBtn.doClick();
 
             return points;
         }
@@ -1333,15 +1353,21 @@ public class GridTrajectoryControl extends DrawingControl {
             isPoints = getIsPoints();
             if (isPoints) {
                 setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
-            } else {
+            } else if(isRectangle){
                 setCurrentCommand(GlyphCreatorCommand.CMD_RECTANGLE);
+            } else if(isClosePlgn){
+                setCurrentCommand(GlyphCreatorCommand.CMD_CLOSEDPOLYGON);
+            } else {
+                setCurrentCommand(CMD_SELECT);
             }
         } else {
             setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
         }
 
         pointsBtn    = new JRadioButton("Points:", isPoints);
-        rectangleBtn = new JRadioButton("Rectangle:", !isPoints);
+        rectangleBtn = new JRadioButton("Rectangle:", isRectangle);
+        closePolygonBtn  = new JRadioButton("ClosePolygon:", isClosePlgn);
+        hiddenBtn = new JRadioButton("ClosePolygon:", isSelector);
 
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1349,24 +1375,47 @@ public class GridTrajectoryControl extends DrawingControl {
                 if (source == pointsBtn) {
                     setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
                     isPoints = true;
+                    isClosePlgn = false;
+                    isRectangle = false;
+                    isSelector = false;
                     removeAllGlyphs();
-                } else {
+                } else if (source == rectangleBtn) {
                     setCurrentCommand(GlyphCreatorCommand.CMD_RECTANGLE);
+                    isRectangle = true;
                     isPoints = false;
+                    isClosePlgn = false;
+                    isSelector = false;
                     removeAllGlyphs();
+                } else if (source == closePolygonBtn) {
+                    setCurrentCommand(GlyphCreatorCommand.CMD_CLOSEDPOLYGON);
+                    isRectangle = false;
+                    isPoints = false;
+                    isSelector = false;
+                    isClosePlgn = true;
+                    removeAllGlyphs();
+                } else  {
+                    setCurrentCommand(CMD_SELECT);
+                    isSelector = true;
+                    isRectangle = false;
+                    isPoints = false;
+                    isClosePlgn = false;
+                    //removeAllGlyphs();
                 }
             }
         };
         pointsBtn.addActionListener(listener);
         rectangleBtn.addActionListener(listener);
-        GuiUtils.buttonGroup(pointsBtn, rectangleBtn);
+        closePolygonBtn.addActionListener(listener);
+        hiddenBtn.addActionListener(listener);
+        GuiUtils.buttonGroup(pointsBtn, rectangleBtn, closePolygonBtn, hiddenBtn);
         //
 
 
         JComponent rightComp = GuiUtils.vbox(GuiUtils.left(pointsBtn),
+                                             GuiUtils.left(closePolygonBtn),
                                              GuiUtils.left(rectangleBtn),
                                              GuiUtils.left(createTrjBtn));
-        JLabel showLabel = GuiUtils.rLabel("Trajectory Initial:");
+        JLabel showLabel = GuiUtils.rLabel("Trajectory Initial Area:");
         showLabel.setVerticalTextPosition(JLabel.TOP);
 
         widgets.add(
@@ -1516,6 +1565,9 @@ public class GridTrajectoryControl extends DrawingControl {
         } else if (command.contains(
                 GlyphCreatorCommand.CMD_SYMBOL.getLabel())) {
             currentCmd = GlyphCreatorCommand.CMD_SYMBOL;
+        } else if (command.contains(
+                GlyphCreatorCommand.CMD_CLOSEDPOLYGON.getLabel())) {
+            currentCmd = GlyphCreatorCommand.CMD_CLOSEDPOLYGON;
         } else {
             currentCmd = getCurrentCmd();
         }
