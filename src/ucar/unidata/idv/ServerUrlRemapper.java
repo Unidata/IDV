@@ -20,7 +20,6 @@
 
 package ucar.unidata.idv;
 
-
 import thredds.util.UnidataTdsDataPathRemapper;
 
 import ucar.unidata.data.DataSource;
@@ -32,7 +31,11 @@ import ucar.unidata.util.LogUtil;
 
 import java.io.IOException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,9 +44,6 @@ import java.util.*;
  */
 
 public class ServerUrlRemapper {
-
-    /** ncIdv version */
-    private String ncIdvVersion = null;
 
     /** Reference to the IDV */
     private IntegratedDataViewer idv;
@@ -75,7 +75,7 @@ public class ServerUrlRemapper {
     /** TDS Service name for catalogs */
     private static final String TDS_CATALOG_SERVICE = "/catalog/";
 
-    /** Datasource ID used for unpersistance */
+    /** Datasource ID used for unpersistence */
     private static final String ID_DATASOURCES = IdvConstants.ID_DATASOURCES;
 
     /** old url used to access TDS (deprecated) */
@@ -99,6 +99,11 @@ public class ServerUrlRemapper {
     /** port number for development snapshot Unidata TDS */
     private static final String PORT_TDS_DEV = ":9080/";
 
+    /** string that indicates the ncIdv version is unknown (pre IDV 4.0 bundles) */
+    private static final String UNKNOWN_NCIDV_VERSION = "unknown";
+
+    /** ncIdv version */
+    private String ncIdvVersion = UNKNOWN_NCIDV_VERSION;
 
     /**
      * thin wrapper to get IDV property
@@ -122,9 +127,9 @@ public class ServerUrlRemapper {
     }
 
     /**
-     * main method to handle remapping urls
+     * This method handles remapping issues for data server URL changes
      *
-     * @param data Object
+     * @param data Object from bundle unpersistence
      *
      * @return Object
      */
@@ -133,6 +138,7 @@ public class ServerUrlRemapper {
         if (data instanceof Hashtable) {
             data = remapDataSources((Hashtable) data);
         } else if (data instanceof DataSource) {
+            //ToDo: Add code to handle different url types (adde, tds, etc.)
             data = (Object) remapMotherlodeToThredds((DataSource) data);
         }
 
@@ -140,8 +146,7 @@ public class ServerUrlRemapper {
     }
 
     /**
-     * This method handles all fo the remapping issues for URL changes related
-     * to the Unidata THREDDS server (formally known as motherlode)
+     * This method handles remapping issues for data server URL changes
      *
      * @param ht Contains the unpersisted objects
      *
@@ -149,15 +154,20 @@ public class ServerUrlRemapper {
      */
     private Hashtable remapDataSources(Hashtable ht) {
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
-        ncIdvVersion = (String) ht.get(IdvConstants.NCIDV_VERSION);
-        ArrayList dataSources    = (ArrayList) ht.get(ID_DATASOURCES);
-        ArrayList newDataSources = new ArrayList();
+        if (ht.containsKey(IdvConstants.ID_NCIDV_VERSION)) {
+            ncIdvVersion = (String) ht.get(IdvConstants.ID_NCIDV_VERSION);
+        } else {
+            ncIdvVersion = UNKNOWN_NCIDV_VERSION;
+        }
+        List             dataSources    = (List) ht.get(ID_DATASOURCES);
+        List<DataSource> newDataSources = new ArrayList<DataSource>();
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource dataSource = (DataSource) dataSources.get(i);
+            //ToDo: Add code to handle different url types (adde, tds, etc.)
             // update motherlode references to thredds
             // this should happen regardless of version of ncIDV
             DataSource remappedDataSource =
-                remapMotherlodeToThredds(dataSource);
+                remapMotherlodeToThredds(dataSource, ncIdvVersion);
 
             newDataSources.add(remappedDataSource);
         }
@@ -166,16 +176,34 @@ public class ServerUrlRemapper {
         return ht;
     }
 
+
     /**
      * Method to change old urls that point to motherlode to the appropriate
      * new server using the thredds*.ucar.edu domain.
+     *
+     * This call is for the case where ncIdvVersion is unknown or not supplied.
      *
      * @param dataSource DataSource object that may need to be updated
      *
      * @return updated DataSource
      */
     private DataSource remapMotherlodeToThredds(DataSource dataSource) {
-        String                  newPath     = null;
+        return remapMotherlodeToThredds(dataSource, UNKNOWN_NCIDV_VERSION);
+    }
+
+    /**
+     * Method to change old urls that point to motherlode to the appropriate
+     * new server using the thredds*.ucar.edu domain.
+     *
+     * @param dataSource DataSource object that may need to be updated
+     * @param ncIdvVersion Version of ncIdv.jar that was used when the bundle was created.
+     *
+     * @return updated DataSource
+     */
+
+    private DataSource remapMotherlodeToThredds(DataSource dataSource,
+            String ncIdvVersion) {
+        String                  updatedPath = null;
         HashMap<String, String> serverRemap = new HashMap<String, String>();
         String                  oldServer   = URL_MOTHERLODE;
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
@@ -198,26 +226,28 @@ public class ServerUrlRemapper {
         serverRemap.put(oldServer.replace("/", PORT_TDS_DEV), URL_TDS_DEV);
 
         if (dataSource instanceof DodsGeoGridDataSource) {
-            ArrayList oldPaths = (ArrayList) dataSource.getDataPaths();
+            List oldPaths = dataSource.getDataPaths();
 
             for (Map.Entry<String, String> oldServerName :
                     serverRemap.entrySet()) {
                 String oldPath = (String) oldPaths.get(0);
                 if (oldPath.contains(oldServerName.getKey())) {
-                    newPath = oldPath.replace(oldServerName.getKey(),
+                    // if old path uses an old server name, like motherlode.ucar.edu, then update with new
+                    updatedPath = oldPath.replace(oldServerName.getKey(),
                             oldServerName.getValue());
                     // remap urlPaths that point to old unidata TDS ( < 4.3)
                     // if ncIdvVersion exists, then it was created with a post tds 4.2 -> 4.3 transition
                     // and the path likely needs to be updated
                     //uncomment next line once 8080 is running 4.3
-                    //if ((ncIdvVersion == null) || (testTds)) {
+                    //ToDo: enable ncIdvVersion check once thredds.ucar.edu -> 4.3
+                    //if ((ncIdvVersion != UNKNOWN_NCIDV_VERSION) || (testTds)) {
                     if (testTds) {
                         dataSource =
                             remapOldMotherlodeDatasetUrlPath(dataSource,
-                                newPath);
+                                updatedPath);
                     } else {
                         dataSource = updatePropsWithRemapUrl(dataSource,
-                                newPath);
+                                updatedPath);
                     }
                     break;
                 }
@@ -233,19 +263,18 @@ public class ServerUrlRemapper {
      * best datasets, frmc collections moving to grib collects, etc.
      *
      * @param dataSource DataSource object that may need to be updated
-     * @param newPath _more_
+     * @param oldUrl URL whose data path may need to be updated
      *
      * @return updated DataSource
      */
     private DataSource remapOldMotherlodeDatasetUrlPath(
-            DataSource dataSource, String newPath) {
+            DataSource dataSource, String oldUrl) {
         // this is where the fmrc -> grib magic will happen
         UnidataTdsDataPathRemapper remapper =
             new UnidataTdsDataPathRemapper();
         // grab dataSource URL
         if (dataSource instanceof DodsGeoGridDataSource) {
-            String    oldUrl   = newPath;
-            String[]  breakUrl = null;
+            String[] breakUrl = null;
             if (oldUrl.contains(TDS_CATALOG_SERVICE)) {
                 breakUrl = oldUrl.split(TDS_CATALOG_SERVICE);
             } else if (oldUrl.contains(TDS_DODS_SERVICE)) {
@@ -264,7 +293,8 @@ public class ServerUrlRemapper {
                 oldUrlPath = oldUrlPath.split(LATEST_XML_NAME)[0];
                 map        = LATEST_REMAP_KEY;
             } else if ((oldUrlPath.contains(TDS_PRE_43_BEST_NAME))
-                       || (oldUrlPath.contains(TDS_PRE_43_BEST_NAME_SUFFIX))) {
+                       || (oldUrlPath.contains(
+                           TDS_PRE_43_BEST_NAME_SUFFIX))) {
                 map = BEST_REMAP_KEY;
             }
 

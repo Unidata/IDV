@@ -2364,7 +2364,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                   String jython) {
 
         data.put(ID_VERSION, getStateManager().getVersion());
-        data.put(NCIDV_VERSION, LibVersionUtil.getNcidvVersion());
+        data.put(ID_NCIDV_VERSION, LibVersionUtil.getNcidvVersion());
         if (dataSources != null) {
             if (makeDataRelative) {
                 if ( !showDataRelativeGui(dataSources)) {
