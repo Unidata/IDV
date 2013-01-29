@@ -1,18 +1,18 @@
 /*
- * Copyright 1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -3540,7 +3540,7 @@ public class GuiUtils extends LayoutUtil {
         }
         box.setActionCommand(command);
         box.setSelectedItem(new Integer(initValue));
-        //Add the listener at the end so we don't get the event 
+        //Add the listener at the end so we don't get the event
         //fired from the prior setSelectedItem
         box.addActionListener(listener);
         return box;
@@ -4987,8 +4987,8 @@ public class GuiUtils extends LayoutUtil {
         if (selected != null) {
             box.setSelectedItem(selected);
         }
-        //This is a little odd but when the box is editable its preferred size is 
-        //increased. So we get the preferred size before, then set editable then reset the 
+        //This is a little odd but when the box is editable its preferred size is
+        //increased. So we get the preferred size before, then set editable then reset the
         //preferred size.
         if (editable) {
             Dimension preferred = box.getPreferredSize();
@@ -5831,7 +5831,7 @@ public class GuiUtils extends LayoutUtil {
         String chinesesample = "\u4e00";
         for (int j = 0; j < fontnames.length; j++) {
             //            System.err.println ("font:" + fontnames[j]);
-            //      if (allfonts[j].canDisplayUpTo(chinesesample) == -1) { 
+            //      if (allfonts[j].canDisplayUpTo(chinesesample) == -1) {
             //          chinesefonts.add(allfonts[j].getFontName());
             //      }
             //              fontcount++;

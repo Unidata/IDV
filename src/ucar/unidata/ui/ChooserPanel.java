@@ -1,7 +1,7 @@
 /*
 a * $Id: ChooserPanel.java,v 1.34 2007/07/27 13:52:12 jeffmc Exp $
  *
- * Copyright  1997-2004 Unidata Program Center/University Corporation for
+ * Copyright  1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
