@@ -69,10 +69,7 @@ import java.lang.reflect.Constructor;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -391,15 +388,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
-    /** 
+    /**
      * Can this handle "All levels"?
      *
      * @return true
      */
 
-     public boolean canDoAllLevels() {
-       return true;
-     }
+    public boolean canDoAllLevels() {
+        return true;
+    }
 
     /**
      * Get the IDV
@@ -495,7 +492,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         JCheckBox allCbx =
             new JCheckBox("Use this mask for all data sources of this type",
                           false);
-        JCheckBox  installCbx         = new JCheckBox("Install Plugin", false);
+        JCheckBox  installCbx         = new JCheckBox("Install Plugin",
+                                            false);
         JTextField labelFld           = new JTextField(id);
         JTextField idFld              = new JTextField(id);
         List       choices            = getDataChoices();
@@ -583,7 +581,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         JTabbedPane tab      = new JTabbedPane();
         List        catComps = new ArrayList();
         for (int i = 0; i < categories.size(); i++) {
-            List   comps      = (List) catMap.get(categories.get(i));
+            List comps = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 2, GuiUtils.WT_YY,
                                     GuiUtils.WT_N);
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
@@ -1592,9 +1590,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (displayType != null) {
             List choices = getDataChoices();
             for (int cIdx = 0; cIdx < choices.size(); cIdx++) {
-                DataChoice    dataChoice      = (DataChoice) choices.get(cIdx);
+                DataChoice    dataChoice      =
+                    (DataChoice) choices.get(cIdx);
                 DataSelection driverSelection = null;
-                boolean       useTimeDriver   =
+                boolean useTimeDriver =
                     getProperty(DataSelection.PROP_CHOOSERTIMEMATCHING,
                                 false);
                 if (useTimeDriver) {
@@ -2178,6 +2177,19 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         if ((givenDataSelection != null) && givenDataSelection.hasTimes()) {
             times = givenDataSelection.getTimes();
+            boolean useSubset = false;
+            Object  sd =
+                dataChoice.getProperty(DataSelection.PROP_TIMESUBSET);
+
+            if (sd != null) {
+                useSubset = Boolean.parseBoolean(sd.toString());
+            }
+
+            if ( !useSubset) {
+                times = DataSourceImpl.getDateTimes(times, getAllDateTimes());
+            }
+
+
             if ((times == null) || (times.size() == 0)) {
                 times = allTimesFromDataChoice;
             }
@@ -2817,7 +2829,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         changeDataPathsCbx.setToolTipText(
             "Should this data source also be changed");
         JTextField nameFld = new JTextField(prefix, 10);
-        File       dir     = FileManager.getDirectory(
+        File dir = FileManager.getDirectory(
                        null, label,
                        GuiUtils.top(
                            GuiUtils.inset(
@@ -3169,7 +3181,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if (chooserClassName != null) {
                 IdvChooser chooser  = null;
                 Class      theClass = Misc.findClass(chooserClassName);
-                Class[] paramTypes  = new Class[] { IdvChooserManager.class,
+                Class[] paramTypes = new Class[] { IdvChooserManager.class,
                         Element.class };
                 Object[] args = new Object[] {
                                     getIdv().getIdvChooserManager(),
@@ -3919,7 +3931,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             if (dataCachePath == null) {
 
                 String uniqueName = "data_" + Misc.getUniqueId();
-                String tmp        =
+                String tmp =
                     IOUtil.joinDir(
                         getIdv().getDataManager().getDataCacheDirectory(),
                         uniqueName);

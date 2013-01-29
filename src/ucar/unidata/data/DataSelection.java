@@ -56,6 +56,9 @@ public class DataSelection {
     public static final String PROP_CHOOSERTIMEMATCHING =
         "Chooser_Do_Time_Matching";
 
+    /** as time subset selection */
+    public final static String PROP_TIMESUBSET = "Use DataChoice time subset";
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
