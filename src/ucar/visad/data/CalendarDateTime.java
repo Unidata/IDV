@@ -288,7 +288,7 @@ public class CalendarDateTime extends visad.DateTime {
             throws VisADException {
         List<DateTime> timeList = getDateTimeList(timeSet);
         if (timeList.isEmpty()) {
-            return null;
+            return new CalendarDateTime[] {};
         }
         CalendarDateTime[] times = new CalendarDateTime[timeList.size()];
 

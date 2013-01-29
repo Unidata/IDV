@@ -385,16 +385,16 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
             }
             updateTimeline();
             DateTime[] timesArray = getAnimationTimes();
-            Calendar   cal        = null;
-            if (timesArray[0] instanceof CalendarDateTime) {
-                cal = ((CalendarDateTime) timesArray[0]).getCalendar();
-            }
 
             double   startOffset = startOffsetField.getTime() * 60;
             double   endOffset   = endOffsetField.getTime() * 60;
             DateTime min         = null;
             DateTime max         = null;
             if (timesArray.length > 0) {
+                Calendar   cal        = null;
+                if (timesArray[0] instanceof CalendarDateTime) {
+                    cal = ((CalendarDateTime) timesArray[0]).getCalendar();
+                }
                 min = timesArray[0];
                 max = timesArray[timesArray.length - 1];
                 double minSeconds =
