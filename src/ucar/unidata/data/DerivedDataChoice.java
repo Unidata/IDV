@@ -558,27 +558,30 @@ public class DerivedDataChoice extends ListDataChoice {
             List selected = dataContext.selectDataChoices(unboundOperands);
             if (selected == null) {
                 return null;
-            } else {  //yuanho added time
-                DataChoice    dc0 = (DataChoice) selected.get(0);
-                DataSelection ds0 = dc0.getDataSelection();
-                if (ds0 != null) {
-                    Object ud =
-                        ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    if ((ud != null) && ((Boolean) ud).booleanValue()) {
-                        dataSelection.putProperty(
-                            DataSelection.PROP_USESTIMEDRIVER, true);
-                    }
-                }
             }
+
             for (int i = 0; i < unboundOperands.size(); i++) {
                 DataOperand op = (DataOperand) unboundOperands.get(i);
                 DataChoice  selectedChoice = (DataChoice) selected.get(i);
+                //
+                DataSelection ds0 = selectedChoice.getDataSelection();
+                if (ds0 != null) {
+                    Object ud =
+                            ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if ((ud != null) && ((Boolean) ud).booleanValue()) {
+                        dataSelection.putProperty(
+                                DataSelection.PROP_USESTIMEDRIVER, true);
+                    } else {
+                        dataSelection.putProperty(
+                                DataSelection.PROP_USESTIMEDRIVER, false);
+                    }
+                }
                 //Add this data choice to the list of data choices
                 childrenChoices.add(selectedChoice);
                 addDataChangeListeners(selectedChoice);
 
                 userSelectedChoices.put(op.getParamName(), selectedChoice);
-                //Do an .equals instead of an instanceof because DerivedDataChoice 
+                //Do an .equals instead of an instanceof because DerivedDataChoice
                 //derived from ListDataChoice
                 setData(selectedChoice, op, dataChoiceToData, dataSelection,
                         requestProperties);
