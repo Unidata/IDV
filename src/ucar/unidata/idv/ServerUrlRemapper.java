@@ -20,11 +20,13 @@
 
 package ucar.unidata.idv;
 
+
 import thredds.util.UnidataTdsDataPathRemapper;
 
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.grid.DodsGeoGridDataSource;
+import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.LogUtil;
 
@@ -35,7 +37,7 @@ import java.util.*;
 
 /**
  * A class to handle remapping URLs from data sources as
- * they are unpesisted from bundles
+ * they are unpersisted from bundles
  */
 
 public class ServerUrlRemapper {
@@ -46,21 +48,74 @@ public class ServerUrlRemapper {
     /** Reference to the IDV */
     private IntegratedDataViewer idv;
 
+    /** xml file name for the latest dataset */
+    private static final String LATEST_XML_NAME = "latest.xml";
+
+    /** property to indicate whether or not to force connections to the tds test server */
+    private static final String TEST_TDS_43_UPDATE = "tds.update.test";
+
+    /** old name for best time series on a pre 43 TDS server */
+    private static final String TDS_PRE_43_BEST_NAME = "best";
+
+    /** old suffix for the best timeseries on a pre 4.3 TDS */
+    private static final String TDS_PRE_43_BEST_NAME_SUFFIX = ".ndc";
+
+    /** key name for TDS hashmap for best time series */
+    private static final String BEST_REMAP_KEY = "best";
+
+    /** key name for TDS hashmap for latest */
+    private static final String LATEST_REMAP_KEY = "latest";
+
+    /** TDS Service name for opendap */
+    private static final String TDS_DODS_SERVICE = "/dodsC/";
+
+    /** TDS Service name for the http fileServer */
+    private static final String TDS_HTTP_SERVICE = "/fileServer/";
+
+    /** TDS Service name for catalogs */
+    private static final String TDS_CATALOG_SERVICE = "/catalog/";
+
+    /** Datasource ID used for unpersistance */
+    private static final String ID_DATASOURCES = IdvConstants.ID_DATASOURCES;
+
+    /** old url used to access TDS (deprecated) */
+    private static final String URL_MOTHERLODE = "motherlode.ucar.edu/";
+
+    /** url for stable Unidata TDS */
+    private static final String URL_TDS = "thredds.ucar.edu/";
+
+    /** url for test Unidata TDS */
+    private static final String URL_TDS_TEST = "thredds-test.ucar.edu/";
+
+    /** URL for development snapshot Unidata TDS */
+    private static final String URL_TDS_DEV = "thredds-dev.ucar.edu/";
+
+    /** port number for stable Unidata TDS */
+    private static final String PORT_TDS = ":8080/";
+
+    /** port number for test Unidata TDS */
+    private static final String PORT_TDS_TEST = ":8081/";
+
+    /** port number for development snapshot Unidata TDS */
+    private static final String PORT_TDS_DEV = ":9080/";
+
 
     /**
-     * _more_
+     * thin wrapper to get IDV property
      *
-     * @param name _more_
-     * @param dflt _more_
+     * @param name name of property
+     * @param dflt default value
      *
-     * @return _more_
+     * @return property
      */
     private boolean getProperty(String name, boolean dflt) {
         return idv.getStateManager().getProperty(name, dflt);
     }
 
     /**
-     * Construct a ServerUrlRemapper 
+     * Construct a ServerUrlRemapper
+     *
+     * @param idv instance of the IDV
      */
     public ServerUrlRemapper(IntegratedDataViewer idv) {
         this.idv = idv;
@@ -93,9 +148,9 @@ public class ServerUrlRemapper {
      * @return ht Contains unpersisted objects with remaped URLs, if needed.
      */
     private Hashtable remapDataSources(Hashtable ht) {
-        Boolean testTds = getProperty("tds.update.test", Boolean.FALSE);
+        Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
         ncIdvVersion = (String) ht.get(IdvConstants.NCIDV_VERSION);
-        ArrayList dataSources    = (ArrayList) ht.get("datasources");
+        ArrayList dataSources    = (ArrayList) ht.get(ID_DATASOURCES);
         ArrayList newDataSources = new ArrayList();
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource dataSource = (DataSource) dataSources.get(i);
@@ -106,7 +161,7 @@ public class ServerUrlRemapper {
 
             newDataSources.add(remappedDataSource);
         }
-        ht.put("datasources", newDataSources);
+        ht.put(ID_DATASOURCES, newDataSources);
 
         return ht;
     }
@@ -122,28 +177,25 @@ public class ServerUrlRemapper {
     private DataSource remapMotherlodeToThredds(DataSource dataSource) {
         String                  newPath     = null;
         HashMap<String, String> serverRemap = new HashMap<String, String>();
-        String                  oldServer   = "motherlode.ucar.edu/";
-        Boolean testTds = getProperty("tds.update.test", Boolean.FALSE);
+        String                  oldServer   = URL_MOTHERLODE;
+        Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
         if (testTds) {
             LogUtil.println(
                 "INFO: Forcing TDS 4.3 connections to get remote data.");
         }
 
         if (testTds) {
-            serverRemap.put(oldServer, "thredds-test.ucar.edu/");
-            serverRemap.put(oldServer.replace("/", ":8080/"),
-                            "thredds-test.ucar.edu/");
-            serverRemap.put("thredds.ucar.edu/", "thredds-test.ucar.edu/");
+            serverRemap.put(oldServer, URL_TDS_TEST);
+            serverRemap.put(oldServer.replace("/", PORT_TDS), URL_TDS_TEST);
+            serverRemap.put(URL_TDS, URL_TDS_TEST);
 
         } else {
-            serverRemap.put(oldServer, "thredds.ucar.edu/");
-            serverRemap.put(oldServer.replace("/", ":8080/"),
-                            "thredds.ucar.edu/");
+            serverRemap.put(oldServer, URL_TDS);
+            serverRemap.put(oldServer.replace("/", PORT_TDS), URL_TDS);
         }
-        serverRemap.put(oldServer.replace("/", ":8081/"),
-                        "thredds-test.ucar.edu/");
-        serverRemap.put(oldServer.replace("/", ":9080/"),
-                        "thredds-dev.ucar.edu/");
+        serverRemap.put(oldServer.replace("/", PORT_TDS_TEST), URL_TDS_TEST);
+
+        serverRemap.put(oldServer.replace("/", PORT_TDS_DEV), URL_TDS_DEV);
 
         if (dataSource instanceof DodsGeoGridDataSource) {
             ArrayList oldPaths = (ArrayList) dataSource.getDataPaths();
@@ -188,18 +240,16 @@ public class ServerUrlRemapper {
     private DataSource remapOldMotherlodeDatasetUrlPath(
             DataSource dataSource, String newPath) {
         // this is where the fmrc -> grib magic will happen
-        Boolean testTds = getProperty("tds.update.test", Boolean.FALSE);
         UnidataTdsDataPathRemapper remapper =
             new UnidataTdsDataPathRemapper();
         // grab dataSource URL
         if (dataSource instanceof DodsGeoGridDataSource) {
-            ArrayList oldUrls  = (ArrayList) dataSource.getDataPaths();
             String    oldUrl   = newPath;
             String[]  breakUrl = null;
-            if (oldUrl.contains("catalog/")) {
-                breakUrl = oldUrl.split("catalog/");
-            } else if (oldUrl.contains("dodsC/")) {
-                breakUrl = oldUrl.split("dodsC/");
+            if (oldUrl.contains(TDS_CATALOG_SERVICE)) {
+                breakUrl = oldUrl.split(TDS_CATALOG_SERVICE);
+            } else if (oldUrl.contains(TDS_DODS_SERVICE)) {
+                breakUrl = oldUrl.split(TDS_DODS_SERVICE);
             }
 
             String oldUrlPath;
@@ -210,12 +260,12 @@ public class ServerUrlRemapper {
                 return dataSource;
             }
             String map = null;
-            if (oldUrlPath.contains("latest.xml")) {
-                oldUrlPath = oldUrlPath.split("latest.xml")[0];
-                map        = "latest";
-            } else if ((oldUrlPath.contains("best"))
-                       || (oldUrlPath.contains(".ncd"))) {
-                map = "best";
+            if (oldUrlPath.contains(LATEST_XML_NAME)) {
+                oldUrlPath = oldUrlPath.split(LATEST_XML_NAME)[0];
+                map        = LATEST_REMAP_KEY;
+            } else if ((oldUrlPath.contains(TDS_PRE_43_BEST_NAME))
+                       || (oldUrlPath.contains(TDS_PRE_43_BEST_NAME_SUFFIX))) {
+                map = BEST_REMAP_KEY;
             }
 
             List<String> newUrlPaths = remapper.getMappedUrlPaths(oldUrlPath,
@@ -235,7 +285,7 @@ public class ServerUrlRemapper {
      * This methods updates the properties that I *think* matter when updating
      * the data url...this is questionable, but works for now.
      *
-     * @param dataSource DataSource object whoes properties need to be updated
+     * @param dataSource DataSource object whose properties need to be updated
      *
      * @param newPath new URL string
      *
@@ -245,23 +295,21 @@ public class ServerUrlRemapper {
     private DataSource updatePropsWithRemapUrl(DataSource dataSource,
             String newPath) {
 
-        Boolean testTds = getProperty("tds.update.test", Boolean.FALSE);
-
-        if (newPath.contains("latest.xml")) {
+        if (newPath.contains(LATEST_XML_NAME)) {
 
             Hashtable props =
                 ((DodsGeoGridDataSource) dataSource).getProperties();
-            if (props.containsKey("prop.service.http")) {
+            if (props.containsKey(GeoGridDataSource.PROP_SERVICE_HTTP)) {
                 String newHttpPath = CatalogUtil.resolveUrl(newPath,
-                                         null).replace("/dodsC/",
-                                             "/fileServer/");
+                                         null).replace(TDS_DODS_SERVICE,
+                                             TDS_HTTP_SERVICE);
                 ((DodsGeoGridDataSource) dataSource).setProperty(
-                    "prop.service.http", newHttpPath);
+                    DataSource.PROP_SERVICE_HTTP, newHttpPath);
             }
 
-            if (props.containsKey("RESOLVERURL")) {
+            if (props.containsKey(DataSource.PROP_RESOLVERURL)) {
                 ((DodsGeoGridDataSource) dataSource).setProperty(
-                    "RESOLVERURL", newPath);
+                    DataSource.PROP_RESOLVERURL, newPath);
             }
         } else {
             Hashtable props =
