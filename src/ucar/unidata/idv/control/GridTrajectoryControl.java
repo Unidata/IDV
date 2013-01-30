@@ -1307,7 +1307,7 @@ public class GridTrajectoryControl extends DrawingControl {
             throws VisADException, RemoteException {
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.add("Controls", GuiUtils.top(doMakeControlsPanel()));
+        tabbedPane.add("Controls", doMakeControlsPanel());
 
         return GuiUtils.centerBottom(tabbedPane, new JLabel(""));
     }
@@ -1327,7 +1327,7 @@ public class GridTrajectoryControl extends DrawingControl {
                                          GuiUtils.WT_N);
 
 
-        return  GuiUtils.topLeft(GuiUtils.topCenter(comps, controlPane));
+        return  GuiUtils.vbox(comps, controlPane);
     }
 
     /**
