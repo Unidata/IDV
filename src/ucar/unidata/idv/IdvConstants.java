@@ -274,7 +274,7 @@ public interface IdvConstants {
     public static final String ID_VERSION = "version";
 
     /** The version of ncIdv the bundle was saved under */
-    public static final String NCIDV_VERSION = "ncidvversion";
+    public static final String ID_NCIDV_VERSION = "ncidvversion";
 
     /**
      *  When we persist off the application state the actual object
