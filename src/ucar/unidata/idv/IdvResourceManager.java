@@ -328,6 +328,14 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     public static final XmlIdvResource RSC_COLORPAIRS =
         new XmlIdvResource("idv.resource.colorpairs", "Color pairs");
 
+    /** Points to Variable name aliases */
+    public static final XmlIdvResource RSC_VARIABLEALIASES =
+        new XmlIdvResource("idv.resource.variablealiases",
+                           "Variable aliases");
+
+    /** Points to url maps */
+    public static final XmlIdvResource RSC_URLMAPS =
+        new XmlIdvResource("idv.resource.urlmaps", "URL change maps");
 
     /** Points to the data source descriptions */
     public static final IdvResource RSC_DATASOURCE =
@@ -435,11 +443,6 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     public static final IdvResource RSC_PUBLISHERTYPES =
         new XmlIdvResource("idv.resource.publishertypes", "Publisher Types",
                            "publishertypes\\.xml$");
-
-    /** Variable aliases */
-     public static final IdvResource RSC_VARIABLEALIASES =
-     new IdvResource("idv.resource.variablealiases", "Variable aliases",
-     ".*varaliases.\\.tbl$");
 
     /** Maps location table full name  to table */
     private Hashtable locationFullNameMap = new Hashtable();
@@ -1317,7 +1320,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
             }
             if (macroValues[i].length() > 0) {
                 path = StringUtil.replace(path, "%" + macroNames[i] + "%",
-                        macroValues[i]);
+                                          macroValues[i]);
             }
         }
         //if(printit)   System.err.println ("\tafter:" + path);

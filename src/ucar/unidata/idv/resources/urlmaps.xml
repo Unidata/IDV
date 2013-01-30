@@ -1,0 +1,18 @@
+<urlmaps>
+    <urlmap
+        type="opendap"
+        old="motherlode.ucar.edu/"
+        new="thredds.ucar.edu/"/>
+    <urlmap
+        type="opendap"
+        old="motherlode.ucar.edu:8080/"
+        new="thredds.ucar.edu/"/>
+    <urlmap
+        type="opendap"
+        old="motherlode.ucar.edu:8081/"
+        new="thredds-test.ucar.edu/"/>
+    <urlmap
+        type="opendap"
+        old="motherlode.ucar.edu:9080/"
+        new="thredds-dev.ucar.edu/"/>
+</urlmaps>

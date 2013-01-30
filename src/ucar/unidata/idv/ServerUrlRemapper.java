@@ -20,6 +20,9 @@
 
 package ucar.unidata.idv;
 
+
+import org.w3c.dom.Element;
+
 import thredds.util.UnidataTdsDataPathRemapper;
 
 import ucar.unidata.data.DataSource;
@@ -28,6 +31,8 @@ import ucar.unidata.data.grid.DodsGeoGridDataSource;
 import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.xml.XmlResourceCollection;
+import ucar.unidata.xml.XmlUtil;
 
 import java.io.IOException;
 
@@ -47,6 +52,9 @@ public class ServerUrlRemapper {
 
     /** Reference to the IDV */
     private IntegratedDataViewer idv;
+
+    /** Reference to the Url Map Resource Collection */
+    private XmlResourceCollection urlmapResourceCollection;
 
     /** xml file name for the latest dataset */
     private static final String LATEST_XML_NAME = "latest.xml";
@@ -87,23 +95,75 @@ public class ServerUrlRemapper {
     /** url for test Unidata TDS */
     private static final String URL_TDS_TEST = "thredds-test.ucar.edu/";
 
-    /** URL for development snapshot Unidata TDS */
-    private static final String URL_TDS_DEV = "thredds-dev.ucar.edu/";
-
     /** port number for stable Unidata TDS */
     private static final String PORT_TDS = ":8080/";
-
-    /** port number for test Unidata TDS */
-    private static final String PORT_TDS_TEST = ":8081/";
-
-    /** port number for development snapshot Unidata TDS */
-    private static final String PORT_TDS_DEV = ":9080/";
 
     /** string that indicates the ncIdv version is unknown (pre IDV 4.0 bundles) */
     private static final String UNKNOWN_NCIDV_VERSION = "unknown";
 
     /** ncIdv version */
     private String ncIdvVersion = UNKNOWN_NCIDV_VERSION;
+
+    /** Xml tag for url maps xml */
+    public static final String TAG_URLMAP = "urlmap";
+
+    /** URL Maps (Type : {oldUrl : newUrl} */
+    private HashMap<String, HashMap<String, String>> urlMaps =
+        new HashMap<String, HashMap<String, String>>();
+
+    /**
+     * Read in the resource xml files and store the URL maps
+     */
+    private void readUrlRemapResources() {
+
+        for (int urlRemapResourceIdx = 0;
+                urlRemapResourceIdx < urlmapResourceCollection.size(); urlRemapResourceIdx++) {
+            Element root =
+                this.urlmapResourceCollection.getRoot(urlRemapResourceIdx,
+                    false);
+
+            if (root == null) {
+                continue;
+            }
+
+            List nodes = XmlUtil.findChildren(root, TAG_URLMAP);
+
+            for (int remapIdx = 0; remapIdx < nodes.size(); remapIdx++) {
+                Element      node    = (Element) nodes.get(remapIdx);
+                final String urlType = XmlUtil.getAttribute(node, "type");
+                final String oldUrl  = XmlUtil.getAttribute(node, "old");
+                final String newUrl  = XmlUtil.getAttribute(node, "new");
+                if (this.urlMaps.containsKey(urlType)) {
+                    HashMap<String, String> tmpUrlMap = urlMaps.get(urlType);
+                    if (tmpUrlMap.containsKey(oldUrl)) {
+                        LogUtil.consoleMessage("Multiple url maps found for "
+                                + oldUrl);
+                    } else {
+                        tmpUrlMap.put(oldUrl, newUrl);
+                    }
+                    this.urlMaps.put(urlType, tmpUrlMap);
+                } else {
+                    HashMap<String, String> tmpUrlMap = new HashMap<String,
+                                                            String>();
+                    tmpUrlMap.put(oldUrl, newUrl);
+                    this.urlMaps.put(urlType, tmpUrlMap);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * initilize the ServerUrlRemapper (get remaps from resources
+     */
+    private void init() {
+
+        urlmapResourceCollection =
+            idv.getResourceManager().getXmlResources(
+                IdvResourceManager.RSC_URLMAPS);
+
+        readUrlRemapResources();
+    }
 
     /**
      * thin wrapper to get IDV property
@@ -114,7 +174,7 @@ public class ServerUrlRemapper {
      * @return property
      */
     private boolean getProperty(String name, boolean dflt) {
-        return idv.getStateManager().getProperty(name, dflt);
+        return this.idv.getStateManager().getProperty(name, dflt);
     }
 
     /**
@@ -124,6 +184,7 @@ public class ServerUrlRemapper {
      */
     public ServerUrlRemapper(IntegratedDataViewer idv) {
         this.idv = idv;
+        init();
     }
 
     /**
@@ -139,7 +200,9 @@ public class ServerUrlRemapper {
             data = remapDataSources((Hashtable) data);
         } else if (data instanceof DataSource) {
             //ToDo: Add code to handle different url types (adde, tds, etc.)
-            data = (Object) remapMotherlodeToThredds((DataSource) data);
+            if (data instanceof DodsGeoGridDataSource) {
+                data = (Object) remapMotherlodeToThredds((DataSource) data);
+            }
         }
 
         return data;
@@ -164,12 +227,14 @@ public class ServerUrlRemapper {
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource dataSource = (DataSource) dataSources.get(i);
             //ToDo: Add code to handle different url types (adde, tds, etc.)
-            // update motherlode references to thredds
-            // this should happen regardless of version of ncIDV
-            DataSource remappedDataSource =
-                remapMotherlodeToThredds(dataSource, ncIdvVersion);
+            if (dataSource instanceof DodsGeoGridDataSource) {
+                // update motherlode references to thredds
+                // this should happen regardless of version of ncIDV
+                DataSource remappedDataSource =
+                    remapMotherlodeToThredds(dataSource, ncIdvVersion);
 
-            newDataSources.add(remappedDataSource);
+                newDataSources.add(remappedDataSource);
+            }
         }
         ht.put(ID_DATASOURCES, newDataSources);
 
@@ -204,53 +269,43 @@ public class ServerUrlRemapper {
     private DataSource remapMotherlodeToThredds(DataSource dataSource,
             String ncIdvVersion) {
         String                  updatedPath = null;
-        HashMap<String, String> serverRemap = new HashMap<String, String>();
+        HashMap<String, String> serverRemap = this.urlMaps.get("opendap");
         String                  oldServer   = URL_MOTHERLODE;
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
+
         if (testTds) {
             LogUtil.println(
                 "INFO: Forcing TDS 4.3 connections to get remote data.");
-        }
 
-        if (testTds) {
-            serverRemap.put(oldServer, URL_TDS_TEST);
-            serverRemap.put(oldServer.replace("/", PORT_TDS), URL_TDS_TEST);
+            serverRemap.put(URL_MOTHERLODE, URL_TDS_TEST);
+            serverRemap.put(URL_MOTHERLODE.replace("/", PORT_TDS),
+                            URL_TDS_TEST);
             serverRemap.put(URL_TDS, URL_TDS_TEST);
-
-        } else {
-            serverRemap.put(oldServer, URL_TDS);
-            serverRemap.put(oldServer.replace("/", PORT_TDS), URL_TDS);
         }
-        serverRemap.put(oldServer.replace("/", PORT_TDS_TEST), URL_TDS_TEST);
 
-        serverRemap.put(oldServer.replace("/", PORT_TDS_DEV), URL_TDS_DEV);
 
-        if (dataSource instanceof DodsGeoGridDataSource) {
-            List oldPaths = dataSource.getDataPaths();
+        List oldPaths = dataSource.getDataPaths();
 
-            for (Map.Entry<String, String> oldServerName :
-                    serverRemap.entrySet()) {
-                String oldPath = (String) oldPaths.get(0);
-                if (oldPath.contains(oldServerName.getKey())) {
-                    // if old path uses an old server name, like motherlode.ucar.edu, then update with new
-                    updatedPath = oldPath.replace(oldServerName.getKey(),
-                            oldServerName.getValue());
-                    // remap urlPaths that point to old unidata TDS ( < 4.3)
-                    // if ncIdvVersion exists, then it was created with a post tds 4.2 -> 4.3 transition
-                    // and the path likely needs to be updated
-                    //uncomment next line once 8080 is running 4.3
-                    //ToDo: enable ncIdvVersion check once thredds.ucar.edu -> 4.3
-                    //if ((ncIdvVersion != UNKNOWN_NCIDV_VERSION) || (testTds)) {
-                    if (testTds) {
-                        dataSource =
-                            remapOldMotherlodeDatasetUrlPath(dataSource,
-                                updatedPath);
-                    } else {
-                        dataSource = updatePropsWithRemapUrl(dataSource,
-                                updatedPath);
-                    }
-                    break;
+        for (Map.Entry<String, String> oldServerName :
+                serverRemap.entrySet()) {
+            String oldPath = (String) oldPaths.get(0);
+            if (oldPath.contains(oldServerName.getKey())) {
+                // if old path uses an old server name, like motherlode.ucar.edu, then update with new
+                updatedPath = oldPath.replace(oldServerName.getKey(),
+                        oldServerName.getValue());
+                // if ncIdvVersion does not exists, then it was created with a pre tds 4.2 -> 4.3 transition
+                // IDV and the url data path likely needs to be updated
+                //uncomment next line once 8080 is running 4.3
+                //ToDo: enable ncIdvVersion check once thredds.ucar.edu -> 4.3
+                //if ((ncIdvVersion != UNKNOWN_NCIDV_VERSION) || (testTds)) {
+                if (testTds) {
+                    dataSource = remapOldMotherlodeDatasetUrlPath(dataSource,
+                            updatedPath);
+                } else {
+                    dataSource = updatePropsWithRemapUrl(dataSource,
+                            updatedPath);
                 }
+                break;
             }
         }
 
