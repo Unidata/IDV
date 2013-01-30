@@ -1327,7 +1327,7 @@ public class GridTrajectoryControl extends DrawingControl {
                                          GuiUtils.WT_N);
 
 
-        return GuiUtils.top(GuiUtils.topCenter(comps, controlPane));
+        return  GuiUtils.topLeft(GuiUtils.topCenter(comps, controlPane));
     }
 
     /**
@@ -1415,21 +1415,25 @@ public class GridTrajectoryControl extends DrawingControl {
 
         JComponent rightComp = GuiUtils.vbox(GuiUtils.left(pointsBtn),
                                              GuiUtils.left(closePolygonBtn),
-                                             GuiUtils.left(rectangleBtn),
-                                             GuiUtils.left(createTrjBtn));
+                                             GuiUtils.left(rectangleBtn));
+
         JLabel showLabel = GuiUtils.rLabel("Trajectory Initial Area:");
+        JLabel removeLabel =
+            GuiUtils.rLabel("Remove Trajectory Initial Area:");
         showLabel.setVerticalTextPosition(JLabel.TOP);
 
         widgets.add(
-            GuiUtils.topBottom(
+            GuiUtils.topCenterBottom(
                 widgets0,
                 GuiUtils.leftRight(
                     GuiUtils.top(
                         GuiUtils.inset(
                             showLabel,
-                            new Insets(10, 0, 0, 0))), GuiUtils.centerRight(
-                                GuiUtils.top(rightComp),
-                                GuiUtils.right(unloadBtn)))));
+                            new Insets(10, 0, 0, 0))), GuiUtils.top(
+                                rightComp)), GuiUtils.leftRight(
+                                    GuiUtils.inset(
+                                        GuiUtils.wrap(createTrjBtn),
+                                        2), GuiUtils.right(unloadBtn))));
 
     }
 
