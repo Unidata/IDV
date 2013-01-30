@@ -1328,6 +1328,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
 
         return GuiUtils.vbox(comps, controlPane);
+
+        /* test */
     }
 
     /**
