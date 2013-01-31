@@ -284,7 +284,7 @@ example:
      canstandalone="false"
      label="Trajectory Colored By Parameter"
      displaycategory="Trajectory"
-     properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
+     properties="windowVisible=false;"/>
   <control
      id="pointcloud"
      categories="pointcloud"
