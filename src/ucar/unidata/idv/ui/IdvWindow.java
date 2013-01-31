@@ -38,6 +38,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -166,6 +167,12 @@ public class IdvWindow extends MultiFrame {
         if (uniqueId == null) {
             uniqueId = Misc.getUniqueId();
         }
+
+        // if macosx, try to add the OSX full screen mode widget
+        if ((GuiUtils.isMac()) && (theIdv.getProperty("mac.fullscreen.enable",Boolean.FALSE))) {
+            enableFullScreenMode(this.getWindow());
+        }
+
         allWindows.add(this);
         if (isAMainWindow) {
             //            Misc.printStack("new window", 5,null);
@@ -957,6 +964,27 @@ public class IdvWindow extends MultiFrame {
         return persistentComponents;
     }
 
+    /**
+     * Enable full screen mode in the context of mac osx (>=10.7)
+     * Special thanks to
+     *
+     * http://saipullabhotla.blogspot.com/2012/05/enabling-full-screen-mode-for-java.html
+     *
+     * @param window The window to which you wish to add the full screen option
+     */
+    public static void enableFullScreenMode(Window window) {
+        String className  = "com.apple.eawt.FullScreenUtilities";
+        String methodName = "setWindowCanFullScreen";
 
+        try {
+            Class<?> clazz  = Class.forName(className);
+            Method method = clazz.getMethod(methodName,
+                    new Class<?>[] { Window.class,
+                            boolean.class });
+            method.invoke(null, window, true);
+        } catch (Throwable t) {
+            LogUtil.printMessage("Full screen mode is not supported");
+        }
+    }
 
 }
