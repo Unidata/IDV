@@ -128,11 +128,21 @@ public class ServerUrlRemapper {
 
             List nodes = XmlUtil.findChildren(root, TAG_URLMAP);
 
-            for (int remapIdx = 0; remapIdx < nodes.size(); remapIdx++) {
-                Element      node    = (Element) nodes.get(remapIdx);
+            for (Object node1 : nodes) {
+                Element node = (Element) node1;
                 final String urlType = XmlUtil.getAttribute(node, "type");
-                final String oldUrl  = XmlUtil.getAttribute(node, "old");
-                final String newUrl  = XmlUtil.getAttribute(node, "new");
+                String tmpOldUrl = XmlUtil.getAttribute(node, "old");
+                String tmpNewUrl = XmlUtil.getAttribute(node, "new");
+                if (!tmpOldUrl.endsWith("/")) {
+                    tmpOldUrl = tmpOldUrl + '/';
+                }
+
+                if (!tmpNewUrl.endsWith("/")) {
+                    tmpNewUrl = tmpNewUrl + '/';
+                }
+                final String oldUrl = tmpOldUrl;
+                final String newUrl = tmpNewUrl;
+
                 if (this.urlMaps.containsKey(urlType)) {
                     HashMap<String, String> tmpUrlMap = urlMaps.get(urlType);
                     if (tmpUrlMap.containsKey(oldUrl)) {
@@ -144,7 +154,7 @@ public class ServerUrlRemapper {
                     this.urlMaps.put(urlType, tmpUrlMap);
                 } else {
                     HashMap<String, String> tmpUrlMap = new HashMap<String,
-                                                            String>();
+                            String>();
                     tmpUrlMap.put(oldUrl, newUrl);
                     this.urlMaps.put(urlType, tmpUrlMap);
                 }
@@ -201,7 +211,7 @@ public class ServerUrlRemapper {
         } else if (data instanceof DataSource) {
             //ToDo: Add code to handle different url types (adde, tds, etc.)
             if (data instanceof DodsGeoGridDataSource) {
-                data = (Object) remapMotherlodeToThredds((DataSource) data);
+                data = remapMotherlodeToThredds((DataSource) data);
             }
         }
 
@@ -219,19 +229,17 @@ public class ServerUrlRemapper {
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
         if (ht.containsKey(IdvConstants.ID_NCIDV_VERSION)) {
             ncIdvVersion = (String) ht.get(IdvConstants.ID_NCIDV_VERSION);
-        } else {
-            ncIdvVersion = UNKNOWN_NCIDV_VERSION;
         }
         List             dataSources    = (List) ht.get(ID_DATASOURCES);
         List<DataSource> newDataSources = new ArrayList<DataSource>();
-        for (int i = 0; i < dataSources.size(); i++) {
-            DataSource dataSource = (DataSource) dataSources.get(i);
+        for (Object dataSource1 : dataSources) {
+            DataSource dataSource = (DataSource) dataSource1;
             //ToDo: Add code to handle different url types (adde, tds, etc.)
             if (dataSource instanceof DodsGeoGridDataSource) {
                 // update motherlode references to thredds
                 // this should happen regardless of version of ncIDV
                 DataSource remappedDataSource =
-                    remapMotherlodeToThredds(dataSource, ncIdvVersion);
+                        remapMotherlodeToThredds(dataSource, ncIdvVersion);
 
                 newDataSources.add(remappedDataSource);
             }
@@ -268,9 +276,8 @@ public class ServerUrlRemapper {
 
     private DataSource remapMotherlodeToThredds(DataSource dataSource,
             String ncIdvVersion) {
-        String                  updatedPath = null;
+        String                  updatedPath;
         HashMap<String, String> serverRemap = this.urlMaps.get("opendap");
-        String                  oldServer   = URL_MOTHERLODE;
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
 
         if (testTds) {
@@ -338,6 +345,7 @@ public class ServerUrlRemapper {
 
             String oldUrlPath;
 
+            assert breakUrl != null;
             if (breakUrl.length == 2) {
                 oldUrlPath = breakUrl[1];
             } else {
