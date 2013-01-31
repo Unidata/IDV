@@ -279,7 +279,7 @@ example:
 
   <control
      id="gridtrajectorycontrol1"
-     categories="GRID-3D-*"
+     categories="trace"
      class="ucar.unidata.idv.control.GridTrajectoryControl"
      canstandalone="false"
      label="Trajectory Colored By Parameter"
