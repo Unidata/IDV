@@ -26,6 +26,7 @@
 
 <plugin name="VGEE" url="http://www.unidata.ucar.edu/software/idv/plugins/vgee.jar" description="A set of animation displays from the VGEE project" category="Displays"/>
 
+<plugin version="4.0" name="Enable Mac Fullscreen" url="http://www.unidata.ucar.edu/software/idv/plugins/macFullScreen.jar" description="Enables the Mac Fullscreen Widget" category="Displays"/>
 
 <!-- Color Tables -->
 <plugin name="GEMPAK Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/gempak.jar" description="Color tables from GEMPAK" category="Color Tables"/>

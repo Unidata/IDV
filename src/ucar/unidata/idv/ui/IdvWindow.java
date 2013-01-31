@@ -39,6 +39,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -169,7 +170,9 @@ public class IdvWindow extends MultiFrame {
         }
 
         // if macosx, try to add the OSX full screen mode widget
-        if ((GuiUtils.isMac()) && (theIdv.getProperty("mac.fullscreen.enable",Boolean.FALSE))) {
+        if ((GuiUtils.isMac())
+                && (theIdv.getProperty("mac.fullscreen.enable",
+                                       Boolean.FALSE))) {
             enableFullScreenMode(this.getWindow());
         }
 
@@ -977,10 +980,10 @@ public class IdvWindow extends MultiFrame {
         String methodName = "setWindowCanFullScreen";
 
         try {
-            Class<?> clazz  = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             Method method = clazz.getMethod(methodName,
-                    new Class<?>[] { Window.class,
-                            boolean.class });
+                                            new Class<?>[] { Window.class,
+                    boolean.class });
             method.invoke(null, window, true);
         } catch (Throwable t) {
             LogUtil.printMessage("Full screen mode is not supported");

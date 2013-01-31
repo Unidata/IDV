@@ -335,7 +335,8 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
     /** Points to url maps */
     public static final XmlIdvResource RSC_URLMAPS =
-        new XmlIdvResource("idv.resource.urlmaps", "URL change maps");
+        new XmlIdvResource("idv.resource.urlmaps", "URL change maps",
+                           "urlmaps\\.xml");
 
     /** Points to the data source descriptions */
     public static final IdvResource RSC_DATASOURCE =
