@@ -51,6 +51,7 @@ import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.idv.VariableRenamer;
 import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.ui.TextSearcher;
 import ucar.unidata.util.CatalogUtil;
@@ -198,7 +199,10 @@ public class GeoGridDataSource extends GridDataSource {
     private CalendarDateRange dateRange;
 
     /** handles the grib variable renaming */
-    private GribVariableRenamer renamer = new GribVariableRenamer();
+    private GribVariableRenamer gribRenamer = new GribVariableRenamer();
+
+    /** handles the general variable renaming */
+    private VariableRenamer varRenamer;
 
     /**
      * Default constructor
@@ -1939,9 +1943,15 @@ public class GeoGridDataSource extends GridDataSource {
          * If name already exists in dataset, then the old name is returned
          *
          */
-        List<String> newName = renamer.matchNcepNames(ds, name);
+        /** handles general variable renaming */
+        this.varRenamer = new VariableRenamer(getIdv());
+        String userRemappedName = varRenamer.renameVar(name);
+        List<String> newName = gribRenamer.matchNcepNames(ds, name);
 
-        if (newName.size() == 1) {
+        if (!userRemappedName.equals(name)) {
+             // we found a new name from the IDV resources, so let it override everything else.
+             name = userRemappedName;
+        } else if (newName.size() == 1) {
             // if unique name is returned from netCDF-Java, then use it.
             name = newName.get(0);
         } else if (newName.size() == 0) {

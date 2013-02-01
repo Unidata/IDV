@@ -331,7 +331,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     /** Points to Variable name aliases */
     public static final XmlIdvResource RSC_VARIABLEALIASES =
         new XmlIdvResource("idv.resource.variablealiases",
-                           "Variable aliases");
+                           "Variable aliases","varaliases\\.tbl");
 
     /** Points to url maps */
     public static final XmlIdvResource RSC_URLMAPS =

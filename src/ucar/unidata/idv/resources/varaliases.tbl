@@ -1,5 +1,5 @@
 <varaliases>
   <varalias
-     old="T"
-     new="Temperature"/>
+     old="oldNameHere"
+     new="newNameHere"/>
 </varaliases>
