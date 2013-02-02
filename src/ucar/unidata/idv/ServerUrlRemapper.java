@@ -287,7 +287,7 @@ public class ServerUrlRemapper {
 
         List oldPaths = dataSource.getDataPaths();
 
-        if (oldPaths.size() != 0) {
+        if (oldPaths.size() != 1) {
             LogUtil.println("multiple paths for a single dataSource...do not know how to handle!");
         }
         for (Map.Entry<String, String> oldServerName :
