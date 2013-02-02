@@ -695,7 +695,7 @@
     <resource location="%APPPATH%/gempakparamtable.tbl"/>
   </resources>
 
-<!-- Where to find variable name lookup tables -->
+<!-- Where to find grib variable name lookup tables -->
   <resources name="idv.resource.variablealiases">
     <resource location="%USERPATH%/varaliases.tbl"/>
     <resource location="%SITEPATH%/varaliases.tbl"/>
@@ -711,5 +711,12 @@
     <resource location="%IDVPATH%/urlmaps.xml"/>
   </resources>
 
+<!-- Where to find variable renaming maps for use at the datasource level -->
+  <resources name="idv.resource.variablerenamer">
+    <resource location="%USERPATH%/varrenamer.xml"/>
+    <resource location="%SITEPATH%/varrenamer.xml"/>
+    <resource location="%APPPATH%/varrenamer.xml"/>
+    <resource location="%IDVPATH%/varrenamer.xml"/>
+  </resources>
 
 </resourcebundle>

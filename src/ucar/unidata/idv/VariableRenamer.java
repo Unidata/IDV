@@ -40,7 +40,7 @@ import java.util.*;
 
 
 /**
- * A class to handle remapping URLs from data sources as
+ * A class to handle remapping variable names from data sources as
  * they are unpersisted from bundles
  */
 
@@ -49,11 +49,11 @@ public class VariableRenamer {
     /** Reference to the IDV */
     private IntegratedDataViewer idv;
 
-    /** Reference to the Url Map Resource Collection */
+    /** Reference to the Variable Renaming Map Resource Collection */
     private XmlResourceCollection varmapResourceCollection;
 
-    /** Xml tag for url maps xml */
-    public static final String TAG_VARMAP = "varalias";
+    /** Xml tag for variable name maps xml */
+    public static final String TAG_VARRENAMER = "varrenamer";
 
     /** URL Maps (oldVar : newVar} */
     private HashMap<String, String> varMaps = new HashMap<String, String>();
@@ -63,18 +63,18 @@ public class VariableRenamer {
      */
     private void readVariableRenameResources() {
 
-        for (int urlRemapResourceIdx = 0;
-                urlRemapResourceIdx < varmapResourceCollection.size();
-                urlRemapResourceIdx++) {
+        for (int varRemapResourceIdx = 0;
+                varRemapResourceIdx < varmapResourceCollection.size();
+                varRemapResourceIdx++) {
             Element root =
-                this.varmapResourceCollection.getRoot(urlRemapResourceIdx,
+                this.varmapResourceCollection.getRoot(varRemapResourceIdx,
                     false);
 
             if (root == null) {
                 continue;
             }
 
-            List nodes = XmlUtil.findChildren(root, TAG_VARMAP);
+            List nodes = XmlUtil.findChildren(root, TAG_VARRENAMER);
 
             for (Object node1 : nodes) {
                 Element node   = (Element) node1;
@@ -108,7 +108,7 @@ public class VariableRenamer {
     private void init() {
 
         varmapResourceCollection = idv.getResourceManager().getXmlResources(
-            IdvResourceManager.RSC_VARIABLEALIASES);
+            IdvResourceManager.RSC_VARIABLERENAMER);
 
         readVariableRenameResources();
     }

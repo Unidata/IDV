@@ -1,5 +1,5 @@
-<varaliases>
-  <varalias
+<varrenamers>
+  <varrenamer
      old="oldNameHere"
      new="newNameHere"/>
-</varaliases>
+</varrenamers>
