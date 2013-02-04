@@ -993,7 +993,8 @@ public class GridTrajectoryControl extends DrawingControl {
         //  FieldImpl u = this.dataChoice;
         //   super.init(dataChoice0);
 
-
+        showWaitCursor();
+        getIdv().getIdvUIManager().splashMsg("Calculating trajectory");
         Unit dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
         gridTrackControl.setDisplayUnit(dUnit);
         final Unit rgUnit =
@@ -1087,7 +1088,7 @@ public class GridTrajectoryControl extends DrawingControl {
         super.paramName = paramName;
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
-
+        showNormalCursor();
     }
 
     /**
