@@ -417,13 +417,13 @@ def lonFlip(grid):
     return GridUtil.lonFlip(grid)
 
 def makeFlowTraj(u,v,w,s,s0):
-  """Get the u,v,w and scaler variable s, s0 from a grid.  Return grid trajectroy.
+  """Get the u,v,w and scalar variable s, s0 from a grid.  Return grid trajectroy.
   """
   ff = DerivedGridFactory.createTrajectoryGrid(u,v,w,s,s0)
   return ff
 
 def make2DFlowTraj(u,v,s,s0):
-  """Get the 2D u,v and scaler variable s, s0 from a grid.  Return grid trajectroy.
+  """Get the 2D u,v and scalar variable s, s0 from a grid.  Return grid trajectroy.
   """
   ff = DerivedGridFactory.createTrajectoryGrid(u,v,s,s0)
   return ff
