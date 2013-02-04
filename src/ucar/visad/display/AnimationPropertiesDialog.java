@@ -1014,13 +1014,13 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
 
             try {
                 myInfo.setFwdSpeed(
-                    (float) (Misc.parseValue(fwdField.getText().trim())));
+                    (float) (Misc.parseNumber(fwdField.getText().trim())));
                 myInfo.setBackSpeed(
-                    (float) (Misc.parseValue(backField.getText().trim())));
+                    (float) (Misc.parseNumber(backField.getText().trim())));
                 myInfo.setStartDwell(
-                    (float) (Misc.parseValue(startField.getText().trim())));
+                    (float) (Misc.parseNumber(startField.getText().trim())));
                 myInfo.setEndDwell(
-                    (float) (Misc.parseValue(endField.getText().trim())));
+                    (float) (Misc.parseNumber(endField.getText().trim())));
             } catch (NumberFormatException nfe) {
                 LogUtil.userErrorMessage("Bad number format:" + nfe);
                 return;
