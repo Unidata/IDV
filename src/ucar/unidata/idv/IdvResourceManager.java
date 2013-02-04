@@ -167,7 +167,6 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     protected static List resources = new ArrayList();
 
 
-
     /** Create this for the default stations */
     private NamedStationTable defaultTable;
 
@@ -177,7 +176,6 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
     /** Holds the actual macro values */
     private String[] macroValues;
-
 
 
     /** Points to the color tables */
@@ -318,7 +316,6 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
         new XmlIdvResource("idv.resource.actions", "Actions",
                            "actions\\.xml$");
 
-
     /** Points to station model symbols */
     public static final XmlIdvResource RSC_STATIONSYMBOLS =
         new XmlIdvResource("idv.resource.stationsymbols",
@@ -328,10 +325,15 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     public static final XmlIdvResource RSC_COLORPAIRS =
         new XmlIdvResource("idv.resource.colorpairs", "Color pairs");
 
-    /** Points to Variable name aliases */
+    /** Points to Variable aliases */
     public static final XmlIdvResource RSC_VARIABLEALIASES =
         new XmlIdvResource("idv.resource.variablealiases",
-                           "Variable aliases");
+                           "Variable aliases", "varaliases\\.tbl");
+
+    /** Points to Variable name maps (to handle loading data when variable names change) */
+    public static final XmlIdvResource RSC_VARIABLERENAMER =
+        new XmlIdvResource("idv.resource.variablerenamer",
+                           "Variable renamer", "varrenamer\\.xml");
 
     /** Points to url maps */
     public static final XmlIdvResource RSC_URLMAPS =

@@ -98,6 +98,9 @@ public class ServerUrlRemapper {
     /** port number for stable Unidata TDS */
     private static final String PORT_TDS = ":8080/";
 
+    /** port number for stable Unidata TDS */
+    private static final String PORT_BUNDLE = ":-1/";
+
     /** string that indicates the ncIdv version is unknown (pre IDV 4.0 bundles) */
     private static final String UNKNOWN_NCIDV_VERSION = "unknown";
 
@@ -145,13 +148,10 @@ public class ServerUrlRemapper {
 
                 if (this.urlMaps.containsKey(urlType)) {
                     HashMap<String, String> tmpUrlMap = urlMaps.get(urlType);
-                    if (tmpUrlMap.containsKey(oldUrl)) {
-                        LogUtil.consoleMessage("Multiple url maps found for "
-                                + oldUrl);
-                    } else {
+                    if (!tmpUrlMap.containsKey(oldUrl)) {
                         tmpUrlMap.put(oldUrl, newUrl);
+                        this.urlMaps.put(urlType, tmpUrlMap);
                     }
-                    this.urlMaps.put(urlType, tmpUrlMap);
                 } else {
                     HashMap<String, String> tmpUrlMap = new HashMap<String,
                             String>();
@@ -242,6 +242,11 @@ public class ServerUrlRemapper {
                         remapMotherlodeToThredds(dataSource, ncIdvVersion);
 
                 newDataSources.add(remappedDataSource);
+            } else {
+                //the case where remapping isn't needed or
+                // remapping for a specific dataSource isn't
+                // accounted for yet...
+                newDataSources.add(dataSource);
             }
         }
         ht.put(ID_DATASOURCES, newDataSources);
@@ -277,25 +282,19 @@ public class ServerUrlRemapper {
     private DataSource remapMotherlodeToThredds(DataSource dataSource,
             String ncIdvVersion) {
         String                  updatedPath;
-        HashMap<String, String> serverRemap = this.urlMaps.get("opendap");
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
-
-        if (testTds) {
-            LogUtil.println(
-                "INFO: Forcing TDS 4.3 connections to get remote data.");
-
-            serverRemap.put(URL_MOTHERLODE, URL_TDS_TEST);
-            serverRemap.put(URL_MOTHERLODE.replace("/", PORT_TDS),
-                            URL_TDS_TEST);
-            serverRemap.put(URL_TDS, URL_TDS_TEST);
-        }
-
+        HashMap<String, String> serverRemap = this.urlMaps.get("opendap");
 
         List oldPaths = dataSource.getDataPaths();
 
+        if (oldPaths.size() != 1) {
+            LogUtil.println("multiple paths for a single dataSource...do not know how to handle!");
+        }
         for (Map.Entry<String, String> oldServerName :
                 serverRemap.entrySet()) {
             String oldPath = (String) oldPaths.get(0);
+            oldPath = oldPath.replace(":-1/","/");
+
             if (oldPath.contains(oldServerName.getKey())) {
                 // if old path uses an old server name, like motherlode.ucar.edu, then update with new
                 updatedPath = oldPath.replace(oldServerName.getKey(),
