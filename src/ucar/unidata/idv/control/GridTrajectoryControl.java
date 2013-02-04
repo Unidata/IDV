@@ -602,7 +602,7 @@ public class GridTrajectoryControl extends DrawingControl {
         DirectDataChoice wdc =
             (DirectDataChoice) choices.get(new String("D3"));
         DirectDataChoice sdc =
-            (DirectDataChoice) choices.get(new String("scaler"));
+            (DirectDataChoice) choices.get(new String("Parameter"));
         addDataChoice(udc);
         addDataChoice(vdc);
         if (wdc != null) {
