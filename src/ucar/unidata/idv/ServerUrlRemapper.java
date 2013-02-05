@@ -214,9 +214,10 @@ public class ServerUrlRemapper {
         while ((n = iter.nextNode()) != null) {
             if (checkForUrl) {
                 oldPath = n.getNodeValue();
-
-                newPath = remapMotherlodeToThredds(oldPath, checkForUrlType);
-                urlNameMaps.put(oldPath, newPath);
+                if (!oldPath.equals("version")) {
+                    newPath = remapMotherlodeToThredds(oldPath, checkForUrlType);
+                    urlNameMaps.put(oldPath, newPath);
+                }
                 checkForUrl = Boolean.FALSE;
             }
 
