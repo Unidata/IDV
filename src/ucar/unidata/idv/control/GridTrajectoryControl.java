@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -142,6 +142,8 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     private static final Data DUMMY_DATA = new Real(0);
 
+    /** _more_ */
+    private Object MUTEX = new Object();
 
     /** _more_ */
     CoordinateSystem pressToHeightCS;
@@ -745,15 +747,11 @@ public class GridTrajectoryControl extends DrawingControl {
                 if (cmd.equals(CMD_createTrj)) {
                     try {
                         createTrjBtnClicked = true;
-                        if ( !is2D) {
-                            createTrajectoryControl();
-                        } else {
-                            create2DTrajectoryControl();
-                        }
+                        createTrajectory();
                         gridTrackControl.setLineWidth(trackLineWidth);
-                    } catch (VisADException ee) {}
-                    catch (RemoteException er) {}
-                    catch (Exception exr) {}
+                    } catch (Exception exr) {
+                        logException("Click create trajectory button", exr);
+                    }
                 }
 
 
@@ -766,6 +764,32 @@ public class GridTrajectoryControl extends DrawingControl {
         return true;
 
 
+    }
+
+    /**
+     * _more_
+     */
+    public void createTrajectory() {
+        Misc.run(new Runnable() {
+            public void run() {
+
+                try {
+                    synchronized (MUTEX) {
+                        showWaitCursor();
+                        if ( !is2D) {
+                            createTrajectoryControl();
+                        } else {
+                            create2DTrajectoryControl();
+                        }
+                    }
+                } catch (Exception exc) {
+                    logException("Calculationing the grid trajectory", exc);
+                } finally {
+                    showNormalCursor();
+                }
+
+            }
+        });
     }
 
     /**
@@ -993,8 +1017,7 @@ public class GridTrajectoryControl extends DrawingControl {
         //  FieldImpl u = this.dataChoice;
         //   super.init(dataChoice0);
 
-        showWaitCursor();
-        getIdv().getIdvUIManager().splashMsg("Calculating trajectory");
+
         Unit dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
         gridTrackControl.setDisplayUnit(dUnit);
         final Unit rgUnit =
@@ -1088,7 +1111,7 @@ public class GridTrajectoryControl extends DrawingControl {
         super.paramName = paramName;
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
-        showNormalCursor();
+
     }
 
     /**
