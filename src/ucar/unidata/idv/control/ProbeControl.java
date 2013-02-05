@@ -22,46 +22,28 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
-
-
+import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
-
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
-
-import ucar.unidata.geoloc.Bearing;
-
-import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.idv.ControlContext;
-
-import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.control.chart.LineState;
-
 import ucar.unidata.idv.control.chart.TimeSeriesChart;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.LatLonWidget;
-
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.MidiProperties;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.ThreeDSize;
-
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.ShapeUtility;
-
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.DisplayableData;
@@ -69,18 +51,34 @@ import ucar.visad.display.PointProbe;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.SelectorPoint;
 
-import visad.*;
-
-import visad.data.units.Parser;
+import visad.Data;
+import visad.FieldImpl;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Set;
+import visad.SetType;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
+import visad.VisADRay;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
-import visad.georef.LatLonTuple;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
+
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -88,13 +86,28 @@ import java.beans.PropertyChangeListener;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 
 import javax.vecmath.Point3d;
 
@@ -106,8 +119,7 @@ import javax.vecmath.Point3d;
  * field sampling - nearest grid point value or weighted average.
  * Can change levels.
  *
- * @author Unidata IDV developers
- * @version $Revision: 1.203 $
+ * @author IDV developers
  */
 public class ProbeControl extends DisplayControlImpl implements DisplayableData
     .DragAdapter {
@@ -163,13 +175,11 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /** Not used for now */
     private boolean updatePending = false;
 
-
-    /** _more_ */
+    /** keep probe at height flag */
     private boolean keepProbeAtHeight = true;
 
-    /** _more_ */
+    /** probe radius */
     private double probeRadius = 1.0;
-
 
     /** time label */
     private JLabel timeLabel;
@@ -258,8 +268,17 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /** Show sunrise/sunset display in time series */
     private boolean showSunriseSunset = false;
 
-    /** _more_ */
+    /** globe position type */
     private RealTupleType globePositionType;
+
+    /** probe size selector */
+    private JSlider probeSizeSlider;
+
+    /** probe color swatch selector */
+    private GuiUtils.ColorSwatch probeColorSwatch;
+
+    /** probe shape selector */
+    private JComboBox shapeCbx;
 
     /**
      * Cstr; sets flags; see init() for creation actions.
@@ -293,7 +312,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                     }
                     theMethod = ((Integer) method).intValue();
                 }
-                Unit           unit  = (Unit) Misc.safeGet(_units, i);
+                Unit unit = (Unit) Misc.safeGet(_units, i);
                 MidiProperties sound = (MidiProperties) Misc.safeGet(_sounds,
                                            i);
                 infos.add(new ProbeRowInfo(level, alt, theMethod, unit,
@@ -305,7 +324,16 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
 
         for (int i = 0; i < choices.size(); i++) {
-            ProbeRowInfo info = getRowInfo(i);
+            ProbeRowInfo info = null;
+            try {
+                info = getRowInfo(i);
+            } catch (BadDataException bde) {
+                removeDataChoice((DataChoice) choices.get(i));
+                infos.remove(i);
+                continue;
+            } finally {
+                showNormalCursor();
+            }
             if (info == null) {
                 return false;
             }
@@ -330,7 +358,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             RealType[] components = { RealType.XAxis, RealType.YAxis,
                                       RealType.ZAxis };
             globePositionType = new RealTupleType(components, null, null);
-            probe             = new PointProbe(new RealTuple(globePositionType,
+            probe = new PointProbe(new RealTuple(globePositionType,
                     new double[] { 0,
                                    0, 0 }));
             probe.getSelectorPoint().setDragAdapter(this);
@@ -394,19 +422,10 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         }
     }
 
-    /** _more_ */
-    private JSlider probeSizeSlider;
-
-    /** _more_ */
-    private GuiUtils.ColorSwatch probeColorSwatch;
-
-    /** _more_ */
-    private JComboBox shapeCbx;
-
     /**
-     * _more_
+     * Add properties components
      *
-     * @param jtp _more_
+     * @param jtp  the JTabbedPane
      */
     protected void addPropertiesComponents(JTabbedPane jtp) {
         super.addPropertiesComponents(jtp);
@@ -442,9 +461,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
 
     /**
-     * _more_
+     * Apply the properties
      *
-     * @return _more_
+     * @return  the properties
      */
     public boolean doApplyProperties() {
         if ( !super.doApplyProperties()) {
@@ -1147,13 +1166,13 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
 
     /**
-     * _more_
+     * Handle the drag
      *
-     * @param ray _more_
-     * @param first _more_
-     * @param mouseModifiers _more_
+     * @param ray   the VisADRay
+     * @param first  whether this is the first time or not
+     * @param mouseModifiers  the mouse modifiers
      *
-     * @return _more_
+     * @return true
      */
     public boolean handleDragDirect(VisADRay ray, boolean first,
                                     int mouseModifiers) {
@@ -1161,22 +1180,22 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     }
 
     /**
-     * _more_
+     * Handle adding a point
      *
-     * @param x _more_
+     * @param x  the point Coordinates
      *
-     * @return _more_
+     * @return true
      */
     public boolean handleAddPoint(float[] x) {
         return true;
     }
 
     /**
-     * _more_
+     * Constrain the drag point
      *
-     * @param position _more_
+     * @param position  the position
      *
-     * @return _more_
+     * @return  true
      */
     public boolean constrainDragPoint(float[] position) {
         float  x      = position[0];
@@ -1741,7 +1760,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 Object value, boolean isSelected, int rowIndex,
                 int vColIndex) {
             JComboBox box    = (JComboBox) getComponent();
-            Object[]  levels = formatLevels((Real[]) getLevelsAtRow(rowIndex));
+            Object[]  levels =
+                formatLevels((Real[]) getLevelsAtRow(rowIndex));
             List      ll     = Misc.toList(levels);
             ll.add(0, "Probe's");
             GuiUtils.setListData(box, ll.toArray());
@@ -1976,8 +1996,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     private void updatePositionInSwingThread(RealTuple position)
             throws VisADException, RemoteException {
         updatePending = false;
-        double[]           positionValues = position.getValues();
-        EarthLocationTuple elt            =
+        double[] positionValues = position.getValues();
+        EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
                 positionValues[1], positionValues[2] }, false);
         LatLonPoint llp = elt.getLatLonPoint();
@@ -2304,9 +2324,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     private EarthLocationTuple getProbeLocation()
             throws VisADException, RemoteException {
-        RealTuple          position       = probe.getPosition();
-        double[]           positionValues = position.getValues();
-        EarthLocationTuple elt            =
+        RealTuple position       = probe.getPosition();
+        double[]  positionValues = position.getValues();
+        EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
                 positionValues[1], positionValues[2] }, false);
         return elt;
@@ -2321,10 +2341,18 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * @throws VisADException On badness
      */
     private void clearCachedSamples() throws VisADException, RemoteException {
+        List<Integer> badOnes = new ArrayList<Integer>();
         for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
             ProbeRowInfo info = infos.get(rowIdx);
             info.clearCachedSamples();
-            info.getDataInstance().reInitialize();
+            try {
+                info.getDataInstance().reInitialize();
+            } catch (BadDataException bde) {
+                badOnes.add(rowIdx);
+            }
+        }
+        for (Integer bad : badOnes) {
+            removeField(bad);
         }
     }
 
@@ -2369,8 +2397,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             double  minDistance = 0;
 
             for (int i = 0; i < numObs; i++) {
-                PointOb ob       = (PointOb) pointObs.getSample(i);
-                double  distance =
+                PointOb ob = (PointOb) pointObs.getSample(i);
+                double distance =
                     ucar.visad.Util.bearingDistance(ob.getEarthLocation(),
                         elt).getValue();
                 if ((closest == null) || (distance < minDistance)) {
@@ -2441,7 +2469,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * @param elt The location
      * @param animationValue The time animation
      * @param animationStep Which step in the animation
-     * @param samples _more_
+     * @param samples the samples
      *
      * @return List of html to display
      *
