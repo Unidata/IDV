@@ -72,4 +72,12 @@
        p1="SPEED"
        p2="DIR"/>
   </paramgroup>
+  <paramgroup description="" name="GridRelative_uvw">
+    <params p1="UREL" p2="VREL" p3="WREL"/>
+    <params p1="GridRelative_u" p2="GridRelative_v" p3="GridRelative_w"/>
+    <params p1="GridRelative_u" p2="GridRelative_v" p3="WREL"/>
+    <params p1="U" p2="V" p3="W"/>
+      <params p1="U" p2="V" p3="WREL"/>
+  </paramgroup>
+
 </paramgroups>

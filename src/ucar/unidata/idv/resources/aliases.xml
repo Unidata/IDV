@@ -165,4 +165,8 @@ The label is used  (if defined) for  the AliasEditor gui.
      name="PROB"
      label="Probability"
      aliases="Ensemble grid univariate probability"/>
+  <alias
+     name="WREL"
+     aliases="GridRelative_w, omega, Vertical_velocity_pressure, Pressure_vertical_velocity,Pressure_vertical_velocity,Pressure_vertical_velocity"
+     label="Grid Relative W component of wind" />
 </aliases>
