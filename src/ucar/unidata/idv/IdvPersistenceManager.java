@@ -3028,13 +3028,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             if (xml == null) {
                 return;
             }
+            // check for old URLs, references to motherlode, remap urls if needed
+            xml = serverUrlRemapper.remapUrlsInBundle(xml);
             Trace.call1("Decode.toObject");
             Object data = getIdv().getEncoderForRead().toObject(xml);
             Trace.call2("Decode.toObject");
 
             if (data != null) {
-                // check dataSources for old URLs, references to motherlode, remap urls if needed
-                data = serverUrlRemapper.remapDataSources(data);
                 Hashtable properties = new Hashtable();
                 if (data instanceof Hashtable) {
                     Hashtable ht = (Hashtable) data;

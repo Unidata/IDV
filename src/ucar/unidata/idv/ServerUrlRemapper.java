@@ -21,24 +21,23 @@
 package ucar.unidata.idv;
 
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.traversal.DocumentTraversal;
+import org.w3c.dom.traversal.NodeFilter;
+import org.w3c.dom.traversal.TreeWalker;
 
 import thredds.util.UnidataTdsDataPathRemapper;
 
 import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceDescriptor;
-import ucar.unidata.data.grid.DodsGeoGridDataSource;
-import ucar.unidata.data.grid.GeoGridDataSource;
-import ucar.unidata.util.CatalogUtil;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -77,29 +76,11 @@ public class ServerUrlRemapper {
     /** TDS Service name for opendap */
     private static final String TDS_DODS_SERVICE = "/dodsC/";
 
-    /** TDS Service name for the http fileServer */
-    private static final String TDS_HTTP_SERVICE = "/fileServer/";
-
     /** TDS Service name for catalogs */
     private static final String TDS_CATALOG_SERVICE = "/catalog/";
 
     /** Datasource ID used for unpersistence */
     private static final String ID_DATASOURCES = IdvConstants.ID_DATASOURCES;
-
-    /** old url used to access TDS (deprecated) */
-    private static final String URL_MOTHERLODE = "motherlode.ucar.edu/";
-
-    /** url for stable Unidata TDS */
-    private static final String URL_TDS = "thredds.ucar.edu/";
-
-    /** url for test Unidata TDS */
-    private static final String URL_TDS_TEST = "thredds-test.ucar.edu/";
-
-    /** port number for stable Unidata TDS */
-    private static final String PORT_TDS = ":8080/";
-
-    /** port number for stable Unidata TDS */
-    private static final String PORT_BUNDLE = ":-1/";
 
     /** string that indicates the ncIdv version is unknown (pre IDV 4.0 bundles) */
     private static final String UNKNOWN_NCIDV_VERSION = "unknown";
@@ -115,12 +96,34 @@ public class ServerUrlRemapper {
         new HashMap<String, HashMap<String, String>>();
 
     /**
+     * Construct a ServerUrlRemapper
+     *
+     * @param idv instance of the IDV
+     */
+    public ServerUrlRemapper(IntegratedDataViewer idv) {
+        this.idv = idv;
+        init();
+    }
+
+    /**
+     * initilize the ServerUrlRemapper (get remaps from resources
+     */
+    private void init() {
+
+        urlmapResourceCollection = idv.getResourceManager().getXmlResources(
+            IdvResourceManager.RSC_URLMAPS);
+
+        readUrlRemapResources();
+    }
+
+    /**
      * Read in the resource xml files and store the URL maps
      */
     private void readUrlRemapResources() {
 
         for (int urlRemapResourceIdx = 0;
-                urlRemapResourceIdx < urlmapResourceCollection.size(); urlRemapResourceIdx++) {
+                urlRemapResourceIdx < urlmapResourceCollection.size();
+                urlRemapResourceIdx++) {
             Element root =
                 this.urlmapResourceCollection.getRoot(urlRemapResourceIdx,
                     false);
@@ -132,15 +135,15 @@ public class ServerUrlRemapper {
             List nodes = XmlUtil.findChildren(root, TAG_URLMAP);
 
             for (Object node1 : nodes) {
-                Element node = (Element) node1;
-                final String urlType = XmlUtil.getAttribute(node, "type");
-                String tmpOldUrl = XmlUtil.getAttribute(node, "old");
-                String tmpNewUrl = XmlUtil.getAttribute(node, "new");
-                if (!tmpOldUrl.endsWith("/")) {
+                Element      node      = (Element) node1;
+                final String urlType   = XmlUtil.getAttribute(node, "type");
+                String       tmpOldUrl = XmlUtil.getAttribute(node, "old");
+                String       tmpNewUrl = XmlUtil.getAttribute(node, "new");
+                if ( !tmpOldUrl.endsWith("/")) {
                     tmpOldUrl = tmpOldUrl + '/';
                 }
 
-                if (!tmpNewUrl.endsWith("/")) {
+                if ( !tmpNewUrl.endsWith("/")) {
                     tmpNewUrl = tmpNewUrl + '/';
                 }
                 final String oldUrl = tmpOldUrl;
@@ -148,31 +151,18 @@ public class ServerUrlRemapper {
 
                 if (this.urlMaps.containsKey(urlType)) {
                     HashMap<String, String> tmpUrlMap = urlMaps.get(urlType);
-                    if (!tmpUrlMap.containsKey(oldUrl)) {
+                    if ( !tmpUrlMap.containsKey(oldUrl)) {
                         tmpUrlMap.put(oldUrl, newUrl);
                         this.urlMaps.put(urlType, tmpUrlMap);
                     }
                 } else {
                     HashMap<String, String> tmpUrlMap = new HashMap<String,
-                            String>();
+                                                            String>();
                     tmpUrlMap.put(oldUrl, newUrl);
                     this.urlMaps.put(urlType, tmpUrlMap);
                 }
             }
         }
-    }
-
-
-    /**
-     * initilize the ServerUrlRemapper (get remaps from resources
-     */
-    private void init() {
-
-        urlmapResourceCollection =
-            idv.getResourceManager().getXmlResources(
-                IdvResourceManager.RSC_URLMAPS);
-
-        readUrlRemapResources();
     }
 
     /**
@@ -188,235 +178,165 @@ public class ServerUrlRemapper {
     }
 
     /**
-     * Construct a ServerUrlRemapper
+     * Walk the xml tree of a bundle, and find and replace
+     * urls that need to be updated before unpersistence
      *
-     * @param idv instance of the IDV
+     * @param xml string representation of the xml bundle
+     *
+     * @return a hash map of old -> new url transformations based on
+     * urls found in the bundle
      */
-    public ServerUrlRemapper(IntegratedDataViewer idv) {
-        this.idv = idv;
-        init();
-    }
+    private HashMap<String, String> bundleWalker(String xml) {
+        HashMap<String, String> urlNameMaps = new HashMap<String, String>();
+        Document                bundle;
+        try {
+            bundle = XmlUtil.getDocument(xml);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return urlNameMaps;
+        }
 
-    /**
-     * This method handles remapping issues for data server URL changes
-     *
-     * @param data Object from bundle unpersistence
-     *
-     * @return Object
-     */
-    public Object remapDataSources(Object data) {
+        DocumentTraversal docTraversal = (DocumentTraversal) bundle;
 
-        if (data instanceof Hashtable) {
-            data = remapDataSources((Hashtable) data);
-        } else if (data instanceof DataSource) {
-            //ToDo: Add code to handle different url types (adde, tds, etc.)
-            if (data instanceof DodsGeoGridDataSource) {
-                data = remapMotherlodeToThredds((DataSource) data);
+        TreeWalker iter =
+            docTraversal.createTreeWalker(bundle.getDocumentElement(),
+                                          NodeFilter.SHOW_CDATA_SECTION,
+                                          null, false);
+        Node         n                = null;
+        List<String> checkUrlTriggers = new ArrayList<String>();
+        checkUrlTriggers.add(ID_DATASOURCES);
+        checkUrlTriggers.add(DataSource.PROP_RESOLVERURL);
+
+        Boolean checkForUrl     = Boolean.FALSE;
+        String  checkForUrlType = null;
+        String  oldPath, newPath;
+
+        while ((n = iter.nextNode()) != null) {
+            if (checkForUrl) {
+                oldPath = n.getNodeValue();
+
+                newPath = remapMotherlodeToThredds(oldPath, checkForUrlType);
+                urlNameMaps.put(oldPath, newPath);
+                checkForUrl = Boolean.FALSE;
+            }
+
+            if (checkUrlTriggers.contains(n.getNodeValue())) {
+                checkForUrl     = Boolean.TRUE;
+                checkForUrlType = n.getNodeValue();
             }
         }
-
-        return data;
+        return urlNameMaps;
     }
 
     /**
-     * This method handles remapping issues for data server URL changes
+     * change urls pointing to motherlode.ucar.edu to
+     * use thredds.ucar.edu. Also handles changing the
+     * datasetUrlPath if required (i.e. old bundles, testTDS
+     * plugin enabled).
      *
-     * @param ht Contains the unpersisted objects
+     * @param oldPath old URL
+     * @param oldPathType either a RESOLVER url or a datasource URL
      *
-     * @return ht Contains unpersisted objects with remaped URLs, if needed.
+     * @return new url string
      */
-    private Hashtable remapDataSources(Hashtable ht) {
-        Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
-        if (ht.containsKey(IdvConstants.ID_NCIDV_VERSION)) {
-            ncIdvVersion = (String) ht.get(IdvConstants.ID_NCIDV_VERSION);
-        }
-        List             dataSources    = (List) ht.get(ID_DATASOURCES);
-        List<DataSource> newDataSources = new ArrayList<DataSource>();
-        for (Object dataSource1 : dataSources) {
-            DataSource dataSource = (DataSource) dataSource1;
-            //ToDo: Add code to handle different url types (adde, tds, etc.)
-            if (dataSource instanceof DodsGeoGridDataSource) {
-                // update motherlode references to thredds
-                // this should happen regardless of version of ncIDV
-                DataSource remappedDataSource =
-                        remapMotherlodeToThredds(dataSource, ncIdvVersion);
+    private String remapMotherlodeToThredds(String oldPath,
+                                            String oldPathType) {
 
-                newDataSources.add(remappedDataSource);
-            } else {
-                //the case where remapping isn't needed or
-                // remapping for a specific dataSource isn't
-                // accounted for yet...
-                newDataSources.add(dataSource);
-            }
-        }
-        ht.put(ID_DATASOURCES, newDataSources);
-
-        return ht;
-    }
-
-
-    /**
-     * Method to change old urls that point to motherlode to the appropriate
-     * new server using the thredds*.ucar.edu domain.
-     *
-     * This call is for the case where ncIdvVersion is unknown or not supplied.
-     *
-     * @param dataSource DataSource object that may need to be updated
-     *
-     * @return updated DataSource
-     */
-    private DataSource remapMotherlodeToThredds(DataSource dataSource) {
-        return remapMotherlodeToThredds(dataSource, UNKNOWN_NCIDV_VERSION);
-    }
-
-    /**
-     * Method to change old urls that point to motherlode to the appropriate
-     * new server using the thredds*.ucar.edu domain.
-     *
-     * @param dataSource DataSource object that may need to be updated
-     * @param ncIdvVersion Version of ncIdv.jar that was used when the bundle was created.
-     *
-     * @return updated DataSource
-     */
-
-    private DataSource remapMotherlodeToThredds(DataSource dataSource,
-            String ncIdvVersion) {
-        String                  updatedPath;
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
         HashMap<String, String> serverRemap = this.urlMaps.get("opendap");
+        String                  newPath     = oldPath;
 
-        List oldPaths = dataSource.getDataPaths();
-
-        if (oldPaths.size() != 1) {
-            LogUtil.println("multiple paths for a single dataSource...do not know how to handle!");
-        }
         for (Map.Entry<String, String> oldServerName :
                 serverRemap.entrySet()) {
-            String oldPath = (String) oldPaths.get(0);
-            oldPath = oldPath.replace(":-1/","/");
-
+            oldPath = oldPath.replace(":-1/", "/");
             if (oldPath.contains(oldServerName.getKey())) {
                 // if old path uses an old server name, like motherlode.ucar.edu, then update with new
-                updatedPath = oldPath.replace(oldServerName.getKey(),
-                        oldServerName.getValue());
+                newPath = oldPath.replace(oldServerName.getKey(),
+                                          oldServerName.getValue());
                 // if ncIdvVersion does not exists, then it was created with a pre tds 4.2 -> 4.3 transition
                 // IDV and the url data path likely needs to be updated
                 //uncomment next line once 8080 is running 4.3
                 //ToDo: enable ncIdvVersion check once thredds.ucar.edu -> 4.3
                 //if ((ncIdvVersion != UNKNOWN_NCIDV_VERSION) || (testTds)) {
                 if (testTds) {
-                    dataSource = remapOldMotherlodeDatasetUrlPath(dataSource,
-                            updatedPath);
-                } else {
-                    dataSource = updatePropsWithRemapUrl(dataSource,
-                            updatedPath);
+                    newPath = remapOldMotherlodeDatasetUrlPath(newPath,
+                            oldPathType);
                 }
                 break;
             }
         }
 
-        return dataSource;
+        return newPath;
     }
 
     /**
-     * This method addresses changes to dataset urlPath changes between
-     * Unidata TDS 4.2 and 4.3. In particular, things like naming of the
-     * best datasets, frmc collections moving to grib collects, etc.
+     * Updates a DatasetUrlPath from pre tds 4.3 to
+     * 4.3.
      *
-     * @param dataSource DataSource object that may need to be updated
-     * @param oldUrl URL whose data path may need to be updated
+     * @param oldUrl old url
+     * @param oldPathType RESOLVER url or datasource URL
      *
-     * @return updated DataSource
+     * @return _more_
      */
-    private DataSource remapOldMotherlodeDatasetUrlPath(
-            DataSource dataSource, String oldUrl) {
+    private String remapOldMotherlodeDatasetUrlPath(String oldUrl,
+            String oldPathType) {
+        String newUrl = oldUrl;
         // this is where the fmrc -> grib magic will happen
         UnidataTdsDataPathRemapper remapper =
             new UnidataTdsDataPathRemapper();
         // grab dataSource URL
-        if (dataSource instanceof DodsGeoGridDataSource) {
-            String[] breakUrl = null;
-            if (oldUrl.contains(TDS_CATALOG_SERVICE)) {
-                breakUrl = oldUrl.split(TDS_CATALOG_SERVICE);
-            } else if (oldUrl.contains(TDS_DODS_SERVICE)) {
-                breakUrl = oldUrl.split(TDS_DODS_SERVICE);
-            }
-
-            String oldUrlPath;
-
-            assert breakUrl != null;
-            if (breakUrl.length == 2) {
-                oldUrlPath = breakUrl[1];
-            } else {
-                return dataSource;
-            }
-            String map = null;
-            if (oldUrlPath.contains(LATEST_XML_NAME)) {
-                oldUrlPath = oldUrlPath.split(LATEST_XML_NAME)[0];
-                map        = LATEST_REMAP_KEY;
-            } else if ((oldUrlPath.contains(TDS_PRE_43_BEST_NAME))
-                       || (oldUrlPath.contains(
-                           TDS_PRE_43_BEST_NAME_SUFFIX))) {
-                map = BEST_REMAP_KEY;
-            }
-
-            List<String> newUrlPaths = remapper.getMappedUrlPaths(oldUrlPath,
-                                           map);
-            if ((newUrlPaths != null) && (newUrlPaths.size() == 1)) {
-                String newUrlPath = newUrlPaths.get(0);
-                String newUrl     = oldUrl.replace(oldUrlPath, newUrlPath);
-                dataSource = updatePropsWithRemapUrl(dataSource, newUrl);
-            }
+        String[] breakUrl = null;
+        if (oldUrl.contains(TDS_CATALOG_SERVICE)) {
+            breakUrl = oldUrl.split(TDS_CATALOG_SERVICE);
+        } else if (oldUrl.contains(TDS_DODS_SERVICE)) {
+            breakUrl = oldUrl.split(TDS_DODS_SERVICE);
         }
 
-        return dataSource;
-    }
+        String oldUrlPath;
 
+        assert breakUrl != null;
+        if (breakUrl.length == 2) {
+            oldUrlPath = breakUrl[1];
+        } else {
+            return oldUrl;
+        }
+        String map = null;
+
+        if (oldUrlPath.contains(LATEST_XML_NAME)) {
+            oldUrlPath = oldUrlPath.split(LATEST_XML_NAME)[0];
+            map        = LATEST_REMAP_KEY;
+        } else if ((oldUrlPath.contains(TDS_PRE_43_BEST_NAME))
+                   || (oldUrlPath.contains(TDS_PRE_43_BEST_NAME_SUFFIX))) {
+            map = BEST_REMAP_KEY;
+        }
+
+        List<String> newUrlPaths = remapper.getMappedUrlPaths(oldUrlPath,
+                                       map);
+        if ((newUrlPaths != null) && (newUrlPaths.size() == 1)) {
+            String newUrlPath = newUrlPaths.get(0);
+            newUrl = oldUrl.replace(oldUrlPath, newUrlPath);
+        }
+
+        return newUrl;
+    }
 
     /**
-     * This methods updates the properties that I *think* matter when updating
-     * the data url...this is questionable, but works for now.
+     * basic method used to remap urls found in a
+     * bundle xml file
      *
-     * @param dataSource DataSource object whose properties need to be updated
+     * @param xml string representation of a bundle
      *
-     * @param newPath new URL string
-     *
-     * @return updated DataSource
+     * @return updated string representation of a bundle
      */
-
-    private DataSource updatePropsWithRemapUrl(DataSource dataSource,
-            String newPath) {
-
-        if (newPath.contains(LATEST_XML_NAME)) {
-
-            Hashtable props =
-                ((DodsGeoGridDataSource) dataSource).getProperties();
-            if (props.containsKey(GeoGridDataSource.PROP_SERVICE_HTTP)) {
-                String newHttpPath = CatalogUtil.resolveUrl(newPath,
-                                         null).replace(TDS_DODS_SERVICE,
-                                             TDS_HTTP_SERVICE);
-                ((DodsGeoGridDataSource) dataSource).setProperty(
-                    DataSource.PROP_SERVICE_HTTP, newHttpPath);
-            }
-
-            if (props.containsKey(DataSource.PROP_RESOLVERURL)) {
-                ((DodsGeoGridDataSource) dataSource).setProperty(
-                    DataSource.PROP_RESOLVERURL, newPath);
-            }
-        } else {
-            Hashtable props =
-                ((DodsGeoGridDataSource) dataSource).getProperties();
-            DataSourceDescriptor descript =
-                ((DodsGeoGridDataSource) dataSource).getDescriptor();
-
-            try {
-                dataSource = new DodsGeoGridDataSource(descript, newPath,
-                        props);
-            } catch (IOException e) {
-                e.printStackTrace();
+    public String remapUrlsInBundle(String xml) {
+        HashMap<String, String> urlNameMaps = bundleWalker(xml);
+        for (String oldUrl : urlNameMaps.keySet()) {
+            while (xml.contains(oldUrl)) {
+                xml = xml.replace(oldUrl, urlNameMaps.get(oldUrl));
             }
         }
 
-        return dataSource;
+        return xml;
     }
+
 }
