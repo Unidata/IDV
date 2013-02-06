@@ -226,9 +226,9 @@ public class ServerUrlRemapper {
         topLevelTags.add(IdvConstants.ID_VIEWMANAGERS);
         topLevelTags.add(IdvConstants.ID_DISPLAYCONTROLS);
 
-        Boolean inDatasourceTag = Boolean.FALSE;
-        Boolean inPropertyTag   = Boolean.FALSE;
-        Boolean inSourcesTag    = Boolean.FALSE;
+        Boolean inDatasourceTag = false;
+        Boolean inPropertyTag   = false;
+        Boolean inSourcesTag    = false;
         String  oldPath, newPath, name, value;
 
 
@@ -238,7 +238,7 @@ public class ServerUrlRemapper {
         String attrName = propAttrs.getNamedItem("class").getNodeValue();
 
         if (attrName.contains("ucar.unidata.data")) {
-            inDatasourceTag = Boolean.TRUE;
+            inDatasourceTag = true;
         }
 
         Node thisNode;
@@ -248,9 +248,9 @@ public class ServerUrlRemapper {
             value = thisNode.getNodeValue();
             if (value != null) {
                 if (value.equals(IdvConstants.ID_DATASOURCES)) {
-                    inDatasourceTag = Boolean.TRUE;
+                    inDatasourceTag = true;
                 } else if (topLevelTags.contains(value)) {
-                    inDatasourceTag = Boolean.FALSE;
+                    inDatasourceTag = false;
                 }
             }
 
@@ -259,14 +259,14 @@ public class ServerUrlRemapper {
                     propAttrs = (AttributeMap) thisNode.getAttributes();
                     attrName  = propAttrs.getNamedItem("name").getNodeValue();
                     if (attrName.equals("Sources")) {
-                        inSourcesTag = Boolean.TRUE;
+                        inSourcesTag = true;
                     } else {
-                        inSourcesTag = Boolean.FALSE;
+                        inSourcesTag = false;
                     }
                     if (attrName.equals("Properties")) {
-                        inPropertyTag = Boolean.TRUE;
+                        inPropertyTag = true;
                     } else {
-                        inPropertyTag = Boolean.FALSE;
+                        inPropertyTag = false;
                     }
                 }
 
