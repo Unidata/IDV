@@ -246,7 +246,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         super(idv);
 
-//        serverUrlRemapper = new ServerUrlRemapper(idv);
+        //        serverUrlRemapper = new ServerUrlRemapper(idv);
         cleanupOldSavedBundles();
 
 
@@ -3028,8 +3028,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             // check for old URLs, references to motherlode, remap urls if needed
 
             Trace.call1("Remapping URLs");
-            xml = new ServerUrlRemapper(getIdv()).remapUrlsInBundle(xml);
-            Trace.call2("Remapping URLs");            
+            ServerUrlRemapper sur = new ServerUrlRemapper(getIdv());
+            xml = sur.remapUrlsInBundle(xml);
+            // get rid of the reference since we don't need it anymore
+            sur = null;
+            Trace.call2("Remapping URLs");
             Trace.call1("Decode.toObject");
             Object data = getIdv().getEncoderForRead().toObject(xml);
             Trace.call2("Decode.toObject");
