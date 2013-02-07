@@ -25,8 +25,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import ucar.nc2.dt.grid.GridDataset;
-import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.util.net.HTTPSession;
 
 import ucar.unidata.idv.IdvResourceManager;
@@ -209,9 +207,6 @@ public class DataManager {
 
     /** Maps variable name to variable alias */
     private static VariableRenamer variableRenamer;
-
-    /** handles the grib variable renaming */
-    private static GribVariableRenamer gribRenamer;
 
     /**
      * The list of {@link DataSourceDescriptor}s defined by the datasource.xml
@@ -587,12 +582,9 @@ public class DataManager {
             }
         }
 
-        // Init variable aliases
-        // get the list of property files
-        this.variableRenamer = new VariableRenamer(resourceManager);
+        // Read in the variable renaming resources
 
-        // Init grib renamer from netCDF-Java
-        this.gribRenamer = new GribVariableRenamer();
+        this.variableRenamer = new VariableRenamer(resourceManager);
     }
 
 
@@ -1752,21 +1744,13 @@ public class DataManager {
 
     /**
      * Get the new name for a variable name
+     *
+     * @param varName _more_
      * @return new name
      */
     public static List<String> getNewVariableName(String varName) {
-       return variableRenamer.renameVar(varName);
+        return variableRenamer.renameVar(varName);
     }
-
-
-    /**
-     * Get the new name for a variable name
-     * @return new name
-     */
-    public static List<String> getNewNcepName(GridDataset gds, String varName) {
-        return gribRenamer.matchNcepNames(gds, varName);
-    }
-
 
     /**
      *  Add in the AddeURLStreamHandler

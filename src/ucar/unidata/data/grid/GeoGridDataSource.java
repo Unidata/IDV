@@ -40,6 +40,7 @@ import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
+import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
@@ -208,6 +209,10 @@ public class GeoGridDataSource extends GridDataSource {
 
     /** for zidv */
     private CalendarDateRange dateRange;
+
+    /** handles the grib variable renaming */
+    private static GribVariableRenamer gribRenamer =
+        new GribVariableRenamer();
 
     /**
      * Default constructor
@@ -1951,26 +1956,24 @@ public class GeoGridDataSource extends GridDataSource {
 
         /** handles general variable renaming */
 
+        List<String> newName           = gribRenamer.matchNcepNames(ds, name);
         List<String> userRemappedNames = DataManager.getNewVariableName(name);
-        List<String> newName          = DataManager.getNewNcepName(ds, name);
 
-        if (newName.size() == 1) {
-            // if unique name is returned from netCDF-Java, then use it.
-            name = newName.get(0);
-        } else if (newName.size() == 0) {
-            // if netCDF-Java does not find any name, then look in IDV tables
-            if ((userRemappedNames != null) && !userRemappedNames.isEmpty()) {
-                for (String remappedName : userRemappedNames) {
-                    GeoGrid tmpGeoGrid = ds.findGridByName(remappedName);
-                    if (tmpGeoGrid != null) {
-                        name = remappedName;
-                        break;
-                    }
+        // check IDV variable renaming first
+        if ((userRemappedNames != null) && !userRemappedNames.isEmpty()) {
+            for (String remappedName : userRemappedNames) {
+                GeoGrid tmpGeoGrid = ds.findGridByName(remappedName);
+                if (tmpGeoGrid != null) {
+                    name = remappedName;
+                    break;
                 }
             }
+        } else if (newName.size() == 1) {
+            // a unique name has been returned from netCDF-Java - use it!
+            name = newName.get(0);
         } else if (newName.size() > 0) {
-            // netCDF-Java returned more than one match and no match was found in the
-            // IDV tables...ask user
+            // netCDF-Java returned more than one match (no match was found in the
+            // IDV tables)...ask user which one is correct
             LogUtil.printMessage("Multiple Matches Found for " + name);
             LogUtil.printMessage("Possible new variable names are:");
             List<String> newDescription = new ArrayList<String>();
@@ -1982,8 +1985,6 @@ public class GeoGridDataSource extends GridDataSource {
             LogUtil.printMessage("Please update your bundle.");
             if (getIdv().getViewManager().isInteractive()) {
                 //Misc.printStack("findgrid", 10);
-
-
                 String msg1 =
                     "The variable name has changed.  Please select a new match.<br><br>";
                 String msg2 = "Possible new names for the variable <i>"
