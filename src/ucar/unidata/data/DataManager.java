@@ -25,10 +25,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ucar.nc2.dt.grid.GridDataset;
+import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.util.net.HTTPSession;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
+import ucar.unidata.idv.VariableRenamer;
 import ucar.unidata.util.AccountManager;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
@@ -204,6 +207,12 @@ public class DataManager {
      */
     private ArrayList<DataSource> dataSources = new ArrayList();
 
+    /** Maps variable name to variable alias */
+    private static VariableRenamer variableRenamer;
+
+    /** handles the grib variable renaming */
+    private static GribVariableRenamer gribRenamer;
+
     /**
      * The list of {@link DataSourceDescriptor}s defined by the datasource.xml
      * resource files.
@@ -258,10 +267,6 @@ public class DataManager {
 
     /** Maps data source names */
     protected Hashtable dataSourceNameMap = new Hashtable();
-
-    /** Maps parameter name to parameter alias */
-    protected Hashtable<String, List> parameterAliases =
-        new Hashtable<String, List>();
 
     /**
      * Create a new DataManager with the given {@link DataContext}.
@@ -582,35 +587,12 @@ public class DataManager {
             }
         }
 
-        // Init GRIB variable aliases
+        // Init variable aliases
         // get the list of property files
-        ResourceCollection variableAliases =
-            resourceManager.getResources(
-                IdvResourceManager.RSC_VARIABLEALIASES);
-        for (int i = 0; i < variableAliases.size(); i++) {
-            try {
-                Properties newAliases = new Properties();
-                newAliases = Misc.readProperties(
-                    (String) variableAliases.get(i).toString(), newAliases,
-                    dataContext.getIdv().getClass());
-                //                System.err.println ("process: " +(String) propertyFiles.get(i));
-                for (Enumeration keys = newAliases.keys();
-                        keys.hasMoreElements(); ) {
-                    String key   = (String) keys.nextElement();
-                    String value = (String) newAliases.get(key);
-                    List<String> aliases = StringUtil.split(value, ",", true,
-                                               true);
-                    if ( !aliases.isEmpty()) {
-                        parameterAliases.put(key, aliases);
-                    }
-                }
-            } catch (IllegalArgumentException iae) {
-                // Ignore this - bad properties
-            }
-        }
+        this.variableRenamer = new VariableRenamer(resourceManager);
 
-
-
+        // Init grib renamer from netCDF-Java
+        this.gribRenamer = new GribVariableRenamer();
     }
 
 
@@ -1769,13 +1751,22 @@ public class DataManager {
     }
 
     /**
-     * Get the aliases for a parameter name
-     * @param paramName  name of the parameter
-     * @return a list of aliases or null
+     * Get the new name for a variable name
+     * @return new name
      */
-    public List<String> getParameterAliases(String paramName) {
-       return parameterAliases.get(paramName);
+    public static List<String> getNewVariableName(String varName) {
+       return variableRenamer.renameVar(varName);
     }
+
+
+    /**
+     * Get the new name for a variable name
+     * @return new name
+     */
+    public static List<String> getNewNcepName(GridDataset gds, String varName) {
+        return gribRenamer.matchNcepNames(gds, varName);
+    }
+
 
     /**
      *  Add in the AddeURLStreamHandler

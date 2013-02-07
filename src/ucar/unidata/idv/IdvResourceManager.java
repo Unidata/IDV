@@ -325,11 +325,6 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     public static final XmlIdvResource RSC_COLORPAIRS =
         new XmlIdvResource("idv.resource.colorpairs", "Color pairs");
 
-    /** Points to Variable aliases */
-    public static final XmlIdvResource RSC_VARIABLEALIASES =
-        new XmlIdvResource("idv.resource.variablealiases",
-                           "Variable aliases", "varaliases\\.tbl");
-
     /** Points to Variable name maps (to handle loading data when variable names change) */
     public static final XmlIdvResource RSC_VARIABLERENAMER =
         new XmlIdvResource("idv.resource.variablerenamer",

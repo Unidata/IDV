@@ -37,8 +37,9 @@ import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableEnhanced;
 import ucar.nc2.dt.GridCoordSystem;
-import ucar.nc2.dt.grid.*;
-import ucar.nc2.grib.GribVariableRenamer;
+import ucar.nc2.dt.grid.GeoGrid;
+import ucar.nc2.dt.grid.GridDataset;
+import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
@@ -50,8 +51,6 @@ import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
-import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.idv.VariableRenamer;
 import ucar.unidata.idv.ui.DataTreeDialog;
 import ucar.unidata.ui.TextSearcher;
 import ucar.unidata.util.CatalogUtil;
@@ -67,10 +66,8 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 
-import ucar.unidata.xml.*;
 import ucar.unidata.xml.XmlUtil;
 
-import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
 
@@ -95,10 +92,24 @@ import java.io.StringWriter;
 
 import java.rmi.RemoteException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 
 
 /**
@@ -197,12 +208,6 @@ public class GeoGridDataSource extends GridDataSource {
 
     /** for zidv */
     private CalendarDateRange dateRange;
-
-    /** handles the grib variable renaming */
-    private GribVariableRenamer gribRenamer = new GribVariableRenamer();
-
-    /** handles the general variable renaming */
-    private VariableRenamer varRenamer;
 
     /**
      * Default constructor
@@ -1943,26 +1948,22 @@ public class GeoGridDataSource extends GridDataSource {
          * If name already exists in dataset, then the old name is returned
          *
          */
-        /** handles general variable renaming */
-        this.varRenamer = new VariableRenamer(getIdv());
-        String userRemappedName = varRenamer.renameVar(name);
-        List<String> newName = gribRenamer.matchNcepNames(ds, name);
 
-        if (!userRemappedName.equals(name)) {
-             // we found a new name from the IDV resources, so let it override everything else.
-             name = userRemappedName;
-        } else if (newName.size() == 1) {
+        /** handles general variable renaming */
+
+        List<String> userRemappedNames = DataManager.getNewVariableName(name);
+        List<String> newName          = DataManager.getNewNcepName(ds, name);
+
+        if (newName.size() == 1) {
             // if unique name is returned from netCDF-Java, then use it.
             name = newName.get(0);
         } else if (newName.size() == 0) {
             // if netCDF-Java does not find any name, then look in IDV tables
-            List<String> aliases =
-                getIdv().getDataManager().getParameterAliases(name);
-            if ((aliases != null) && !aliases.isEmpty()) {
-                for (String alias : aliases) {
-                    GeoGrid tmpGeoGrid = ds.findGridByName(alias);
+            if ((userRemappedNames != null) && !userRemappedNames.isEmpty()) {
+                for (String remappedName : userRemappedNames) {
+                    GeoGrid tmpGeoGrid = ds.findGridByName(remappedName);
                     if (tmpGeoGrid != null) {
-                        name = alias;
+                        name = remappedName;
                         break;
                     }
                 }
