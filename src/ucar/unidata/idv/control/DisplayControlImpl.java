@@ -3230,8 +3230,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected void revertToDefaultColorTable() {
         try {
+            setDisplayInactive();
             setColorTable(getInitialColorTable());
             setRange(getInitialRange());
+            setDisplayActive();
         } catch (Exception exc) {
             logException("Resetting color table", exc);
         }

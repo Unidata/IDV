@@ -21,13 +21,16 @@
 package ucar.unidata.idv;
 
 
+import org.apache.xerces.dom.AttributeMap;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.traversal.DocumentTraversal;
 import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.TreeWalker;
+
+import org.xml.sax.SAXException;
 
 import thredds.util.UnidataTdsDataPathRemapper;
 
@@ -35,11 +38,20 @@ import ucar.unidata.data.DataSource;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 
 /**
@@ -79,9 +91,6 @@ public class ServerUrlRemapper {
     /** TDS Service name for catalogs */
     private static final String TDS_CATALOG_SERVICE = "/catalog/";
 
-    /** Datasource ID used for unpersistence */
-    private static final String ID_DATASOURCES = IdvConstants.ID_DATASOURCES;
-
     /** string that indicates the ncIdv version is unknown (pre IDV 4.0 bundles) */
     private static final String UNKNOWN_NCIDV_VERSION = "unknown";
 
@@ -94,6 +103,10 @@ public class ServerUrlRemapper {
     /** URL Maps (Type : {oldUrl : newUrl} */
     private HashMap<String, HashMap<String, String>> urlMaps =
         new HashMap<String, HashMap<String, String>>();
+
+    /** name for cdata tags */
+    public static final String CDATA_ID = "#cdata-section";
+
 
     /**
      * Construct a ServerUrlRemapper
@@ -185,48 +198,125 @@ public class ServerUrlRemapper {
      *
      * @return a hash map of old -> new url transformations based on
      * urls found in the bundle
+     *
+     * @throws IOException _more_
+     * @throws SAXException _more_
+     * @throws TransformerException _more_
      */
-    private HashMap<String, String> bundleWalker(String xml) {
-        HashMap<String, String> urlNameMaps = new HashMap<String, String>();
-        Document                bundle;
+
+    private String bundleWalker(String xml)
+            throws SAXException, IOException, TransformerException {
+
+        Document bundle;
         try {
             bundle = XmlUtil.getDocument(xml);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return urlNameMaps;
+            return xml;
         }
 
         DocumentTraversal docTraversal = (DocumentTraversal) bundle;
 
-        TreeWalker iter =
+        TreeWalker walker =
             docTraversal.createTreeWalker(bundle.getDocumentElement(),
-                                          NodeFilter.SHOW_CDATA_SECTION,
-                                          null, false);
-        Node         n                = null;
-        List<String> checkUrlTriggers = new ArrayList<String>();
-        checkUrlTriggers.add(ID_DATASOURCES);
-        checkUrlTriggers.add(DataSource.PROP_RESOLVERURL);
+                                          NodeFilter.SHOW_ALL, null, false);
 
-        Boolean checkForUrl     = Boolean.FALSE;
-        String  checkForUrlType = null;
-        String  oldPath, newPath;
+        List<String> topLevelTags = new ArrayList<String>();
+        topLevelTags.add(IdvConstants.ID_VERSION);
+        topLevelTags.add(IdvConstants.ID_VIEWMANAGERS);
+        topLevelTags.add(IdvConstants.ID_DISPLAYCONTROLS);
 
-        while ((n = iter.nextNode()) != null) {
-            if (checkForUrl) {
-                oldPath = n.getNodeValue();
-                if (!oldPath.equals("version")) {
-                    newPath = remapMotherlodeToThredds(oldPath, checkForUrlType);
-                    urlNameMaps.put(oldPath, newPath);
-                }
-                checkForUrl = Boolean.FALSE;
-            }
+        Boolean inDatasourceTag = false;
+        Boolean inPropertyTag   = false;
+        Boolean inSourcesTag    = false;
+        String  oldPath, newPath, name, value;
 
-            if (checkUrlTriggers.contains(n.getNodeValue())) {
-                checkForUrl     = Boolean.TRUE;
-                checkForUrlType = n.getNodeValue();
-            }
+
+        // look to see if the root tag indicates a datasource only bundle
+        AttributeMap propAttrs =
+            (AttributeMap) walker.getRoot().getAttributes();
+        String attrName = propAttrs.getNamedItem("class").getNodeValue();
+
+        if (attrName.contains("ucar.unidata.data")) {
+            inDatasourceTag = true;
         }
-        return urlNameMaps;
+
+        Node thisNode;
+        thisNode = walker.nextNode();
+        while (thisNode != null) {
+            name  = thisNode.getNodeName();
+            value = thisNode.getNodeValue();
+            if (value != null) {
+                if (value.equals(IdvConstants.ID_DATASOURCES)) {
+                    inDatasourceTag = true;
+                } else if (topLevelTags.contains(value)) {
+                    inDatasourceTag = false;
+                }
+            }
+
+            if (inDatasourceTag) {
+                if (name.equals("property")) {
+                    propAttrs = (AttributeMap) thisNode.getAttributes();
+                    attrName  = propAttrs.getNamedItem("name").getNodeValue();
+                    if (attrName.equals("Sources")) {
+                        inSourcesTag = true;
+                    } else {
+                        inSourcesTag = false;
+                    }
+                    if (attrName.equals("Properties")) {
+                        inPropertyTag = true;
+                    } else {
+                        inPropertyTag = false;
+                    }
+                }
+
+                if (inSourcesTag) {
+                    if (thisNode.getNodeName().equals(CDATA_ID)) {
+                        oldPath = thisNode.getNodeValue();
+                        newPath = remapMotherlodeToThredds(oldPath);
+                        thisNode.setNodeValue(newPath);
+                    }
+                } else if (inPropertyTag) {
+                    if (thisNode.getNodeName().equals(CDATA_ID)) {
+                        if (thisNode.getNodeValue().equals(
+                                DataSource.PROP_RESOLVERURL)) {
+                            thisNode = walker.nextNode();
+                            while ( !thisNode.getNodeName().equals(
+                                    CDATA_ID)) {
+                                thisNode = walker.nextNode();
+                            }
+                            oldPath = thisNode.getNodeValue();
+                            newPath = remapMotherlodeToThredds(oldPath);
+                            thisNode.setNodeValue(newPath);
+                        }
+                    }
+                }
+            }
+
+            thisNode = walker.nextNode();
+        }
+
+        TransformerFactory tFactory    = TransformerFactory.newInstance();
+        Transformer        transformer = tFactory.newTransformer();
+        DOMSource          source      = new DOMSource(bundle);
+        Writer             outWriter   = new StringWriter();
+        StreamResult       result      = new StreamResult(outWriter);
+        transformer.transform(source, result);
+        return outWriter.toString();
+    }
+
+    /**
+     * change urls pointing to motherlode.ucar.edu to
+     * use thredds.ucar.edu. Also handles changing the
+     * datasetUrlPath if required (i.e. old bundles, testTDS
+     * plugin enabled).
+     *
+     * @param oldPath old url
+     *
+     * @return new url
+     */
+    private String remapMotherlodeToThredds(String oldPath) {
+        return remapMotherlodeToThredds(oldPath, null);
     }
 
     /**
@@ -240,16 +330,17 @@ public class ServerUrlRemapper {
      *
      * @return new url string
      */
+
     private String remapMotherlodeToThredds(String oldPath,
                                             String oldPathType) {
 
         Boolean testTds = getProperty(TEST_TDS_43_UPDATE, Boolean.FALSE);
         HashMap<String, String> serverRemap = this.urlMaps.get("opendap");
-        String                  newPath     = oldPath;
+        oldPath = oldPath.replace(":-1/", "/");
+        String newPath = oldPath;
 
         for (Map.Entry<String, String> oldServerName :
                 serverRemap.entrySet()) {
-            oldPath = oldPath.replace(":-1/", "/");
             if (oldPath.contains(oldServerName.getKey())) {
                 // if old path uses an old server name, like motherlode.ucar.edu, then update with new
                 newPath = oldPath.replace(oldServerName.getKey(),
@@ -277,7 +368,7 @@ public class ServerUrlRemapper {
      * @param oldUrl old url
      * @param oldPathType RESOLVER url or datasource URL
      *
-     * @return _more_
+     * @return updated url
      */
     private String remapOldMotherlodeDatasetUrlPath(String oldUrl,
             String oldPathType) {
@@ -328,14 +419,15 @@ public class ServerUrlRemapper {
      * @param xml string representation of a bundle
      *
      * @return updated string representation of a bundle
+     *
+     * @throws IOException _more_
+     * @throws SAXException _more_
+     * @throws TransformerException _more_
      */
-    public String remapUrlsInBundle(String xml) {
-        HashMap<String, String> urlNameMaps = bundleWalker(xml);
-        for (String oldUrl : urlNameMaps.keySet()) {
-            while (xml.contains(oldUrl)) {
-                xml = xml.replace(oldUrl, urlNameMaps.get(oldUrl));
-            }
-        }
+    public String remapUrlsInBundle(String xml)
+            throws TransformerException, SAXException, IOException {
+
+        xml = bundleWalker(xml);
 
         return xml;
     }

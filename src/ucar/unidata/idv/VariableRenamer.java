@@ -31,6 +31,7 @@ import ucar.unidata.data.grid.DodsGeoGridDataSource;
 import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
@@ -47,16 +48,16 @@ import java.util.*;
 public class VariableRenamer {
 
     /** Reference to the IDV */
-    private IntegratedDataViewer idv;
+    private IdvResourceManager resourceManager;
 
     /** Reference to the Variable Renaming Map Resource Collection */
     private XmlResourceCollection varmapResourceCollection;
 
     /** Xml tag for variable name maps xml */
-    public static final String TAG_VARRENAMER = "varrenamer";
+    private static final String TAG_VARRENAMER = "varrenamer";
 
     /** URL Maps (oldVar : newVar} */
-    private HashMap<String, String> varMaps = new HashMap<String, String>();
+    private HashMap<String, List<String>> varMaps = new HashMap<String, List<String>>();
 
     /**
      * Read in the resource xml files and store the URL maps
@@ -82,23 +83,29 @@ public class VariableRenamer {
                 String  newVar = XmlUtil.getAttribute(node, "new");
 
                 if (!this.varMaps.containsKey(oldVar)) {
-                    varMaps.put(oldVar, newVar);
+                    List<String> tmpList = new ArrayList<String>();
+                    tmpList.add(newVar);
+                    varMaps.put(oldVar, tmpList);
+                } else {
+                    List<String> tmpList = varMaps.get(oldVar);
+                    tmpList.add(newVar);
+                    varMaps.put(oldVar, tmpList);
                 }
             }
         }
     }
 
 
-    public String renameVar(final String oldName) {
-        String newName;
+    public List<String> renameVar(final String oldName) {
+        List<String> newNames = new ArrayList<String>();
 
         if (varMaps.containsKey(oldName)) {
-            newName = varMaps.get(oldName);
+            newNames = varMaps.get(oldName);
         } else {
-            newName = oldName;
+            newNames.add(oldName);
         }
 
-        return newName;
+        return newNames;
     }
 
 
@@ -107,8 +114,8 @@ public class VariableRenamer {
      */
     private void init() {
 
-        varmapResourceCollection = idv.getResourceManager().getXmlResources(
-            IdvResourceManager.RSC_VARIABLERENAMER);
+        varmapResourceCollection = this.resourceManager.getXmlResources(
+                IdvResourceManager.RSC_VARIABLERENAMER);
 
         readVariableRenameResources();
     }
@@ -116,8 +123,8 @@ public class VariableRenamer {
     /**
      * Construct a VariableRenamer
      */
-    public VariableRenamer(IntegratedDataViewer idv) {
-        this.idv = idv;
+    public VariableRenamer(IdvResourceManager rsm) {
+        this.resourceManager = rsm;
         init();
     }
 

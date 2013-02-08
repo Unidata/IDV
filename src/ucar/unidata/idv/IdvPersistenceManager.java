@@ -237,9 +237,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** for saving favorites */
     private boolean catSelected;
 
-    /** remap datasources */
-    private ServerUrlRemapper serverUrlRemapper = null;
-
     /**
      * The ctor
      *
@@ -249,7 +246,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         super(idv);
 
-        serverUrlRemapper = new ServerUrlRemapper(idv);
+        //        serverUrlRemapper = new ServerUrlRemapper(idv);
         cleanupOldSavedBundles();
 
 
@@ -3029,7 +3026,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 return;
             }
             // check for old URLs, references to motherlode, remap urls if needed
-            xml = serverUrlRemapper.remapUrlsInBundle(xml);
+
+            Trace.call1("Remapping URLs");
+            ServerUrlRemapper sur = new ServerUrlRemapper(getIdv());
+            xml = sur.remapUrlsInBundle(xml);
+            sur = null;
+            Trace.call2("Remapping URLs");
             Trace.call1("Decode.toObject");
             Object data = getIdv().getEncoderForRead().toObject(xml);
             Trace.call2("Decode.toObject");
