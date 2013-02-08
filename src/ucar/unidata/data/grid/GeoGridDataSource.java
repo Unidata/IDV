@@ -1965,10 +1965,14 @@ public class GeoGridDataSource extends GridDataSource {
                 GeoGrid tmpGeoGrid = ds.findGridByName(remappedName);
                 if (tmpGeoGrid != null) {
                     name = remappedName;
-                    break;
+                    dc.setId(name);
+                    dc.setName(name);
+                    return tmpGeoGrid;
                 }
             }
-        } else if (newName.size() == 1) {
+        }
+        // ok, match not found in the user remapping...let's try netCDF-Java's map
+        if (newName.size() == 1) {
             // a unique name has been returned from netCDF-Java - use it!
             name = newName.get(0);
         } else if (newName.size() > 0) {
