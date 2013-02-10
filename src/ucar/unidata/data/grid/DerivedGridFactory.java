@@ -1304,16 +1304,16 @@ public class DerivedGridFactory {
         ExecutorService   executor = Executors.newFixedThreadPool(4);
 
 
-        Callable          pt       = new Varbar(grid1);
+        Callable          pt       = new VarNClone(grid1);
         Future<FieldImpl> future1  = executor.submit(pt);
 
-        Callable          pt1      = new Varbar(grid2);
+        Callable          pt1      = new VarNClone(grid2);
         Future<FieldImpl> future2  = executor.submit(pt1);
 
-        Callable          pt2      = new Varbar(grid3);
+        Callable          pt2      = new VarNClone(grid3);
         Future<FieldImpl> future3  = executor.submit(pt2);
 
-        Callable          pt3      = new Varbar(grid4);
+        Callable          pt3      = new VarNClone(grid4);
         Future<FieldImpl> future4  = executor.submit(pt3);
 
         FieldImpl         u        = future1.get();
@@ -1351,13 +1351,13 @@ public class DerivedGridFactory {
         ExecutorService   executor = Executors.newFixedThreadPool(4);
 
 
-        Callable          pt       = new Varbar(grid1);
+        Callable          pt       = new VarNClone(grid1);
         Future<FieldImpl> future1  = executor.submit(pt);
 
-        Callable          pt1      = new Varbar(grid2);
+        Callable          pt1      = new VarNClone(grid2);
         Future<FieldImpl> future2  = executor.submit(pt1);
 
-        Callable          pt2      = new Varbar(grid3);
+        Callable          pt2      = new VarNClone(grid3);
         Future<FieldImpl> future3  = executor.submit(pt2);
 
 
@@ -1370,6 +1370,44 @@ public class DerivedGridFactory {
         flist.add(u);
         flist.add(v);
         flist.add(s);
+        return flist;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param grid1 _more_
+     * @param grid2 _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static List<FieldImpl> combineGridsArray(FieldImpl grid1,
+            FieldImpl grid2)
+            throws VisADException, RemoteException, Exception {
+
+        ExecutorService   executor = Executors.newFixedThreadPool(4);
+
+
+        Callable          pt       = new VarNClone(grid1);
+        Future<FieldImpl> future1  = executor.submit(pt);
+
+        Callable          pt1      = new VarNClone(grid2);
+        Future<FieldImpl> future2  = executor.submit(pt1);
+
+
+        FieldImpl         u        = future1.get();
+        FieldImpl         v        = future2.get();
+
+
+        List              flist    = new ArrayList();
+        flist.add(u);
+        flist.add(v);
+
         return flist;
 
     }
@@ -3927,6 +3965,41 @@ public class DerivedGridFactory {
     }
 
     /**
+     * Class description
+     *
+     *
+     * @version
+     * @author
+     */
+    static class VarNClone implements Callable<Object> {
+
+        /** _more_ */
+        private FieldImpl v;
+
+
+        /**
+         * _more_
+         *
+         * @param v _more_
+         */
+        private VarNClone(FieldImpl v) {
+            this.v = v;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         *
+         * @throws CloneNotSupportedException _more_
+         */
+        public FieldImpl call() throws CloneNotSupportedException {
+            return (FieldImpl) v;
+
+        }
+    }
+
+    /**
      * Based on point data trajectory control, create all individual tracks and then merge them
      *
      *
@@ -4032,7 +4105,7 @@ public class DerivedGridFactory {
         //first step  init  u,v, w, and s at all initial points
         List<TrajInfo> tj = calculateTrackPoints(uFI, vFI, null, sFI, ttts,
                                 geoVals, numPoints, numTimes, latIndex,
-                                lonIndex, haveAlt, normalizeLon);
+                                lonIndex, haveAlt, normalizeLon, null);
 
 
         int numParcels = numPoints;  //10;
@@ -4177,7 +4250,7 @@ public class DerivedGridFactory {
         //first step  init  u,v, w, and s at all initial points
         List<TrajInfo> tj = calculateTrackPoints(uFI, vFI, wFI, sFI, ttts,
                                 geoVals, numPoints, numTimes, latIndex,
-                                lonIndex, haveAlt, normalizeLon);
+                                lonIndex, haveAlt, normalizeLon, null);
 
         // System.out.println("Time used to compute = "
         //                   + (System.currentTimeMillis() - start) / 1000.0);
@@ -4446,10 +4519,10 @@ public class DerivedGridFactory {
     /**
      * _more_
      *
-     * @param uFI _more_
-     * @param vFI _more_
-     * @param wFI _more_
-     * @param sFI _more_
+     * @param uFI0 _more_
+     * @param vFI0 _more_
+     * @param wFI0 _more_
+     * @param sFI0 _more_
      * @param ttts _more_
      * @param geoVals _more_
      * @param numPoints _more_
@@ -4458,20 +4531,55 @@ public class DerivedGridFactory {
      * @param lonIndex _more_
      * @param haveAlt _more_
      * @param normalizeLon _more_
+     * @param clevel _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public static List<TrajInfo> calculateTrackPoints(final FieldImpl uFI,
-            final FieldImpl vFI, final FieldImpl wFI, final FieldImpl sFI,
+    public static List<TrajInfo> calculateTrackPoints(final FieldImpl uFI0,
+            final FieldImpl vFI0, final FieldImpl wFI0, final FieldImpl sFI0,
             final double[] ttts, final float[][] geoVals,
             final int numPoints, final int numTimes, final int latIndex,
             final int lonIndex, final boolean haveAlt,
-            final boolean normalizeLon)
+            final boolean normalizeLon, final Real clevel)
             throws Exception {
 
-        ExecutorService      executor = Executors.newFixedThreadPool(8);
+        ExecutorService   executor = Executors.newFixedThreadPool(8);
+
+        Callable          pt0      = new Varbar(uFI0);
+        Future<FieldImpl> future0  = executor.submit(pt0);
+
+
+        Callable          pt1      = new Varbar(vFI0);
+        Future<FieldImpl> future1  = executor.submit(pt1);
+
+        Callable          pt2;
+        Future<FieldImpl> future2 = null;
+        if (wFI0 != null) {
+            pt2     = new Varbar(wFI0);
+            future2 = executor.submit(pt2);
+        }
+
+        Callable          pt3     = new Varbar(sFI0);
+        Future<FieldImpl> future3 = executor.submit(pt3);
+
+        FieldImpl         uFI     = future0.get();
+        FieldImpl         vFI     = future1.get();
+        FieldImpl         wFI     = null;
+        if (wFI0 != null) {
+            wFI = future2.get();
+        }
+        FieldImpl sFI = future3.get();
+
+        if ((wFI0 == null) && (clevel != null)) {
+            uFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(uFI,
+                    clevel));
+            vFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(vFI,
+                    clevel));
+            sFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(sFI,
+                    clevel));
+        }
         final List<TrajInfo> result   = new ArrayList<TrajInfo>();
         List<Future>         pthreads = new ArrayList<Future>();
         for (int i = 0; i < numPoints; i++) {

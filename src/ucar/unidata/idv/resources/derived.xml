@@ -580,41 +580,41 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
      label="Grid 3D Trajectory"
      isenduser="true"
      isdefault="true"
-     formula="DerivedGridFactory.combineGridsArray ( D1[label=U Component], D2[label=V Component], D3[label=W Component], Parameter)">
-    <categories>
+     formula="DerivedGridFactory.combineGridsArray ( D1[label=U Component], D2[label=V Component], D3[label=W Component])">
+     <categories>
         <category
-                value="inherit"
-                append="Derived"
-                childidx="0"
-                categoryidx="0"/>
+            value="inherit"
+            append="Derived"
+            childidx="0"
+            categoryidx="0"/>
         <category value="display:gridtrajectorycontrol1"/>
-    </categories>
+     </categories>
         <operands>
             <paramgroup categories="GRID-3D-*;" name="u_v_w"/>
             <paramgroup categories="GRID-3D-*;" name="GridRelative_uvw"/>
         </operands>
-    </derived>
-    <derived
-            id="gridTrajectory"
-            description="Grid 2D Trajectory (from %N1% &amp; %N2% )"
-            label="Grid 2D Trajectory"
-            isenduser="true"
-            isdefault="true"
-            formula="DerivedGridFactory.combineGridsArray ( D1[label=U Component], D2[label=V Component], Parameter)">
-        <categories>
-            <category
-                    value="inherit"
-                    append="Derived"
-                    childidx="0"
-                    categoryidx="0"/>
-            <category value="display:gridtrajectorycontrol1"/>
-        </categories>
-        <operands>
-            <paramgroup categories="GRID-3D-*;" name="u_v"/>
-            <paramgroup categories="GRID-3D-*;" name="u_and_v"/>
-            <paramgroup categories="GRID-3D-*;" name="GridRelative_uv"/>
-        </operands>
-    </derived>
+  </derived>
+  <derived
+     id="gridTrajectory"
+     description="Grid 2D Trajectory (from %N1% &amp; %N2% )"
+     label="Grid 2D Trajectory"
+     isenduser="true"
+     isdefault="true"
+     formula="DerivedGridFactory.combineGridsArray ( D1[label=U Component], D2[label=V Component])">
+     <categories>
+        <category
+            value="inherit"
+            append="Derived"
+            childidx="0"
+            categoryidx="0"/>
+        <category value="display:gridtrajectorycontrol1"/>
+     </categories>
+     <operands>
+        <paramgroup categories="GRID-3D-*;" name="u_v"/>
+        <paramgroup categories="GRID-3D-*;" name="u_and_v"/>
+        <paramgroup categories="GRID-3D-*;" name="GridRelative_uv"/>
+     </operands>
+  </derived>
 
   <derived
      id="fluxdivergence"

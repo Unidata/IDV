@@ -274,7 +274,7 @@ example:
      class="ucar.unidata.idv.control.TrackControl"
      canstandalone="false"
      label="Trajectory Colored By Parameter"
-     displaycategory="Trajectory"
+     displaycategory="GridTrajectory"
      properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
 
   <control
@@ -283,8 +283,12 @@ example:
      class="ucar.unidata.idv.control.GridTrajectoryControl"
      canstandalone="false"
      label="Trajectory Colored By Parameter"
-     displaycategory="Trajectory"
-     properties="windowVisible=false;"/>
+     code="DerivedGridFactory.combineGridsArray( D1, parameter )"
+     displaycategory="GridTrajectory"
+     properties="windowVisible=false;">
+  </control>
+
+
   <control
      id="pointcloud"
      categories="pointcloud"

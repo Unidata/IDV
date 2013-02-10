@@ -2,7 +2,7 @@
  * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
@@ -588,13 +588,14 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl = new MyTrackControl(this);
         // super.init(dataChoice);
         this.dataChoice = dataChoice;
-        DataInstance      di         = getDataInstance();
-        DerivedDataChoice ddc        = (DerivedDataChoice) dataChoice;
+        DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
+        List              choices0 = ddc.getChoices();
+        DerivedDataChoice ddc0     = (DerivedDataChoice) choices0.get(0);
+        Hashtable    choices = ddc0.getUserSelectedChoices();
+        DataInstance di      = getDataInstance();
 
-
-        Hashtable         choices    = ddc.getUserSelectedChoices();
-        int               numChoices = choices.size();
-        if (numChoices == 3) {
+        int numChoices = choices.size();
+        if (numChoices == 2) {
             is2D = true;
         }
         DirectDataChoice udc =
@@ -603,8 +604,7 @@ public class GridTrajectoryControl extends DrawingControl {
             (DirectDataChoice) choices.get(new String("D2"));
         DirectDataChoice wdc =
             (DirectDataChoice) choices.get(new String("D3"));
-        DirectDataChoice sdc =
-            (DirectDataChoice) choices.get(new String("Parameter"));
+        DirectDataChoice sdc = (DirectDataChoice) choices0.get(1);
         addDataChoice(udc);
         addDataChoice(vdc);
         if (wdc != null) {
@@ -1064,7 +1064,7 @@ public class GridTrajectoryControl extends DrawingControl {
         List<DerivedGridFactory.TrajInfo> tj =
             DerivedGridFactory.calculateTrackPoints(u, v, w, s, ttts,
                 geoVals, numPoints, numTimes, latIndex, lonIndex, true,
-                normalizeLon);
+                normalizeLon, null);
 
         int numParcels = numPoints;  //10;
         final FunctionType ft = new FunctionType(
@@ -1162,17 +1162,17 @@ public class GridTrajectoryControl extends DrawingControl {
             clevel = (Real) ((TwoFacedObject) currentLevel).getId();
 
         }
-        FieldImpl u1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(u,
-                           clevel));
-        FieldImpl v1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(v,
-                           clevel));
-        FieldImpl s1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(s,
-                           clevel));
+        /* FieldImpl u1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(u,
+                            clevel));
+         FieldImpl v1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(v,
+                            clevel));
+         FieldImpl s1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(s,
+                            clevel));    */
         //first step  init  u,v, w, and s at all initial points
         List<DerivedGridFactory.TrajInfo> tj =
-            DerivedGridFactory.calculateTrackPoints(u1, v1, null, s1, ttts,
+            DerivedGridFactory.calculateTrackPoints(u, v, null, s, ttts,
                 geoVals, numPoints, numTimes, latIndex, lonIndex, true,
-                normalizeLon);
+                normalizeLon, clevel);
 
         int numParcels = numPoints;  //10;
         final FunctionType ft = new FunctionType(
