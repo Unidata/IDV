@@ -215,6 +215,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
      * @param fontName the name of the font family
      */
     public void setFontName(String fontName) {
+    	fontChoice = fontName;
         if (uiType == COMBOBOX_UI) {
             ((JComboBox) fontSelector).setSelectedItem(fontName);
         } else {
@@ -228,6 +229,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
      * @param fontStyle  style of the font.
      */
     public void setFontStyle(int fontStyle) {
+    	styleChoice = fontStyle;
         if (uiType == COMBOBOX_UI) {
             ((JComboBox) styleSelector).setSelectedIndex(fontStyle);
         } else {
@@ -241,6 +243,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
      * @param fontSize size of the font
      */
     public void setFontSize(int fontSize) {
+    	sizeChoice = fontSize;
         if (uiType == COMBOBOX_UI) {
             ((JComboBox) sizeSelector).setSelectedItem(new Integer(fontSize));
         } else {
