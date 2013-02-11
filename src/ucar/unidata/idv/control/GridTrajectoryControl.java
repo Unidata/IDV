@@ -1546,7 +1546,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @return _more_
      */
     public int getCoordType() {
-        return DrawingGlyph.COORD_XY;
+        return DrawingGlyph.COORD_LATLON; //.COORD_XY;
     }
 
 
