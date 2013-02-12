@@ -3029,11 +3029,14 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             Trace.call1("Remapping URLs");
             ServerUrlRemapper sur = new ServerUrlRemapper(getIdv());
-            xml = sur.remapUrlsInBundle(xml);
+            Element bundleRoot = sur.remapUrlsInBundle(xml);
+            if (bundleRoot == null) {
+                return;
+            }
             sur = null;
             Trace.call2("Remapping URLs");
             Trace.call1("Decode.toObject");
-            Object data = getIdv().getEncoderForRead().toObject(xml);
+            Object data = getIdv().getEncoderForRead().toObject(bundleRoot);
             Trace.call2("Decode.toObject");
 
             if (data != null) {
