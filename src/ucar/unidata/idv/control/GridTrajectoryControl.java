@@ -206,6 +206,9 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     boolean is2D = false;
 
+    /** a component to change the skip */
+    ValueSliderWidget skipFactorWidget;
+
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -1301,13 +1304,17 @@ public class GridTrajectoryControl extends DrawingControl {
                 GridUtil.findContainedLatLons((GriddedSet) domain0,
                     mapMaker.getMaps());
             int       num    = latlons[0][0].length;
-            float[][] points = new float[3][num];
+            int       skipFactor = (int)skipFactorWidget.getValue();
 
-            for (int i = 0; i < num; i++) {
+            int       onum = num/(skipFactor+1);
 
-                points[latIndex][i] = latlons[0][0][i];
+            float[][] points = new float[3][onum];
+
+            for (int i = 0; i < onum; i++) {
+                int j = i * (skipFactor+1);
+                points[latIndex][i] = latlons[0][0][j];
                 points[lonIndex][i] =
-                    (float) LatLonPointImpl.lonNormal(latlons[0][1][i]);
+                    (float) LatLonPointImpl.lonNormal(latlons[0][1][j]);
                 points[2][i] = z;
             }
             setCurrentCommand(CMD_SELECT);
@@ -1443,6 +1450,12 @@ public class GridTrajectoryControl extends DrawingControl {
                                              GuiUtils.left(closePolygonBtn),
                                              GuiUtils.left(rectangleBtn));
 
+
+        skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
+                getSkipWidgetLabel());
+        addRemovable(skipFactorWidget);
+
+
         JLabel showLabel = GuiUtils.rLabel("Trajectory Initial Area:");
         JLabel removeLabel =
             GuiUtils.rLabel("Remove Trajectory Initial Area:");
@@ -1451,15 +1464,20 @@ public class GridTrajectoryControl extends DrawingControl {
         widgets.add(
             GuiUtils.topCenterBottom(
                 widgets0,
+                GuiUtils.topBottom(
+                    GuiUtils.leftRight(
+                        GuiUtils.top(
+                            GuiUtils.inset(
+                                showLabel,
+                                new Insets(10, 0, 0, 0))), GuiUtils.top(
+                                rightComp)),
+                        GuiUtils.top(GuiUtils.hbox(
+                                GuiUtils.rLabel("Initial Area Skip Factor:  "),
+                                skipFactorWidget.getContents(false)))),
                 GuiUtils.leftRight(
-                    GuiUtils.top(
-                        GuiUtils.inset(
-                            showLabel,
-                            new Insets(10, 0, 0, 0))), GuiUtils.top(
-                                rightComp)), GuiUtils.leftRight(
-                                    GuiUtils.inset(
-                                        GuiUtils.wrap(createTrjBtn),
-                                        2), GuiUtils.right(unloadBtn))));
+                    GuiUtils.inset(
+                        GuiUtils.wrap(createTrjBtn),
+                            2), GuiUtils.right(unloadBtn))));
 
     }
 
@@ -1485,8 +1503,19 @@ public class GridTrajectoryControl extends DrawingControl {
         }
     }
 
+    /**
+     * Set the  skip value
+     *
+     * @param value skip value
+     **/
 
+    public void setSkipValue(int value) {
+        super.setSkipValue(value);
+        if (skipFactorWidget != null) {
+            skipFactorWidget.setValue(value);
+        }
 
+    }
 
 
     /**
@@ -1546,7 +1575,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @return _more_
      */
     public int getCoordType() {
-        return DrawingGlyph.COORD_LATLON; //.COORD_XY;
+        return DrawingGlyph.COORD_LATLON;  //.COORD_XY;
     }
 
 
