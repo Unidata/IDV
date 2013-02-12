@@ -2,7 +2,7 @@
  * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
@@ -209,11 +209,14 @@ public class GridTrajectoryControl extends DrawingControl {
     /** a component to change the skip */
     ValueSliderWidget skipFactorWidget;
 
+    /** _more_ */
+    int coordinateType;
+
     /**
      * Create a new Drawing Control; set attributes.
      */
     public GridTrajectoryControl() {
-        setCoordType(DrawingGlyph.COORD_LATLON);
+        //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
                           | FLAG_DISPLAYUNIT | FLAG_TIMERANGE);
@@ -1303,15 +1306,15 @@ public class GridTrajectoryControl extends DrawingControl {
             float[][][] latlons =
                 GridUtil.findContainedLatLons((GriddedSet) domain0,
                     mapMaker.getMaps());
-            int       num    = latlons[0][0].length;
-            int       skipFactor = (int)skipFactorWidget.getValue();
+            int       num        = latlons[0][0].length;
+            int       skipFactor = (int) skipFactorWidget.getValue();
 
-            int       onum = num/(skipFactor+1);
+            int       onum       = num / (skipFactor + 1);
 
-            float[][] points = new float[3][onum];
+            float[][] points     = new float[3][onum];
 
             for (int i = 0; i < onum; i++) {
-                int j = i * (skipFactor+1);
+                int j = i * (skipFactor + 1);
                 points[latIndex][i] = latlons[0][0][j];
                 points[lonIndex][i] =
                     (float) LatLonPointImpl.lonNormal(latlons[0][1][j]);
@@ -1406,6 +1409,7 @@ public class GridTrajectoryControl extends DrawingControl {
         ActionListener listener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JRadioButton source = (JRadioButton) e.getSource();
+                coordinateType = DrawingGlyph.COORD_LATLON;
                 if (source == pointsBtn) {
                     setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
                     isPoints    = true;
@@ -1421,6 +1425,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     isSelector  = false;
                     removeAllGlyphs();
                 } else if (source == closePolygonBtn) {
+                    coordinateType = DrawingGlyph.COORD_XY;
                     setCurrentCommand(GlyphCreatorCommand.CMD_CLOSEDPOLYGON);
                     isRectangle = false;
                     isPoints    = false;
@@ -1435,6 +1440,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     isClosePlgn = false;
                     //removeAllGlyphs();
                 }
+                setCoordType(coordinateType);
             }
         };
         pointsBtn.addActionListener(listener);
@@ -1461,23 +1467,22 @@ public class GridTrajectoryControl extends DrawingControl {
             GuiUtils.rLabel("Remove Trajectory Initial Area:");
         showLabel.setVerticalTextPosition(JLabel.TOP);
 
-        widgets.add(
-            GuiUtils.topCenterBottom(
-                widgets0,
-                GuiUtils.topBottom(
-                    GuiUtils.leftRight(
-                        GuiUtils.top(
-                            GuiUtils.inset(
-                                showLabel,
-                                new Insets(10, 0, 0, 0))), GuiUtils.top(
-                                rightComp)),
-                        GuiUtils.top(GuiUtils.hbox(
-                                GuiUtils.rLabel("Initial Area Skip Factor:  "),
-                                skipFactorWidget.getContents(false)))),
-                GuiUtils.leftRight(
-                    GuiUtils.inset(
-                        GuiUtils.wrap(createTrjBtn),
-                            2), GuiUtils.right(unloadBtn))));
+        widgets.add(GuiUtils
+            .topCenterBottom(widgets0, GuiUtils
+                .topBottom(GuiUtils
+                    .leftRight(GuiUtils
+                        .top(GuiUtils
+                            .inset(showLabel, new Insets(10, 0, 0, 0))), GuiUtils
+                                .top(rightComp)), GuiUtils
+                                    .top(GuiUtils
+                                        .hbox(GuiUtils
+                                            .rLabel("Initial Area Skip Factor:  "), skipFactorWidget
+                                            .getContents(false)))), GuiUtils
+                                                .leftRight(GuiUtils
+                                                    .inset(GuiUtils
+                                                        .wrap(createTrjBtn), 2), GuiUtils
+                                                            .right(unloadBtn))));
+
 
     }
 
@@ -1507,7 +1512,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * Set the  skip value
      *
      * @param value skip value
-     **/
+     */
 
     public void setSkipValue(int value) {
         super.setSkipValue(value);
@@ -1575,7 +1580,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @return _more_
      */
     public int getCoordType() {
-        return DrawingGlyph.COORD_LATLON;  //.COORD_XY;
+        return coordinateType;
     }
 
 
@@ -1670,5 +1675,23 @@ public class GridTrajectoryControl extends DrawingControl {
      */
     public void setIsPoints(boolean point) {
         isPoints = point;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getCoordinateType() {
+        return coordinateType;
+    }
+
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
+    public void setCoordinateType(int type) {
+        coordinateType = type;
     }
 }
