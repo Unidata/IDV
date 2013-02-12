@@ -204,7 +204,7 @@ public class ServerUrlRemapper {
      * @throws TransformerException _more_
      */
 
-    private String bundleWalker(String xml)
+    private Node bundleWalker(String xml)
             throws SAXException, IOException, TransformerException {
 
         Document bundle;
@@ -212,7 +212,7 @@ public class ServerUrlRemapper {
             bundle = XmlUtil.getDocument(xml);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return xml;
+            return null;
         }
 
         DocumentTraversal docTraversal = (DocumentTraversal) bundle;
@@ -296,13 +296,15 @@ public class ServerUrlRemapper {
             thisNode = walker.nextNode();
         }
 
-        TransformerFactory tFactory    = TransformerFactory.newInstance();
-        Transformer        transformer = tFactory.newTransformer();
-        DOMSource          source      = new DOMSource(bundle);
-        Writer             outWriter   = new StringWriter();
-        StreamResult       result      = new StreamResult(outWriter);
-        transformer.transform(source, result);
-        return outWriter.toString();
+        return walker.getRoot();
+
+        //TransformerFactory tFactory    = TransformerFactory.newInstance();
+        //Transformer        transformer = tFactory.newTransformer();
+        //DOMSource          source      = new DOMSource(bundle);
+        //Writer             outWriter   = new StringWriter();
+        //StreamResult       result      = new StreamResult(outWriter);
+        //transformer.transform(source, result);
+        //return outWriter.toString();
     }
 
     /**
@@ -416,20 +418,20 @@ public class ServerUrlRemapper {
      * basic method used to remap urls found in a
      * bundle xml file
      *
-     * @param xml string representation of a bundle
+     * @param xml String representation of the xml bundle
      *
-     * @return updated string representation of a bundle
+     * @return updated Element representation of a bundle
      *
      * @throws IOException _more_
      * @throws SAXException _more_
      * @throws TransformerException _more_
      */
-    public String remapUrlsInBundle(String xml)
+    public Element remapUrlsInBundle(String xml)
             throws TransformerException, SAXException, IOException {
+        Node bundleNode = bundleWalker(xml);
 
-        xml = bundleWalker(xml);
+        return (Element) bundleNode;
 
-        return xml;
     }
 
 }
