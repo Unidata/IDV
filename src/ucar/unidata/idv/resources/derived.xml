@@ -580,7 +580,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
      label="Grid 3D Trajectory"
      isenduser="true"
      isdefault="true"
-     formula="DerivedGridFactory.combineGridsArray ( D1[label=U Component], D2[label=V Component], D3[label=W Component])">
+     formula="GridTrajectory.combineGridsArray ( D1[label=U Component], D2[label=V Component], D3[label=W Component])">
      <categories>
         <category
             value="inherit"
@@ -600,7 +600,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
      label="Grid 2D Trajectory"
      isenduser="true"
      isdefault="true"
-     formula="DerivedGridFactory.combineGridsArray ( D1[label=U Component], D2[label=V Component])">
+     formula="GridTrajectory.combineGridsArray ( D1[label=U Component], D2[label=V Component])">
      <categories>
         <category
             value="inherit"

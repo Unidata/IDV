@@ -30,7 +30,7 @@ import ucar.unidata.data.*;
 
 import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.grid.DerivedGridFactory;
-import ucar.unidata.data.grid.GeoGridDataSource;
+import ucar.unidata.data.grid.GridTrajectory;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointObFactory;
@@ -1068,8 +1068,8 @@ public class GridTrajectoryControl extends DrawingControl {
                                 domain2D);
         int numPoints = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
-        List<DerivedGridFactory.TrajInfo> tj =
-            DerivedGridFactory.calculateTrackPoints(u, v, w, s, ttts,
+        List<GridTrajectory.TrajInfo> tj =
+                GridTrajectory.calculateTrackPoints(u, v, w, s, ttts,
                 geoVals, numPoints, numTimes, latIndex, lonIndex, true,
                 normalizeLon, null);
 
@@ -1082,7 +1082,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         List tracks;
 
-        tracks = DerivedGridFactory.createTracks(paramName, tj, timeSet, ft,
+        tracks = GridTrajectory.createTracks(paramName, tj, timeSet, ft,
                 paramUnit, numParcels);
         FlatField mergedTracks = DerivedGridFactory.mergeTracks(tracks);
 
@@ -1176,8 +1176,8 @@ public class GridTrajectoryControl extends DrawingControl {
          FieldImpl s1 = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(s,
                             clevel));    */
         //first step  init  u,v, w, and s at all initial points
-        List<DerivedGridFactory.TrajInfo> tj =
-            DerivedGridFactory.calculateTrackPoints(u, v, null, s, ttts,
+        List<GridTrajectory.TrajInfo> tj =
+                GridTrajectory.calculateTrackPoints(u, v, null, s, ttts,
                 geoVals, numPoints, numTimes, latIndex, lonIndex, true,
                 normalizeLon, clevel);
 
@@ -1190,7 +1190,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         List tracks;
 
-        tracks = DerivedGridFactory.createTracks(paramName, tj, timeSet, ft,
+        tracks = GridTrajectory.createTracks(paramName, tj, timeSet, ft,
                 paramUnit, numParcels);
         FlatField mergedTracks = DerivedGridFactory.mergeTracks(tracks);
 

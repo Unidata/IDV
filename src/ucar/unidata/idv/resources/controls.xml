@@ -283,7 +283,7 @@ example:
      class="ucar.unidata.idv.control.GridTrajectoryControl"
      canstandalone="false"
      label="Trajectory Colored By Parameter"
-     code="DerivedGridFactory.combineGridsArray( D1, parameter )"
+     code="GridTrajectory.combineGridsArray( D1, parameter )"
      displaycategory="GridTrajectory"
      properties="windowVisible=false;">
   </control>

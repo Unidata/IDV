@@ -1236,6 +1236,7 @@ public class JythonManager extends IdvManager implements ActionListener {
         interpreter.exec("import ucar.unidata.util.StringUtil as StringUtil");
         interpreter.exec(
             "import ucar.unidata.data.grid.DerivedGridFactory as DerivedGridFactory");
+        interpreter.exec("import ucar.unidata.data.grid.GridTrajectory as GridTrajectory");
         //interpreter.exec("from visad import FlatField");
         //interpreter.exec("from visad import FieldImpl");
     }
