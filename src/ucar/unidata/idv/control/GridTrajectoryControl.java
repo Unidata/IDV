@@ -753,6 +753,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 if (cmd.equals(CMD_createTrj)) {
                     try {
                         createTrjBtnClicked = true;
+                        removeGC();
                         createTrajectory();
                         gridTrackControl.setLineWidth(trackLineWidth);
                     } catch (Exception exr) {
@@ -879,9 +880,9 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param r _more_
      */
     public void setLevel(Object r) {
-        if ( !createTrjBtnClicked) {
+       // if ( !createTrjBtnClicked) {
             currentLevel = r;
-        }
+       // }
     }
 
     /**
@@ -1262,7 +1263,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
         float      z     = (float) hVals[0][0];
         if (currentCmd.getLabel().equals(
-                GlyphCreatorCommand.CMD_SYMBOL.getLabel())) {
+                GlyphCreatorCommand.CMD_SYMBOL.getLabel()) ||
+                (glyphs.get(0) instanceof SymbolGlyph)) {
             int       pointNum = glyphs.size();
 
             float[][] points   = new float[3][pointNum];
@@ -1401,6 +1403,11 @@ public class GridTrajectoryControl extends DrawingControl {
             setCurrentCommand(GlyphCreatorCommand.CMD_SYMBOL);
         }
 
+        skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
+                getSkipWidgetLabel());
+        skipFactorWidget.setEnabled(false);
+        addRemovable(skipFactorWidget);
+
         pointsBtn       = new JRadioButton("Points:", isPoints);
         rectangleBtn    = new JRadioButton("Rectangle:", isRectangle);
         closePolygonBtn = new JRadioButton("ClosePolygon:", isClosePlgn);
@@ -1416,6 +1423,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     isClosePlgn = false;
                     isRectangle = false;
                     isSelector  = false;
+                    skipFactorWidget.setEnabled(false);
                     removeAllGlyphs();
                 } else if (source == rectangleBtn) {
                     setCurrentCommand(GlyphCreatorCommand.CMD_RECTANGLE);
@@ -1423,6 +1431,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     isPoints    = false;
                     isClosePlgn = false;
                     isSelector  = false;
+                    skipFactorWidget.setEnabled(true);
                     removeAllGlyphs();
                 } else if (source == closePolygonBtn) {
                     coordinateType = DrawingGlyph.COORD_XY;
@@ -1431,6 +1440,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     isPoints    = false;
                     isSelector  = false;
                     isClosePlgn = true;
+                    skipFactorWidget.setEnabled(true);
                     removeAllGlyphs();
                 } else {
                     setCurrentCommand(CMD_SELECT);
@@ -1438,6 +1448,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     isRectangle = false;
                     isPoints    = false;
                     isClosePlgn = false;
+                    skipFactorWidget.setEnabled(false);
                     //removeAllGlyphs();
                 }
                 setCoordType(coordinateType);
@@ -1457,9 +1468,7 @@ public class GridTrajectoryControl extends DrawingControl {
                                              GuiUtils.left(rectangleBtn));
 
 
-        skipFactorWidget = new ValueSliderWidget(this, 0, 10, "skipValue",
-                getSkipWidgetLabel());
-        addRemovable(skipFactorWidget);
+
 
 
         JLabel showLabel = GuiUtils.rLabel("Trajectory Initial Area:");
@@ -1547,7 +1556,24 @@ public class GridTrajectoryControl extends DrawingControl {
 
     }
 
+    public void removeGC() {
+        try {
 
+            while (controlPane.getComponentCount() > 0) {
+                controlPane.remove(0);
+                controlPane.setVisible(false);
+                if (gridTrackControl.trackDisplay != null) {
+                    gridTrackControl.trackDisplay.setData(DUMMY_DATA);
+                    gridTrackControl.indicator.setVisible(false);
+                    gridTrackControl.timesHolder.setData(DUMMY_DATA);
+                }
+                createTrjBtnClicked = false;
+            }
+        } catch (Exception exc) {
+            logException("Removing drawings", exc);
+        }
+
+    }
 
     /**
      * Clear the cursor in the main display
