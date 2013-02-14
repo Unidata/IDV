@@ -4074,6 +4074,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         for (DisplayControl control : (List<DisplayControl>) getControls()) {
             if (((DisplayControlImpl) control).getIsTimeDriver()) {
                 ((DisplayControlImpl) control).setIsTimeDriver(false);
+                // make sure it will listen to the animation driver
+                ((DisplayControlImpl) control).setUsesTimeDriver(true);
             }
         }
         // now, reload any that are using time drives
@@ -7687,6 +7689,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if ( !control.equals(displayControl)
                     && control.getIsTimeDriver()) {
                 ((DisplayControlImpl) control).setIsTimeDriver(false);
+                // but make it listen to the other one now
+                ((DisplayControlImpl) control).setUsesTimeDriver(true);
             }
         }
     }
