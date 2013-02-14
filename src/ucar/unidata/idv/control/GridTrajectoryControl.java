@@ -1323,19 +1323,27 @@ public class GridTrajectoryControl extends DrawingControl {
             float[][][] latlons =
                 GridUtil.findContainedLatLons((GriddedSet) domain0,
                     mapMaker.getMaps());
-            int       num        = latlons[0][0].length;
+            int       num   = 0;
+            for(int i = 0; i < latlons.length; i++){
+                num = num + latlons[i][0].length;
+            }
+
             int       skipFactor = (int) skipFactorWidget.getValue();
 
             int       onum       = num / (skipFactor + 1);
 
             float[][] points     = new float[3][onum];
-
-            for (int i = 0; i < onum; i++) {
-                int j = i * (skipFactor + 1);
-                points[latIndex][i] = latlons[0][0][j];
-                points[lonIndex][i] =
-                    (float) LatLonPointImpl.lonNormal(latlons[0][1][j]);
-                points[2][i] = z;
+            int  psize = 0;
+            for(int k = 0; k <latlons.length; k++ ) {
+                int isize = latlons[k][0].length/(skipFactor + 1) ;
+                for (int i = 0; i < isize; i++) {
+                    int j = i * (skipFactor + 1);
+                    points[latIndex][i + psize] = latlons[k][0][j];
+                    points[lonIndex][i + psize] =
+                        (float) LatLonPointImpl.lonNormal(latlons[k][1][j]);
+                    points[2][i + psize] = z;
+                }
+                psize = psize + isize;
             }
             setCurrentCommand(CMD_SELECT);
             hiddenBtn.doClick();
