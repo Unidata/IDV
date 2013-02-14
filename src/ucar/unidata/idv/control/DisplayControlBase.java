@@ -122,6 +122,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+
 /**
  * Some display control oriented utilities
  * @author IDV development team
@@ -310,6 +311,9 @@ public abstract class DisplayControlBase extends SharableImpl {
 
     /** Bitmask for controls that allow grid smoothing setting */
     public static final int FLAG_SMOOTHING = 1 << 13;
+
+    /** flag for the trackcontrol to add marker widget or not */
+    public static final int FLAG_GRIDTRAJECTORY = 1;
 
     /** No-op for attributeFlags */
     public static final int FLAG_NONE = 0;

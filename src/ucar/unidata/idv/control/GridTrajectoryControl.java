@@ -30,8 +30,8 @@ import ucar.unidata.data.*;
 
 import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.grid.DerivedGridFactory;
-import ucar.unidata.data.grid.GridTrajectory;
 import ucar.unidata.data.grid.GridDataInstance;
+import ucar.unidata.data.grid.GridTrajectory;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -208,7 +208,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
     /** _more_ */
     boolean is2DDC = false;
-    
+
     /** a component to change the skip */
     ValueSliderWidget skipFactorWidget;
 
@@ -221,8 +221,7 @@ public class GridTrajectoryControl extends DrawingControl {
     public GridTrajectoryControl() {
         //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
-        reallySetAttributeFlags(FLAG_COLORTABLE
-                           );
+        reallySetAttributeFlags(FLAG_COLORTABLE);
     }
 
 
@@ -257,7 +256,7 @@ public class GridTrajectoryControl extends DrawingControl {
          */
         public MyTrackControl(GridTrajectoryControl gtc) {
             setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
-                              | FLAG_TIMERANGE
+                              | FLAG_GRIDTRAJECTORY | FLAG_TIMERANGE
                               | FLAG_SELECTRANGE);
             this.gtc = gtc;
             setUseTrackTimes(true);
@@ -269,7 +268,7 @@ public class GridTrajectoryControl extends DrawingControl {
          */
         public MyTrackControl() {
             setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
-                              | FLAG_TIMERANGE
+                              | FLAG_GRIDTRAJECTORY | FLAG_TIMERANGE
                               | FLAG_SELECTRANGE);
             setUseTrackTimes(true);
             setTimeDeclutterEnabled(true);
@@ -597,13 +596,13 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl = new MyTrackControl(this);
         // super.init(dataChoice);
         this.dataChoice = dataChoice;
-        DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
-        List              choices0 = ddc.getChoices();
-        DerivedDataChoice ddc0     = (DerivedDataChoice) choices0.get(0);
-        Hashtable    choices = ddc0.getUserSelectedChoices();
-        DataInstance di      = getDataInstance();
+        DerivedDataChoice ddc        = (DerivedDataChoice) dataChoice;
+        List              choices0   = ddc.getChoices();
+        DerivedDataChoice ddc0       = (DerivedDataChoice) choices0.get(0);
+        Hashtable         choices    = ddc0.getUserSelectedChoices();
+        DataInstance      di         = getDataInstance();
 
-        int numChoices = choices.size();
+        int               numChoices = choices.size();
         if (numChoices == 2) {
             is2DTraj = true;
         }
@@ -726,8 +725,7 @@ public class GridTrajectoryControl extends DrawingControl {
         setLineWidth(gridTrackControl.trackWidth);
         addDisplayable(gridTrackControl.trackDisplay, getAttributeFlags());
         gridTrackControl.selectRangeDisplay = new SelectRangeDisplayable();
-        addDisplayable(gridTrackControl.selectRangeDisplay,
-                       FLAG_SELECTRANGE);
+        addDisplayable(gridTrackControl.selectRangeDisplay, FLAG_SELECTRANGE);
         getViewAnimation();
         gridTrackControl.indicator = new StationModelDisplayable("indicator");
         gridTrackControl.indicator.setScale(gridTrackControl.markerScale);
@@ -742,7 +740,7 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl.addDisplayable(gridTrackControl.trackDisplay,
                                         getAttributeFlags());
         gridTrackControl.addDisplayable(gridTrackControl.selectRangeDisplay,
-                                         FLAG_SELECTRANGE);
+                                        FLAG_SELECTRANGE);
         gridTrackControl.addDisplayable(gridTrackControl.indicator);
         gridTrackControl.addDisplayable(gridTrackControl.timesHolder);
         // return setData(dataChoice);
@@ -882,9 +880,9 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param r _more_
      */
     public void setLevel(Object r) {
-       // if ( !createTrjBtnClicked) {
-            currentLevel = r;
-       // }
+        // if ( !createTrjBtnClicked) {
+        currentLevel = r;
+        // }
     }
 
     /**
@@ -1071,9 +1069,9 @@ public class GridTrajectoryControl extends DrawingControl {
         int numPoints = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
         List<GridTrajectory.TrajInfo> tj =
-                GridTrajectory.calculateTrackPoints(u, v, w, s, ttts,
-                geoVals, numPoints, numTimes, latIndex, lonIndex, true,
-                normalizeLon, null);
+            GridTrajectory.calculateTrackPoints(u, v, w, s, ttts, geoVals,
+                numPoints, numTimes, latIndex, lonIndex, true, normalizeLon,
+                null);
 
         int numParcels = numPoints;  //10;
         final FunctionType ft = new FunctionType(
@@ -1085,7 +1083,7 @@ public class GridTrajectoryControl extends DrawingControl {
         List tracks;
 
         tracks = GridTrajectory.createTracks(paramName, tj, timeSet, ft,
-                paramUnit, numParcels);
+                                             paramUnit, numParcels);
         FlatField mergedTracks = DerivedGridFactory.mergeTracks(tracks);
 
         FunctionType fiType = new FunctionType(RealType.Time,
@@ -1162,9 +1160,9 @@ public class GridTrajectoryControl extends DrawingControl {
                                   ? 1
                                   : 0;
 
-        boolean haveAlt = true;
-        if(domain0.getManifoldDimension() == 2) {
-            is2DDC = true;
+        boolean    haveAlt      = true;
+        if (domain0.getManifoldDimension() == 2) {
+            is2DDC  = true;
             haveAlt = false;
         }
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
@@ -1185,9 +1183,9 @@ public class GridTrajectoryControl extends DrawingControl {
                             clevel));    */
         //first step  init  u,v, w, and s at all initial points
         List<GridTrajectory.TrajInfo> tj =
-                GridTrajectory.calculateTrackPoints(u, v, null, s, ttts,
-                geoVals, numPoints, numTimes, latIndex, lonIndex, haveAlt,
-                normalizeLon, clevel );
+            GridTrajectory.calculateTrackPoints(u, v, null, s, ttts, geoVals,
+                numPoints, numTimes, latIndex, lonIndex, haveAlt,
+                normalizeLon, clevel);
 
         int numParcels = numPoints;  //10;
         final FunctionType ft = new FunctionType(
@@ -1199,7 +1197,7 @@ public class GridTrajectoryControl extends DrawingControl {
         List tracks;
 
         tracks = GridTrajectory.createTracks(paramName, tj, timeSet, ft,
-                paramUnit, numParcels);
+                                             paramUnit, numParcels);
         FlatField mergedTracks = DerivedGridFactory.mergeTracks(tracks);
 
         FunctionType fiType = new FunctionType(RealType.Time,
@@ -1266,20 +1264,20 @@ public class GridTrajectoryControl extends DrawingControl {
                 DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
         }
 
-        float      z ;
-        if(!is2DDC){
+        float z;
+        if ( !is2DDC) {
             double[][] hVals = pressToHeightCS.toReference(new double[][] {
                 new double[] { clevel }
             }, new Unit[] { zunit });
 
-            z     = (float) hVals[0][0];
+            z = (float) hVals[0][0];
         } else {
-            z = (float)clevel;
+            z = (float) clevel;
         }
 
         if (currentCmd.getLabel().equals(
-                GlyphCreatorCommand.CMD_SYMBOL.getLabel()) ||
-                (glyphs.get(0) instanceof SymbolGlyph)) {
+                GlyphCreatorCommand.CMD_SYMBOL.getLabel()) || (glyphs.get(0)
+                instanceof SymbolGlyph)) {
             int       pointNum = glyphs.size();
 
             float[][] points   = new float[3][pointNum];
@@ -1323,8 +1321,8 @@ public class GridTrajectoryControl extends DrawingControl {
             float[][][] latlons =
                 GridUtil.findContainedLatLons((GriddedSet) domain0,
                     mapMaker.getMaps());
-            int       num   = 0;
-            for(int i = 0; i < latlons.length; i++){
+            int num = 0;
+            for (int i = 0; i < latlons.length; i++) {
                 num = num + latlons[i][0].length;
             }
 
@@ -1333,9 +1331,9 @@ public class GridTrajectoryControl extends DrawingControl {
             int       onum       = num / (skipFactor + 1);
 
             float[][] points     = new float[3][onum];
-            int  psize = 0;
-            for(int k = 0; k <latlons.length; k++ ) {
-                int isize = latlons[k][0].length/(skipFactor + 1) ;
+            int       psize      = 0;
+            for (int k = 0; k < latlons.length; k++) {
+                int isize = latlons[k][0].length / (skipFactor + 1);
                 for (int i = 0; i < isize; i++) {
                     int j = i * (skipFactor + 1);
                     points[latIndex][i + psize] = latlons[k][0][j];
@@ -1579,6 +1577,9 @@ public class GridTrajectoryControl extends DrawingControl {
 
     }
 
+    /**
+     * _more_
+     */
     public void removeGC() {
         try {
 

@@ -855,10 +855,10 @@ public class TrackControl extends GridDisplayControl {
                             doMakeTimeOptionWidget(), null));
                 }
                 */
-
-        controlWidgets.add(new WrapperWidget(this,
-                                             GuiUtils.rLabel("Marker:"),
-                                             makeLayoutModelWidget()));
+        if ( !checkFlag(FLAG_GRIDTRAJECTORY)) {
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Marker:"), makeLayoutModelWidget()));
+        }
 
 
         controlWidgets.add(
