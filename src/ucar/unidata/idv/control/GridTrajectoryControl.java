@@ -221,8 +221,8 @@ public class GridTrajectoryControl extends DrawingControl {
     public GridTrajectoryControl() {
         //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
-        setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
-                          | FLAG_DISPLAYUNIT | FLAG_TIMERANGE);
+        reallySetAttributeFlags(FLAG_COLORTABLE
+                           );
     }
 
 
@@ -257,7 +257,7 @@ public class GridTrajectoryControl extends DrawingControl {
          */
         public MyTrackControl(GridTrajectoryControl gtc) {
             setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
-                              | FLAG_DISPLAYUNIT | FLAG_TIMERANGE
+                              | FLAG_TIMERANGE
                               | FLAG_SELECTRANGE);
             this.gtc = gtc;
             setUseTrackTimes(true);
@@ -269,7 +269,7 @@ public class GridTrajectoryControl extends DrawingControl {
          */
         public MyTrackControl() {
             setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
-                              | FLAG_DISPLAYUNIT | FLAG_TIMERANGE
+                              | FLAG_TIMERANGE
                               | FLAG_SELECTRANGE);
             setUseTrackTimes(true);
             setTimeDeclutterEnabled(true);
@@ -727,7 +727,7 @@ public class GridTrajectoryControl extends DrawingControl {
         addDisplayable(gridTrackControl.trackDisplay, getAttributeFlags());
         gridTrackControl.selectRangeDisplay = new SelectRangeDisplayable();
         addDisplayable(gridTrackControl.selectRangeDisplay,
-                       FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
+                       FLAG_SELECTRANGE);
         getViewAnimation();
         gridTrackControl.indicator = new StationModelDisplayable("indicator");
         gridTrackControl.indicator.setScale(gridTrackControl.markerScale);
@@ -742,7 +742,7 @@ public class GridTrajectoryControl extends DrawingControl {
         gridTrackControl.addDisplayable(gridTrackControl.trackDisplay,
                                         getAttributeFlags());
         gridTrackControl.addDisplayable(gridTrackControl.selectRangeDisplay,
-                                        FLAG_DISPLAYUNIT | FLAG_SELECTRANGE);
+                                         FLAG_SELECTRANGE);
         gridTrackControl.addDisplayable(gridTrackControl.indicator);
         gridTrackControl.addDisplayable(gridTrackControl.timesHolder);
         // return setData(dataChoice);
