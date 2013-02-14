@@ -677,13 +677,17 @@ public class GridTrajectory {
         FieldImpl uvFI = DerivedGridFactory.createTrueFlowVectors(uFI, vFI);
         uFI = DerivedGridFactory.getUComponent(uvFI);
         vFI = DerivedGridFactory.getVComponent(uvFI);
-        if ((wFI0 == null) && (clevel != null)) {
+        if ((wFI0 == null) && (clevel != null) && (haveAlt)) {
             uFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(uFI,
                     clevel));
             vFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(vFI,
                     clevel));
             sFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(sFI,
                     clevel));
+        } else if (!haveAlt) {
+            uFI = GridUtil.make2DGridFromSlice(uFI, false);
+            vFI = GridUtil.make2DGridFromSlice(vFI, false);
+            sFI = GridUtil.make2DGridFromSlice(sFI, false);
         }
         final List<TrajInfo> result   = new ArrayList<TrajInfo>();
         List<Future>         pthreads = new ArrayList<Future>();

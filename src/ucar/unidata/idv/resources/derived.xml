@@ -610,6 +610,9 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
         <category value="display:gridtrajectorycontrol1"/>
      </categories>
      <operands>
+        <paramgroup categories="GRID-2D-*;" name="u_v"/>
+        <paramgroup categories="GRID-2D-*;" name="u_and_v"/>
+        <paramgroup categories="GRID-2D-*;" name="GridRelative_uv"/>
         <paramgroup categories="GRID-3D-*;" name="u_v"/>
         <paramgroup categories="GRID-3D-*;" name="u_and_v"/>
         <paramgroup categories="GRID-3D-*;" name="GridRelative_uv"/>

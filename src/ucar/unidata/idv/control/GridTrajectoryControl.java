@@ -204,8 +204,11 @@ public class GridTrajectoryControl extends DrawingControl {
     private DataTimeRange trjDataTimeRange;
 
     /** _more_ */
-    boolean is2D = false;
+    boolean is2DTraj = false;
 
+    /** _more_ */
+    boolean is2DDC = false;
+    
     /** a component to change the skip */
     ValueSliderWidget skipFactorWidget;
 
@@ -602,7 +605,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         int numChoices = choices.size();
         if (numChoices == 2) {
-            is2D = true;
+            is2DTraj = true;
         }
         DirectDataChoice udc =
             (DirectDataChoice) choices.get(new String("D1"));
@@ -616,7 +619,6 @@ public class GridTrajectoryControl extends DrawingControl {
         if (wdc != null) {
             addDataChoice(wdc);
         }
-
 
         u = (FieldImpl) udc.getData(null);
         v = (FieldImpl) vdc.getData(null);
@@ -783,7 +785,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 try {
                     synchronized (MUTEX) {
                         showWaitCursor();
-                        if ( !is2D) {
+                        if ( !is2DTraj) {
                             createTrajectoryControl();
                         } else {
                             create2DTrajectoryControl();
@@ -1159,6 +1161,12 @@ public class GridTrajectoryControl extends DrawingControl {
         int        lonIndex     = isLatLon
                                   ? 1
                                   : 0;
+
+        boolean haveAlt = true;
+        if(domain0.getManifoldDimension() == 2) {
+            is2DDC = true;
+            haveAlt = false;
+        }
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
                                 domain2D);
         int  numPoints = geoVals[0].length;
@@ -1178,8 +1186,8 @@ public class GridTrajectoryControl extends DrawingControl {
         //first step  init  u,v, w, and s at all initial points
         List<GridTrajectory.TrajInfo> tj =
                 GridTrajectory.calculateTrackPoints(u, v, null, s, ttts,
-                geoVals, numPoints, numTimes, latIndex, lonIndex, true,
-                normalizeLon, clevel);
+                geoVals, numPoints, numTimes, latIndex, lonIndex, haveAlt,
+                normalizeLon, clevel );
 
         int numParcels = numPoints;  //10;
         final FunctionType ft = new FunctionType(
@@ -1257,11 +1265,18 @@ public class GridTrajectoryControl extends DrawingControl {
             pressToHeightCS =
                 DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
         }
-        double[][] hVals = pressToHeightCS.toReference(new double[][] {
-            new double[] { clevel }
-        }, new Unit[] { zunit });
 
-        float      z     = (float) hVals[0][0];
+        float      z ;
+        if(!is2DDC){
+            double[][] hVals = pressToHeightCS.toReference(new double[][] {
+                new double[] { clevel }
+            }, new Unit[] { zunit });
+
+            z     = (float) hVals[0][0];
+        } else {
+            z = (float)clevel;
+        }
+
         if (currentCmd.getLabel().equals(
                 GlyphCreatorCommand.CMD_SYMBOL.getLabel()) ||
                 (glyphs.get(0) instanceof SymbolGlyph)) {
