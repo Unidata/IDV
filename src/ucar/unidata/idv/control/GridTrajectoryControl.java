@@ -618,16 +618,17 @@ public class GridTrajectoryControl extends DrawingControl {
         if (wdc != null) {
             addDataChoice(wdc);
         }
+        DataSelection dataSelection1 = getDataSelection();
 
-        u = (FieldImpl) udc.getData(null);
-        v = (FieldImpl) vdc.getData(null);
+        u = (FieldImpl) udc.getData(dataSelection1);
+        v = (FieldImpl) vdc.getData(dataSelection1);
         if (wdc != null) {
-            pw = (FieldImpl) wdc.getData(null);
+            pw = (FieldImpl) wdc.getData(dataSelection1);
         }
         if (sdc == null) {
             return false;
         }
-        s = (FieldImpl) sdc.getData(null);
+        s = (FieldImpl) sdc.getData(dataSelection1);
         doMakeDataInstance(sdc);
 
 
@@ -1395,6 +1396,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param widgets List to add to. Add in pairs (label, widget)
      */
     protected void addControlWidgets(List widgets) {
+
         JPanel levelUpDown = GuiUtils.doLayout(new Component[] { levelUpBtn,
                 levelDownBtn }, 1, GuiUtils.WT_N, GuiUtils.WT_N);
         JPanel levelSelector = GuiUtils.doLayout(new Component[] { levelBox,
@@ -1512,6 +1514,7 @@ public class GridTrajectoryControl extends DrawingControl {
                                                     .inset(GuiUtils
                                                         .wrap(createTrjBtn), 2), GuiUtils
                                                             .right(unloadBtn))));
+
 
 
     }
