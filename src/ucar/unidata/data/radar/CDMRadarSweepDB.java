@@ -21,33 +21,31 @@
 package ucar.unidata.data.radar;
 
 
-import ucar.nc2.dt.RadialDatasetSweep;
-
 import java.io.IOException;
-
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
- * Class CDMRadarSweepDB holds things
+ * Class CDMRadarSweepDB holds things.
  *
- *
- * @author IDV Development Team
- * @version $Revision: 1.3 $
  */
 public class CDMRadarSweepDB {
 
-    /** The table */
-    private HashMap sweepTableHash = null;
+    /** The table. */
+    private Map<Integer,Ray> sweepTableHash = null;
 
     /**
-     * init a CDM radar sweep table
+     * init a CDM radar sweep table.
      *
-     * @param s sweep
-     * @param sIdx _more_
-     * @param b _more_
-     *
-     * @throws IOException On badness
+     * @param s
+     *          sweep
+     * @param sIdx
+     *          s index
+     * @param b
+     *          beam
+     * @throws IOException
+     *           On badness
      */
     public CDMRadarSweepDB(float[] s, int[] sIdx, float b)
             throws IOException {
@@ -57,29 +55,31 @@ public class CDMRadarSweepDB {
     }
 
     /**
-     * get the ray index
+     * get the ray index.
      *
-     * @param idx rayIndex
-     *
+     * @param idx
+     *          rayIndex
      * @return Ray object
      */
     public Ray get(int idx) {
-        return (Ray) sweepTableHash.get(Integer.toString(idx));
+        return (Ray) sweepTableHash.get(idx);
     }
 
-
     /**
-     * calculate each ray in a sweep to construct a hash map table
+     * calculate each ray in a sweep to construct a hash map table.
      *
-     * @param s radialDatasetSweep object
-     * @param sIdx _more_
-     * @param beamWidth _more_
-     *
-     * @throws IOException On badness
+     * @param s
+     *          radialDatasetSweep object
+     * @param sIdx
+     *          s index
+     * @param beamWidth
+     *          beam width
+     * @throws IOException
+     *           On badness
      */
     private void readSweepTable(float[] s, int[] sIdx, float beamWidth)
             throws IOException {
-        sweepTableHash = new HashMap();
+        sweepTableHash = new HashMap<Integer,Ray>();
 
         int   i, iazim;
         int   numberOfRay = s.length;
@@ -97,24 +97,27 @@ public class CDMRadarSweepDB {
         float[] _azimuths = s;
         for (i = 0; i < numberOfRay; i++) {
             float azi = 0.0f;
-            //  try {
+            // try {
             azi = _azimuths[i];
             if ( !Float.isNaN(azi)) {
                 iazim = (int) (azi / res + res / 2.0);  /* Centered on bin. */
-                //  } catch (IOException e) {
-                //     e.printStackTrace();
-                //     iazim = 0;
-                //  }
+                // } catch (IOException e) {
+                // e.printStackTrace();
+                // iazim = 0;
+                // }
                 if (iazim >= numberOfRay) {
                     iazim -= numberOfRay;
                 }
 
                 Ray r = new Ray();
-                r.index    = Integer.toString(iazim);
+                r.index    = iazim;
                 r.rayIndex = sIdx[i];
                 r.azimuth  = azi;
 
-                /*      fprintf(stderr,"ray# %d, azim %f, iazim %d\n", ray->h.ray_num, ray->h.azimuth, iazim); */
+                /*
+                 * fprintf(stderr,"ray# %d, azim %f, iazim %d\n", ray->h.ray_num,
+                 * ray->h.azimuth, iazim);
+                 */
                 sweepTableHash.put(r.index, r);
             }
         }
@@ -122,30 +125,81 @@ public class CDMRadarSweepDB {
     }
 
     /**
-     * Class Ray represents a ray
+     * Class Ray represents a ray.
      *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.3 $
      */
     public class Ray {
 
-        /** azi angle index, such 255 */
-        public String index;
+        /** azi angle index, such 255. */
+        public int index;
 
-        /** number index, 0 to 360+/- */
+        /** number index, 0 to 360+/-. */
         public int rayIndex;
 
-        /** azimuth angle, 0 to 360+/- degree */
+        /** azimuth angle, 0 to 360+/- degree. */
         public float azimuth;
 
         /**
-         * get the string object of rayIndex
+         * get the string object of rayIndex.
          *
          * @return rayIndex string
          */
         public String toString() {
             return Integer.toString(rayIndex);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            final int prime  = 31;
+            int       result = 1;
+            result = prime * result + getOuterType().hashCode();
+            result = prime * result + Float.floatToIntBits(azimuth);
+            result = prime * result + index;
+            result = prime * result + rayIndex;
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Ray other = (Ray) obj;
+            if ( !getOuterType().equals(other.getOuterType())) {
+                return false;
+            }
+            if (Float.floatToIntBits(azimuth)
+                    != Float.floatToIntBits(other.azimuth)) {
+                return false;
+            }
+            if (index != other.index) {
+                return false;
+            }
+            if (rayIndex != other.rayIndex) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * For equals/hashcode
+         *
+         * @return CDMRadarSweepDB
+         */
+        private CDMRadarSweepDB getOuterType() {
+            return CDMRadarSweepDB.this;
         }
     }
 
