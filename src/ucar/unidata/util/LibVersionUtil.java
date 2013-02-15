@@ -76,7 +76,7 @@ public class LibVersionUtil {
                             attrs.getValue("Implementation-Version"));
                         SimpleDateFormat oldFormat =
                             new SimpleDateFormat(
-                                "EEE MMM d HH:mm:sss z yyyy");
+                                    "yyyyMMdd.HHmm");
                         //Fri Dec 07 10:51:57 MST 2012
                         SimpleDateFormat newFormat =
                             new SimpleDateFormat("yyyyMMddHHmmss");
