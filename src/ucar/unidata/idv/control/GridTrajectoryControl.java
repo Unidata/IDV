@@ -221,7 +221,7 @@ public class GridTrajectoryControl extends DrawingControl {
     public GridTrajectoryControl() {
         //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
-        reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_GRIDTRAJECTORY);
+        reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT  | FLAG_GRIDTRAJECTORY);
     }
 
 
@@ -377,8 +377,9 @@ public class GridTrajectoryControl extends DrawingControl {
             }
             trackGrid = fi;
             Unit newUnit = getDisplayUnit();
+            setColorUnit(newUnit);
             //TODO: use the right index
-            if ((newUnit != null) && !newUnit.equals(getDisplayUnit())
+            if ((newUnit != null)  && !newUnit.equals(getDisplayUnit())
                     && Unit.canConvert(newUnit, getRawDataUnit())) {
                 trackDisplay.setDisplayUnit(newUnit);
                 selectRangeDisplay.setDisplayUnit(newUnit);
@@ -776,6 +777,14 @@ public class GridTrajectoryControl extends DrawingControl {
 
     }
 
+    /**
+     * _more_
+     */
+    protected void displayUnitChanged(Unit oldUnit, Unit newUnit) {
+        gridTrackControl.displayUnitChanged(oldUnit, newUnit);
+        gridTrackControl.setNewDisplayUnit(newUnit, true);
+
+    }
     /**
      * _more_
      */
