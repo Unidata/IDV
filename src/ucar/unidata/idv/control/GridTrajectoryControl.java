@@ -221,7 +221,7 @@ public class GridTrajectoryControl extends DrawingControl {
     public GridTrajectoryControl() {
         //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
-        reallySetAttributeFlags(FLAG_COLORTABLE);
+        reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_GRIDTRAJECTORY);
     }
 
 
