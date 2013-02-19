@@ -221,7 +221,7 @@ public class GridTrajectoryControl extends DrawingControl {
     public GridTrajectoryControl() {
         //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
-        reallySetAttributeFlags(FLAG_COLORTABLE);
+        reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT  | FLAG_GRIDTRAJECTORY);
     }
 
 
@@ -377,8 +377,9 @@ public class GridTrajectoryControl extends DrawingControl {
             }
             trackGrid = fi;
             Unit newUnit = getDisplayUnit();
+            setColorUnit(newUnit);
             //TODO: use the right index
-            if ((newUnit != null) && !newUnit.equals(getDisplayUnit())
+            if ((newUnit != null)  && !newUnit.equals(getDisplayUnit())
                     && Unit.canConvert(newUnit, getRawDataUnit())) {
                 trackDisplay.setDisplayUnit(newUnit);
                 selectRangeDisplay.setDisplayUnit(newUnit);
@@ -612,22 +613,25 @@ public class GridTrajectoryControl extends DrawingControl {
             (DirectDataChoice) choices.get(new String("D2"));
         DirectDataChoice wdc =
             (DirectDataChoice) choices.get(new String("D3"));
+        if(choices0.size() == 1)
+            return false;
         DirectDataChoice sdc = (DirectDataChoice) choices0.get(1);
         addDataChoice(udc);
         addDataChoice(vdc);
         if (wdc != null) {
             addDataChoice(wdc);
         }
+        DataSelection dataSelection1 = getDataSelection();
 
-        u = (FieldImpl) udc.getData(null);
-        v = (FieldImpl) vdc.getData(null);
+        u = (FieldImpl) udc.getData(dataSelection1);
+        v = (FieldImpl) vdc.getData(dataSelection1);
         if (wdc != null) {
-            pw = (FieldImpl) wdc.getData(null);
+            pw = (FieldImpl) wdc.getData(dataSelection1);
         }
         if (sdc == null) {
             return false;
         }
-        s = (FieldImpl) sdc.getData(null);
+        s = (FieldImpl) sdc.getData(dataSelection1);
         doMakeDataInstance(sdc);
 
 
@@ -773,6 +777,14 @@ public class GridTrajectoryControl extends DrawingControl {
 
     }
 
+    /**
+     * _more_
+     */
+    protected void displayUnitChanged(Unit oldUnit, Unit newUnit) {
+        gridTrackControl.displayUnitChanged(oldUnit, newUnit);
+        gridTrackControl.setNewDisplayUnit(newUnit, true);
+
+    }
     /**
      * _more_
      */
@@ -1395,6 +1407,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param widgets List to add to. Add in pairs (label, widget)
      */
     protected void addControlWidgets(List widgets) {
+
         JPanel levelUpDown = GuiUtils.doLayout(new Component[] { levelUpBtn,
                 levelDownBtn }, 1, GuiUtils.WT_N, GuiUtils.WT_N);
         JPanel levelSelector = GuiUtils.doLayout(new Component[] { levelBox,
@@ -1512,6 +1525,7 @@ public class GridTrajectoryControl extends DrawingControl {
                                                     .inset(GuiUtils
                                                         .wrap(createTrjBtn), 2), GuiUtils
                                                             .right(unloadBtn))));
+
 
 
     }

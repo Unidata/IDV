@@ -21,17 +21,13 @@
 package ucar.unidata.idv;
 
 
-import org.apache.batik.dom.util.HashTable;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataSourceResults;
-import ucar.unidata.data.grid.DodsGeoGridDataSource;
 import ucar.unidata.data.grid.GridDataSource;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -40,14 +36,24 @@ import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.idv.ui.IslDialog;
 import ucar.unidata.idv.ui.LoadBundleDialog;
 import ucar.unidata.idv.ui.QuicklinkPanel;
-import ucar.unidata.util.*;
+import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.FileManager;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.ObjectPair;
+import ucar.unidata.util.Prototypable;
+import ucar.unidata.util.PrototypeManager;
+import ucar.unidata.util.ResourceCollection;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Trace;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import visad.util.ThreadManager;
-
-
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -59,7 +65,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -78,9 +88,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-
-
-
 
 /**
  * This class defines what is to be saved when we are

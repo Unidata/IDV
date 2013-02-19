@@ -18,7 +18,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.util;
+package ucar.unidata.idv;
 
 
 import ucar.nc2.grib.GribVariableRenamer;
@@ -76,7 +76,7 @@ public class LibVersionUtil {
                             attrs.getValue("Implementation-Version"));
                         SimpleDateFormat oldFormat =
                             new SimpleDateFormat(
-                                "EEE MMM d HH:mm:sss z yyyy");
+                                    "yyyyMMdd.HHmm");
                         //Fri Dec 07 10:51:57 MST 2012
                         SimpleDateFormat newFormat =
                             new SimpleDateFormat("yyyyMMddHHmmss");

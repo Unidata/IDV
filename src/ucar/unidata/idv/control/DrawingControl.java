@@ -1988,11 +1988,12 @@ public class DrawingControl extends DisplayControlImpl {
 
         items.add(GuiUtils.makeMenuItem("Remove All", this,
                                         "removeAllGlyphs"));
-        items.add(GuiUtils.makeMenuItem("Apply Color to Selected", this,
-                                        "applyColorToAll"));
-        items.add(GuiUtils.makeMenuItem("Apply Z Position to Selected", this,
-                                        "applyZPosition", selectedGlyphs));
-
+        if(! checkFlag(FLAG_GRIDTRAJECTORY)) {
+            items.add(GuiUtils.makeMenuItem("Apply Color to Selected", this,
+                                            "applyColorToAll"));
+            items.add(GuiUtils.makeMenuItem("Apply Z Position to Selected", this,
+                                            "applyZPosition", selectedGlyphs));
+        }
         super.getEditMenuItems(items, forMenuBar);
 
     }
