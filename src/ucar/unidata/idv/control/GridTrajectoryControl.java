@@ -215,6 +215,11 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     int coordinateType;
 
+    /** _more_ */
+    Unit newUnit = null;
+
+    /** _more_ */
+    boolean levelChanged = false;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -640,7 +645,9 @@ public class GridTrajectoryControl extends DrawingControl {
         setDataInstance(gdi);
         gridTrackControl.controlContext = getControlContext();
         gridTrackControl.updateGridDataInstance(gdi);
-        setDisplayUnit(gdi.getRawUnit(0));
+        if(getDisplayUnit().equals(getDefaultDistanceUnit())){
+            setDisplayUnit(gdi.getRawUnit(0));
+        }
         initDisplayUnit();
 
         // level widget init
@@ -653,6 +660,7 @@ public class GridTrajectoryControl extends DrawingControl {
                         (TwoFacedObject) ((JComboBox) event.getSource())
                             .getSelectedItem();
                     setLevel(select);
+                    levelChanged = true;
                 }
             }
         });
@@ -771,7 +779,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         controlPane = new JPanel();
         controlPane.setPreferredSize(new Dimension(300, 180));
-
+        levelChanged = false;
         return true;
 
 
@@ -783,7 +791,7 @@ public class GridTrajectoryControl extends DrawingControl {
     protected void displayUnitChanged(Unit oldUnit, Unit newUnit) {
         gridTrackControl.displayUnitChanged(oldUnit, newUnit);
         gridTrackControl.setNewDisplayUnit(newUnit, true);
-
+        this.setDisplayUnit(newUnit);
     }
     /**
      * _more_
@@ -828,9 +836,7 @@ public class GridTrajectoryControl extends DrawingControl {
             if ((getGlyphs() != null) && (glyphs.size() > 0)) {
                 currentLevel = getCurrentLevel();
                 setLevel(currentLevel);
-
-                // msgLabel  = new JLabel();
-                // setCurrentCommand(getCurrentCmd());
+                newUnit = getDisplayUnit();
                 createTrjBtn.doClick();
                 gridTrackControl.setLineWidth(getTrackLineWidth());
                 // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
@@ -1033,10 +1039,6 @@ public class GridTrajectoryControl extends DrawingControl {
     void createTrajectoryControl()
             throws VisADException, RemoteException, Exception {
 
-        //  FieldImpl u = this.dataChoice;
-        //   super.init(dataChoice0);
-
-
         Unit dUnit = ((FlatField) s.getSample(0)).getRangeUnits()[0][0];
         gridTrackControl.setDisplayUnit(dUnit);
         final Unit rgUnit =
@@ -1131,6 +1133,18 @@ public class GridTrajectoryControl extends DrawingControl {
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
 
+        if(newUnit != null){
+             Unit oldUnit = getDisplayUnit();
+             gridTrackControl.displayUnitChanged(oldUnit, newUnit);
+             gridTrackControl.setNewDisplayUnit(newUnit, true);
+        }
+
+        if(levelChanged){
+            Unit cUnit = getDisplayUnit();
+            gridTrackControl.displayUnitChanged(dUnit, cUnit);
+            gridTrackControl.setNewDisplayUnit(cUnit, true);
+            levelChanged = false;
+        }
     }
 
     /**
@@ -1244,7 +1258,18 @@ public class GridTrajectoryControl extends DrawingControl {
         super.paramName = paramName;
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
+        if(newUnit != null){
+            Unit oldUnit = getDisplayUnit();
+            gridTrackControl.displayUnitChanged(oldUnit, newUnit);
+            gridTrackControl.setNewDisplayUnit(newUnit, true);
+        }
 
+        if(levelChanged){
+            Unit cUnit = getDisplayUnit();
+            gridTrackControl.displayUnitChanged(dUnit, cUnit);
+            gridTrackControl.setNewDisplayUnit(cUnit, true);
+            levelChanged = false;
+        }
     }
 
 
