@@ -18,11 +18,109 @@ The items below reflect changes since the 3.1u1 release.
 <faqitem cat="System Changes"></faqitem>
 
 
-<faqitem q="Latest netCDF-Java Version" id="nj42">
-A new version of the netCDF-Java library (4.2.34) is included in this release.
-See the
-<a href="http://www.unidata.ucar.edu/software/netcdf-java/v4.2/CHANGES">
-netCDF-Java change log</a> for a complete list of changes.
+<faqitem q="Latest netCDF-Java Version" id="nj43">
+<p>
+A new version of the netCDF-Java library (4.3.16) is included in this release. This version of netCDF-Java
+includes major changes to the way GRIB 1/2 files are handled. See the <a
+    href="http://www.unidata.ucar.edu/software/netcdf-java/formats/GribFiles.html"> netCDF-Java GRIB
+documentation</a> for a more details on these changes.
+</p>
+
+<p>
+One major outcome of this change is that GRIB variable names will now be generated in a very general way. This
+means that bundles that were generated with a previous version of the IDV might break. In order to aid users in
+the transition between netCDF-Java 4.2 and 4.3, the netCDF-Java library has provided a mapping of old variable
+names and new variable names for the datasets served on the Unidata THREDDS Data Server (TDS), and this mapping
+is being used 'under the hood' in the IDV to minimize the impact of these changes on users.
+</p>
+
+<p>
+For users reading GRIB files from other locations (local files or other remote servers), the IDV now allows
+users to make custom variable name mappings. New variable mappings should be placed in the following file (found
+under the users home directory):
+</p>
+
+<p>
+&nbsp;&nbsp;.unidata/idv/DefaultIdv/varrenamer.xml
+</p>
+
+<p>
+The structure of this file is quite simple:
+</p>
+
+<p><code>
+&lt;varrenamers&gt;<br>
+<br>
+&nbsp;&nbsp;&lt;varrenamer<br>
+&nbsp;&nbsp;&nbsp;&nbsp;old="oldNameHere"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;new="newNameHere" /&gt;<br>
+<br>
+&nbsp;&nbsp;&lt;varrenamer<br>
+&nbsp;&nbsp;&nbsp;&nbsp;old="anotherOldNameHere"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;new="anotherNewNameHere" /&gt;<br>
+<br>
+&lt;/varrenamers&gt;
+</code></p>
+
+<p>
+Changes to the way GRIB files are served via the Unidata TDS server have also been made. The impact of this
+change on IDV users is that the dataset URLs that point to GRIB resources will change, which will break bundles
+that point to the main Unidata TDS (thredds.ucar.edu, previously known as motherlode.ucar.edu).
+</p>
+
+<p>Again, in order to aid users in this transition, the netCDF-Java library has provided a mapping between the old
+and new dataset URL paths for all datasets served through the Unidata TDS. As with the variable name changes,
+the URL mapping for datasets on the Unidata TDS is being used 'under the hood' in the IDV to minimize the impact
+on users.
+</p>
+
+<p>
+Currently, the latest version of TDS (4.3), where URL related impacts will be seen, is not yet running on the
+main Unidata TDS, but the transition to the new server will happen in the near future. The IDV has a new plugin
+that will allow users to test the transition before it happens by redirecting all data request to the main
+Unidata TDS (currently running 4.2) to thredds-test.ucar.edu, which is running TDS 4.3. The plugin can be found
+in the IDV plugin manager under [ht::menu {Available Plugins} {Data Sources}{Test Unidata TDS 4.2->4.3
+Upgrade}]. Note that this plugin should be removed once thredds.ucar.edu is running TDS 4.3.
+</p>
+
+<p>
+As TDS servers in the community begin to upgrade to TDS 4.3, IDV users will likely need to use custom URL
+mappings. New URL mappings should be placed in the following file (found under the users home directory):
+</p>
+
+<p>
+&nbsp;&nbsp;.unidata/idv/DefaultIdv/urlmaps.xml
+</p>
+
+<p>
+Again, the format of this file is quite simple:
+</p>
+
+<p><code>
+&lt;urlmaps&gt;<br>
+<br>
+&nbsp;&nbsp;&lt;urlmap<br>
+&nbsp;&nbsp;&nbsp;&nbsp;type="opendap"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;old="oldthreddsserver1.edu/"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;new="newthreddsserver1.edu/" /&gt;<br>
+<br>
+&nbsp;&nbsp;&lt;urlmap<br>
+&nbsp;&nbsp;&nbsp;&nbsp;type="opendap"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;old="threddsserver2.edu/thredds/dodsC/old/path/"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;new="threddsserver2.edu/thredds/dodcC/new/path/" /&gt;<br>
+<br>
+&lt;/urlmaps&gt;
+</code></p>
+
+<p>
+In the first example, a new THREDDS server has replaced an old server - all requests going to
+oldthreddsserver1.edu will be directed to newthreddsserver1.edu. The second example is where the URL path to a
+particular dataset has changed, either because the product has been replaced (for example, the RUC to the RAP
+transition) or the maintainer of the TDS server has changed the way data are cataloged. Note in both cases the
+type of URL is an opendap URL. In the future, this mechanism will be used to redirect other types of data
+requests, such as ADDE requests.
+</p>
+
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
