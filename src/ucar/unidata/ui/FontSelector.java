@@ -215,11 +215,16 @@ public class FontSelector implements ItemListener, ListSelectionListener {
      * @param fontName the name of the font family
      */
     public void setFontName(String fontName) {
-        if (uiType == COMBOBOX_UI) {
-            ((JComboBox) fontSelector).setSelectedItem(fontName);
-        } else {
-            ((JList) fontSelector).setSelectedValue(fontName, true);
-        }
+        // only update fontSelector if the font name has changed
+        // (careful, fontChoice can be null)
+    	if (!fontName.equals(fontChoice)) {
+            if (uiType == COMBOBOX_UI) {
+                ((JComboBox) fontSelector).setSelectedItem(fontName);
+            } else {
+                ((JList) fontSelector).setSelectedValue(fontName, true);
+            }
+            fontChoice = fontName;
+    	}
     }
 
     /**
@@ -228,11 +233,15 @@ public class FontSelector implements ItemListener, ListSelectionListener {
      * @param fontStyle  style of the font.
      */
     public void setFontStyle(int fontStyle) {
-        if (uiType == COMBOBOX_UI) {
-            ((JComboBox) styleSelector).setSelectedIndex(fontStyle);
-        } else {
-            ((JList) styleSelector).setSelectedIndex(fontStyle);
-        }
+        // only update styleSelector if the style has changed
+    	if (styleChoice != fontStyle) {
+            if (uiType == COMBOBOX_UI) {
+                ((JComboBox) styleSelector).setSelectedIndex(fontStyle);
+            } else {
+                ((JList) styleSelector).setSelectedIndex(fontStyle);
+            }
+            styleChoice = fontStyle;
+    	}
     }
 
     /**
@@ -241,11 +250,15 @@ public class FontSelector implements ItemListener, ListSelectionListener {
      * @param fontSize size of the font
      */
     public void setFontSize(int fontSize) {
-        if (uiType == COMBOBOX_UI) {
-            ((JComboBox) sizeSelector).setSelectedItem(new Integer(fontSize));
-        } else {
-            ((JList) sizeSelector).setSelectedValue(new Integer(fontSize),
-                    true);
+        // only update sizeSelector if the size has changed
+        if (sizeChoice != fontSize) {
+            if (uiType == COMBOBOX_UI) {
+                ((JComboBox) sizeSelector).setSelectedItem(new Integer(fontSize));
+            } else {
+                ((JList) sizeSelector).setSelectedValue(new Integer(fontSize),
+                        true);
+            }
+            sizeChoice = fontSize;
         }
     }
 
