@@ -88,8 +88,7 @@ server will happen in the near future. The IDV has a new plugin that will allow
 users to test the transition before it happens by redirecting all data request
 to the main Unidata TDS (currently running 4.2) to thredds-test.ucar.edu, which
 is running TDS 4.3. The plugin can be found in the IDV plugin manager under
-[ht::menu {Available Plugins} {Data Sources}{Test Unidata TDS 4.2->4.3
-Upgrade}]. Note that this plugin should be removed once thredds.ucar.edu is
+[ht::menu {Available Plugins} {Data Sources} {Test Unidata TDS 4.2-&gt;4.3 Upgrade}]. Note that this plugin should be removed once thredds.ucar.edu is
 running TDS 4.3.
 </p>
 
@@ -159,6 +158,12 @@ Fixed broken webcam links available in the IDV.
 
 <faqitem cat="Data Changes"></faqitem>
 
+<faqitem q="Non standard calendars" id="calendar">
+An additional change in the netCDF-Java 4.3 library is support for 
+non-standard calendars (e.g. 365 or 360 day years used in climate datasets).
+The IDV has been modified to support these calendars and display dates
+correctly from those datasets.
+</faqitem>
 
 <faqitem cat="ISL Changes"></faqitem>
 
