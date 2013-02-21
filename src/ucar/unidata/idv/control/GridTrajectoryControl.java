@@ -220,8 +220,6 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     Unit newUnit = null;
 
-    /** _more_ */
-    boolean levelChanged = false;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -662,7 +660,6 @@ public class GridTrajectoryControl extends DrawingControl {
                         (TwoFacedObject) ((JComboBox) event.getSource())
                             .getSelectedItem();
                     setLevel(select);
-                    levelChanged = true;
                 }
             }
         });
@@ -781,7 +778,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         controlPane = new JPanel();
         controlPane.setPreferredSize(new Dimension(300, 180));
-        levelChanged = false;
+
         return true;
 
 
@@ -793,6 +790,11 @@ public class GridTrajectoryControl extends DrawingControl {
     protected void displayUnitChanged(Unit oldUnit, Unit newUnit) {
         gridTrackControl.displayUnitChanged(oldUnit, newUnit);
         gridTrackControl.setNewDisplayUnit(newUnit, true);
+        try {
+            gridTrackControl.setSelectRange(gridTrackControl.getColorRangeFromData());
+        } catch (Exception exc) {
+            logException("change unit", exc);
+        }
         this.setDisplayUnit(newUnit);
     }
     /**
@@ -1138,18 +1140,15 @@ public class GridTrajectoryControl extends DrawingControl {
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
 
+        Unit cUnit = getDisplayUnit();
+
         if(newUnit != null){
-             Unit oldUnit = getDisplayUnit();
-             gridTrackControl.displayUnitChanged(oldUnit, newUnit);
-             gridTrackControl.setNewDisplayUnit(newUnit, true);
+             cUnit = newUnit;
         }
 
-        if(levelChanged){
-            Unit cUnit = getDisplayUnit();
-            gridTrackControl.displayUnitChanged(dUnit, cUnit);
-            gridTrackControl.setNewDisplayUnit(cUnit, true);
-            levelChanged = false;
-        }
+        gridTrackControl.displayUnitChanged(dUnit, cUnit);
+        gridTrackControl.setNewDisplayUnit(cUnit, true);
+        gridTrackControl.setSelectRange(gridTrackControl.getColorRangeFromData());
     }
 
     /**
@@ -1263,21 +1262,18 @@ public class GridTrajectoryControl extends DrawingControl {
         super.paramName = paramName;
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
+
+        Unit cUnit = getDisplayUnit();
+
         if(newUnit != null){
-            Unit oldUnit = getDisplayUnit();
-            gridTrackControl.displayUnitChanged(oldUnit, newUnit);
-            gridTrackControl.setNewDisplayUnit(newUnit, true);
+            cUnit = newUnit;
         }
 
-        if(levelChanged){
-            Unit cUnit = getDisplayUnit();
-            gridTrackControl.displayUnitChanged(dUnit, cUnit);
-            gridTrackControl.setNewDisplayUnit(cUnit, true);
-            levelChanged = false;
-        }
+        gridTrackControl.displayUnitChanged(dUnit, cUnit);
+        gridTrackControl.setNewDisplayUnit(cUnit, true);
+        gridTrackControl.setSelectRange(gridTrackControl.getColorRangeFromData());
+
     }
-
-
 
     /**
      * _more_
