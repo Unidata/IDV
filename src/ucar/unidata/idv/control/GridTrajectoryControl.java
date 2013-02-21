@@ -127,6 +127,8 @@ public class GridTrajectoryControl extends DrawingControl {
     protected Object currentLevel;
 
     /** _more_ */
+    protected Object bundleLevel = null;
+    /** _more_ */
     protected Object[] currentLevels;
 
     /** _more_ */
@@ -835,7 +837,10 @@ public class GridTrajectoryControl extends DrawingControl {
         if (createTrjBtnClicked) {
             if ((getGlyphs() != null) && (glyphs.size() > 0)) {
                 currentLevel = getCurrentLevel();
-                setLevel(currentLevel);
+                if(!currentLevel.equals(bundleLevel)) {
+                    setLevel(bundleLevel);
+                    levelBox.setSelectedItem(bundleLevel);
+                }
                 newUnit = getDisplayUnit();
                 createTrjBtn.doClick();
                 gridTrackControl.setLineWidth(getTrackLineWidth());
@@ -1630,7 +1635,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     gridTrackControl.indicator.setVisible(false);
                     gridTrackControl.timesHolder.setData(DUMMY_DATA);
                 }
-                createTrjBtnClicked = false;
+               // createTrjBtnClicked = false;
             }
         } catch (Exception exc) {
             logException("Removing drawings", exc);
@@ -1689,6 +1694,7 @@ public class GridTrajectoryControl extends DrawingControl {
      */
     public void setCurrentLevel(Object lvl) {
         currentLevel = lvl;
+        bundleLevel = lvl;
     }
 
     /**
