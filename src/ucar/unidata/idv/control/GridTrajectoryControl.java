@@ -1445,7 +1445,7 @@ public class GridTrajectoryControl extends DrawingControl {
         JButton unloadBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Cut16.gif", this,
                                      "removeAllGlyphs");
-        unloadBtn.setToolTipText("Remove all glyphs");
+        unloadBtn.setToolTipText("Remove existing glyphs and trajectories");
 
         msgLabel = new JLabel();
         if (createTrjBtnClicked) {
