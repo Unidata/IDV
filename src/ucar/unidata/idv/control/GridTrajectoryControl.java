@@ -1307,7 +1307,13 @@ public class GridTrajectoryControl extends DrawingControl {
                 DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
         }
 
-        float z = (float)alt.getValue();
+        float z; //= (float)alt.getValue();
+
+        if(is2DDC){
+            z = (float) clevel;
+        } else {
+            z = (float)alt.getValue();
+        }
          /*
         if ( !is2DDC) {
             double[][] hVals = pressToHeightCS.toReference(new double[][] {
