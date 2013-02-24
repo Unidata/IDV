@@ -1085,8 +1085,13 @@ public class GridTrajectoryControl extends DrawingControl {
         int        lonIndex     = isLatLon
                                   ? 1
                                   : 0;
+
+        Real alt = null;
+       // if(zunit.getIdentifier().length() == 0) {
+            alt = GridUtil.getAltitude(s, (Real)((TwoFacedObject)currentLevel).getId()) ;
+        //}
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
-                                domain2D);
+                                domain2D, alt);
         int numPoints = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
         List<GridTrajectory.TrajInfo> tj =
@@ -1196,7 +1201,7 @@ public class GridTrajectoryControl extends DrawingControl {
             haveAlt = false;
         }
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
-                                domain2D);
+                                domain2D, null);
         int  numPoints = geoVals[0].length;
         Real clevel    = null;
         if (currentLevel instanceof Real) {
@@ -1287,7 +1292,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @throws Exception _more_
      */
     public float[][] getEarthLocationPoints(int latIndex, int lonIndex,
-                                            SampledSet domain0)
+                                            SampledSet domain0, Real alt)
             throws Exception {
         double clevel = 0;
         if (currentLevel instanceof Real) {
@@ -1302,7 +1307,8 @@ public class GridTrajectoryControl extends DrawingControl {
                 DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
         }
 
-        float z;
+        float z = (float)alt.getValue();
+         /*
         if ( !is2DDC) {
             double[][] hVals = pressToHeightCS.toReference(new double[][] {
                 new double[] { clevel }
@@ -1311,7 +1317,7 @@ public class GridTrajectoryControl extends DrawingControl {
             z = (float) hVals[0][0];
         } else {
             z = (float) clevel;
-        }
+        }     */
 
         if (currentCmd.getLabel().equals(
                 GlyphCreatorCommand.CMD_SYMBOL.getLabel()) || (glyphs.get(0)
