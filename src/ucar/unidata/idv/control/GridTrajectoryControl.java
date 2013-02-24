@@ -839,7 +839,7 @@ public class GridTrajectoryControl extends DrawingControl {
         if (createTrjBtnClicked) {
             if ((getGlyphs() != null) && (glyphs.size() > 0)) {
                 currentLevel = getCurrentLevel();
-                if(!currentLevel.equals(bundleLevel)) {
+                if(currentLevel != null && bundleLevel != null && !currentLevel.equals(bundleLevel)) {
                     setLevel(bundleLevel);
                     levelBox.setSelectedItem(bundleLevel);
                 }
