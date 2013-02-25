@@ -215,7 +215,7 @@ public class GridTrajectoryControl extends DrawingControl {
     ValueSliderWidget skipFactorWidget;
 
     /** _more_ */
-    int coordinateType;
+    int coordinateType= DrawingGlyph.COORD_LATLON;;
 
     /** _more_ */
     Unit newUnit = null;
@@ -620,7 +620,9 @@ public class GridTrajectoryControl extends DrawingControl {
             (DirectDataChoice) choices.get(new String("D3"));
         if(choices0.size() == 1)
             return false;
-        DirectDataChoice sdc = (DirectDataChoice) choices0.get(1);
+        DataChoice sdc;
+
+        sdc = (DataChoice)choices0.get(1);
         addDataChoice(udc);
         addDataChoice(vdc);
         if (wdc != null) {
