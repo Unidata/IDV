@@ -1410,6 +1410,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
      * Format the level for labelling.  If subclasses want to have
      * different formatting, they can override this method.
      *
+     * Check for 'currentLevel' to have a non-numeric: SFC, MSL, or TRO
+     * and if so, return just that String...
+     *
      * @param level  level to format
      *
      * @return formatted string for level
@@ -1421,9 +1424,19 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         Real         myLevel = getLevelReal(level);
         StringBuffer buf     = new StringBuffer();
-        buf.append(getDisplayConventions().format(myLevel.getValue()));
-        buf.append(" ");
-        buf.append(myLevel.getUnit());
+        if ( (currentLevel != null) && currentLevel.toString().equals("SFC") ) {
+          buf.append("SFC ");
+        } else if ( (currentLevel != null) &&
+                 currentLevel.toString().equals("MSL") ) {
+          buf.append("MSL ");
+        } else if ( (currentLevel != null) &&
+                 currentLevel.toString().equals("TRO") ) {
+          buf.append("TRO ");
+        } else {
+          buf.append(getDisplayConventions().format(myLevel.getValue()));
+          buf.append(" ");
+          buf.append(myLevel.getUnit());
+        }
         return buf.toString();
     }
 
