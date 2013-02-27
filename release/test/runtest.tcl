@@ -24,6 +24,7 @@ set noplugins ""
 set java ""
 set idvJar ""
 set testHome ""
+set offscreen ""
 
 set tmpArchives [list]
 
@@ -40,7 +41,9 @@ foreach arg $argv {
             puts "-testName=name : name of directory that will hold results \[default : results\]"
             puts "-nodefault : flag to tell IDV to not load the default bundle before loading the test \[default : flag not set\]"
             puts "-noplugin : flag to tell IDV to not load plugins located in the userDir \[default : flag not set\]"
-            puts "test : one or more test names, space seperated, no dash. Any argument without a dash is treated as a test name"
+            puts "-noplugin : flag to tell IDV to not load plugins located in the userDir \[default : flag not set\]"
+            puts "-offscreen : flag to tell IDV to run in offscreen mode \[default : flag not set\]"
+            puts "test : one or more test names, space separated, no dash. Any argument without a dash is treated as a test name"
             puts ""
             exit
         }
@@ -69,6 +72,9 @@ foreach arg $argv {
         }
         -noplugins {
             set noplugins "-noplugins"
+        }
+        -offscreen {
+            set offscreen "-Doffscreen='true'"
         }
         default {
           puts $arg
@@ -176,7 +182,7 @@ proc processBundle {archiveName bundle archiveDir resultsDir} {
 
     lappend ::archives $archiveName
     if {$::doJava} {
-        set command "$java -Xmx${jvmMemory} -XX:MaxPermSize=${jvmPermGen} -Djava.net.preferIPv4Stack=true -Dswing.metalTheme=steel $extra -userpath $userDir $nodefault $noplugins -test $archiveName $resultsDir $bundle 2> $logFile"
+        set command "$java -Xmx${jvmMemory} -XX:MaxPermSize=${jvmPermGen} ${offscreen} -Djava.net.preferIPv4Stack=true -Dswing.metalTheme=steel $extra -userpath $userDir $nodefault $noplugins -test $archiveName $resultsDir $bundle 2> $logFile"
         puts $command
 
         set result  [catch {eval exec $command} err]

@@ -24,6 +24,7 @@ runtest.tcl usage:
 -testName=name : name of directory that will hold results [default : results]
 -nodefault : flag to tell IDV to not load the default bundle before loading the test [default : flag not set]
 -noplugin : flag to tell IDV to not load plugins located in the userDir [default : flag not set]
+-offscreen : flag to tell IDV to run in offscreen mode [default : flag not set]
 test : one or more test names, space seperated, no dash. Any argument without a dash is treated as a test name
 
 #######################
