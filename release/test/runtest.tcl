@@ -156,6 +156,7 @@ proc processBundle {archiveName bundle archiveDir resultsDir} {
     global jvmMemory
     global nodefault
     global noplugins
+    global offscreen
 
     set logFile [file join $resultsDir $archiveName.log]
     puts $logFile
