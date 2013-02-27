@@ -1,0 +1,40 @@
+
+
+
+
+All of the test archives are held  under the -tests=dir directory.
+(defaults to ./archives). These are all created directly from the IDV. 
+Install the test plugin which adds a Test menu. In there you can export
+a test archive. The IDV will write  out a bundle containing jnlp file 
+and capture all images.
+
+The script runtest.tcl is run as:
+tclsh runtest.tcl -idvJar=/path/to/idv.jar
+
+runtest.tcl can take several command line args:
+
+#######################
+
+runtest.tcl usage:
+
+-idvJar=path [default : nightly build - /upc/share/idv/lib/idv.jar]i
+-javaHome=path : path to java [default : java]
+-tests=path : path to test archive [default : ./archive]
+-userDir=path : path to IDV user resources directory [default : ./userdir]
+-testName=name : name of directory that will hold results [default : results]
+-nodefault : flag to tell IDV to not load the default bundle before loading the test [default : flag not set]
+-noplugin : flag to tell IDV to not load plugins located in the userDir [default : flag not set]
+test : one or more test names, space seperated, no dash. Any argument without a dash is treated as a test name
+
+#######################
+
+By default, -idvJar=/upc/share/idv/lib/idv.jar, which points to the
+nightly build on Unidata machines.
+
+This will go through all of the test archives under the archives directory,
+run the IDV, capture all of the images in the bundle into a <archive>_results
+directory (stored under the -testName subdirectory) and generate a big html 
+file that has side by side comparisons of the original image (the expected) 
+and the new image. You can then do a quick scan of the images to see if things 
+are working. The html files are stored under the -testName=dir directory 
+(again, default is ./results).
