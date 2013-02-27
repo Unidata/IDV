@@ -18,7 +18,7 @@ set startTime [clock format [clock seconds] -format {%Y-%m-%d %H:%M:%S %Z}]
 # parse command line args
 
 set testName ""
-set userdir ""
+set userDir ""
 set nodefault "" 
 set noplugins ""
 set java ""
@@ -62,7 +62,7 @@ foreach arg $argv {
         }
         -userDir=* {
             set userdirTmp [split $arg "="]
-            set userdir [lindex $userdirTmp 1]
+            set userDir [lindex $userdirTmp 1]
         }
         -nodefault {
             set nodefault "-nodefault"  
@@ -77,8 +77,8 @@ foreach arg $argv {
     }
 }
 
-if {$userdir == ""} {
-    set userDir [file join [pwd] userdir]
+if {$userDir == ""} {
+    set userDir [file join [pwd] "userdir"]
 }
 
 if {$testHome == ""} {
