@@ -21,6 +21,8 @@
 package ucar.visad.display;
 
 
+import ucar.visad.quantities.CommonUnits;
+
 import visad.*;
 
 import visad.bom.Radar2DCoordinateSystem;
@@ -95,6 +97,9 @@ public class RadarGrid extends CompositeDisplayable {
     /** width for range rings */
     private float radialWidth = 1.f;
 
+    /** width for range rings */
+    private Unit distanceUnit = CommonUnits.KILOMETER;
+
     /**
      * Construct a RadarGrid centered at llp.
      *
@@ -106,8 +111,23 @@ public class RadarGrid extends CompositeDisplayable {
      */
     public RadarGrid(LatLonPoint llp, Color color)
             throws VisADException, RemoteException {
+        this(llp, color, CommonUnits.KILOMETER);
+    }
+
+    /**
+     * Construct a RadarGrid centered at llp.
+     *
+     * @param llp  center point
+     * @param color  color for the grid
+     * @param distUnit distance unit
+     *
+     * @throws VisADException  VisAD error
+     * @throws RemoteException  remote error
+     */
+    public RadarGrid(LatLonPoint llp, Color color, Unit distUnit)
+            throws VisADException, RemoteException {
         this(llp.getLatitude().getValue(CommonUnit.degree),
-             llp.getLongitude().getValue(CommonUnit.degree), color);
+             llp.getLongitude().getValue(CommonUnit.degree), color, distUnit);
     }
 
     /**
@@ -122,17 +142,34 @@ public class RadarGrid extends CompositeDisplayable {
      */
     public RadarGrid(double lat, double lon, Color color)
             throws VisADException, RemoteException {
+        this(lat, lon, color, CommonUnits.KILOMETER);
+    }
+
+    /**
+     * Construct a RadarGrid centered at specified lat/lon
+     *
+     * @param lat  center point latitude (degrees)
+     * @param lon  center point longitude (degrees)
+     * @param color  color for the grid
+     * @param distUnit distance unit
+     *
+     * @throws VisADException  VisAD error
+     * @throws RemoteException  remote error
+     */
+    public RadarGrid(double lat, double lon, Color color, Unit distUnit)
+            throws VisADException, RemoteException {
 
         // initial values of range ring separation, range ring max distance,
         // and radials angular separation.
-        rrSpacing  = 50.0;           // km
-        rrMax      = 200.0;          // km
-        radialInc  = 30.0;           // degrees
-        label_inc  = 2 * rrSpacing;  // label spacing
-        gridColor  = color;
-        lineColor  = color;
-        ringColor  = color;
-        labelColor = color;
+        rrSpacing    = 50.0;           // km
+        rrMax        = 200.0;          // km
+        radialInc    = 30.0;           // degrees
+        label_inc    = 2 * rrSpacing;  // label spacing
+        gridColor    = color;
+        lineColor    = color;
+        ringColor    = color;
+        labelColor   = color;
+        distanceUnit = distUnit;
 
         setCenterPoint(lat, lon);
 
@@ -375,9 +412,8 @@ public class RadarGrid extends CompositeDisplayable {
      */
     public void setRangeRingSpacing(double spacing, double max)
             throws VisADException, RemoteException {
-        rangeRings.setRingValues(
-            new Real(rangeType, spacing, CommonUnit.meter.scale(1000)),
-            new Real(rangeType, max, CommonUnit.meter.scale(1000)));
+        rangeRings.setRingValues(new Real(rangeType, spacing, distanceUnit),
+                                 new Real(rangeType, max, distanceUnit));
         rrSpacing = spacing;
         rrMax     = max;
         // redraw the radials which now may be too short or too long
@@ -429,9 +465,8 @@ public class RadarGrid extends CompositeDisplayable {
     public void setRadialInterval(double inc)
             throws VisADException, RemoteException {
         // args are min distance in km, max distance, angular increment
-        radials.setRadials(
-            new Real(rangeType, rrSpacing, CommonUnit.meter.scale(1000)),
-            new Real(rangeType, rrMax, CommonUnit.meter.scale(1000)), inc);
+        radials.setRadials(new Real(rangeType, rrSpacing, distanceUnit),
+                           new Real(rangeType, rrMax, distanceUnit), inc);
         radialInc = inc;
 
     }
@@ -476,10 +511,9 @@ public class RadarGrid extends CompositeDisplayable {
                               ? radials.getVisible()
                               : getVisible());
         radials = new Radials("radials", rtt, lineColor);
-        radials.setRadials(
-            new Real(rangeType, rrSpacing, CommonUnit.meter.scale(1000)),
-            new Real(rangeType, rrMax, CommonUnit.meter.scale(1000)),
-            radialInc);
+        radials.setRadials(new Real(rangeType, rrSpacing, distanceUnit),
+                           new Real(rangeType, rrMax, distanceUnit),
+                           radialInc);
         radials.setVisible(oldVisible);
         radials.setLineWidth(radialWidth);
         addDisplayable(radials);
@@ -497,9 +531,9 @@ public class RadarGrid extends CompositeDisplayable {
                               : getVisible());
         rangeRings = new RingSet("range rings", rtt, ringColor);
         // set initial spacing etc.
-        rangeRings.setRingValues(
-            new Real(rangeType, rrSpacing, CommonUnit.meter.scale(1000)),
-            new Real(rangeType, rrMax, CommonUnit.meter.scale(1000)));
+        rangeRings.setRingValues(new Real(rangeType, rrSpacing,
+                                          distanceUnit), new Real(rangeType,
+                                              rrMax, distanceUnit));
         rangeRings.setVisible(oldVisible);
         rangeRings.setLineWidth(rangeRingWidth);
         addDisplayable(rangeRings);
@@ -512,17 +546,16 @@ public class RadarGrid extends CompositeDisplayable {
      * @throws VisADException   problem creating VisAD object
      */
     private void makeLabels() throws VisADException, RemoteException {
-        // labels arre cented along the 15 degree radial (from "north")
+        // labels are cented along the 15 degree radial (from "north")
         boolean oldVisible = ((labels != null)
                               ? labels.getVisible()
                               : getVisible());
         labels = new RingLabels("Distance", rtt, new Real(azimuthType, 15),
                                 labelColor);
         // there is a label at every 2nd range ring
-        labels.setLabelValues(
-            new Real(rangeType, label_inc, CommonUnit.meter.scale(1000)),
-            new Real(rangeType, rrMax, CommonUnit.meter.scale(1000)));
-        labels.setLabelUnit(CommonUnit.meter.scale(1000));
+        labels.setLabelValues(new Real(rangeType, label_inc, distanceUnit),
+                              new Real(rangeType, rrMax, distanceUnit));
+        labels.setLabelUnit(distanceUnit);
         labels.setTextSize(labelSize);
         labels.setVisible(oldVisible);
         labels.setLineWidth(labelWidth);
@@ -543,5 +576,29 @@ public class RadarGrid extends CompositeDisplayable {
         labels.setFont(f);
     }
 
+    @Override
+    public void setDisplayUnit(Unit newUnit)
+            throws VisADException, RemoteException {
+        //super.setDisplayUnit(newUnit);
+        setDistanceUnit(newUnit);
+    }
+
+    /**
+     * Set the distance unit
+     *
+     * @param newUnit  the new Unit
+     *
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  unit not a distance unit
+     */
+    public void setDistanceUnit(Unit newUnit)
+            throws VisADException, RemoteException {
+        if ( !Unit.canConvert(CommonUnit.meter, newUnit)) {
+            throw new VisADException("Units must be convertible to meters");
+        }
+        distanceUnit = newUnit;
+        // redraw
+        setCenterPoint(center_lat, center_lon);
+    }
 
 }
