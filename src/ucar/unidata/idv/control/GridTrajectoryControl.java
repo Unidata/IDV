@@ -850,6 +850,9 @@ public class GridTrajectoryControl extends DrawingControl {
                 gridTrackControl.setLineWidth(getTrackLineWidth());
                 // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
                 gridTrackControl.getDataTimeRange(true).getTimeModeLabel();
+                try{
+                    applyColorScaleInfo();
+                } catch (Exception ee) {}
             }
         }
 
@@ -1744,7 +1747,42 @@ public class GridTrajectoryControl extends DrawingControl {
         }
     }
 
+    /**
+     * Get the range to use to apply to displayables
+     *
+     * @return the range for displayables
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public void setColorScaleInfo(ColorScaleInfo newInfo)
+            throws VisADException, RemoteException {
+        if (newInfo == null) {
+            colorScaleInfo = null;
+            return;
+        }
+        if(gridTrackControl != null)
+            gridTrackControl.colorScaleInfo = new ColorScaleInfo(newInfo);
+        this.colorScaleInfo = new ColorScaleInfo(newInfo);  //.setColorScaleInfo(newInfo);
+        //applyColorScaleInfo();
+        colorScaleInfo = new ColorScaleInfo(newInfo);
+        applyColorScaleInfo();
+    }
 
+    public Range getRangeToApply() throws RemoteException, VisADException {
+        return gridTrackControl.getRange();
+    }
+
+
+    /**
+     * Get the contour information for any contours
+     *
+     * @return  the contour information
+     */
+    public ColorScaleInfo getColorScaleInfo() {
+               this.colorScaleInfo =  gridTrackControl.getColorScaleInfo();
+        return this.colorScaleInfo;
+    }
 
     /**
      * _more_
