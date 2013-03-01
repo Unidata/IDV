@@ -588,6 +588,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
             childidx="0"
             categoryidx="0"/>
         <category value="display:gridtrajectorycontrol1"/>
+        <category value="display:gridtrajectorycontrol2"/>
      </categories>
         <operands>
             <paramgroup categories="GRID-3D-*;" name="u_v_w"/>

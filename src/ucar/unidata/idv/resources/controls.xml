@@ -287,7 +287,15 @@ example:
      displaycategory="GridTrajectory"
      properties="windowVisible=false;">
   </control>
-
+    <control
+            id="gridtrajectorycontrol2"
+            categories="trace"
+            class="ucar.unidata.idv.control.GridTrajectoryControl"
+            canstandalone="false"
+            label="Trajectory"
+            displaycategory="GridTrajectory"
+            properties="windowVisible=false;">
+    </control>
 
   <control
      id="pointcloud"

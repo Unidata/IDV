@@ -604,29 +604,49 @@ public class GridTrajectoryControl extends DrawingControl {
         this.dataChoice = dataChoice;
         DerivedDataChoice ddc        = (DerivedDataChoice) dataChoice;
         List              choices0   = ddc.getChoices();
-        DerivedDataChoice ddc0       = (DerivedDataChoice) choices0.get(0);
-        Hashtable         choices    = ddc0.getUserSelectedChoices();
         DataInstance      di         = getDataInstance();
+        DirectDataChoice udc = null;
+        DirectDataChoice vdc = null;
+        DirectDataChoice wdc = null;
+        DataChoice sdc = null;
+                
+        if(choices0.size() == 2){   // color by
+            Hashtable         choices;
+            DerivedDataChoice ddc0       = (DerivedDataChoice) choices0.get(0);
+            choices    = ddc0.getUserSelectedChoices();
 
-        int               numChoices = choices.size();
-        if (numChoices == 2) {
-            is2DTraj = true;
-        }
-        DirectDataChoice udc =
-            (DirectDataChoice) choices.get(new String("D1"));
-        DirectDataChoice vdc =
-            (DirectDataChoice) choices.get(new String("D2"));
-        DirectDataChoice wdc =
-            (DirectDataChoice) choices.get(new String("D3"));
-        if(choices0.size() == 1)
-            return false;
-        DataChoice sdc;
+          
+            int               numChoices = choices.size();
+            if (numChoices == 2) {
+                is2DTraj = true;
+            }
+            udc =
+                (DirectDataChoice) choices.get(new String("D1"));
+            vdc =
+                (DirectDataChoice) choices.get(new String("D2"));
+            wdc =
+                (DirectDataChoice) choices.get(new String("D3"));
+            if(choices0.size() == 1)
+                return false;             
+    
+            sdc = (DataChoice)choices0.get(1);
+            addDataChoice(udc);
+            addDataChoice(vdc);
+            if (wdc != null) {
+                addDataChoice(wdc);
+            }
 
-        sdc = (DataChoice)choices0.get(1);
-        addDataChoice(udc);
-        addDataChoice(vdc);
-        if (wdc != null) {
-            addDataChoice(wdc);
+            if (sdc == null) {
+                return false;
+            }
+            
+        } else if(choices0.size() == 3) {
+            udc =
+                    (DirectDataChoice) choices0.get(0);
+            vdc =
+                    (DirectDataChoice) choices0.get(1);
+            wdc =
+                    (DirectDataChoice) choices0.get(2);
         }
         DataSelection dataSelection1 = getDataSelection();
 
@@ -635,14 +655,22 @@ public class GridTrajectoryControl extends DrawingControl {
         if (wdc != null) {
             pw = (FieldImpl) wdc.getData(dataSelection1);
         }
+
         if (sdc == null) {
-            return false;
+          //  s = u;
         }
-        s = (FieldImpl) sdc.getData(dataSelection1);
+        DataChoice dc;
+        if(sdc != null) {
+            dc = sdc;
+            s = (FieldImpl) sdc.getData(dataSelection1);
+        }else {
+            dc = udc;
+        }
+
         doMakeDataInstance(sdc);
 
 
-        GridDataInstance gdi = new GridDataInstance(sdc, getDataSelection(),
+        GridDataInstance gdi = new GridDataInstance(dc, getDataSelection(),
                                    getRequestProperties());
         setDataInstance(gdi);
         gridTrackControl.controlContext = getControlContext();
@@ -696,7 +724,7 @@ public class GridTrajectoryControl extends DrawingControl {
         //tmpSelection.setFromLevel(null);
         //tmpSelection.setToLevel(null);
 
-        List     levelsList = sdc.getAllLevels(tmpSelection);
+        List     levelsList = dc.getAllLevels(tmpSelection);
         Object[] levels     = null;
         if ((levelsList != null) && (levelsList.size() > 0)) {
             levels =
@@ -727,7 +755,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         if ( !gridTrackControl.trackDataOk()) {
             List dlist = new ArrayList();
-            dlist.add(sdc);
+            dlist.add(dc);
             gridTrackControl.appendDataChoices(dlist);
             if ( !gridTrackControl.trackDataOk()) {
                 return false;
@@ -1036,6 +1064,124 @@ public class GridTrajectoryControl extends DrawingControl {
     protected String getColorParamName() {
 
         return paramName;
+    }
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    void createSolidColorTrajectoryControl()
+            throws VisADException, RemoteException, Exception {
+
+        Unit dUnit = null;
+        gridTrackControl.setDisplayUnit(dUnit);
+        final Unit rgUnit =
+                ((FlatField) pw.getSample(0)).getRangeUnits()[0][0];
+        FieldImpl w;
+        if (Unit.canConvert(rgUnit, CommonUnits.METERS_PER_SECOND)) {
+            w = pw;
+        } else {
+            FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                    (FlatField) pw.getSample(0));
+            FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+            w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
+                    pw, hPI, null);
+        }
+
+        final Set timeSet  = u.getDomainSet();
+        int       numTimes = timeSet.getLength();
+        Unit      timeUnit = timeSet.getSetUnits()[0];
+        final Unit paramUnit =  null;
+        FunctionType rt = (s==null)? (FunctionType) ((FlatField) u.getSample(0)).getType() :
+                (FunctionType) ((FlatField) s.getSample(0)).getType();
+        final String paramName = (s==null)? "Fixed" :
+                rt.getFlatRange().getRealComponents()[0].getName();
+
+        double[]   timeVals     = timeSet.getDoubles()[0];
+
+        SampledSet domain0      = GridUtil.getSpatialDomain(s);
+        SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
+        double[]   ttts         = timeSet.getDoubles()[0];
+        boolean    normalizeLon = true;
+
+        boolean    isLatLon     = GridUtil.isLatLonOrder(domain0);
+        int        latIndex     = isLatLon
+                ? 0
+                : 1;
+        int        lonIndex     = isLatLon
+                ? 1
+                : 0;
+
+        Real alt = null;
+        // if(zunit.getIdentifier().length() == 0) {
+        alt = GridUtil.getAltitude(s, (Real)((TwoFacedObject)currentLevel).getId()) ;
+        //}
+        float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
+                domain2D, alt);
+        int numPoints = geoVals[0].length;
+        //first step  init  u,v, w, and s at all initial points
+        List<GridTrajectory.TrajInfo> tj =
+                GridTrajectory.calculateTrackPoints(u, v, w, s, ttts, geoVals,
+                        numPoints, numTimes, latIndex, lonIndex, true, normalizeLon,
+                        null);
+
+        int numParcels = numPoints;  //10;
+        final FunctionType ft = new FunctionType(
+                RealType.Generic,
+                new FunctionType(
+                        RealTupleType.SpatialEarth3DTuple,
+                        RealType.getRealType(paramName)));
+
+        List tracks;
+
+        tracks = GridTrajectory.createTracks(paramName, tj, timeSet, ft,
+                paramUnit, numParcels);
+        FlatField mergedTracks = DerivedGridFactory.mergeTracks(tracks);
+
+        FunctionType fiType = new FunctionType(RealType.Time,
+                mergedTracks.getType());
+
+        DateTime endTime = new DateTime(timeVals[numTimes - 1], timeUnit);
+
+        FieldImpl fi =
+                new FieldImpl(fiType,
+                        new SingletonSet(new RealTuple(new Real[] {
+                                endTime })));
+        fi.setSample(0, mergedTracks, false);
+
+        //super.init(fi)
+
+        // gridTrackControl.setLineWidth(gridTrackControl.getTrackWidth());
+        // gridTrackControl.setDataTimeRange(gridTrackControl.getDataTimeRange());
+        gridTrackControl.setData(fi);
+        Range range = gridTrackControl.getGridDataInstance().getRange(
+                gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
+        gridTrackControl.setRange(range);
+        Set[]         rset = mergedTracks.getRangeSets();
+        DoubleSet     ds   = (DoubleSet) rset[0];
+
+        SetType       st   = (SetType) ds.getType();
+        RealTupleType rtt  = st.getDomain();
+
+        RealType      rt0  = (RealType) rtt.getRealComponents()[0];
+        super.setDataInstance(getDataInstance());
+        gridTrackControl.selectRangeDisplay.setSelectRealType(rt0);
+        //super.initializationDone = true;
+        super.paramName = paramName;
+        controlPane.setVisible(true);
+        controlPane.add(gridTrackControl.doMakeContents());
+
+        Unit cUnit = getDisplayUnit();
+
+        if(newUnit != null){
+            cUnit = newUnit;
+        }
+
+        gridTrackControl.displayUnitChanged(dUnit, cUnit);
+        gridTrackControl.setNewDisplayUnit(cUnit, true);
+        gridTrackControl.setSelectRange(gridTrackControl.getColorRangeFromData());
     }
 
     /**
