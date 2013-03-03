@@ -1285,8 +1285,14 @@ public class GridTrajectoryControl extends DrawingControl {
             is2DDC  = true;
             haveAlt = false;
         }
+
+        Real       alt          = null;
+        // if(zunit.getIdentifier().length() == 0) {
+        if(!is2DDC)
+            alt = GridUtil.getAltitude(
+                s, (Real) ((TwoFacedObject) currentLevel).getId());
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
-                                domain2D, null);
+                                domain2D, alt);
         int  numPoints = geoVals[0].length;
         Real clevel    = null;
         if (currentLevel instanceof Real) {
