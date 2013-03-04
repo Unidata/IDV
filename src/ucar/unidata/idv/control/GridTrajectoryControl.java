@@ -863,9 +863,11 @@ public class GridTrajectoryControl extends DrawingControl {
     protected void displayUnitChanged(Unit oldUnit, Unit newUnit) {
         gridTrackControl.displayUnitChanged(oldUnit, newUnit);
         gridTrackControl.setNewDisplayUnit(newUnit, true);
+
         try {
             gridTrackControl.setSelectRange(
                 gridTrackControl.getColorRangeFromData());
+            gridTrackControl.selectRangeDisplay.setDisplayUnit(newUnit);
         } catch (Exception exc) {
             logException("change unit", exc);
         }
