@@ -1,0 +1,63 @@
+<html>
+<head>
+    <title>Grid Trajectory Displays</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+    <p> The IDV can display 2D and 3D grid trajectory as a derived field based on the horizontal and vertical wind components.<p>
+</div>
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]
+
+    <li> Load some gridded data.
+        <ul>
+            <li> [ht::openDataSourceChooser]
+            <li>In the [ht::dialog Data Chooser] tree click on the
+                [ht::command Files] node.
+            <li> Go to the grid data directory:  [ht::filename <%workshop.datadir%>/grids/].
+            <li> Select [ht::filename sample_eta_grid.nc]
+            <li> Press [ht::button Add Source]
+        </ul>
+
+    <li>Create the trajectory control
+        <ul>
+            <li>In the [ht::command Fields] panel open the [ht::param 3D grid] node and [ht::param Derived] node,
+                scroll down the [ht::param Derived] node and select [ht::param Grid 3D Trajectory].
+            <li>In the [ht::command Displays]  select [ht::display Trajectory Colored By Parameter] and press
+                [ht::button Create Display]
+            <li>After you click the [ht::button Create Display] button, a dialog will pop up to allow you to select the
+            [ht::param Color by parameter].  From the dialog, expand the [ht::param 3D grid] node and select
+            the [ht::param temperature] field and click the [ht::button OK] button.
+        </ul>
+
+
+    <li>Create the trajectory display
+        <ul>
+            <li>From the control window for this display, change the level to 700 hectopascals using Levels selector.
+            <li>Click the Rectangle radio button as the trajectory intial area option, click and hold the
+                left mouse button and drag a rectangle in the view window.
+            <li>After selecting the level and specifying the initial area, click on the button Create Trajectory
+                to create the display.
+        </ul>
+
+    <li> Change the trajectory time display
+        <ul>
+            <li> Bring up the display control window for the [ht::display Trajectory] display.
+            <li> In the display control window go to the [ht::command Times] tab.
+                 Press Time Mode [ht::button Change]  button.
+            <li> For End Time choose [ht::button From Animation Time]
+            <li> For Start Time choose [ht::button Relative to End Time]
+            <li> Change the Offset for the start time to be -6 hours.
+        </ul>
+
+    <li>  Try other levels and trajectory intial area options, and do more with grid trajectory display.
+
+</ol>
+
+</body>
+</html>
