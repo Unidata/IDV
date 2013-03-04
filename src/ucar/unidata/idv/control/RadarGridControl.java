@@ -163,6 +163,8 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
 
     /** default range ring color */
     private Color rrColor = Color.gray;
+    
+    private List<JLabel> distanceUnitLabels;
 
     /** default label color */
     private Color lblColor = Color.gray;
@@ -232,7 +234,7 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
 
     /** radial width */
     private int radWidth = 1;
-
+    
     /** range ring unit */
     private Unit rrUnit = CommonUnits.KILOMETER;
 
@@ -275,7 +277,9 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
      * Need to have a parameter-less constructor for the reflection-based
      * object creation in the IDV to call.
      */
-    public RadarGridControl() {}
+    public RadarGridControl() {
+        //setAttributeFlags(FLAG_ZPOSITION | FLAG_DISPLAYUNIT);
+    }
 
 
     /**
@@ -293,14 +297,19 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
      */
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
+        super.init(dataChoice);
         LatLonPoint llp = new LatLonTuple(0.0, 0.0);
 
 
         // get geographic center of the data grid
         llp = findCenterPoint(dataChoice);
+        
+        if (getDisplayUnit() == null) {
+            setDisplayUnit(getDefaultDistanceUnit());
+        }
 
         // create the actual displayable
-        rangeRings = new RadarGrid(llp, rrColor);
+        rangeRings = new RadarGrid(llp, rrColor, getDisplayUnit());
 
         if (labelFont != null) {
             rangeRings.setFont(labelFont);
@@ -327,7 +336,9 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
         rangeRings.setRangeRingLineWidth(rrWidth);
         rangeRings.setRadialLineWidth(radWidth);
 
-        addDisplayable(rangeRings, FLAG_ZPOSITION);
+        addDisplayable(rangeRings);
+        //addAttributedDisplayable(rangeRings, FLAG_ZPOSITION | FLAG_DISPLAYUNIT);
+        addAttributedDisplayable(rangeRings, FLAG_ZPOSITION);
 
         //Now, apply our local visiblity flags to each of the subcomponents
         applyVisibilityFlags();
@@ -621,6 +632,11 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
         double[]    stretchy = {
             0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0
         };
+        distanceUnitLabels = new ArrayList<JLabel>();
+        String distUnitText = " ("+getDisplayUnit()+") ";
+        for (int i = 0; i < 3; i++) {
+            distanceUnitLabels.add(new JLabel(distUnitText));
+        }
         Component[] comps    = new Component[] {
             GuiUtils.filler(), GuiUtils.cLabel("Visible"),
             GuiUtils.cLabel(" Spacing "), GuiUtils.cLabel(" Unit "),
@@ -629,7 +645,7 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
             GuiUtils.hbox(new JLabel("  "),
                           makeCbx("", CMD_RR_VIS, rrVisible)),
             makeSpacingBox(rrSpacingList, CMD_RR_SPACING, rrSpacing),
-            new JLabel(" (km) "), makeColorBox(CMD_RR_COLOR, rrColor),
+            distanceUnitLabels.get(0), makeColorBox(CMD_RR_COLOR, rrColor),
             GuiUtils.filler(), makeLineWidthBox(CMD_RR_WIDTH, rrWidth),
             GuiUtils.rLabel("Radials: "),
             GuiUtils.hbox(new JLabel("  "),
@@ -641,11 +657,11 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
             GuiUtils.hbox(new JLabel("  "),
                           makeCbx("", CMD_LBL_VIS, lblVisible)),
             makeSpacingBox(lblSpacingList, CMD_LBL_SPACING, lblSpacing),
-            new JLabel(" (km) "), makeColorBox(CMD_LBL_COLOR, lblColor),
+            distanceUnitLabels.get(1), makeColorBox(CMD_LBL_COLOR, lblColor),
             GuiUtils.filler(), makeLineWidthBox(CMD_LBL_WIDTH, lblWidth),
             GuiUtils.rLabel(" "), new JLabel("Max. Radius: "),
             makeSpacingBox(rrMaxRadiusList, CMD_RR_RADIUS, rrMaxRadius),
-            new JLabel(" (km) "), GuiUtils.filler(), GuiUtils.filler(),
+            distanceUnitLabels.get(2), GuiUtils.filler(), GuiUtils.filler(),
             GuiUtils.filler()
         };
 
@@ -1401,5 +1417,16 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
         initStationLocation = l;
     }
 
-
+    /**
+     *  Set the display unit
+     *  @param newUnit  the new display unit
+     */
+    public void setDisplayUnit(Unit newUnit) {
+        super.setDisplayUnit(newUnit);
+        if (distanceUnitLabels != null) {
+            for (JLabel label : distanceUnitLabels) {
+                label.setText(" ("+newUnit+") ");
+            }
+        }
+    }
 }
