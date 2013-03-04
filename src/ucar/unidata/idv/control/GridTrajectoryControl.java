@@ -128,6 +128,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
     /** _more_ */
     protected Object bundleLevel = null;
+
     /** _more_ */
     protected Object[] currentLevels;
 
@@ -206,6 +207,9 @@ public class GridTrajectoryControl extends DrawingControl {
     private DataTimeRange trjDataTimeRange;
 
     /** _more_ */
+    ColorTable trjColorTable;
+
+    /** _more_ */
     boolean is2DTraj = false;
 
     /** _more_ */
@@ -215,7 +219,7 @@ public class GridTrajectoryControl extends DrawingControl {
     ValueSliderWidget skipFactorWidget;
 
     /** _more_ */
-    int coordinateType= DrawingGlyph.COORD_LATLON;;
+    int coordinateType = DrawingGlyph.COORD_LATLON;;
 
     /** _more_ */
     Unit newUnit = null;
@@ -226,7 +230,8 @@ public class GridTrajectoryControl extends DrawingControl {
     public GridTrajectoryControl() {
         //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
-        reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT  | FLAG_GRIDTRAJECTORY);
+        reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
+                                | FLAG_GRIDTRAJECTORY);
     }
 
 
@@ -362,8 +367,41 @@ public class GridTrajectoryControl extends DrawingControl {
         }
 
 
+        /**
+         * _more_
+         *
+         * @param newColorTable _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public void setColorTable(ColorTable newColorTable)
+                throws RemoteException, VisADException {
+
+            if (newColorTable != super.getColorTable()) {
+                super.setColorTable(newColorTable);
+            }
+            if ((gtc != null) && (newColorTable != gtc.getTrjColorTable())) {
+
+                gtc.setTrjColorTable(newColorTable);
+            }
+        }
 
 
+        /**
+         * Get the {@link ucar.unidata.util.ColorTable} property.
+         *
+         * @return The ColorTable
+         */
+        public ColorTable getColorTable() {
+
+
+            if ((gtc != null) && (gtc.getTrjColorTable() != null)) {
+                return gtc.getTrjColorTable();
+            } else {
+                return super.getColorTable();
+            }
+        }
 
         /**
          * _more_
@@ -384,7 +422,7 @@ public class GridTrajectoryControl extends DrawingControl {
             Unit newUnit = getDisplayUnit();
             setColorUnit(newUnit);
             //TODO: use the right index
-            if ((newUnit != null)  && !newUnit.equals(getDisplayUnit())
+            if ((newUnit != null) && !newUnit.equals(getDisplayUnit())
                     && Unit.canConvert(newUnit, getRawDataUnit())) {
                 trackDisplay.setDisplayUnit(newUnit);
                 selectRangeDisplay.setDisplayUnit(newUnit);
@@ -584,6 +622,35 @@ public class GridTrajectoryControl extends DrawingControl {
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public ColorTable getTrjColorTable() {
+        return trjColorTable;
+    }
+
+    /**
+     * _more_
+     *
+     * @param ctable _more_
+     */
+    public void setTrjColorTable(ColorTable ctable) {
+        if (ctable != null) {
+            trjColorTable = ctable;
+            if (gridTrackControl != null) {
+                try {
+                    gridTrackControl.setColorTable(ctable);
+                } catch (Exception ee) {}
+            }
+            try {
+                super.setColorTable(ctable);
+            } catch (Exception ee) {}
+
+        }
+    }
+
+    /**
      * Call to help make this kind of Display Control; also calls code to
      * made the Displayable (empty of data thus far).
      * This method is called from inside DisplayControlImpl.init(several args).
@@ -618,11 +685,12 @@ public class GridTrajectoryControl extends DrawingControl {
             (DirectDataChoice) choices.get(new String("D2"));
         DirectDataChoice wdc =
             (DirectDataChoice) choices.get(new String("D3"));
-        if(choices0.size() == 1)
+        if (choices0.size() == 1) {
             return false;
+        }
         DataChoice sdc;
 
-        sdc = (DataChoice)choices0.get(1);
+        sdc = (DataChoice) choices0.get(1);
         addDataChoice(udc);
         addDataChoice(vdc);
         if (wdc != null) {
@@ -647,7 +715,7 @@ public class GridTrajectoryControl extends DrawingControl {
         setDataInstance(gdi);
         gridTrackControl.controlContext = getControlContext();
         gridTrackControl.updateGridDataInstance(gdi);
-        if(getDisplayUnit().equals(getDefaultDistanceUnit())){
+        if (getDisplayUnit().equals(getDefaultDistanceUnit())) {
             setDisplayUnit(gdi.getRawUnit(0));
         }
         initDisplayUnit();
@@ -788,17 +856,22 @@ public class GridTrajectoryControl extends DrawingControl {
 
     /**
      * _more_
+     *
+     * @param oldUnit _more_
+     * @param newUnit _more_
      */
     protected void displayUnitChanged(Unit oldUnit, Unit newUnit) {
         gridTrackControl.displayUnitChanged(oldUnit, newUnit);
         gridTrackControl.setNewDisplayUnit(newUnit, true);
         try {
-            gridTrackControl.setSelectRange(gridTrackControl.getColorRangeFromData());
+            gridTrackControl.setSelectRange(
+                gridTrackControl.getColorRangeFromData());
         } catch (Exception exc) {
             logException("change unit", exc);
         }
         this.setDisplayUnit(newUnit);
     }
+
     /**
      * _more_
      */
@@ -841,7 +914,8 @@ public class GridTrajectoryControl extends DrawingControl {
         if (createTrjBtnClicked) {
             if ((getGlyphs() != null) && (glyphs.size() > 0)) {
                 currentLevel = getCurrentLevel();
-                if(currentLevel != null && bundleLevel != null && !currentLevel.equals(bundleLevel)) {
+                if ((currentLevel != null) && (bundleLevel != null)
+                        && !currentLevel.equals(bundleLevel)) {
                     setLevel(bundleLevel);
                     levelBox.setSelectedItem(bundleLevel);
                 }
@@ -850,9 +924,13 @@ public class GridTrajectoryControl extends DrawingControl {
                 gridTrackControl.setLineWidth(getTrackLineWidth());
                 // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
                 gridTrackControl.getDataTimeRange(true).getTimeModeLabel();
-                try{
-                    applyColorScaleInfo();
+
+                try {
+                    //gridTrackControl.setColorScaleInfo(getColorScaleInfo());
+                    gridTrackControl.setColorTable(getTrjColorTable());
+                    doMakeColorScales();
                 } catch (Exception ee) {}
+
             }
         }
 
@@ -1091,9 +1169,10 @@ public class GridTrajectoryControl extends DrawingControl {
                                   ? 1
                                   : 0;
 
-        Real alt = null;
-       // if(zunit.getIdentifier().length() == 0) {
-            alt = GridUtil.getAltitude(s, (Real)((TwoFacedObject)currentLevel).getId()) ;
+        Real       alt          = null;
+        // if(zunit.getIdentifier().length() == 0) {
+        alt = GridUtil.getAltitude(
+            s, (Real) ((TwoFacedObject) currentLevel).getId());
         //}
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
                                 domain2D, alt);
@@ -1152,13 +1231,14 @@ public class GridTrajectoryControl extends DrawingControl {
 
         Unit cUnit = getDisplayUnit();
 
-        if(newUnit != null){
-             cUnit = newUnit;
+        if (newUnit != null) {
+            cUnit = newUnit;
         }
 
         gridTrackControl.displayUnitChanged(dUnit, cUnit);
         gridTrackControl.setNewDisplayUnit(cUnit, true);
-        gridTrackControl.setSelectRange(gridTrackControl.getColorRangeFromData());
+        gridTrackControl.setSelectRange(
+            gridTrackControl.getColorRangeFromData());
     }
 
     /**
@@ -1205,8 +1285,14 @@ public class GridTrajectoryControl extends DrawingControl {
             is2DDC  = true;
             haveAlt = false;
         }
+
+        Real       alt          = null;
+        // if(zunit.getIdentifier().length() == 0) {
+        if(!is2DDC)
+            alt = GridUtil.getAltitude(
+                s, (Real) ((TwoFacedObject) currentLevel).getId());
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
-                                domain2D, null);
+                                domain2D, alt);
         int  numPoints = geoVals[0].length;
         Real clevel    = null;
         if (currentLevel instanceof Real) {
@@ -1275,13 +1361,14 @@ public class GridTrajectoryControl extends DrawingControl {
 
         Unit cUnit = getDisplayUnit();
 
-        if(newUnit != null){
+        if (newUnit != null) {
             cUnit = newUnit;
         }
 
         gridTrackControl.displayUnitChanged(dUnit, cUnit);
         gridTrackControl.setNewDisplayUnit(cUnit, true);
-        gridTrackControl.setSelectRange(gridTrackControl.getColorRangeFromData());
+        gridTrackControl.setSelectRange(
+            gridTrackControl.getColorRangeFromData());
 
     }
 
@@ -1292,6 +1379,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param latIndex _more_
      * @param lonIndex _more_
      * @param domain0 _more_
+     * @param alt _more_
      * @return _more_
      *
      * @throws Exception _more_
@@ -1299,6 +1387,7 @@ public class GridTrajectoryControl extends DrawingControl {
     public float[][] getEarthLocationPoints(int latIndex, int lonIndex,
                                             SampledSet domain0, Real alt)
             throws Exception {
+
         double clevel = 0;
         if (currentLevel instanceof Real) {
             clevel = ((Real) currentLevel).getValue();
@@ -1312,23 +1401,23 @@ public class GridTrajectoryControl extends DrawingControl {
                 DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
         }
 
-        float z; //= (float)alt.getValue();
+        float z;  //= (float)alt.getValue();
 
-        if(is2DDC){
+        if (is2DDC) {
             z = (float) clevel;
         } else {
-            z = (float)alt.getValue();
+            z = (float) alt.getValue();
         }
-         /*
-        if ( !is2DDC) {
-            double[][] hVals = pressToHeightCS.toReference(new double[][] {
-                new double[] { clevel }
-            }, new Unit[] { zunit });
+        /*
+       if ( !is2DDC) {
+           double[][] hVals = pressToHeightCS.toReference(new double[][] {
+               new double[] { clevel }
+           }, new Unit[] { zunit });
 
-            z = (float) hVals[0][0];
-        } else {
-            z = (float) clevel;
-        }     */
+           z = (float) hVals[0][0];
+       } else {
+           z = (float) clevel;
+       }     */
 
         if (currentCmd.getLabel().equals(
                 GlyphCreatorCommand.CMD_SYMBOL.getLabel()) || (glyphs.get(0)
@@ -1403,6 +1492,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
             return points;
         }
+
     }
 
 
@@ -1648,7 +1738,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     gridTrackControl.indicator.setVisible(false);
                     gridTrackControl.timesHolder.setData(DUMMY_DATA);
                 }
-               // createTrjBtnClicked = false;
+                // createTrjBtnClicked = false;
             }
         } catch (Exception exc) {
             logException("Removing drawings", exc);
@@ -1707,7 +1797,7 @@ public class GridTrajectoryControl extends DrawingControl {
      */
     public void setCurrentLevel(Object lvl) {
         currentLevel = lvl;
-        bundleLevel = lvl;
+        bundleLevel  = lvl;
     }
 
     /**
@@ -1750,7 +1840,8 @@ public class GridTrajectoryControl extends DrawingControl {
     /**
      * Get the range to use to apply to displayables
      *
-     * @return the range for displayables
+     *
+     * @param newInfo _more_
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness
@@ -1761,16 +1852,35 @@ public class GridTrajectoryControl extends DrawingControl {
             colorScaleInfo = null;
             return;
         }
-        if(gridTrackControl != null)
+        if (gridTrackControl != null) {
             gridTrackControl.colorScaleInfo = new ColorScaleInfo(newInfo);
-        this.colorScaleInfo = new ColorScaleInfo(newInfo);  //.setColorScaleInfo(newInfo);
+            gridTrackControl.applyColorScaleInfo();
+        }
         //applyColorScaleInfo();
         colorScaleInfo = new ColorScaleInfo(newInfo);
         applyColorScaleInfo();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public Range getRangeToApply() throws RemoteException, VisADException {
         return gridTrackControl.getRange();
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected ColorTable getColorTableToApply() {
+
+        return gridTrackControl.getColorTableToApply();
     }
 
 
@@ -1780,7 +1890,8 @@ public class GridTrajectoryControl extends DrawingControl {
      * @return  the contour information
      */
     public ColorScaleInfo getColorScaleInfo() {
-               this.colorScaleInfo =  gridTrackControl.getColorScaleInfo();
+        //    this.colorScaleInfo =  gridTrackControl.getColorScaleInfo();
+
         return this.colorScaleInfo;
     }
 
