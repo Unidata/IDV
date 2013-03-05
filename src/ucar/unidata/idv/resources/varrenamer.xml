@@ -1,5 +1,8 @@
 <varrenamers>
   <varrenamer
-     old="oldNameHere"
-     new="newNameHere"/>
+     old="Geopotential_height"
+     new="Geopotential_height_isobaric"/>
+  <varrenamer
+     old="Geopotential_height"
+     new="Geopotential_height_pressure"/>
 </varrenamers>
