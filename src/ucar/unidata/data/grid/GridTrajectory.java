@@ -682,8 +682,13 @@ public class GridTrajectory {
                     clevel));
             vFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(vFI,
                     clevel));
-            sFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(sFI,
-                    clevel));
+            SampledSet domain0 = GridUtil.getSpatialDomain(sFI);
+            if(domain0.getManifoldDimension() == 3) {   // in case the s field is already subset
+                sFI = GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(sFI,
+                        clevel));
+            } else {
+                sFI = GridUtil.make2DGridFromSlice(sFI, false);
+            }
         } else if (!haveAlt) {
             uFI = GridUtil.make2DGridFromSlice(uFI, false);
             vFI = GridUtil.make2DGridFromSlice(vFI, false);

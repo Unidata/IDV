@@ -1271,6 +1271,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
         SampledSet domain0      = GridUtil.getSpatialDomain(s);
         SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
+        SampledSet domain1      = GridUtil.getSpatialDomain(u);
+
         double[]   ttts         = timeSet.getDoubles()[0];
         boolean    normalizeLon = true;
 
@@ -1283,7 +1285,8 @@ public class GridTrajectoryControl extends DrawingControl {
                                   : 0;
 
         boolean    haveAlt      = true;
-        if (domain0.getManifoldDimension() == 2) {
+        if (domain0.getManifoldDimension() == 2 && domain1.getManifoldDimension() == 2) {
+            //in case the s is already subset to a specific level in 3D derived 2D trajectory
             is2DDC  = true;
             haveAlt = false;
         }
