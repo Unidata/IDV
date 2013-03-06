@@ -706,7 +706,8 @@ public class GridTrajectoryControl extends DrawingControl {
         if (sdc == null) {
             return false;
         }
-        s = (FieldImpl) sdc.getData(dataSelection1);
+        sdc.setDataSelection(dataSelection1);
+        s = (FieldImpl) sdc.getData(null);
         doMakeDataInstance(sdc);
 
 
