@@ -282,6 +282,7 @@ example:
      categories="trace"
      class="ucar.unidata.idv.control.GridTrajectoryControl"
      canstandalone="false"
+     doeslevels="true"
      label="Trajectory Colored By Parameter"
      code="GridTrajectory.combineGridsArray( D1, parameter )"
      displaycategory="GridTrajectory"

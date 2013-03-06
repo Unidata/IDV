@@ -697,7 +697,8 @@ public class GridTrajectoryControl extends DrawingControl {
             addDataChoice(wdc);
         }
         DataSelection dataSelection1 = getDataSelection();
-
+        Object fromLevel = dataSelection1.getFromLevel();
+        dataSelection1.setLevel(null);
         u = (FieldImpl) udc.getData(dataSelection1);
         v = (FieldImpl) vdc.getData(dataSelection1);
         if (wdc != null) {
@@ -782,14 +783,14 @@ public class GridTrajectoryControl extends DrawingControl {
         }
 
         if (currentLevel == null) {
-            currentLevel = getDataSelection().getFromLevel();
+            currentLevel = fromLevel; //getDataSelection().getFromLevel();
         }
         if ((levels != null) && (levels.length > 0)
                 && (currentLevel == null)) {
             currentLevel = levels[0];
         }
 
-        setLevels(levels);
+        setLevels(levels, fromLevel);
 
         // the control for the track
         setDisplayActive();
@@ -955,7 +956,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * @param levels _more_
      */
 
-    public void setLevels(Object[] levels) {
+    public void setLevels(Object[] levels, Object initLevel) {
         setOkToFireEvents(false);
         currentLevels = levels;
         levelEnabled  = (levels != null);
@@ -972,13 +973,13 @@ public class GridTrajectoryControl extends DrawingControl {
 
 
         GuiUtils.setListData(levelBox, formatLevels(levels));
-        if (currentLevel != null) {
-            if (currentLevel instanceof Real) {
+        if (initLevel != null) {
+            if (initLevel instanceof Real) {
                 TwoFacedObject clevel =
-                    Util.labeledReal((Real) currentLevel);;
+                    Util.labeledReal((Real) initLevel);;
                 levelBox.setSelectedItem(clevel);
             } else {
-                levelBox.setSelectedItem(currentLevel);
+                levelBox.setSelectedItem(initLevel);
             }
         }
 
