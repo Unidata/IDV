@@ -1162,6 +1162,11 @@ public class GridTrajectoryControl extends DrawingControl {
 
         SampledSet domain0      = GridUtil.getSpatialDomain(s);
         SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
+        int       skipFactor = (int) skipFactorWidget.getValue();
+        if(skipFactor > 0) {
+            SampledSet  domain1 =  GridUtil.subsetDomain((GriddedSet)domain0, skipFactor, skipFactor, 1);
+            domain2D     = GridUtil.makeDomain2D((GriddedSet) domain1);
+        }
         double[]   ttts         = timeSet.getDoubles()[0];
         boolean    normalizeLon = true;
 
@@ -1273,6 +1278,11 @@ public class GridTrajectoryControl extends DrawingControl {
 
         SampledSet domain0      = GridUtil.getSpatialDomain(s);
         SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
+        int       skipFactor = (int) skipFactorWidget.getValue();
+        if(skipFactor > 0) {
+            SampledSet  domain1 =  GridUtil.subsetDomain((GriddedSet)domain0, skipFactor, skipFactor, 1);
+            domain2D     = GridUtil.makeDomain2D((GriddedSet) domain1);
+        }
         SampledSet domain1      = GridUtil.getSpatialDomain(u);
 
         double[]   ttts         = timeSet.getDoubles()[0];
@@ -1477,19 +1487,18 @@ public class GridTrajectoryControl extends DrawingControl {
                 num = num + latlons[i][0].length;
             }
 
-            int       skipFactor = (int) skipFactorWidget.getValue();
+            //int       skipFactor = 0; //(int) skipFactorWidget.getValue();
 
-            int       onum       = num / (skipFactor + 1);
+            //int       onum       = num / (skipFactor + 1);
 
-            float[][] points     = new float[3][onum];
+            float[][] points     = new float[3][num];
             int       psize      = 0;
             for (int k = 0; k < latlons.length; k++) {
-                int isize = latlons[k][0].length / (skipFactor + 1);
+                int isize = latlons[k][0].length;
                 for (int i = 0; i < isize; i++) {
-                    int j = i * (skipFactor + 1);
-                    points[latIndex][i + psize] = latlons[k][0][j];
+                    points[latIndex][i + psize] = latlons[k][0][i];
                     points[lonIndex][i + psize] =
-                        (float) LatLonPointImpl.lonNormal(latlons[k][1][j]);
+                        (float) LatLonPointImpl.lonNormal(latlons[k][1][i]);
                     points[2][i + psize] = z;
                 }
                 psize = psize + isize;

@@ -1426,6 +1426,180 @@ public class GridUtil {
     }
 
     /**
+     * Create a subset of the domainset skipping every i'th x and
+     * j'th y point.
+     *
+     * @param domainSet     domain to subsample
+     * @param skipx    x skip factor
+     * @param skipy    y skip factor
+     * @param skipz    z skip factor
+     * @return   subsampled grid
+     *
+     * @throws VisADException   unable to subsample grid
+     */
+    public static GriddedSet subsetDomain(GriddedSet domainSet, int skipx,
+                                          int skipy, int skipz)
+            throws VisADException {
+
+
+        if ((skipx == 1) && (skipy == 1) && (skipz == 1)) {
+            return domainSet;  // no-op
+        }
+
+
+        GriddedSet subDomain = null;
+        if ((skipz > 1) && (domainSet.getManifoldDimension() < 3)) {
+            throw new VisADException(
+                "Unable to subset in Z for a 2D manifold");
+        }
+        if (domainSet instanceof LinearSet) {
+            Linear1DSet xSet =
+                ((LinearSet) domainSet).getLinear1DComponent(0);
+            Linear1DSet ySet =
+                ((LinearSet) domainSet).getLinear1DComponent(1);
+            int         numSteps = 1 + (xSet.getLength() - 1) / skipx;
+            Linear1DSet newX     = (skipx == 1)
+                                   ? xSet
+                                   : new Linear1DSet(xSet.getType(),
+                                       xSet.getFirst(),
+                                       xSet.getFirst()
+                                       + (numSteps - 1) * xSet.getStep()
+                                         * skipx, numSteps);
+            numSteps = 1 + (ySet.getLength() - 1) / skipy;
+            Linear1DSet newY = (skipy == 1)
+                               ? ySet
+                               : new Linear1DSet(ySet.getType(), ySet
+                                   .getFirst(), ySet.getFirst()
+                                       + (numSteps - 1) * ySet.getStep()
+                                         * skipy, numSteps);
+
+            if (domainSet instanceof LinearLatLonSet) {
+                subDomain = new LinearLatLonSet(domainSet.getType(),
+                        new Linear1DSet[] { newX,
+                                            newY }, domainSet
+                                            .getCoordinateSystem(), domainSet
+                                            .getSetUnits(), domainSet
+                                            .getSetErrors());
+            } else if (domainSet instanceof Linear2DSet) {
+                subDomain = new Linear2DSet(domainSet.getType(),
+                                            new Linear1DSet[] { newX,
+                        newY }, domainSet.getCoordinateSystem(),
+                                domainSet.getSetUnits(),
+                                domainSet.getSetErrors());
+            } else if (domainSet instanceof Linear3DSet) {
+                Linear1DSet zSet =
+                    ((LinearSet) domainSet).getLinear1DComponent(2);
+                if (zSet.getLength() > 1) {
+                    numSteps = 1 + (zSet.getLength() - 1) / skipz;
+                    Linear1DSet newZ = (skipz == 1)
+                                       ? zSet
+                                       : new Linear1DSet(zSet.getType(),
+                                           zSet.getFirst(),
+                                           zSet.getFirst()
+                                           + (numSteps - 1) * zSet.getStep()
+                                             * skipz, numSteps);
+                    subDomain = new Linear3DSet(domainSet.getType(),
+                            new Linear1DSet[] { newX,
+                            newY, newZ }, domainSet.getCoordinateSystem(),
+                                          domainSet.getSetUnits(),
+                                          domainSet.getSetErrors());
+                } else {  // single level 3D grid
+                    float[][] samples  = domainSet.getSamples(false);
+                    int       sizeX    = domainSet.getLength(0);
+                    int       sizeY    = domainSet.getLength(1);
+                    int       sizeZ    = 1;
+                    int       newSizeX = 1 + (sizeX - 1) / skipx;
+                    int       newSizeY = 1 + (sizeY - 1) / skipy;
+
+                    float[][] subSamples =
+                        new float[domainSet.getDimension()][newSizeX * newSizeY * sizeZ];
+                    int l = 0;
+                    for (int k = 0; k < sizeZ; k++) {
+                        for (int j = 0; j < sizeY; j += skipy) {
+                            for (int i = 0; i < sizeX; i += skipx) {
+                                //compute stride into 1D array of 3D data
+                                int elem = i + (j + k * sizeY) * sizeX;
+
+                                subSamples[0][l] = samples[0][elem];
+                                subSamples[1][l] = samples[1][elem];
+                                subSamples[2][l] = samples[2][elem];
+                                l++;
+
+                            }
+                        }
+                    }
+                    subDomain = new Gridded3DSet(domainSet.getType(),
+                            subSamples, newSizeX, newSizeY,
+                            domainSet.getCoordinateSystem(),
+                            domainSet.getSetUnits(),
+                            domainSet.getSetErrors(), false);
+                }
+            }
+
+        } else {  // GriddedSet
+            float[][] samples  = domainSet.getSamples(false);
+            int       sizeX    = domainSet.getLength(0);
+            int       sizeY    = domainSet.getLength(1);
+            int       sizeZ    = (domainSet.getManifoldDimension() == 3)
+                                 ? domainSet.getLength(2)
+                                 : 1;
+            int       newSizeX = 1 + (sizeX - 1) / skipx;
+            int       newSizeY = 1 + (sizeY - 1) / skipy;
+            int       newSizeZ = 1 + (sizeZ - 1) / skipz;
+
+            float[][] subSamples =
+                new float[domainSet.getDimension()][newSizeX * newSizeY * newSizeZ];
+            int l = 0;
+            for (int k = 0; k < sizeZ; k += skipz) {
+                for (int j = 0; j < sizeY; j += skipy) {
+                    for (int i = 0; i < sizeX; i += skipx) {
+                        //compute stride into 1D array of 3D data
+                        int elem = i + (j + k * sizeY) * sizeX;
+
+                        subSamples[0][l] = samples[0][elem];
+                        subSamples[1][l] = samples[1][elem];
+                        if (domainSet.getDimension() == 3) {
+                            subSamples[2][l] = samples[2][elem];
+                        }
+                        l++;
+
+                    }
+                }
+            }
+            int[] newSizes = (domainSet.getManifoldDimension() == 3)
+                             ? new int[] { newSizeX, newSizeY, newSizeZ }
+                             : new int[] { newSizeX, newSizeY };
+            try {
+                subDomain = GriddedSet.create(domainSet.getType(),
+                        subSamples, newSizes,
+                        domainSet.getCoordinateSystem(),
+                        domainSet.getSetUnits(), domainSet.getSetErrors(),
+                        false, true);
+            } catch (SetException se) {
+                // if a SetException is thrown, then it's possible that the
+                // samples are missing or inconsistent.  Try again with
+                // test = false
+                String msg = se.getMessage();
+                if ((msg.indexOf("form a valid grid") >= 0)
+                        || (msg.indexOf("may not be missing") >= 0)) {
+                    subDomain = GriddedSet.create(domainSet.getType(),
+                            subSamples, newSizes,
+                            domainSet.getCoordinateSystem(),
+                            domainSet.getSetUnits(),
+                            domainSet.getSetErrors(), false, false);
+                } else {
+                    throw new VisADException(se);
+                }
+            }
+
+
+
+        }
+
+        return subDomain;
+    }
+
+    /**
      * Slice the grid at the vertical level indictated.
      *
      * @param  grid   grid to slice (must be a valid 3D grid)
