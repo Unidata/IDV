@@ -209,6 +209,9 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     ColorTable trjColorTable;
 
+    Range trjColorRange;
+
+    Range bundleColorRange = null;
     /** _more_ */
     boolean is2DTraj = false;
 
@@ -567,6 +570,14 @@ public class GridTrajectoryControl extends DrawingControl {
             return trackGrid;
         }
 
+        public void setRange(Range nRange)
+                throws RemoteException, VisADException{
+             super.setRange(nRange);
+            if(gtc != null) {
+                gtc.setTrjColorRange(nRange);
+               // gtc.bundleColorRange = null;
+            }
+        }
     }
 
     /**
@@ -621,6 +632,13 @@ public class GridTrajectoryControl extends DrawingControl {
         }
     }
 
+    public Range getTrjColorRange() {
+        return trjColorRange;
+    }
+
+    public void setTrjColorRange(Range crange) {
+        trjColorRange = crange;
+    }
     /**
      * _more_
      *
@@ -933,6 +951,7 @@ public class GridTrajectoryControl extends DrawingControl {
                     //gridTrackControl.setColorScaleInfo(getColorScaleInfo());
                     gridTrackControl.setColorTable(getTrjColorTable());
                     doMakeColorScales();
+                    bundleColorRange = getTrjColorRange();
                 } catch (Exception ee) {}
 
             }
@@ -1246,8 +1265,15 @@ public class GridTrajectoryControl extends DrawingControl {
 
         gridTrackControl.displayUnitChanged(dUnit, cUnit);
         gridTrackControl.setNewDisplayUnit(cUnit, true);
-        gridTrackControl.setSelectRange(
-            gridTrackControl.getColorRangeFromData());
+        Range newRange = null;
+        if(bundleColorRange != null) {
+            newRange = bundleColorRange;
+        } else {
+            newRange = gridTrackControl.getColorRangeFromData();
+        }
+        gridTrackControl.setSelectRange( newRange );
+        gridTrackControl.setRange( newRange );
+           // gridTrackControl.getColorRangeFromData());
     }
 
     /**
