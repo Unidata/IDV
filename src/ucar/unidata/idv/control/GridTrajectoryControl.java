@@ -209,9 +209,12 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     ColorTable trjColorTable;
 
+    /** _more_ */
     Range trjColorRange;
 
+    /** _more_ */
     Range bundleColorRange = null;
+
     /** _more_ */
     boolean is2DTraj = false;
 
@@ -226,6 +229,9 @@ public class GridTrajectoryControl extends DrawingControl {
 
     /** _more_ */
     Unit newUnit = null;
+
+    /** _more_ */
+    boolean isBundle = false;
 
     /**
      * Create a new Drawing Control; set attributes.
@@ -409,6 +415,39 @@ public class GridTrajectoryControl extends DrawingControl {
         /**
          * _more_
          *
+         * @param nRange _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public void setRange(Range nRange)
+                throws RemoteException, VisADException {
+            super.setRange(nRange);
+            if ((gtc != null) && (nRange != gtc.getTrjColorRange())) {
+                gtc.setTrjColorRange(nRange);
+                // gtc.bundleColorRange = null;
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public Range getRange() throws RemoteException, VisADException {
+            if ((gtc != null) && (gtc.getTrjColorRange() != null)) {
+                return gtc.getTrjColorRange();
+            } else {
+                return super.getRange();
+            }
+        }
+
+        /**
+         * _more_
+         *
          * @param fi _more_
          *
          * @return _more_
@@ -570,14 +609,6 @@ public class GridTrajectoryControl extends DrawingControl {
             return trackGrid;
         }
 
-        public void setRange(Range nRange)
-                throws RemoteException, VisADException{
-             super.setRange(nRange);
-            if(gtc != null) {
-                gtc.setTrjColorRange(nRange);
-               // gtc.bundleColorRange = null;
-            }
-        }
     }
 
     /**
@@ -632,13 +663,35 @@ public class GridTrajectoryControl extends DrawingControl {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Range getTrjColorRange() {
         return trjColorRange;
     }
 
+    /**
+     * _more_
+     *
+     * @param crange _more_
+     */
     public void setTrjColorRange(Range crange) {
         trjColorRange = crange;
+        if (crange != null) {
+            trjColorRange = crange;
+            if (gridTrackControl != null) {
+                try {
+                    gridTrackControl.setRange(crange);
+                } catch (Exception ee) {}
+            }
+            try {
+                super.setRange(crange);
+            } catch (Exception ee) {}
+        }
     }
+
     /**
      * _more_
      *
@@ -683,6 +736,7 @@ public class GridTrajectoryControl extends DrawingControl {
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
 
+        isBundle = getIdv().getStateManager().isLoadingXml();
         super.init((DataChoice) null);
         gridTrackControl = new MyTrackControl(this);
         // super.init(dataChoice);
@@ -715,7 +769,7 @@ public class GridTrajectoryControl extends DrawingControl {
             addDataChoice(wdc);
         }
         DataSelection dataSelection1 = getDataSelection();
-        Object fromLevel = dataSelection1.getFromLevel();
+        Object        fromLevel      = dataSelection1.getFromLevel();
         dataSelection1.setLevel(null);
         u = (FieldImpl) udc.getData(dataSelection1);
         v = (FieldImpl) vdc.getData(dataSelection1);
@@ -801,7 +855,7 @@ public class GridTrajectoryControl extends DrawingControl {
         }
 
         if (currentLevel == null) {
-            currentLevel = fromLevel; //getDataSelection().getFromLevel();
+            currentLevel = fromLevel;  //getDataSelection().getFromLevel();
         }
         if ((levels != null) && (levels.length > 0)
                 && (currentLevel == null)) {
@@ -973,6 +1027,7 @@ public class GridTrajectoryControl extends DrawingControl {
      * current level
      *
      * @param levels _more_
+     * @param initLevel _more_
      */
 
     public void setLevels(Object[] levels, Object initLevel) {
@@ -994,8 +1049,7 @@ public class GridTrajectoryControl extends DrawingControl {
         GuiUtils.setListData(levelBox, formatLevels(levels));
         if (initLevel != null) {
             if (initLevel instanceof Real) {
-                TwoFacedObject clevel =
-                    Util.labeledReal((Real) initLevel);;
+                TwoFacedObject clevel = Util.labeledReal((Real) initLevel);;
                 levelBox.setSelectedItem(clevel);
             } else {
                 levelBox.setSelectedItem(initLevel);
@@ -1177,27 +1231,28 @@ public class GridTrajectoryControl extends DrawingControl {
         final String paramName =
             rt.getFlatRange().getRealComponents()[0].getName();
 
-        double[]   timeVals     = timeSet.getDoubles()[0];
+        double[]   timeVals   = timeSet.getDoubles()[0];
 
-        SampledSet domain0      = GridUtil.getSpatialDomain(s);
-        SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
-        int       skipFactor = (int) skipFactorWidget.getValue();
-        if(skipFactor > 0) {
-            SampledSet  domain1 =  GridUtil.subsetDomain((GriddedSet)domain0, skipFactor, skipFactor, 1);
-            domain2D     = GridUtil.makeDomain2D((GriddedSet) domain1);
+        SampledSet domain0    = GridUtil.getSpatialDomain(s);
+        SampledSet domain2D   = GridUtil.makeDomain2D((GriddedSet) domain0);
+        int        skipFactor = (int) skipFactorWidget.getValue();
+        if (skipFactor > 0) {
+            SampledSet domain1 = GridUtil.subsetDomain((GriddedSet) domain0,
+                                     skipFactor, skipFactor, 1);
+            domain2D = GridUtil.makeDomain2D((GriddedSet) domain1);
         }
-        double[]   ttts         = timeSet.getDoubles()[0];
-        boolean    normalizeLon = true;
+        double[] ttts         = timeSet.getDoubles()[0];
+        boolean  normalizeLon = true;
 
-        boolean    isLatLon     = GridUtil.isLatLonOrder(domain0);
-        int        latIndex     = isLatLon
-                                  ? 0
-                                  : 1;
-        int        lonIndex     = isLatLon
-                                  ? 1
-                                  : 0;
+        boolean  isLatLon     = GridUtil.isLatLonOrder(domain0);
+        int      latIndex     = isLatLon
+                                ? 0
+                                : 1;
+        int      lonIndex     = isLatLon
+                                ? 1
+                                : 0;
 
-        Real       alt          = null;
+        Real     alt          = null;
         // if(zunit.getIdentifier().length() == 0) {
         alt = GridUtil.getAltitude(
             s, (Real) ((TwoFacedObject) currentLevel).getId());
@@ -1265,15 +1320,16 @@ public class GridTrajectoryControl extends DrawingControl {
 
         gridTrackControl.displayUnitChanged(dUnit, cUnit);
         gridTrackControl.setNewDisplayUnit(cUnit, true);
-        Range newRange = null;
-        if(bundleColorRange != null) {
+        Range newRange;
+        if (isBundle && (bundleColorRange != null)) {
             newRange = bundleColorRange;
         } else {
             newRange = gridTrackControl.getColorRangeFromData();
         }
-        gridTrackControl.setSelectRange( newRange );
-        gridTrackControl.setRange( newRange );
-           // gridTrackControl.getColorRangeFromData());
+        isBundle = false;
+        gridTrackControl.setSelectRange(newRange);
+        gridTrackControl.setRange(newRange);
+        // gridTrackControl.getColorRangeFromData());
     }
 
     /**
@@ -1300,14 +1356,15 @@ public class GridTrajectoryControl extends DrawingControl {
         final String paramName =
             rt.getFlatRange().getRealComponents()[0].getName();
 
-        double[]   timeVals     = timeSet.getDoubles()[0];
+        double[]   timeVals   = timeSet.getDoubles()[0];
 
-        SampledSet domain0      = GridUtil.getSpatialDomain(s);
-        SampledSet domain2D     = GridUtil.makeDomain2D((GriddedSet) domain0);
-        int       skipFactor = (int) skipFactorWidget.getValue();
-        if(skipFactor > 0) {
-            SampledSet  domain1 =  GridUtil.subsetDomain((GriddedSet)domain0, skipFactor, skipFactor, 1);
-            domain2D     = GridUtil.makeDomain2D((GriddedSet) domain1);
+        SampledSet domain0    = GridUtil.getSpatialDomain(s);
+        SampledSet domain2D   = GridUtil.makeDomain2D((GriddedSet) domain0);
+        int        skipFactor = (int) skipFactorWidget.getValue();
+        if (skipFactor > 0) {
+            SampledSet domain1 = GridUtil.subsetDomain((GriddedSet) domain0,
+                                     skipFactor, skipFactor, 1);
+            domain2D = GridUtil.makeDomain2D((GriddedSet) domain1);
         }
         SampledSet domain1      = GridUtil.getSpatialDomain(u);
 
@@ -1323,17 +1380,19 @@ public class GridTrajectoryControl extends DrawingControl {
                                   : 0;
 
         boolean    haveAlt      = true;
-        if (domain0.getManifoldDimension() == 2 && domain1.getManifoldDimension() == 2) {
+        if ((domain0.getManifoldDimension() == 2)
+                && (domain1.getManifoldDimension() == 2)) {
             //in case the s is already subset to a specific level in 3D derived 2D trajectory
             is2DDC  = true;
             haveAlt = false;
         }
 
-        Real       alt          = null;
+        Real alt = null;
         // if(zunit.getIdentifier().length() == 0) {
-        if(!is2DDC)
+        if ( !is2DDC) {
             alt = GridUtil.getAltitude(
                 s, (Real) ((TwoFacedObject) currentLevel).getId());
+        }
         float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
                                 domain2D, alt);
         int  numPoints = geoVals[0].length;
@@ -1410,8 +1469,15 @@ public class GridTrajectoryControl extends DrawingControl {
 
         gridTrackControl.displayUnitChanged(dUnit, cUnit);
         gridTrackControl.setNewDisplayUnit(cUnit, true);
-        gridTrackControl.setSelectRange(
-            gridTrackControl.getColorRangeFromData());
+        Range newRange;
+        if (isBundle && (bundleColorRange != null)) {
+            newRange = bundleColorRange;
+        } else {
+            newRange = gridTrackControl.getColorRangeFromData();
+        }
+        isBundle = false;
+        gridTrackControl.setSelectRange(newRange);
+        gridTrackControl.setRange(newRange);
 
     }
 
@@ -1517,8 +1583,8 @@ public class GridTrajectoryControl extends DrawingControl {
 
             //int       onum       = num / (skipFactor + 1);
 
-            float[][] points     = new float[3][num];
-            int       psize      = 0;
+            float[][] points = new float[3][num];
+            int       psize  = 0;
             for (int k = 0; k < latlons.length; k++) {
                 int isize = latlons[k][0].length;
                 for (int i = 0; i < isize; i++) {
