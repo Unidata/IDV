@@ -233,6 +233,12 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     boolean isBundle = false;
 
+    /** _more_ */
+    private JCheckBox backwardCbx;
+
+    /** _more_ */
+    private boolean backwardTrajectory = false;
+
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -1264,7 +1270,7 @@ public class GridTrajectoryControl extends DrawingControl {
         List<GridTrajectory.TrajInfo> tj =
             GridTrajectory.calculateTrackPoints(u, v, w, s, ttts, geoVals,
                 numPoints, numTimes, latIndex, lonIndex, true, normalizeLon,
-                null);
+                null, backwardTrajectory);
 
         int numParcels = numPoints;  //10;
         final FunctionType ft = new FunctionType(
@@ -1413,7 +1419,7 @@ public class GridTrajectoryControl extends DrawingControl {
         List<GridTrajectory.TrajInfo> tj =
             GridTrajectory.calculateTrackPoints(u, v, null, s, ttts, geoVals,
                 numPoints, numTimes, latIndex, lonIndex, haveAlt,
-                normalizeLon, clevel);
+                normalizeLon, clevel, backwardTrajectory);
 
         int numParcels = numPoints;  //10;
         final FunctionType ft = new FunctionType(
@@ -1743,8 +1749,10 @@ public class GridTrajectoryControl extends DrawingControl {
                                              GuiUtils.left(rectangleBtn));
 
 
-
-
+        backwardCbx = GuiUtils.makeCheckbox("", this, "backwardTrajectory");
+        backwardCbx.setToolTipText(
+            "display the backward trajectory of air parcel");
+        backwardCbx.setSelected(false);
 
         JLabel showLabel = GuiUtils.rLabel("Trajectory Initial Area:");
         JLabel removeLabel =
@@ -1753,7 +1761,7 @@ public class GridTrajectoryControl extends DrawingControl {
 
         widgets.add(GuiUtils
             .topCenterBottom(widgets0, GuiUtils
-                .topBottom(GuiUtils
+                .topCenterBottom(GuiUtils
                     .leftRight(GuiUtils
                         .top(GuiUtils
                             .inset(showLabel, new Insets(10, 0, 0, 0))), GuiUtils
@@ -1761,18 +1769,41 @@ public class GridTrajectoryControl extends DrawingControl {
                                     .top(GuiUtils
                                         .hbox(GuiUtils
                                             .rLabel("Initial Area Skip Factor:  "), skipFactorWidget
-                                            .getContents(false)))), GuiUtils
-                                                .leftRight(GuiUtils
-                                                    .inset(GuiUtils
-                                                        .wrap(createTrjBtn), 2), GuiUtils
-                                                            .right(unloadBtn))));
+                                            .getContents(false))), GuiUtils
+                                                .top(GuiUtils
+                                                    .hbox(GuiUtils
+                                                        .rLabel("Backward trajectory:"), GuiUtils
+                                                            .left(backwardCbx)))), GuiUtils
+                                                                .leftRight(GuiUtils
+                                                                    .inset(GuiUtils
+                                                                        .wrap(createTrjBtn), 2), GuiUtils
+                                                                            .right(unloadBtn))));
 
 
 
     }
 
+    /**
+     * _more_
+     *
+     * @param back _more_
+     *
+     * @throws Exception _more_
+     */
+    public void setBackwardTrajectory(boolean back) throws Exception {
+        backwardTrajectory = back;
+    }
 
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean getBackwardTrajectory() throws Exception {
+        return backwardTrajectory;
+    }
 
     /**
      * Should we show the locatio  widgets
