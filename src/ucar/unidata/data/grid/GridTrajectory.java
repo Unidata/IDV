@@ -1048,7 +1048,7 @@ public class GridTrajectory {
             float[] v = new float[numTimes];
 
 
-            for (int timeStepIdx = numTimes - 1; timeStepIdx > 0;
+            for (int timeStepIdx = numTimes - 1; timeStepIdx > -1;
                     timeStepIdx--) {
                 if (timeStepIdx == numTimes - 1) {
 
