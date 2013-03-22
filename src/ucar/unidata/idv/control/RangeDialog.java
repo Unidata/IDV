@@ -152,9 +152,11 @@ public class RangeDialog implements RangeWidget, Removable {
                 if (cmd.equals(GuiUtils.CMD_OK)
                         || cmd.equals(GuiUtils.CMD_APPLY)) {
                     try {
-                        double dLo = Double.valueOf(rangeMinField.getText()).doubleValue();
-                        double dHi = Double.valueOf(rangeMaxField.getText()).doubleValue();
-                        Range newRange = new Range(dLo, dHi);
+                        Range newRange =
+                                new Range(
+                                    Misc.parseNumber(rangeMinField.getText()),
+                                    Misc.parseNumber(rangeMaxField.getText()));
+                            handleNewRange(newRange);
                         handleNewRange(newRange);
                     } catch (NumberFormatException pe) {
                         LogUtil.userMessage("Invalid numeric format");
