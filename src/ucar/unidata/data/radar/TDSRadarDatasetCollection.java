@@ -1289,7 +1289,7 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
         ds_location =
             //"http://localhost:8080/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
             //"http://motherlode.ucar.edu:8081/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
-            "http://motherlode.ucar.edu:8080/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
+            "http://thredds.ucar.edu/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
         dsc = TDSRadarDatasetCollection.factory("test", ds_location, errlog);
         System.out.println(" errs= " + errlog);
         stns = dsc.getStations();
