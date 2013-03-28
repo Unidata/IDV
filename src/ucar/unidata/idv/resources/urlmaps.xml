@@ -1,4 +1,9 @@
 <urlmaps>
+    <!--
+    this url map assume that TDS 4.2 no longer exists, and all references
+    to motherlode should be moved to their 4.3 equivalent using the thredds*.ucar.edu
+    access address
+    -->
     <urlmap
         type="opendap"
         old="motherlode.ucar.edu/"
