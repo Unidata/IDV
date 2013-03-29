@@ -349,13 +349,14 @@ public class ServerUrlRemapper {
                                           oldServerName.getValue());
                 // if ncIdvVersion does not exists, then it was created with a pre tds 4.2 -> 4.3 transition
                 // IDV and the url data path likely needs to be updated
-                //uncomment next line once 8080 is running 4.3
-                //ToDo: enable ncIdvVersion check once thredds.ucar.edu -> 4.3
-                //if ((ncIdvVersion != UNKNOWN_NCIDV_VERSION) || (testTds)) {
-                if (testTds) {
-                    newPath = remapOldMotherlodeDatasetUrlPath(newPath,
-                            oldPathType);
-                }
+                //uncomment next line once 8080 is running 4.3...no need to check
+                // path if bundle was created after transition.
+
+                //ToDo: enable ncIdvVersion check once TDS 4.2 no longer running at Unidata
+                // for now, assume urlpath needs to be updated
+
+                newPath = remapOldMotherlodeDatasetUrlPath(newPath,
+                          oldPathType);
                 break;
             }
         }

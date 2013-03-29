@@ -70,7 +70,7 @@ The structure of this file is quite simple:
 Changes to the way GRIB files are served via the Unidata TDS server have also
 been made. The impact of this change on IDV users is that the dataset URLs that
 point to GRIB resources will change, which will break bundles that point to the
-main Unidata TDS (thredds.ucar.edu, previously known as motherlode.ucar.edu).
+old Unidata TDS (motherlode.ucar.edu).
 </p>
 
 <p>
@@ -82,14 +82,14 @@ IDV to minimize the impact on users.
 </p>
 
 <p>
-Currently, the latest version of TDS (4.3), where URL related impacts will be
-seen, is not yet running on the main Unidata TDS, but the transition to the new
-server will happen in the near future. The IDV has a new plugin that will allow
-users to test the transition before it happens by redirecting all data request
-to the main Unidata TDS (currently running 4.2) to thredds-test.ucar.edu, which
-is running TDS 4.3. The plugin can be found in the IDV plugin manager under
-[ht::menu {Available Plugins} {Data Sources} {Test Unidata TDS 4.2-&gt;4.3 Upgrade}]. Note that this plugin should be removed once thredds.ucar.edu is
-running TDS 4.3.
+The latest version of TDS (4.3), where URL related impacts will be
+seen, is <b>now running</b> on the main Unidata TDS (thredds.ucar.edu).
+Starting with this release (4.0u1), the IDV will redirect all requests to the old
+Unidata TDS (motherlode.ucar.edu) to the new Unidata TDS (thredds.ucar.edu)
+automatically and update the appropriate data URLs. Unlike the previous
+release (4.0), users do not need to install any plugins related to the
+TDS upgrade. <b><i>If you previously installed plugins related to the TDS
+upgrade, please remove them once you've upgraded to IDV 4.0u1 (or later).</i></b> 
 </p>
 
 <p>
@@ -159,6 +159,11 @@ or horizontally across the display.
 
 <faqitem q="Webcams" id="webcam">
 Fixed broken webcam links available in the IDV.
+</faqitem>
+
+<faqitem q="Webcams" id="webcam">
+USGS Shaded Relief has been reinstated as "CONUS Shaded Relief" in the
+list of map background images.
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>

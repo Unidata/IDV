@@ -977,7 +977,7 @@ public class DqcRadarDatasetCollection extends StationRadarCollectionImpl {
     public static void main(String args[]) throws IOException {
         StringBuffer errlog = new StringBuffer();
         String dqc_location =
-            "http://motherlode.ucar.edu:8080/thredds/idd/radarLevel2";
+            "http://thredds.ucar.edu/thredds/idd/radarLevel2";
         DqcRadarDatasetCollection ds = factory("test", dqc_location, errlog);
         System.out.println(" errs= " + errlog);
 
