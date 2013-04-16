@@ -7256,6 +7256,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public String getDefaultView() {
         ViewManager vm = getDefaultViewManager();
+        if ( !controlContext.getPersistenceManager()
+                .getSaveDataSources() ) {
+            return null;
+        }
         if ((vm != null) && (vm.getViewDescriptor() != null)) {
             return vm.getViewDescriptor().getName();
         }
