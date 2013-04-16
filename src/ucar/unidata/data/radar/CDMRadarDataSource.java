@@ -346,25 +346,28 @@ public class CDMRadarDataSource extends RadarDataSource {
         List                      collectionTimes = null;
 
         RadarQuery query = (RadarQuery) getProperty(PROP_RADARQUERY);
+        if(query != null) {
+            StringBuffer              errlog          = new StringBuffer();
+            Date fromDate =
+                DateUnit.getStandardOrISO(timeDriverTimes.get(0).dateString()
+                                          + "T"
+                                          + timeDriverTimes.get(0).timeString());
+            Date toDate = DateUnit.getStandardOrISO(timeDriverTimes.get(num
+                              - 1).dateString() + "T"
+                                                + timeDriverTimes.get(num
+                                                    - 1).timeString());
+            try {
+                collection = TDSRadarDatasetCollection.factory("test",
+                        query.getCollectionUrl(), errlog);
+                List timeSpan = collection.getRadarTimeSpan();
 
-        StringBuffer              errlog          = new StringBuffer();
-        Date fromDate =
-            DateUnit.getStandardOrISO(timeDriverTimes.get(0).dateString()
-                                      + "T"
-                                      + timeDriverTimes.get(0).timeString());
-        Date toDate = DateUnit.getStandardOrISO(timeDriverTimes.get(num
-                          - 1).dateString() + "T"
-                                            + timeDriverTimes.get(num
-                                                - 1).timeString());
-        try {
-            collection = TDSRadarDatasetCollection.factory("test",
-                    query.getCollectionUrl(), errlog);
-            List timeSpan = collection.getRadarTimeSpan();
-
-            collectionTimes =
-                collection.getRadarStationTimes(query.getStation(),
-                    query.getProduct(), fromDate, toDate);
-        } catch (Exception e) {}
+                collectionTimes =
+                    collection.getRadarStationTimes(query.getStation(),
+                        query.getProduct(), fromDate, toDate);
+            } catch (Exception e) {}
+        } else {
+            collectionTimes = dataChoice.getAllDateTimes();
+        }
 
         List results = null;
         try {
