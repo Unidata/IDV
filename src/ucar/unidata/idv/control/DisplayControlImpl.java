@@ -5798,8 +5798,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (selectRangeEnabled && (selectRange != null)) {
-            //            dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
-            //                                 SETTINGS_GROUP_DISPLAY);
+                        dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
+                                             SETTINGS_GROUP_DISPLAY);
         }
 
         if (contourInfo != null) {
