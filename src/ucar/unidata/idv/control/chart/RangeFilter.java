@@ -1,20 +1,18 @@
 /*
- * $Id: RangeFilter.java,v 1.18 2007/05/04 14:50:05 dmurray Exp $
- *
  * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,76 +21,26 @@
 package ucar.unidata.idv.control.chart;
 
 
-import org.jfree.chart.*;
-import org.jfree.chart.annotations.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.event.*;
-import org.jfree.chart.labels.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.chart.urls.*;
-import org.jfree.data.*;
-import org.jfree.data.time.*;
-import org.jfree.data.xy.*;
-import org.jfree.ui.*;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.AnnotationChangeListener;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.ui.RectangleEdge;
 
-
-
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.sounding.TrackDataSource;
-import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.geoloc.ProjectionRect;
-
-
-
-
-import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.util.GuiUtils;
-
-
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
-
-import ucar.visad.GeoUtils;
-import ucar.visad.Util;
-import ucar.visad.display.*;
-
-import visad.*;
-
-import visad.georef.*;
-
-import visad.util.BaseRGBMap;
-
-import visad.util.ColorPreview;
 
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 
-
-import java.rmi.RemoteException;
-
-
-
-
-
-import java.text.SimpleDateFormat;
-
-
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 
 /**
@@ -441,13 +389,16 @@ public class RangeFilter extends ChartAnnotation {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void addChangeListener(AnnotationChangeListener arg0) {
-    }
+    public void addChangeListener(AnnotationChangeListener arg0) {}
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void removeChangeListener(AnnotationChangeListener arg0) {
-    }
+    public void removeChangeListener(AnnotationChangeListener arg0) {}
 }
-

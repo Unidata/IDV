@@ -1,20 +1,18 @@
-/**
- * $Id: XYChartManager.java,v 1.4 2007/04/16 21:32:12 jeffmc Exp $
- *
- * Copyright  1997-2013 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,100 +21,56 @@
 package ucar.unidata.idv.control.chart;
 
 
-import org.jfree.chart.*;
-import org.jfree.chart.annotations.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.entity.*;
-import org.jfree.chart.event.*;
-import org.jfree.chart.labels.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.*;
-import org.jfree.data.general.*;
-import org.jfree.data.time.*;
-import org.jfree.data.xy.*;
-import org.jfree.ui.*;
-
-import ucar.unidata.data.DataAlias;
-import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.data.point.*;
-
-
-import ucar.unidata.idv.ControlContext;
-
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.annotations.XYAnnotation;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.entity.EntityCollection;
+import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.event.AnnotationChangeListener;
+import org.jfree.chart.labels.XYItemLabelGenerator;
+import org.jfree.chart.labels.XYToolTipGenerator;
+import org.jfree.chart.plot.CrosshairState;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.PlotState;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
+import org.jfree.chart.renderer.xy.XYAreaRenderer;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYItemRendererState;
+import org.jfree.data.general.Series;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.xy.IntervalXYDataset;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.ui.RectangleEdge;
 
 import ucar.unidata.idv.control.DisplayControlImpl;
-import ucar.unidata.idv.control.ProbeRowInfo;
-
-
-import ucar.unidata.idv.control.chart.LineState;
-import ucar.unidata.ui.GraphPaperLayout;
-
-import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.ui.symbol.*;
-
-
-import ucar.unidata.ui.symbol.StationModelManager;
 import ucar.unidata.ui.symbol.WindBarbSymbol;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.Resource;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
-
-import ucar.unidata.view.geoloc.NavigatedDisplay;
-
-
-import ucar.visad.ShapeUtility;
-
-import ucar.visad.Util;
-
-
-
-import ucar.visad.display.Animation;
-import ucar.visad.display.Animation;
-import ucar.visad.display.StationModelDisplayable;
 import ucar.visad.quantities.CommonUnits;
 
-
-import visad.*;
-
-import visad.georef.EarthLocation;
-import visad.georef.LatLonPoint;
-
-import visad.georef.MapProjection;
-
-import visad.util.BaseRGBMap;
-import visad.util.ColorPreview;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
+import visad.Unit;
+import visad.VisADException;
 
 
-import java.rmi.RemoteException;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
-
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-
-
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Hashtable;
 import java.util.List;
-
-import javax.swing.*;
 
 
 
@@ -239,7 +193,7 @@ public abstract class XYChartManager extends ChartManager {
         /** Do we have a shape to draw */
         boolean hasShape;
 
-        /** _more_          */
+        /** _more_ */
         boolean showLegend = true;
 
         /**
@@ -436,7 +390,7 @@ public abstract class XYChartManager extends ChartManager {
                 EntityCollection entities =
                     info.getOwner().getEntityCollection();
                 if (entities != null) {
-                    String tip = null;
+                    String             tip       = null;
                     XYToolTipGenerator generator =
                         getToolTipGenerator(series, item);
                     if (generator != null) {
@@ -671,8 +625,7 @@ public abstract class XYChartManager extends ChartManager {
                 int         width            = fm.stringWidth(text);
                 int         height = (fm.getMaxDescent() + fm.getMaxAscent());
 
-                int         verticalPosition =
-                    lineState.getVerticalPosition();
+                int         verticalPosition = lineState.getVerticalPosition();
                 if (verticalPosition == LineState.VPOS_TOP) {
                     vAnchor = top + height;
                 } else if (verticalPosition == LineState.VPOS_MIDDLE) {
@@ -947,12 +900,12 @@ public abstract class XYChartManager extends ChartManager {
                 }
 
                 @Override
-                public void addChangeListener(AnnotationChangeListener arg0) {
-                }
+                public void addChangeListener(
+                        AnnotationChangeListener arg0) {}
 
                 @Override
-                public void removeChangeListener(AnnotationChangeListener arg0) {
-                }
+                public void removeChangeListener(
+                        AnnotationChangeListener arg0) {}
             };
             for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
                 ChartHolder chartHolder =
@@ -1036,5 +989,3 @@ public abstract class XYChartManager extends ChartManager {
 
 
 }
-
-

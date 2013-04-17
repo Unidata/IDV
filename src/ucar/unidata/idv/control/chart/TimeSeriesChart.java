@@ -1,108 +1,102 @@
 /*
- * $Id: TimeSeriesChart.java,v 1.12 2007/04/16 21:32:11 jeffmc Exp $
- *
- * Copyright  1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.idv.control.chart;
 
 
-import org.itc.idv.math.SunriseSunsetCollector;
-
-
-import org.jfree.chart.*;
-import org.jfree.chart.annotations.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.entity.*;
-import org.jfree.chart.event.AnnotationChangeListener;
-import org.jfree.chart.labels.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.*;
-import org.jfree.data.general.*;
-import org.jfree.data.time.*;
-import org.jfree.data.xy.*;
-import org.jfree.ui.*;
+import org.jfree.chart.annotations.XYAnnotation;
+import org.jfree.chart.axis.Axis;
+import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTick;
+import org.jfree.chart.axis.DateTickMarkPosition;
+import org.jfree.chart.axis.DateTickUnit;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
-import org.jfree.chart.title.TextTitle;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.HorizontalAlignment;
+import org.jfree.chart.axis.Tick;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.AnnotationChangeListener;
+import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.FixedMillisecond;
+import org.jfree.data.time.Month;
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.TimeSeriesDataItem;
+import org.jfree.data.time.Year;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleEdge;
-import org.jfree.ui.RefineryUtilities;
-
+import org.jfree.ui.TextAnchor;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.data.point.*;
-import ucar.unidata.data.storm.*;
-
+import ucar.unidata.data.point.PointOb;
 import ucar.unidata.geoloc.LatLonPoint;
-import ucar.unidata.geoloc.LatLonPointImpl;
-
-import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.IdvPreferenceManager;
-
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.ProbeRowInfo;
-import ucar.unidata.idv.control.chart.LineState;
 import ucar.unidata.idv.ui.IdvTimeline;
-
-
-import ucar.unidata.ui.symbol.*;
-
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.Trace;
 
 import ucar.visad.Util;
-
 import ucar.visad.display.Animation;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.MathType;
+import visad.Real;
+import visad.Set;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 
 import java.rmi.RemoteException;
 
-import java.text.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
-
-import javax.swing.*;
 
 
 /**
@@ -184,9 +178,9 @@ public class TimeSeriesChart extends XYChartManager {
 
         IdvPreferenceManager pref =
             control.getControlContext().getIdv().getPreferenceManager();
-        TimeZone   timeZone  = pref.getDefaultTimeZone();
-        NumberAxis valueAxis = new FixedWidthNumberAxis("");
-        final SimpleDateFormat sdf = new SimpleDateFormat(((dateFormat
+        TimeZone               timeZone  = pref.getDefaultTimeZone();
+        NumberAxis             valueAxis = new FixedWidthNumberAxis("");
+        final SimpleDateFormat sdf       = new SimpleDateFormat(((dateFormat
                                          != null)
                 ? dateFormat
                 : pref.getDefaultDateFormat()));
@@ -209,8 +203,7 @@ public class TimeSeriesChart extends XYChartManager {
                 }
 
                 DateTickUnit unit      = getTickUnit();
-                Date         tickDate  =
-                    calculateLowestVisibleTickValue(unit);
+                Date         tickDate  = calculateLowestVisibleTickValue(unit);
                 Date         upperDate = getMaximumDate();
 
                 Date         firstDate = null;
@@ -357,12 +350,12 @@ public class TimeSeriesChart extends XYChartManager {
                 }
 
                 @Override
-                public void addChangeListener(AnnotationChangeListener arg0) {
-                }
+                public void addChangeListener(
+                        AnnotationChangeListener arg0) {}
 
                 @Override
-                public void removeChangeListener(AnnotationChangeListener arg0) {
-                }
+                public void removeChangeListener(
+                        AnnotationChangeListener arg0) {}
             };
             List plots = getPlots();
             for (int plotIdx = 0; plotIdx < plots.size(); plotIdx++) {
@@ -734,7 +727,8 @@ public class TimeSeriesChart extends XYChartManager {
                                 series = new MyTimeSeries(name,
                                         FixedMillisecond.class);
                             }
-                            series.add(new FixedMillisecond(date), valueArray[i]);
+                            series.add(new FixedMillisecond(date),
+                                       valueArray[i]);
                             if ((i == 0) || (valueArray[i] > max)) {
                                 max = valueArray[i];
                             }
@@ -908,7 +902,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 Data dataElement =
                                     tuple.getComponent(lineState.index);
                                 if ((dataElement instanceof Real)) {
-                                    Real obsReal = (Real) dataElement;
+                                    Real obsReal     = (Real) dataElement;
                                     Unit displayUnit =
                                         control.getDisplayConventions()
                                             .getDisplayUnit(name,
@@ -941,9 +935,9 @@ public class TimeSeriesChart extends XYChartManager {
                         if ( !lineState.getVisible()) {
                             continue;
                         }
-                        MyTimeSeries series   = null;
-                        List<String> textList = null;
-                        String canonical =
+                        MyTimeSeries series    = null;
+                        List<String> textList  = null;
+                        String       canonical =
                             DataAlias.aliasToCanonical(lineState.getName());
                         //System.err.println ("var:" + lineState.getName() + " canon:" + canonical);
                         Unit   unit = null;
@@ -951,12 +945,11 @@ public class TimeSeriesChart extends XYChartManager {
                             min     = 0,
                             max     = 0;
                         for (int obIdx = 0; obIdx < obs.size(); obIdx++) {
-                            PointOb    ob        = (PointOb) obs.get(obIdx);
-                            Tuple      tuple     = (Tuple) ob.getData();
-                            TupleType  tupleType =
-                                (TupleType) tuple.getType();
-                            MathType[] types     = tupleType.getComponents();
-                            Data dataElement =
+                            PointOb    ob          = (PointOb) obs.get(obIdx);
+                            Tuple      tuple       = (Tuple) ob.getData();
+                            TupleType  tupleType = (TupleType) tuple.getType();
+                            MathType[] types       = tupleType.getComponents();
+                            Data       dataElement =
                                 tuple.getComponent(lineState.index);
                             Date dttm = Util.makeDate(ob.getDateTime());
                             if (series == null) {
@@ -991,15 +984,16 @@ public class TimeSeriesChart extends XYChartManager {
                             //NaN wind directions must be special cased b/c they cannot
                             //be thrown away lest they get out of sync with speed causing
                             //rendering problems for wind barbs.
-                            if ((value == value) || Misc.equals(canonical, "DIR")) {
+                            if ((value == value)
+                                    || Misc.equals(canonical, "DIR")) {
                                 if ((obIdx == 0) || (value > max)) {
                                     max = value;
                                 }
                                 if ((obIdx == 0) || (value < min)) {
                                     min = value;
                                 }
-                                series.addOrUpdate(new FixedMillisecond(dttm),
-                                        value);
+                                series.addOrUpdate(
+                                    new FixedMillisecond(dttm), value);
                             }
                         }
 
@@ -1060,10 +1054,13 @@ public class TimeSeriesChart extends XYChartManager {
                         }
                     }
                     if ((speedSeries != null) && (dirSeries != null)) {
-                    	WindbarbRenderer renderer =
+                        WindbarbRenderer renderer =
                             new WindbarbRenderer(speedLineState, speedSeries,
                                 dirSeries, speedUnit, polarWind);
-                    	renderer.isSouth = (obs != null && obs.size() > 0) ? obs.get(0).getEarthLocation().getLatitude().getValue() < 0 : false;
+                        renderer.isSouth = ((obs != null) && (obs.size() > 0))
+                                           ? obs.get(0).getEarthLocation()
+                                           .getLatitude().getValue() < 0
+                                           : false;
                         Axis axis = addSeries(speedSeries, speedLineState,
                                         paramIdx++, renderer, true);
                         if (speedLineState.getVerticalPosition()
@@ -1271,7 +1268,7 @@ public class TimeSeriesChart extends XYChartManager {
                 || !Misc.equals(endDate, lastEndDate)) {
             lastStartDate = startDate;
             lastEndDate   = endDate;
-            sunriseDates = IdvTimeline.makeSunriseDates(sunriseLocation,
+            sunriseDates  = IdvTimeline.makeSunriseDates(sunriseLocation,
                     startDate, endDate);
         }
         int top    = (int) (dataArea.getY());
@@ -1283,7 +1280,7 @@ public class TimeSeriesChart extends XYChartManager {
         for (int i = 0; i < sunriseDates.size(); i += 2) {
             Date d1 = (Date) sunriseDates.get(i + 1);
             Date d2 = (Date) sunriseDates.get(i);
-            int x1 = (int) domainAxis.valueToJava2D(d1.getTime(), dataArea,
+            int  x1 = (int) domainAxis.valueToJava2D(d1.getTime(), dataArea,
                          RectangleEdge.BOTTOM);
             int x2 = (int) domainAxis.valueToJava2D(d2.getTime(), dataArea,
                          RectangleEdge.BOTTOM);
@@ -1319,7 +1316,7 @@ public class TimeSeriesChart extends XYChartManager {
             g2.setStroke(new BasicStroke());
             g2.setColor(Color.black);
             double timeValue = dttm.getValue(CommonUnit.secondsSinceTheEpoch);
-            int x = (int) domainAxis.valueToJava2D(timeValue * 1000,
+            int    x         = (int) domainAxis.valueToJava2D(timeValue * 1000,
                         dataArea, RectangleEdge.BOTTOM);
             if ((x < dataArea.getX())
                     || (x > dataArea.getX() + dataArea.getWidth())) {
@@ -1369,8 +1366,4 @@ public class TimeSeriesChart extends XYChartManager {
     public String getDateFormat() {
         return dateFormat;
     }
-
-
-
 }
-
