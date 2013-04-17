@@ -7256,8 +7256,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public String getDefaultView() {
         ViewManager vm = getDefaultViewManager();
-        if ( !controlContext.getPersistenceManager()
-                .getSaveDataSources() ) {
+        if ( !controlContext.getPersistenceManager().getSaveViewState() &&
+             !controlContext.getPersistenceManager().getSaveDataSources() &&
+             !controlContext.getPersistenceManager().getSaveData() &&
+             !controlContext.getPersistenceManager().getSaveJython() ) {
+            // this block is for the display template
             return null;
         }
         if ((vm != null) && (vm.getViewDescriptor() != null)) {
