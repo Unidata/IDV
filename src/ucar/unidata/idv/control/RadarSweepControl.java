@@ -25,8 +25,10 @@ import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.radar.RadarConstants;
 
+import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.metdata.NamedStation;
 
@@ -35,11 +37,13 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.visad.RadarMapProjection;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
 
 import visad.*;
 
+import visad.bom.Radar2DCoordinateSystem;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
@@ -360,5 +364,73 @@ public class RadarSweepControl extends ColorPlanViewControl {
     protected String getDataProjectionLabel() {
         return "Use Radar Projection";
     }
+    /**
+     * Get the cursor data
+     *
+     * @param el  earth location
+     * @param animationValue   the animation value
+     * @param animationStep  the animation step
+     * @param samples the list of samples
+     *
+     * @return  the list of readout data
+     *
+     * @throws Exception  problem getting the data
+     */
+    protected List getCursorReadoutInner11(EarthLocation el,
+                                         Real animationValue,
+                                         int animationStep,
+                                         List<ReadoutInfo> samples)
+            throws Exception {
+        if (currentSlice == null) {
+            return null;
+        }       
+        RadarMapProjection rp = (RadarMapProjection) getDataProjection();
+        LatLonPoint radarLocation = rp.getCenterLatLon();
+        FlatField d = (FlatField)currentSlice.getSample(0);
+        Gridded2DSet ds = (Gridded2DSet)d.getDomainSet();
+        Radar2DCoordinateSystem rcoord = (Radar2DCoordinateSystem)d.getDomainCoordinateSystem();
+        float [] center = rcoord.getCenterPoint();
+        float [] values = d.getFloats()[0];
+        float   lat1        = (float) el.getLatitude().getValue();
+        float   lon1        = (float) el.getLongitude().getValue();
+         
+        Bearing b1          = getBearing(radarLocation, lat1, lon1);         
+        double  azimuth1    = b1.getAngle();
+        double  range1      = b1.getDistance(); 
+        double [][] pvalues = new double[2][1];
+        pvalues[0][0] = range1;
+        pvalues[1][0] = azimuth1;
+        int [] pidx = ds.doubleToIndex(pvalues);
+        currentSlice.getSample(0);
+        List result = new ArrayList();
+        Real r = GridUtil.sampleToReal(
+                currentSlice, el, animationValue,
+                getSamplingModeValue(
+                        getObjectStore().get(
+                                PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
+        if (r != null) {
+            ReadoutInfo readoutInfo = new ReadoutInfo(this, r, el,
+                    animationValue);
+            readoutInfo.setUnit(getDisplayUnit());
+            readoutInfo.setRange(getRange());
+            samples.add(readoutInfo);
+        }
 
+        if ((r != null) && !r.isMissing()) {
+
+            result.add("<tr><td>" + getMenuLabel()
+                    + ":</td><td  align=\"right\">"
+                    + formatForCursorReadout(r) + ((currentLevel != null)
+                    ? ("@" + currentLevel)
+                    : "") + "</td></tr>");
+        }
+        return result;
+    }
+    public Bearing getBearing(LatLonPoint radarLocation, double lat, double lon) {
+        Bearing b1 =
+                Bearing.calculateBearing(radarLocation.getLatitude().getValue(),
+                        radarLocation.getLongitude().getValue(),
+                        lat, lon, null);
+        return b1;
+    }
 }
