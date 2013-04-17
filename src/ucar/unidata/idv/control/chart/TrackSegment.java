@@ -342,10 +342,12 @@ public class TrackSegment extends ChartAnnotation {
         return Math.abs(leftP.y - y);
     }
 
+    @Override
+    public void addChangeListener(AnnotationChangeListener arg0) {
+    }
 
-
-
-
-
+    @Override
+    public void removeChangeListener(AnnotationChangeListener arg0) {
+    }
 }
 

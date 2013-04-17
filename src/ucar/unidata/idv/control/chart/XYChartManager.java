@@ -945,6 +945,14 @@ public abstract class XYChartManager extends ChartManager {
                         g2.drawString(emptyChartLabel, 100, 50);
                     }
                 }
+
+                @Override
+                public void addChangeListener(AnnotationChangeListener arg0) {
+                }
+
+                @Override
+                public void removeChangeListener(AnnotationChangeListener arg0) {
+                }
             };
             for (int plotIdx = 0; plotIdx < chartHolders.size(); plotIdx++) {
                 ChartHolder chartHolder =

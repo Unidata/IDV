@@ -497,5 +497,14 @@ public class WayPoint extends ChartAnnotation {
         return midiProperties;
     }
 
+
+    @Override
+    public void addChangeListener(AnnotationChangeListener arg0) {
+    }
+
+
+    @Override
+    public void removeChangeListener(AnnotationChangeListener arg0) {
+    }
 }
 

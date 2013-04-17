@@ -441,6 +441,13 @@ public class RangeFilter extends ChartAnnotation {
     }
 
 
+    @Override
+    public void addChangeListener(AnnotationChangeListener arg0) {
+    }
 
+
+    @Override
+    public void removeChangeListener(AnnotationChangeListener arg0) {
+    }
 }
 

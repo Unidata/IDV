@@ -32,6 +32,7 @@ import org.jfree.chart.*;
 import org.jfree.chart.annotations.*;
 import org.jfree.chart.axis.*;
 import org.jfree.chart.entity.*;
+import org.jfree.chart.event.AnnotationChangeListener;
 import org.jfree.chart.labels.*;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.*;
@@ -353,6 +354,14 @@ public class TimeSeriesChart extends XYChartManager {
                         drawTime(g2, plot, dataArea, domainAxis, rangeAxis,
                                  rendererIndex, info);
                     }
+                }
+
+                @Override
+                public void addChangeListener(AnnotationChangeListener arg0) {
+                }
+
+                @Override
+                public void removeChangeListener(AnnotationChangeListener arg0) {
                 }
             };
             List plots = getPlots();
