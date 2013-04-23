@@ -273,6 +273,8 @@ public class Misc {
         if (format.indexOf("H") >= 0) {
             if (use360) {            // should we ignore or add E?
                 formatted = formatted.replace("H", "");
+            } else if (Math.abs(value) == 180) {     // 180 line - subject to debate
+                formatted = formatted.replace("H", "");
             } else if (value < 0) {  // South/West
                 formatted = formatted.replace("H", (isLatitude)
                         ? "S"
