@@ -1953,7 +1953,6 @@ public class Misc {
 
     /** decimal format for scientific notation */
     static DecimalFormat format1 = new DecimalFormat("0.#E0");
-    //new DecimalFormat("#.00000");
 
     /** decimal format for 4 places after the decimal point */
     static DecimalFormat format2 = new DecimalFormat("#.00##");
@@ -1977,8 +1976,8 @@ public class Misc {
      * Return different pre-defined DecimalFormat objects depending
      * on the value of the given double
      *
-     * @param v  valut in question
-     * @return   appropriate formatter
+     * @param v  value in question
+     * @return   appropriate decimal format pattern
      */
     public static DecimalFormat getDecimalFormat(double v) {
         v = Math.abs(v);
@@ -2056,6 +2055,8 @@ public class Misc {
             return Double.NaN;
         }
         try {
+            // hack to also accept lower case e for exponent
+            value = value.replace("e","E"); 
             return formatter.parse(value).doubleValue();
         } catch (ParseException pe) {
             throw new NumberFormatException(pe.getMessage());
