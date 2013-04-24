@@ -30,6 +30,7 @@ import ucar.nc2.Attribute;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.RadialDatasetSweep;
 import ucar.nc2.dt.TypedDatasetFactory;
@@ -316,9 +317,15 @@ public class CDMRadarAdapter implements RadarAdapter {
         double[] vcpAngles;
         try {
             Trace.call1("CDMRadarAdapter:open dataset");
-            rds = (RadialDatasetSweep) TypedDatasetFactory.open(
-                ucar.nc2.constants.FeatureType.RADIAL, swpFileName, null,
-                new StringBuilder());
+            if(swpFileName.endsWith("entry.das"))
+                rds = (RadialDatasetSweep) TypedDatasetFactory.open(
+                    ucar.nc2.constants.FeatureType.RADIAL, DODSNetcdfFile.canonicalURL(swpFileName), null,
+                    new StringBuilder());
+            else
+                rds = (RadialDatasetSweep) TypedDatasetFactory.open(
+                        ucar.nc2.constants.FeatureType.RADIAL, swpFileName, null,
+                        new StringBuilder());
+
             Trace.call2("CDMRadarAdapter:open dataset");
             stationID      = rds.getRadarID();
             stationName    = rds.getRadarName();
