@@ -20,49 +20,31 @@
 
 package ucar.unidata.idv.control;
 
-
-import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.ui.colortable.ColorTableCanvas;
 import ucar.unidata.ui.colortable.ColorTableEditor;
-
 
 import ucar.unidata.ui.colortable.ColorTableManager;
 
-
 import ucar.unidata.util.ColorTable;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Removable;
-import ucar.unidata.util.TwoFacedObject;
 
 import visad.VisADException;
 
-import visad.util.BaseRGBMap;
-
-import visad.util.ColorPreview;
-
 import java.awt.*;
 import java.awt.event.*;
-
-
-
-import java.awt.geom.Rectangle2D;
 
 import java.beans.*;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.*;
-
-
 
 /**
  * A {@link ControlWidget} for the color table information in the
@@ -438,7 +420,6 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
     public void setRangeFromPopup(String cmd) {
         Range r = null;
         if (cmd.equals(CMD_RANGE_COLORTABLE)) {
-            Range ctRange = null;
             ColorTable originalCT =
                 colorTableManager.getColorTable(colorTable.getName());
             if (originalCT != null) {
@@ -533,7 +514,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
                                 Misc.parseNumber(rangeMaxField.getText()));
                         handleNewRange(newRange);
                     } catch (NumberFormatException pe) {
-                        LogUtil.userMessage("Incorrect numeric format ");
+                        LogUtil.userMessage("Invalid numeric format");
                         return;
                     }
                 }
