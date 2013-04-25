@@ -34,6 +34,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+import ucar.unidata.view.geoloc.CoordinateFormat;
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -1067,8 +1068,8 @@ public class KmlDataSource extends FilesDataSource {
         sb.append("<LatLonBox>\n");
         sb.append("<north>" + bounds.getMaxLat() + "</north>\n");
         sb.append("<south>" + bounds.getMinLat() + "</south>\n");
-        sb.append("<east>" + bounds.getMaxLon() + "</east>\n");
-        sb.append("<west>" + bounds.getMinLon() + "</west>\n");
+        sb.append("<east>" + CoordinateFormat.formatLongitude(bounds.getMaxLon(), "DD.dddddd", false) + "</east>\n");
+        sb.append("<west>" + CoordinateFormat.formatLongitude(bounds.getMinLon(), "DD.dddddd", false) + "</west>\n");
         sb.append("</LatLonBox>\n");
 
     }
