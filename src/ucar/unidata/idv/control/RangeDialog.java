@@ -20,35 +20,23 @@
 
 package ucar.unidata.idv.control;
 
-
-import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Removable;
-
-
-import ucar.visad.display.*;
 
 import java.awt.*;
 import java.awt.event.*;
 
 import java.lang.reflect.*;
 
-import java.rmi.RemoteException;
-
 import java.util.ArrayList;
 
 import java.util.List;
 
 import javax.swing.*;
-
-import javax.swing.event.*;
-
-
 
 /**
  * A JFrame widget to get range info from the user.
@@ -165,12 +153,13 @@ public class RangeDialog implements RangeWidget, Removable {
                         || cmd.equals(GuiUtils.CMD_APPLY)) {
                     try {
                         Range newRange =
-                            new Range(
-                                Misc.parseNumber(rangeMinField.getText()),
-                                Misc.parseNumber(rangeMaxField.getText()));
+                                new Range(
+                                    Misc.parseNumber(rangeMinField.getText()),
+                                    Misc.parseNumber(rangeMaxField.getText()));
+                            handleNewRange(newRange);
                         handleNewRange(newRange);
                     } catch (NumberFormatException pe) {
-                        LogUtil.userMessage("Incorrect numeric format ");
+                        LogUtil.userMessage("Invalid numeric format");
                         return;
                     }
                 }
