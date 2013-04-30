@@ -20,10 +20,10 @@
 package ucar.unidata.idv.chooser;
 
 
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.input.SAXBuilder;
 
 import org.w3c.dom.Element;
 
@@ -435,15 +435,15 @@ public class TDSRadarChooser1 extends TimesChooser {
             //e.printStackTrace();
         }
 
-        org.jdom.Element rootElem    = doc.getRootElement();
-        org.jdom.Element serviceElem = readElements(rootElem, "service");
+        org.jdom2.Element rootElem    = doc.getRootElement();
+        org.jdom2.Element serviceElem = readElements(rootElem, "service");
         String           uriBase     = serviceElem.getAttributeValue("base");
-        org.jdom.Element dsElem      = readElements(rootElem, "dataset");
+        org.jdom2.Element dsElem      = readElements(rootElem, "dataset");
         String           naming      = "catalogRef";
         Namespace        nss         = rootElem.getNamespace("xlink");
         List             children    = dsElem.getChildren();
         for (int j = 0; j < children.size(); j++) {
-            org.jdom.Element child     = (org.jdom.Element) children.get(j);
+            org.jdom2.Element child     = (org.jdom2.Element) children.get(j);
             String           childName = child.getName();
             if (childName.equals(naming)) {
                 //String id   = child.getAttributeValue("ID");
@@ -469,11 +469,11 @@ public class TDSRadarChooser1 extends TimesChooser {
      *
      * @return an element
      */
-    public org.jdom.Element readElements(org.jdom.Element elem,
+    public org.jdom2.Element readElements(org.jdom2.Element elem,
                                          String eleName) {
         List children = elem.getChildren();
         for (int j = 0; j < children.size(); j++) {
-            org.jdom.Element child     = (org.jdom.Element) children.get(j);
+            org.jdom2.Element child     = (org.jdom2.Element) children.get(j);
             String           childName = child.getName();
             if (childName.equals(eleName)) {
                 return child;
