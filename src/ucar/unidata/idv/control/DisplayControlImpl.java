@@ -5798,8 +5798,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (selectRangeEnabled && (selectRange != null)) {
-            //            dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
-            //                                 SETTINGS_GROUP_DISPLAY);
+                        dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
+                                             SETTINGS_GROUP_DISPLAY);
         }
 
         if (contourInfo != null) {
@@ -7256,6 +7256,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public String getDefaultView() {
         ViewManager vm = getDefaultViewManager();
+        if ( !controlContext.getPersistenceManager().getSaveViewState() &&
+             !controlContext.getPersistenceManager().getSaveDataSources() &&
+             !controlContext.getPersistenceManager().getSaveData() &&
+             !controlContext.getPersistenceManager().getSaveJython() ) {
+            // this block is for the display template
+            return null;
+        }
         if ((vm != null) && (vm.getViewDescriptor() != null)) {
             return vm.getViewDescriptor().getName();
         }

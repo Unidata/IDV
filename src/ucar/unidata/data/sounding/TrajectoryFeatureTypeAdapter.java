@@ -22,6 +22,7 @@ package ucar.unidata.data.sounding;
 
 import ucar.nc2.constants.FeatureType;
 
+import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.ft.*;
 
 import ucar.unidata.data.BadDataException;
@@ -84,7 +85,7 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
         Formatter log = new Formatter();
         FeatureDatasetPoint dataset =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
-                FeatureType.TRAJECTORY, filename, null, log);
+                FeatureType.TRAJECTORY, DODSNetcdfFile.canonicalURL(filename), null, log);
         if(dataset == null){
             dataset =
                     (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
