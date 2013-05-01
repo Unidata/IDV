@@ -36,6 +36,7 @@ import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableEnhanced;
+import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridDataset;
@@ -1080,14 +1081,25 @@ public class GeoGridDataSource extends GridDataSource {
                       + timeName + "\" timeUnitsChange=\"true\">\n");
             for (int i = 0; i < sources.size(); i++) {
                 String s = sources.get(i).toString();
+
                 try {
-                    sb.append(
-                        XmlUtil.tag(
-                            "netcdf",
-                            XmlUtil.attrs(
-                                "location",
-                                IOUtil.getURL(s, getClass()).toString(),
-                                "enhance", "true"), ""));
+                    if(s.startsWith("http") && s.endsWith("entry.das"))  {  // opendap from ramadda
+                        s = DODSNetcdfFile.canonicalURL(s);
+                        sb.append(
+                                XmlUtil.tag(
+                                        "netcdf",
+                                        XmlUtil.attrs(
+                                                "location",
+                                                s,
+                                                "enhance", "true"), ""));
+                    } else
+                        sb.append(
+                            XmlUtil.tag(
+                                "netcdf",
+                                XmlUtil.attrs(
+                                    "location",
+                                    IOUtil.getURL(s, getClass()).toString(),
+                                    "enhance", "true"), ""));
                 } catch (IOException ioe) {
                     setInError(true);
                     throw new WrapperException(
@@ -1110,6 +1122,8 @@ public class GeoGridDataSource extends GridDataSource {
         try {
             file = convertSourceFile(file);
             Trace.msg("GeoGridDataSource: opening file " + file);
+            if(file.startsWith("http") && file.endsWith("entry.das")) // opendap from ramadda
+                file = DODSNetcdfFile.canonicalURL(file);
             GridDataset gds = GridDataset.open(file);
             return gds;
         } catch (java.io.FileNotFoundException fnfe) {
