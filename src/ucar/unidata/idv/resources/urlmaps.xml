@@ -6,18 +6,18 @@
     -->
     <urlmap
         type="opendap"
-        old="motherlode.ucar.edu/"
-        new="thredds.ucar.edu/"/>
+        old="motherlode.ucar.edu/thredds/"
+        new="thredds.ucar.edu/thredds/"/>
     <urlmap
         type="opendap"
-        old="motherlode.ucar.edu:8080/"
-        new="thredds.ucar.edu/"/>
+        old="motherlode.ucar.edu:8080/thredds/"
+        new="thredds.ucar.edu/thredds/"/>
     <urlmap
         type="opendap"
-        old="motherlode.ucar.edu:8081/"
-        new="thredds-test.ucar.edu/"/>
+        old="motherlode.ucar.edu:8081/thredds/"
+        new="thredds-test.ucar.edu/thredds/"/>
     <urlmap
         type="opendap"
-        old="motherlode.ucar.edu:9080/"
-        new="thredds-dev.ucar.edu/"/>
+        old="motherlode.ucar.edu:9080/thredds/"
+        new="thredds-dev.ucar.edu/thredds/"/>
 </urlmaps>
