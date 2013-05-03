@@ -2010,14 +2010,11 @@ public class GeoGridDataSource extends GridDataSource {
                 String msg3 = StringUtil.join("<br>", newDescription);
                 String label = "<html>" + msg1 + msg2 + "<i>" + msg3
                                + "</i></html>";
-                StringBuilder paramCats = new StringBuilder();
+                
+                List<DataCategory> cats = new ArrayList<DataCategory>();
                 for (String possibleNewName : newName) {
-                    paramCats.append("param:");
-                    paramCats.append(possibleNewName);
-                    paramCats.append(";");
+                    cats.add(new DataCategory("param:"+possibleNewName,false));
                 }
-                List cats =
-                    DataCategory.parseCategories(paramCats.toString());
 
                 DataOperand operand = new DataOperand(name, label, cats,
                                           false);
