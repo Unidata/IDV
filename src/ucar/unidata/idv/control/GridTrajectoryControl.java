@@ -1267,6 +1267,8 @@ public class GridTrajectoryControl extends DrawingControl {
                                 domain2D, alt);
         int numPoints = geoVals[0].length;
         //first step  init  u,v, w, and s at all initial points
+        LogUtil.consoleMessage("Calculation grid trajectory ");
+        LogUtil.message("Calculation grid trajectory...");
         List<GridTrajectory.TrajInfo> tj =
             GridTrajectory.calculateTrackPoints(u, v, w, s, ttts, geoVals,
                 numPoints, numTimes, latIndex, lonIndex, true, normalizeLon,
