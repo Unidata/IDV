@@ -2453,7 +2453,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 vm.getIdv().addDisplayControl(dc);
                 // searching for the shared group map view and move the control there 
                 List vmList = vm.getVMManager().getViewManagers();
-                 for(int i = 0; i < vmList.size(); i++) {
+                Boolean moved = false;
+                for(int i = 0; i < vmList.size(); i++) {
                     ViewManager vm0 = (ViewManager)vmList.get(i);
                     if(vm0 instanceof TransectViewManager){
                         String grp0 = (String)vm0.getShareGroup();
@@ -2464,13 +2465,29 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                     String grp1 = (String)vm1.getShareGroup();
                                     if(grp0.equals(grp1) && j != i){
                                         dc.moveTo(vm1);
+                                        moved = true;
                                         break;
                                     }
                                 }
                             }
                         }
                     }
-                }                    
+                }
+                if(!moved) {       
+                    if(dc.getDefaultViewManager() != null) {
+                        dc.moveTo(dc.getDefaultViewManager()); 
+                    } else{                       
+                        List vms =vm.getVMManager().getViewManagers();
+                        for(int i=0; i< vms.size(); i++){
+                            ViewManager mvm = (ViewManager)vms.get(i);
+                            if(mvm instanceof MapViewManager){
+                                dc.moveTo(mvm);
+                                break;
+                            }
+                        }
+                    }
+                    
+                }
             }
             return true;
         }
