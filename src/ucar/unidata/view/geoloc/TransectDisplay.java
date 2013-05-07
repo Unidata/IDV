@@ -944,7 +944,15 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
         LatLonPointImpl workPoint  = new LatLonPointImpl();
         for (int i = 0; i < xyzPoints[0].length; i++) {
             workPoint.set(linePoints[0][i], linePoints[1][i]);
-            labelTable.put(new Double(xyzPoints[0][i]), workPoint.toString());
+            String txtLabel;
+            if(i == 0)
+                txtLabel = workPoint.toString()+ " (B)";
+            else if (i == xyzPoints[0].length-1)
+                txtLabel =  workPoint.toString() + " (E)";
+            else
+                txtLabel = workPoint.toString();
+
+            labelTable.put(new Double(xyzPoints[0][i]), txtLabel);
         }
         latlonScale.setLabelTable(labelTable);
         latlonScale.setTickBase(xRange[0]);
