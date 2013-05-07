@@ -1109,7 +1109,7 @@ Since this is confusing and needs more work lets remove this for now
      icon="/auxdata/ui/icons/transect.png"
      label="Transect Drawing Control"
      displaycategory="General"
-     properties="windowVisible=true;showInTabs=false;">
+     properties="windowVisible=true;showInTabs=true;">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
