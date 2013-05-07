@@ -53,11 +53,7 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.ui.DataSelectionWidget;
-import ucar.unidata.idv.ui.DataSelector;
-import ucar.unidata.idv.ui.DataTreeDialog;
-import ucar.unidata.idv.ui.IdvComponentHolder;
-import ucar.unidata.idv.ui.IdvWindow;
+import ucar.unidata.idv.ui.*;
 import ucar.unidata.ui.DndImageButton;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.Help;
@@ -2450,6 +2446,32 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean isInTransectView() {
         ViewManager vm = getViewManager();
         if ((vm != null) && (vm instanceof TransectViewManager)) {
+            List tdcList = getIdv().getVMManager().findTransectDrawingControls();
+            if(tdcList.size() == 0) {
+               // ViewPanelImpl.VMInfo vmInfos = vm.get
+                DisplayControl dc = vm.getIdv().doMakeControl("transectdrawingcontrol");
+                vm.getIdv().addDisplayControl(dc);
+                // searching for the shared group map view and move the control there 
+                List vmList = vm.getVMManager().getViewManagers();
+                 for(int i = 0; i < vmList.size(); i++) {
+                    ViewManager vm0 = (ViewManager)vmList.get(i);
+                    if(vm0 instanceof TransectViewManager){
+                        String grp0 = (String)vm0.getShareGroup();
+                        if(vm0.getShareViews() && grp0 != null) {
+                            for(int j = 0; j < vmList.size(); j++){
+                                ViewManager vm1 = (ViewManager)vmList.get(j);
+                                if(vm1 instanceof MapViewManager) {
+                                    String grp1 = (String)vm1.getShareGroup();
+                                    if(grp0.equals(grp1) && j != i){
+                                        dc.moveTo(vm1);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }                    
+            }
             return true;
         }
         return false;
