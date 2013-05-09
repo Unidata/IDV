@@ -832,10 +832,6 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
             });
 
             categoryToggleBtn.addKeyListener(keyListener);
-            popupButton = GuiUtils.makeImageButton(
-                "/auxdata/ui/icons/Information16.gif", VMInfo.this,
-                "showPopupMenu");
-
 
             popupButton = new JButton(icon);
             popupButton.addKeyListener(keyListener);
