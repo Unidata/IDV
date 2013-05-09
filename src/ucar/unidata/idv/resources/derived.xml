@@ -587,8 +587,10 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
             append="Derived"
             childidx="0"
             categoryidx="0"/>
+         <category display="true" value="Grids"/>
         <category value="display:gridtrajectorycontrol1"/>
      </categories>
+
         <operands>
             <paramgroup categories="GRID-3D-*;" name="u_v_w"/>
             <paramgroup categories="GRID-3D-*;" name="GridRelative_uvw"/>
@@ -607,6 +609,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
             append="Derived"
             childidx="0"
             categoryidx="0"/>
+         <category display="true" value="Grids"/>
         <category value="display:gridtrajectorycontrol1"/>
      </categories>
      <operands>

@@ -225,7 +225,7 @@
      <operands>
      </operands>
   </derived>
-  <derived
+  <!-- derived
         description="Create 3D Flow Trajectory"
         formula="makeFlowTraj(u,v,w,s,s0)"
         id="gridFlowTraj"
@@ -238,8 +238,8 @@
           <category value="display:gridtrajectorycontrol"/>
       </categories>
     <operands/>
-  </derived>
-  <derived
+  </derived -->
+  <!-- derived
         description="Create 2D Flow Trajectory"
         formula="make2DFlowTraj(u,v,s,s0)"
         id="grid2DFlowTraj"
@@ -252,7 +252,7 @@
         <category value="display:gridtrajectorycontrol"/>
     </categories>
     <operands/>
-  </derived>
+  </derived -->
   <derived
      description="Find latitude of grid points"
      formula="extractLatitudeFromNWPGrid(fieldimpl)"
