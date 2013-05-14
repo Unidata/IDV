@@ -251,4 +251,45 @@ public class ImagePlanViewControl extends PlanViewControl {
         return true;
     }
 
+    /**
+     * _more_
+     */
+    public void viewpointChanged() {
+        // check if this is rubber band event, if not do nothing
+        super.viewpointChanged();
+        try {
+            reloadData();
+        } catch (Exception e) {}
+        System.out.println("hhhhh");
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected boolean shouldAddDisplayListener() {
+        return true;
+    }
+
+    /**
+     * Signal base class to add this as a control listener
+     *
+     * @return Add as control listener
+     */
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    protected void reloadData() throws RemoteException, VisADException {
+        //calcualte the mag factor, reset the data descriptor
+
+        // call the reloadDataSource()
+    }
 }
