@@ -3,10 +3,10 @@
 xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
 xmlns:xlink="http://www.w3.org/1999/xlink">
 
-<service name="ncdods" serviceType="OPENDAP" base="http://motherlode.ucar.edu:8080/thredds/dodsC/" />
+<service name="ncdods" serviceType="OPENDAP" base="http://thredds.ucar.edu/thredds/dodsC/" />
 
     <dataset name="Case Studies">
-    <catalogRef xlink:title="Data for Comet Case Study 039" xlink:href="http://motherlode.ucar.edu:8080/thredds/catalog/casestudies/ccs039Catalog.xml"/>
+    <catalogRef xlink:title="Data for Comet Case Study 039" xlink:href="http://thredds.ucar.edu/thredds/catalog/casestudies/ccs039Catalog.xml"/>
     </dataset>
 
     <dataset name="Sample Data">
