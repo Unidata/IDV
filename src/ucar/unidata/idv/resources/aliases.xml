@@ -108,7 +108,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="GP"
      label="Geopotential"
-     aliases="Geopotential"/>
+     aliases="Geopotential,Geopotential_isobaric"/>
   <alias
      name="ALTITUDE"
      label="Altitude"
