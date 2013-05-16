@@ -21,7 +21,12 @@
 package ucar.unidata.idv.control;
 
 
+import edu.wisc.ssec.mcidas.AreaDirectory;
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.imagery.AddeImageDataSource;
+import ucar.unidata.data.imagery.AddeImageDescriptor;
+import ucar.unidata.data.imagery.AddeImageInfo;
+import ucar.unidata.idv.chooser.adde.AddeImageChooser;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
@@ -34,6 +39,9 @@ import visad.VisADException;
 
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 
 /**
@@ -289,7 +297,31 @@ public class ImagePlanViewControl extends PlanViewControl {
      */
     protected void reloadData() throws RemoteException, VisADException {
         //calcualte the mag factor, reset the data descriptor
+        int eleMag = 1;
+        int lineMag = 1;
+        int lines = 1000;
+        int elems = 500;
 
+        //
+        List dsList = new ArrayList();
+
+        datachoice.getDataSources(dsList);
+        AddeImageDataSource adataSource = (AddeImageDataSource)dsList.get(0);
+        ArrayList imageList = (ArrayList)adataSource.getImageList();
+        for(int i = 0; i < imageList.size(); i++){
+            AddeImageDescriptor imageDescriptor = (AddeImageDescriptor)imageList.get(0);
+
+            AddeImageInfo info = imageDescriptor.getImageInfo();
+            info.setElementMag(eleMag);
+            info.setLineMag(lineMag);
+            info.setLocateKey("LATLON");
+            info.setLocateValue("57.400 160.300");
+            info.setPlaceValue("ULEFT");
+            info.setLines(lines);
+            info.setElements(elems);
+        }
+        adataSource.setImageList(imageList);
         // call the reloadDataSource()
     }
+
 }
