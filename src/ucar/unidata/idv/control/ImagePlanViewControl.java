@@ -31,13 +31,18 @@ import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
+import ucar.unidata.view.geoloc.MapProjectionDisplay;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
 
-import visad.FieldImpl;
-import visad.VisADException;
+import ucar.visad.display.RubberBandBox;
+import visad.*;
+import visad.georef.MapProjection;
 
 
+import javax.swing.*;
+import java.awt.event.InputEvent;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +68,7 @@ public class ImagePlanViewControl extends PlanViewControl {
     public ImagePlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
+
     }
 
     /**
@@ -262,9 +268,18 @@ public class ImagePlanViewControl extends PlanViewControl {
     /**
      * _more_
      */
+    Gridded2DSet last2DSet = null;
     public void viewpointChanged() {
         // check if this is rubber band event, if not do nothing
         super.viewpointChanged();
+        MapProjectionDisplay mpd =
+                (MapProjectionDisplay) getNavigatedDisplay();
+        RubberBandBox rubberBandBox = mpd.getRubberBandBox();
+        Gridded2DSet new2DSet = rubberBandBox.getBounds();
+        if(rubberBandBox != null && !new2DSet.equals(last2DSet)){
+            dosomething();
+            last2DSet = new2DSet;
+        }
         try {
             reloadData();
         } catch (Exception e) {}
@@ -312,6 +327,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             AddeImageDescriptor imageDescriptor = (AddeImageDescriptor)imageList.get(0);
 
             AddeImageInfo info = imageDescriptor.getImageInfo();
+            AreaDirectory dir =imageDescriptor.getDirectory() ;
             info.setElementMag(eleMag);
             info.setLineMag(lineMag);
             info.setLocateKey("LATLON");
@@ -324,4 +340,26 @@ public class ImagePlanViewControl extends PlanViewControl {
         // call the reloadDataSource()
     }
 
+    public void handleDisplayChanged11(DisplayEvent event) {
+        try {
+            int        id         = event.getId();
+            InputEvent inputEvent = event.getInputEvent();
+            int  a = event.getModifiers();
+            NavigatedDisplay navDisplay = getNavigatedDisplay();
+
+
+         /*   MouseBehavior mb =navDisplay.getDisplay().getDisplayRenderer().getMouseBehavior();
+            if ((id == DisplayEvent.MOUSE_PRESSED_LEFT  )
+                    && inputEvent.isShiftDown()) {
+                   
+                System.out.println("shift and rubber band " + id);
+            }   */
+        } catch (Exception e) {
+            logException("Handling display event changed", e);
+        }
+    }
+
+    protected  void dosomething()  {
+        System.out.println("hddddhhhh");
+    }
 }
