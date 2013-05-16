@@ -340,7 +340,7 @@ public class ImagePlanViewControl extends PlanViewControl {
         // call the reloadDataSource()
     }
 
-    public void handleDisplayChanged11(DisplayEvent event) {
+    public void handleDisplayChanged(DisplayEvent event) {
         try {
             int        id         = event.getId();
             InputEvent inputEvent = event.getInputEvent();
