@@ -22,10 +22,12 @@ package ucar.unidata.idv.control;
 
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
+import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.imagery.AddeImageDataSource;
 import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.data.imagery.AddeImageInfo;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.chooser.adde.AddeImageChooser;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.Misc;
@@ -38,10 +40,13 @@ import ucar.visad.display.Grid2DDisplayable;
 
 import ucar.visad.display.RubberBandBox;
 import visad.*;
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -275,15 +280,23 @@ public class ImagePlanViewControl extends PlanViewControl {
         MapProjectionDisplay mpd =
                 (MapProjectionDisplay) getNavigatedDisplay();
         RubberBandBox rubberBandBox = mpd.getRubberBandBox();
+
         Gridded2DSet new2DSet = rubberBandBox.getBounds();
         if(rubberBandBox != null && !new2DSet.equals(last2DSet)){
+            //now the rubberband is changed and the IDV is going to do sth.
+
             dosomething();
             last2DSet = new2DSet;
+            try {
+                EarthLocation el = mpd.getCenterPoint();
+                LatLonRect llr = mpd.getLatLonRect();
+                Rectangle rect = mpd.getScreenBounds();
+                reloadData("LATLON", el.toString(), "CENTER", 500, 500, -2, -2);
+                //locateKey, locateValue, PlaceValue, lines, elems, lineMag, eleMag
+            } catch (Exception e) {}
+            System.out.println("hhhhh");
         }
-        try {
-            reloadData();
-        } catch (Exception e) {}
-        System.out.println("hhhhh");
+
     }
 
     /**
@@ -310,12 +323,8 @@ public class ImagePlanViewControl extends PlanViewControl {
      * @throws RemoteException _more_
      * @throws VisADException _more_
      */
-    protected void reloadData() throws RemoteException, VisADException {
-        //calcualte the mag factor, reset the data descriptor
-        int eleMag = 1;
-        int lineMag = 1;
-        int lines = 1000;
-        int elems = 500;
+    protected void reloadData(String locateKey, String locateValue, String PlaceValue, int lines, int elems,
+                                int lineMag, int eleMag) throws RemoteException, VisADException {
 
         //
         List dsList = new ArrayList();
@@ -325,8 +334,8 @@ public class ImagePlanViewControl extends PlanViewControl {
         ArrayList imageList = (ArrayList)adataSource.getImageList();
         for(int i = 0; i < imageList.size(); i++){
             AddeImageDescriptor imageDescriptor = (AddeImageDescriptor)imageList.get(0);
-
             AddeImageInfo info = imageDescriptor.getImageInfo();
+
             AreaDirectory dir =imageDescriptor.getDirectory() ;
             info.setElementMag(eleMag);
             info.setLineMag(lineMag);
@@ -335,31 +344,26 @@ public class ImagePlanViewControl extends PlanViewControl {
             info.setPlaceValue("ULEFT");
             info.setLines(lines);
             info.setElements(elems);
+
+            AddeImageURL newURL = new AddeImageURL(info.getHost(), info.getRequestType(), info.getGroup(),
+                    info.getDescriptor(), info.getLocateKey(),
+                    info.getLocateValue(), info.getPlaceValue(), info.getLines(),
+                    info.getElements(), info.getLineMag(), info.getElementMag(), info.getBand(),
+                    info.getUnit(), info.getSpacing());
+            imageDescriptor.setSource(newURL.toString());
         }
-        adataSource.setImageList(imageList);
+
         // call the reloadDataSource()
     }
 
-    public void handleDisplayChanged(DisplayEvent event) {
-        try {
-            int        id         = event.getId();
-            InputEvent inputEvent = event.getInputEvent();
-            int  a = event.getModifiers();
-            NavigatedDisplay navDisplay = getNavigatedDisplay();
-
-
-         /*   MouseBehavior mb =navDisplay.getDisplay().getDisplayRenderer().getMouseBehavior();
-            if ((id == DisplayEvent.MOUSE_PRESSED_LEFT  )
-                    && inputEvent.isShiftDown()) {
-                   
-                System.out.println("shift and rubber band " + id);
-            }   */
-        } catch (Exception e) {
-            logException("Handling display event changed", e);
-        }
-    }
-
     protected  void dosomething()  {
+        List dsList = new ArrayList();
+
+        datachoice.getDataSources(dsList);
+        AddeImageDataSource adataSource = (AddeImageDataSource)dsList.get(0);
+        ArrayList imageList = (ArrayList)adataSource.getImageList();
         System.out.println("hddddhhhh");
     }
+
+
 }
