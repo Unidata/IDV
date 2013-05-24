@@ -21,12 +21,17 @@
 package ucar.unidata.idv.control;
 
 
-import edu.wisc.ssec.mcidas.AreaDirectory;
+import edu.wisc.ssec.mcidas.*;
 import edu.wisc.ssec.mcidas.adde.AddeImageURL;
+
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.grid.DerivedGridFactory;
 import ucar.unidata.data.imagery.AddeImageDataSource;
 import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.data.imagery.AddeImageInfo;
+import ucar.unidata.data.imagery.BandInfo;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.chooser.adde.AddeImageChooser;
 import ucar.unidata.util.ColorTable;
@@ -35,23 +40,34 @@ import ucar.unidata.util.Range;
 
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
+
+import ucar.visad.data.AreaImageFlatField;
+import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
 
 import ucar.visad.display.RubberBandBox;
+
 import visad.*;
+
+import visad.data.mcidas.AREACoordinateSystem;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.awt.geom.Rectangle2D;
+
 import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
+
+import javax.swing.*;
 
 
 /**
@@ -274,30 +290,40 @@ public class ImagePlanViewControl extends PlanViewControl {
      * _more_
      */
     Gridded2DSet last2DSet = null;
+
+    /**
+     * _more_
+     */
     public void viewpointChanged() {
-        // check if this is rubber band event, if not do nothing
-        super.viewpointChanged();
+        try {
+            // check if this is rubber band event, if not do nothing
+            if (isRubberBandBoxChanged()) {
+                reloadDataSource();
+            }
+        } catch (Exception e) {}
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isRubberBandBoxChanged() {
+
         MapProjectionDisplay mpd =
-                (MapProjectionDisplay) getNavigatedDisplay();
+            (MapProjectionDisplay) getNavigatedDisplay();
         RubberBandBox rubberBandBox = mpd.getRubberBandBox();
+        // get the displayCS here:
 
         Gridded2DSet new2DSet = rubberBandBox.getBounds();
-        if(rubberBandBox != null && !new2DSet.equals(last2DSet)){
-            //now the rubberband is changed and the IDV is going to do sth.
-
-            dosomething();
+        if ((rubberBandBox != null) && !new2DSet.equals(last2DSet)) {
             last2DSet = new2DSet;
-            try {
-                EarthLocation el = mpd.getCenterPoint();
-                LatLonRect llr = mpd.getLatLonRect();
-                Rectangle rect = mpd.getScreenBounds();
-                reloadData("LATLON", el.toString(), "CENTER", 500, 500, -2, -2);
-                //locateKey, locateValue, PlaceValue, lines, elems, lineMag, eleMag
-            } catch (Exception e) {}
-            System.out.println("hhhhh");
-        }
 
+            return true;
+        }
+        return false;
     }
+
 
     /**
      * _more_
@@ -315,54 +341,6 @@ public class ImagePlanViewControl extends PlanViewControl {
      */
     protected boolean shouldAddControlListener() {
         return true;
-    }
-
-    /**
-     * _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
-    protected void reloadData(String locateKey, String locateValue, String PlaceValue, int lines, int elems,
-                                int lineMag, int eleMag) throws RemoteException, VisADException {
-
-        //
-        List dsList = new ArrayList();
-
-        datachoice.getDataSources(dsList);
-        AddeImageDataSource adataSource = (AddeImageDataSource)dsList.get(0);
-        ArrayList imageList = (ArrayList)adataSource.getImageList();
-        for(int i = 0; i < imageList.size(); i++){
-            AddeImageDescriptor imageDescriptor = (AddeImageDescriptor)imageList.get(0);
-            AddeImageInfo info = imageDescriptor.getImageInfo();
-
-            AreaDirectory dir =imageDescriptor.getDirectory() ;
-            info.setElementMag(eleMag);
-            info.setLineMag(lineMag);
-            info.setLocateKey("LATLON");
-            info.setLocateValue("57.400 160.300");
-            info.setPlaceValue("ULEFT");
-            info.setLines(lines);
-            info.setElements(elems);
-
-            AddeImageURL newURL = new AddeImageURL(info.getHost(), info.getRequestType(), info.getGroup(),
-                    info.getDescriptor(), info.getLocateKey(),
-                    info.getLocateValue(), info.getPlaceValue(), info.getLines(),
-                    info.getElements(), info.getLineMag(), info.getElementMag(), info.getBand(),
-                    info.getUnit(), info.getSpacing());
-            imageDescriptor.setSource(newURL.toString());
-        }
-
-        // call the reloadDataSource()
-    }
-
-    protected  void dosomething()  {
-        List dsList = new ArrayList();
-
-        datachoice.getDataSources(dsList);
-        AddeImageDataSource adataSource = (AddeImageDataSource)dsList.get(0);
-        ArrayList imageList = (ArrayList)adataSource.getImageList();
-        System.out.println("hddddhhhh");
     }
 
 
