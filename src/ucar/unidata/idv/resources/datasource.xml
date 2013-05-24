@@ -138,7 +138,7 @@
   <datasource
      id="File.Grid,NetCDF.Grid,HTTPServer.Grid"
      factory="ucar.unidata.data.grid.GeoGridDataSource"
-     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd,GRID....$,\.grb2$,\.gb2$,\.gb1$"
+     patterns="\.nc$,\.nc4$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd,GRID....$,\.grb2$,\.gb2$,\.gb1$"
      fileselection="true"
      doesmultiples="false"
      label="Grid files (netCDF/GRIB/OPeNDAP/GEMPAK)">
@@ -195,7 +195,7 @@
   <datasource
      id="FILE.NETCDF"
      factory="ucar.unidata.data.grid.GeoGridDataSource"
-     patterns="\.nc$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$"
+     patterns="\.nc$,\.nc4$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$"
      label="netCDF files">
     <property
        name="icon"
