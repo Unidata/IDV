@@ -1078,7 +1078,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 };
 
                 JComponent[] lineMagComps =
-                    GuiUtils.makeSliderPopup(-SLIDER_MAX, SLIDER_MAX, 0,
+                    GuiUtils.makeSliderPopup(-SLIDER_MAX, 1, 0,
                                              lineListener);
                 lineMagSlider = (JSlider) lineMagComps[1];
                 lineMagSlider.setMajorTickSpacing(1);
@@ -1087,7 +1087,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 lineMagComps[0].setToolTipText(
                     "Change the line magnification");
                 JComponent[] elementMagComps =
-                    GuiUtils.makeSliderPopup(-SLIDER_MAX, SLIDER_MAX, 0,
+                    GuiUtils.makeSliderPopup(-SLIDER_MAX, 1, 0,
                                              elementListener);
                 elementMagSlider = (JSlider) elementMagComps[1];
                 elementMagSlider.setExtent(1);
