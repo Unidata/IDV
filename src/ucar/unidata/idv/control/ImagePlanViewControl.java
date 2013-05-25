@@ -299,6 +299,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             // check if this is rubber band event, if not do nothing
             if (isRubberBandBoxChanged()) {
                 reloadDataSource();
+                setProjectionInView(true);
             }
         } catch (Exception e) {}
     }

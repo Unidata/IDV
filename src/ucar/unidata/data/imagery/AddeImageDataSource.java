@@ -214,10 +214,9 @@ public class AddeImageDataSource extends ImageDataSource {
     public void reloadData() {
         // reset url based on rbb
         if (rubberBoxChanged()) {
-            rubberBoxToImageDescriptor();
+            geoSpaceSubset();
         }
         super.reloadData();
-
 
     }
 
@@ -225,7 +224,19 @@ public class AddeImageDataSource extends ImageDataSource {
     Gridded2DSet last2DSet = null;
 
     /** _more_ */
-    String baseSource = null;
+    String    baseSource = null;
+
+    /** _more_ */
+    AREAnav   baseAnav= null;
+
+    /** _more_ */
+    AddeImageDescriptor baseImageDescriptor = null;
+
+    /** _more_ */
+    int eMag;
+
+    /** _more_ */
+    int lMag;
 
     /**
      * _more_
@@ -281,7 +292,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
         for (int i = 0; i < imageList.size(); i++) {
             AddeImageDescriptor imageDescriptor =
-                (AddeImageDescriptor) imageList.get(0);
+                (AddeImageDescriptor) imageList.get(i);
             AddeImageInfo info = imageDescriptor.getImageInfo();
 
             AreaDirectory dir  = imageDescriptor.getDirectory();
@@ -304,6 +315,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                       info.getElementMag(), info.getBand(),
                                       info.getUnit(), info.getSpacing());
             imageDescriptor.setSource(newURL.toString());
+           // imageList.add(i,imageDescriptor );
         }
 
     }
@@ -313,7 +325,8 @@ public class AddeImageDataSource extends ImageDataSource {
     /**
      * _more_
      */
-    public void rubberBoxToImageDescriptor() {
+
+    public void geoSpaceSubset() {
         // check if this is rubber band event, if not do nothing
         ViewManager      vm            = getIdv().getViewManager();
         NavigatedDisplay navDisplay    = (NavigatedDisplay) vm.getMaster();
@@ -323,13 +336,18 @@ public class AddeImageDataSource extends ImageDataSource {
 
         //now the rubberband is changed and the IDV is going to do sth.
         try {
-            AddeImageDescriptor imageDescriptor =
-                (AddeImageDescriptor) imageList.get(0);
+
             //String baseSource0 = getBaseSource(imageDescriptor.getSource()) ;
             if (baseSource == null) {
-                baseSource = imageDescriptor.getSource();
+                baseImageDescriptor =
+                        (AddeImageDescriptor) imageList.get(0);
+
+                baseSource = baseImageDescriptor.getSource();
+                AreaFile   areaFile = new AreaFile(baseSource);
+                baseAnav = areaFile.getNavigation();
+                eMag = baseImageDescriptor.getImageInfo().getElementMag();
+                lMag = baseImageDescriptor.getImageInfo().getLineMag();
             }
-            AreaFile   areaFile = new AreaFile(baseSource);
 
             double[][] dd       = rubberBandBox.getBounds().getDoubles();
 
@@ -340,25 +358,25 @@ public class AddeImageDataSource extends ImageDataSource {
             EarthLocation elcenter = navDisplay.getEarthLocation((dd[0][0]
                                          + dd[0][1]) / 2, (dd[1][0]
                                              + dd[1][1]) / 2, 0);
-            AREAnav   anav   = areaFile.getNavigation();
+
 
             float[][] latlon = new float[2][1];
             latlon[1][0] = (float) ulpoint.getLongitude().getValue();
             latlon[0][0] = (float) ulpoint.getLatitude().getValue();
-            float[][] ulLinEle = anav.toLinEle(latlon);
+            float[][] ulLinEle = baseAnav.toLinEle(latlon);
 
             latlon[1][0] = (float) lrpoint.getLongitude().getValue();
             latlon[0][0] = (float) lrpoint.getLatitude().getValue();
-            float[][] lrLinEle   = anav.toLinEle(latlon);
+            float[][] lrLinEle   = baseAnav.toLinEle(latlon);
             int       displayNum = (int) rect.getWidth();
             int       lines      = (int) (lrLinEle[1][0] - ulLinEle[1][0])
-                                   * 2;
+                                   * Math.abs(lMag);
             int       elems      = (int) (lrLinEle[0][0] - ulLinEle[0][0])
-                                   * 2;
+                                   * Math.abs(eMag);
 
 
-            int eleMag = 1;  //calculateMagFactor(elems, (int)rect.getWidth());
-            int lineMag = 1;  //calculateMagFactor(lines, (int)rect.getHeight());
+            int eleMag = calculateMagFactor(elems, (int)rect.getWidth());
+            int lineMag = calculateMagFactor(lines, (int)rect.getHeight());
 
             int newLines;
             int newelems;
