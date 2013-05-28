@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2012 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,13 +21,41 @@
 package ucar.unidata.data.grid;
 
 
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
+
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
-
 import ucar.nc2.Attribute;
 import ucar.nc2.Group;
 import ucar.nc2.Variable;
@@ -45,9 +73,18 @@ import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
-
-
-import ucar.unidata.data.*;
+import ucar.unidata.data.BadDataException;
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataManager;
+import ucar.unidata.data.DataOperand;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -67,51 +104,16 @@ import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
-
 import ucar.unidata.xml.XmlUtil;
-
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
-
 import visad.Data;
 import visad.DateTime;
 import visad.FieldImpl;
 import visad.Real;
 import visad.VisADException;
-
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
-
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-
-import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
-
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 
 
 /**
@@ -723,6 +725,7 @@ public class GeoGridDataSource extends GridDataSource {
         Hashtable             catMap             = new Hashtable();
         Hashtable             currentDataChoices = new Hashtable();
 
+
         List                  displays = getIdv().getDisplayControls();
         for (int i = 0; i < displays.size(); i++) {
             List dataChoices =
@@ -746,6 +749,26 @@ public class GeoGridDataSource extends GridDataSource {
                 }
                 currentDataChoices.put(ddc.getName(), "");
             }
+        }
+
+        if (getDefaultSave()) {
+            List varNames = new ArrayList();
+
+            for (int i = 0; i < dataChoices.size(); i++) {
+                DataChoice dataChoice = (DataChoice) dataChoices.get(i);
+                if ( !(dataChoice instanceof DirectDataChoice)) {
+                    continue;
+                }
+                String name = dataChoice.getName();
+                //hack, hack, hack,
+                if (name.startsWith(PREFIX_GRIDRELATIVE)) {
+                    name = name.substring(PREFIX_GRIDRELATIVE.length());
+                }
+                if (currentDataChoices.get(name) != null) {
+                    varNames.add(name);
+                }
+            }
+            return writeNc(prefix, changeLinks, varNames);
         }
 
 
@@ -796,7 +819,7 @@ public class GeoGridDataSource extends GridDataSource {
         JTabbedPane tab      = new JTabbedPane(JTabbedPane.LEFT);
 
         for (int i = 0; i < categories.size(); i++) {
-            List comps = (List) catMap.get(categories.get(i));
+            List   comps      = (List) catMap.get(categories.get(i));
             JPanel innerPanel = GuiUtils.doLayout(comps, 3, GuiUtils.WT_NYN,
                                     GuiUtils.WT_N);
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
@@ -845,6 +868,20 @@ public class GeoGridDataSource extends GridDataSource {
             return null;
         }
 
+        return writeNc(prefix, changeLinks, varNames);
+    }
+
+    /**
+     * Write netCDF file.
+     *
+     * @param prefix  the prefix for the local file name
+     * @param changeLinks true to change the links
+     * @param varNames the var names to write
+     * 
+     * @return The list of files
+     */
+    private List writeNc(String prefix, boolean changeLinks, List varNames) {
+        Object       loadId;
         LatLonRect   llr           = null;
         int          hStride       = 1;
         int          zStride       = 1;
@@ -889,11 +926,6 @@ public class GeoGridDataSource extends GridDataSource {
                 geoSelectionPanel.initWith(doMakeGeoSelectionPanel());
             }
         }
-
-        //                       LatLonRect llbb, 
-        //                       boolean addLatLon,
-        //                       int horizStride, int stride_z, int stride_time) throws IOException, InvalidRangeException {
-
 
         List newFiles = Misc.newList(path);
         if (changeLinks) {
@@ -971,8 +1003,8 @@ public class GeoGridDataSource extends GridDataSource {
                     if (sb3d == null) {
                         sb3d = new StringBuffer();
                     }
-                    total *= size.getSizeZ();
-                    theSb = sb3d;
+                    total     *= size.getSizeZ();
+                    theSb     = sb3d;
                     sizeEntry = size.getSizeX() + "x" + size.getSizeY() + "x"
                                 + size.getSizeZ();
                 } else {
@@ -1083,23 +1115,17 @@ public class GeoGridDataSource extends GridDataSource {
                 String s = sources.get(i).toString();
 
                 try {
-                    if(s.startsWith("http") && s.endsWith("entry.das"))  {  // opendap from ramadda
+                    if (s.startsWith("http") && s.endsWith("entry.das")) {  // opendap from ramadda
                         s = DODSNetcdfFile.canonicalURL(s);
-                        sb.append(
-                                XmlUtil.tag(
-                                        "netcdf",
-                                        XmlUtil.attrs(
-                                                "location",
-                                                s,
-                                                "enhance", "true"), ""));
-                    } else
-                        sb.append(
-                            XmlUtil.tag(
-                                "netcdf",
-                                XmlUtil.attrs(
-                                    "location",
+                        sb.append(XmlUtil.tag("netcdf",
+                                XmlUtil.attrs("location", s, "enhance",
+                                    "true"), ""));
+                    } else {
+                        sb.append(XmlUtil.tag("netcdf",
+                                XmlUtil.attrs("location",
                                     IOUtil.getURL(s, getClass()).toString(),
                                     "enhance", "true"), ""));
+                    }
                 } catch (IOException ioe) {
                     setInError(true);
                     throw new WrapperException(
@@ -1122,8 +1148,9 @@ public class GeoGridDataSource extends GridDataSource {
         try {
             file = convertSourceFile(file);
             Trace.msg("GeoGridDataSource: opening file " + file);
-            if(file.startsWith("http") && file.endsWith("entry.das")) // opendap from ramadda
+            if (file.startsWith("http") && file.endsWith("entry.das")) {  // opendap from ramadda
                 file = DODSNetcdfFile.canonicalURL(file);
+            }
             GridDataset gds = GridDataset.open(file);
             return gds;
         } catch (java.io.FileNotFoundException fnfe) {
@@ -1195,7 +1222,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
 
-        Iterator iter = myDataset.getGrids().iterator();
+        Iterator  iter        = myDataset.getGrids().iterator();
         SortedSet uniqueTimes =
             Collections.synchronizedSortedSet(new TreeSet());
 
@@ -1394,7 +1421,7 @@ public class GeoGridDataSource extends GridDataSource {
             int    fromLevelIndex = -1;
             int    toLevelIndex   = -1;
             if ((fromLevel != null) && (toLevel != null)) {
-                long t1 = System.currentTimeMillis();
+                long t1        = System.currentTimeMillis();
                 List allLevels =
                     getAllLevels(dataChoice,
                                  new DataSelection(GeoSelection.STRIDE_BASE));
@@ -1407,7 +1434,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
 
 
-            long t1 = System.currentTimeMillis();
+            long           t1             = System.currentTimeMillis();
             GeoGridAdapter geoGridAdapter = makeGeoGridAdapter(dataChoice,
                                                 dataSelection, null,
                                                 fromLevelIndex, toLevelIndex,
@@ -1498,10 +1525,9 @@ public class GeoGridDataSource extends GridDataSource {
         }
         ucar.nc2.Dimension ensDim       = geoGrid.getEnsembleDimension();
         GeoSelection       geoSelection = ((givenDataSelection != null)
-                                           ? givenDataSelection
-                                               .getGeoSelection()
+                                           ? givenDataSelection.getGeoSelection()
                                            : null);
-        boolean needVolume =
+        boolean            needVolume   =
             ((geoGrid.getCoordinateSystem().getVerticalTransform() != null)
              && ((requestProperties != null)
                  && (requestProperties.get(
@@ -1774,7 +1800,7 @@ public class GeoGridDataSource extends GridDataSource {
             throws VisADException, RemoteException {
 
 
-        long millis = System.currentTimeMillis();
+        long millis    = System.currentTimeMillis();
         List allLevels =
             getAllLevels(dataChoice,
                          new DataSelection(GeoSelection.STRIDE_BASE));
@@ -1860,7 +1886,7 @@ public class GeoGridDataSource extends GridDataSource {
         List  allTimes    = null;
         if (times != null) {
             timeIndices = new int[times.size()];
-            allTimes =
+            allTimes    =
                 getGeoGridTimes((CoordinateAxis1DTime) geoGrid
                     .getCoordinateSystem().getTimeAxis1D());
             int numTimes = allTimes.size();
@@ -1918,8 +1944,8 @@ public class GeoGridDataSource extends GridDataSource {
                 && (givenDataSelection.getTimeDriverTimes() != null)) {
             CalendarDateTime t0 =
                 new CalendarDateTime((DateTime) times.get(0));
-            CalendarDate dt0 = t0.getCalendarDate();
-            CalendarDateTime t1 =
+            CalendarDate     dt0 = t0.getCalendarDate();
+            CalendarDateTime t1  =
                 new CalendarDateTime((DateTime) times.get(times.size() - 1));
             CalendarDate dt1 = t1.getCalendarDate();
             dateRange = CalendarDateRange.of(dt0, dt1);
@@ -2007,13 +2033,14 @@ public class GeoGridDataSource extends GridDataSource {
                     "The variable name has changed.  Please select a new match.<br><br>";
                 String msg2 = "Possible new names for the variable <i>"
                               + dc.getDescription() + "</i> are:<br><br>";
-                String msg3 = StringUtil.join("<br>", newDescription);
+                String msg3  = StringUtil.join("<br>", newDescription);
                 String label = "<html>" + msg1 + msg2 + "<i>" + msg3
                                + "</i></html>";
-                
+
                 List<DataCategory> cats = new ArrayList<DataCategory>();
                 for (String possibleNewName : newName) {
-                    cats.add(new DataCategory("param:"+possibleNewName,false));
+                    cats.add(new DataCategory("param:" + possibleNewName,
+                            false));
                 }
 
                 DataOperand operand = new DataOperand(name, label, cats,
@@ -2082,11 +2109,11 @@ public class GeoGridDataSource extends GridDataSource {
     private DataChoice makeDataChoiceFromGeoGrid(GeoGrid cfield,
             List allTimes, Hashtable timeToIndex) {
 
-        GridCoordSystem gcs    = cfield.getCoordinateSystem();
-        LatLonRect      llr    = gcs.getLatLonBoundingBox();
-        LatLonPointImpl lleft  = llr.getLowerLeftPoint();
-        LatLonPointImpl uright = llr.getUpperRightPoint();
-        double centerLat = lleft.getLatitude()
+        GridCoordSystem gcs       = cfield.getCoordinateSystem();
+        LatLonRect      llr       = gcs.getLatLonBoundingBox();
+        LatLonPointImpl lleft     = llr.getLowerLeftPoint();
+        LatLonPointImpl uright    = llr.getUpperRightPoint();
+        double          centerLat = lleft.getLatitude()
                            + (uright.getLatitude() - lleft.getLatitude())
                              / 2.0;
 
@@ -2163,10 +2190,8 @@ public class GeoGridDataSource extends GridDataSource {
             Hashtable props      = null;
             if ((sizeZ == 0) || (sizeZ == 1)) {
                 //if (sizeZ == 0) {
-                int xLength               =
-                    cfield.getXDimension().getLength();
-                int yLength               =
-                    cfield.getYDimension().getLength();
+                int xLength               = cfield.getXDimension().getLength();
+                int yLength               = cfield.getYDimension().getLength();
                 ucar.nc2.Dimension ensDim = cfield.getEnsembleDimension();
                 if (twoDDimensionsLabel == null) {
                     twoDDimensionsLabel = "Total grid size:  x: " + xLength
@@ -2223,12 +2248,9 @@ public class GeoGridDataSource extends GridDataSource {
 
             } else {  // if (sizeZ > 1)
                 // Have 3D field (we expect); usually sizeZ > 1:
-                int xLength               =
-                    cfield.getXDimension().getLength();
-                int yLength               =
-                    cfield.getYDimension().getLength();
-                int zLength               =
-                    cfield.getZDimension().getLength();
+                int xLength               = cfield.getXDimension().getLength();
+                int yLength               = cfield.getYDimension().getLength();
+                int zLength               = cfield.getZDimension().getLength();
                 ucar.nc2.Dimension ensDim = cfield.getEnsembleDimension();
                 if (xLength * yLength * zLength > max3D) {
                     max3D  = xLength * yLength * zLength;
@@ -2711,5 +2733,4 @@ public class GeoGridDataSource extends GridDataSource {
     public boolean getReverseTimes() {
         return reverseTimes;
     }
-
 }

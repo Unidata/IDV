@@ -3972,6 +3972,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     /** password */
     private String password;
 
+    /** Deafult save option */
+    private boolean defaultSave = false;
+
     /**
      * Show the password dialog
      *
@@ -4067,5 +4070,20 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
     }
 
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setDefaultSave(boolean defaultsave) {
+      this.defaultSave  = defaultsave;
+    }
+    
+    /**
+     * Gets the default save.
+     *
+     * @return the default save
+     */
+    public boolean getDefaultSave(){
+      return defaultSave;
+    }
 }
