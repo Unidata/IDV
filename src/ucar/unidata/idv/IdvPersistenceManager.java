@@ -28,7 +28,6 @@ import org.w3c.dom.Node;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
-import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.data.grid.GridDataSource;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -2110,6 +2109,35 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     }
 
 
+    /**
+     * For deselecting checkboxes.
+     */
+    private final class DeselectAL implements ActionListener {
+
+        /** _more_          */
+        private final JCheckBox cbx;
+
+        /**
+         * Instantiates a new deselect al.
+         *
+         * @param cbx the cbx
+         */
+        private DeselectAL(JCheckBox cbx) {
+            this.cbx = cbx;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param e _more_
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            cbx.setSelected(false);
+        }
+    }
+
+
 
     /**
      * Class DataSourceComponent For showing save guis
@@ -2151,19 +2179,25 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      */
     private List showDataEmbedGui(List dataSources) throws IOException {
 
-        List      fileDataSources = new ArrayList();
-        List      copyDataSources = new ArrayList();
-        List      fileComps       = new ArrayList();
-        List      copyComps       = new ArrayList();
-        List      notSavedLabels  = new ArrayList();
-        JCheckBox allCbx          = new JCheckBox("All", false);
-        JCheckBox defaultCbx        = new JCheckBox("Default", false);
+        List            fileDataSources = new ArrayList();
+        List            copyDataSources = new ArrayList();
+        List            fileComps       = new ArrayList();
+        List            copyComps       = new ArrayList();
+        List            notSavedLabels  = new ArrayList();
+        final JCheckBox defaultCbx      = new JCheckBox("Default", false);
+        final JCheckBox allCbx          = new JCheckBox("All", false);
+        defaultCbx.addActionListener(new DeselectAL(allCbx));
+        allCbx.addActionListener(new DeselectAL(defaultCbx));
+
+
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource          dataSource = (DataSource) dataSources.get(i);
-            List                files          = dataSource.getDataPaths();
+            List                files      = dataSource.getDataPaths();
             DataSourceComponent dsc = new DataSourceComponent(dataSource);
+            dsc.cbx.addActionListener(new DeselectAL(defaultCbx));
+            defaultCbx.addActionListener(new DeselectAL(dsc.cbx));
 
-            String              dataSourceName =
+            String dataSourceName =
                 DataSelector.getNameForDataSource(dataSource);
             if (dataSource.canSaveDataToLocalDisk()) {
                 copyDataSources.add(dsc);
@@ -2252,9 +2286,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             comps.add(GuiUtils.vbox(notSavedLabels));
         }
 
-        JPanel panel =
-            LayoutUtil.topCenterBottom(
-                defaultCbx, new JSeparator(SwingConstants.HORIZONTAL),
+        JPanel panel = LayoutUtil.topCenterBottom(defaultCbx,
+                           new JSeparator(SwingConstants.HORIZONTAL),
                            GuiUtils.vbox(comps));
         if ( !GuiUtils.askOkCancel("Save Data", panel)) {
             return null;
@@ -2268,7 +2301,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 (DataSourceComponent) copyDataSources.get(i);
             dsc.dataSource.setDefaultSave(defaultCbx.isSelected());
 
-            if (allCbx.isSelected() || dsc.cbx.isSelected() || defaultCbx.isSelected()) {
+            if (allCbx.isSelected() || dsc.cbx.isSelected()
+                    || defaultCbx.isSelected()) {
                 List files = dsc.dataSource.saveDataToLocalDisk(false,
                                  IOUtil.joinDir(dir, "data_" + i));
                 if (files == null) {
@@ -2283,7 +2317,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         for (int i = 0; i < fileDataSources.size(); i++) {
             DataSourceComponent dsc =
                 (DataSourceComponent) fileDataSources.get(i);
-            if (!allCbx.isSelected() && !dsc.cbx.isSelected() && !defaultCbx.isSelected()) {
+            if ( !allCbx.isSelected() && !dsc.cbx.isSelected()
+                    && !defaultCbx.isSelected()) {
                 continue;
             }
             DataSource dataSource    = dsc.dataSource;
