@@ -190,5 +190,60 @@ public class AddeImageDataSource extends ImageDataSource {
         }
         return newFiles;
     }
+    
+    /**
+     * For cases where each data value has an English meaning,
+     * (e.g., quality flags).  Useful for cursor readouts.
+     * 
+     * For AddeImageDataSource, used to return a description corresponding
+     * to values of the NEXRAD Hydrometeor Classification product.
+     * 
+     * @param val  the data value to translae
+     * @param dataChoiceName to determine what translation table to use
+     * @return the string translation of the data point 
+     */
+    public String getStringForDataValue(int val, String dataChoiceName) {
+        if (dataChoiceName.startsWith("7_Band16")) {
+            // this is the Hydrometeor Classification product
+            // list of codes found here:
+            // (51.2.2) http://www.roc.noaa.gov/wsr88d/PublicDocs/ICDs/2620003R.pdf
+            String str;
+            switch (val) {
+                case 0:  str = "SNR&lt;Threshold";  // black
+                         break;
+                case 10:  str = "Biological";  // medium gray
+                         break;
+                case 20:  str = "AP/Ground Clutter";  // dark gray
+                         break;
+                case 30:  str = "Ice Crystals";  // light pink
+                         break;
+                case 40:  str = "Dry Snow";  // light blue
+                         break;
+                case 50:  str = "Wet Snow";  // medium blue
+                         break;
+                case 60:  str = "Light-Moderate Rain";  // light green
+                         break;
+                case 70:  str = "Heavy Rain";  // medium green
+                         break;
+                case 80:  str = "Big Drops Rain";  // dark yellow
+                         break;
+                case 90:  str = "Graupel";  // medium pink
+                         break;
+                case 100: str = "Hail, Possibly With Rain";  // red
+                         break;
+                // classification algorithm reports "unknown type" here.
+                // How to distinguish this from "McV doesnt understand the code"?
+                case 140: str = "Unknown Type";  // purple
+                         break;
+                case 150: str = "RF";  // dark purple
+                         break;
+                default: str = "code undefined";
+                         break;
+            }
+            return str;
+        } else {
+            return "";
+        }
+    }
 
 }

@@ -24,6 +24,8 @@ package ucar.unidata.idv.control;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
@@ -276,10 +278,20 @@ public abstract class PlanViewControl extends GridDisplayControl {
         }
 
         if ((r != null) && !r.isMissing()) {
+            
+            // TODO: check length of getDataSource, handle intelligently...?
+            DataSource ds = (DataSource) getDataSources().get(0);
+            String translatedDataValue = ds.getStringForDataValue((int) r.getValue(), getDataChoice().getName());
+            String formatted = formatForCursorReadout(r);
+            if (!translatedDataValue.equals("")) {
+                // TODO: if we actually got a translatedDataValue back...
+                // we really better be in nearest neighbor sampling mode...
+                formatted = translatedDataValue;
+            }
 
             result.add("<tr><td>" + getMenuLabel()
                        + ":</td><td  align=\"right\">"
-                       + formatForCursorReadout(r) + ((currentLevel != null)
+                       + formatted + ((currentLevel != null)
                     ? ("@" + currentLevel)
                     : "") + "</td></tr>");
         }

@@ -599,5 +599,14 @@ public interface DataSource {
      * @param properties _more_
      */
     public void reloadData(Object object, Hashtable properties);
-
+    
+    /**
+     * For cases where each data value has an English meaning,
+     * (e.g., quality flags).  Useful for cursor readouts
+     * 
+     * @param val  the data value to translae
+     * @param dataChoiceName to determine what translation table to use
+     * @return the string translation of the data point 
+     */
+    public String getStringForDataValue(int val, String dataChoiceName);
 }
