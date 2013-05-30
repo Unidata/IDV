@@ -2272,7 +2272,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 List files = dsc.dataSource.saveDataToLocalDisk(false,
                                  IOUtil.joinDir(dir, "data_" + i));
                 if (files == null) {
-                    return null;
+                    continue;
                 }
                 dsc.files = files;
                 fileDataSources.add(dsc);
