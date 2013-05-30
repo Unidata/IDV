@@ -196,7 +196,7 @@ public class AddeImageDataSource extends ImageDataSource {
      * (e.g., quality flags).  Useful for cursor readouts.
      * 
      * For AddeImageDataSource, used to return a description corresponding
-     * to values of the NEXRAD Hydrometeor Classification product.
+     * to values of the NEXRAD L3 Hydrometeor Classification product.
      * 
      * @param val  the data value to translae
      * @param dataChoiceName to determine what translation table to use
@@ -237,12 +237,12 @@ public class AddeImageDataSource extends ImageDataSource {
                          break;
                 case 150: str = "RF";  // dark purple
                          break;
-                default: str = "code undefined";
+                default: str = "No translation available";
                          break;
             }
             return str;
         } else {
-            return "";
+            return null;
         }
     }
 

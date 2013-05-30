@@ -264,11 +264,21 @@ public abstract class PlanViewControl extends GridDisplayControl {
             return null;
         }
         List result = new ArrayList();
+        // TODO: check length of getDataSources, handle intelligently...?
+        DataSource ds = (DataSource) getDataSources().get(0);
+        boolean areWeTranslating = ds.hasStringForDataValue(getDataChoice().getName());
+        int samplingModeValue;
+        if (areWeTranslating) {
+            // Need to force NEAREST_NEIGHBOR we are going to convert
+            // the data value to an English meaning.  Wouldn't ever
+            // make sense to do WEIGHTED_AVERAGE for this case.
+            samplingModeValue = getSamplingModeValue(NEAREST_NEIGHBOR);
+        } else {
+            samplingModeValue = getSamplingModeValue(
+                getObjectStore().get(PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE));
+        }
         Real r = GridUtil.sampleToReal(
-                     currentSlice, el, animationValue,
-                     getSamplingModeValue(
-                         getObjectStore().get(
-                             PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
+                     currentSlice, el, animationValue, samplingModeValue);
         if (r != null) {
             ReadoutInfo readoutInfo = new ReadoutInfo(this, r, el,
                                           animationValue);
@@ -279,14 +289,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         if ((r != null) && !r.isMissing()) {
             
-            // TODO: check length of getDataSource, handle intelligently...?
-            DataSource ds = (DataSource) getDataSources().get(0);
-            String translatedDataValue = ds.getStringForDataValue((int) r.getValue(), getDataChoice().getName());
-            String formatted = formatForCursorReadout(r);
-            if (!translatedDataValue.equals("")) {
-                // TODO: if we actually got a translatedDataValue back...
-                // we really better be in nearest neighbor sampling mode...
-                formatted = translatedDataValue;
+            String formatted;
+            if (areWeTranslating) {
+                formatted = ds.getStringForDataValue(
+                        (int) r.getValue(), getDataChoice().getName());
+            } else {
+                formatted = formatForCursorReadout(r);
             }
 
             result.add("<tr><td>" + getMenuLabel()

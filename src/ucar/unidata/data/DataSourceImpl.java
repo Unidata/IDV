@@ -4076,7 +4076,24 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     public String getStringForDataValue(int val, String dataChoiceName) {
         // just return empty string for base class
-        return "";
+        return null;
+    }
+    
+    /**
+     * Determine whether we can convert a data point to an English meaning 
+     * for a given data choice name.  Needed for cursor readout functionality
+     * so it can determine whether to force NEAREST_NEIGHBOR sampling
+     * 
+     * @param dataChoiceName to determine whether we have a string translation table
+     * @return whether we can convert a data value to an English meaning
+     */
+    public boolean hasStringForDataValue(String dataChoiceName) {
+        // data value doesn't matter here...
+        if (getStringForDataValue(0, dataChoiceName) != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
