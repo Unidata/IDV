@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -2114,7 +2114,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      */
     private final class DeselectAL implements ActionListener {
 
-        /** _more_          */
+        /** _more_ */
         private final JCheckBox cbx;
 
         /**
@@ -2184,11 +2184,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         List            fileComps       = new ArrayList();
         List            copyComps       = new ArrayList();
         List            notSavedLabels  = new ArrayList();
-        final JCheckBox defaultCbx      = new JCheckBox("Default", false);
-        final JCheckBox allCbx          = new JCheckBox("All", false);
-        defaultCbx.addActionListener(new DeselectAL(allCbx));
-        allCbx.addActionListener(new DeselectAL(defaultCbx));
-
+        final JCheckBox defaultCbx      = new JCheckBox("All displayed data",
+                                         false);
 
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource          dataSource = (DataSource) dataSources.get(i);
@@ -2246,9 +2243,6 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
         if (copyComps.size() > 0) {
-            if (copyComps.size() > 1) {
-                copyComps.add(0, allCbx);
-            }
             copyComps.add(
                 0, new JLabel("Or select the data sources to include:"));
             if (copyComps.size() > 5) {
@@ -2301,8 +2295,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                 (DataSourceComponent) copyDataSources.get(i);
             dsc.dataSource.setDefaultSave(defaultCbx.isSelected());
 
-            if (allCbx.isSelected() || dsc.cbx.isSelected()
-                    || defaultCbx.isSelected()) {
+            if (dsc.cbx.isSelected() || defaultCbx.isSelected()) {
                 List files = dsc.dataSource.saveDataToLocalDisk(false,
                                  IOUtil.joinDir(dir, "data_" + i));
                 if (files == null) {
@@ -2317,8 +2310,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         for (int i = 0; i < fileDataSources.size(); i++) {
             DataSourceComponent dsc =
                 (DataSourceComponent) fileDataSources.get(i);
-            if ( !allCbx.isSelected() && !dsc.cbx.isSelected()
-                    && !defaultCbx.isSelected()) {
+            if ( !dsc.cbx.isSelected() && !defaultCbx.isSelected()) {
                 continue;
             }
             DataSource dataSource    = dsc.dataSource;
