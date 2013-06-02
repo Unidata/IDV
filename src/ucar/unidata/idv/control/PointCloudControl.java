@@ -936,7 +936,7 @@ public class PointCloudControl extends DrawingControl {
                 }
             }
             pts = Misc.copy(newPts, pointCnt);
-            FunctionType ft = (FunctionType) ((FlatField) data).getType();
+            FunctionType ft = (FunctionType) ((FlatField) points).getType();
             data = PointCloudDataSource.makeField(ft.getRange(), pts);
         }
 
