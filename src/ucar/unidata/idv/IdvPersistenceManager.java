@@ -40,6 +40,7 @@ import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LayoutUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectPair;
@@ -54,6 +55,7 @@ import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import visad.util.ThreadManager;
+
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -74,6 +76,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -86,8 +89,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
+
 
 /**
  * This class defines what is to be saved when we are
@@ -2106,13 +2113,38 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     }
 
 
+    /**
+     * For deselecting checkboxes.
+     */
+    private final class DeselectAL implements ActionListener {
+
+        /** _more_ */
+        private final JToggleButton cbx;
+
+        /**
+         * Instantiates a new deselect al.
+         *
+         * @param cbx the cbx
+         */
+        private DeselectAL(JToggleButton cbx) {
+            this.cbx = cbx;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param e _more_
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            cbx.setSelected(false);
+        }
+    }
+
+
 
     /**
      * Class DataSourceComponent For showing save guis
-     *
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.177 $
      */
     private static class DataSourceComponent {
 
@@ -2147,16 +2179,32 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      */
     private List showDataEmbedGui(List dataSources) throws IOException {
 
-        List      fileDataSources = new ArrayList();
-        List      copyDataSources = new ArrayList();
-        List      fileComps       = new ArrayList();
-        List      copyComps       = new ArrayList();
-        List      notSavedLabels  = new ArrayList();
-        JCheckBox allCbx          = new JCheckBox("All", false);
+        List fileDataSources = new ArrayList();
+        List copyDataSources = new ArrayList();
+        List fileComps       = new ArrayList();
+        List copyComps       = new ArrayList();
+        List notSavedLabels  = new ArrayList();
+        final JRadioButton defaultRB =
+            new JRadioButton("Save All Displayed Data", true);
+        final JRadioButton selectRB = new JRadioButton("Save Selected Data");
+        ButtonGroup        dataBG   = new ButtonGroup();
+        dataBG.add(defaultRB);
+        dataBG.add(selectRB);
+
         for (int i = 0; i < dataSources.size(); i++) {
             DataSource          dataSource = (DataSource) dataSources.get(i);
             List                files      = dataSource.getDataPaths();
             DataSourceComponent dsc = new DataSourceComponent(dataSource);
+            defaultRB.addActionListener(new DeselectAL(dsc.cbx));
+            // Can't use DeselectAL because you can't unselect a JRadioButton
+            dsc.cbx.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JCheckBox cbx = (JCheckBox) e.getSource();
+                    if (cbx.isSelected()) {
+                        selectRB.setSelected(true);
+                    }
+                }
+            });
 
             String dataSourceName =
                 DataSelector.getNameForDataSource(dataSource);
@@ -2178,8 +2226,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     continue;
                 }
                 fileDataSources.add(dsc);
+                dsc.cbx.setText(dataSourceName);
                 fileComps.add(dsc.cbx);
-                fileComps.add(new JLabel(dataSourceName));
+                //fileComps.add(new JLabel(dataSourceName));
                 long size = 0;
                 for (int fileIdx = 0; fileIdx < files.size(); fileIdx++) {
                     String file = files.get(fileIdx).toString();
@@ -2203,23 +2252,25 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         List comps = new ArrayList();
 
+        if ( !fileComps.isEmpty()) {
+            copyComps.add(new JSeparator(SwingConstants.HORIZONTAL));
+        }
         copyComps.addAll(fileComps);
 
 
         if (copyComps.size() > 0) {
-            if (copyComps.size() > 1) {
-                copyComps.add(0, allCbx);
-            }
-            copyComps.add(
-                0, new JLabel("Select the data sources to include:"));
+            comps.add(selectRB);
+            JComponent vcc = GuiUtils.inset(GuiUtils.vbox(copyComps), 10, 5);
+            //copyComps.add(
+            //    0, new JLabel("Or select the data sources to include:"));
             if (copyComps.size() > 5) {
-                JComponent sp = GuiUtils.makeScrollPane(
-                                    GuiUtils.top(GuiUtils.vbox(copyComps)),
-                                    300, 400);
-                sp.setPreferredSize(new Dimension(300, 400));
+                JComponent sp = GuiUtils.makeScrollPane(GuiUtils.top(vcc),
+                                    400, 400);
+                sp.setPreferredSize(new Dimension(400, 400));
                 comps.add(sp);
+
             } else {
-                comps.add(GuiUtils.vbox(copyComps));
+                comps.add(vcc);
             }
         }
 
@@ -2247,7 +2298,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             comps.add(GuiUtils.vbox(notSavedLabels));
         }
 
-        JComponent panel = GuiUtils.vbox(comps);
+        JPanel panel = LayoutUtil.topCenterBottom(defaultRB,
+                           GuiUtils.filler(), GuiUtils.vbox(comps));
         if ( !GuiUtils.askOkCancel("Save Data", panel)) {
             return null;
         }
@@ -2258,11 +2310,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         for (int i = 0; i < copyDataSources.size(); i++) {
             DataSourceComponent dsc =
                 (DataSourceComponent) copyDataSources.get(i);
-            if (allCbx.isSelected() || dsc.cbx.isSelected()) {
+            dsc.dataSource.setDefaultSave(defaultRB.isSelected());
+
+            if (dsc.cbx.isSelected() || defaultRB.isSelected()) {
                 List files = dsc.dataSource.saveDataToLocalDisk(false,
                                  IOUtil.joinDir(dir, "data_" + i));
                 if (files == null) {
-                    return null;
+                    continue;
                 }
                 dsc.files = files;
                 fileDataSources.add(dsc);
@@ -2273,7 +2327,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         for (int i = 0; i < fileDataSources.size(); i++) {
             DataSourceComponent dsc =
                 (DataSourceComponent) fileDataSources.get(i);
-            if ( !allCbx.isSelected() && !dsc.cbx.isSelected()) {
+            if ( !dsc.cbx.isSelected() && !defaultRB.isSelected()) {
                 continue;
             }
             DataSource dataSource    = dsc.dataSource;
@@ -3035,8 +3089,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             // check for old URLs, references to motherlode, remap urls if needed
 
             Trace.call1("Remapping URLs");
-            ServerUrlRemapper sur = new ServerUrlRemapper(getIdv());
-            Element bundleRoot = sur.remapUrlsInBundle(xml);
+            ServerUrlRemapper sur        = new ServerUrlRemapper(getIdv());
+            Element           bundleRoot = sur.remapUrlsInBundle(xml);
             if (bundleRoot == null) {
                 return;
             }
