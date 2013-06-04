@@ -83,6 +83,8 @@ public class DataOperand {
     /** Data categories */
     private List categories;
 
+    /** Data Choice associated with this operand. May be {@code null}. */
+    private DerivedDataChoice dataChoice;
 
     /** associated data */
     private Object data;
@@ -98,17 +100,18 @@ public class DataOperand {
      *
      */
     public DataOperand(String name) {
-        this(name, null);
+        this(null, name, null);
     }
 
     /**
-     * Create a new DataOperand
-     *
+     * Create a new DataOperand.
+     * 
+     * @param choice  Data choice associated with this operand. May be {@code null}.
      * @param name    name for this object
      * @param data    associated data
-     *
      */
-    public DataOperand(String name, Object data) {
+    public DataOperand(DerivedDataChoice choice, String name, Object data) {
+        this.dataChoice = choice;
         this.name = name;
         this.data = data;
         int idx1 = name.indexOf("[");
@@ -461,7 +464,24 @@ public class DataOperand {
         return timeIndices;
     }
 
-
+    /**
+     * Returns the Data Choice associated with this operand.
+     * 
+     * @return Either the associated data choice or {@code null}.
+     */
+    public DerivedDataChoice getDataChoice() {
+        return dataChoice;
+    }
+    
+    /**
+     * Sets the Data Choice associated with this operand.
+     * 
+     * @param choice Associated data choice. May be {@code null}.
+     */
+    public void setDataChoice(DerivedDataChoice choice) {
+        dataChoice = choice;
+    }
+    
     /**
      * Test
      *
