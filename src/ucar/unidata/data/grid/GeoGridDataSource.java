@@ -1613,8 +1613,7 @@ public class GeoGridDataSource extends GridDataSource {
         // just prior to loading data
         if ((readingFullGrid) && ( !fromBundle) && (warn)) {
             // check if interactive, if restoring from a bundle, and if file being loaded is remote
-            if ((getIdv().getViewManager().isInteractive())
-                    && ( !isLocalFile())) {
+            if (getIdv().getInteractiveMode() && ( !isLocalFile())) {
                 long total = 1;
                 // get dimensions (note that the time dimension returned does not take into
                 // account subsetting!
@@ -2027,7 +2026,7 @@ public class GeoGridDataSource extends GridDataSource {
                     ds.getDataVariable(possibleNewName).getDescription());
             }
             LogUtil.printMessage("Please update your bundle.");
-            if (getIdv().getViewManager().isInteractive()) {
+            if (getIdv().getInteractiveMode()) {
                 //Misc.printStack("findgrid", 10);
                 String msg1 =
                     "The variable name has changed.  Please select a new match.<br><br>";
