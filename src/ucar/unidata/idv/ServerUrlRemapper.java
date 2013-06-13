@@ -83,7 +83,7 @@ public class ServerUrlRemapper {
     private static final String BEST_REMAP_KEY = "best";
 
     /** key name for TDS hashmap for latest */
-    private static final String LATEST_REMAP_KEY = "latest";
+    private static final String FILES_REMAP_KEY = "files";
 
     /** TDS Service name for opendap */
     private static final String TDS_DODS_SERVICE = "/dodsC/";
@@ -229,6 +229,7 @@ public class ServerUrlRemapper {
         Boolean inDatasourceTag = false;
         Boolean inPropertyTag   = false;
         Boolean inSourcesTag    = false;
+        Boolean inDisplayControlsTag = false;
         String  oldPath, newPath, name, value;
 
 
@@ -241,6 +242,10 @@ public class ServerUrlRemapper {
             inDatasourceTag = true;
         }
 
+        if (attrName.contains("ucar.unidata.idv.control")) {
+            inDisplayControlsTag = true;
+        }
+
         Node thisNode;
         thisNode = walker.nextNode();
         while (thisNode != null) {
@@ -249,12 +254,15 @@ public class ServerUrlRemapper {
             if (value != null) {
                 if (value.equals(IdvConstants.ID_DATASOURCES)) {
                     inDatasourceTag = true;
+                } else if (value.equals(IdvConstants.ID_DISPLAYCONTROLS)) {
+                    inDisplayControlsTag = true;
                 } else if (topLevelTags.contains(value)) {
                     inDatasourceTag = false;
+                    inDisplayControlsTag = false;
                 }
             }
 
-            if (inDatasourceTag) {
+            if (inDatasourceTag || inDisplayControlsTag) {
                 if (name.equals("property")) {
                     propAttrs = (AttributeMap) thisNode.getAttributes();
                     attrName  = propAttrs.getNamedItem("name").getNodeValue();
@@ -397,12 +405,16 @@ public class ServerUrlRemapper {
         }
         String map = null;
 
+        map = FILES_REMAP_KEY;
         if (oldUrlPath.contains(LATEST_XML_NAME)) {
             oldUrlPath = oldUrlPath.split(LATEST_XML_NAME)[0];
-            map        = LATEST_REMAP_KEY;
         } else if ((oldUrlPath.contains(TDS_PRE_43_BEST_NAME))
                    || (oldUrlPath.contains(TDS_PRE_43_BEST_NAME_SUFFIX))) {
             map = BEST_REMAP_KEY;
+        } else {
+            String[] parts = oldUrlPath.split("/");
+            String fileName = parts[parts.length -1];
+            oldUrlPath = oldUrlPath.replace(fileName,"");
         }
 
         List<String> newUrlPaths = remapper.getMappedUrlPaths(oldUrlPath,
