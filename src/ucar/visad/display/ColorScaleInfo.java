@@ -364,7 +364,7 @@ public class ColorScaleInfo {
             orient    = ColorScale.getDefaultOrient(placement);
             x         = getX(orient, placement);
             y         = getY(orient, placement);
-            labelSide = placement.equals(RIGHT)
+            labelSide = (placement.equals(RIGHT) || placement.equals(BOTTOM))
                         ? ColorScale.SECONDARY
                         : ColorScale.PRIMARY;
         }
