@@ -458,8 +458,8 @@ public class FormulaDialog extends JFrame implements ActionListener {
         double[] stretchyY = new double[] { 0, 0, 0, 1 };
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         JPanel bottomPanel = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Description:"), descField,
-            GuiUtils.rLabel("Group:"), categoryBox,
+        	GuiUtils.rLabel("Tooltip:"), nameField,
+        	GuiUtils.rLabel("Group:"), categoryBox,
             GuiUtils.rLabel("Displays:"), radioBtnPanel,
             GuiUtils.top(allOnOffPanel), cdScroll,
         }, 2, GuiUtils.WT_NY, stretchyY);
@@ -609,8 +609,21 @@ public class FormulaDialog extends JFrame implements ActionListener {
         advancedBtn.addActionListener(advancedListener);
         advancedIconBtn.addActionListener(advancedListener);
         GuiUtils.tmpInsets = new Insets(4, 4, 0, 4);
+        /* In the original formula UI, the value entered for Name:
+         * was shown in the tool tip. The value entered 
+         * for Description: was shown in the Field Selector. 
+         * Users were finding this backwards. The entry box for 
+         * Description: has now been moved to the main tab and 
+         * the entry box for Name: has been moved to the advanced
+         * tab and the text header now reads Tooltip.  To make sure
+         * bundles were backward compatible, the XML tags were 
+         * unchanged. The value for the id tag is now what is
+         * entered for Tooltip:. The value for the description tag
+         * is now what is entered from Description: 
+         */
         Container topPanel = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Name:"), nameField,
+            GuiUtils.rLabel("Description:"), descField,
+        	
             GuiUtils.rLabel("       Formula:"),
             GuiUtils.centerRight(formulaField,
                                  GuiUtils.hbox(evalBtn, jythonBtn)),
