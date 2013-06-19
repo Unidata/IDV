@@ -22,28 +22,23 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.ui.FontSelector;
-
-
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
 
-import ucar.visad.display.ColorScale;
 import ucar.visad.display.ColorScaleInfo;
 
-import java.awt.*;
-import java.awt.event.*;
 
-import java.io.*;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.rmi.RemoteException;
-
-import java.util.*;
-
-import javax.swing.*;
-
-import javax.swing.event.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
 
 
 /**
@@ -178,6 +173,7 @@ public class ColorScaleDialog implements ActionListener {
         myInfo.setLabelFont(fontSelector.getFont());
         try {
             if (displayControl != null) {
+                myInfo.setUnit(displayControl.getDisplayUnit());
                 displayControl.setColorScaleInfo(
                     new ColorScaleInfo(getInfo()));
             }
@@ -195,12 +191,12 @@ public class ColorScaleDialog implements ActionListener {
      */
     private void doMakeContents(boolean showDialog) {
         placementBox = new JComboBox(positions);
-        colorSwatch = new GuiUtils.ColorSwatch(myInfo.getLabelColor(),
+        colorSwatch  = new GuiUtils.ColorSwatch(myInfo.getLabelColor(),
                 "Color Scale Label Color");
         final JComponent colorComp = colorSwatch.getSetPanel();
         visibilityCbx = new JCheckBox("", myInfo.getIsVisible());
-        alphaCbx = new JCheckBox("", myInfo.getUseAlpha());
-        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
+        alphaCbx      = new JCheckBox("", myInfo.getUseAlpha());
+        fontSelector  = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
         fontSelector.setFont(myInfo.getLabelFont());
 

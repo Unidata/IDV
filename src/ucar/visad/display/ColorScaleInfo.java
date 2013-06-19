@@ -21,10 +21,10 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.ui.drawing.Glyph;
-import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.StringUtil;
+
+import visad.Unit;
+
 
 import java.awt.Color;
 import java.awt.Font;
@@ -99,6 +99,9 @@ public class ColorScaleInfo {
 
     /** This keeps track of whether we need to update the X, Y and orientation */
     private boolean dirty = true;
+
+    /** The unit of the info displayed in the color scale */
+    private Unit unit;
 
     /** default ctor */
     public ColorScaleInfo() {
@@ -238,6 +241,7 @@ public class ColorScaleInfo {
         this.isVisible    = that.isVisible;
         this.labelVisible = that.labelVisible;
         this.useAlpha     = that.useAlpha;
+        this.unit         = that.unit;
     }
 
     /**
@@ -526,7 +530,7 @@ public class ColorScaleInfo {
 
     /**
      *     Gets the useAlpha property
-     *    
+     *
      *     @return the useAlpha
      */
     public boolean getUseAlpha() {
@@ -586,6 +590,24 @@ public class ColorScaleInfo {
     public String toString() {
         return "placement:" + placement + " orient:" + orient
                + " label side: " + labelSide + " x/y:" + x + "/" + y;
+    }
+
+    /**
+     * Sets the unit.
+     *
+     * @param unit the new unit
+     */
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
+
+    /**
+     * Gets the unit.
+     *
+     * @return the unit
+     */
+    public Unit getUnit() {
+        return unit;
     }
 
 }

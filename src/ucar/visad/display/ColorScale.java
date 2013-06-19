@@ -21,31 +21,42 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-import ucar.visad.Util;
-
-import visad.*;
-
-import visad.bom.*;
-
-import visad.java2d.*;
-
-import visad.util.HersheyFont;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-
 import java.rmi.RemoteException;
-
-import java.text.DecimalFormat;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.visad.Util;
+import visad.ConstantMap;
+import visad.DataRenderer;
+import visad.Display;
+import visad.DisplayImpl;
+import visad.Integer1DSet;
+import visad.MouseBehavior;
+import visad.PlotText;
+import visad.ProjectionControl;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.ShadowType;
+import visad.ShapeControl;
+import visad.TextControl;
+import visad.Unit;
+import visad.VisADException;
+import visad.VisADGeometryArray;
+import visad.VisADLineArray;
+import visad.VisADTriangleArray;
+import visad.java2d.DefaultRendererJ2D;
+import visad.java2d.DisplayRendererJ2D;
+import visad.util.HersheyFont;
 
 
 /**
@@ -177,6 +188,9 @@ public class ColorScale extends DisplayableData {
     /** use alpha when drawing */
     private boolean useAlpha = false;
 
+    /** The unit of the info displayed in the color scale */
+    private Unit unit;
+
     /**
      * Construct a new <code>ColorScale</code> with the given name
      * and default orientation.
@@ -278,6 +292,7 @@ public class ColorScale extends DisplayableData {
         labelSide    = info.getLabelSide();
         labelVisible = info.getLabelVisible();
         useAlpha     = info.getUseAlpha();
+        unit         = info.getUnit();
         setVisible(info.getIsVisible());
         setUpScalarMaps();
         makeShapes();
@@ -336,8 +351,9 @@ public class ColorScale extends DisplayableData {
         labelColor   = info.getLabelColor();
         labelSide    = info.getLabelSide();
         labelVisible = info.getLabelVisible();
-        useAlpha = info.getUseAlpha();
+        useAlpha     = info.getUseAlpha();
         setVisible(info.getIsVisible());
+        unit = info.getUnit();
         makeShapes();
     }
 
@@ -385,7 +401,7 @@ public class ColorScale extends DisplayableData {
 
     /**
      *     Gets the useAlpha property
-     *    
+     *
      *     @return the useAlpha
      */
     public boolean getUseAlpha() {
@@ -555,6 +571,7 @@ public class ColorScale extends DisplayableData {
         if (getDisplay() == null) {
             return;
         }
+        
         calculateScaleBounds();
         Vector shapeVector = new Vector();
         if (colorPalette != null) {
@@ -619,7 +636,7 @@ public class ColorScale extends DisplayableData {
                                        ? 4
                                        : 3;
         int     numTriangles         = numColours * 2;
-        float[] triangles =
+        float[] triangles            =
             new float[numTriangles * numPointsPerTriangle * numValuesPerPoint];
         byte[] colors =
             new byte[numTriangles * numPointsPerTriangle * numColoursPerPoint];
@@ -793,11 +810,11 @@ public class ColorScale extends DisplayableData {
     private VisADLineArray createOutline(float width, float height)
             throws VisADException {
 
-        int numPoints = 4;  // four corners, plus the start again to close
-        int numValuesPerPoint = 3;
-        int numPointsPerLine  = 2;
+        int     numPoints = 4;  // four corners, plus the start again to close
+        int     numValuesPerPoint = 3;
+        int     numPointsPerLine  = 2;
 
-        float[] outline =
+        float[] outline           =
             new float[numPoints * numPointsPerLine * numValuesPerPoint];
 
         float[] rgb;
@@ -811,9 +828,9 @@ public class ColorScale extends DisplayableData {
         } else {
             rgb = labelColor.getColorComponents(null);
         }
-        byte red   = ShadowType.floatToByte(rgb[0]);
-        byte green = ShadowType.floatToByte(rgb[1]);
-        byte blue  = ShadowType.floatToByte(rgb[2]);
+        byte   red    = ShadowType.floatToByte(rgb[0]);
+        byte   green  = ShadowType.floatToByte(rgb[1]);
+        byte   blue   = ShadowType.floatToByte(rgb[2]);
         byte[] colors =
             new byte[numPoints * numPointsPerLine * numValuesPerPoint];
         int   colorIndex = 0;
@@ -1030,6 +1047,34 @@ public class ColorScale extends DisplayableData {
                 lineArrayVector.add(label);
             }
         }
+        
+        double   val_unit   = Math.abs(highRange - lowRange) / (range);
+        double[] point_unit = new double[3];
+        for (int j = 0; j < 3; j++) {
+            point_unit[j] = (1.0 - val_unit) * startn[j]
+                            + val_unit * startp[j] - dist * up[j];
+        }
+        if (unit != null) {
+            if (labelFont == null) {
+                VisADLineArray label = PlotText.render_label(unit+"",
+                                           point_unit, base, updir,
+                                           justification);
+                lineArrayVector.add(label);
+            } else if (labelFont instanceof Font) {
+                VisADTriangleArray label = PlotText.render_font(unit+"",
+                                               (Font) labelFont, point_unit,
+                                               base, updir, justification);
+                labelArrayVector.add(label);
+            } else if (labelFont instanceof HersheyFont) {
+                VisADLineArray label = PlotText.render_font(unit+"",
+                                           (HersheyFont) labelFont,
+                                           point_unit, base, updir,
+                                           justification);
+                lineArrayVector.add(label);
+            }
+
+        }
+
         // merge the line arrays
         VisADLineArray     lineLabels = null;
         VisADTriangleArray triLabels  = null;
@@ -1348,4 +1393,6 @@ public class ColorScale extends DisplayableData {
         }
         return y;
     }
+        
+    
 }
