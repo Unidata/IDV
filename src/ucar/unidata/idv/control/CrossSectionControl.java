@@ -1859,7 +1859,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             throws VisADException {
 
         float[][] elp    = GridUtil.getEarthLocationPoints(domainSet);
-        float[]   values = elp[2];
+        float[]   values = null;
+        if(elp.length == 2){
+            values = elp[1];
+        } else if(elp.length == 3){
+            values = elp[2];
+        }
 
         float     pMin   = values[0];
         float     pMax   = values[0];
