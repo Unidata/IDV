@@ -215,7 +215,8 @@ public class RangeDialog implements RangeWidget, Removable {
      */
     public void setRangeFromPopup(String cmd) {
         Range r = null;
-        if(displayControl instanceof CrossSectionControl){
+        if(!(displayControl instanceof DataTransectControl) &&
+                displayControl instanceof CrossSectionControl){
             CrossSectionControl csc = (CrossSectionControl)displayControl;
             if (cmd.equals(CMD_RANGE_DATA)) {
                 r = csc.getDataVerticalRange();
