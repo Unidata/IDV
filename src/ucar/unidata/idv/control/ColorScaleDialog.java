@@ -75,6 +75,9 @@ public class ColorScaleDialog implements ActionListener {
     /** checkbox for visibility */
     private JCheckBox visibilityCbx;
 
+    /** checkbox for unit display */
+    private JCheckBox unitCbx;
+
     /** checkbox for label visibility */
     private JCheckBox labelVisibilityCbx;
 
@@ -125,6 +128,7 @@ public class ColorScaleDialog implements ActionListener {
         }
         //orientationBox.setSelectedItem(myInfo.getOrientation());
         visibilityCbx.setSelected(myInfo.getIsVisible());
+        unitCbx.setSelected(myInfo.isUnitVisible());
         labelVisibilityCbx.setSelected(myInfo.getLabelVisible());
         alphaCbx.setSelected(myInfo.getUseAlpha());
 
@@ -168,6 +172,7 @@ public class ColorScaleDialog implements ActionListener {
         }
         myInfo.setLabelColor(colorSwatch.getSwatchColor());
         myInfo.setIsVisible(visibilityCbx.isSelected());
+        myInfo.setUnitVisible(unitCbx.isSelected());
         myInfo.setLabelVisible(labelVisibilityCbx.isSelected());
         myInfo.setUseAlpha(alphaCbx.isSelected());
         myInfo.setLabelFont(fontSelector.getFont());
@@ -195,6 +200,7 @@ public class ColorScaleDialog implements ActionListener {
                 "Color Scale Label Color");
         final JComponent colorComp = colorSwatch.getSetPanel();
         visibilityCbx = new JCheckBox("", myInfo.getIsVisible());
+        unitCbx       = new JCheckBox("", myInfo.isUnitVisible());
         alphaCbx      = new JCheckBox("", myInfo.getUseAlpha());
         fontSelector  = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
@@ -212,6 +218,7 @@ public class ColorScaleDialog implements ActionListener {
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         contents           = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Visible: "), visibilityCbx,
+            GuiUtils.rLabel("Display Unit: "), unitCbx,
             //GuiUtils.leftRight(visibilityCbx, GuiUtils.flow( new Component[] {GuiUtils.rLabel("  Show Transparency: "), alphaCbx})),
             GuiUtils.rLabel("Position: "),
             GuiUtils.leftRight(placementBox, GuiUtils.filler()),

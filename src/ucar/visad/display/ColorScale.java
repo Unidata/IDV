@@ -21,18 +21,11 @@
 package ucar.visad.display;
 
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.rmi.RemoteException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
+
 import ucar.visad.Util;
+
 import visad.ConstantMap;
 import visad.DataRenderer;
 import visad.Display;
@@ -54,9 +47,23 @@ import visad.VisADException;
 import visad.VisADGeometryArray;
 import visad.VisADLineArray;
 import visad.VisADTriangleArray;
+
 import visad.java2d.DefaultRendererJ2D;
 import visad.java2d.DisplayRendererJ2D;
+
 import visad.util.HersheyFont;
+
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+
+import java.rmi.RemoteException;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -191,6 +198,9 @@ public class ColorScale extends DisplayableData {
     /** The unit of the info displayed in the color scale */
     private Unit unit;
 
+    /** Is the unit displayed on color scale */
+    private boolean unitVisible;
+
     /**
      * Construct a new <code>ColorScale</code> with the given name
      * and default orientation.
@@ -293,6 +303,8 @@ public class ColorScale extends DisplayableData {
         labelVisible = info.getLabelVisible();
         useAlpha     = info.getUseAlpha();
         unit         = info.getUnit();
+        unitVisible  = info.isUnitVisible();
+
         setVisible(info.getIsVisible());
         setUpScalarMaps();
         makeShapes();
@@ -352,6 +364,7 @@ public class ColorScale extends DisplayableData {
         labelSide    = info.getLabelSide();
         labelVisible = info.getLabelVisible();
         useAlpha     = info.getUseAlpha();
+        unitVisible  = info.isUnitVisible();
         setVisible(info.getIsVisible());
         unit = info.getUnit();
         makeShapes();
@@ -397,6 +410,24 @@ public class ColorScale extends DisplayableData {
      */
     public boolean getLabelVisble() {
         return labelVisible;
+    }
+
+    /**
+     * Checks if is unit visible.
+     *
+     * @return true, if is unit visible
+     */
+    public boolean isUnitVisible() {
+        return unitVisible;
+    }
+
+    /**
+     * Sets the unit visible.
+     *
+     * @param unitVisible the new unit visible
+     */
+    public void setUnitVisible(boolean unitVisible) {
+        this.unitVisible = unitVisible;
     }
 
     /**
@@ -571,7 +602,7 @@ public class ColorScale extends DisplayableData {
         if (getDisplay() == null) {
             return;
         }
-        
+
         calculateScaleBounds();
         Vector shapeVector = new Vector();
         if (colorPalette != null) {
@@ -1003,6 +1034,32 @@ public class ColorScale extends DisplayableData {
             return null;
         }
 
+        double   val_unit   = Math.abs(highRange - lowRange) / (range);
+        double[] point_unit = new double[3];
+        for (int j = 0; j < 3; j++) {
+            point_unit[j] = (1.0 - val_unit) * startn[j]
+                            + val_unit * startp[j] - dist * up[j];
+        }
+        if ((unit != null) && unitVisible) {
+            if (labelFont == null) {
+                VisADLineArray label = PlotText.render_label(unit + "",
+                                           point_unit, base, updir,
+                                           justification);
+                lineArrayVector.add(label);
+            } else if (labelFont instanceof Font) {
+                VisADTriangleArray label = PlotText.render_font(unit + "",
+                                               (Font) labelFont, point_unit,
+                                               base, updir, justification);
+                labelArrayVector.add(label);
+            } else if (labelFont instanceof HersheyFont) {
+                VisADLineArray label = PlotText.render_font(unit + "",
+                                           (HersheyFont) labelFont,
+                                           point_unit, base, updir,
+                                           justification);
+                lineArrayVector.add(label);
+            }
+        }
+
         for (Enumeration e = labelTable.keys(); e.hasMoreElements(); ) {
             Double Value;
             try {
@@ -1023,6 +1080,14 @@ public class ColorScale extends DisplayableData {
                            - dist * up[j];
 
             }
+
+            //Don't have unit stomping on the label
+            if (unitVisible && (point[0] == point_unit[0])
+                    && (point[1] == point_unit[1])
+                    && (point[2] == point_unit[2])) {
+                continue;
+            }
+
             /*
             System.out.println("For label = " + Value.doubleValue() + "(" + val + "), point is (" + point[0] + "," + point[1] + "," + point[2] + ")");
             */
@@ -1046,33 +1111,6 @@ public class ColorScale extends DisplayableData {
                                          base, updir, justification);
                 lineArrayVector.add(label);
             }
-        }
-        
-        double   val_unit   = Math.abs(highRange - lowRange) / (range);
-        double[] point_unit = new double[3];
-        for (int j = 0; j < 3; j++) {
-            point_unit[j] = (1.0 - val_unit) * startn[j]
-                            + val_unit * startp[j] - dist * up[j];
-        }
-        if (unit != null) {
-            if (labelFont == null) {
-                VisADLineArray label = PlotText.render_label(unit+"",
-                                           point_unit, base, updir,
-                                           justification);
-                lineArrayVector.add(label);
-            } else if (labelFont instanceof Font) {
-                VisADTriangleArray label = PlotText.render_font(unit+"",
-                                               (Font) labelFont, point_unit,
-                                               base, updir, justification);
-                labelArrayVector.add(label);
-            } else if (labelFont instanceof HersheyFont) {
-                VisADLineArray label = PlotText.render_font(unit+"",
-                                           (HersheyFont) labelFont,
-                                           point_unit, base, updir,
-                                           justification);
-                lineArrayVector.add(label);
-            }
-
         }
 
         // merge the line arrays
@@ -1393,6 +1431,5 @@ public class ColorScale extends DisplayableData {
         }
         return y;
     }
-        
-    
+
 }

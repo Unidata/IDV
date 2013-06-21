@@ -103,6 +103,9 @@ public class ColorScaleInfo {
     /** The unit of the info displayed in the color scale */
     private Unit unit;
 
+    /** Is the unit displayed on color scale */
+    private boolean unitVisible;
+
     /** default ctor */
     public ColorScaleInfo() {
         this("ColorScaleInfo");
@@ -242,6 +245,7 @@ public class ColorScaleInfo {
         this.labelVisible = that.labelVisible;
         this.useAlpha     = that.useAlpha;
         this.unit         = that.unit;
+        this.unitVisible  = that.unitVisible;
     }
 
     /**
@@ -610,4 +614,21 @@ public class ColorScaleInfo {
         return unit;
     }
 
+    /**
+     * Checks if is unit visible.
+     *
+     * @return true, if is unit visible
+     */
+    public boolean isUnitVisible() {
+        return unitVisible;
+    }
+
+    /**
+     * Sets the unit visible.
+     *
+     * @param unitVisible the new unit visible
+     */
+    public void setUnitVisible(boolean unitVisible) {
+        this.unitVisible = unitVisible;
+    }
 }
