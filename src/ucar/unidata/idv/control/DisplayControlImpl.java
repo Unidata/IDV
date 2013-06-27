@@ -6097,7 +6097,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (csd != null) {
             csd.doApply();
         }
-
+        if(idFld == null)
+            return true;
         setId(idFld.getText());
         visbilityAnimationPause = new Integer(
             visbilityAnimationPauseFld.getText().trim()).intValue();
