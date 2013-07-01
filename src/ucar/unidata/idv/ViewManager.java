@@ -7679,8 +7679,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param displayControl  the time driver control
      */
     public void ensureOnlyOneTimeDriver(DisplayControl displayControl) {
-        if (getAnimationInfo() != null
-                & getAnimationInfo().getAnimationSetInfo().getActive()) {
+        if (getAnimationInfo() != null && getAnimationInfo().getAnimationSetInfo() != null 
+                && getAnimationInfo().getAnimationSetInfo().getActive()) {
             AnimationInfo ai = getAnimationWidget().getAnimationInfo();
             ai.getAnimationSetInfo().setIsTimeDriver(false);
             getAnimationWidget().setProperties(ai);
