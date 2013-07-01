@@ -154,8 +154,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -1319,7 +1317,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
         };
         JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
-        JComponent comp =
+        JComponent comp                   =
             GuiUtils.inset(GuiUtils.centerBottom(getPropertiesComponent(),
                 buttons), 5);
         boolean newOne = false;
@@ -1790,8 +1788,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     protected JComponent getAspectPropertiesComponent() {
         try {
-            DisplayMaster master = getMaster();
-            JButton resetBtn = GuiUtils.makeButton("Reset", this,
+            DisplayMaster master   = getMaster();
+            JButton       resetBtn = GuiUtils.makeButton("Reset", this,
                                    "resetAspectSliders");
             List comps = new ArrayList();
 
@@ -1988,8 +1986,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             for (Enumeration keys = propertiesMap.keys();
                     keys.hasMoreElements(); ) {
                 JCheckBox       cbx = (JCheckBox) keys.nextElement();
-                BooleanProperty bp  =
-                    (BooleanProperty) propertiesMap.get(cbx);
+                BooleanProperty bp  = (BooleanProperty) propertiesMap.get(cbx);
 
                 bp.setValue(cbx.isSelected());
             }
@@ -2084,13 +2081,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 Point ap = ImageUtils.parsePoint(getLogoPosition(), bounds);
 
                 // System.out.println("screen point = " + ap);
-                int   baseX = ap.x;
-                int   baseY = ap.y;
-                float zval  = getPerspectiveView()
-                              ? 1
-                              : display.getDisplayRenderer().getMode2D()
-                                ? 1.5f
-                                : 2;
+                int      baseX   = ap.x;
+                int      baseY   = ap.y;
+                float    zval    = getPerspectiveView()
+                                   ? 1
+                                   : display.getDisplayRenderer().getMode2D()
+                                     ? 1.5f
+                                     : 2;
                 ImageJ3D logoJ3D = new ImageJ3D(logo,
                                        getImageAnchor(getLogoPosition()),
                                        baseX, baseY, zval, getLogoScale());
@@ -2510,7 +2507,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     }
 
                     DateTime[] times = Animation.getDateTimeArray(timeSet);
-                    List datedObjects =
+                    List       datedObjects =
                         DatedObject.wrap(ucar.visad.Util.makeDates(times));
 
                     if (datedObjects.size() == 0) {
@@ -2634,7 +2631,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 List controls = getControls();
                 Hashtable<String, List<TextDisplayable>> catMap =
                     new Hashtable<String, List<TextDisplayable>>();
-                List<String> cats = new ArrayList<String>();
+                List<String>          cats = new ArrayList<String>();
                 List<TextDisplayable> textDisplayables =
                     new ArrayList<TextDisplayable>();
 
@@ -2742,7 +2739,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 // System.out.println("screen bounds = " + r);
                 float scale = getDisplayListFont().getSize() / 12.f;
                 int   x     = r.x + (int) (.5f * r.width);
-                int y = r.y
+                int   y     = r.y
                         + (int) ((1.f - ((.025 * scale) * number))
                                  * r.height);
 
@@ -5987,7 +5984,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     "Set the background color to be transparent");
                 mainDisplayBtn = new JRadioButton("Current View", true);
                 allViewsBtn    = new JRadioButton("All Views", false);
-                contentsBtn = new JRadioButton("Current View & Legend",
+                contentsBtn    = new JRadioButton("Current View & Legend",
                         false);
                 fullWindowBtn = new JRadioButton("Full Window", false);
                 GuiUtils.buttonGroup(mainDisplayBtn, allViewsBtn,
@@ -6022,7 +6019,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                          new Insets(10, 0, 0, 0)));
             }
 
-            JComponent accessory = GuiUtils.vbox(comps);
+            JComponent        accessory     = GuiUtils.vbox(comps);
             PatternFileFilter captureFilter =
                 new PatternFileFilter(
                     ".+\\.jpg|.+\\.gif|.+\\.jpeg|.+\\.png|.+\\.pdf|.+\\.ps|.+\\.svg",
@@ -6360,8 +6357,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     Real now = anime.getCurrentAnimationValue();
 
                     if (now != null) {
-                        FieldImpl fi = (FieldImpl) data;
-                        Data rangeValue = fi.evaluate(now,
+                        FieldImpl fi         = (FieldImpl) data;
+                        Data      rangeValue = fi.evaluate(now,
                                               Data.NEAREST_NEIGHBOR,
                                               Data.NO_ERRORS);
 
@@ -6476,7 +6473,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         colorMenu.add(deleteMenu);
         colorMenu.addSeparator();
 
-        boolean addedToDelete = false;
+        boolean               addedToDelete = false;
         XmlResourceCollection colors = getResourceManager().getXmlResources(
                                            IdvResourceManager.RSC_COLORPAIRS);
         boolean didone = false;
@@ -6492,13 +6489,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
             List nodes = XmlUtil.findChildren(root, TAG_COLORPAIR);
 
             for (int colorIdx = 0; colorIdx < nodes.size(); colorIdx++) {
-                Element node = (Element) nodes.get(colorIdx);
-                final Color fg = XmlUtil.getAttribute(node, "foreground",
+                Element     node = (Element) nodes.get(colorIdx);
+                final Color fg   = XmlUtil.getAttribute(node, "foreground",
                                      (Color) Color.black);
                 final Color bg = XmlUtil.getAttribute(node, "background",
                                      (Color) Color.white);
                 final String label = XmlUtil.getAttribute(node, "label");
-                JMenuItem mi = new JMenuItem(GuiUtils.getLocalName(label,
+                JMenuItem    mi    = new JMenuItem(GuiUtils.getLocalName(label,
                                    (colorResourceIdx == 0)));
 
                 try {
@@ -6573,8 +6570,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         final JDialog dialog = new JDialog((JFrame) null,
                                            "Background/Foreground Color",
                                            true);
-        JLabel bgLbl = GuiUtils.rLabel("Background:");
-        JLabel fgLbl = GuiUtils.rLabel("Foreground:");
+        JLabel             bgLbl   = GuiUtils.rLabel("Background:");
+        JLabel             fgLbl   = GuiUtils.rLabel("Foreground:");
         final JComponent[] bgComps =
             GuiUtils.makeColorSwatchWidget(getBackground(),
                                            "Set Background Color");
@@ -6630,7 +6627,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param bg Background color
      */
     private void saveColors(Color fg, Color bg) {
-        String name = "";
+        String                name   = "";
         XmlResourceCollection colors = getResourceManager().getXmlResources(
                                            IdvResourceManager.RSC_COLORPAIRS);
         Document colorDoc =
@@ -6879,7 +6876,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public static Border getHighlightBorder() {
         if (highlightBorder == null) {
-            int bw = borderWidth;
+            int    bw    = borderWidth;
             Border outer = new MatteBorder(new Insets(bw, bw, bw, bw),
                                            borderHighlightColor);
 
@@ -7037,7 +7034,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             rightPanel = animationWidget.getContents();
         }
 
-        JComponent menuBar = doMakeMenuBar();
+        JComponent menuBar    = doMakeMenuBar();
         JComponent cancelBtn1 =
             GuiUtils.makeImageButton("/auxdata/ui/icons/cancel.gif", this,
                                      "resetFullScreen");
@@ -7679,7 +7676,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @param displayControl  the time driver control
      */
     public void ensureOnlyOneTimeDriver(DisplayControl displayControl) {
-        if (getAnimationInfo() != null && getAnimationInfo().getAnimationSetInfo() != null 
+        if ((getAnimationInfo() != null)
+                && (getAnimationInfo().getAnimationSetInfo() != null)
                 && getAnimationInfo().getAnimationSetInfo().getActive()) {
             AnimationInfo ai = getAnimationWidget().getAnimationInfo();
             ai.getAnimationSetInfo().setIsTimeDriver(false);
