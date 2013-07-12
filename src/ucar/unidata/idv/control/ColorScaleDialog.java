@@ -200,7 +200,7 @@ public class ColorScaleDialog implements ActionListener {
                 "Color Scale Label Color");
         final JComponent colorComp = colorSwatch.getSetPanel();
         visibilityCbx = new JCheckBox("", myInfo.getIsVisible());
-        unitCbx       = new JCheckBox("", myInfo.isUnitVisible());
+        unitCbx       = new JCheckBox("Show Unit", myInfo.isUnitVisible());
         alphaCbx      = new JCheckBox("", myInfo.getUseAlpha());
         fontSelector  = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
@@ -218,12 +218,13 @@ public class ColorScaleDialog implements ActionListener {
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         contents           = GuiUtils.doLayout(new Component[] {
             GuiUtils.rLabel("Visible: "), visibilityCbx,
-            GuiUtils.rLabel("Display Unit: "), unitCbx,
             //GuiUtils.leftRight(visibilityCbx, GuiUtils.flow( new Component[] {GuiUtils.rLabel("  Show Transparency: "), alphaCbx})),
             GuiUtils.rLabel("Position: "),
             GuiUtils.leftRight(placementBox, GuiUtils.filler()),
             GuiUtils.rLabel("Labels: "),
             GuiUtils.leftRight(labelVisibilityCbx, GuiUtils.filler()),
+            GuiUtils.filler(),
+            GuiUtils.leftRight(unitCbx,GuiUtils.filler()),
             GuiUtils.filler(),
             GuiUtils.leftRight(GuiUtils.rLabel("Font: "),
                                fontSelector.getComponent()),
