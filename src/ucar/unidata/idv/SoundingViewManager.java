@@ -71,7 +71,8 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
     private boolean dryAdiabatVisibility = true;
 
     /** isobars visibility */
-    private boolean isobarsVisibility = false;
+    private boolean isobarsVisibility = true;
+
     /**
      *  A paramterless ctor for XmlEncoder  based decoding.
      */
@@ -390,6 +391,7 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
     public boolean getIsobarsVisibility() {
         return isobarsVisibility;
     }
+
     /**
      * Set the dry adiabat visibility
      * @param value  true if visiable
@@ -415,6 +417,7 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
             } catch (Exception ignore) {}
         }
     }
+
     /**
      * Get the saturation mixing ratio visibility
      * @return true if visiable
