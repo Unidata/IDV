@@ -15,10 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class helps supply command line arguments to the IDV via bash.
- * Ultimately, it dumps all the user preferences defined in the user path
- * main.xml into a format that can be read by bash. Moreover, if some variables
- * are not present, it provides some sensible defaults.
+ * This class helps supply command line arguments to the IDV via bash or the
+ * Windows Batch Scripting environment. Ultimately, it dumps all the user
+ * preferences defined in the user path main.xml into a format that can be read
+ * by bash or the Windows Batch Scripting environment. Moreover, if some
+ * variables are not present, it provides some sensible defaults.
  */
 public class IdvCommandLinePrefs {
 
