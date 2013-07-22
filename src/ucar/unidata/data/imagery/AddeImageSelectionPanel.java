@@ -1,6 +1,7 @@
 package ucar.unidata.data.imagery;
 
 import java.awt.*;
+import java.awt.List;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
@@ -8,11 +9,19 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import javax.swing.JPanel;
+import java.text.ParseException;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaFile;
-import ucar.unidata.data.GeoSelectionPanel;
+import edu.wisc.ssec.mcidas.adde.AddeTextReader;
+import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.visad.MapProjectionProjection;
 import ucar.visad.display.RubberBandBox;
@@ -30,594 +39,570 @@ import visad.georef.NavigatedCoordinateSystem;
  * Time: 10:36 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AddeImageSelectionPanel extends JPanel implements MouseListener, MouseMotionListener {
-    MapProjection proj;
-    GeneralPath gp;
-    private static final int CONTROL_POINT_SIZE = 10;
-    java.awt.geom.Rectangle2D.Float boundingBox;
-    private AddeImageDescriptor preview_image_descriptor;
-    private BufferedImage preview_image;
-    private boolean keep_drawing;
-    private int startX;
-    private int startY;
-    private int endX;
-    private int endY;
-    private boolean first_time;
-    private java.awt.geom.Rectangle2D.Float ul_cp;
-    private java.awt.geom.Rectangle2D.Float ur_cp;
-    private java.awt.geom.Rectangle2D.Float ll_cp;
-    private java.awt.geom.Rectangle2D.Float lr_cp;
-    private int curr_cp_indx;
-    private boolean created;
-    int threshold_data_width;
-    int threshold_data_height;
-    private int track_point_x;
-    private int track_point_y;
-    private boolean move_rect;
-    private int data_width;
-    private int data_height;
-    private PropertyChangeSupport pcs;
-    NavigatedMapPanel mapPanel;
+public class AddeImageSelectionPanel extends DataSelectionComponent
+{
+    public JPanel advance;
+    GeoSelection geoSelection;
 
-    public void clearBoundingBox()
-    {
-        startX = -1;
-        startY = -1;
-        endX = -1;
-        endY = -1;
-        curr_cp_indx = -1;
-        first_time = true;
-        created = false;
-        keep_drawing = false;
-        ul_cp = null;
-        ur_cp = null;
-        ll_cp = null;
-        lr_cp = null;
-        if(null != boundingBox)
-        {
-            boundingBox = null;
-            repaint();
-        }
-    }
+    private java.awt.geom.Rectangle2D.Float new_bb;
+    private JPanel MasterPanel;
 
-    public void addPropertyChangeListener(PropertyChangeListener pcl)
-    {
-        pcs.addPropertyChangeListener(pcl);
-    }
+    private String source;
+    AddeImageDescriptor descriptor;
+    private JCheckBox chkUseFull;
 
-    public void removePropertyChangeListener(PropertyChangeListener pcl)
-    {
-        pcs.removePropertyChangeListener(pcl);
-    }
+    private Hashtable propToComps = new Hashtable();
+    /** The spacing used in the grid layout */
+    protected  int GRID_SPACING = 3;
 
-    public AddeImageSelectionPanel(BufferedImage preview_image,  AddeImageDescriptor preview_image_descriptor)
+    /** Used by derived classes when they do a GuiUtils.doLayout */
+    protected  Insets GRID_INSETS = new Insets(GRID_SPACING,
+            GRID_SPACING,
+            GRID_SPACING,
+            GRID_SPACING);
+    protected JSlider lineMagSlider;
+    protected JSlider elementMagSlider;
+    JTextField lineMagFld = new JTextField();
+    JTextField eleMagFld = new JTextField();
+    JLabel lineMagLbl = new JLabel();
+    JLabel lineResLbl = new JLabel();
+    private JPanel lMagPanel;
+    private JPanel eMagPanel;
+    private JPanel pRessPanel;
+    private static final int SLIDER_MAX = 1;
+    private static final int SLIDER_MIN = -29;
+    private static final int SLIDER_WIDTH = 150;
+    private static final int SLIDER_HEIGHT = 16;
+    boolean amSettingProperties = false;
+    private int lineMag;
+    private int elementMag;
+    private double lRes;
+    protected double baseLRes = 0.0;
+    private double eRes;
+    protected double baseERes = 0.0;
+    private String kmLbl = " km";
+    JLabel elementMagLbl = new JLabel();
+    JLabel elementResLbl = new JLabel();
+    private int lineResolution;
+    private int elementResolution;
+
+    JCheckBox prograssiveCbx;
+
+    AddeImageSelectionPanel(String source, AddeImageDescriptor descriptor)
+            throws IOException, ParseException, VisADException
     {
-        boundingBox = null;
-        keep_drawing = false;
-        startX = -1;
-        startY = -1;
-        endX = -1;
-        endY = -1;
-        first_time = true;
-        curr_cp_indx = -1;
-        created = false;
-        move_rect = false;
-        this.preview_image_descriptor = preview_image_descriptor;
-        this.preview_image = preview_image;
+
+        super("Advanced");
+        this.source =  source;
+        this.descriptor = descriptor;
+        JComponent propComp = null;
+        java.util.List allComps = new ArrayList();
+        Insets  dfltGridSpacing = new Insets(4, 0, 4, 0);
+        AddeImageInfo aInfo = descriptor.getImageInfo();
+        this.elementMag = aInfo.getElementMag();
+        this.lineMag = aInfo.getLineMag();
+        AreaDirectory aDir = descriptor.getDirectory();
         try{
-            AreaFile af = new AreaFile(preview_image_descriptor.getSource());
-            AREACoordinateSystem acs = null;
-            acs = new AREACoordinateSystem(af);
-            this.proj = acs;
-        } catch (Exception e){}
+            this.lineResolution = aDir.getValue(11);
+            this.elementResolution = aDir.getValue(12);
+        } catch (Exception e){
 
-        data_width = preview_image.getWidth();
-        data_height = preview_image.getHeight();
-        threshold_data_height = data_height;
-        threshold_data_width = data_width;
-
-        gp = new GeneralPath();
-        readBaseMap();
-        addMouseListener(this);
-        addMouseMotionListener(this);
-        setToolTipText("Use mouse drag and resize the bounding box");
-        pcs = new PropertyChangeSupport(this);
-
-        init();
-
-    }
-
-    private void init()
-    {
-        Dimension d = new Dimension(data_width, data_height);
-        setPreferredSize(d);
-        setSize(d);
-        setMinimumSize(d);
-        setMaximumSize(d);
-        int initial_window_width = Math.min(data_width, threshold_data_width);
-        int initial_window_height = Math.min(data_height, threshold_data_height);
-        startX = 0;
-        startY = 0;
-        endX = initial_window_width;
-        endY = initial_window_height;
-        ul_cp = new java.awt.geom.Rectangle2D.Float(startX, startY, 10F, 10F);
-        ur_cp = new java.awt.geom.Rectangle2D.Float(endX, startY, 10F, 10F);
-        ll_cp = new java.awt.geom.Rectangle2D.Float(startX, endY, 10F, 10F);
-        lr_cp = new java.awt.geom.Rectangle2D.Float(endX, endY, 10F, 10F);
-        boundingBox = new java.awt.geom.Rectangle2D.Float(startX >= endX ? endX : startX, startY >= endY ? endY : startY, Math.abs(endX - startX), Math.abs(endY - startY));
-        pcs.firePropertyChange("BOUNDING_BOX_CHANGED", null, boundingBox);
-        first_time = false;
-        created = true;
-        move_rect = false;
-    }
-
-    public void resetBoundingBox()
-    {
-        int initial_window_width = Math.min(data_width, threshold_data_width);
-        int initial_window_height = Math.min(data_height, threshold_data_height);
-        startX = 0;
-        startY = 0;
-        endX = initial_window_width;
-        endY = initial_window_height;
-        ul_cp = new java.awt.geom.Rectangle2D.Float(startX, startY, 10F, 10F);
-        ur_cp = new java.awt.geom.Rectangle2D.Float(endX, startY, 10F, 10F);
-        ll_cp = new java.awt.geom.Rectangle2D.Float(startX, endY, 10F, 10F);
-        lr_cp = new java.awt.geom.Rectangle2D.Float(endX, endY, 10F, 10F);
-        boundingBox = new java.awt.geom.Rectangle2D.Float(startX >= endX ? endX : startX, startY >= endY ? endY : startY, Math.abs(endX - startX), Math.abs(endY - startY));
-        pcs.firePropertyChange("BOUNDING_BOX_CHANGED", null, boundingBox);
-        first_time = false;
-        created = true;
-        move_rect = false;
-        repaint();
-    }
-
-    public void updateImage(BufferedImage preview_image)
-    {
-        this.preview_image = preview_image;
-        data_width = preview_image.getWidth();
-        data_height = preview_image.getHeight();
-        threshold_data_height = data_height;
-        threshold_data_width = data_width;
-        init();
-        repaint();
-    }
-
-    public java.awt.geom.Rectangle2D.Float getBoundingBox()
-    {
-        return boundingBox;
-    }
-
-    public void paintComponent(Graphics g)
-    {
-        Graphics2D g2d = (Graphics2D)g;
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
-        if(null != preview_image)
-            g2d.drawImage(preview_image, 0, 0, this);
-        g2d.setColor(Color.BLUE);
-        g2d.draw(gp);
-        g2d.setColor(Color.CYAN);
-        if(created)
-        {
-            g2d.drawRect(startX >= endX ? endX : startX, startY >= endY ? endY : startY, Math.abs(endX - startX), Math.abs(endY - startY));
-            g2d.setColor(Color.BLUE);
-            g2d.fillRect(startX, startY, 10, 10);
-            g2d.fillRect(endX, startY, 10, 10);
-            g2d.fillRect(startX, endY, 10, 10);
-            g2d.fillRect(endX, endY, 10, 10);
         }
+        float[] res = getLineEleResolution(aDir);
+        float resol = res[0];
+        if (this.lineMag < 0)
+            resol *= Math.abs(this.lineMag);
+
+        this.lRes = resol;
+        this.baseLRes =  (double)(this.lineResolution);
+
+        resol = res[1];
+        if (this.elementMag < 0)
+            resol *= Math.abs(this.elementMag);
+        this.eRes = resol;
+        this.baseERes =  (double)(this.elementResolution);
+        // progressive checkbx
+        prograssiveCbx = new JCheckBox("", true);
+
+        prograssiveCbx.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean showMagSection =  !((JCheckBox) e.getSource()).isSelected();
+                enablePanel(lMagPanel, showMagSection);
+                enablePanel(eMagPanel, showMagSection);
+            }
+        });
+
+        pRessPanel = GuiUtils.doLayout(new Component[] { prograssiveCbx
+                  }, 1,
+                GuiUtils.WT_N, GuiUtils.WT_N);
+        propComp = GuiUtils.hbox(new Component[] { GuiUtils.lLabel("ProgressiveResolution:"), pRessPanel }, 2);
+       // allComps.add(GuiUtils.lLabel("ProgressiveResolution:"));
+        allComps.add(GuiUtils.left(propComp)) ;
+        allComps.add(GuiUtils.hbox(new Component[]{new JLabel("")}, 1)) ;
+        // Magnification
+        propComp = GuiUtils.hbox(new Component[]{new JLabel("")}, 1);
+        addPropComp("Magnification: ", propComp);
+        allComps.add(GuiUtils.lLabel("Magnification:"));
+        allComps.add(GuiUtils.right(propComp));
+        GuiUtils.tmpInsets = GRID_INSETS;
+
+        //line mag
+        boolean oldAmSettingProperties = amSettingProperties;
+        amSettingProperties = true;
+        ChangeListener lineListener = new ChangeListener() {
+            public void stateChanged(ChangeEvent evt) {
+                if (amSettingProperties) {
+                    return;
+                }
+                int val = getMagValue(lineMagSlider);
+                setLineMag(val);
+                lineMagSliderChanged(true);
+
+            }
+        };
+
+        ActionListener lineMagChange =new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                if (amSettingProperties) {
+                    return;
+                }
+                setLineMag();
+                changeLineMagSlider(true);
+            }
+        };
+        FocusListener lineMagFocusChange = new FocusListener() {
+            public void focusGained(FocusEvent fe) {
+            }
+            public void focusLost(FocusEvent fe) {
+                if (amSettingProperties) {
+                    return;
+                }
+                setLineMag();
+                changeLineMagSlider(true);
+            }
+        };
+        JComponent[] lineMagComps =
+                GuiUtils.makeSliderPopup(SLIDER_MIN, SLIDER_MAX, -3,
+                        lineListener);
+        lineMagSlider = (JSlider) lineMagComps[1];
+        lineMagSlider.setPreferredSize(new Dimension(SLIDER_WIDTH,SLIDER_HEIGHT));
+        lineMagSlider.setMajorTickSpacing(1);
+        lineMagSlider.setSnapToTicks(true);
+        lineMagSlider.setExtent(1);
+        int mag = getLineMag();
+        setLineMagSlider(mag);
+        lineMagComps[0].setToolTipText(
+                "Change the line magnification");
+        lineMagSlider.setToolTipText(
+                "Slide to set line magnification factor");
+        String str = "Line Mag=";
+        lineMagFld = new JTextField(Integer.toString(mag),3);
+        lineMagFld.addFocusListener(lineMagFocusChange);
+        lineMagFld.addActionListener(lineMagChange);
+        lineMagLbl =
+                GuiUtils.getFixedWidthLabel(StringUtil.padLeft(str, 4));
+        str = truncateNumericString(Double.toString(this.baseLRes*Math.abs(getLineMag())), 1);
+        str = " Res=" + str + kmLbl;
+        lineResLbl =
+                GuiUtils.getFixedWidthLabel(StringUtil.padLeft(str, 4));
+        amSettingProperties = oldAmSettingProperties;
+
+        GuiUtils.tmpInsets  = dfltGridSpacing;
+        lMagPanel = GuiUtils.doLayout(new Component[] {
+                lineMagLbl, lineMagFld,
+                GuiUtils.inset(lineMagComps[1],
+                        new Insets(0, 4, 0, 0)), lineResLbl, }, 5,
+                GuiUtils.WT_N, GuiUtils.WT_N);
+        propComp = GuiUtils.hbox(new Component[] {  lMagPanel }, 1);
+        allComps.add(GuiUtils.left(propComp));
+        allComps.add(GuiUtils.lLabel(""));
+        //  allComps.add(GuiUtils.left(propComp));
+
+        //element mag
+        amSettingProperties = true;
+        ChangeListener elementListener = new ChangeListener() {
+            public void stateChanged(
+                    javax.swing.event.ChangeEvent evt) {
+                if (amSettingProperties) {
+                    return;
+                }
+                int val = getMagValue(elementMagSlider);
+                setElementMag(val);
+                elementMagSliderChanged(true);
+            }
+        };
+        ActionListener eleMagChange =new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                if (amSettingProperties) {
+                    return;
+                }
+                setElementMag();
+                changeEleMagSlider(true);
+            }
+        };
+        FocusListener eleMagFocusChange = new FocusListener() {
+            public void focusGained(FocusEvent fe) {
+            }
+            public void focusLost(FocusEvent fe) {
+                if (amSettingProperties) {
+                    return;
+                }
+                setElementMag();
+                changeEleMagSlider(true);
+            }
+        };
+        JComponent[] elementMagComps =
+                GuiUtils.makeSliderPopup(SLIDER_MIN, SLIDER_MAX, 0,
+                        elementListener);
+        elementMagSlider = (JSlider) elementMagComps[1];
+        elementMagSlider.setPreferredSize(new Dimension(SLIDER_WIDTH,SLIDER_HEIGHT));
+        elementMagSlider.setExtent(1);
+        elementMagSlider.setMajorTickSpacing(1);
+        elementMagSlider.setSnapToTicks(true);
+        mag = getElementMag();
+        setElementMagSlider(mag);
+        elementMagComps[0].setToolTipText(
+                "Change the element magnification");
+        elementMagSlider.setToolTipText(
+                "Slide to set element magnification factor");
+        eleMagFld = new JTextField(Integer.toString(mag),3);
+        eleMagFld.addFocusListener(eleMagFocusChange);
+        eleMagFld.addActionListener(eleMagChange);
+        str = "Ele  Mag=";
+        elementMagLbl =
+                GuiUtils.getFixedWidthLabel(StringUtil.padLeft(str, 4));
+        str = truncateNumericString(Double.toString(this.baseERes*Math.abs(getElementMag())), 1);
+        str = " Res=" + str + kmLbl;
+        elementResLbl =
+                GuiUtils.getFixedWidthLabel(StringUtil.padLeft(str, 4));
+        amSettingProperties = oldAmSettingProperties;
+
+        GuiUtils.tmpInsets  = dfltGridSpacing;
+        eMagPanel = GuiUtils.doLayout(new Component[] {
+                elementMagLbl, eleMagFld,
+                GuiUtils.inset(elementMagComps[1],
+                        new Insets(0, 4, 0, 0)), elementResLbl, }, 5,
+                GuiUtils.WT_N, GuiUtils.WT_N);
+        propComp = GuiUtils.hbox(new Component[] {  eMagPanel }, 1);
+        allComps.add(GuiUtils.left(propComp));
+        allComps.add(GuiUtils.lLabel(""));
+        //all
+        JPanel imagePanel = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NY,
+                GuiUtils.WT_N);
+        advance = GuiUtils.top(imagePanel);
+
+        enablePanel(lMagPanel, false);
+        enablePanel(eMagPanel, false);
+
+        chkUseFull = new JCheckBox("Use Default");
+
+        chkUseFull.setSelected(true);
+
+        JScrollPane jsp = new JScrollPane();
+        jsp.getViewport().setView(advance);
+        JPanel labelsPanel = null;
+        labelsPanel = new JPanel();
+        labelsPanel.setLayout(new BoxLayout(labelsPanel, 1));
+
+
+        MasterPanel = new JPanel(new java.awt.BorderLayout());
+        MasterPanel.add(labelsPanel, "North");
+        MasterPanel.add(jsp, "Center");
     }
 
-    private void readBaseMap()
-    {
-        SampledSet sets[] = null;
-        BaseMapAdapter bma = null;
-        try
-        {
-            bma = new BaseMapAdapter(getClass().getResource("/auxdata/maps/OUTLSUPW"));
-            sets = bma.getData().getSets();
+    public void enablePanel(JPanel panel, boolean enable){
+
+        java.util.List cList = new ArrayList();
+        Component [] ac = panel.getComponents();
+        for(int i = 0; i< ac.length; i++){
+            Component a = ac[i];
+            cList.add(a);
         }
-        catch(IOException ex) { }
-        catch(VisADException ex) { }
-        float samples[][] = (float[][])null;
-        ProjectionRect rect = new ProjectionRect(proj.getDefaultMapArea());
-        ProjectionPoint pp_ul = rect.getUpperLeftPoint();
-        ProjectionPoint pp_lr = rect.getLowerRightPoint();
-        double top_left_x = pp_ul.getX();
-        double top_left_y = pp_ul.getY();
-        double proj_rect_width = pp_lr.getX() - top_left_x;
-        double proj_rect_height = pp_lr.getY() - top_left_y;
-        boolean flip_y = false;
-        double step_x = (double)data_width / proj_rect_width;
-        double step_y = (double)data_height / proj_rect_height;
-        for(int i = 0; i < sets.length; i++)
-        {
-            try
-            {
-                samples = sets[i].getSamples(false);
+
+        GuiUtils.enableComponents(cList, enable);
+    }
+
+    private void setElementMag() {
+        int val = 1;
+        try {
+            val = Integer.parseInt(eleMagFld.getText().trim());
+        } catch (Exception e) {
+            System.out.println(" setElementMag e=" + e);
+            return;
+        }
+        setElementMag(val);
+    }
+
+    protected String getUrl() {
+        String str = source;
+        str = str.replaceFirst("imagedata", "text");
+        int indx = str.indexOf("VERSION");
+        str = str.substring(0, indx);
+        str = str.concat("file=SATBAND");
+        return str;
+    }
+
+    protected java.util.List readTextLines(String url) {
+        AddeTextReader reader = new AddeTextReader(url);
+        java.util.List lines = null;
+        if ("OK".equals(reader.getStatus())) {
+            lines = reader.getLinesOfText();
+        }
+        return lines;
+    }
+
+    private float[] getLineEleResolution(AreaDirectory ad) {
+
+        float[] res = {(float)1.0, (float)1.0};
+        int sensor = ad.getSensorID();
+        java.util.List lines = null;
+        try {
+            String buff = getUrl();
+
+            lines = readTextLines(buff);
+            if (lines == null) {
+                return res;
             }
-            catch(VisADException ex)
-            {
-                ex.printStackTrace();
+
+            int gotit = -1;
+            String[] cards = StringUtil.listToStringArray(lines);
+
+
+            for (int i=0; i<cards.length; i++) {
+                if ( ! cards[i].startsWith("Sat ")) continue;
+                StringTokenizer st = new StringTokenizer(cards[i]," ");
+                String temp = st.nextToken();  // throw away the key
+                int m = st.countTokens();
+                for (int k=0; k<m; k++) {
+                    int ss = Integer.parseInt(st.nextToken().trim());
+                    if (ss == sensor) {
+                        gotit = i;
+                        break;
+                    }
+                }
+
+                if (gotit != -1) {
+                    break;
+                }
             }
-            java.awt.geom.Path2D.Double p = new java.awt.geom.Path2D.Double();
-            boolean flag = false;
-            MapProjectionProjection mpp = new MapProjectionProjection(proj);
-            for(int j = 0; j < samples[0].length; j++)
-            {
-                ProjectionPointImpl ppi = mpp.latLonToProj(samples[0][j], samples[1][j]);
-                double x = ppi.getX();
-                double y = ppi.getY();
-                if(java.lang.Double.isNaN(x) || java.lang.Double.isNaN(y))
+
+            if (gotit == -1) {
+                return res;
+            }
+
+            int gotSrc = -1;
+            for (int i=gotit; i<cards.length; i++) {
+                if (cards[i].startsWith("EndSat")) {
+                    return res;
+                }
+                if (!cards[i].startsWith("B") ) {
                     continue;
-                x = (x - top_left_x) * step_x;
-                y = (y - top_left_y) * step_y;
-                if(flip_y)
-                    y = (double)data_height - y - 1.0D;
-                if(x < 0.0D || x >= (double)data_width || y < 0.0D || y >= (double)data_height)
-                    continue;
-                if(!flag)
-                {
-                    p.moveTo(x, y);
-                    flag = true;
-                } else
-                {
-                    p.lineTo(x, y);
                 }
+                StringTokenizer tok = new StringTokenizer(cards[i]);
+                String str = tok.nextToken();
+                str = tok.nextToken();
+                Float flt = new Float(str);
+                res[0] = flt.floatValue();
+                str = tok.nextToken();
+                flt = new Float(str);
+                res[1] = flt.floatValue();
+                return res;
             }
+        } catch (Exception e) {
 
-            gp.append(p, false);
-            samples = (float[][])null;
         }
-
-        sets = null;
-        bma = null;
+        return res;
     }
 
-    public void mouseClicked(MouseEvent me)
+    public void setDataChoice(DataChoice dataChoice)
     {
-        if(first_time)
+
+
+        // display.updateImage(image_preview.getPreviewImage());
+    }
+    protected JComponent addPropComp(String propId, JComponent comp) {
+        Object oldComp = propToComps.get(propId);
+        if (oldComp != null) {
+            throw new IllegalStateException(
+                    "Already have a component defined:" + propId);
+        }
+        propToComps.put(propId, comp);
+        return comp;
+    }
+
+    private String truncateNumericString(String str, int numDec) {
+        int indx = str.indexOf(".") + numDec + 1;
+        if (indx >= str.length()) indx = str.length();
+        return str.substring(0,indx);
+    }
+    public int getLineMag() {
+        return this.lineMag;
+    }
+    public void setLineMag(int val) {
+        if (val > SLIDER_MAX) val = SLIDER_MAX;
+        if (val < SLIDER_MIN-1) val = SLIDER_MIN-1;
+        if (val == -1) val = 1;
+        this.lineMag = val;
+    }
+
+    private void setLineMagSlider(int val) {
+        if (val == 1) val = -1;
+        if (val > SLIDER_MAX) val = -1;
+        if (val < SLIDER_MIN) val = SLIDER_MIN-1;
+        lineMagSlider.setValue(val + 1);
+    }
+
+
+    public int getElementMag() {
+        return this.elementMag;
+    }
+
+    private void setLineMag() {
+        int val = 1;
+        try {
+            val = Integer.parseInt(lineMagFld.getText().trim());
+        } catch (Exception e) {
+        }
+        setLineMag(val);
+    }
+    public void setElementMag(int val) {
+        if (val > SLIDER_MAX) val = SLIDER_MAX;
+        if (val < SLIDER_MIN-1) val = SLIDER_MIN-1;
+        if (val == -1) val = 1;
+        this.elementMag = val;
+
+    }
+
+    protected void elementMagSliderChanged(boolean recomputeLineEleRatio) {
+        int value = getElementMag();
+
+        value = getElementMagValue();
+        setElementMag(value);
+
+        elementMagLbl.setText("Ele  Mag=");
+        eleMagFld.setText(new Integer(value).toString());
+        String str = " Res=" +
+                truncateNumericString(Double.toString(this.baseERes*Math.abs(value)), 1);
+        elementResLbl.setText(StringUtil.padLeft(str, 4) + kmLbl);
+
+
+    }
+
+    private void changeLineMagSlider(boolean autoSetSize) {
+        int value = getLineMag();
+        setLineMagSlider(value);
+    }
+
+    private void changeEleMagSlider(boolean autoSetSize) {
+        int value = getElementMag();
+        setElementMagSlider(value);
+    }
+    private void setElementMagSlider(int val) {
+        if (val == 1) val = -1;
+        if (val > SLIDER_MAX) val = -1;
+        if (val < SLIDER_MIN) val = SLIDER_MIN-1;
+        elementMagSlider.setValue(val + 1);
+    }
+    /**
+     * Handle the line mag slider changed event
+     *
+     * @param autoSetSize  the event
+     */
+    protected void lineMagSliderChanged(boolean autoSetSize) {
+        try {
+            int value = getLineMag();
+
+            value = getLineMagValue();
+            setLineMag(value);
+
+            lineMagLbl.setText("Line Mag=");
+            lineMagFld.setText(new Integer(value).toString());
+            String str = " Res=" +
+                    truncateNumericString(Double.toString(this.baseLRes*Math.abs(value)), 1);
+            lineResLbl.setText(StringUtil.padLeft(str, 4) + kmLbl);
+
+            //amSettingProperties = true;
+            //setElementMag(value);
+            //setElementMagSlider(value);
+            //amSettingProperties = false;
+            // elementMagSliderChanged(false);
+        } catch (Exception exc) {
+            System.out.println("Setting line magnification" + exc);
+        }
+    }
+
+    /**
+     * Get the value of the line magnification slider.
+     *
+     * @return The magnification value for the line
+     */
+    protected int getLineMagValue() {
+        int val = getMagValue(lineMagSlider);
+        return val;
+    }
+
+    /**
+     * Get the value of the element magnification slider.
+     *
+     * @return The magnification value for the element
+     */
+    protected int getElementMagValue() {
+        int val = getMagValue(elementMagSlider);
+        //   setElementMag(val);
+        return val;
+    }
+
+    /**
+     * Get the value of the given  magnification slider.
+     *
+     * @param slider The slider to get the value from
+     * @return The magnification value
+     */
+    private int getMagValue(JSlider slider) {
+        //Value is [-SLIDER_MAX,SLIDER_MAX]. We change 0 and -1 to 1
+        int value = slider.getValue();
+        if (value == 0) {
+            value = SLIDER_MAX;
+            return value;
+        } else if (value < SLIDER_MIN) {
+            value = SLIDER_MIN;
+        }
+        return value - 1;
+    }
+
+
+
+
+    public String getFileName()
+    {
+        return this.source;
+    }
+
+
+    protected JComponent doMakeContents()
+    {
+        return MasterPanel;
+    }
+
+    public void applyToDataSelection(DataSelection dataSelection)
+    {
+        ProjectionRect rect = null;
+        if(rect == null)
         {
-            keep_drawing = true;
-            startX = me.getX();
-            startY = me.getY();
-        } else
-        {
-            int pt_x = me.getX();
-            int pt_y = me.getY();
-            if(ul_cp == null)
-                ul_cp = new java.awt.geom.Rectangle2D.Float(startX, startY, 10F, 10F);
-            if(ur_cp == null)
-                ur_cp = new java.awt.geom.Rectangle2D.Float(endX, startY, 10F, 10F);
-            if(ll_cp == null)
-                ll_cp = new java.awt.geom.Rectangle2D.Float(startX, endY, 10F, 10F);
-            if(lr_cp == null)
-                lr_cp = new java.awt.geom.Rectangle2D.Float(endX, endY, 10F, 10F);
-            if(ul_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 0;
-                setCursor(new Cursor(12));
-            } else
-            if(ur_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 1;
-                setCursor(new Cursor(12));
-            } else
-            if(ll_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 2;
-                setCursor(new Cursor(12));
-            } else
-            if(lr_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 3;
-                setCursor(new Cursor(12));
-            } else
-            if(boundingBox.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                setCursor(new Cursor(13));
-                track_point_x = pt_x;
-                track_point_y = pt_y;
-                move_rect = true;
+            // no region subset, full image
+        } else {
+            rect.getBounds() ;
+            GeoLocationInfo bbox = GeoSelection.getDefaultBoundingBox();
+            if (bbox != null) {
+                this.geoSelection = new GeoSelection(bbox);
             }
         }
-        requestFocus(true);
+
+
     }
 
-    public void mousePressed(MouseEvent me)
-    {
-        if(first_time)
-        {
-            keep_drawing = true;
-            startX = me.getX();
-            startY = me.getY();
-        } else
-        {
-            int pt_x = me.getX();
-            int pt_y = me.getY();
-            if(ul_cp == null)
-                ul_cp = new java.awt.geom.Rectangle2D.Float(startX, startY, 10F, 10F);
-            if(ur_cp == null)
-                ur_cp = new java.awt.geom.Rectangle2D.Float(endX, startY, 10F, 10F);
-            if(ll_cp == null)
-                ll_cp = new java.awt.geom.Rectangle2D.Float(startX, endY, 10F, 10F);
-            if(lr_cp == null)
-                lr_cp = new java.awt.geom.Rectangle2D.Float(endX, endY, 10F, 10F);
-            if(ul_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 0;
-                setCursor(new Cursor(12));
-            } else
-            if(ur_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 1;
-                setCursor(new Cursor(12));
-            } else
-            if(ll_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 2;
-                setCursor(new Cursor(12));
-            } else
-            if(lr_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                curr_cp_indx = 3;
-                setCursor(new Cursor(12));
-            } else
-            if(boundingBox.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                setCursor(new Cursor(13));
-                track_point_x = pt_x;
-                track_point_y = pt_y;
-                move_rect = true;
-            }
-        }
-        requestFocus(true);
+    public boolean getIsProgressiveResolution(){
+        return this.prograssiveCbx.isSelected();
     }
-
-    public void mouseReleased(MouseEvent me)
-    {
-        int pt_x = me.getX();
-        int pt_y = me.getY();
-        boolean inside_data_window = pt_x >= 0 && pt_x < data_width && pt_y >= 0 && pt_y < data_height;
-        if(inside_data_window)
-            if(first_time)
-            {
-                first_time = false;
-                if(shouldRedraw_firstTime(pt_x, pt_y))
-                {
-                    boundingBox = new java.awt.geom.Rectangle2D.Float(startX >= endX ? endX : startX, startY >= endY ? endY : startY, Math.abs(endX - startX), Math.abs(endY - startY));
-                    pcs.firePropertyChange("BOUNDING_BOX_CHANGED", null, boundingBox);
-                    repaint();
-                }
-            } else if(move_rect)
-            {
-                int trans_x = pt_x - track_point_x;
-                int trans_y = pt_y - track_point_y;
-                if(shouldTranslate(trans_x, trans_y))
-                    translate_rect(trans_x, trans_y);
-                track_point_x = -1;
-                track_point_y = -1;
-                move_rect = false;
-            } else if(shouldRedraw(me))
-            {
-                updateSelectedCP(me);
-                repaint();
-            }
-        setCursor(Cursor.getDefaultCursor());
-        keep_drawing = false;
-        curr_cp_indx = -1;
-    }
-
-    private void updateSelectedCP(MouseEvent me)
-    {
-        if(curr_cp_indx == 0)
-        {
-            startX = me.getX();
-            startY = me.getY();
-        }
-        if(curr_cp_indx == 1)
-        {
-            endX = me.getX();
-            startY = me.getY();
-        }
-        if(curr_cp_indx == 2)
-        {
-            startX = me.getX();
-            endY = me.getY();
-        }
-        if(curr_cp_indx == 3)
-        {
-            endX = me.getX();
-            endY = me.getY();
-        }
-        ur_cp = new java.awt.geom.Rectangle2D.Float(endX, startY, 10F, 10F);
-        ul_cp = new java.awt.geom.Rectangle2D.Float(startX, startY, 10F, 10F);
-        ll_cp = new java.awt.geom.Rectangle2D.Float(startX, endY, 10F, 10F);
-        lr_cp = new java.awt.geom.Rectangle2D.Float(endX, endY, 10F, 10F);
-        boundingBox = new java.awt.geom.Rectangle2D.Float(startX >= endX ? endX : startX, startY >= endY ? endY : startY, Math.abs(endX - startX), Math.abs(endY - startY));
-        pcs.firePropertyChange("BOUNDING_BOX_CHANGED", null, boundingBox);
-    }
-
-    public void mouseEntered(MouseEvent mouseevent)
-    {
-    }
-
-    public void mouseExited(MouseEvent mouseevent)
-    {
-    }
-
-    public void mouseDragged(MouseEvent me)
-    {
-        int pt_x = me.getX();
-        int pt_y = me.getY();
-        if(ul_cp.contains(pt_x, pt_y))
-        {
-            keep_drawing = true;
-            curr_cp_indx = 0;
-            setCursor(new Cursor(12));
-        } else if(ur_cp.contains(pt_x, pt_y))
-        {
-            keep_drawing = true;
-            curr_cp_indx = 1;
-            setCursor(new Cursor(12));
-        } else if(ll_cp.contains(pt_x, pt_y))
-        {
-            keep_drawing = true;
-            curr_cp_indx = 2;
-            setCursor(new Cursor(12));
-        } else if(lr_cp.contains(pt_x, pt_y))
-        {
-            keep_drawing = true;
-            curr_cp_indx = 3;
-            setCursor(new Cursor(12));
-        } else if(boundingBox.contains(pt_x, pt_y))
-        {
-            keep_drawing = true;
-            setCursor(new Cursor(13));
-            //track_point_x = pt_x;
-            //track_point_y = pt_y;
-            move_rect = true;
-        }
-        boolean inside_data_window = true; //pt_x >= 0 && pt_x < data_width && pt_y >= 0 && pt_y < data_height;
-        if(inside_data_window && keep_drawing)
-        {
-            if(first_time)
-            {
-                if(shouldRedraw_firstTime(pt_x, pt_y))
-                {
-                    endX = pt_x;
-                    endY = pt_y;
-                    created = true;
-                    ul_cp = new java.awt.geom.Rectangle2D.Float(startX, startY, 10F, 10F);
-                    ur_cp = new java.awt.geom.Rectangle2D.Float(endX, startY, 10F, 10F);
-                    ll_cp = new java.awt.geom.Rectangle2D.Float(startX, endY, 10F, 10F);
-                    lr_cp = new java.awt.geom.Rectangle2D.Float(endX, endY, 10F, 10F);
-                    boundingBox = new java.awt.geom.Rectangle2D.Float(startX >= endX ? endX : startX, startY >= endY ? endY : startY, Math.abs(endX - startX), Math.abs(endY - startY));
-                    pcs.firePropertyChange("BOUNDING_BOX_CHANGED", null, boundingBox);
-                }
-            } else if(move_rect) {
-                int trans_x = pt_x - track_point_x;
-                int trans_y = pt_y - track_point_y;
-                if(shouldTranslate(trans_x, trans_y))
-                    translate_rect(trans_x, trans_y);
-                track_point_x = pt_x;
-                track_point_y = pt_y;
-                move_rect = false;
-            } else if(shouldRedraw(me)) {
-                updateSelectedCP(me);
-            }
-
-            repaint();
-        }
-    }
-
-    public void mouseMoved(MouseEvent me)
-    {
-        if(boundingBox != null)
-        {
-            int pt_x = me.getX();
-            int pt_y = me.getY();
-            if(ul_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                setCursor(new Cursor(12));
-            } else
-            if(ur_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                setCursor(new Cursor(12));
-            } else
-            if(ll_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                setCursor(new Cursor(12));
-            } else
-            if(lr_cp.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                setCursor(new Cursor(12));
-            } else
-            if(boundingBox.contains(pt_x, pt_y))
-            {
-                keep_drawing = true;
-                setCursor(new Cursor(13));
-            } else
-            if(!getCursor().equals(Cursor.getDefaultCursor()))
-                setCursor(Cursor.getDefaultCursor());
-        }
-    }
-
-    private boolean shouldRedraw_firstTime(int pt_x, int pt_y)
-    {
-        int local_data_width = Math.abs(startX - pt_x);
-        int local_data_height = Math.abs(startY - pt_y);
-        return local_data_width <= threshold_data_width && local_data_height <= threshold_data_height;
-    }
-
-    private boolean shouldRedraw(MouseEvent me)
-    {
-        int local_data_width = -1;
-        int local_data_height = -1;
-        int pt_x = me.getX();
-        int pt_y = me.getY();
-        if(curr_cp_indx == 0)
-        {
-            local_data_width = Math.abs(endX - me.getX());
-            local_data_height = Math.abs(endY - me.getY());
-        }
-        if(curr_cp_indx == 1)
-        {
-            local_data_width = Math.abs(pt_x - startX);
-            local_data_height = Math.abs(endY - pt_y);
-        }
-        if(curr_cp_indx == 2)
-        {
-            local_data_width = Math.abs(endX - pt_x);
-            local_data_height = Math.abs(pt_y - startY);
-        }
-        if(curr_cp_indx == 3)
-        {
-            local_data_width = Math.abs(pt_x - startX);
-            local_data_height = Math.abs(pt_y - startY);
-        }
-        return local_data_width <= threshold_data_width && local_data_height <= threshold_data_height;
-    }
-
-    private boolean shouldTranslate(int transX, int transY)
-    {
-        int new_startX = startX + transX;
-        int new_startY = startY + transY;
-        int new_endX = endX + transX;
-        int new_endY = endY + transY;
-        return new_startX >= 0 && new_startY >= 0 && new_endX < data_width && new_endY < data_height;
-    }
-
-    private void translate_rect(int transX, int transY)
-    {
-        startX += transX;
-        startY += transY;
-        endX += transX;
-        endY += transY;
-        ur_cp = new java.awt.geom.Rectangle2D.Float(endX, startY, 10F, 10F);
-        ul_cp = new java.awt.geom.Rectangle2D.Float(startX, startY, 10F, 10F);
-        ll_cp = new java.awt.geom.Rectangle2D.Float(startX, endY, 10F, 10F);
-        lr_cp = new java.awt.geom.Rectangle2D.Float(endX, endY, 10F, 10F);
-        boundingBox = new java.awt.geom.Rectangle2D.Float(startX >= endX ? endX : startX, startY >= endY ? endY : startY, Math.abs(endX - startX), Math.abs(endY - startY));
-        pcs.firePropertyChange("BOUNDING_BOX_CHANGED", null, boundingBox);
-    }
-
-
-
-
-
 }

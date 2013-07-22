@@ -1224,7 +1224,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 }
             }
 
-            if (descriptorsToUse.size() == 0) {
+            if (descriptorsToUse == null || descriptorsToUse.size() == 0) {
                 return null;
             }
             AddeImageInfo biggestPosition = null;
@@ -1448,7 +1448,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
      *
      * @return  list of descriptors matching the selection
      */
-    private List getDescriptors(DataChoice dataChoice, DataSelection subset) {
+    protected List getDescriptors(DataChoice dataChoice, DataSelection subset) {
 
         List times = getTimesFromDataSelection(subset, dataChoice);
         boolean usingTimeDriver = ((subset != null)

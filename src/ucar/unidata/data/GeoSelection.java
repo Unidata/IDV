@@ -31,6 +31,8 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.view.geoloc.*;
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
 
+import ucar.visad.display.RubberBandBox;
+
 import visad.*;
 
 import java.awt.*;
@@ -78,6 +80,13 @@ public class GeoSelection {
     /** The level */
     private Real level;
 
+    /* Screen Bound*/
+
+    /** _more_ */
+    Rectangle screenBoundRect;
+
+    /** _more_ */
+    LatLonPoint[] rubberBandBoxPoints;
 
     /**
      * ctor
@@ -109,6 +118,12 @@ public class GeoSelection {
         this.yStride = that.yStride;
         this.zStride = that.zStride;
         this.level   = that.level;
+        if (that.screenBoundRect != null) {
+            this.screenBoundRect = that.screenBoundRect;
+        }
+        if (that.rubberBandBoxPoints != null) {
+            this.rubberBandBoxPoints = that.rubberBandBoxPoints;
+        }
     }
 
 
@@ -179,17 +194,44 @@ public class GeoSelection {
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
                         int xStride, int yStride, int zStride, Real level) {
 
-        this.boundingBox   = boundingBox;
-        this.useFullBounds = useFullBounds;
-        this.xStride       = xStride;
-        this.yStride       = yStride;
-        this.zStride       = zStride;
-        this.level         = level;
+        this.boundingBox         = boundingBox;
+        this.useFullBounds       = useFullBounds;
+        this.xStride             = xStride;
+        this.yStride             = yStride;
+        this.zStride             = zStride;
+        this.level               = level;
+        this.screenBoundRect     = null;
+        this.rubberBandBoxPoints = null;
     }
 
 
 
+    /**
+     * Construct a GeoSelection
+     *
+     * @param boundingBox _more_
+     * @param useFullBounds _more_
+     * @param xStride _more_
+     * @param yStride _more_
+     * @param zStride _more_
+     * @param level _more_
+     * @param screenBoundRect _more_
+     * @param rubberBandBoxPoints _more_
+     */
+    public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
+                        int xStride, int yStride, int zStride, Real level,
+                        Rectangle screenBoundRect,
+                        LatLonPoint[] rubberBandBoxPoints) {
 
+        this.boundingBox         = boundingBox;
+        this.useFullBounds       = useFullBounds;
+        this.xStride             = xStride;
+        this.yStride             = yStride;
+        this.zStride             = zStride;
+        this.level               = level;
+        this.screenBoundRect     = screenBoundRect;
+        this.rubberBandBoxPoints = rubberBandBoxPoints;
+    }
 
     /**
      * Get the default bbox
@@ -306,11 +348,24 @@ public class GeoSelection {
         int             zStride = highPriority.hasZStride()
                                   ? highPriority.zStride
                                   : lowPriority.zStride;
-        GeoLocationInfo bbox    = ((highPriority.boundingBox != null)
-                                   ? highPriority.boundingBox
-                                   : lowPriority.boundingBox);
+        GeoLocationInfo bbox = ((highPriority.boundingBox != null)
+                                ? highPriority.boundingBox
+                                : lowPriority.boundingBox);
 
+        Rectangle screenBoundRect = ((highPriority.screenBoundRect != null)
+                                     ? highPriority.screenBoundRect
+                                     : lowPriority.screenBoundRect);
 
+        LatLonPoint[] rubberBandBoxPoints =
+            ((highPriority.rubberBandBoxPoints != null)
+             ? highPriority.rubberBandBoxPoints
+             : lowPriority.rubberBandBoxPoints);
+
+        if ((highPriority.boundingBox == null)
+                && (highPriority.rubberBandBoxPoints == null)) {
+            bbox                = null;
+            rubberBandBoxPoints = null;
+        }
 
         if (highPriority.getUseFullBounds()
                 && (highPriority.boundingBox == null)) {
@@ -322,7 +377,8 @@ public class GeoSelection {
                       : lowPriority.level);
         GeoSelection newOne = new GeoSelection(bbox,
                                   highPriority.getUseFullBounds(), xStride,
-                                  yStride, zStride, level);
+                                  yStride, zStride, level, screenBoundRect,
+                                  rubberBandBoxPoints);
 
         return newOne;
     }
@@ -586,5 +642,40 @@ public class GeoSelection {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param screenBoundRect _more_
+     */
+    public void setScreenBound(Rectangle screenBoundRect) {
+        this.screenBoundRect = screenBoundRect;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Rectangle getScreenBound() {
+        return this.screenBoundRect;
+    }
+
+    /**
+     * _more_
+     *
+     * @param rubberBandBoxPoints _more_
+     */
+    public void setRubberBandBoxPoints(LatLonPoint[] rubberBandBoxPoints) {
+        this.rubberBandBoxPoints = rubberBandBoxPoints;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public LatLonPoint[] getRubberBandBoxPoints() {
+        return this.rubberBandBoxPoints;
+    }
 
 }

@@ -2808,7 +2808,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if ((bi == null) || bi.equals(ALLBANDS)) {
             return 0;
         }
-        return ((BandInfo) bi).getBandNumber();
+        return 0; //((BandInfo) bi).getBandNumber();
     }
 
     /**
@@ -2901,7 +2901,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if ((bandComboBox != null) && (getSelectedBand() == 0)) {
             tfo = ALLUNITS;
         } else {
-            String preferredUnit = getDefault(PROP_UNIT, "BRIT");
+            String preferredUnit = getDefault(PROP_UNIT, "ALL");
             tfo = TwoFacedObject.findId(preferredUnit, l);
         }
         if (tfo != null) {

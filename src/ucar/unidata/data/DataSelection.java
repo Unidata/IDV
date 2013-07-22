@@ -59,6 +59,9 @@ public class DataSelection {
     /** as time subset selection */
     public final static String PROP_TIMESUBSET = "Use DataChoice time subset";
 
+    /** progressive resolution */
+    public final static String PROP_PROGRESSIVERESOLUTION = "Use_Progressive_Resolution";
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(

@@ -1,7 +1,5 @@
 /*
- * $Id: NavigatedMapPanel.java,v 1.13 2007/04/20 14:05:54 dmurray Exp $
- *
- * Copyright  1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -9,25 +7,26 @@
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.view.geoloc;
 
+
+import edu.wisc.ssec.mcidas.AreaFile;
 
 import ucar.unidata.beans.NonVetoableProperty;
 import ucar.unidata.beans.Property;
 import ucar.unidata.beans.PropertySet;
+import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 
@@ -36,6 +35,15 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.view.Renderer;
 import ucar.unidata.view.geoloc.*;
 
+import ucar.visad.MapProjectionProjection;
+
+import visad.SampledSet;
+import visad.VisADException;
+
+import visad.data.mcidas.AREACoordinateSystem;
+import visad.data.mcidas.BaseMapAdapter;
+
+import visad.georef.MapProjection;
 
 
 import java.awt.*;
@@ -45,9 +53,15 @@ import java.awt.geom.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 
@@ -88,6 +102,20 @@ public class NavigatedMapPanel extends JPanel {
     /** lower right lat/lon point */
     LatLonPoint lr;
 
+    /** _more_ */
+    private MapProjection project;
+
+    /** _more_ */
+    BufferedImage preview_image;
+
+    /** _more_ */
+    private int data_width;
+
+    /** _more_ */
+    private int data_height;
+
+    /** _more_ */
+    GeneralPath gp;
 
     /**
      * Default constructor.  Uses the default map
@@ -162,6 +190,68 @@ public class NavigatedMapPanel extends JPanel {
         init(defaultMaps, makeNavToolBar, makeMoveToolBar);
     }
 
+    /**
+     * Construct a NavigatedMapPanel 
+     *
+     * @param defaultMaps _more_
+     * @param makeNavToolBar _more_
+     * @param makeMoveToolBar _more_
+     * @param preview_image _more_
+     * @param preview_image_source _more_
+     */
+    public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
+                             boolean makeMoveToolBar,
+                             BufferedImage preview_image,
+                             String preview_image_source) {
+        init(defaultMaps, makeNavToolBar, makeMoveToolBar);
+        this.preview_image = preview_image;
+        try {
+            AreaFile af = new AreaFile(preview_image_source);
+            AREACoordinateSystem acs = null;
+            acs = new AREACoordinateSystem(af);
+            //   this.project = new MapProjectionProjection(acs);
+            this.project = acs;
+        } catch (Exception e) {}
+        NavigatedPanel np = getNavigatedPanel();
+
+        if (this.project != null) {
+            SampledSet sets[] = null;
+            setProjectionImpl(new MapProjectionProjection(this.project));
+            //ProjectionRect r = np.normalizeRectangle(
+            //        this.project.getDefaultMapArea());
+            //np.setSelectedRegionBounds(r);
+            data_width  = preview_image.getWidth();
+            data_height = preview_image.getHeight();
+
+            float samples[][] = (float[][]) null;
+            ProjectionRect rect =
+                new ProjectionRect(project.getDefaultMapArea());
+            np.setMapArea(rect);
+            //np.setSelectedRegionBounds(rect);
+            float ymag = ((AREACoordinateSystem)this.project).getDirBlock()[8]* 1.0f/data_height;
+            float xmag = ((AREACoordinateSystem)this.project).getDirBlock()[9] * 1.0f/(data_width);
+
+            if (null != this.preview_image) {
+
+                AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+                tx.scale(xmag, ymag);
+                tx.translate(0, -this.preview_image.getHeight(null));
+
+                AffineTransformOp op =
+                    new AffineTransformOp(
+                        tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+
+                this.preview_image = op.filter(this.preview_image, null);
+
+            }
+
+        }
+        np.setSelectRegionMode(true);
+        //np.zoom(1.0);
+
+        gp = new GeneralPath();
+
+    }
 
     /**
      * Factory method to make the map panel. Derived classes can
@@ -195,6 +285,9 @@ public class NavigatedMapPanel extends JPanel {
         // set up the properties
         // here's where the map will be drawn:
         navigatedPanel = doMakeMapPanel();
+        Dimension d = new Dimension(data_width, data_height);
+        navigatedPanel.setPreferredSize(d);
+        navigatedPanel.setSize(d);
         //mapRender = new ucar.unidata.gis.worldmap.WorldMap(); // map Renderer
         for (int i = 0; i < maps.size(); i++) {
             Renderer mapRender = new ucar.unidata.gis.mcidasmap.McidasMap(
@@ -429,9 +522,26 @@ public class NavigatedMapPanel extends JPanel {
         java.awt.Rectangle r = gNP.getClipBounds();
         gNP.clearRect(r.x, r.y, r.width, r.height);
 
+
+        Graphics2D g2d = (Graphics2D) gNP;
+        g2d.setColor(Color.white);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        if (null != preview_image) {
+            float[]   scales  = { 1f, 1f, 1f, 0.5f };
+            float[]   offsets = new float[4];
+            RescaleOp rop     = new RescaleOp(scales, offsets, null);
+            g2d.drawImage(preview_image, 0, 0, this);
+
+        }
+        g2d.setColor(Color.BLUE);
+        g2d.draw(gp);
+        g2d.setColor(Color.CYAN);
+
+
         for (int i = 0; i < mapRenderers.size(); i++) {
             ((Renderer) mapRenderers.get(i)).draw(gNP, atI);
         }
+
         annotateMap(gNP);
         gNP.dispose();
 
@@ -478,4 +588,3 @@ public class NavigatedMapPanel extends JPanel {
 
 
 }
-
