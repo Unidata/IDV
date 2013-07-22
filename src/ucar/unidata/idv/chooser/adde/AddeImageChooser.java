@@ -831,7 +831,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     protected JComponent doMakeContents() {
         List allComps = processServerComponents();
         getComponents(allComps);
-        allComps.addAll(processPropertyComponents());
+        processPropertyComponents();
+        // allComps.addAll(processPropertyComponents());
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel imagePanel = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_N);
@@ -1503,7 +1504,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     protected void enableWidgets() {
         boolean descriptorState = ((getState() == STATE_CONNECTED)
                                    && canReadTimes());
-        if(drivercbx != null){
+        if (drivercbx != null) {
             drivercbx.setSelected(false);
             enableTimeWidgets();
         }
@@ -1811,9 +1812,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         }
         if (imageTimes.length > 0) {
             try {
-                Gridded1DSet imageSet    = CalendarDateTime.makeTimeSet(imageTimes);
-                int          numTimes    = times.length;
-                double[][]   timesValues = new double[1][numTimes];
+                Gridded1DSet imageSet =
+                    CalendarDateTime.makeTimeSet(imageTimes);
+                int        numTimes    = times.length;
+                double[][] timesValues = new double[1][numTimes];
                 for (int i = 0; i < times.length; i++) {
                     timesValues[0][i] =
                         times[i].getValue(imageSet.getSetUnits()[0]);
@@ -2808,7 +2810,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if ((bi == null) || bi.equals(ALLBANDS)) {
             return 0;
         }
-        return 0; //((BandInfo) bi).getBandNumber();
+        return 0;  //((BandInfo) bi).getBandNumber();
     }
 
     /**
@@ -3286,7 +3288,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      * @return the display id
      */
     protected String getDefaultDisplayType() {
-        return "imagedisplay";
+        return null;  //"imagedisplay";
     }
 
 
