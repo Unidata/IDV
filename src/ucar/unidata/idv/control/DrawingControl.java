@@ -20,73 +20,96 @@
 
 package ucar.unidata.idv.control;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import org.python.core.*;
-import org.python.util.*;
+import java.rmi.RemoteException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.AbstractTableModel;
+
+import org.python.util.PythonInterpreter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.collab.Sharable;
-
 import ucar.unidata.data.DataChoice;
-
-import ucar.unidata.idv.ViewManager;
-
-
-import ucar.unidata.idv.control.drawing.*;
+import ucar.unidata.idv.control.drawing.DrawingCommand;
+import ucar.unidata.idv.control.drawing.DrawingGlyph;
+import ucar.unidata.idv.control.drawing.FrontGlyph;
+import ucar.unidata.idv.control.drawing.GlyphCreatorCommand;
+import ucar.unidata.idv.control.drawing.HighLowGlyph;
+import ucar.unidata.idv.control.drawing.ImageGlyph;
+import ucar.unidata.idv.control.drawing.MovieGlyph;
+import ucar.unidata.idv.control.drawing.PolyGlyph;
+import ucar.unidata.idv.control.drawing.ShapeGlyph;
+import ucar.unidata.idv.control.drawing.SymbolGlyph;
+import ucar.unidata.idv.control.drawing.TextGlyph;
 import ucar.unidata.ui.FineLineBorder;
-
-import ucar.unidata.ui.colortable.ColorTableDefaults;
 import ucar.unidata.util.ColorTable;
-
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-
 import ucar.unidata.xml.XmlUtil;
-
-
 import ucar.visad.data.CalendarDateTime;
-import ucar.visad.display.*;
+import ucar.visad.display.Animation;
+import ucar.visad.display.CompositeDisplayable;
+import ucar.visad.display.Displayable;
+import ucar.visad.display.FrontDrawer;
 
-
-import visad.*;
-
+import visad.Data;
+import visad.DateTime;
+import visad.DisplayEvent;
+import visad.Gridded1DSet;
+import visad.Real;
+import visad.Set;
+import visad.SingletonSet;
+import visad.UnionSet;
+import visad.Unit;
+import visad.VisADException;
+import visad.VisADRay;
 import visad.georef.EarthLocation;
-import visad.georef.LatLonPoint;
-
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
-
-import java.rmi.RemoteException;
-
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.*;
-
 
 /**
  * A MetApps Display Control for drawing lines on a navigated
@@ -2890,11 +2913,11 @@ public class DrawingControl extends DisplayControlImpl {
             if (column == 1) {
                 return "Type";
             }
+            if (column == 2) {
+                return "Properties";
+            }
             if ( !editable) {
                 return "";
-            }
-            if (column == 2) {
-                return "Coordinates";
             }
             return "";
         }
