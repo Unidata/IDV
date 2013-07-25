@@ -62,6 +62,9 @@ public class DataSelection {
     /** progressive resolution */
     public final static String PROP_PROGRESSIVERESOLUTION = "Use_Progressive_Resolution";
 
+    /** region option */
+    public final static String PROP_REGIONOPTION = "Region_Selection_Option";
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(

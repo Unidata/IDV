@@ -31,6 +31,7 @@ import ucar.nc2.*;
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.chooser.TimesChooser;
 import ucar.unidata.util.*;
 
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
@@ -57,10 +58,7 @@ import visad.meteorology.SingleBandedImage;
 import java.awt.*;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -70,6 +68,8 @@ import java.io.RandomAccessFile;
 
 
 import java.rmi.RemoteException;
+
+import java.security.PublicKey;
 
 import java.text.ParseException;
 
@@ -301,22 +301,45 @@ public class AddeImageDataSource extends ImageDataSource {
                 deMag = subset.getGeoSelection().getXStride();
             }
         }
+        boolean useDisplayArea = false;
 
+        Object  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION);
+        if (t1 != null) {
+            String areaOpt = (String) t1;
+            if (t1.equals("Use Display Area")) {
+                useDisplayArea = true;
+            }
+        }
 
-        if ((subset.getGeoSelection() != null) && !isReload) {
+        if ((geoSelection != null) && !isReload) {
             // applies the rubberbandbox geosubset here
-            GeoSelection gs = subset.getGeoSelection();
-            if (gs.getBoundingBox() != null) {
-                double maxLat = gs.getBoundingBox().getMaxLat();
-                double minLat = gs.getBoundingBox().getMinLat();
-                double maxLon = gs.getBoundingBox().getMaxLon();
-                double minLon = gs.getBoundingBox().getMinLon();
+            //GeoSelection gs = subset.getGeoSelection();
+            if (geoSelection.getBoundingBox() != null) {
+                double maxLat = geoSelection.getBoundingBox().getMaxLat();
+                double minLat = geoSelection.getBoundingBox().getMinLat();
+                double maxLon = geoSelection.getBoundingBox().getMaxLon();
+                double minLon = geoSelection.getBoundingBox().getMinLon();
                 // double maxLat, double minLat, double maxLon, double minLon
                 descriptors = geoSpaceSubset(geoSelection.getScreenBound(),
                                              unitStr, eMag, lMag, baseAnav,
                                              descriptors, maxLat, minLat,
                                              maxLon, minLon, elFactor, deMag,
-                                             dlMag, isProgressiveResolution);
+                                             dlMag, "ULEFT",
+                                             isProgressiveResolution);
+            } else if (useDisplayArea) {
+
+                LatLonRect llrect = geoSelection.getScreenLatLonRect();
+                double     maxLat = llrect.getLatMax();
+                double     minLat = llrect.getLatMin();
+                double     maxLon = llrect.getLonMax();
+                double     minLon = llrect.getLonMin();
+
+                descriptors = geoSpaceSubset(geoSelection.getScreenBound(),
+                                             unitStr, eMag, lMag, baseAnav,
+                                             descriptors, maxLat, minLat,
+                                             maxLon, minLon, elFactor, deMag,
+                                             dlMag, "CENTER",
+                                             isProgressiveResolution);
             } else {
                 AddeImageDescriptor desc =
                     (AddeImageDescriptor) descriptors.get(0);
@@ -620,7 +643,7 @@ public class AddeImageDataSource extends ImageDataSource {
             return geoSpaceSubset(geoSelection.getScreenBound(), null, eMag,
                                   lMag, baseAnav, descriptors, latLons[0],
                                   latLons[1], latLons[2], latLons[3],
-                                  elFactor, deMag, dlMag,
+                                  elFactor, deMag, dlMag, "ULEFT",
                                   isProgressiveResolution);
         }
 
@@ -755,6 +778,7 @@ public class AddeImageDataSource extends ImageDataSource {
      * @param factor _more_
      * @param elMag _more_
      * @param llMag _more_
+     * @param placeValue _more_
      * @param isProgressiveResolution _more_
      *
      * @return _more_
@@ -765,7 +789,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                       List despList, double maxLat,
                                       double minLat, double maxLon,
                                       double minLon, int factor, int elMag,
-                                      int llMag,
+                                      int llMag, String placeValue,
                                       boolean isProgressiveResolution) {
         // check if this is rubber band event, if not do nothing
 
@@ -819,13 +843,21 @@ public class AddeImageDataSource extends ImageDataSource {
                                + (int) rect.getHeight());
 
 
-            String locateValue = Misc.format(maxLat) + " "
-                                 + Misc.format(minLon);
+            String locateValue = null;
+            if (placeValue.equals("ULEFT")) {
+                locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
+            } else {
+                double cLat = (maxLat + minLat) / 2;
+                double cLon = (maxLon + minLon) / 2;
+
+                locateValue = Misc.format(cLat) + " " + Misc.format(cLon);
+            }
 
             return reSetImageDataDescriptor(despList,
                                             AddeImageURL.KEY_LATLON,
-                                            locateValue, "ULEFT", newLines,
-                                            newelems, lineMag, eleMag, unit);
+                                            locateValue, placeValue,
+                                            newLines, newelems, lineMag,
+                                            eleMag, unit);
         } catch (Exception e) {}
 
         return null;
@@ -1050,7 +1082,28 @@ public class AddeImageDataSource extends ImageDataSource {
         private JCheckBox chkUseFull;
         //final AddeImageDataSource this;
 
+        /** _more_ */
+        private JComboBox regionOptionLabelBox;
 
+        /** _more_ */
+        public String USE_DEFAULTREGION = "Use Default";
+
+        /** _more_ */
+        public String USE_SELECTEDREGION = "Use Selected";
+
+        /** _more_ */
+        public String USE_DISPLAYREGION = "Use Display Area";
+
+        /** _more_ */
+        private String[] regionSubsetOptionLabels = new String[] {
+                                                        USE_DEFAULTREGION,
+                USE_SELECTEDREGION, USE_DISPLAYREGION };
+
+        /** _more_ */
+        private JComponent regionsListInfo;
+
+        /** _more_ */
+        private String regionOption = USE_DEFAULTREGION;
 
         /**
          * Construct a ImagePreviewSelection
@@ -1079,17 +1132,132 @@ public class AddeImageDataSource extends ImageDataSource {
             chkUseFull = new JCheckBox("Use Default");
 
             chkUseFull.setSelected(true);
-
+            getRegionsList();
             JScrollPane jsp = new JScrollPane();
             jsp.getViewport().setView(display);
+            //  jsp.add(GuiUtils.topCenter(regionsListInfo, display));
             JPanel labelsPanel = null;
             labelsPanel = new JPanel();
             labelsPanel.setLayout(new BoxLayout(labelsPanel, 1));
-
+            labelsPanel.add(regionsListInfo);
 
             MasterPanel = new JPanel(new java.awt.BorderLayout());
             MasterPanel.add(labelsPanel, "North");
             MasterPanel.add(jsp, "Center");
+
+
+
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public JComponent getRegionsList() {
+            return getRegionsList(USE_DEFAULTREGION);
+
+        }
+
+        /**
+         * _more_
+         *
+         * @param cbxLabel _more_
+         *
+         * @return _more_
+         */
+        public JComponent getRegionsList(String cbxLabel) {
+            if (regionsListInfo == null) {
+                regionsListInfo = makeRegionsListAndPanel(cbxLabel, null);
+            }
+
+            return regionsListInfo;
+        }
+
+        /**
+         * _more_
+         *
+         * @param cbxLabel _more_
+         * @param extra _more_
+         *
+         * @return _more_
+         */
+        private JComponent makeRegionsListAndPanel(String cbxLabel,
+                JComponent extra) {
+            final JComboBox regionOptionLabelBox = new JComboBox();
+
+            //added
+            regionOptionLabelBox.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+                    String selectedObj =
+                        (String) regionOptionLabelBox.getSelectedItem();
+                    setRegionOptions(selectedObj);
+
+                }
+
+            });
+
+            //timeDeclutterFld = new JTextField("" + getTimeDeclutterMinutes(), 5);
+            GuiUtils.enableTree(regionOptionLabelBox, true);
+
+            List regionOptionNames = Misc.toList(regionSubsetOptionLabels);
+
+            GuiUtils.setListData(regionOptionLabelBox, regionOptionNames);
+            //        JComponent top = GuiUtils.leftRight(new JLabel("Times"),
+            //                                            allTimesButton);
+            JComponent top;
+
+
+            if (extra != null) {
+                top = GuiUtils.leftRight(extra, regionOptionLabelBox);
+            } else {
+                top = GuiUtils.right(regionOptionLabelBox);
+            }
+
+
+            return top;
+
+        }
+
+        /**
+         * _more_
+         *
+         * @param selectedObject _more_
+         */
+        public void setRegionOptions(String selectedObject) {
+
+            regionOption = selectedObject.toString();
+            if (selectedObject.equals(USE_DEFAULTREGION)) {
+                display.getNavigatedPanel().setSelectedRegion(
+                    (LatLonRect) null);
+                display.getNavigatedPanel().setSelectRegionMode(false);
+                display.getNavigatedPanel().repaint();
+            } else if (selectedObject.equals(USE_SELECTEDREGION)) {
+                display.getNavigatedPanel().setSelectRegionMode(true);
+            } else if (selectedObject.equals(USE_DISPLAYREGION)) {
+                display.getNavigatedPanel().setSelectedRegion(
+                    (LatLonRect) null);
+                display.getNavigatedPanel().setSelectRegionMode(false);
+                display.getNavigatedPanel().repaint();
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getRegionOption() {
+            return regionOption;
+        }
+
+        /**
+         * _more_
+         *
+         * @param option _more_
+         */
+        public void setRegionOption(String option) {
+            regionOption = option;
         }
 
         /**

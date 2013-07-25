@@ -165,6 +165,8 @@ public class ImagePlanViewControl extends PlanViewControl {
 
             boolean isProgressive =
                 advanceSelection.getIsProgressiveResolution();
+            String regionOption =  regionSelection.getRegionOption();
+
             if (rect != null) {
                 ProjectionImpl projectionImpl =
                     regionSelection.display.getProjectionImpl();
@@ -176,7 +178,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                     (NavigatedDisplay) getViewManager().getMaster();
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
-
+                gs.setScreenLatLonRect(navDisplay.getLatLonRect());
                 if ( !isProgressive) {
                     gs.setXStride(advanceSelection.getElementMag());
                     gs.setYStride(advanceSelection.getLineMag());
@@ -189,6 +191,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                     (NavigatedDisplay) getViewManager().getMaster();
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
+                gs.setScreenLatLonRect(navDisplay.getLatLonRect());
                 if ( !isProgressive) {
                     gs.setXStride(advanceSelection.getElementMag());
                     gs.setYStride(advanceSelection.getLineMag());
@@ -197,6 +200,8 @@ public class ImagePlanViewControl extends PlanViewControl {
             }
             dataSelection.putProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION, isProgressive);
+            dataSelection.putProperty(
+                    DataSelection.PROP_REGIONOPTION, regionOption);
         }
 
         boolean result = super.setData(dataChoice);
@@ -347,6 +352,9 @@ public class ImagePlanViewControl extends PlanViewControl {
     public void viewpointChanged() {
         try {
             // check if this is rubber band event, if not do nothing
+            GeoSelection geoSelection = dataSelection.getGeoSelection(true);
+            geoSelection.setScreenLatLonRect(
+                    getNavigatedDisplay().getLatLonRect());
             if (isRubberBandBoxChanged()) {
                 reloadDataSource();
                 setProjectionInView(true);
