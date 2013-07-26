@@ -40,6 +40,7 @@ import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
@@ -75,6 +76,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.GlobeDisplay;
+import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlObjectStore;
 
@@ -82,38 +84,9 @@ import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
 import ucar.visad.data.CalendarDateTimeSet;
-import ucar.visad.display.Animation;
-import ucar.visad.display.AnimationInfo;
-import ucar.visad.display.AnimationWidget;
-import ucar.visad.display.ColorScale;
-import ucar.visad.display.ColorScaleInfo;
-import ucar.visad.display.DisplayMaster;
-import ucar.visad.display.Displayable;
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.TextDisplayable;
+import ucar.visad.display.*;
 
-import visad.CommonUnit;
-import visad.ControlEvent;
-import visad.ControlListener;
-import visad.Data;
-import visad.DateTime;
-import visad.DisplayEvent;
-import visad.DisplayListener;
-import visad.DisplayRealType;
-import visad.FieldImpl;
-import visad.FunctionType;
-import visad.GriddedSet;
-import visad.LocalDisplay;
-import visad.ProjectionControl;
-import visad.Real;
-import visad.RealTuple;
-import visad.RealType;
-import visad.Set;
-import visad.SetType;
-import visad.Text;
-import visad.TextType;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
@@ -935,6 +908,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /** default type */
     private String smoothingType = LABEL_NONE;
+
+    /** can do progressive resolution */
+    private boolean canDoProgressiveResolution = false;
+
+    /**
+     * _more_
+     */
+    boolean isProgressiveResolution = false;
+
+    /**
+     * _more_
+     */
+    private Gridded2DSet last2DSet = null;
 
     /**
      * Default constructor. This is called when the control is
@@ -2446,24 +2432,27 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean isInTransectView() {
         ViewManager vm = getViewManager();
         if ((vm != null) && (vm instanceof TransectViewManager)) {
-            List tdcList = getIdv().getVMManager().findTransectDrawingControls();
-            if(tdcList.size() == 0) {
-               // ViewPanelImpl.VMInfo vmInfos = vm.get
-                DisplayControl dc = vm.getIdv().doMakeControl("transectdrawingcontrol");
+            List tdcList =
+                getIdv().getVMManager().findTransectDrawingControls();
+            if (tdcList.size() == 0) {
+                // ViewPanelImpl.VMInfo vmInfos = vm.get
+                DisplayControl dc =
+                    vm.getIdv().doMakeControl("transectdrawingcontrol");
                 vm.getIdv().addDisplayControl(dc);
                 // searching for the shared group map view and move the control there 
-                List vmList = vm.getVMManager().getViewManagers();
-                Boolean moved = false;
-                for(int i = 0; i < vmList.size(); i++) {
-                    ViewManager vm0 = (ViewManager)vmList.get(i);
-                    if(vm0 instanceof TransectViewManager){
-                        String grp0 = (String)vm0.getShareGroup();
-                        if(vm0.getShareViews() && grp0 != null) {
-                            for(int j = 0; j < vmList.size(); j++){
-                                ViewManager vm1 = (ViewManager)vmList.get(j);
-                                if(vm1 instanceof MapViewManager) {
-                                    String grp1 = (String)vm1.getShareGroup();
-                                    if(grp0.equals(grp1) && j != i){
+                List    vmList = vm.getVMManager().getViewManagers();
+                Boolean moved  = false;
+                for (int i = 0; i < vmList.size(); i++) {
+                    ViewManager vm0 = (ViewManager) vmList.get(i);
+                    if (vm0 instanceof TransectViewManager) {
+                        String grp0 = (String) vm0.getShareGroup();
+                        if (vm0.getShareViews() && (grp0 != null)) {
+                            for (int j = 0; j < vmList.size(); j++) {
+                                ViewManager vm1 = (ViewManager) vmList.get(j);
+                                if (vm1 instanceof MapViewManager) {
+                                    String grp1 =
+                                        (String) vm1.getShareGroup();
+                                    if (grp0.equals(grp1) && (j != i)) {
                                         dc.moveTo(vm1);
                                         moved = true;
                                         break;
@@ -2473,20 +2462,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         }
                     }
                 }
-                if(!moved) {       
-                    if(dc.getDefaultViewManager() != null) {
-                        dc.moveTo(dc.getDefaultViewManager()); 
-                    } else{                       
-                        List vms =vm.getVMManager().getViewManagers();
-                        for(int i=0; i< vms.size(); i++){
-                            ViewManager mvm = (ViewManager)vms.get(i);
-                            if(mvm instanceof MapViewManager){
+                if ( !moved) {
+                    if (dc.getDefaultViewManager() != null) {
+                        dc.moveTo(dc.getDefaultViewManager());
+                    } else {
+                        List vms = vm.getVMManager().getViewManagers();
+                        for (int i = 0; i < vms.size(); i++) {
+                            ViewManager mvm = (ViewManager) vms.get(i);
+                            if (mvm instanceof MapViewManager) {
                                 dc.moveTo(mvm);
                                 break;
                             }
                         }
                     }
-                    
+
                 }
             }
             return true;
@@ -2730,7 +2719,21 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * This gets called when we have received a controlChanged event
      * and have not received another one in some time delta
      */
-    public void viewpointChanged() {}
+    public void viewpointChanged() {
+        if (canDoProgressiveResolution) {
+            try {
+                // check if this is rubber band event, if not do nothing
+                GeoSelection geoSelection =
+                    dataSelection.getGeoSelection(true);
+                geoSelection.setScreenLatLonRect(
+                    getNavigatedDisplay().getLatLonRect());
+                if (isRubberBandBoxChanged()) {
+                    reloadDataSource();
+                    setProjectionInView(true);
+                }
+            } catch (Exception e) {}
+        }
+    }
 
 
     /**
@@ -5837,8 +5840,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (selectRangeEnabled && (selectRange != null)) {
-                        dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
-                                             SETTINGS_GROUP_DISPLAY);
+            dsd.addPropertyValue(selectRange, "selectRange", "Data Range",
+                                 SETTINGS_GROUP_DISPLAY);
         }
 
         if (contourInfo != null) {
@@ -7295,10 +7298,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public String getDefaultView() {
         ViewManager vm = getDefaultViewManager();
-        if ( !controlContext.getPersistenceManager().getSaveViewState() &&
-             !controlContext.getPersistenceManager().getSaveDataSources() &&
-             !controlContext.getPersistenceManager().getSaveData() &&
-             !controlContext.getPersistenceManager().getSaveJython() ) {
+        if ( !controlContext.getPersistenceManager().getSaveViewState()
+                && !controlContext.getPersistenceManager()
+                    .getSaveDataSources() && !controlContext
+                    .getPersistenceManager().getSaveData() && !controlContext
+                    .getPersistenceManager().getSaveJython()) {
             // this block is for the display template
             return null;
         }
@@ -7677,6 +7681,40 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (checkFlag(FLAG_SMOOTHING)) {
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel("Smoothing:"), doMakeSmoothingWidget()));
+        }
+
+        if (canDoProgressiveResolution) {
+            JCheckBox toggle = new JCheckBox("", isProgressiveResolution);
+            toggle.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    // setDeclutter(((JCheckBox) e.getSource()).isSelected());
+                    // loadDataInThread();
+                    isProgressiveResolution =
+                        ((JCheckBox) e.getSource()).isSelected();
+                    try {
+                        GeoSelection geoSelection =
+                            dataSelection.getGeoSelection(true);
+                        geoSelection.setScreenLatLonRect(
+                            getNavigatedDisplay().getLatLonRect());
+
+                        geoSelection.setScreenBound(
+                            getNavigatedDisplay().getScreenBounds());
+
+                        dataSelection.setGeoSelection(geoSelection);
+                        List          dataSources = getDataSources();
+                        DataSelection ds          = null;
+                        for (int i = 0; i < dataSources.size(); i++) {
+                            DataSourceImpl d =
+                                (DataSourceImpl) dataSources.get(i);
+                            ds = d.getDataSelection();
+                            ds.setGeoSelection(geoSelection);
+                        }
+                        reloadDataSource();
+                    } catch (Exception d) {}
+                }
+            });
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Progressive Resolution:"), toggle));
         }
     }
 
@@ -12308,4 +12346,89 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return this.usesTimeDriver;
     }
 
+    /**
+     * _more_
+     *
+     * @param xyPoints _more_
+     *
+     * @return _more_
+     */
+    public ucar.unidata.geoloc.LatLonPoint[] getLatLonPoints(
+            double[][] xyPoints) {
+        ucar.unidata.geoloc.LatLonPoint[] latlonPoints =
+            new ucar.unidata.geoloc.LatLonPoint[xyPoints[0].length];
+        NavigatedDisplay navDisplay = getMapDisplay();
+        for (int i = 0; i < xyPoints.length; i++) {
+            EarthLocation llpoint =
+                navDisplay.getEarthLocation(xyPoints[0][i], xyPoints[1][i],
+                                            0);
+            latlonPoints[i] =
+                new LatLonPointImpl(llpoint.getLatitude().getValue(),
+                                    llpoint.getLongitude().getValue());
+
+        }
+
+        return latlonPoints;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isRubberBandBoxChanged() {
+
+        MapProjectionDisplay mpd =
+            (MapProjectionDisplay) getNavigatedDisplay();
+        RubberBandBox rubberBandBox = mpd.getRubberBandBox();
+        float[]       boundHi       = rubberBandBox.getBounds().getHi();
+
+        if ((boundHi[0] == 0) && (boundHi[1] == 0)) {
+            return false;
+        }
+        // get the displayCS here:
+
+        Gridded2DSet new2DSet = rubberBandBox.getBounds();
+        if ((rubberBandBox != null) && !new2DSet.equals(last2DSet)) {
+            last2DSet = new2DSet;
+            GeoSelection geoSelection = dataSelection.getGeoSelection(true);
+            try {
+                ucar.unidata.geoloc.LatLonPoint[] llp0 =
+                    getLatLonPoints(rubberBandBox.getBounds().getDoubles());
+                geoSelection.setRubberBandBoxPoints(llp0);
+                geoSelection.setScreenBound(
+                    getNavigatedDisplay().getScreenBounds());
+            } catch (Exception e) {}
+            dataSelection.setGeoSelection(geoSelection);
+            List          dataSources = getDataSources();
+            DataSelection ds          = null;
+            for (int i = 0; i < dataSources.size(); i++) {
+                DataSourceImpl d = (DataSourceImpl) dataSources.get(i);
+                ds = d.getDataSelection();
+                ds.setGeoSelection(geoSelection);
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getCanDoProgressiveResolution() {
+        return this.canDoProgressiveResolution;
+    }
+
+    /**
+     * _more_
+     *
+     * @param canDoProgressiveResolution _more_
+     */
+    public void setCanDoProgressiveResolution(
+            boolean canDoProgressiveResolution) {
+        this.canDoProgressiveResolution = canDoProgressiveResolution;
+    }
 }

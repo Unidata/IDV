@@ -31,6 +31,7 @@ import ucar.unidata.geoloc.*;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.adde.AddeImageChooser;
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 
@@ -53,6 +54,8 @@ import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.geom.Rectangle2D;
 
@@ -76,10 +79,7 @@ import javax.swing.*;
  */
 public class ImagePlanViewControl extends PlanViewControl {
 
-    /**
-     * _more_
-     */
-    Gridded2DSet last2DSet = null;
+
 
     //  NB: For now, we don't subclass ColorPlanViewControl because we get
     //  the DataRange widget from getControlWidgets.  Might want this in
@@ -92,7 +92,7 @@ public class ImagePlanViewControl extends PlanViewControl {
     public ImagePlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
-
+        setCanDoProgressiveResolution(true);
     }
 
     /**
@@ -162,9 +162,10 @@ public class ImagePlanViewControl extends PlanViewControl {
             ProjectionRect rect =
                 regionSelection.display.getNavigatedPanel()
                     .getSelectedRegion();
+            if(!aImageDS.getIsReload())
+                isProgressiveResolution =
+                    advanceSelection.getIsProgressiveResolution();
 
-            boolean isProgressive =
-                advanceSelection.getIsProgressiveResolution();
             String regionOption =  regionSelection.getRegionOption();
 
             if (rect != null) {
@@ -179,7 +180,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
-                if ( !isProgressive) {
+                if ( !isProgressiveResolution) {
                     gs.setXStride(advanceSelection.getElementMag());
                     gs.setYStride(advanceSelection.getLineMag());
                 }
@@ -192,14 +193,14 @@ public class ImagePlanViewControl extends PlanViewControl {
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
-                if ( !isProgressive) {
+                if ( !isProgressiveResolution) {
                     gs.setXStride(advanceSelection.getElementMag());
                     gs.setYStride(advanceSelection.getLineMag());
                 }
                 dataSelection.setGeoSelection(gs);
             }
             dataSelection.putProperty(
-                DataSelection.PROP_PROGRESSIVERESOLUTION, isProgressive);
+                DataSelection.PROP_PROGRESSIVERESOLUTION, isProgressiveResolution);
             dataSelection.putProperty(
                     DataSelection.PROP_REGIONOPTION, regionOption);
         }
@@ -344,88 +345,6 @@ public class ImagePlanViewControl extends PlanViewControl {
         return true;
     }
 
-
-
-    /**
-     * _more_
-     */
-    public void viewpointChanged() {
-        try {
-            // check if this is rubber band event, if not do nothing
-            GeoSelection geoSelection = dataSelection.getGeoSelection(true);
-            geoSelection.setScreenLatLonRect(
-                    getNavigatedDisplay().getLatLonRect());
-            if (isRubberBandBoxChanged()) {
-                reloadDataSource();
-                setProjectionInView(true);
-            }
-        } catch (Exception e) {}
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean isRubberBandBoxChanged() {
-
-        MapProjectionDisplay mpd =
-            (MapProjectionDisplay) getNavigatedDisplay();
-        RubberBandBox rubberBandBox = mpd.getRubberBandBox();
-        float[]       boundHi       = rubberBandBox.getBounds().getHi();
-
-        if ((boundHi[0] == 0) && (boundHi[1] == 0)) {
-            return false;
-        }
-        // get the displayCS here:
-
-        Gridded2DSet new2DSet = rubberBandBox.getBounds();
-        if ((rubberBandBox != null) && !new2DSet.equals(last2DSet)) {
-            last2DSet = new2DSet;
-            GeoSelection geoSelection = dataSelection.getGeoSelection(true);
-            try {
-                LatLonPoint[] llp0 =
-                    getLatLonPoints(rubberBandBox.getBounds().getDoubles());
-                geoSelection.setRubberBandBoxPoints(llp0);
-                geoSelection.setScreenBound(
-                    getNavigatedDisplay().getScreenBounds());
-            } catch (Exception e) {}
-            dataSelection.setGeoSelection(geoSelection);
-            List          dataSources = getDataSources();
-            DataSelection ds          = null;
-            for (int i = 0; i < dataSources.size(); i++) {
-                DataSourceImpl d = (DataSourceImpl) dataSources.get(i);
-                ds = d.getDataSelection();
-                ds.setGeoSelection(geoSelection);
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * _more_
-     *
-     * @param xyPoints _more_
-     *
-     * @return _more_
-     */
-    public LatLonPoint[] getLatLonPoints(double[][] xyPoints) {
-        LatLonPoint[]    latlonPoints = new LatLonPoint[xyPoints[0].length];
-        NavigatedDisplay navDisplay   = getMapDisplay();
-        for (int i = 0; i < xyPoints.length; i++) {
-            EarthLocation llpoint =
-                navDisplay.getEarthLocation(xyPoints[0][i], xyPoints[1][i],
-                                            0);
-            latlonPoints[i] =
-                new LatLonPointImpl(llpoint.getLatitude().getValue(),
-                                    llpoint.getLongitude().getValue());
-
-        }
-
-        return latlonPoints;
-    }
 
     /**
      * _more_

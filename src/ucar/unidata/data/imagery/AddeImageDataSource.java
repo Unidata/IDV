@@ -1379,4 +1379,21 @@ public class AddeImageDataSource extends ImageDataSource {
         components.add(advancedSelection);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsReload() {
+        return isReload;
+    }
+
+    /**
+     * _more_
+     *
+     * @param isReload _more_
+     */
+    public void setIsReload(boolean isReload) {
+        this.isReload = isReload;
+    }
 }
