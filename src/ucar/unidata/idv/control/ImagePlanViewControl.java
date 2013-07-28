@@ -181,8 +181,8 @@ public class ImagePlanViewControl extends PlanViewControl {
                 gs.setScreenBound(screenBoundRect);
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
                 if ( !isProgressiveResolution) {
-                    gs.setXStride(advanceSelection.getElementMag());
-                    gs.setYStride(advanceSelection.getLineMag());
+                    gs.setXStride(aImageDS.getEleMag());
+                    gs.setYStride(aImageDS.getLineMag());
                 }
                 dataSelection.setGeoSelection(gs);
 
@@ -193,10 +193,11 @@ public class ImagePlanViewControl extends PlanViewControl {
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
-                if ( !isProgressiveResolution) {
-                    gs.setXStride(advanceSelection.getElementMag());
-                    gs.setYStride(advanceSelection.getLineMag());
+                if(dataSelection.getGeoSelection() != null) {
+                    LatLonPoint[] llp0 = dataSelection.getGeoSelection().getRubberBandBoxPoints();
+                    gs.setRubberBandBoxPoints(llp0);
                 }
+
                 dataSelection.setGeoSelection(gs);
             }
             dataSelection.putProperty(

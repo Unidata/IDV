@@ -920,7 +920,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * _more_
      */
-    private Gridded2DSet last2DSet = null;
+    protected Gridded2DSet last2DSet = null;
 
     /**
      * Default constructor. This is called when the control is
