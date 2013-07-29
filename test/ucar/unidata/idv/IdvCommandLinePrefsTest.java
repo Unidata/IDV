@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -26,6 +26,7 @@ import org.junit.Test;
 import ucar.unidata.idv.IdvCommandLinePrefs.IDVVersion;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -53,20 +54,20 @@ public class IdvCommandLinePrefsTest {
         assertEquals(msg, "3.0b1", new IDVVersion("3.0b1").toString());
         assertEquals(msg, "2.7uX", new IDVVersion("2.7uX").toString());
     }
-    
+
 
     /**
      * Test parse IDV Version String
      */
     @Test
     public void testIdvVersion() {
-      final String msg = "IDV Version incorrect";
-      assertEquals(msg, "2.6", new IDVVersion("2","6",null).toString());
-      assertEquals(msg, "2.6", new IDVVersion("2","6","").toString());
-      assertEquals(msg, "2.6", new IDVVersion("2","6"," ").toString());
-      assertEquals(msg, "2.7u2", new IDVVersion("2","7","u2").toString());
-      assertEquals(msg, "2.8uX", new IDVVersion("2","8","uX").toString());
-      assertEquals(msg, "3.0b1", new IDVVersion("3","0","b1").toString());
+        final String msg = "IDV Version incorrect";
+        assertEquals(msg, "2.6", new IDVVersion("2", "6", null).toString());
+        assertEquals(msg, "2.6", new IDVVersion("2", "6", "").toString());
+        assertEquals(msg, "2.6", new IDVVersion("2", "6", " ").toString());
+        assertEquals(msg, "2.7u2", new IDVVersion("2", "7", "u2").toString());
+        assertEquals(msg, "2.8uX", new IDVVersion("2", "8", "uX").toString());
+        assertEquals(msg, "3.0b1", new IDVVersion("3", "0", "b1").toString());
     }
 
     /**
@@ -142,5 +143,17 @@ public class IdvCommandLinePrefsTest {
             IdvCommandLinePrefs.parseOutVersion(
                 "xxxxxxxxxx Unidata IDV API v4.0u1 xxxxxxxxxxx").toString());
 
+    }
+
+    /**
+     * Test "is the IDV old?" logic
+     */
+    @Test
+    public void tesgingIsIDVoldLogic() {
+        IDVVersion idv1 = new IDVVersion("4", "0", "u3");
+        IDVVersion idv2 = new IDVVersion("4", "0", "u2");
+        assertTrue(idv1.compareTo(idv1) == 0);
+        assertTrue(idv1.compareTo(idv2) < 0);
+        assertTrue(idv2.compareTo(idv1) > 0);
     }
 }

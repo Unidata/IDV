@@ -501,6 +501,8 @@ public class IdvCommandLinePrefs {
             if ((major >= o.major) && (minor >= o.minor)
                     && (revision > o.revision)) {
                 return -1;
+            } else if (this.equals(o)) {
+                return 0;
             } else {
                 return 1;
             }
