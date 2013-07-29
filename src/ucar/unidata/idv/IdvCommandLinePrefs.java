@@ -211,7 +211,7 @@ public class IdvCommandLinePrefs {
         JOptionPane.showOptionDialog(null, doLayout, "New IDV Version",
                                      JOptionPane.OK_CANCEL_OPTION,
                                      JOptionPane.INFORMATION_MESSAGE, null,
-                                     new String[] { "Dismiss" }, "default");
+                                     new String[] { "Close" }, "default");
         return cbl.show;
     }
 
