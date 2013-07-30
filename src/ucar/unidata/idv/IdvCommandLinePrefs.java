@@ -325,9 +325,10 @@ public class IdvCommandLinePrefs {
         Misc.readProperties("/ucar/unidata/idv/resources/version.properties",
                             properties, IdvCommandLinePrefs.class);
 
-        return new IDVVersion(properties.getProperty("idv.version.major"),
-                              properties.getProperty("idv.version.minor"),
-                              properties.getProperty("idv.version.revision"));
+        return new IDVVersion(
+            properties.getProperty("idv.version.major") + "."
+            + properties.getProperty("idv.version.minor")
+            + properties.getProperty("idv.version.revision"));
     }
 
     /**
@@ -365,7 +366,7 @@ public class IdvCommandLinePrefs {
      * Parses the current available version of the IDV from Unidata.
      *
      * @param response the response
-     * @return the iDV version
+     * @return the IDV version
      */
     static IDVVersion parseOutVersion(String response) {
         Pattern p = Pattern.compile(
@@ -420,6 +421,8 @@ public class IdvCommandLinePrefs {
 
         /**
          * {@inheritDoc}
+         *
+         * @param arg0 _more_
          */
         @Override
         public void itemStateChanged(ItemEvent arg0) {
@@ -438,13 +441,13 @@ public class IdvCommandLinePrefs {
         /** Minor version. */
         private int minor;
 
-        /** Revision version */
-        private int revision;
+        /** Revision version char */
+        private int revisionChar;
 
-        /** Compile patter for Integer */
-        private final Pattern p = Pattern.compile("\\d+");
+        /** Revision version number */
+        private int revisionNum;
 
-        /** Revision String. */
+        /** Revision String */
         private String revisionStr;
 
         /**
@@ -452,20 +455,14 @@ public class IdvCommandLinePrefs {
          *
          * @param major the major
          * @param minor the minor
-         * @param revision the revision
+         * @param revision the revision character
+         * @param revision the revision number
+         * @param revisionChar _more_
+         * @param revisionNum _more_
          */
-        IDVVersion(String major, String minor, String revision) {
-            this.major = Integer.parseInt(major);
-            this.minor = Integer.parseInt(minor);
-            if ((revision != null) && !revision.trim().isEmpty()) {
-                this.revisionStr = revision.trim();
-                Matcher matcher = p.matcher(revisionStr);
-                if (matcher.find()) {
-                    this.revision = Integer.parseInt(matcher.group(0));
-                }
-            } else {
-                this.revision = Integer.MIN_VALUE;
-            }
+        IDVVersion(String major, String minor, String revisionChar,
+                   String revisionNum) {
+            idvVersionInternal(major, minor, revisionChar, revisionNum);
         }
 
         /**
@@ -476,20 +473,114 @@ public class IdvCommandLinePrefs {
          *          the idv version, e.g., "4.0u2"
          */
         IDVVersion(String idvversion) {
-            String[] parts = idvversion.split("\\.");
-            this.major = Integer.parseInt(parts[0]);
-            String[] parts2 = parts[1].split("[a-z]");
-            this.minor = Integer.parseInt(parts2[0].trim());
-            if (parts2.length > 1) {
-                try {
-                    this.revision = Integer.parseInt(parts2[1]);
-                } catch (NumberFormatException e) {
-                    this.revision = Integer.MAX_VALUE;
-                }
-                String[] parts3 = parts[1].split("(?=[a-z])");
-                this.revisionStr = parts3[1];
+            String[] parts        = idvversion.split("\\.");
+            String   major        = parts[0];
+            String[] parts2       = parts[1].split("[a-z]");
+            String   minor        = parts2[0];
+            String   revisionChar = null;
+            String   revisionNum  = null;
+            String[] rev          = idvversion.split(major + "." + minor);
+            if (rev.length > 1) {
+                String r = rev[1];
+                revisionChar = r.substring(0, 1);
+                revisionNum  = r.substring(1, r.length());
+            }
+            idvVersionInternal(major, minor, revisionChar, revisionNum);
+        }
+
+        /**
+         * Helper method for the constructor
+         *
+         * @param major the major
+         * @param minor the minor
+         * @param revision the revision character
+         * @param revision the revision number
+         * @param revisionChar _more_
+         * @param revisionNum _more_
+         */
+        private void idvVersionInternal(String major, String minor,
+                                        String revisionChar,
+                                        String revisionNum) {
+            this.major = Integer.parseInt(major.trim());
+            this.minor = Integer.parseInt(minor.trim());
+            if ((revisionChar == null) || (revisionNum == null)) {
+                this.revisionStr = "";
             } else {
-                this.revision = Integer.MIN_VALUE;
+                this.revisionStr = (revisionChar + revisionNum).trim();
+            }
+            this.revisionChar = digitizeRevisionChar((revisionChar == null)
+                    ? ""
+                    : revisionChar.trim());
+            this.revisionNum  = digitizeRevisionNum((revisionNum == null)
+                    ? ""
+                    : revisionNum.trim());
+        }
+
+
+        /**
+         * {@inheritDoc}
+         *
+         */
+        @Override
+        public int compareTo(IDVVersion o) {
+            int v1 = digitizeVersion(this);
+            int v2 = digitizeVersion(o);
+            if (v2 == v1) {
+                return 0;
+            } else if (v1 > v2) {
+                return -1;
+            } else if (this.equals(o)) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+
+        /**
+         * Digitize version. Turn something like 2.7uX, or 4.0u1 into a number so
+         * that is may be used by the comparator.
+         *
+         * @param idvv
+         *          the idvv
+         * @return the int
+         */
+        private static int digitizeVersion(IDVVersion idvv) {
+            return idvv.major * 1000000 + idvv.minor * 10000
+                   + idvv.revisionChar * 100 + idvv.revisionNum;
+
+        }
+
+        /**
+         * Digitize revision character. In short, ? > u > b > empty
+         *
+         * @param c the c
+         * @return the revision character as a number
+         */
+        private int digitizeRevisionChar(String c) {
+            if (c.equals("")) {
+                return 0;
+            } else if (c.equals("b")) {
+                return 1;
+            } else if (c.equals("u")) {
+                return 2;
+            } else {
+                return 3;
+            }
+        }
+
+        /**
+         * Assign a number to a revision number. They are not always numbers (e.g. 2.7uX)
+         *
+         * @param n the "number"
+         * @return the revision number
+         */
+        private static int digitizeRevisionNum(String n) {
+            try {
+                return Integer.parseInt(n);
+            } catch (NumberFormatException e) {
+                //Could not find a number so default to something big.
+                // 2.7uX comes after 2.7u2
+                return 99;
             }
         }
 
@@ -497,15 +588,17 @@ public class IdvCommandLinePrefs {
          * {@inheritDoc}
          */
         @Override
-        public int compareTo(IDVVersion o) {
-            if ((major >= o.major) && (minor >= o.minor)
-                    && (revision > o.revision)) {
-                return -1;
-            } else if (this.equals(o)) {
-                return 0;
-            } else {
-                return 1;
-            }
+        public String toString() {
+            return major + "." + minor + revisionStr;
+        }
+
+        /**
+         * Normalized string for shell.
+         *
+         * @return the string
+         */
+        String stringForShell() {
+            return toString().replaceAll("\\.|\\s+", "_");
         }
 
         /**
@@ -517,15 +610,14 @@ public class IdvCommandLinePrefs {
             int       result = 1;
             result = prime * result + major;
             result = prime * result + minor;
-            result = prime * result + ((p == null)
-                                       ? 0
-                                       : p.hashCode());
-            result = prime * result + revision;
+            result = prime * result + revisionChar;
+            result = prime * result + revisionNum;
             return result;
         }
 
         /**
          * {@inheritDoc}
+         *
          */
         @Override
         public boolean equals(Object obj) {
@@ -545,36 +637,13 @@ public class IdvCommandLinePrefs {
             if (minor != other.minor) {
                 return false;
             }
-            if (p == null) {
-                if (other.p != null) {
-                    return false;
-                }
-            } else if ( !p.equals(other.p)) {
+            if (revisionChar != other.revisionChar) {
                 return false;
             }
-            if (revision != other.revision) {
+            if (revisionNum != other.revisionNum) {
                 return false;
             }
             return true;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return major + "." + minor + ((revisionStr != null)
-                                          ? revisionStr
-                                          : "");
-        }
-
-        /**
-         * Normalized string for shell.
-         *
-         * @return the string
-         */
-        String stringForShell() {
-            return toString().replaceAll("\\.|\\s+", "_");
         }
 
     }
