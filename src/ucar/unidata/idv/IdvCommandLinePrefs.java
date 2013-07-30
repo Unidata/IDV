@@ -180,7 +180,7 @@ public class IdvCommandLinePrefs {
      */
     private static boolean showOldVersionMessage() {
         JEditorPane      ep  = new JEditorPane("text/html", getHTML());
-        final JCheckBox  cb  = new JCheckBox("Don't Show again");
+        final JCheckBox  cb  = new JCheckBox("Don't show again");
         CheckboxListener cbl = new CheckboxListener(cb);
         cb.addItemListener(cbl);
 
