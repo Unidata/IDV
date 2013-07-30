@@ -135,10 +135,30 @@ requests, such as ADDE requests.
 
 </faqitem>
 
-<faqitem q="New minor version of Java 6" id="java">
-The latest and final version of Java 6 (6u41) is included in this version of 
-the IDV.
+<faqitem q="New version update message" id="update">
+The IDV now has a mechanism to alert users of a new available version of the
+IDV. As the IDV starts up, the user's version is compared against the latest
+stable version of the IDV. If the user's version is old, they are presented with
+an alert message and link indicating where to obtain the newer version. They
+can also choose to check "Don't show again" in which case they will no longer
+receive alerts for that newer version. However, if a new subsequent version of
+the IDV is released, they will again be alerted for that newer version.
 </faqitem>
+
+<faqitem q="ZIDV bundles" id="zidv">
+There is now a quicker way to save zidv bundles with the "Save All Displayed
+Data" option.  This selection allows the user to avoid having to go through many
+dialogs asking what data they would like saved.
+</faqitem>
+
+<faqitem q="Performance" id="performance">
+Various memory usage and performance enhancements. During bundle
+deserialization, using a (eh)cache to avoid redundant method lookups in the
+class object. Fixed inefficient use of hashmap to store rays in radar data. At
+the VisAD level, replaced home-grown thread pools with java.util.concurrent
+thread pools. Again in VisAD, fixed a needless HersheyFont instantiation issue.
+</faqitem>
+
 
 <faqitem cat="Display Changes"></faqitem>
 
@@ -149,6 +169,11 @@ A new transect control will be created when a user creates a cross section displ
 
 <faqitem q="Contour labelling frequency" id="contourlabelfq">
 Improving the logic in the visad library can do better validation of the numeric ranges.
+</faqitem>
+
+<faqitem q="Units on color scale" id="colorscaleunit">
+It is now possible to label the color scale with a unit. This option is configurable via
+the Dashboard, Displays Tab, Edit, Properties Menu, Color Scale tab. 
 </faqitem>
 
 
