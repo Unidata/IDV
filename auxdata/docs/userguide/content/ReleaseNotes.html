@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 3.1u1 release.
+The items below reflect changes since the 4.0u1 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -142,60 +142,22 @@ the IDV.
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Grid Trajectory Display" id="gridTrajectory">
-The IDV now can plot 2D and 3D forward and backward gridded trajectory. The forward and backward 2D and 3D grid
-trajectory are derived data choices based on the horizontal velocity
-components and vertical velocity component. The trajectory is colored
-by a user selected parameter. There are three options in
-the <a href="controls/GridTrajectoryControl.html">Grid Trajectory
-Control</a> to initialize the trajectory initial area.
+<faqitem q="Transect Display" id="gridTransect">
+A new transect control will be created when a user creates a cross section display on a transect view. Two end points
+    lables are added in the transect display.
 </faqitem>
 
 <faqitem q="Contour labelling frequency" id="contourlabelfq">
-Added a user interface to change the frequency of the contour labels.
-The density of the label can now be increased or decreased along the contours
-or horizontally across the display.
+Improving the logic in the visad library can do better validation of the numeric ranges.
 </faqitem>
 
-<faqitem q="Webcams" id="webcam">
-Fixed broken webcam links available in the IDV.
-</faqitem>
-
-<faqitem q="WMS server" id="webmapserver">
-USGS Shaded Relief has been reinstated as "CONUS Shaded Relief" in the
-list of map background images.
-</faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
 
-<faqitem q="Non standard calendars" id="calendar">
-An additional change in the netCDF-Java 4.3 library is support for 
-non-standard calendars (e.g. 365 or 360 day years used in climate datasets).
-The IDV has been modified to support these calendars and display dates
-correctly from those datasets.
+<faqitem q="Adde server list" id="addeList">
+ Non active server has been removed and a few new servers added to the list..
 </faqitem>
 
-<faqitem cat="ISL Changes"></faqitem>
-
-<faqitem q="ISL Export Tag to Save Data to Comma Separated Value (CSV) and netCDF Formats" id="export">
-The IDV Scripting Language (ISL) has new capability
-to <a href="isl/DataAndDisplays.html#export">export</a> data available in
-ObsListControl (e.g. a Point Data List display for METAR data).
-</faqitem>
-
-<faqitem q="ISL Image Tag animation_index Attribute" id="animation">
-The IDV Scripting Language
-(ISL) <a href="isl/ImagesAndMovies.html#image">image</a> tag has a new
-animation_index attribute to specify multiple images in the animation.
-</faqitem>
-
-<faqitem cat="Documentation Changes"></faqitem>
-
-<faqitem q="RAMADDA Section in IDV Training Workshop" id="ramadda">
-There is a new RAMADDA section
-in <a href="http://www.unidata.ucar.edu/software/idv/docs/workshop/ramadda/index.html">IDV
-training workshop</a>.
-</faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
