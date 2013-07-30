@@ -40,7 +40,7 @@ import java.util.List;
 public class IdvCommandLinePrefsTest {
 
     /**
-     * _more_
+     * Test IDV Version equality
      */
     @Test
     public void testIdvVersionEquality() {
@@ -51,7 +51,7 @@ public class IdvCommandLinePrefsTest {
     }
 
     /**
-     * _more_
+     * Test IDV version comparison
      */
     @Test
     public void testIdvVersionComparison() {

@@ -108,6 +108,7 @@ public class IdvCommandLinePrefs {
         try {
             final Map<Object, Object> userPrefMap   = getPrefMap(args);
             String                    oldVersionKey = "idv_old_version_"
+                                   + getIDVVersion().stringForShell() + "_"
                                    + currentIDVVersion.stringForShell()
                                    + "_dontwarn";
 
@@ -421,8 +422,6 @@ public class IdvCommandLinePrefs {
 
         /**
          * {@inheritDoc}
-         *
-         * @param arg0 _more_
          */
         @Override
         public void itemStateChanged(ItemEvent arg0) {
@@ -455,10 +454,8 @@ public class IdvCommandLinePrefs {
          *
          * @param major the major
          * @param minor the minor
-         * @param revision the revision character
-         * @param revision the revision number
-         * @param revisionChar _more_
-         * @param revisionNum _more_
+         * @param revisionChar the revision character
+         * @param revisionNum the revision number
          */
         IDVVersion(String major, String minor, String revisionChar,
                    String revisionNum) {
@@ -493,10 +490,8 @@ public class IdvCommandLinePrefs {
          *
          * @param major the major
          * @param minor the minor
-         * @param revision the revision character
-         * @param revision the revision number
-         * @param revisionChar _more_
-         * @param revisionNum _more_
+         * @param revisionChar the revision character
+         * @param revisionNum the revision number
          */
         private void idvVersionInternal(String major, String minor,
                                         String revisionChar,
@@ -519,7 +514,6 @@ public class IdvCommandLinePrefs {
 
         /**
          * {@inheritDoc}
-         *
          */
         @Override
         public int compareTo(IDVVersion o) {
@@ -545,9 +539,15 @@ public class IdvCommandLinePrefs {
          * @return the int
          */
         private static int digitizeVersion(IDVVersion idvv) {
-            return idvv.major * 1000000 + idvv.minor * 10000
-                   + idvv.revisionChar * 100 + idvv.revisionNum;
-
+            // Represent the IDV version as a long. 
+            // The revision number takes the first eight bits
+            // The revision character takes the second eight bits
+            // The minor version number takes the third eight bits
+            // The major version number takes the fourth eight bits
+            return  idvv.revisionNum
+                   + (idvv.revisionChar << (8 * 1))
+                   + (idvv.minor << (8 * 2))
+                   + (idvv.major << (8 * 3));
         }
 
         /**
@@ -580,7 +580,7 @@ public class IdvCommandLinePrefs {
             } catch (NumberFormatException e) {
                 //Could not find a number so default to something big.
                 // 2.7uX comes after 2.7u2
-                return 99;
+                return 255;  //Highest number possible for first eight bits, see  digitizeVersion method
             }
         }
 
