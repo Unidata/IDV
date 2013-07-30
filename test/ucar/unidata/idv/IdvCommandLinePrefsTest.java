@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2012 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -25,7 +25,9 @@ import org.junit.Test;
 
 import ucar.unidata.idv.IdvCommandLinePrefs.IDVVersion;
 
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -36,6 +38,32 @@ import java.util.List;
  * The Class IdvCommandLinePrefsTest.
  */
 public class IdvCommandLinePrefsTest {
+
+    /**
+     * _more_
+     */
+    @Test
+    public void testIdvVersionEquality() {
+        IDVVersion idv1 = new IDVVersion("4", "0", "u", "1");
+        IDVVersion idv2 = new IDVVersion("4", "0", "u", "1");
+        assertTrue(idv1.equals(idv1));
+        assertTrue(idv1.equals(idv2));
+    }
+
+    /**
+     * _more_
+     */
+    @Test
+    public void testIdvVersionComparison() {
+        IDVVersion idv1 = new IDVVersion("4", "0", "b", "2");
+        IDVVersion idv2 = new IDVVersion("4", "0", "u", "1");
+        IDVVersion idv3 = new IDVVersion("4", "0", "u", "2");
+        IDVVersion idv4 = new IDVVersion("5", "0", "u", "1");
+        assertTrue(idv2.compareTo(idv1) < 0);
+        assertTrue(idv3.compareTo(idv2) < 0);
+        assertTrue(idv4.compareTo(idv3) < 0);
+    }
+
 
 
     /**
@@ -53,20 +81,25 @@ public class IdvCommandLinePrefsTest {
         assertEquals(msg, "3.0b1", new IDVVersion("3.0b1").toString());
         assertEquals(msg, "2.7uX", new IDVVersion("2.7uX").toString());
     }
-    
+
 
     /**
      * Test parse IDV Version String
      */
     @Test
     public void testIdvVersion() {
-      final String msg = "IDV Version incorrect";
-      assertEquals(msg, "2.6", new IDVVersion("2","6",null).toString());
-      assertEquals(msg, "2.6", new IDVVersion("2","6","").toString());
-      assertEquals(msg, "2.6", new IDVVersion("2","6"," ").toString());
-      assertEquals(msg, "2.7u2", new IDVVersion("2","7","u2").toString());
-      assertEquals(msg, "2.8uX", new IDVVersion("2","8","uX").toString());
-      assertEquals(msg, "3.0b1", new IDVVersion("3","0","b1").toString());
+        final String msg = "IDV Version incorrect";
+        assertEquals(msg, "2.6",
+                     new IDVVersion("2", "6", null, null).toString());
+        assertEquals(msg, "2.6", new IDVVersion("2", "6", "", "").toString());
+        assertEquals(msg, "2.6",
+                     new IDVVersion("2", "6", " ", " ").toString());
+        assertEquals(msg, "2.7u2",
+                     new IDVVersion("2", "7", "u", "2").toString());
+        assertEquals(msg, "2.8uX",
+                     new IDVVersion("2", "8", "u", "X").toString());
+        assertEquals(msg, "3.0b1",
+                     new IDVVersion("3", "0", "b", "1").toString());
     }
 
     /**
@@ -99,15 +132,20 @@ public class IdvCommandLinePrefsTest {
         list.add(new IDVVersion("3.1u2"));
         list.add(new IDVVersion("4.0"));
         list.add(new IDVVersion("4.0u1"));
-        Collections.sort(list);
-        StringBuilder sb = new StringBuilder();
-        for (IDVVersion i : list) {
-            sb.append(i.toString() + ",");
+
+        for (int j = 0; j < 100; j++) {
+            Collections.shuffle(list);
+            Collections.sort(list);
+            StringBuilder sb = new StringBuilder();
+            for (IDVVersion i : list) {
+                sb.append(i.toString() + ",");
+            }
+            assertEquals(
+                "IDV Version not sorting correctly",
+                "4.0u1,4.0,3.1u2,3.1u1,3.1,3.0u2,3.0u1,3.0b1,3.0,2.9u3,2.9u2,2.9u1,2.9,2.8uX,2.8,2.7uX,2.7u2,2.7,2.6uX,2.6,2.5,2.5,2.4,2.4,",
+                sb.toString());
+
         }
-        assertEquals(
-            "IDV Version not sorting correctly",
-            "4.0u1,4.0,3.1u2,3.1u1,3.1,3.0u2,3.0u1,3.0b1,3.0,2.9u3,2.9u2,2.9u1,2.9,2.8uX,2.8,2.7uX,2.7u2,2.7,2.6uX,2.6,2.5,2.4,2.5,2.4,",
-            sb.toString());
     }
 
     /**
