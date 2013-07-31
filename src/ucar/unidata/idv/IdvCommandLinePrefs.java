@@ -422,6 +422,7 @@ public class IdvCommandLinePrefs {
 
         /**
          * {@inheritDoc}
+         *
          */
         @Override
         public void itemStateChanged(ItemEvent arg0) {
@@ -434,20 +435,11 @@ public class IdvCommandLinePrefs {
      */
     static class IDVVersion implements Comparable<IDVVersion> {
 
-        /** Major version. */
-        private int major;
+        /** IDV version. */
+        private int version;
 
-        /** Minor version. */
-        private int minor;
-
-        /** Revision version char */
-        private int revisionChar;
-
-        /** Revision version number */
-        private int revisionNum;
-
-        /** Revision String */
-        private String revisionStr;
+        /** IDV version string. */
+        private String versionStr;
 
         /**
          * Instantiates a new IDV version.
@@ -496,29 +488,40 @@ public class IdvCommandLinePrefs {
         private void idvVersionInternal(String major, String minor,
                                         String revisionChar,
                                         String revisionNum) {
-            this.major = Integer.parseInt(major.trim());
-            this.minor = Integer.parseInt(minor.trim());
+            int    mjr = Integer.parseInt(major.trim());
+            int    mnr = Integer.parseInt(minor.trim());
+            String revStr;
             if ((revisionChar == null) || (revisionNum == null)) {
-                this.revisionStr = "";
+                revStr = "";
             } else {
-                this.revisionStr = (revisionChar + revisionNum).trim();
+                revStr = (revisionChar + revisionNum).trim();
             }
-            this.revisionChar = digitizeRevisionChar((revisionChar == null)
+            int revChar = digitizeRevisionChar((revisionChar == null)
                     ? ""
                     : revisionChar.trim());
-            this.revisionNum  = digitizeRevisionNum((revisionNum == null)
+            int revNum  = digitizeRevisionNum((revisionNum == null)
                     ? ""
                     : revisionNum.trim());
+
+            // Represent the IDV version as a int. 
+            // The revision number takes the first eight bits
+            // The revision character takes the second eight bits
+            // The minor version number takes the third eight bits
+            // The major version number takes the fourth eight bits
+            this.version = revNum + (revChar << (8 * 1)) + (mnr << (8 * 2))
+                           + (mjr << (8 * 3));
+            this.versionStr = mjr + "." + mnr + revStr;
         }
 
 
         /**
          * {@inheritDoc}
+         *
          */
         @Override
         public int compareTo(IDVVersion o) {
-            int v1 = digitizeVersion(this);
-            int v2 = digitizeVersion(o);
+            int v1 = this.version;
+            int v2 = o.version;
             if (v2 == v1) {
                 return 0;
             } else if (v1 > v2) {
@@ -531,32 +534,12 @@ public class IdvCommandLinePrefs {
         }
 
         /**
-         * Digitize version. Turn something like 2.7uX, or 4.0u1 into a number so
-         * that is may be used by the comparator.
-         *
-         * @param idvv
-         *          the idvv
-         * @return the int
-         */
-        private static int digitizeVersion(IDVVersion idvv) {
-            // Represent the IDV version as a long. 
-            // The revision number takes the first eight bits
-            // The revision character takes the second eight bits
-            // The minor version number takes the third eight bits
-            // The major version number takes the fourth eight bits
-            return  idvv.revisionNum
-                   + (idvv.revisionChar << (8 * 1))
-                   + (idvv.minor << (8 * 2))
-                   + (idvv.major << (8 * 3));
-        }
-
-        /**
          * Digitize revision character. In short, ? > u > b > empty
          *
          * @param c the c
          * @return the revision character as a number
          */
-        private int digitizeRevisionChar(String c) {
+        private static int digitizeRevisionChar(String c) {
             if (c.equals("")) {
                 return 0;
             } else if (c.equals("b")) {
@@ -580,16 +563,17 @@ public class IdvCommandLinePrefs {
             } catch (NumberFormatException e) {
                 //Could not find a number so default to something big.
                 // 2.7uX comes after 2.7u2
-                return 255;  //Highest number possible for first eight bits, see  digitizeVersion method
+                return 255;  //Highest number possible for first eight bits, see idvVersionInternal method
             }
         }
 
         /**
          * {@inheritDoc}
+         *
          */
         @Override
         public String toString() {
-            return major + "." + minor + revisionStr;
+            return versionStr;
         }
 
         /**
@@ -603,15 +587,13 @@ public class IdvCommandLinePrefs {
 
         /**
          * {@inheritDoc}
+         *
          */
         @Override
         public int hashCode() {
             final int prime  = 31;
             int       result = 1;
-            result = prime * result + major;
-            result = prime * result + minor;
-            result = prime * result + revisionChar;
-            result = prime * result + revisionNum;
+            result = prime * result + version;
             return result;
         }
 
@@ -631,20 +613,10 @@ public class IdvCommandLinePrefs {
                 return false;
             }
             IDVVersion other = (IDVVersion) obj;
-            if (major != other.major) {
-                return false;
-            }
-            if (minor != other.minor) {
-                return false;
-            }
-            if (revisionChar != other.revisionChar) {
-                return false;
-            }
-            if (revisionNum != other.revisionNum) {
+            if (version != other.version) {
                 return false;
             }
             return true;
         }
-
     }
 }
