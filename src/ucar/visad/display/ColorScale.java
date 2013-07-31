@@ -1035,6 +1035,8 @@ public class ColorScale extends DisplayableData {
         }
 
         double   val_unit   = Math.abs(highRange - lowRange) / (range);
+        //Fudge factor to move unit slightly beyond color bar. 
+        val_unit = val_unit + (val_unit * 5/100); 
         double[] point_unit = new double[3];
         for (int j = 0; j < 3; j++) {
             point_unit[j] = (1.0 - val_unit) * startn[j]
@@ -1079,13 +1081,6 @@ public class ColorScale extends DisplayableData {
                 point[j] = (1.0 - val) * startn[j] + val * startp[j]
                            - dist * up[j];
 
-            }
-
-            //Don't have unit stomping on the label
-            if (unitVisible && (point[0] == point_unit[0])
-                    && (point[1] == point_unit[1])
-                    && (point[2] == point_unit[2])) {
-                continue;
             }
 
             /*
