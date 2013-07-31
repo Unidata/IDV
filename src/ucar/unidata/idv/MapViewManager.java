@@ -102,6 +102,7 @@ import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
 import java.text.Collator;
+
 import java.util.*;
 
 import javax.swing.JButton;
@@ -1365,7 +1366,7 @@ public class MapViewManager extends NavigatedViewManager {
                                                       Object>();
 
         Collection<String> projNames =
-                new TreeSet<String>(Collator.getInstance());
+            new TreeSet<String>(Collator.getInstance());
 
         for (int p = 0; p < projections.size(); p++) {
             String projName = ((ProjectionImpl) projections.get(p)).getName();
@@ -1377,7 +1378,8 @@ public class MapViewManager extends NavigatedViewManager {
         Object defaultProj = getDefaultProjection();
         if (defaultProj != null) {
             if (defaultProj instanceof ProjectionImpl) {
-                projBox.setSelectedItem(((ProjectionImpl) defaultProj).getName());
+                projBox.setSelectedItem(
+                    ((ProjectionImpl) defaultProj).getName());
             } else {
                 projBox.setSelectedItem(defaultProj);
             }
@@ -3367,6 +3369,14 @@ public class MapViewManager extends NavigatedViewManager {
      */
     public void setShowElevation(boolean value) {}
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setProjectionFromData(boolean value) {
+        setUseProjectionFromData(value);
+    }
 
     /**
      * Set the  use projection from data flag

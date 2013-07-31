@@ -7807,6 +7807,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setProjectionFromData(boolean value) {}
 
     /**
      * Class MyTimeline for the animation timeline

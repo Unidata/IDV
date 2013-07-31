@@ -28,6 +28,7 @@ import ucar.unidata.data.*;
 import ucar.unidata.data.grid.DerivedGridFactory;
 import ucar.unidata.data.imagery.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.adde.AddeImageChooser;
 import ucar.unidata.util.ColorTable;
@@ -197,7 +198,10 @@ public class ImagePlanViewControl extends PlanViewControl {
                     LatLonPoint[] llp0 = dataSelection.getGeoSelection().getRubberBandBoxPoints();
                     gs.setRubberBandBoxPoints(llp0);
                 }
-
+                if(getViewManager() instanceof MapViewManager) {
+                    if(regionSelection.getRegionOption().equals("Use Display Area"))
+                        getViewManager().setProjectionFromData(false);
+                }
                 dataSelection.setGeoSelection(gs);
             }
             dataSelection.putProperty(
