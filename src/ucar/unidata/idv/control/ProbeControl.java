@@ -97,6 +97,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -299,6 +300,32 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     public boolean init(List choices) throws VisADException, RemoteException {
 
+        // make sure user has selected at least two times.
+    	// can't do a time series with less
+    	boolean singleTime = true;
+    	for (int i = 0; i < choices.size(); i++) {
+    		ProbeRowInfo info = getRowInfo(i);
+    		Data data = info.getDataInstance().getData();
+    		if ( !(data instanceof FieldImpl)) {
+    			continue;
+    		}
+    		Set set = ((FieldImpl) data).getDomainSet();
+    		if (set != null) {
+    			if (set.getLength() > 1) {
+    				singleTime = false;
+    				break;
+    			}
+    		}
+    	}
+    	if (singleTime) {
+    		JOptionPane.showMessageDialog(
+    				getMainPanel(), 
+    				"Select at least two times for a time series", 
+    				"Data Probe / Time Series Message",
+    				JOptionPane.INFORMATION_MESSAGE);
+    		return false;
+    	}
+        
         if ((_levels != null) && (infos.size() == 0)) {
             //We have legacy muli-list table state
             for (int i = 0; i < _levels.size(); i++) {
