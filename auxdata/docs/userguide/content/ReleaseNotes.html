@@ -20,8 +20,76 @@ The items below reflect changes since the 4.0u1 release.
 
 <faqitem q="Latest netCDF-Java Version" id="nj43">
 <p>
-A new version of the netCDF-Java library (4.3.16) is included in this
-release. This version of netCDF-Java includes major changes to the way GRIB 1
+A new version of the netCDF-Java library (4.3.18) is included included in this release.
+Please see the <a href="#netcdfJavaTdsChanges">
+netCDF-Java and TDS updade</a> item for more details on these changes.
+</p>
+</faqitem>
+
+<faqitem q="New version update message" id="update">
+The IDV now has a mechanism to alert users of a new available version of the
+IDV. As the IDV starts up, the user's version is compared against the latest
+stable version of the IDV. If the user's version is old, they are presented with
+an alert message and link indicating where to obtain the newer version. They
+can also choose to check "Don't show again" in which case they will no longer
+receive alerts for that newer version. However, if a new subsequent version of
+the IDV is released, they will again be alerted for that newer version.
+</faqitem>
+
+<faqitem q="ZIDV bundles" id="zidv">
+There is now a quicker way to save zidv bundles with the "Save All Displayed
+Data" option.  This selection allows the user to avoid having to go through many
+dialogs asking what data they would like saved.
+</faqitem>
+
+<faqitem q="Performance" id="performance">
+Various memory usage and performance enhancements. During bundle
+deserialization, using a (eh)cache to avoid redundant method lookups in the
+class object. Fixed inefficient use of hashmap to store rays in radar data. At
+the VisAD level, replaced home-grown thread pools with java.util.concurrent
+thread pools. Again in VisAD, fixed a needless HersheyFont instantiation issue.
+</faqitem>
+
+
+<faqitem cat="Display Changes"></faqitem>
+
+<faqitem q="Transect Display" id="gridTransect">
+A new transect control will be created when a user creates a cross section display on a transect view. Two end points
+    lables are added in the transect display.
+</faqitem>
+
+<faqitem q="Contour labelling frequency" id="contourlabelfq">
+Improving the logic in the visad library can do better validation of the numeric ranges.
+</faqitem>
+
+<faqitem q="Units on color scale" id="colorscaleunit">
+It is now possible to label the color scale with a unit. This option is configurable via
+the Dashboard, Displays Tab, Edit, Properties Menu, Color Scale tab. 
+</faqitem>
+
+
+<faqitem cat="Data Changes"></faqitem>
+
+<faqitem q="Adde server list" id="addeList">
+ Non active server has been removed and a few new servers added to the list..
+</faqitem>
+
+
+<faqitem cat="Bug Fixes/Known Problems"></faqitem>
+
+<faqitem q="Bug Fixes" id="bugfix">
+</faqitem>
+
+<faqitem q="Known Problems" id="problems">
+For a list of outstanding known problems, see the
+<a href="Bugs.html">Known Problems</a> page.
+</faqitem>
+
+
+<faqitem cat="Reminders"></faqitem>
+<faqitem q="Reminder on changes to netCDF-Java and TDS" id="netcdfJavaTdsChanges">
+<p>
+Version 4.3 and greater of netCDF-Java includes major changes to the way GRIB 1
 and 2 files are handled. See
 the <a href="http://www.unidata.ucar.edu/software/netcdf-java/formats/GribFiles.html">
 netCDF-Java GRIB documentation</a> for a more details on these changes.
@@ -135,64 +203,6 @@ requests, such as ADDE requests.
 
 </faqitem>
 
-<faqitem q="New version update message" id="update">
-The IDV now has a mechanism to alert users of a new available version of the
-IDV. As the IDV starts up, the user's version is compared against the latest
-stable version of the IDV. If the user's version is old, they are presented with
-an alert message and link indicating where to obtain the newer version. They
-can also choose to check "Don't show again" in which case they will no longer
-receive alerts for that newer version. However, if a new subsequent version of
-the IDV is released, they will again be alerted for that newer version.
-</faqitem>
-
-<faqitem q="ZIDV bundles" id="zidv">
-There is now a quicker way to save zidv bundles with the "Save All Displayed
-Data" option.  This selection allows the user to avoid having to go through many
-dialogs asking what data they would like saved.
-</faqitem>
-
-<faqitem q="Performance" id="performance">
-Various memory usage and performance enhancements. During bundle
-deserialization, using a (eh)cache to avoid redundant method lookups in the
-class object. Fixed inefficient use of hashmap to store rays in radar data. At
-the VisAD level, replaced home-grown thread pools with java.util.concurrent
-thread pools. Again in VisAD, fixed a needless HersheyFont instantiation issue.
-</faqitem>
-
-
-<faqitem cat="Display Changes"></faqitem>
-
-<faqitem q="Transect Display" id="gridTransect">
-A new transect control will be created when a user creates a cross section display on a transect view. Two end points
-    lables are added in the transect display.
-</faqitem>
-
-<faqitem q="Contour labelling frequency" id="contourlabelfq">
-Improving the logic in the visad library can do better validation of the numeric ranges.
-</faqitem>
-
-<faqitem q="Units on color scale" id="colorscaleunit">
-It is now possible to label the color scale with a unit. This option is configurable via
-the Dashboard, Displays Tab, Edit, Properties Menu, Color Scale tab. 
-</faqitem>
-
-
-<faqitem cat="Data Changes"></faqitem>
-
-<faqitem q="Adde server list" id="addeList">
- Non active server has been removed and a few new servers added to the list..
-</faqitem>
-
-
-<faqitem cat="Bug Fixes/Known Problems"></faqitem>
-
-<faqitem q="Bug Fixes" id="bugfix">
-</faqitem>
-
-<faqitem q="Known Problems" id="problems">
-For a list of outstanding known problems, see the
-<a href="Bugs.html">Known Problems</a> page.
-</faqitem>
 
 </faq>
 
