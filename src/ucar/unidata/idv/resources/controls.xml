@@ -233,7 +233,7 @@ example:
      class="ucar.unidata.idv.control.ContourCrossSectionControl"
      label="Contour Cross Section"
      icon="/ucar/unidata/idv/images/crosssection.jpg"
-     displaycategory="Cross sections"
+     displaycategory="Vertical Cross Sections"
      properties="windowVisible=true;autoScaleYAxis=true;"/>
   <control
      id="contourxsfilled"
@@ -241,7 +241,7 @@ example:
      class="ucar.unidata.idv.control.ContourCrossSectionControl"
      label="Color-Filled Contour Cross Section"
      xxxicon="/ucar/unidata/idv/images/crosssection.jpg"
-     displaycategory="Cross sections"
+     displaycategory="Vertical Cross Sections"
      properties="windowVisible=true;colorFill=true;autoScaleYAxis=true;"/>
   <control
      id="colorxs"
@@ -249,14 +249,14 @@ example:
      class="ucar.unidata.idv.control.ColorCrossSectionControl"
      label="Color-Shaded Cross Section"
      xxxicon="/ucar/unidata/idv/images/crosssection.jpg"
-     displaycategory="Cross sections"
+     displaycategory="Vertical Cross Sections"
      properties="windowVisible=true;smoothed=false;autoScaleYAxis=true;"/>
   <control
      id="dataxs"
      categories="GRID-2D-*;IMAGE-*-*"
      class="ucar.unidata.idv.control.DataTransectControl"
      label="Data Transect"
-     displaycategory="Cross sections"
+     displaycategory="Cross Sections"
      properties="windowVisible=true;autoScaleYAxis=false;"/>
 
   <control
