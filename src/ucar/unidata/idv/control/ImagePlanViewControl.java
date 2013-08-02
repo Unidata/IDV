@@ -31,10 +31,7 @@ import ucar.unidata.geoloc.*;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.adde.AddeImageChooser;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
+import ucar.unidata.util.*;
 
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
@@ -163,11 +160,12 @@ public class ImagePlanViewControl extends PlanViewControl {
             ProjectionRect rect =
                 regionSelection.display.getNavigatedPanel()
                     .getSelectedRegion();
-            if(!aImageDS.getIsReload())
+            if ( !aImageDS.getIsReload()) {
                 isProgressiveResolution =
                     advanceSelection.getIsProgressiveResolution();
+            }
 
-            String regionOption =  regionSelection.getRegionOption();
+            String regionOption = regionSelection.getRegionOption();
 
             if (rect != null) {
                 ProjectionImpl projectionImpl =
@@ -194,20 +192,51 @@ public class ImagePlanViewControl extends PlanViewControl {
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
-                if(dataSelection.getGeoSelection() != null) {
-                    LatLonPoint[] llp0 = dataSelection.getGeoSelection().getRubberBandBoxPoints();
+                if (dataSelection.getGeoSelection() != null) {
+                    LatLonPoint[] llp0 =
+                        dataSelection.getGeoSelection()
+                            .getRubberBandBoxPoints();
                     gs.setRubberBandBoxPoints(llp0);
                 }
-                if(getViewManager() instanceof MapViewManager) {
-                    if(regionSelection.getRegionOption().equals("Use Display Area"))
+                if (getViewManager() instanceof MapViewManager) {
+                    if (regionSelection.getRegionOption().equals(
+                            "Use Display Area")) {
                         getViewManager().setProjectionFromData(false);
+                        List<TwoFacedObject> coords =
+                            navDisplay.getScreenSidesCoordinates();
+                        double[]      elid = (double[]) coords.get(1).getId();
+                        EarthLocation el   =
+                            navDisplay.getEarthLocation(elid);
+                        double maxLat =
+                            el.getLatLonPoint().getLatitude().getValue();
+                        elid = (double[]) coords.get(2).getId();
+                        el   = navDisplay.getEarthLocation(elid);
+                        double minLat =
+                            el.getLatLonPoint().getLatitude().getValue();
+                        elid = (double[]) coords.get(3).getId();
+                        el   = navDisplay.getEarthLocation(elid);
+                        double maxLon =
+                            el.getLatLonPoint().getLongitude().getValue();
+                        elid = (double[]) coords.get(4).getId();
+                        el   = navDisplay.getEarthLocation(elid);
+                        double minLon =
+                            el.getLatLonPoint().getLongitude().getValue();
+                        GeoLocationInfo glInfo =
+                            new GeoLocationInfo(maxLat,
+                                LatLonPointImpl.lonNormal(minLon), minLat,
+                                LatLonPointImpl.lonNormal(maxLon));
+
+                        gs.setBoundingBox(glInfo);
+                    }
+
                 }
                 dataSelection.setGeoSelection(gs);
             }
             dataSelection.putProperty(
-                DataSelection.PROP_PROGRESSIVERESOLUTION, isProgressiveResolution);
-            dataSelection.putProperty(
-                    DataSelection.PROP_REGIONOPTION, regionOption);
+                DataSelection.PROP_PROGRESSIVERESOLUTION,
+                isProgressiveResolution);
+            dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
+                                      regionOption);
         }
 
         boolean result = super.setData(dataChoice);
