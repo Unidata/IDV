@@ -2094,11 +2094,19 @@ public class DrawingControl extends DisplayControlImpl {
      */
     private void doExport() {
         try {
-            if (loadAsMapData == null) {
-                loadAsMapData = new JCheckBox("Load as map data", false);
-                loadAsMapData.setToolTipText(
-                    "Load this xgrf file back in as map data");
+          loadAsMapData = null;
+          Boolean okayMap = true;
+
+            for (int i = 0; i < glyphs.size(); i++) { 
+              if (((DrawingGlyph)glyphs.get(i)).getTagName() != 
+                                  DrawingGlyph.TAG_POLYGON) okayMap = false;
             }
+
+              if (okayMap) {
+                loadAsMapData = new JCheckBox("Load polygons as map data", false);
+                loadAsMapData.setToolTipText("Load polygons in this xgrf file back in as map data");
+              }
+
             String filename = FileManager.getWriteFile(FILTER_XGRF,
                                   SUFFIX_XGRF, GuiUtils.top(loadAsMapData));
             if (filename == null) {
@@ -2109,7 +2117,7 @@ public class DrawingControl extends DisplayControlImpl {
                 return;
             }
             IOUtil.writeFile(filename, xml);
-            if (loadAsMapData.isSelected()) {
+            if ( (loadAsMapData != null) && (loadAsMapData.isSelected()) ) {
                 getIdv().makeOneDataSource(filename, "FILE.MAPFILE", null);
             }
         } catch (Exception exc) {
