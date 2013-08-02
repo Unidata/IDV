@@ -1089,11 +1089,11 @@ public class AddeImageDataSource extends ImageDataSource {
             } else if (ctLinEle[1][0] != ctLinEle[1][0]) {
                 // top is outside
                 lines = (int) (cbLinEle[1][0] - cLinEle[1][0])
-                        * Math.abs(lMag);
+                        * Math.abs(lMag) * 2;
             } else if (cbLinEle[1][0] != cbLinEle[1][0]) {
                 // bottom is outside
                 lines = (int) (cLinEle[1][0] - ctLinEle[1][0])
-                        * Math.abs(lMag);
+                        * Math.abs(lMag) * 2;
             } else {
                 // both inside
                 lines = (int) (cbLinEle[1][0] - ctLinEle[1][0])
@@ -1107,11 +1107,11 @@ public class AddeImageDataSource extends ImageDataSource {
             } else if (clLinEle[0][0] != clLinEle[0][0]) {
                 // left is outside
                 elems = (int) (crLinEle[0][0] - cLinEle[0][0])
-                        * Math.abs(eMag);
+                        * Math.abs(eMag) * 2;
             } else if (crLinEle[0][0] != crLinEle[0][0]) {
                 // right is outside
                 elems = (int) (cLinEle[0][0] - clLinEle[0][0])
-                        * Math.abs(eMag);
+                        * Math.abs(eMag) *2;
             } else {
                 //both inside
                 elems = (int) (crLinEle[0][0] - clLinEle[0][0])
