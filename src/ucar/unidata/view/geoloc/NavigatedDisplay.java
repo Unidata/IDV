@@ -2,27 +2,24 @@
  * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.view.geoloc;
 
-//~--- non-JDK imports --------------------------------------------------------
 
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
@@ -58,8 +55,6 @@ import visad.georef.MapProjection;
 
 import visad.java3d.DisplayRendererJ3D;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Color;
 import java.awt.event.InputEvent;
 import java.awt.geom.Rectangle2D;
@@ -78,6 +73,7 @@ import javax.swing.JToolBar;
 import javax.vecmath.Point3d;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
+
 
 /**
  * Provides support for a navigated VisAD DisplayImplJ3D for
@@ -202,7 +198,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     private boolean isAnimating = false;
 
     /** flag for clipping */
-    private boolean clipping = false;    // clipping not enabled by default
+    private boolean clipping = false;  // clipping not enabled by default
 
     /**
      * Vertical range visible
@@ -252,7 +248,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    protected NavigatedDisplay(DisplayImpl display) throws VisADException, RemoteException {
+    protected NavigatedDisplay(DisplayImpl display)
+            throws VisADException, RemoteException {
         init(display);
     }
 
@@ -264,14 +261,16 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws VisADException   VisAD error
      * @throws RemoteException  remote error
      */
-    protected void init(DisplayImpl display) throws VisADException, RemoteException {
+    protected void init(DisplayImpl display)
+            throws VisADException, RemoteException {
         super.init(display, 1);
 
         DisplayRenderer displayRenderer = display.getDisplayRenderer();
 
         myMode = (displayRenderer instanceof visad.java2d.DisplayRendererJ2D)
                  ? MODE_2D
-                 : (displayRenderer instanceof visad.java3d.TwoDDisplayRendererJ3D)
+                 : (displayRenderer
+                    instanceof visad.java3d.TwoDDisplayRendererJ3D)
                    ? MODE_2Din3D
                    : MODE_3D;
         displayRenderer.setCursorStringOn(false);
@@ -305,15 +304,17 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                     } else if (id == event.MOUSE_MOVED) {
                         pointerMoved(event.getX(), event.getY());
                     } else if (id == event.MOUSE_DRAGGED) {
-                        int mods    = event.getInputEvent().getModifiers();
-                        int button2 = (InputEvent.BUTTON1_MASK | InputEvent.BUTTON3_MASK);
-                        int button3 = (InputEvent.BUTTON1_MASK | InputEvent.BUTTON2_MASK);
+                        int mods = event.getInputEvent().getModifiers();
+                        int button2 = (InputEvent.BUTTON1_MASK
+                                       | InputEvent.BUTTON3_MASK);
+                        int button3 = (InputEvent.BUTTON1_MASK
+                                       | InputEvent.BUTTON2_MASK);
 
-                        if (((mods & InputEvent.BUTTON2_MASK) == InputEvent.BUTTON2_MASK)
-                                || ((mods & button2) == button2)) {
+                        if (((mods & InputEvent.BUTTON2_MASK)
+                                == InputEvent.BUTTON2_MASK) || ((mods
+                                    & button2) == button2)) {
                             cursorMoved();
-                        } else    // if ( ((mods & InputEvent.BUTTON3_MASK) ==
-
+                        } else  // if ( ((mods & InputEvent.BUTTON3_MASK) ==
                         // InputEvent.BUTTON3_MASK) ||
                         // ((mods & button3) == button3)) {
                         {
@@ -335,7 +336,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException on badness
      * @throws VisADException on badness
      */
-    public void setPolygonOffsetFactor(int offset) throws VisADException, RemoteException {
+    public void setPolygonOffsetFactor(int offset)
+            throws VisADException, RemoteException {
 
         // System.err.println(getClass().getName() + ".setPolygonOffsetFactor:"
         // + offset);
@@ -350,7 +352,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException on badness
      * @throws VisADException on badness
      */
-    public void setPolygonOffset(int offset) throws VisADException, RemoteException {
+    public void setPolygonOffset(int offset)
+            throws VisADException, RemoteException {
 
         // System.err.println(getClass().getName() + ".setPolygonOffset:"
         // + offset);
@@ -364,7 +367,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param roty  y rotation
      * @param rotz  z rotation
      */
-    public void setRotationMultiplierMatrix(double rotx, double roty, double rotz) {
+    public void setRotationMultiplierMatrix(double rotx, double roty,
+                                            double rotz) {
         rotateX = rotx;
         rotateY = roty;
         rotateZ = rotz;
@@ -426,7 +430,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param screenY Screen y coordinate
      * @return visad coordinates.
      */
-    public double[] getSpatialCoordinatesFromScreen(int screenX, int screenY) {
+    public double[] getSpatialCoordinatesFromScreen(int screenX,
+            int screenY) {
         return getSpatialCoordinatesFromScreen(screenX, screenY, Double.NaN);
     }
 
@@ -438,7 +443,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param zDepth  depth in the zbox
      * @return visad coordinates.
      */
-    public double[] getSpatialCoordinatesFromScreen(int screenX, int screenY, double zDepth) {
+    public double[] getSpatialCoordinatesFromScreen(int screenX, int screenY,
+            double zDepth) {
         return getRayPositionAtZ(getRay(screenX, screenY), zDepth);
     }
 
@@ -461,7 +467,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @return the ray
      */
     public VisADRay getRay(int screenX, int screenY) {
-        return getDisplay().getDisplayRenderer().getMouseBehavior().findRay(screenX, screenY);
+        return getDisplay().getDisplayRenderer().getMouseBehavior().findRay(
+            screenX, screenY);
     }
 
     /**
@@ -472,7 +479,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @return screen (x,y) coordinates
      */
     public int[] getScreenCoordinates(double[] position) {
-        return getDisplay().getDisplayRenderer().getMouseBehavior().getScreenCoords(position);
+        return getDisplay().getDisplayRenderer().getMouseBehavior()
+            .getScreenCoords(position);
     }
 
     /**
@@ -495,7 +503,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *             (might be useful for debugging).
      */
     public void setCursorStringOn(boolean on) {
-        ((DisplayRenderer) getDisplay().getDisplayRenderer()).setCursorStringOn(on);
+        ((DisplayRenderer) getDisplay().getDisplayRenderer())
+            .setCursorStringOn(on);
     }
 
     /**
@@ -570,7 +579,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws  VisADException         Couldn't create necessary VisAD object
      * @throws  RemoteException        Couldn't create a remote object
      */
-    public void setMapProjection(ProjectionImpl projection) throws VisADException, RemoteException {
+    public void setMapProjection(ProjectionImpl projection)
+            throws VisADException, RemoteException {
         setMapProjection(new ProjectionCoordinateSystem(projection));
     }
 
@@ -583,7 +593,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws  VisADException         Couldn't create necessary VisAD object
      * @throws  RemoteException        Couldn't create a remote object
      */
-    public abstract void setMapProjection(MapProjection mapProjection) throws VisADException, RemoteException;
+    public abstract void setMapProjection(MapProjection mapProjection)
+     throws VisADException, RemoteException;
 
     /**
      * Set the map area to be displayed in the box.  Subclasses should
@@ -595,7 +606,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws  VisADException         invalid navigation or VisAD error
      * @throws  RemoteException        Couldn't create a remote object
      */
-    public void setMapArea(ProjectionRect mapArea) throws VisADException, RemoteException {}
+    public void setMapArea(ProjectionRect mapArea)
+            throws VisADException, RemoteException {}
 
     /**
      * Accessor method for the altitude ScalarMap (i.e.,
@@ -616,7 +628,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
      */
-    public void addVerticalMap(RealType verticalType) throws VisADException, RemoteException {}
+    public void addVerticalMap(RealType verticalType)
+            throws VisADException, RemoteException {}
 
     /**
      * Method to remove a new ScalarMap to the vertical coordinate (i.e.,
@@ -629,7 +642,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
      */
-    public void removeVerticalMap(RealType verticalType) throws VisADException, RemoteException {}
+    public void removeVerticalMap(RealType verticalType)
+            throws VisADException, RemoteException {}
 
     /**
      * Set the view for 3D.  The views are subject to each subclass-s
@@ -711,7 +725,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException   unable to toggle the rubber banding function
      */
-    public void enableRubberBanding(boolean on) throws VisADException, RemoteException {
+    public void enableRubberBanding(boolean on)
+            throws VisADException, RemoteException {
         RubberBandBox box = getRubberBandBox();
 
         if (box == null) {
@@ -735,11 +750,12 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    public void setVerticalRangeUnit(Unit newUnit) throws VisADException, RemoteException {
+    public void setVerticalRangeUnit(Unit newUnit)
+            throws VisADException, RemoteException {
         ScalarMap vertMap = getAltitudeMap();
 
         if ((vertMap != null) && (newUnit != null)) {
-            if (!Misc.equals(getVerticalRangeUnit(), newUnit)) {
+            if ( !Misc.equals(getVerticalRangeUnit(), newUnit)) {
                 vertMap.setOverrideUnit(newUnit);
             }
         }
@@ -769,13 +785,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     Unable to create the display
      */
-    public void setVerticalRange(double min, double max) throws VisADException, RemoteException {
+    public void setVerticalRange(double min, double max)
+            throws VisADException, RemoteException {
         ScalarMap vertMap = getAltitudeMap();
 
         if (vertMap != null) {
             double[] vertRange = getVerticalRange();
 
-            if (!((vertRange[0] == min) && (vertRange[1] == max))) {
+            if ( !((vertRange[0] == min) && (vertRange[1] == max))) {
                 vertMap.setRange(min, max);
             }
         }
@@ -823,7 +840,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws  RemoteException   If there was a problem making this
      *                               change in a remote collaborative display.
      */
-    public void setBoxVisible(boolean on) throws VisADException, RemoteException {
+    public void setBoxVisible(boolean on)
+            throws VisADException, RemoteException {
         getDisplay().getDisplayRenderer().setBoxOn(on);
         box = on;
     }
@@ -847,7 +865,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws  RemoteException   If there was a problem making this
      *                               change in a remote collaborative display.
      */
-    public void setScalesVisible(boolean on) throws VisADException, RemoteException {
+    public void setScalesVisible(boolean on)
+            throws VisADException, RemoteException {
         getDisplay().getGraphicsModeControl().setScaleEnable(on);
     }
 
@@ -881,14 +900,16 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         EarthLocation el = null;
 
         try {
-            el = getEarthLocation(new double[] { ((Real) xyz.getComponent(0)).getValue(),
-                    ((Real) xyz.getComponent(1)).getValue(), ((Real) xyz.getComponent(2)).getValue() });
+            el = getEarthLocation(new double[] {
+                ((Real) xyz.getComponent(0)).getValue(),
+                ((Real) xyz.getComponent(1)).getValue(),
+                ((Real) xyz.getComponent(2)).getValue() });
         } catch (VisADException e) {
             e.printStackTrace();
-        }    // can't happen
+        }  // can't happen
                 catch (RemoteException e) {
             e.printStackTrace();
-        }    // can't happen
+        }  // can't happen
 
         return el;
     }
@@ -927,7 +948,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @return point in lat/lon/alt space.
      */
-    public abstract EarthLocation getEarthLocation(double x, double y, double z, boolean setZToZeroIfOverhead);
+    public abstract EarthLocation getEarthLocation(double x, double y,
+            double z, boolean setZToZeroIfOverhead);
 
     /**
      * Returns the spatial (XYZ) coordinates of the particular EarthLocation
@@ -950,8 +972,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *                            change in a remote collaborative display.
      * @throws  VisADException    Couldn't create the necessary VisAD object
      */
-    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz) throws VisADException, RemoteException {
-        return getSpatialCoordinates(el, xyz, el.getAltitude().getValue(CommonUnit.meter));
+    public double[] getSpatialCoordinates(EarthLocation el, double[] xyz)
+            throws VisADException, RemoteException {
+        return getSpatialCoordinates(
+            el, xyz, el.getAltitude().getValue(CommonUnit.meter));
     }
 
     /**
@@ -967,8 +991,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *                            change in a remote collaborative display.
      * @throws  VisADException    Couldn't create the necessary VisAD object
      */
-    public abstract double[] getSpatialCoordinates(EarthLocation el, double[] xyz, double altitude)
-            throws VisADException, RemoteException;
+    public abstract double[] getSpatialCoordinates(EarthLocation el,
+            double[] xyz, double altitude)
+     throws VisADException, RemoteException;
 
     /**
      * Return the real altitude from a ZAxis (or displayAltitudeType) value
@@ -992,7 +1017,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    protected void setCursorLatitude(Real latitude) throws VisADException, RemoteException {
+    protected void setCursorLatitude(Real latitude)
+            throws VisADException, RemoteException {
         Real oldLatitude = cursorLatitude;
 
         cursorLatitude = latitude;
@@ -1017,7 +1043,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    protected void setCursorLongitude(Real longitude) throws VisADException, RemoteException {
+    protected void setCursorLongitude(Real longitude)
+            throws VisADException, RemoteException {
         Real oldLongitude = cursorLongitude;
 
         cursorLongitude = longitude;
@@ -1042,7 +1069,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    protected void setCursorAltitude(Real altitude) throws VisADException, RemoteException {
+    protected void setCursorAltitude(Real altitude)
+            throws VisADException, RemoteException {
         Real oldAltitude = cursorAltitude;
 
         cursorAltitude = altitude;
@@ -1084,7 +1112,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param sleepTime  sleep time
      */
     public void animateMatrix(double[] to, long sleepTime) {
-        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null, sleepTime);
+        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null,
+                      sleepTime);
     }
 
     /**
@@ -1096,7 +1125,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param to The dest matrix
      * @param finalLocation   final location to animate to
      */
-    public void animateMatrix(int myTimeStamp, double[] from, double[] to, EarthLocation finalLocation) {
+    public void animateMatrix(int myTimeStamp, double[] from, double[] to,
+                              EarthLocation finalLocation) {
         animateMatrix(myTimeStamp, from, to, finalLocation, 50);
     }
 
@@ -1111,9 +1141,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[]      scale         = { 0.0, 0.0, 0.0 };
         MouseBehavior mouseBehavior = getMouseBehavior();
 
-        mouseBehavior.instance_unmake_matrix(rot, scale, trans, getProjectionMatrix());
+        mouseBehavior.instance_unmake_matrix(rot, scale, trans,
+                                             getProjectionMatrix());
 
-        double[]    t         = mouseBehavior.make_matrix(rot[0], rot[1], rot[2], 1, 1, 1, 0, 0, 0);
+        double[] t = mouseBehavior.make_matrix(rot[0], rot[1], rot[2], 1, 1,
+                         1, 0, 0, 0);
         Transform3D transform = new Transform3D(t);
 
         transform.invert();
@@ -1129,8 +1161,9 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param finalLocation  the final location
      * @param sleepTime  sleepy time
      */
-    public void animateMatrix(int myTimeStamp, double[] from, double[] to, EarthLocation finalLocation,
-                              long sleepTime) {
+    public void animateMatrix(int myTimeStamp, double[] from, double[] to,
+                              EarthLocation finalLocation, long sleepTime) {
+
         double[] lastGoodMatrix = from;
 
         try {
@@ -1160,15 +1193,18 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             Transform3D        t1          = new Transform3D(from);
             Transform3D        t2          = new Transform3D(to);
             java.awt.Rectangle bounds      = getScreenBounds();
-            int[]              ptsx        = { 0, bounds.width / 2, bounds.width };
-            int[]              ptsy        = { 0, bounds.height / 2, bounds.height };
+            int[]              ptsx = { 0, bounds.width / 2, bounds.width };
+            int[]              ptsy = { 0, bounds.height / 2, bounds.height };
             double             maxDistance = 0;
 
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    double[] screenLoc = getSpatialCoordinatesFromScreen(ptsx[i], ptsx[j]);
-                    Point3d  p1        = new Point3d(screenLoc[0], screenLoc[1], screenLoc[2]);
-                    Point3d  p2        = new Point3d(screenLoc[0], screenLoc[1], screenLoc[2]);
+                    double[] screenLoc =
+                        getSpatialCoordinatesFromScreen(ptsx[i], ptsx[j]);
+                    Point3d p1 = new Point3d(screenLoc[0], screenLoc[1],
+                                             screenLoc[2]);
+                    Point3d p2 = new Point3d(screenLoc[0], screenLoc[1],
+                                             screenLoc[2]);
 
                     t1.transform(p1);
                     t2.transform(p2);
@@ -1243,17 +1279,20 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 double[] tmpRot = new double[16];
 
                 t3.get(tmpRot);
-                getMouseBehavior().instance_unmake_matrix(rot, scale, trans, tmpRot);
+                getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                        tmpRot);
                 tmp = mouseBehavior.make_matrix(rot[0], rot[1], rot[2],
-
                 // 0,0,0,
-                interp(scale1, scale2, 0, percent), interp(scale1, scale2, 1, percent),
-                        interp(scale1, scale2, 2, percent), interp(trans1, trans2, 0, percent),
-                        interp(trans1, trans2, 1, percent), interp(trans1, trans2, 2, percent));
+                interp(scale1, scale2, 0, percent), interp(scale1, scale2, 1,
+                       percent), interp(scale1, scale2, 2, percent),
+                                 interp(trans1, trans2, 0, percent),
+                                 interp(trans1, trans2, 1, percent),
+                                 interp(trans1, trans2, 2, percent));
 
                 double[] currentMatrix = getProjectionMatrix();
 
-                if ((lastMatrix != null) &&!Misc.arraysEquals(lastMatrix, currentMatrix)) {
+                if ((lastMatrix != null)
+                        && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
                     isAnimating = false;
 
                     return;
@@ -1304,6 +1343,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         } catch (Exception exp) {
             System.out.println("Error  animating matrix:" + exp);
         }
+
     }
 
     /**
@@ -1329,7 +1369,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @return the value
      */
-    private double interp(Vector3d a1, Vector3d a2, int index, double percent) {
+    private double interp(Vector3d a1, Vector3d a2, int index,
+                          double percent) {
         if (index == 0) {
             return a1.x + percent * (a2.x - a1.x);
         }
@@ -1351,7 +1392,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @return the interpolated value
      */
-    private double interp(double[] a1, double[] a2, int index, double percent) {
+    private double interp(double[] a1, double[] a2, int index,
+                          double percent) {
         return a1[index] + percent * (a2[index] - a1[index]);
     }
 
@@ -1365,7 +1407,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     public double[] getScreenCenter() throws VisADException, RemoteException {
         java.awt.Rectangle screenBounds = getScreenBounds();
 
-        return getSpatialCoordinatesFromScreen(screenBounds.width / 2, screenBounds.height / 2);
+        return getSpatialCoordinatesFromScreen(screenBounds.width / 2,
+                screenBounds.height / 2);
     }
 
     /**
@@ -1376,7 +1419,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException Java RMI issue
      * @throws VisADException  VisAD issue
      */
-    public List<TwoFacedObject> getScreenCoordinates() throws VisADException, RemoteException {
+    public List<TwoFacedObject> getScreenCoordinates()
+            throws VisADException, RemoteException {
         List<TwoFacedObject> l = new ArrayList<TwoFacedObject>();
 
         l.add(new TwoFacedObject("Center", getScreenCenter()));
@@ -1389,6 +1433,28 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public List<TwoFacedObject> getScreenSidesCoordinates()
+            throws VisADException, RemoteException {
+        List<TwoFacedObject> l = new ArrayList<TwoFacedObject>();
+
+        l.add(new TwoFacedObject("Center", getScreenCenter()));
+        l.add(new TwoFacedObject("Center Top", getScreenCenterTop()));
+        l.add(new TwoFacedObject("Center Bottom", getScreenCenterBottom()));
+        l.add(new TwoFacedObject("Center Left", getScreenCenterLeft()));
+        l.add(new TwoFacedObject("Center Right", getScreenCenterRight()));
+
+        return l;
+    }
+
+
+    /**
      * Get the x/y position of the left/center of the screen
      *
      * @return x/y of screen left
@@ -1396,7 +1462,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public double[] getScreenUpperLeft() throws VisADException, RemoteException {
+    public double[] getScreenUpperLeft()
+            throws VisADException, RemoteException {
         return getSpatialCoordinatesFromScreen(0, 0);
     }
 
@@ -1408,7 +1475,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public double[] getScreenUpperRight() throws VisADException, RemoteException {
+    public double[] getScreenUpperRight()
+            throws VisADException, RemoteException {
         java.awt.Rectangle screenBounds = getScreenBounds();
 
         return getSpatialCoordinatesFromScreen(screenBounds.width, 0);
@@ -1422,7 +1490,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public double[] getScreenLowerLeft() throws VisADException, RemoteException {
+    public double[] getScreenLowerLeft()
+            throws VisADException, RemoteException {
         java.awt.Rectangle screenBounds = getScreenBounds();
 
         return getSpatialCoordinatesFromScreen(0, screenBounds.height);
@@ -1436,10 +1505,71 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public double[] getScreenLowerRight() throws VisADException, RemoteException {
+    public double[] getScreenLowerRight()
+            throws VisADException, RemoteException {
         java.awt.Rectangle screenBounds = getScreenBounds();
 
-        return getSpatialCoordinatesFromScreen(screenBounds.width, screenBounds.height);
+        return getSpatialCoordinatesFromScreen(screenBounds.width,
+                screenBounds.height);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public double[] getScreenCenterTop()
+            throws VisADException, RemoteException {
+        java.awt.Rectangle screenBounds = getScreenBounds();
+        return getSpatialCoordinatesFromScreen(screenBounds.width / 2, 0);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public double[] getScreenCenterBottom()
+            throws VisADException, RemoteException {
+        java.awt.Rectangle screenBounds = getScreenBounds();
+        return getSpatialCoordinatesFromScreen(screenBounds.width / 2,
+                screenBounds.height);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public double[] getScreenCenterLeft()
+            throws VisADException, RemoteException {
+        java.awt.Rectangle screenBounds = getScreenBounds();
+        return getSpatialCoordinatesFromScreen(0, screenBounds.height / 2);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public double[] getScreenCenterRight()
+            throws VisADException, RemoteException {
+        java.awt.Rectangle screenBounds = getScreenBounds();
+        return getSpatialCoordinatesFromScreen(screenBounds.width,
+                screenBounds.height / 2);
     }
 
     /**
@@ -1450,7 +1580,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public Rectangle2D.Double getLatLonBox() throws VisADException, RemoteException {
+    public Rectangle2D.Double getLatLonBox()
+            throws VisADException, RemoteException {
         return getLatLonBox(true, true);
     }
 
@@ -1465,7 +1596,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public Rectangle2D.Double getLatLonBox(boolean padSamples, boolean normalizeLon)
+    public Rectangle2D.Double getLatLonBox(boolean padSamples,
+                                           boolean normalizeLon)
             throws VisADException, RemoteException {
         java.awt.Rectangle b   = getScreenBounds();
         double             pad = (padSamples
@@ -1475,11 +1607,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[]           ys;
 
         xs = new double[] {
-            b.width * -pad, b.width * 0.0, b.width * 0.1, b.width * 0.2, b.width * 0.3, b.width * 0.4, b.width * 0.5,
-            b.width * 0.6, b.width * 0.7, b.width * 0.8, b.width * 0.9, b.width * 1.0, b.width * (1 + pad)
+            b.width * -pad, b.width * 0.0, b.width * 0.1, b.width * 0.2,
+            b.width * 0.3, b.width * 0.4, b.width * 0.5, b.width * 0.6,
+            b.width * 0.7, b.width * 0.8, b.width * 0.9, b.width * 1.0,
+            b.width * (1 + pad)
         };
         ys = new double[] {
-            0 - b.height * pad, 0, b.height * 0.2, b.height * 0.4, b.height * 0.6, b.height * 0.8, b.height * 1,
+            0 - b.height * pad, 0, b.height * 0.2, b.height * 0.4,
+            b.height * 0.6, b.height * 0.8, b.height * 1,
             b.height + b.height * pad
         };
 
@@ -1488,14 +1623,16 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
         for (int yidx = 0; yidx < ys.length; yidx++) {
             for (int xidx = 0; xidx < xs.length; xidx++) {
-                findMinMaxFromScreen((int) xs[xidx], (int) ys[yidx], rangeX, rangeY, normalizeLon);
+                findMinMaxFromScreen((int) xs[xidx], (int) ys[yidx], rangeX,
+                                     rangeY, normalizeLon);
             }
         }
 
         for (int xidx = 0; xidx < 100; xidx++) {
             double percent = xidx / 100.0;
 
-            findMinMaxFromScreen((int) (b.width * percent), b.height / 2, rangeX, rangeY, normalizeLon);
+            findMinMaxFromScreen((int) (b.width * percent), b.height / 2,
+                                 rangeX, rangeY, normalizeLon);
         }
 
         double left   = rangeX[0];
@@ -1526,7 +1663,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
         // System.err.println ("left:" + left);
         // System.err.println ("right:" + right);
-        return new Rectangle2D.Double(left, bottom, right - left, top - bottom);
+        return new Rectangle2D.Double(left, bottom, right - left,
+                                      top - bottom);
     }
 
     /**
@@ -1539,7 +1677,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @throws VisADException problem accessing data
      */
-    public EarthLocation screenToEarthLocation(int x, int y) throws VisADException {
+    public EarthLocation screenToEarthLocation(int x, int y)
+            throws VisADException {
         double[] pt = getSpatialCoordinatesFromScreen(x, y, -1);
 
         return getEarthLocation(pt);
@@ -1556,7 +1695,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @throws VisADException problem accessing screen
      */
-    private void findMinMaxFromScreen(int x, int y, double[] rangeX, double[] rangeY, boolean normalizeLon)
+    private void findMinMaxFromScreen(int x, int y, double[] rangeX,
+                                      double[] rangeY, boolean normalizeLon)
             throws VisADException {
         EarthLocation el   = screenToEarthLocation(x, y);
         double        tmpx = el.getLongitude().getValue(CommonUnit.degree);
@@ -1601,27 +1741,30 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws VisADException On badness
      */
     public LatLonRect getLatLonRect() throws VisADException, RemoteException {
-        java.awt.Rectangle b      = getScreenBounds();
-        double[]           xs     = {
-            0 - b.width * 0.10, 0, b.width * 0.25, b.width * 0.5, b.width * 1, b.width + b.width * 0.10
+        java.awt.Rectangle b  = getScreenBounds();
+        double[]           xs = {
+            0 - b.width * 0.10, 0, b.width * 0.25, b.width * 0.5, b.width * 1,
+            b.width + b.width * 0.10
         };
-        double[]           ys     = {
-            0 - b.height * 0.10, 0, b.height * 0.25, b.height * 0.5, b.height * 1, b.height + b.height * 0.10
+        double[] ys = {
+            0 - b.height * 0.10, 0, b.height * 0.25, b.height * 0.5,
+            b.height * 1, b.height + b.height * 0.10
         };
-        double             left   = 180;
-        double             right  = -180;
-        double             top    = -90;
-        double             bottom = 90;
-        double[]           tpt    = getSpatialCoordinatesFromScreen(0, 0, -1);
+        double   left   = 180;
+        double   right  = -180;
+        double   top    = -90;
+        double   bottom = 90;
+        double[] tpt    = getSpatialCoordinatesFromScreen(0, 0, -1);
 
         // System.err.println ("tpt:" + tpt[0] + " " + tpt[1]);
         for (int yidx = 0; yidx < ys.length; yidx++) {
             for (int xidx = 0; xidx < xs.length; xidx++) {
-                double[] pt = getSpatialCoordinatesFromScreen((int) xs[xidx], (int) ys[yidx], -1);
+                double[] pt = getSpatialCoordinatesFromScreen((int) xs[xidx],
+                                  (int) ys[yidx], -1);
 
                 // System.err.println("pt["+xs[xidx]+","+ys[yidx]+"]: " + pt[0] + ", " + pt[1] + ", " + pt[2]);
-                EarthLocation el   = getEarthLocation(pt);
-                double        tmpx = el.getLongitude().getValue(CommonUnit.degree);
+                EarthLocation el = getEarthLocation(pt);
+                double tmpx = el.getLongitude().getValue(CommonUnit.degree);
 
                 if (Double.isNaN(tmpx)) {
                     continue;
@@ -1679,10 +1822,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public Rectangle2D.Double getVisadBox() throws VisADException, RemoteException {
+    public Rectangle2D.Double getVisadBox()
+            throws VisADException, RemoteException {
         java.awt.Rectangle b      = getScreenBounds();
-        double[]           xs     = { 0, b.width * 0.25, b.width * 0.5, b.width * 1 };
-        double[]           ys     = { 0, b.height * 0.25, b.height * 0.5, b.height * 1 };
+        double[] xs = { 0, b.width * 0.25, b.width * 0.5, b.width * 1 };
+        double[] ys = { 0, b.height * 0.25, b.height * 0.5, b.height * 1 };
         double             left   = 0;
         double             right  = 0;
         double             top    = 0;
@@ -1690,7 +1834,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
         for (int yidx = 0; yidx < ys.length; yidx++) {
             for (int xidx = 0; xidx < xs.length; xidx++) {
-                double[] pt = getSpatialCoordinatesFromScreen((int) xs[xidx], (int) ys[yidx], -1);
+                double[] pt = getSpatialCoordinatesFromScreen((int) xs[xidx],
+                                  (int) ys[yidx], -1);
 
                 // if(xs[xidx]==0)
                 // System.err.println("  x/y:" + xs[xidx] +"/" + ys[yidx] +"  pt:" + pt[0]+"/" + pt[1] +"/" + pt[2]);
@@ -1735,7 +1880,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         top    = Math.min(top, 90);
         bottom = Math.max(bottom, -90);
 
-        Rectangle2D.Double box = new Rectangle2D.Double(left, bottom, right - left, top - bottom);
+        Rectangle2D.Double box = new Rectangle2D.Double(left, bottom,
+                                     right - left, top - bottom);
 
         return box;
     }
@@ -1765,7 +1911,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             return;
         }
 
-        moveToScreen(x, y, (int) (screenBounds.getWidth() / 2), (int) (screenBounds.getHeight() / 2), animated);
+        moveToScreen(x, y, (int) (screenBounds.getWidth() / 2),
+                     (int) (screenBounds.getHeight() / 2), animated);
     }
 
     /**
@@ -1803,7 +1950,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param sy screen y
      * @param animated Animate the move
      */
-    public void moveToScreen(double x, double y, int sx, int sy, boolean animated) {
+    public void moveToScreen(double x, double y, int sx, int sy,
+                             boolean animated) {
         try {
             double[] currentMatrix = getProjectionMatrix();
             double[] trans         = { 0.0, 0.0, 0.0 };
@@ -1811,21 +1959,26 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             double[] scale         = { 0.0, 0.0, 0.0 };
             double[] centerXY      = getSpatialCoordinatesFromScreen(sx, sy);
 
-            getMouseBehavior().instance_unmake_matrix(rot, scale, trans, currentMatrix);
+            getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                    currentMatrix);
 
-            double[] translateMatrix = getMouseBehavior().make_translate(scale[0] * (centerXY[0] - x),
-                                           scale[1] * (centerXY[1] - y));
+            double[] translateMatrix =
+                getMouseBehavior().make_translate(scale[0]
+                    * (centerXY[0] - x), scale[1] * (centerXY[1] - y));
 
-            currentMatrix = getMouseBehavior().multiply_matrix(translateMatrix, currentMatrix);
+            currentMatrix =
+                getMouseBehavior().multiply_matrix(translateMatrix,
+                    currentMatrix);
 
-            if (!animated) {
+            if ( !animated) {
                 setProjectionMatrix(currentMatrix);
             } else {
                 final double[] to = currentMatrix;
 
                 Misc.run(new Runnable() {
                     public void run() {
-                        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, null);
+                        animateMatrix(++animationTimeStamp,
+                                      getProjectionMatrix(), to, null);
                     }
                 });
             }
@@ -1840,7 +1993,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @return the View
      */
     public View getView() {
-        DisplayRendererJ3D rend = (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
+        DisplayRendererJ3D rend =
+            (DisplayRendererJ3D) getDisplay().getDisplayRenderer();
 
         return rend.getView();
     }
@@ -1853,7 +2007,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void center(EarthLocation el) throws VisADException, RemoteException {
+    public void center(EarthLocation el)
+            throws VisADException, RemoteException {
         center(el, false);
     }
 
@@ -1866,7 +2021,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void center(final EarthLocation el, boolean animated) throws VisADException, RemoteException {
+    public void center(final EarthLocation el, boolean animated)
+            throws VisADException, RemoteException {
         centerAndZoom(el, animated, 1.0);
     }
 
@@ -1880,7 +2036,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void centerAndZoom(final EarthLocation el, boolean animated, double zoomFactor)
+    public void centerAndZoom(final EarthLocation el, boolean animated,
+                              double zoomFactor)
             throws VisADException, RemoteException {
         centerAndZoom(el, null, zoomFactor, animated, true);
     }
@@ -1897,7 +2054,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException On badness
      * @throws VisADException On badness
      */
-    public void centerAndZoom(final EarthLocation el, Real altitude, double zoomFactor, boolean animated,
+    public void centerAndZoom(final EarthLocation el, Real altitude,
+                              double zoomFactor, boolean animated,
                               boolean northUp)
             throws VisADException, RemoteException {
         if ((zoomFactor == 0) || (zoomFactor != zoomFactor)) {
@@ -1916,29 +2074,38 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             double[]           trans         = { 0.0, 0.0, 0.0 };
             double[]           rot           = { 0.0, 0.0, 0.0 };
             double[]           scale         = { 0.0 };
-            double[]           xy            = getSpatialCoordinates(el, null);
-            double[]           centerXY      = getSpatialCoordinatesFromScreen(screenBounds.width / 2, screenBounds.height / 2);
+            double[]           xy            = getSpatialCoordinates(el,
+                                                   null);
+            double[] centerXY =
+                getSpatialCoordinatesFromScreen(screenBounds.width / 2,
+                    screenBounds.height / 2);
 
-            mouseBehavior.instance_unmake_matrix(rot, scale, trans, currentMatrix);
+            mouseBehavior.instance_unmake_matrix(rot, scale, trans,
+                    currentMatrix);
 
-            double[] translateMatrix = mouseBehavior.make_translate(scale[0] * (centerXY[0] - xy[0]),
-                                           scale[0] * (centerXY[1] - xy[1]));
+            double[] translateMatrix = mouseBehavior.make_translate(scale[0]
+                                           * (centerXY[0] - xy[0]), scale[0]
+                                               * (centerXY[1] - xy[1]));
 
-            currentMatrix = mouseBehavior.multiply_matrix(translateMatrix, currentMatrix);
+            currentMatrix = mouseBehavior.multiply_matrix(translateMatrix,
+                    currentMatrix);
 
-            if (!animated) {
+            if ( !animated) {
                 setProjectionMatrix(currentMatrix);
                 zoom(zoomFactor);
             } else {
-                double[] scaleMatrix = mouseBehavior.make_matrix(0.0, 0.0, 0.0, zoomFactor, 0.0, 0.0, 0.0);
+                double[] scaleMatrix = mouseBehavior.make_matrix(0.0, 0.0,
+                                           0.0, zoomFactor, 0.0, 0.0, 0.0);
 
-                currentMatrix = mouseBehavior.multiply_matrix(scaleMatrix, currentMatrix);
+                currentMatrix = mouseBehavior.multiply_matrix(scaleMatrix,
+                        currentMatrix);
 
                 final double[] to = currentMatrix;
 
                 Misc.run(new Runnable() {
                     public void run() {
-                        animateMatrix(++animationTimeStamp, getProjectionMatrix(), to, el);
+                        animateMatrix(++animationTimeStamp,
+                                      getProjectionMatrix(), to, el);
                     }
                 });
             }
@@ -1958,7 +2125,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[] rot           = { 0.0, 0.0, 0.0 };
         double[] scale         = { 0.0, 0.0, 0.0 };
 
-        getMouseBehavior().instance_unmake_matrix(rot, scale, trans, currentMatrix);
+        getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                currentMatrix);
 
         return rot;
     }
@@ -2001,11 +2169,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                                   : matrix;
 
             // rotate in z
-            double[] aziMatrix = getDisplay().make_matrix(0.0, 0.0, zAngle, 1.0, 0.0, 0.0, 0.0);
-            double[] combo     = getDisplay().multiply_matrix(aziMatrix, origMatrix);
+            double[] aziMatrix = getDisplay().make_matrix(0.0, 0.0, zAngle,
+                                     1.0, 0.0, 0.0, 0.0);
+            double[] combo = getDisplay().multiply_matrix(aziMatrix,
+                                 origMatrix);
 
             // rotate in x
-            double[] decMatrix = getDisplay().make_matrix(decAngle, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+            double[] decMatrix = getDisplay().make_matrix(decAngle, 0.0, 0.0,
+                                     1.0, 0.0, 0.0, 0.0);
 
             // total rotation matrix is computed and applied
             double[] combo2 = getDisplay().multiply_matrix(decMatrix, combo);
@@ -2034,13 +2205,15 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @return  the toolbar
      */
-    public NavigatedDisplayToolBar getNavigationToolBar(int orientation, boolean floatable) {
+    public NavigatedDisplayToolBar getNavigationToolBar(int orientation,
+            boolean floatable) {
         if (getDestroyed()) {
             return null;
         }
 
         if (navToolBar == null) {
-            navToolBar = new NavigatedDisplayToolBar(this, orientation, floatable);
+            navToolBar = new NavigatedDisplayToolBar(this, orientation,
+                    floatable);
         }
 
         return navToolBar;
@@ -2076,7 +2249,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected void pointerMoved(int x, int y) throws VisADException, RemoteException {}
+    protected void pointerMoved(int x, int y)
+            throws VisADException, RemoteException {}
 
     /**
      * Update lat/lon/alt properties with the EarthLocation.
@@ -2086,7 +2260,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    protected void updateLocation(EarthLocation el) throws VisADException, RemoteException {
+    protected void updateLocation(EarthLocation el)
+            throws VisADException, RemoteException {
         if (el == null) {
             return;
         }
@@ -2118,7 +2293,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
         double r = (zValue - ray.position[2]) / ray.vector[2];
 
-        return new double[] { ray.position[0] + r * ray.vector[0], ray.position[1] + r * ray.vector[1], zValue };
+        return new double[] { ray.position[0] + r * ray.vector[0],
+                              ray.position[1] + r * ray.vector[1], zValue };
     }
 
     /**
@@ -2140,10 +2316,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @throws RemoteException Java RMI problem
      * @throws VisADException problem setting unit
      */
-    protected void setVerticalMapUnit(ScalarMap vertMap, Unit u) throws VisADException, RemoteException {
-        if (Unit.canConvert(((RealType) vertMap.getScalar()).getDefaultUnit(),
-                            GeopotentialAltitude.getGeopotentialMeter())) {
-            vertMap.setOverrideUnit(GeopotentialAltitude.getGeopotentialUnit(u));
+    protected void setVerticalMapUnit(ScalarMap vertMap, Unit u)
+            throws VisADException, RemoteException {
+        if (Unit.canConvert(
+                ((RealType) vertMap.getScalar()).getDefaultUnit(),
+                GeopotentialAltitude.getGeopotentialMeter())) {
+            vertMap.setOverrideUnit(
+                GeopotentialAltitude.getGeopotentialUnit(u));
         } else {
             vertMap.setOverrideUnit(u);
         }
@@ -2215,7 +2394,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             try {
                 double[] currentMatrix = getProjectionMatrix();
 
-                if ((lastMatrix != null) &&!Misc.arraysEquals(lastMatrix, currentMatrix)) {
+                if ((lastMatrix != null)
+                        && !Misc.arraysEquals(lastMatrix, currentMatrix)) {
                     setAutoRotate(false);
 
                     return;
@@ -2260,12 +2440,16 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[] t2 = null;
 
         if (displayRenderer.getRotateAboutCenter()) {
-            myMatrix = mouseBehavior.multiply_matrix(mouseBehavior.make_translate(-transA[0], -transA[1], -transA[2]),
-                    myMatrix);
-            t2 = mouseBehavior.make_translate(transA[0], transA[1], transA[2]);
+            myMatrix = mouseBehavior.multiply_matrix(
+                mouseBehavior.make_translate(
+                    -transA[0], -transA[1], -transA[2]), myMatrix);
+            t2 = mouseBehavior.make_translate(transA[0], transA[1],
+                    transA[2]);
         }
 
-        double[] t1 = display.make_matrix(rotateX / scale, rotateY / scale, rotateZ / scale, 1.0, 0.0, 0.0, 0.0);
+        double[] t1 = display.make_matrix(rotateX / scale, rotateY / scale,
+                                          rotateZ / scale, 1.0, 0.0, 0.0,
+                                          0.0);
 
         t1 = mouseBehavior.multiply_matrix(t1, myMatrix);
 
@@ -2346,16 +2530,20 @@ public abstract class NavigatedDisplay extends DisplayMaster {
          * @throws RemoteException  Java RMI problem
          * @throws VisADException   Problem setting unit
          */
-        public void setVerticalUnit(Unit newUnit) throws VisADException, RemoteException {
+        public void setVerticalUnit(Unit newUnit)
+                throws VisADException, RemoteException {
             for (Iterator iter = iterator(); iter.hasNext(); ) {
                 ScalarMap vertMap = (ScalarMap) iter.next();
 
                 if ((vertMap != null) && (newUnit != null)) {
                     setVerticalMapUnit(vertMap, newUnit);
 
-                    if (Unit.canConvert(((RealType) vertMap.getScalar()).getDefaultUnit(),
-                                        GeopotentialAltitude.getGeopotentialMeter())) {
-                        vertMap.setOverrideUnit(GeopotentialAltitude.getGeopotentialUnit(newUnit));
+                    if (Unit.canConvert(((RealType) vertMap.getScalar())
+                            .getDefaultUnit(), GeopotentialAltitude
+                            .getGeopotentialMeter())) {
+                        vertMap.setOverrideUnit(
+                            GeopotentialAltitude.getGeopotentialUnit(
+                                newUnit));
                     } else {
                         vertMap.setOverrideUnit(newUnit);
                     }
@@ -2373,7 +2561,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
          * @throws RemoteException  Java RMI problem
          * @throws VisADException   Problem setting unit
          */
-        public void setVerticalRange(double min, double max) throws VisADException, RemoteException {
+        public void setVerticalRange(double min, double max)
+                throws VisADException, RemoteException {
             for (Iterator iter = iterator(); iter.hasNext(); ) {
                 ScalarMap vertMap = (ScalarMap) iter.next();
 
