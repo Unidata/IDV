@@ -21,8 +21,10 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.nc2.units.SimpleUnit;
 import ucar.unidata.ui.TableSorter;
 import ucar.unidata.util.Misc;
+import ucar.units.UnitFormatManager;
 
 import ucar.visad.Util;
 import ucar.visad.quantities.Direction;
@@ -150,10 +152,23 @@ public class SoundingTable extends JTable {
         // domain values
         Set              domain     = sounding.getDomainSet();
         CoordinateSystem cs         = domain.getCoordinateSystem();
-
+        
         float[][]        domSamples = domain.getSamples(false);
         if ((cs != null)) {
-            float[][] refData = cs.toReference(Set.copyFloats(domSamples));
+            float[][] domFloats = Set.copyFloats(domSamples);
+            // Must convert from the default coordinate domain system to
+            // the domain coordinate system of the sounding.
+            String fromUnit = sounding.getDomainUnits()[0].toString();
+            String toUnit = cs.getCoordinateSystemUnits()[0].toString();
+            if (!fromUnit.equals(toUnit) && SimpleUnit.isCompatible(fromUnit, toUnit)){
+              float conversionFactor = (float)SimpleUnit.getConversionFactor(fromUnit, toUnit);
+               for (int i = 0; i < domFloats.length; i++) {
+                 for (int j = 0; j < domFloats[i].length; j++) {
+                   domFloats[i][j] = domFloats[i][j] * conversionFactor;
+                 }              
+               }
+            } 
+            float[][] refData = cs.toReference(domFloats);
             domainData = new float[][] {
                 domSamples[0], refData[0]
             };
