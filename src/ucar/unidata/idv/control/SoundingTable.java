@@ -22,25 +22,32 @@ package ucar.unidata.idv.control;
 
 
 import ucar.nc2.units.SimpleUnit;
+
 import ucar.unidata.ui.TableSorter;
-import ucar.unidata.util.Misc;
-import ucar.units.UnitFormatManager;
 
 import ucar.visad.Util;
 import ucar.visad.quantities.Direction;
 import ucar.visad.quantities.PolarHorizontalWind;
 import ucar.visad.quantities.Speed;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.Field;
+import visad.FunctionType;
+import visad.InverseCoordinateSystem;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Set;
+import visad.SetType;
+import visad.Unit;
+import visad.VisADException;
+
 
 import java.awt.Dimension;
 
 import java.rmi.RemoteException;
 
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-
-import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -56,7 +63,7 @@ public class SoundingTable extends JTable {
     /** The table model to use */
     private AbstractTableModel model = null;
 
-    /** misc **/
+    /** misc */
     private TableSorter sorter = null;
 
     /** The flat field we are displaying */
@@ -152,22 +159,24 @@ public class SoundingTable extends JTable {
         // domain values
         Set              domain     = sounding.getDomainSet();
         CoordinateSystem cs         = domain.getCoordinateSystem();
-        
+
         float[][]        domSamples = domain.getSamples(false);
         if ((cs != null)) {
             float[][] domFloats = Set.copyFloats(domSamples);
             // Must convert from the default coordinate domain system to
             // the domain coordinate system of the sounding.
             String fromUnit = sounding.getDomainUnits()[0].toString();
-            String toUnit = cs.getCoordinateSystemUnits()[0].toString();
-            if (!fromUnit.equals(toUnit) && SimpleUnit.isCompatible(fromUnit, toUnit)){
-              float conversionFactor = (float)SimpleUnit.getConversionFactor(fromUnit, toUnit);
-               for (int i = 0; i < domFloats.length; i++) {
-                 for (int j = 0; j < domFloats[i].length; j++) {
-                   domFloats[i][j] = domFloats[i][j] * conversionFactor;
-                 }              
-               }
-            } 
+            String toUnit   = cs.getCoordinateSystemUnits()[0].toString();
+            if ( !fromUnit.equals(toUnit)
+                    && SimpleUnit.isCompatible(fromUnit, toUnit)) {
+                float conversionFactor =
+                    (float) SimpleUnit.getConversionFactor(fromUnit, toUnit);
+                for (int i = 0; i < domFloats.length; i++) {
+                    for (int j = 0; j < domFloats[i].length; j++) {
+                        domFloats[i][j] = domFloats[i][j] * conversionFactor;
+                    }
+                }
+            }
             float[][] refData = cs.toReference(domFloats);
             domainData = new float[][] {
                 domSamples[0], refData[0]
@@ -273,7 +282,7 @@ public class SoundingTable extends JTable {
             }
         }
         if (model == null) {
-            model = new SoundingTableModel();
+            model  = new SoundingTableModel();
             sorter = new TableSorter(model);
             JTableHeader header = getTableHeader();
             header.setToolTipText("Click to sort");
@@ -359,15 +368,15 @@ public class SoundingTable extends JTable {
          * @return the value
          */
         public Object getValueAt(int row, int col) {
-          try {
-            if (col < numDomainCols) {
-                return new Float(domainData[col][row]);
-            } else {
-                return new Float(rangeData[col - numDomainCols][row]);
+            try {
+                if (col < numDomainCols) {
+                    return new Float(domainData[col][row]);
+                } else {
+                    return new Float(rangeData[col - numDomainCols][row]);
+                }
+            } catch (Exception enr) {
+                return Float.NaN;
             }
-          } catch (Exception enr) {
-            return Float.NaN;
-          }
         }
 
         /**
