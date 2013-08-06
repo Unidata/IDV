@@ -20,7 +20,6 @@
 
 package ucar.unidata.idv.control;
 
-
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataChoice;
@@ -68,7 +67,6 @@ import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -111,8 +109,6 @@ import javax.swing.table.JTableHeader;
 
 import javax.vecmath.Point3d;
 
-
-
 /**
  * A widget to display data values at one point in the 2d or 3d data field.
  * Can show several parameters' values at the point. Can choose method of
@@ -121,6 +117,7 @@ import javax.vecmath.Point3d;
  *
  * @author IDV developers
  */
+
 public class ProbeControl extends DisplayControlImpl implements DisplayableData
     .DragAdapter {
 
@@ -135,7 +132,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
     /** ID for sharing levels */
     public static final String SHARE_LEVELS = "ProbeControl.SHARE_LEVELS";
-
 
     /** Column name property */
     public static final int COL_NAME = 0;
@@ -169,8 +165,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
     /** Is the axis fixed */
     private boolean zFixed = false;
-
-
 
     /** Not used for now */
     private boolean updatePending = false;
@@ -207,7 +201,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
     /** list of sound properties */
     private List _sounds;
-
 
     /** list of times */
     private List times = new ArrayList();
@@ -251,10 +244,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /** The label to show the readout in the side legend */
     private JLabel sideLegendReadout;
 
-
     /** The shape for the probe point */
     private String marker;
-
 
     /** time series chart */
     private TimeSeriesChart timeSeries;
@@ -299,6 +290,28 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     public boolean init(List choices) throws VisADException, RemoteException {
 
+        // make sure user has selected at least two times.
+    	// can't do a time series with less
+    	boolean singleTime = true;
+    	for (int i = 0; i < choices.size(); i++) {
+    		ProbeRowInfo info = getRowInfo(i);
+    		Data data = info.getDataInstance().getData();
+    		if ( !(data instanceof FieldImpl)) {
+    			continue;
+    		}
+    		Set set = ((FieldImpl) data).getDomainSet();
+    		if (set != null) {
+    			if (set.getLength() > 1) {
+    				singleTime = false;
+    				break;
+    			}
+    		}
+    	}
+    	if (singleTime) {
+    		userMessage("Select at least two times for a time series");
+    		return false;
+    	}
+        
         if ((_levels != null) && (infos.size() == 0)) {
             //We have legacy muli-list table state
             for (int i = 0; i < _levels.size(); i++) {
