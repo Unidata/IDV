@@ -20,7 +20,6 @@
 
 package ucar.unidata.idv.control;
 
-
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataChoice;
@@ -97,7 +96,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -112,8 +110,6 @@ import javax.swing.table.JTableHeader;
 
 import javax.vecmath.Point3d;
 
-
-
 /**
  * A widget to display data values at one point in the 2d or 3d data field.
  * Can show several parameters' values at the point. Can choose method of
@@ -122,6 +118,7 @@ import javax.vecmath.Point3d;
  *
  * @author IDV developers
  */
+
 public class ProbeControl extends DisplayControlImpl implements DisplayableData
     .DragAdapter {
 
@@ -318,11 +315,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     		}
     	}
     	if (singleTime) {
-    		JOptionPane.showMessageDialog(
-    				getMainPanel(), 
-    				"Select at least two times for a time series", 
-    				"Data Probe / Time Series Message",
-    				JOptionPane.INFORMATION_MESSAGE);
+    		LogUtil.userMessage("Select at least two times for a time series");
     		return false;
     	}
         
