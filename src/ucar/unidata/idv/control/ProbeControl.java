@@ -67,7 +67,6 @@ import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -134,7 +133,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /** ID for sharing levels */
     public static final String SHARE_LEVELS = "ProbeControl.SHARE_LEVELS";
 
-
     /** Column name property */
     public static final int COL_NAME = 0;
 
@@ -167,8 +165,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
     /** Is the axis fixed */
     private boolean zFixed = false;
-
-
 
     /** Not used for now */
     private boolean updatePending = false;
@@ -205,7 +201,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
     /** list of sound properties */
     private List _sounds;
-
 
     /** list of times */
     private List times = new ArrayList();
@@ -249,10 +244,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /** The label to show the readout in the side legend */
     private JLabel sideLegendReadout;
 
-
     /** The shape for the probe point */
     private String marker;
-
 
     /** time series chart */
     private TimeSeriesChart timeSeries;
@@ -315,7 +308,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     		}
     	}
     	if (singleTime) {
-    		LogUtil.userMessage("Select at least two times for a time series");
+    		userMessage("Select at least two times for a time series");
     		return false;
     	}
         
