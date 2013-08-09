@@ -1117,58 +1117,55 @@ public class ViewManager extends SharableImpl implements ActionListener,
             }
         }
 
-        // Create it if we need to
-        if (sideLegend == null) {
-            sideLegend = new SideLegend(this);
-            addRemovable(sideLegend);
-        }
+        if (getShowSideLegend()) {
+            // Create it if we need to
+            if (sideLegend == null) {
+                sideLegend = new SideLegend(this);
+                addRemovable(sideLegend);
+            }
 
-        synchronized (legends) {
-            if (getShowSideLegend()) {
+            synchronized (legends) {
                 legends.add(sideLegend);
             }
-        }
+        
 
-        sideLegendComponent = getSideComponent(sideLegend.getContents());
-        sideLegendContainer = new JPanel(new BorderLayout());
-        sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
+            sideLegendComponent = getSideComponent(sideLegend.getContents());
+            sideLegendContainer = new JPanel(new BorderLayout());
+            sideLegendContainer.add(BorderLayout.CENTER, sideLegendComponent);
 
-        // Set the contents from the side legend in case the sideLegendComponent is not just the
-        // contents from the legend
-        sideLegend.setContentsToUse(sideLegendComponent);
+            // Set the contents from the side legend in case the sideLegendComponent is not just the
+            // contents from the legend
+            sideLegend.setContentsToUse(sideLegendComponent);
 
-        JComponent leftComp  = (legendOnLeft
-                                ? sideLegendContainer
-                                : centerPanel);
-        JComponent rightComp = (legendOnLeft
-                                ? centerPanel
-                                : sideLegendContainer);
+            JComponent leftComp  = (legendOnLeft
+                                    ? sideLegendContainer
+                                    : centerPanel);
+            JComponent rightComp = (legendOnLeft
+                                    ? centerPanel
+                                    : sideLegendContainer);
 
-        mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftComp,
-                                       rightComp);
+            mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, 
+                                       leftComp,rightComp);
 
-        if (legendOnLeft) {
-            mainSplitPane.setResizeWeight(0.20);
+            if (legendOnLeft) {
+                mainSplitPane.setResizeWeight(0.20);
+            } else {
+                mainSplitPane.setResizeWeight(0.80);
+            }
+
+            mainSplitPane.setOneTouchExpandable(true);
+
+            centerPanelWrapper = (showControlLegend)
+                                  ? GuiUtils.center(mainSplitPane)
+                                  : GuiUtils.center(centerPanel);
+            insertSideLegend();
         } else {
-            mainSplitPane.setResizeWeight(0.80);
+            centerPanelWrapper = GuiUtils.center(centerPanel);
         }
 
-        mainSplitPane.setOneTouchExpandable(true);
-
-        if (splitPaneLocation >= 0) {
-
-            // SPLIT       mainSplitPane.setDividerLocation(splitPaneLocation);
-        }
-
-        // centerPanelWrapper = new JPanel(new BorderLayout());
-        centerPanelWrapper = (showControlLegend)
-                             ? GuiUtils.center(mainSplitPane)
-                             : GuiUtils.center(centerPanel);
-        fullContents       = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
+        fullContents = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
         fullContents.setBorder(getContentsBorder());
-        insertSideLegend();
         fillLegends();
-
     }
 
     /**
