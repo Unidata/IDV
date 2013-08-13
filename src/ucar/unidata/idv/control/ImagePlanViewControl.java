@@ -150,6 +150,7 @@ public class ImagePlanViewControl extends PlanViewControl {
         List dsList = new ArrayList();
         dataChoice.getDataSources(dsList);
         DataSourceImpl dsImpl = (DataSourceImpl) dsList.get(0);
+        boolean hasConner = false;
         if (dsImpl instanceof AddeImageDataSource) {
             AddeImageDataSource aImageDS = (AddeImageDataSource) dsImpl;
             AddeImageDataSource.ImagePreviewSelection regionSelection =
@@ -175,6 +176,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                 GeoLocationInfo gInfo;
                 if(latLonRect.getHeight() != latLonRect.getHeight()){
                     //conner point outside the earth
+                    hasConner = true;
                     LatLonPointImpl cImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth()/2, rect.y + rect.getHeight()/2);
                     LatLonPointImpl urImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth(), rect.y + rect.getHeight());
                     LatLonPointImpl ulImpl = projectionImpl.projToLatLon(rect.x, rect.y + rect.getHeight());
@@ -218,7 +220,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                             LatLonPointImpl.lonNormal(maxLon));
                     dataSelection.putProperty(
                             DataSelection.PROP_HASSCONNER,
-                            "true");
+                            hasConner);
                 } else {
                     gInfo = new GeoLocationInfo(latLonRect);
                 }
@@ -290,7 +292,10 @@ public class ImagePlanViewControl extends PlanViewControl {
 
         boolean result = super.setData(dataChoice);
         if ( !result) {
-            userMessage("Selected image(s) not available");
+            if(hasConner)
+                userMessage("Selected region bounding box is not big enough");
+            else
+                userMessage("Selected image(s) not available");
         }
         return result;
     }

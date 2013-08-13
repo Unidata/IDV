@@ -348,7 +348,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 double maxLon = geoSelection.getBoundingBox().getMaxLon();
                 double minLon = geoSelection.getBoundingBox().getMinLon();
                 // double maxLat, double minLat, double maxLon, double minLon
-                if (useDisplayArea || hasConner) {
+                if (useDisplayArea ) {
                     AddeImageDescriptor desc =
                         (AddeImageDescriptor) descriptors.get(0);
                     int[] dir = desc.getDirectory().getDirectoryBlock();
@@ -359,6 +359,13 @@ public class AddeImageDataSource extends ImageDataSource {
                                         minLon, elFactor, dlMag, deMag,
                                         "CENTER", isProgressiveResolution,
                                         dir);
+                } else if(hasConner) {
+                    descriptors =
+                            geoSpaceSubset(geoSelection.getScreenBound(),
+                                    unitStr, eMag, lMag, baseAnav,
+                                    descriptors, maxLat, minLat, maxLon,
+                                    minLon, elFactor, dlMag, deMag,
+                                    "CENTER", isProgressiveResolution);
                 } else {
                     descriptors =
                         geoSpaceSubset(geoSelection.getScreenBound(),
