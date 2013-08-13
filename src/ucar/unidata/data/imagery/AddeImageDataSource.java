@@ -312,7 +312,7 @@ public class AddeImageDataSource extends ImageDataSource {
             }
         }
         boolean useDisplayArea = false;
-
+        boolean hasConner = false;
         Object  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION);
         if (t1 != null) {
             String areaOpt = (String) t1;
@@ -321,6 +321,13 @@ public class AddeImageDataSource extends ImageDataSource {
             }
         }
 
+        Object  t2 = subset.getProperty(DataSelection.PROP_HASSCONNER);
+        if (t2 != null) {
+            String areaOpt = (String) t2;
+            if(areaOpt.equalsIgnoreCase("true")) {
+                hasConner = true;
+            }
+        }
         if (geoSelection != null) {  //&& !isReload) {
             // applies the rubberbandbox geosubset here
             //GeoSelection gs = subset.getGeoSelection();
@@ -341,7 +348,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 double maxLon = geoSelection.getBoundingBox().getMaxLon();
                 double minLon = geoSelection.getBoundingBox().getMinLon();
                 // double maxLat, double minLat, double maxLon, double minLon
-                if (useDisplayArea) {
+                if (useDisplayArea || hasConner) {
                     AddeImageDescriptor desc =
                         (AddeImageDescriptor) descriptors.get(0);
                     int[] dir = desc.getDirectory().getDirectoryBlock();

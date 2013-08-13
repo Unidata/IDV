@@ -172,7 +172,56 @@ public class ImagePlanViewControl extends PlanViewControl {
                     regionSelection.display.getProjectionImpl();
                 LatLonRect latLonRect =
                     projectionImpl.getLatLonBoundingBox(rect);
-                GeoLocationInfo gInfo = new GeoLocationInfo(latLonRect);
+                GeoLocationInfo gInfo;
+                if(latLonRect.getHeight() != latLonRect.getHeight()){
+                    //conner point outside the earth
+                    LatLonPointImpl cImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth()/2, rect.y + rect.getHeight()/2);
+                    LatLonPointImpl urImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth(), rect.y + rect.getHeight());
+                    LatLonPointImpl ulImpl = projectionImpl.projToLatLon(rect.x, rect.y + rect.getHeight());
+                    LatLonPointImpl lrImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth(), rect.y);
+                    LatLonPointImpl llImpl = projectionImpl.projToLatLon(rect.x, rect.y);
+
+                    double maxLat = Double.NaN;
+                    double minLat = Double.NaN;
+                    double maxLon = Double.NaN;
+                    double minLon = Double.NaN;
+                    if(cImpl.getLatitude() != cImpl.getLatitude()) {
+                        //do nothing
+                    } else if(lrImpl.getLatitude() == lrImpl.getLatitude()){
+                       //upper left conner
+                        maxLat = cImpl.getLatitude() + (cImpl.getLatitude() - lrImpl.getLatitude());
+                        minLat = lrImpl.getLatitude();
+                        maxLon = lrImpl.getLongitude();
+                        minLon = cImpl.getLongitude() - (lrImpl.getLongitude() - cImpl.getLongitude());
+                    } else if(llImpl.getLatitude() == llImpl.getLatitude()){
+                        //upper right conner
+                        maxLat = cImpl.getLatitude() + (cImpl.getLatitude() - llImpl.getLatitude());
+                        minLat = llImpl.getLatitude();
+                        maxLon = cImpl.getLongitude() + (cImpl.getLongitude() - lrImpl.getLongitude());
+                        minLon = lrImpl.getLongitude();
+                    } else if(urImpl.getLatitude() == urImpl.getLatitude()){
+                        // lower left conner
+                        maxLat = urImpl.getLatitude();
+                        minLat = cImpl.getLatitude() - (urImpl.getLatitude() - cImpl.getLatitude() );
+                        maxLon = urImpl.getLongitude();
+                        minLon = cImpl.getLongitude() - (urImpl.getLongitude() - cImpl.getLongitude());
+                    } else if(ulImpl.getLatitude() == ulImpl.getLatitude()){
+                        // lower right conner
+                        maxLat = ulImpl.getLatitude();
+                        minLat = cImpl.getLatitude() - (ulImpl.getLatitude() - cImpl.getLatitude());
+                        maxLon = cImpl.getLongitude() + (cImpl.getLongitude() - ulImpl.getLongitude());
+                        minLon = ulImpl.getLongitude();
+                    }
+
+                    gInfo = new GeoLocationInfo(maxLat,
+                            LatLonPointImpl.lonNormal(minLon), minLat,
+                            LatLonPointImpl.lonNormal(maxLon));
+                    dataSelection.putProperty(
+                            DataSelection.PROP_HASSCONNER,
+                            "true");
+                } else {
+                    gInfo = new GeoLocationInfo(latLonRect);
+                }
                 GeoSelection    gs    = new GeoSelection(gInfo);
                 NavigatedDisplay navDisplay =
                     (NavigatedDisplay) getViewManager().getMaster();

@@ -65,6 +65,10 @@ public class DataSelection {
     /** region option */
     public final static String PROP_REGIONOPTION = "Region_Selection_Option";
 
+    /** region option */
+    public final static String PROP_HASSCONNER = "Region_Selection_Has_Conner";
+
+
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
