@@ -323,7 +323,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
         Object  t2 = subset.getProperty(DataSelection.PROP_HASSCONNER);
         if (t2 != null) {
-            String areaOpt = (String) t2;
+            String areaOpt = t2.toString();
             if(areaOpt.equalsIgnoreCase("true")) {
                 hasConner = true;
             }

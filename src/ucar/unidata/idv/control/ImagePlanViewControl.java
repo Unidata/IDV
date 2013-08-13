@@ -189,25 +189,25 @@ public class ImagePlanViewControl extends PlanViewControl {
                     double minLon = Double.NaN;
                     if(cImpl.getLatitude() != cImpl.getLatitude()) {
                         //do nothing
-                    } else if(lrImpl.getLatitude() == lrImpl.getLatitude()){
+                    } else if(ulImpl.getLatitude() != ulImpl.getLatitude()){
                        //upper left conner
                         maxLat = cImpl.getLatitude() + (cImpl.getLatitude() - lrImpl.getLatitude());
                         minLat = lrImpl.getLatitude();
                         maxLon = lrImpl.getLongitude();
                         minLon = cImpl.getLongitude() - (lrImpl.getLongitude() - cImpl.getLongitude());
-                    } else if(llImpl.getLatitude() == llImpl.getLatitude()){
+                    } else if(urImpl.getLatitude() != urImpl.getLatitude()){
                         //upper right conner
                         maxLat = cImpl.getLatitude() + (cImpl.getLatitude() - llImpl.getLatitude());
                         minLat = llImpl.getLatitude();
                         maxLon = cImpl.getLongitude() + (cImpl.getLongitude() - lrImpl.getLongitude());
                         minLon = lrImpl.getLongitude();
-                    } else if(urImpl.getLatitude() == urImpl.getLatitude()){
+                    } else if(llImpl.getLatitude() != llImpl.getLatitude()){
                         // lower left conner
                         maxLat = urImpl.getLatitude();
                         minLat = cImpl.getLatitude() - (urImpl.getLatitude() - cImpl.getLatitude() );
                         maxLon = urImpl.getLongitude();
                         minLon = cImpl.getLongitude() - (urImpl.getLongitude() - cImpl.getLongitude());
-                    } else if(ulImpl.getLatitude() == ulImpl.getLatitude()){
+                    } else if(lrImpl.getLatitude() != lrImpl.getLatitude()){
                         // lower right conner
                         maxLat = ulImpl.getLatitude();
                         minLat = cImpl.getLatitude() - (ulImpl.getLatitude() - cImpl.getLatitude());
