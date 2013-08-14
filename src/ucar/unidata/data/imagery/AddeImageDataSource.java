@@ -323,10 +323,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
         Object  t2 = subset.getProperty(DataSelection.PROP_HASSCONNER);
         if (t2 != null) {
-            String areaOpt = t2.toString();
-            if(areaOpt.equalsIgnoreCase("true")) {
-                hasConner = true;
-            }
+            hasConner = (Boolean)t2;
         }
         if (geoSelection != null) {  //&& !isReload) {
             // applies the rubberbandbox geosubset here
