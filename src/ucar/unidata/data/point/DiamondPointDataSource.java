@@ -69,6 +69,8 @@ public class DiamondPointDataSource extends TextPointDataSource {
         + "MidCouldShape[miss=\"9999\"]," + "HighCloudShape[miss=\"9999\"],"
         + "ShipDir[miss=\"9999\"]," + "ShipSPD[miss=\"9999\"]\n"
     ;
+
+    /** _more_ */
     public static int diamond1Size = 24;
     /* StationId(Text),Longitude,Latitude,Time,Altitude,CF,High,T,TD,DIR,SPD*/
 
@@ -84,6 +86,7 @@ public class DiamondPointDataSource extends TextPointDataSource {
         + "DIR[unit=\"deg\" miss=\"9999\"],"
         + "SPD[unit=\"m/s\" miss=\"9999\"]\n";
 
+    /** _more_ */
     public static int diamond2Size = 11;
 
     /**
@@ -106,6 +109,16 @@ public class DiamondPointDataSource extends TextPointDataSource {
 
     }
 
+    /**
+     * Construct a DiamondPointDataSource 
+     *
+     * @throws VisADException _more_
+     */
+    public DiamondPointDataSource() throws VisADException {
+        super();
+
+
+    }
 
     /**
      * Create a new Diamond PointDataSource
@@ -143,10 +156,10 @@ public class DiamondPointDataSource extends TextPointDataSource {
         List<String> lines        = StringUtil.split(s, "\n", true, true);
         int          currentIndex = 0;
         String       headerLine1  = lines.get(currentIndex++);
-        Pattern pattern1 = Pattern.compile("diamond\\s{1,}1");
-        Pattern pattern2 = Pattern.compile("diamond\\s{1,}2");
-        Matcher matcher1 = pattern1.matcher(headerLine1);
-        Matcher matcher2 = pattern2.matcher(headerLine1);
+        Pattern      pattern1     = Pattern.compile("diamond\\s{1,}1");
+        Pattern      pattern2     = Pattern.compile("diamond\\s{1,}2");
+        Matcher      matcher1     = pattern1.matcher(headerLine1);
+        Matcher      matcher2     = pattern2.matcher(headerLine1);
         if (matcher1.find()) {
             return readDiamond1File(lines);
         } else if (matcher2.find()) {
@@ -199,24 +212,25 @@ public class DiamondPointDataSource extends TextPointDataSource {
             output.append("\n");
 
             /* StationId(Text),Longitude,Latitude,Time,Altitude,CF,High,T,TD,DIR,SPD*/
-            int endPtsIndex = currentIndex + numberPts ;
+            int endPtsIndex = currentIndex + numberPts;
 
             //System.out.println("endPtsIndex "+ endPtsIndex);
             while (currentIndex < endPtsIndex) {
                 StringBuffer outputline = new StringBuffer();
                 //System.out.println("currentIndex "+ currentIndex);
-                String       line1 = lines.get(currentIndex++);
-              //  String       line2 = lines.get(currentIndex++);
+                String line1 = lines.get(currentIndex++);
+                //  String       line2 = lines.get(currentIndex++);
                 List<String> toks1 = StringUtil.split(line1, " ", true, true);
-              //  List<String> toks2 = StringUtil.split(line2, " ", true, true);
-                if(toks1.size() >= 24) {
+                //  List<String> toks2 = StringUtil.split(line2, " ", true, true);
+                if (toks1.size() >= 24) {
                     for (String a : toks1) {
                         outputline.append(a);
                         outputline.append(",");
                     }
                 } else {
-                    String       line2 = lines.get(currentIndex++);
-                    List<String> toks2 = StringUtil.split(line2, " ", true, true);
+                    String line2 = lines.get(currentIndex++);
+                    List<String> toks2 = StringUtil.split(line2, " ", true,
+                                             true);
                     for (String a : toks1) {
                         outputline.append(a);
                         outputline.append(",");
