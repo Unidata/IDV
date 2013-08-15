@@ -1,20 +1,18 @@
 /*
- * $Id: DateTimePicker.java,v 1.7 2007/07/06 20:45:29 jeffmc Exp $
- *
- * Copyright  1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -145,11 +143,12 @@ public class DateTimePicker extends JPanel {
     public Date getDate() {
         Date     d = dateChooser.getDate();
         Calendar c = getCalendar(d);
-        c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
-        c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
-        c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
-        c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
-
+        if(d.getHours() != 0 || d.getMinutes() != 0) {
+            c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
+            c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
+            c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
+            c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
+        }
         if (timeModel != null) {
             Date     time    = timeModel.getDate();
             Calendar timeCal = getCalendar(time);
@@ -181,10 +180,18 @@ public class DateTimePicker extends JPanel {
      * @param d  the new Date
      */
     public void setDate(Date d) {
-        Calendar c = getCalendar(d);
-        dateChooser.setDate(c.getTime());
+        Calendar c       = getCalendar(d);
+        String   dString = ucar.unidata.util.DateUtil.getTimeAsISO8601(d);
+        Date     dd      = null;
+        try {
+            dd = ucar.unidata.util.DateUtil.parse(dString);
+        } catch (Exception e) {}
+        if(myTimeZone.equals(c.getTimeZone()))
+            dateChooser.setDate(d);
+        else
+            dateChooser.setDate(dd);
         timeModel.setValue(d);
+      //  }
     }
 
 }
-

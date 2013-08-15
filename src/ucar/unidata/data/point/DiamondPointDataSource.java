@@ -33,6 +33,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -50,7 +52,7 @@ public class DiamondPointDataSource extends TextPointDataSource {
         + "CloudTotal,DIR,SPD,PressureSFC,Pressure3Hr,Weather1, Weather2,Preci6Hr,LowCloudShape,"
         + "LowCloud,LowCloudHigh,TD,Visibility,Weather,T,MidCouldShape,"
         + "HighCloudShape,ShipDir,ShipSPD))\n" + "StationId(Text),"
-        + "Longitude[unit=\"degrees west\"]," + "Latitude[unit=\"deg\"],"
+        + "Longitude[unit=\"degree\"]," + "Latitude[unit=\"deg\"],"
         + "Time[fmt=\"yyyy-MM-dd HH:mm:ss z\"],"
         + "Altitude[unit=\"m\" miss=\"9999\"]," + "CF[miss=\"9999\"],"
         + "CloudTotal[miss=\"9999\"]," + "DIR[unit=\"deg\" miss=\"9999\"],"
@@ -68,6 +70,8 @@ public class DiamondPointDataSource extends TextPointDataSource {
         + "ShipDir[miss=\"9999\"]," + "ShipSPD[miss=\"9999\"]\n"
     ;
 
+    /** _more_ */
+    public static int diamond1Size = 24;
     /* StationId(Text),Longitude,Latitude,Time,Altitude,CF,High,T,TD,DIR,SPD*/
 
     /** _more_ */
@@ -82,6 +86,8 @@ public class DiamondPointDataSource extends TextPointDataSource {
         + "DIR[unit=\"deg\" miss=\"9999\"],"
         + "SPD[unit=\"m/s\" miss=\"9999\"]\n";
 
+    /** _more_ */
+    public static int diamond2Size = 11;
 
     /**
      * Create a new Diamond PointDataSource
@@ -103,6 +109,16 @@ public class DiamondPointDataSource extends TextPointDataSource {
 
     }
 
+    /**
+     * Construct a DiamondPointDataSource 
+     *
+     * @throws VisADException _more_
+     */
+    public DiamondPointDataSource() throws VisADException {
+        super();
+
+
+    }
 
     /**
      * Create a new Diamond PointDataSource
@@ -140,9 +156,13 @@ public class DiamondPointDataSource extends TextPointDataSource {
         List<String> lines        = StringUtil.split(s, "\n", true, true);
         int          currentIndex = 0;
         String       headerLine1  = lines.get(currentIndex++);
-        if (headerLine1.contains("diamond 1")) {
+        Pattern      pattern1     = Pattern.compile("diamond\\s{1,}1");
+        Pattern      pattern2     = Pattern.compile("diamond\\s{1,}2");
+        Matcher      matcher1     = pattern1.matcher(headerLine1);
+        Matcher      matcher2     = pattern2.matcher(headerLine1);
+        if (matcher1.find()) {
             return readDiamond1File(lines);
-        } else if (headerLine1.contains("diamond 2")) {
+        } else if (matcher2.find()) {
             return readDiamond2File(lines);
         } else {
             return null;
@@ -192,24 +212,33 @@ public class DiamondPointDataSource extends TextPointDataSource {
             output.append("\n");
 
             /* StationId(Text),Longitude,Latitude,Time,Altitude,CF,High,T,TD,DIR,SPD*/
-            int endPtsIndex = currentIndex + numberPts * 2;
+            int endPtsIndex = currentIndex + numberPts;
 
             //System.out.println("endPtsIndex "+ endPtsIndex);
             while (currentIndex < endPtsIndex) {
                 StringBuffer outputline = new StringBuffer();
                 //System.out.println("currentIndex "+ currentIndex);
-                String       line1 = lines.get(currentIndex++);
-                String       line2 = lines.get(currentIndex++);
+                String line1 = lines.get(currentIndex++);
+                //  String       line2 = lines.get(currentIndex++);
                 List<String> toks1 = StringUtil.split(line1, " ", true, true);
-                List<String> toks2 = StringUtil.split(line2, " ", true, true);
-
-                for (String a : toks1) {
-                    outputline.append(a);
-                    outputline.append(",");
-                }
-                for (String a : toks2) {
-                    outputline.append(a);
-                    outputline.append(",");
+                //  List<String> toks2 = StringUtil.split(line2, " ", true, true);
+                if (toks1.size() >= 24) {
+                    for (String a : toks1) {
+                        outputline.append(a);
+                        outputline.append(",");
+                    }
+                } else {
+                    String line2 = lines.get(currentIndex++);
+                    List<String> toks2 = StringUtil.split(line2, " ", true,
+                                             true);
+                    for (String a : toks1) {
+                        outputline.append(a);
+                        outputline.append(",");
+                    }
+                    for (String a : toks2) {
+                        outputline.append(a);
+                        outputline.append(",");
+                    }
                 }
                 //outputline.replace(outputline.length()-1, outputline.length()-1, "\n");
                 output.append(outputline);
