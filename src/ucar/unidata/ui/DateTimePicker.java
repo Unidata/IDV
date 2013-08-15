@@ -143,11 +143,12 @@ public class DateTimePicker extends JPanel {
     public Date getDate() {
         Date     d = dateChooser.getDate();
         Calendar c = getCalendar(d);
-        c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
-        c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
-        c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
-        c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
-
+        if(d.getHours() != 0 || d.getMinutes() != 0) {
+            c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
+            c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
+            c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
+            c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
+        }
         if (timeModel != null) {
             Date     time    = timeModel.getDate();
             Calendar timeCal = getCalendar(time);
@@ -185,8 +186,12 @@ public class DateTimePicker extends JPanel {
         try {
             dd = ucar.unidata.util.DateUtil.parse(dString);
         } catch (Exception e) {}
-        dateChooser.setDate(dd);
+        if(myTimeZone.equals(c.getTimeZone()))
+            dateChooser.setDate(d);
+        else
+            dateChooser.setDate(dd);
         timeModel.setValue(d);
+      //  }
     }
 
 }
