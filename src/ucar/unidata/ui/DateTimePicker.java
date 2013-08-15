@@ -141,17 +141,19 @@ public class DateTimePicker extends JPanel {
      * @return  the date
      */
     public Date getDate() {
-        Date     d = dateChooser.getDate();
-        Calendar c = getCalendar(d);
-        if(d.getHours() != 0 || d.getMinutes() != 0) {
-            c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
-            c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
-            c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
-            c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
-        }
+        Date     d   = dateChooser.getDate();
+        Calendar cal = dateChooser.getCalendar();
+        Calendar c   = getCalendarN(cal);
+        // if(d.getHours() != 0 || d.getMinutes() != 0) {
+        c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
+        c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
+        c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
+        c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
+        //  }
         if (timeModel != null) {
             Date     time    = timeModel.getDate();
-            Calendar timeCal = getCalendar(time);
+            Calendar timeCal = new GregorianCalendar(cal.getTimeZone());
+            timeCal.setTime(time);
             c.add(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
             c.add(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
         }
@@ -173,6 +175,22 @@ public class DateTimePicker extends JPanel {
         return calendar;
     }
 
+    /**
+     * _more_
+     *
+     * @param cal _more_
+     *
+     * @return _more_
+     */
+    private Calendar getCalendarN(Calendar cal) {
+        Calendar calendar = new GregorianCalendar(myTimeZone);
+
+        for (int i = 0; i < Calendar.FIELD_COUNT; i++) {
+            calendar.set(i, cal.get(i));
+        }
+        return calendar;
+    }
+
 
     /**
      * Set the Date.
@@ -180,18 +198,9 @@ public class DateTimePicker extends JPanel {
      * @param d  the new Date
      */
     public void setDate(Date d) {
-        Calendar c       = getCalendar(d);
-        String   dString = ucar.unidata.util.DateUtil.getTimeAsISO8601(d);
-        Date     dd      = null;
-        try {
-            dd = ucar.unidata.util.DateUtil.parse(dString);
-        } catch (Exception e) {}
-        if(myTimeZone.equals(c.getTimeZone()))
-            dateChooser.setDate(d);
-        else
-            dateChooser.setDate(dd);
+        // Calendar c = getCalendar(d);
+        dateChooser.setDate(d);
         timeModel.setValue(d);
-      //  }
     }
 
 }
