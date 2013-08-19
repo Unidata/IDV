@@ -785,8 +785,8 @@ public class TimeSeriesChart extends XYChartManager {
                             timeSeriesList.add(series);
                         }
                         boolean first = true;
+                        lineState.setRange(new ucar.unidata.util.Range(min, max));
                         for (MyTimeSeries tmp : timeSeriesList) {
-                        	lineState.setRange(new ucar.unidata.util.Range(min, max));
                             addSeries(tmp, lineState, paramIdx, null, true, first);
                             first = false;
                         }
