@@ -786,12 +786,11 @@ public class TimeSeriesChart extends XYChartManager {
                         }
                         boolean first = true;
                         for (MyTimeSeries tmp : timeSeriesList) {
-                            addSeries(tmp, lineState, paramIdx, null, true,
-                                      first);
+                        	lineState.setRange(new ucar.unidata.util.Range(min, max));
+                            addSeries(tmp, lineState, paramIdx, null, true, first);
                             first = false;
                         }
-                        addRange(min, max,
-                                 "Data range from: " + lineState.getName());
+                        addRange(min, max, "Data range from: " + lineState.getName());
                     }
                 }
 
