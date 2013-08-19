@@ -20,17 +20,21 @@
 
 package ucar.visad.display;
 
-
-import ucar.unidata.data.grid.GridUtil;
-
-import visad.*;
-
-import visad.util.DataUtility;
-
 import java.awt.Color;
-
 import java.rmi.RemoteException;
 
+import ucar.unidata.data.grid.GridUtil;
+import visad.BaseColorControl;
+import visad.Display;
+import visad.Field;
+import visad.FieldImpl;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.Unit;
+import visad.VisADException;
 
 /**
  * A class to support showing 2D gridded data as colored contours on a plane
@@ -39,6 +43,7 @@ import java.rmi.RemoteException;
  * @author IDV Development Team
  * @version $Revision: 1.40 $
  */
+
 public class Contour2DDisplayable extends ContourLines implements GridDisplayable {
 
     /**
@@ -85,7 +90,6 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
         this(name, false);
     }
 
-
     /**
      * Constructs an instance with the supplied name and null initial RealType
      * and given alphaFlag
@@ -118,9 +122,6 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
             setColorFill(true);
         }
     }
-
-
-
 
     /**
      * Constructs from a name for the Displayable and the type of the
@@ -538,7 +539,6 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
         return ( !Double.isNaN(lowRange) && !Double.isNaN(highRange));
     }
 
-
     /**
      * Set the units for the displayed range
      *
@@ -556,7 +556,6 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
             applyUnit(colorMap, rgbRealType);
         }
     }
-
 
     /**
      * Set the units for the displayed range
@@ -597,7 +596,6 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
         }
     }
 
-
     /**
      * VisAD color control setup.
      *
@@ -625,8 +623,8 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
 
                 int id = event.getId();
 
-                if ((id == event.CONTROL_ADDED)
-                        || (id == event.CONTROL_REPLACED)) {
+                if ((id == ScalarMapEvent.CONTROL_ADDED)
+                        || (id == ScalarMapEvent.CONTROL_REPLACED)) {
                     colorControl = (BaseColorControl) colorMap.getControl();
 
                     if (colorControl != null) {
@@ -641,7 +639,7 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
 
             public void mapChanged(ScalarMapEvent event)
                     throws RemoteException, VisADException {
-                if ((event.getId() == event.AUTO_SCALE) && hasRange()) {
+                if ((event.getId() == ScalarMapEvent.AUTO_SCALE) && hasRange()) {
                     colorMap.setRange(lowRange, highRange);
                 }
             }
