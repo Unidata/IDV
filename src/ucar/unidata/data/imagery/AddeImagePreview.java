@@ -59,7 +59,7 @@ import java.util.StringTokenizer;
 
 /**
  * Created with IntelliJ IDEA.
- * User: opendap
+ * User: yuanho
  * Date: 5/29/13
  * Time: 9:56 PM
  * To change this template use File | Settings | File Templates.
@@ -73,7 +73,7 @@ public class AddeImagePreview {
     private String BandNames[];
 
     /** _more_ */
-    private String source;
+    private AreaAdapter adapter;
 
 
     /** _more_ */
@@ -91,19 +91,16 @@ public class AddeImagePreview {
     /**
      * Construct a AddeImagePreview
      *
-     * @param source _more_
+     * @param adapter _more_
+     * @param aid _more_
      *
      * @throws IOException _more_
      */
-    public AddeImagePreview(String source) throws IOException {
+    public AddeImagePreview(AreaAdapter adapter, AddeImageDescriptor aid)
+            throws IOException {
 
-        this.source = source;
-        //AddeImageDescriptor aid = null;
-        while (aid == null) {
-            try {
-                aid = new AddeImageDescriptor(source);
-            } catch (Exception excp) {}
-        }
+        this.adapter = adapter;
+        this.aid     = aid;
 
         try {
             init();
@@ -160,14 +157,14 @@ public class AddeImagePreview {
      */
     private void init()
             throws IOException, VisADException, AreaFileException {
-        AreaAdapter aa = new AreaAdapter(this.source, false);
+
         visad.meteorology.SingleBandedImageImpl ff =
-            (visad.meteorology.SingleBandedImageImpl) aa.getImage();
+            (visad.meteorology.SingleBandedImageImpl) adapter.getImage();
         AREACoordinateSystem acs = null;
-        acs       = new AREACoordinateSystem(aa.getAreaFile());
+        acs       = new AREACoordinateSystem(adapter.getAreaFile());
         this.proj = new MapProjectionProjection(acs);
 
-        int[] ldir = aa.getAreaDirectory().getDirectoryBlock();
+        int[] ldir = adapter.getAreaDirectory().getDirectoryBlock();
 
         subSampledPixels = ldir[9];
         subSampledScans  = ldir[8];
