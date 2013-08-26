@@ -1,18 +1,20 @@
 /*
- * Copyright 1997-2013 Unidata Program Center/University Corporation for
+ * $Id: DateTimePicker.java,v 1.7 2007/07/06 20:45:29 jeffmc Exp $
+ *
+ * Copyright  1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -88,6 +90,7 @@ public class DateTimePicker extends JPanel {
         jc.setCalendar(calendar);
 
         dateChooser = new JDateChooser(jc, new Date(), null, null);
+        dateChooser.setDateFormatCalendar(calendar);
         //dateChooser = new JDateChooser(jc);
         setLayout(new BorderLayout());
 
@@ -141,23 +144,18 @@ public class DateTimePicker extends JPanel {
      * @return  the date
      */
     public Date getDate() {
-        Date     d   = dateChooser.getDate();
-        Calendar cal = dateChooser.getCalendar();
-        Calendar c   = getCalendarN(cal);
-        // if(d.getHours() != 0 || d.getMinutes() != 0) {
-        c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
-        c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
-        c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
-        c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
-        //  }
+        Date     d = dateChooser.getDate();
+        Calendar c0 = getCalendar(d);
+        Calendar c1 = new GregorianCalendar(c0.get(Calendar.YEAR), c0.get(Calendar.MONTH), c0.get(Calendar.DAY_OF_MONTH));
+        c1.setTimeZone(getDefaultTimeZone());
+        
         if (timeModel != null) {
             Date     time    = timeModel.getDate();
-            Calendar timeCal = new GregorianCalendar(cal.getTimeZone());
-            timeCal.setTime(time);
-            c.add(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
-            c.add(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+            Calendar timeCal = getCalendar(time);
+            c1.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+            c1.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
         }
-        return c.getTime();
+        return c1.getTime();
     }
 
     /**
@@ -175,22 +173,6 @@ public class DateTimePicker extends JPanel {
         return calendar;
     }
 
-    /**
-     * _more_
-     *
-     * @param cal _more_
-     *
-     * @return _more_
-     */
-    private Calendar getCalendarN(Calendar cal) {
-        Calendar calendar = new GregorianCalendar(myTimeZone);
-
-        for (int i = 0; i < Calendar.FIELD_COUNT; i++) {
-            calendar.set(i, cal.get(i));
-        }
-        return calendar;
-    }
-
 
     /**
      * Set the Date.
@@ -198,9 +180,11 @@ public class DateTimePicker extends JPanel {
      * @param d  the new Date
      */
     public void setDate(Date d) {
-        // Calendar c = getCalendar(d);
-        dateChooser.setDate(d);
+        Calendar c = getCalendar(d);
+        dateChooser.setDate(c.getTime());
+        dateChooser.setDateFormatCalendar(c);
         timeModel.setValue(d);
     }
 
 }
+
