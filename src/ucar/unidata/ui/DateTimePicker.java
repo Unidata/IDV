@@ -193,16 +193,17 @@ public class DateTimePicker extends JPanel {
         timeModel.setValue(d);
     }
 
-  /**
-   * Must extend JTextFieldDateEditor because for poor support for time zone in
-   * JTextFieldDateEditor
-   */
+    /**
+     * Must extend JTextFieldDateEditor because for poor support for time zone in
+     * JTextFieldDateEditor
+     */
     private static class JTextFieldEditorTZ extends JTextFieldDateEditor {
 
         /**
          * {@inheritDoc}
          */
         protected void setDate(Date date, boolean firePropertyChange) {
+
             super.setDate(date, firePropertyChange);
             if (date != null) {
                 DateFormat format =
@@ -210,6 +211,15 @@ public class DateTimePicker extends JPanel {
                 format.setTimeZone(getDefaultTimeZone());
                 setText(format.format(date));
             }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getText() {
+            return (date == null)
+                   ? super.getText()
+                   : dateFormatter.format(date);
         }
     }
 }
