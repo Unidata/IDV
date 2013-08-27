@@ -23,11 +23,15 @@ package ucar.unidata.ui;
 
 import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
+import com.toedter.calendar.JTextFieldDateEditor;
 
 import ucar.unidata.util.GuiUtils;
 
 
 import java.awt.BorderLayout;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -91,7 +95,8 @@ public class DateTimePicker extends JPanel {
         jc.getDayChooser().setCalendar(calendar);
         jc.setCalendar(calendar);
 
-        dateChooser = new JDateChooser(jc, new Date(), null, null);
+        dateChooser = new JDateChooser(jc, new Date(), null,
+                                       new JTextFieldEditorTZ());
         //dateChooser = new JDateChooser(jc);
         setLayout(new BorderLayout());
 
@@ -188,4 +193,23 @@ public class DateTimePicker extends JPanel {
         timeModel.setValue(d);
     }
 
+  /**
+   * Must extend JTextFieldDateEditor because for poor support for time zone in
+   * JTextFieldDateEditor
+   */
+    private static class JTextFieldEditorTZ extends JTextFieldDateEditor {
+
+        /**
+         * {@inheritDoc}
+         */
+        protected void setDate(Date date, boolean firePropertyChange) {
+            super.setDate(date, firePropertyChange);
+            if (date != null) {
+                DateFormat format =
+                    new SimpleDateFormat(dateFormatter.toPattern());
+                format.setTimeZone(getDefaultTimeZone());
+                setText(format.format(date));
+            }
+        }
+    }
 }
