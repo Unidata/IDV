@@ -1,20 +1,18 @@
 /*
- * $Id: DateTimePicker.java,v 1.7 2007/07/06 20:45:29 jeffmc Exp $
- *
- * Copyright  1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,18 +21,23 @@
 package ucar.unidata.ui;
 
 
-import com.toedter.calendar.*;
+import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDateChooser;
 
 import ucar.unidata.util.GuiUtils;
 
-import java.awt.*;
+
+import java.awt.BorderLayout;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpinnerDateModel;
 
 
 
@@ -43,7 +46,6 @@ import javax.swing.*;
  *
  *
  * @author IDV Development Team
- * @version $Revision: 1.7 $
  */
 public class DateTimePicker extends JPanel {
 
@@ -144,11 +146,13 @@ public class DateTimePicker extends JPanel {
      * @return  the date
      */
     public Date getDate() {
-        Date     d = dateChooser.getDate();
+        Date     d  = dateChooser.getDate();
         Calendar c0 = getCalendar(d);
-        Calendar c1 = new GregorianCalendar(c0.get(Calendar.YEAR), c0.get(Calendar.MONTH), c0.get(Calendar.DAY_OF_MONTH));
+        Calendar c1 = new GregorianCalendar(c0.get(Calendar.YEAR),
+                                            c0.get(Calendar.MONTH),
+                                            c0.get(Calendar.DAY_OF_MONTH));
         c1.setTimeZone(getDefaultTimeZone());
-        
+
         if (timeModel != null) {
             Date     time    = timeModel.getDate();
             Calendar timeCal = getCalendar(time);
@@ -187,4 +191,3 @@ public class DateTimePicker extends JPanel {
     }
 
 }
-
