@@ -92,7 +92,6 @@ public class DateTimePicker extends JPanel {
         jc.setCalendar(calendar);
 
         dateChooser = new JDateChooser(jc, new Date(), null, null);
-        dateChooser.setDateFormatCalendar(calendar);
         //dateChooser = new JDateChooser(jc);
         setLayout(new BorderLayout());
 
@@ -186,7 +185,6 @@ public class DateTimePicker extends JPanel {
     public void setDate(Date d) {
         Calendar c = getCalendar(d);
         dateChooser.setDate(c.getTime());
-        dateChooser.setDateFormatCalendar(c);
         timeModel.setValue(d);
     }
 
