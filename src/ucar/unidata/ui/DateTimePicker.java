@@ -21,18 +21,7 @@
 package ucar.unidata.ui;
 
 
-import com.toedter.calendar.JCalendar;
-import com.toedter.calendar.JDateChooser;
-import com.toedter.calendar.JTextFieldDateEditor;
-
-import ucar.unidata.util.GuiUtils;
-
-
 import java.awt.BorderLayout;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -42,6 +31,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpinnerDateModel;
+
+import ucar.unidata.util.GuiUtils;
+
+import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDateChooser;
 
 
 
@@ -95,8 +89,7 @@ public class DateTimePicker extends JPanel {
         jc.getDayChooser().setCalendar(calendar);
         jc.setCalendar(calendar);
 
-        dateChooser = new JDateChooser(jc, new Date(), null,
-                                       new JTextFieldEditorTZ());
+        dateChooser = new JDateChooser(jc, new Date(), null, null);
         //dateChooser = new JDateChooser(jc);
         setLayout(new BorderLayout());
 
@@ -107,14 +100,14 @@ public class DateTimePicker extends JPanel {
         javax.swing.JSpinner spinner = new javax.swing.JSpinner(timeModel);
         javax.swing.JSpinner.DateEditor editor =
             new javax.swing.JSpinner.DateEditor(spinner, "HH:mm");
-        editor.getFormat().setTimeZone(calendar.getTimeZone());
         spinner.setEditor(editor);
         JComponent timeComp;
         if (includeHours) {
             timeComp = GuiUtils.hbox(spinner,
-                                     new JLabel(" " + myTimeZone.getID()), 5);
+                                     new JLabel(" "
+                                         + TimeZone.getDefault().getID()), 5);
         } else {
-            timeComp = new JLabel(" " + myTimeZone.getID());
+            timeComp = new JLabel(" " + TimeZone.getDefault().getID());
         }
         add(BorderLayout.CENTER, GuiUtils.hbox(dateChooser, timeComp));
         if (date != null) {
@@ -155,13 +148,13 @@ public class DateTimePicker extends JPanel {
         Calendar c1 = new GregorianCalendar(c0.get(Calendar.YEAR),
                                             c0.get(Calendar.MONTH),
                                             c0.get(Calendar.DAY_OF_MONTH));
-        c1.setTimeZone(getDefaultTimeZone());
 
         if (timeModel != null) {
             Date     time    = timeModel.getDate();
             Calendar timeCal = getCalendar(time);
             c1.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
             c1.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+            c1.set(Calendar.SECOND, timeCal.get(Calendar.SECOND));
         }
         return c1.getTime();
     }
@@ -174,7 +167,7 @@ public class DateTimePicker extends JPanel {
      * @return  the associated calendar
      */
     private Calendar getCalendar(Date d) {
-        Calendar calendar = new GregorianCalendar(myTimeZone);
+        Calendar calendar = new GregorianCalendar();
         if (d != null) {
             calendar.setTime(d);
         }
@@ -191,35 +184,5 @@ public class DateTimePicker extends JPanel {
         Calendar c = getCalendar(d);
         dateChooser.setDate(c.getTime());
         timeModel.setValue(d);
-    }
-
-    /**
-     * Must extend JTextFieldDateEditor because for poor support for time zone in
-     * JTextFieldDateEditor
-     */
-    private static class JTextFieldEditorTZ extends JTextFieldDateEditor {
-
-        /**
-         * {@inheritDoc}
-         */
-        protected void setDate(Date date, boolean firePropertyChange) {
-
-            super.setDate(date, firePropertyChange);
-            if (date != null) {
-                DateFormat format =
-                    new SimpleDateFormat(dateFormatter.toPattern());
-                format.setTimeZone(getDefaultTimeZone());
-                setText(format.format(date));
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public String getText() {
-            return (date == null)
-                   ? super.getText()
-                   : dateFormatter.format(date);
-        }
     }
 }
