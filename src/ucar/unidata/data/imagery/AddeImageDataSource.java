@@ -56,10 +56,15 @@ import visad.georef.MapProjection;
 
 import visad.meteorology.SingleBandedImage;
 
+
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
+
 import java.awt.*;
 
 import java.awt.Dimension;
 import java.awt.event.*;
+
+import java.awt.image.BufferedImage;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -144,6 +149,9 @@ public class AddeImageDataSource extends ImageDataSource {
 
     /** _more_ */
     private Boolean showPreview = Boolean.FALSE;
+
+    /** _more_ */
+    private AREACoordinateSystem acs;
 
     /**
      *  The parameterless ctor unpersisting.
@@ -240,6 +248,7 @@ public class AddeImageDataSource extends ImageDataSource {
             try {
                 AreaFile areaFile = new AreaFile(baseSource);
                 baseAnav = areaFile.getNavigation();
+                acs      = new AREACoordinateSystem(areaFile);
             } catch (Exception e) {}
             elFactor =
                 (int) Math
@@ -555,8 +564,8 @@ public class AddeImageDataSource extends ImageDataSource {
         inLineMag = inElemMag / elFactor;
 
         outLine   = inLine / inLineMag;
-        int    cline       = inLine / 2;
-        int    celem       = inElem / 2;
+        int    cline       = inLine / inLineMag;
+        int    celem       = inElem / inElemMag;
 
         String locateValue = cline + " " + celem;
 
@@ -1304,10 +1313,22 @@ public class AddeImageDataSource extends ImageDataSource {
         /** _more_ */
         private String regionOption = USE_DEFAULTREGION;
 
+
+        /** _more_ */
+        AddeImageDataSource imageDataSource;
+
+        /** _more_ */
+        int preNumLines = 0;
+
+        /** _more_ */
+        int preNumEles = 0;
+
         /**
          * Construct a ImagePreviewSelection
          *
          *
+         *
+         * @param imageDataSource _more_
          * @param adapter _more_
          * @param source _more_
          * @param descriptor _more_
@@ -1316,17 +1337,17 @@ public class AddeImageDataSource extends ImageDataSource {
          * @throws ParseException _more_
          * @throws VisADException _more_
          */
-        ImagePreviewSelection(AreaAdapter adapter, String source,
+        ImagePreviewSelection(AddeImageDataSource imageDataSource,
+                              AreaAdapter adapter, String source,
                               AddeImageDescriptor descriptor)
                 throws IOException, ParseException, VisADException {
-
             super("Region");
-            this.aAdapter   = adapter;
-            this.source     = source;
-            this.descriptor = descriptor;
+            this.imageDataSource = imageDataSource;
+            this.aAdapter        = adapter;
+            this.source          = source;
+            this.descriptor      = descriptor;
 
             createImagePreview(source);
-
             display = new NavigatedMapPanel(null, true, true,
                                             image_preview.getPreviewImage(),
                                             this.source);
@@ -1348,6 +1369,17 @@ public class AddeImageDataSource extends ImageDataSource {
             MasterPanel.add(labelsPanel, "North");
             MasterPanel.add(jsp, "Center");
 
+            display.getNavigatedPanel().addFocusListener(new FocusListener() {
+                @Override
+                public void focusGained(FocusEvent focusEvent) {
+                    System.err.println("Gain");
+                }
+
+                @Override
+                public void focusLost(FocusEvent focusEvent) {
+                    update();
+                }
+            });
 
 
         }
@@ -1551,7 +1583,166 @@ public class AddeImageDataSource extends ImageDataSource {
 
         }
 
+        /**
+         * _more_
+         */
+        public void update() {
 
+            ProjectionRect rect =
+                display.getNavigatedPanel().getSelectedRegion();
+            if (rect == null) {
+                // no region subset, full image
+            } else {
+                ProjectionImpl projectionImpl = display.getProjectionImpl();
+                LatLonRect latLonRect =
+                    projectionImpl.getLatLonBoundingBox(rect);
+                GeoLocationInfo gInfo;
+                if (latLonRect.getHeight() != latLonRect.getHeight()) {
+                    //conner point outside the earth
+
+                    LatLonPointImpl cImpl =
+                        projectionImpl.projToLatLon(rect.x
+                            + rect.getWidth() / 2, rect.y
+                                + rect.getHeight() / 2);
+                    LatLonPointImpl urImpl =
+                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
+                            rect.y + rect.getHeight());
+                    LatLonPointImpl ulImpl =
+                        projectionImpl.projToLatLon(rect.x,
+                            rect.y + rect.getHeight());
+                    LatLonPointImpl lrImpl =
+                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
+                            rect.y);
+                    LatLonPointImpl llImpl =
+                        projectionImpl.projToLatLon(rect.x, rect.y);
+
+                    double maxLat = Double.NaN;
+                    double minLat = Double.NaN;
+                    double maxLon = Double.NaN;
+                    double minLon = Double.NaN;
+                    if (cImpl.getLatitude() != cImpl.getLatitude()) {
+                        //do nothing
+                    } else if (ulImpl.getLatitude() != ulImpl.getLatitude()) {
+                        //upper left conner
+                        maxLat = cImpl.getLatitude()
+                                 + (cImpl.getLatitude()
+                                    - lrImpl.getLatitude());
+                        minLat = lrImpl.getLatitude();
+                        maxLon = lrImpl.getLongitude();
+                        minLon = cImpl.getLongitude()
+                                 - (lrImpl.getLongitude()
+                                    - cImpl.getLongitude());
+                    } else if (urImpl.getLatitude() != urImpl.getLatitude()) {
+                        //upper right conner
+                        maxLat = cImpl.getLatitude()
+                                 + (cImpl.getLatitude()
+                                    - llImpl.getLatitude());
+                        minLat = llImpl.getLatitude();
+                        maxLon = cImpl.getLongitude()
+                                 + (cImpl.getLongitude()
+                                    - lrImpl.getLongitude());
+                        minLon = lrImpl.getLongitude();
+                    } else if (llImpl.getLatitude() != llImpl.getLatitude()) {
+                        // lower left conner
+                        maxLat = urImpl.getLatitude();
+                        minLat = cImpl.getLatitude()
+                                 - (urImpl.getLatitude()
+                                    - cImpl.getLatitude());
+                        maxLon = urImpl.getLongitude();
+                        minLon = cImpl.getLongitude()
+                                 - (urImpl.getLongitude()
+                                    - cImpl.getLongitude());
+                    } else if (lrImpl.getLatitude() != lrImpl.getLatitude()) {
+                        // lower right conner
+                        maxLat = ulImpl.getLatitude();
+                        minLat = cImpl.getLatitude()
+                                 - (ulImpl.getLatitude()
+                                    - cImpl.getLatitude());
+                        maxLon = cImpl.getLongitude()
+                                 + (cImpl.getLongitude()
+                                    - ulImpl.getLongitude());
+                        minLon = ulImpl.getLongitude();
+                    }
+
+                    gInfo = new GeoLocationInfo(maxLat,
+                            LatLonPointImpl.lonNormal(minLon), minLat,
+                            LatLonPointImpl.lonNormal(maxLon));
+
+                } else {
+                    gInfo = new GeoLocationInfo(latLonRect);
+                }
+                // update the advanced
+                float[][] latlon = new float[2][1];
+                latlon[1][0] = (float) gInfo.getMinLon();
+                latlon[0][0] = (float) gInfo.getMaxLat();
+                float[][] ulLinEle = baseAnav.toLinEle(latlon);
+
+                latlon[1][0] = (float) gInfo.getMaxLon();
+                latlon[0][0] = (float) gInfo.getMinLat();
+                float[][] lrLinEle   = baseAnav.toLinEle(latlon);
+                int       displayNum = (int) rect.getWidth();
+                int lines = (int) (lrLinEle[1][0] - ulLinEle[1][0])
+                            * Math.abs(lMag);
+                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
+                            * Math.abs(eMag);
+                // set latlon coord
+                imageDataSource.advancedSelection.setIsFromRegionUpdate(true);
+                imageDataSource.advancedSelection.coordinateTypeComboBox
+                    .setSelectedIndex(0);
+                // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
+                imageDataSource.advancedSelection.setPlace("ULEFT");
+                imageDataSource.advancedSelection.setLatitude(
+                    gInfo.getMaxLat());
+                imageDataSource.advancedSelection.setLongitude(
+                    gInfo.getMinLon());
+                imageDataSource.advancedSelection.convertToLineEle();
+
+                // update the size
+                imageDataSource.advancedSelection.setNumLines(lines);
+                imageDataSource.advancedSelection.setNumEles(elems);
+                imageDataSource.advancedSelection.setIsFromRegionUpdate(
+                    false);
+                preNumEles  = elems;
+                preNumLines = lines;
+            }
+
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public int getPreNumLines() {
+            return preNumLines;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public int getPreNumEles() {
+            return preNumEles;
+        }
+
+        /**
+         * _more_
+         *
+         * @param num _more_
+         */
+        public void setPreNumLines(int num) {
+            preNumLines = num;
+        }
+
+        /**
+         * _more_
+         *
+         * @param num _more_
+         */
+        public void setPreNumEles(int num) {
+            preNumEles = num;
+        }
     }
 
     /** _more_ */
@@ -1570,20 +1761,20 @@ public class AddeImageDataSource extends ImageDataSource {
             DataChoice dataChoice) {
 
         try {
-            AreaAdapter aa = new AreaAdapter(this.source, false);
-            visad.meteorology.SingleBandedImageImpl ff =
-                (visad.meteorology.SingleBandedImageImpl) aa.getImage();
-            AREACoordinateSystem acs = null;
-            acs = new AREACoordinateSystem(aa.getAreaFile());
-            MapProjection  mProjection = (MapProjection) acs;
-            ProjectionImpl proj        = new MapProjectionProjection(acs);
+
+            AreaAdapter   aa = new AreaAdapter(this.baseSource, false);
+
+            MapProjection mProjection = (MapProjection) acs;
 
             if (null == previewSelection) {
-                previewSelection = new ImagePreviewSelection(aa, source,
-                        this.descriptor);
+
+                previewSelection = new ImagePreviewSelection(this, aa,
+                        baseSource, this.descriptor);
+
                 advancedSelection = new AddeImageSelectionPanel(this,
-                        this.source, this.baseAnav, this.descriptor,
-                        mProjection);
+                        dataChoice, this.baseSource, baseAnav,
+                        this.descriptor, mProjection, previewSelection);
+
             } else {
                 previewSelection.setDataChoice(dataChoice);
             }
