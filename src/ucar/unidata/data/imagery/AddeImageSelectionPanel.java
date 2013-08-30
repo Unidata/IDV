@@ -418,8 +418,8 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
             newRect.setY(y);
         }
         navigatedPanel.setSelectedRegion(newRect);
-        ProjectionRect rect1 = navigatedPanel.getSelectedRegion();
-        System.out.println("here");
+
+        //System.out.println("here");
     }
 
 
