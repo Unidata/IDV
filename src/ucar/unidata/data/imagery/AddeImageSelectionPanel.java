@@ -447,6 +447,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
         navigatedPanel.setSelectedRegion(newRect);
         dataSource.previewSelection.setPreNumEles(newNumEles);
+        updatePlace();
     }
 
     /**
@@ -471,6 +472,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
         navigatedPanel.setSelectedRegion(newRect);
         dataSource.previewSelection.setPreNumLines(newNumLines);
+        updatePlace();
     }
 
     /**
