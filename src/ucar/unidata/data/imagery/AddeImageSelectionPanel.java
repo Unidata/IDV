@@ -85,9 +85,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     public JPanel advance;
 
     /** _more_ */
-    GeoSelection geoSelection;
-
-    /** _more_ */
     private java.awt.geom.Rectangle2D.Float new_bb;
 
     /** _more_ */
@@ -134,11 +131,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     /** _more_ */
     private JPanel eMagPanel;
 
-    /** _more_ */
-    private JPanel pRessPanel;
-
-    /** _more_ */
-    private JPanel cCoorPanel;
 
 
     /** _more_ */
@@ -228,8 +220,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     /** _more_ */
     private double defaultLon = Double.NaN;
 
-    /** _more_ */
-    private boolean resetLatLon = true;
 
     /** _more_ */
     private int imageLine;
@@ -491,6 +481,23 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         }
 
         GuiUtils.enableComponents(cList, enable);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param enable _more_
+     */
+    public void enablePanelAll(boolean enable) {
+
+        coordinateTypeComboBox.setEnabled(enable);
+        locationComboBox.setEnabled(enable);
+        enablePanel(locationPanel, enable);
+        enablePanel(lMagPanel, enable);
+        enablePanel(eMagPanel, enable);
+        enablePanel(sizePanel, enable);
+
     }
 
     /**
@@ -871,15 +878,8 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
                     !((JCheckBox) e.getSource()).isSelected();
                 enablePanel(lMagPanel, showMagSection);
                 enablePanel(eMagPanel, showMagSection);
-                enablePanel(sizePanel, showMagSection);
             }
         });
-
-        pRessPanel = GuiUtils.doLayout(new Component[] { prograssiveCbx }, 1,
-                                       GuiUtils.WT_N, GuiUtils.WT_N);
-        propComp = GuiUtils.hbox(new Component[] {
-            GuiUtils.lLabel("ProgressiveResolution:"),
-            pRessPanel }, 2);
 
         allComps.add(GuiUtils.rLabel("ProgressiveResolution:"));
         allComps.add(GuiUtils.left(prograssiveCbx));
@@ -1164,8 +1164,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
                 GuiUtils.inset(lineMagComps[1], new Insets(0, 4, 0, 0)) }, 5,
                     GuiUtils.WT_N, GuiUtils.WT_N);
         propComp = GuiUtils.hbox(new Component[] { lMagPanel }, 1);
-        // allComps.add(GuiUtils.left(propComp));
-        // allComps.add(GuiUtils.lLabel(""));
+
         allComps.add(GuiUtils.rLabel(""));
         allComps.add(GuiUtils.left(propComp));
 
@@ -1262,6 +1261,16 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         MasterPanel = new JPanel(new java.awt.BorderLayout());
         MasterPanel.add(labelsPanel, "North");
         MasterPanel.add(jsp, "Center");
+
+        if (dataSource.previewSelection != null) {
+            String opStr = dataSource.previewSelection.getRegionOptions();
+
+            if (opStr.equals("Use Selected")) {
+                enablePanelAll(true);
+            } else {
+                enablePanelAll(false);
+            }
+        }
 
 
         return MasterPanel;
@@ -1376,8 +1385,8 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
             val = defaultLat;
         }
         latLonWidget.setLat(val);
-        this.latitude    = val;
-        this.resetLatLon = false;
+        this.latitude = val;
+
     }
 
     /**
@@ -1415,8 +1424,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
             val = defaultLon;
         }
         latLonWidget.setLon(val);
-        this.longitude   = val;
-        this.resetLatLon = false;
+        this.longitude = val;
     }
 
     /**
@@ -1565,45 +1573,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
     }
 
-    /**
-     * _more_
-     *
-     * @param lin _more_
-     * @param ele _more_
-     *
-     * @return _more_
-     */
-    protected GeoLocationInfo getGeoLocationInfo(int lin, int ele) {
-        int nLin = getNumLines();
-        if (nLin > 0) {
-            int nEle = getNumEles();
-            if (nEle > 0) {
-                int lMag = getLineMag();
-                if (lMag > 1) {
-                    return geoLocInfo;
-                }
-                int eMag = getElementMag();
-                if (eMag > 1) {
-                    return geoLocInfo;
-                }
-                geoLocInfo = makeGeoLocationInfo(lin, ele, nLin, nEle, lMag,
-                        eMag);
-                return geoLocInfo;
-            }
-        }
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 5; j++) {
-                latLon[i][j]    = Double.NaN;
-                imageEL[i][j]   = Double.NaN;
-                areaEL[i][j]    = Double.NaN;
-                displayEL[i][j] = Double.NaN;
-            }
-        }
 
-        setLine(-1);
-        setElement(-1);
-        return null;
-    }
 
     /**
      * _more_
@@ -1631,133 +1601,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         }
     }
 
-    /**
-     * _more_
-     *
-     * @param lin _more_
-     * @param ele _more_
-     * @param nlins _more_
-     * @param neles _more_
-     * @param linMag _more_
-     * @param eleMag _more_
-     *
-     * @return _more_
-     */
-    private GeoLocationInfo makeGeoLocationInfo(int lin, int ele, int nlins,
-            int neles, int linMag, int eleMag) {
-
-        geoLocInfo = null;
-
-        String               plc         = getPlace();
-        String               type        = getCoordinateType();
-
-        AREACoordinateSystem macs = (AREACoordinateSystem) sampleProjection;
-        Rectangle2D          mapArea     = macs.getDefaultMapArea();
-        double               previewXDim = mapArea.getWidth();
-        double               previewYDim = mapArea.getHeight();
-
-        double dLine = (double) nlins / (2.0 * this.previewLineRes)
-                       * Math.abs(linMag);
-        double dEle = (double) neles / (2.0 * this.previewEleRes)
-                      * Math.abs(eleMag);
-
-        if (plc.equals(PLACE_CENTER)) {
-            displayEL[0][0] = ele;
-            displayEL[1][0] = lin;
-            displayEL[0][1] = ele - dEle;
-            if (displayEL[0][1] < 0) {
-                displayEL[0][1] = 0.0;
-            }
-            displayEL[1][1] = lin + dLine;
-            if (displayEL[1][1] > previewYDim) {
-                displayEL[1][1] = previewYDim;
-            }
-        } else if (plc.equals(PLACE_ULEFT)) {
-            displayEL[0][0] = ele + dEle;
-            if (displayEL[0][0] > previewXDim) {
-                displayEL[0][0] = previewXDim;
-            }
-            displayEL[1][0] = lin - dLine;
-            if (displayEL[1][0] < 0) {
-                displayEL[1][0] = 0.0;
-            }
-            displayEL[0][1] = ele;
-            displayEL[1][1] = lin;
-        }
-        int cEle = (int) Math.ceil(displayEL[0][0]);
-        int cLin = (int) Math.ceil(displayEL[1][0]);
-        displayEL[0][2] = cEle + dEle;
-        if (displayEL[0][2] > previewXDim) {
-            displayEL[0][2] = previewXDim;
-        }
-        displayEL[1][2] = cLin + dLine;
-        if (displayEL[1][2] > previewYDim) {
-            displayEL[1][2] = previewYDim;
-        }
-        displayEL[0][3] = cEle - dEle;
-        if (displayEL[0][3] < 0) {
-            displayEL[0][3] = 0.0;
-        }
-        displayEL[1][3] = cLin - dLine;
-        if (displayEL[1][3] < 0) {
-            displayEL[1][3] = 0.0;
-        }
-        displayEL[0][4] = cEle + dEle;
-        if (displayEL[0][4] > previewXDim) {
-            displayEL[0][4] = previewXDim;
-        }
-        displayEL[1][4] = cLin - dLine;
-        if (displayEL[1][4] < 0) {
-            displayEL[1][4] = 0.0;
-        }
-
-        areaEL = displayCoordToAreaCoord(displayEL);
-
-        for (int i = 0; i < 5; i++) {
-            if (areaEL[0][i] < 0.0) {
-                areaEL[0][i] = 0.0;
-            }
-            if (areaEL[0][i] > this.maxEles) {
-                areaEL[0][i] = (double) this.maxEles;
-            }
-            if (areaEL[1][i] < 0.0) {
-                areaEL[1][i] = 0.0;
-            }
-            if (areaEL[1][i] > this.maxLines) {
-                areaEL[1][i] = (double) this.maxLines;
-            }
-        }
-
-        try {
-            latLon = macs.toReference(displayEL);
-        } catch (Exception e) {
-            System.out.println("Error converting input lat/lon e=" + e);
-        }
-
-        double maxLat = latLon[0][1];
-        if (latLon[0][2] > maxLat) {
-            maxLat = latLon[0][2];
-        }
-        double minLat = latLon[0][3];
-        if (latLon[0][4] < minLat) {
-            minLat = latLon[0][4];
-        }
-        double maxLon = latLon[1][4];
-        if (latLon[1][2] > maxLon) {
-            maxLon = latLon[1][2];
-        }
-        double minLon = latLon[1][1];
-        if (latLon[1][3] < minLon) {
-            minLon = latLon[1][3];
-        }
-
-        imageEL    = this.previewNav.areaCoordToImageCoord(areaEL);
-
-        geoLocInfo = new GeoLocationInfo(maxLat, minLon, minLat, maxLon);
-
-        return geoLocInfo;
-
-    }
 
     /**
      * _more_
@@ -1788,85 +1631,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         return this.dataChoice;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public int getPreviewLineRes() {
-        return this.previewLineRes;
-    }
 
-    /**
-     * _more_
-     *
-     * @param val _more_
-     */
-    public void setPreviewLineRes(int val) {
-        this.previewLineRes = val;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public int getPreviewEleRes() {
-        return this.previewEleRes;
-    }
-
-    /**
-     * _more_
-     *
-     * @param val _more_
-     */
-    public void setPreviewEleRes(int val) {
-        this.previewEleRes = val;
-    }
-
-    /**
-     * _more_
-     *
-     * @param disp _more_
-     *
-     * @return _more_
-     */
-    private double[][] displayCoordToAreaCoord(double[][] disp) {
-        double[][] area = new double[2][disp[0].length];
-        try {
-            if (sampleProjection != null) {
-                AREACoordinateSystem macs =
-                    (AREACoordinateSystem) sampleProjection;
-                double[][] ll     = macs.toReference(disp);
-                double[][] el     = this.baseAnav.toLinEle(ll);
-                int        midEle = (int) Math.floor(el[0][0] + 0.5);
-                int        midLin = (int) Math.floor(el[1][0] + 0.5);
-
-                int width = (int) Math.floor(Math.abs(disp[0][2]
-                                - disp[0][1]) * getPreviewEleRes() + 0.5);
-
-                int height = (int) Math.floor(Math.abs(disp[1][3]
-                                 - disp[1][1]) * getPreviewLineRes() + 0.5);
-                int deltaEle = width / 2;
-                int deltaLin = height / 2;
-
-                area[0][0] = midEle;
-                area[1][0] = midLin;
-                area[0][1] = midEle - deltaEle;
-                area[1][1] = midLin - deltaLin;
-                area[0][2] = midEle + deltaEle;
-                area[1][2] = midLin - deltaLin;
-                area[0][3] = midEle - deltaEle;
-                area[1][3] = midLin + deltaLin;
-                area[0][4] = midEle + deltaEle;
-                area[1][4] = midLin + deltaLin;
-
-            }
-        } catch (Exception e) {
-            System.out.println("displayCoordToAreaCoord e=" + e);
-        }
-        return area;
-    }
 
     /**
      * _more_
@@ -1898,50 +1663,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
             return PLACE_CENTER;
         }
         return thisPlace;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    protected double[][] convertToDisplayCoords() {
-        double[][] el = getLineElement();
-        try {
-            double[][] ll = new double[2][1];
-            AREACoordinateSystem macs =
-                (AREACoordinateSystem) sampleProjection;
-            String type = getCoordinateType();
-            if (type.equals(TYPE_LATLON)) {
-                ll[0][0] = getLatitude();
-                ll[1][0] = getLongitude();
-                el       = macs.fromReference(ll);
-            } else {
-                int[]       dirB           = macs.getDirBlock();
-                int         previewLineMag = dirB[11];
-                int         previewEleMag  = dirB[12];
-                int         dirLMag        = this.previewDir.getValue(11);
-                int         dirEMag        = this.previewDir.getValue(12);
-
-                Rectangle2D mapArea        = macs.getDefaultMapArea();
-                int previewXDim =
-                    new Long(
-                        new Double(
-                            mapArea.getMaxX()
-                            - mapArea.getMinX()).longValue()).intValue();
-                int previewYDim =
-                    new Long(
-                        new Double(
-                            mapArea.getMaxY()
-                            - mapArea.getMinY()).longValue()).intValue();
-                el[0][0] = el[0][0] * dirEMag / previewEleMag;
-                el[1][0] = previewYDim - 1
-                           - el[1][0] * dirLMag / previewLineMag;;
-            }
-        } catch (Exception e) {
-            System.out.println("convertToDisplayCoords e=" + e);
-        }
-        return el;
     }
 
 
@@ -2029,14 +1750,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         }
     }
 
-    /**
-     * _more_
-     *
-     * @param str _more_
-     */
-    public void setPlace0(String str) {
-        this.place = str;
-    }
 
     /**
      * _more_
@@ -2062,21 +1775,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
     /** _more_ */
     protected boolean amUpdating = false;
-
-    /** _more_ */
-    private GeoLocationInfo geoLocInfo;
-
-    /** _more_ */
-    double[][] imageEL = new double[2][5];
-
-    /** _more_ */
-    double[][] areaEL = new double[2][5];
-
-    /** _more_ */
-    double[][] displayEL = new double[2][5];
-
-    /** _more_ */
-    double[][] latLon = new double[2][5];
 
     /** _more_ */
     private String place;
@@ -2110,13 +1808,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
     /** _more_ */
     private String defaultPlace = PLACE_CENTER;
-
-    /** Property for image default value lat/lon */
-    protected static final String PROP_LATLON = "LATLON";
-
-    /** Property for image default value line/ele */
-    protected static final String PROP_LINEELE = "LINELE";
-
 
     /** _more_ */
     JLabel sizeLbl;

@@ -1291,9 +1291,6 @@ public class AddeImageDataSource extends ImageDataSource {
         //final AddeImageDataSource this;
 
         /** _more_ */
-        private JComboBox regionOptionLabelBox;
-
-        /** _more_ */
         public String USE_DEFAULTREGION = "Use Default";
 
         /** _more_ */
@@ -1322,6 +1319,9 @@ public class AddeImageDataSource extends ImageDataSource {
 
         /** _more_ */
         int preNumEles = 0;
+
+        /** _more_ */
+        JComboBox regionOptionLabelBox;
 
         /**
          * Construct a ImagePreviewSelection
@@ -1419,7 +1419,7 @@ public class AddeImageDataSource extends ImageDataSource {
          */
         private JComponent makeRegionsListAndPanel(String cbxLabel,
                 JComponent extra) {
-            final JComboBox regionOptionLabelBox = new JComboBox();
+            regionOptionLabelBox = new JComboBox();
 
             //added
             regionOptionLabelBox.addItemListener(new ItemListener() {
@@ -1427,6 +1427,7 @@ public class AddeImageDataSource extends ImageDataSource {
                     String selectedObj =
                         (String) regionOptionLabelBox.getSelectedItem();
                     setRegionOptions(selectedObj);
+                    setAdvancedPanel(selectedObj);
 
                 }
 
@@ -1457,6 +1458,16 @@ public class AddeImageDataSource extends ImageDataSource {
         /**
          * _more_
          *
+         * @return _more_
+         */
+        public String getRegionOptions() {
+
+            return (String) regionOptionLabelBox.getSelectedItem();
+        }
+
+        /**
+         * _more_
+         *
          * @param selectedObject _more_
          */
         public void setRegionOptions(String selectedObject) {
@@ -1478,6 +1489,25 @@ public class AddeImageDataSource extends ImageDataSource {
                     (LatLonRect) null);
                 display.getNavigatedPanel().setSelectRegionMode(false);
                 display.getNavigatedPanel().repaint();
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @param selectedObject _more_
+         */
+        public void setAdvancedPanel(String selectedObject) {
+            if (advancedSelection == null) {
+                return;
+            }
+
+            regionOption = selectedObject.toString();
+            if (selectedObject.equals(USE_SELECTEDREGION)) {
+                // only progressiveResolution and mag can be changed
+                advancedSelection.enablePanelAll(true);
+            } else {
+                advancedSelection.enablePanelAll(false);
             }
         }
 
