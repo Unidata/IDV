@@ -178,9 +178,9 @@ public class TimeSeriesChart extends XYChartManager {
 
         IdvPreferenceManager pref =
             control.getControlContext().getIdv().getPreferenceManager();
-        TimeZone               timeZone  = pref.getDefaultTimeZone();
-        NumberAxis             valueAxis = new FixedWidthNumberAxis("");
-        final SimpleDateFormat sdf       = new SimpleDateFormat(((dateFormat
+        TimeZone   timeZone  = pref.getDefaultTimeZone();
+        NumberAxis valueAxis = new FixedWidthNumberAxis("");
+        final SimpleDateFormat sdf = new SimpleDateFormat(((dateFormat
                                          != null)
                 ? dateFormat
                 : pref.getDefaultDateFormat()));
@@ -203,7 +203,8 @@ public class TimeSeriesChart extends XYChartManager {
                 }
 
                 DateTickUnit unit      = getTickUnit();
-                Date         tickDate  = calculateLowestVisibleTickValue(unit);
+                Date         tickDate  =
+                    calculateLowestVisibleTickValue(unit);
                 Date         upperDate = getMaximumDate();
 
                 Date         firstDate = null;
@@ -255,6 +256,7 @@ public class TimeSeriesChart extends XYChartManager {
                         tickDate = unit.addToDate(tickDate, getTimeZone());
                     } else {
                         tickDate = unit.rollDate(tickDate, getTimeZone());
+
                         continue;
                     }
 
@@ -272,12 +274,14 @@ public class TimeSeriesChart extends XYChartManager {
                           tickDate =
                               calculateDateForPositionX(new Month(tickDate,
                                   getTimeZone()), getTickMarkPosition());
+
                           break;
 
                       case (DateTickUnit.YEAR) :
                           tickDate =
                               calculateDateForPositionX(new Year(tickDate,
                                   getTimeZone()), getTickMarkPosition());
+
                           break;
 
                       default :
@@ -286,6 +290,7 @@ public class TimeSeriesChart extends XYChartManager {
                     }
 
                 }
+
                 return result;
 
             }
@@ -305,6 +310,7 @@ public class TimeSeriesChart extends XYChartManager {
                 } else if (position == DateTickMarkPosition.END) {
                     result = new Date(period.getLastMillisecond());
                 }
+
                 return result;
 
             }
@@ -326,6 +332,7 @@ public class TimeSeriesChart extends XYChartManager {
         if (animationTimeAnnotation != null) {
             xyPlotHolder[0].addAnnotation(animationTimeAnnotation);
         }
+
         return xyPlotHolder[0];
 
     }
@@ -422,6 +429,7 @@ public class TimeSeriesChart extends XYChartManager {
                                            FieldPosition fieldPosition) {
                     String s = control.getDisplayConventions().format(number);
                     result.append(s);
+
                     return result;
                 }
             };
@@ -720,6 +728,7 @@ public class TimeSeriesChart extends XYChartManager {
                                         timeSeriesList.add(series);
                                         series = null;
                                     }
+
                                     continue;
                                 }
                             }
@@ -748,6 +757,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 speedSeries    = series;
                                 polarWind      = false;
                                 speedLineState = lineState;
+
                                 continue;
                             }
                             if (Misc.equals(canonical, "V")
@@ -758,6 +768,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 dirMin       = min;
                                 dirMax       = max;
                                 polarWind    = false;
+
                                 continue;
                             }
                             if (Misc.equals(canonical, "SPEED")) {
@@ -768,6 +779,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 speedSeries    = series;
                                 polarWind      = true;
                                 speedLineState = lineState;
+
                                 continue;
                             }
                             if (Misc.equals(canonical, "DIR")) {
@@ -777,6 +789,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 dirMin       = min;
                                 dirMax       = max;
                                 polarWind    = true;
+
                                 continue;
                             }
                         }
@@ -785,12 +798,17 @@ public class TimeSeriesChart extends XYChartManager {
                             timeSeriesList.add(series);
                         }
                         boolean first = true;
-                        lineState.setRange(new ucar.unidata.util.Range(min, max));
+                        if (lineState.getRange() == null) {
+                            lineState.setRange(
+                                new ucar.unidata.util.Range(min, max));
+                        }
                         for (MyTimeSeries tmp : timeSeriesList) {
-                            addSeries(tmp, lineState, paramIdx, null, true, first);
+                            addSeries(tmp, lineState, paramIdx, null, true,
+                                      first);
                             first = false;
                         }
-                        addRange(min, max, "Data range from: " + lineState.getName());
+                        addRange(min, max,
+                                 "Data range from: " + lineState.getName());
                     }
                 }
 
@@ -855,6 +873,7 @@ public class TimeSeriesChart extends XYChartManager {
                    && Unit.canConvert(units[1], CommonUnit.meterPerSecond)) {
             return true;
         }
+
         return false;
     }
 
@@ -901,7 +920,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 Data dataElement =
                                     tuple.getComponent(lineState.index);
                                 if ((dataElement instanceof Real)) {
-                                    Real obsReal     = (Real) dataElement;
+                                    Real obsReal = (Real) dataElement;
                                     Unit displayUnit =
                                         control.getDisplayConventions()
                                             .getDisplayUnit(name,
@@ -914,6 +933,7 @@ public class TimeSeriesChart extends XYChartManager {
                                     goodVars.add(plotVar);
                                 }
                                 isValid = true;
+
                                 break;
                             }
                         }
@@ -934,9 +954,9 @@ public class TimeSeriesChart extends XYChartManager {
                         if ( !lineState.getVisible()) {
                             continue;
                         }
-                        MyTimeSeries series    = null;
-                        List<String> textList  = null;
-                        String       canonical =
+                        MyTimeSeries series   = null;
+                        List<String> textList = null;
+                        String canonical =
                             DataAlias.aliasToCanonical(lineState.getName());
                         //System.err.println ("var:" + lineState.getName() + " canon:" + canonical);
                         Unit   unit = null;
@@ -944,11 +964,12 @@ public class TimeSeriesChart extends XYChartManager {
                             min     = 0,
                             max     = 0;
                         for (int obIdx = 0; obIdx < obs.size(); obIdx++) {
-                            PointOb    ob          = (PointOb) obs.get(obIdx);
-                            Tuple      tuple       = (Tuple) ob.getData();
-                            TupleType  tupleType = (TupleType) tuple.getType();
-                            MathType[] types       = tupleType.getComponents();
-                            Data       dataElement =
+                            PointOb    ob        = (PointOb) obs.get(obIdx);
+                            Tuple      tuple     = (Tuple) ob.getData();
+                            TupleType  tupleType =
+                                (TupleType) tuple.getType();
+                            MathType[] types     = tupleType.getComponents();
+                            Data dataElement =
                                 tuple.getComponent(lineState.index);
                             Date dttm = Util.makeDate(ob.getDateTime());
                             if (series == null) {
@@ -966,6 +987,7 @@ public class TimeSeriesChart extends XYChartManager {
                                 } catch (Exception exc) {
                                     //noop here. Its sortof bad form but this way we keep the text list in synch with the series
                                 }
+
                                 continue;
                             }
                             Real obsReal = (Real) dataElement;
@@ -1006,11 +1028,13 @@ public class TimeSeriesChart extends XYChartManager {
                                     speedUnit      = unit;
                                     speedSeries    = series;
                                     speedLineState = lineState;
+
                                     continue;
                                 }
                                 if (Misc.equals(canonical, "DIR")) {
                                     dirSeries    = series;
                                     dirLineState = lineState;
+
                                     continue;
                                 }
                                 if (Misc.equals(canonical, "U")) {
@@ -1018,12 +1042,14 @@ public class TimeSeriesChart extends XYChartManager {
                                     speedSeries    = series;
                                     polarWind      = false;
                                     speedLineState = lineState;
+
                                     continue;
                                 }
                                 if (Misc.equals(canonical, "V")) {
                                     dirSeries    = series;
                                     dirLineState = lineState;
                                     polarWind    = false;
+
                                     continue;
                                 }
                                 if (Misc.equals(canonical, "CC")) {
@@ -1231,6 +1257,7 @@ public class TimeSeriesChart extends XYChartManager {
      */
     public XYDataset getDummyDataset() {
         TimeSeriesCollection dummy = new TimeSeriesCollection();
+
         return dummy;
     }
 
@@ -1267,7 +1294,7 @@ public class TimeSeriesChart extends XYChartManager {
                 || !Misc.equals(endDate, lastEndDate)) {
             lastStartDate = startDate;
             lastEndDate   = endDate;
-            sunriseDates  = IdvTimeline.makeSunriseDates(sunriseLocation,
+            sunriseDates = IdvTimeline.makeSunriseDates(sunriseLocation,
                     startDate, endDate);
         }
         int top    = (int) (dataArea.getY());
@@ -1279,7 +1306,7 @@ public class TimeSeriesChart extends XYChartManager {
         for (int i = 0; i < sunriseDates.size(); i += 2) {
             Date d1 = (Date) sunriseDates.get(i + 1);
             Date d2 = (Date) sunriseDates.get(i);
-            int  x1 = (int) domainAxis.valueToJava2D(d1.getTime(), dataArea,
+            int x1 = (int) domainAxis.valueToJava2D(d1.getTime(), dataArea,
                          RectangleEdge.BOTTOM);
             int x2 = (int) domainAxis.valueToJava2D(d2.getTime(), dataArea,
                          RectangleEdge.BOTTOM);
@@ -1315,7 +1342,7 @@ public class TimeSeriesChart extends XYChartManager {
             g2.setStroke(new BasicStroke());
             g2.setColor(Color.black);
             double timeValue = dttm.getValue(CommonUnit.secondsSinceTheEpoch);
-            int    x         = (int) domainAxis.valueToJava2D(timeValue * 1000,
+            int x = (int) domainAxis.valueToJava2D(timeValue * 1000,
                         dataArea, RectangleEdge.BOTTOM);
             if ((x < dataArea.getX())
                     || (x > dataArea.getX() + dataArea.getWidth())) {
