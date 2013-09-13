@@ -167,8 +167,8 @@ public class ImagePlanViewControl extends PlanViewControl {
             }
 
             String regionOption = regionSelection.getRegionOption();
-
-            if (rect != null) {
+            //boolean isRBBChanged = isRubberBandBoxChanged();
+            if (rect != null && !isRBBChanged) {
                 ProjectionImpl projectionImpl =
                     regionSelection.display.getProjectionImpl();
                 LatLonRect latLonRect =
@@ -243,7 +243,8 @@ public class ImagePlanViewControl extends PlanViewControl {
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
-                if (dataSelection.getGeoSelection() != null) {
+                if (dataSelection.getGeoSelection() != null && !regionSelection.getRegionOption().equals(
+                        "Use Display Area")) {
                     LatLonPoint[] llp0 =
                         dataSelection.getGeoSelection()
                             .getRubberBandBoxPoints();

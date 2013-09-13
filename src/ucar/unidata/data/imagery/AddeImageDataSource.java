@@ -24,58 +24,32 @@ package ucar.unidata.data.imagery;
 import edu.wisc.ssec.mcidas.*;
 import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 
-import edu.wisc.ssec.mcidas.adde.AddeTextReader;
-
-import ucar.nc2.*;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.chooser.TimesChooser;
 import ucar.unidata.util.*;
 
-import ucar.unidata.view.geoloc.MapProjectionDisplay;
-import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
-import ucar.unidata.view.geoloc.NavigatedPanel;
-
-import ucar.visad.MapProjectionProjection;
-import ucar.visad.UtcDate;
-import ucar.visad.data.AreaImageFlatField;
-import ucar.visad.display.RubberBandBox;
 
 import visad.*;
 
 import visad.data.mcidas.AREACoordinateSystem;
 import visad.data.mcidas.AreaAdapter;
 
-import visad.georef.EarthLocation;
-
 import visad.georef.MapProjection;
 
-import visad.meteorology.SingleBandedImage;
-
-
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 
 import java.awt.*;
 
-import java.awt.Dimension;
 import java.awt.event.*;
 
 import java.awt.image.BufferedImage;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 
 import java.rmi.RemoteException;
-
-import java.security.PublicKey;
 
 import java.text.ParseException;
 
@@ -83,8 +57,7 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+
 
 
 /**
@@ -115,16 +88,10 @@ public class AddeImageDataSource extends ImageDataSource {
     boolean isReload = false;
 
     /** _more_ */
-    List rbbDescriptors = null;
-
-    /** _more_ */
-    String baseSource = null;
-
-    /** _more_ */
     AREAnav baseAnav = null;
 
     /** _more_ */
-    AddeImageDescriptor baseImageDescriptor = null;
+    AreaAdapter  areaAdapter = null;
 
     /** _more_ */
     int eMag;
@@ -226,35 +193,15 @@ public class AddeImageDataSource extends ImageDataSource {
 
         this.descriptor = aid;
         // sourceProps     = properties;
-        if (baseSource == null) {
-            baseImageDescriptor = (AddeImageDescriptor) imageList.get(0);
-            baseSource          = baseImageDescriptor.getSource();
-            int[]         dir   = aid.getDirectory().getDirectoryBlock();
-            int           lines = dir[8];  //2726
-            int           elems = dir[9];  //1732
+        if (baseAnav == null) {
 
-            AddeImageInfo iInfo = aid.getImageInfo();
-            eMag = baseImageDescriptor.getImageInfo().getElementMag();
-            lMag = baseImageDescriptor.getImageInfo().getLineMag();
-
-            iInfo.setLines(lines / Math.abs(lMag));
-            iInfo.setElements(elems / Math.abs(eMag));
-            String sizeValue = Integer.toString(lines / Math.abs(lMag)) + " "
-                               + Integer.toString(elems / Math.abs(eMag));
-            baseSource = replaceKey(baseSource, AddeImageURL.KEY_SIZE,
-                                    sizeValue);
-            baseSource = replaceKey(baseSource, AddeImageURL.KEY_LINEELE,
-                                    sizeValue);
             try {
-                AreaFile areaFile = new AreaFile(baseSource);
+                areaAdapter = new AreaAdapter(this.source, false);
+                AreaFile areaFile = areaAdapter.getAreaFile();
                 baseAnav = areaFile.getNavigation();
                 acs      = new AREACoordinateSystem(areaFile);
             } catch (Exception e) {}
-            elFactor =
-                (int) Math
-                    .ceil(baseImageDescriptor.getDirectory()
-                        .getCenterLatitudeResolution() / baseImageDescriptor
-                        .getDirectory().getCenterLongitudeResolution() - 0.5);
+
         }
     }
 
@@ -564,9 +511,11 @@ public class AddeImageDataSource extends ImageDataSource {
         inLineMag = inElemMag / elFactor;
 
         outLine   = inLine / inLineMag;
-        int    cline       = inLine / inLineMag;
-        int    celem       = inElem / inElemMag;
-
+        // alway in the center of the image and this is why it is divided by 2
+        int    cline       = inLine / 2;
+        int    celem       = inElem / 2;
+        eMag  = inElemMag;
+        lMag  = inLineMag;
         String locateValue = cline + " " + celem;
 
         String magStr1 = "-" + String.valueOf(inLineMag) + " " + "-"
@@ -1266,7 +1215,7 @@ public class AddeImageDataSource extends ImageDataSource {
         public NavigatedMapPanel display;
 
         /** _more_ */
-        private AddeImagePreview image_preview;
+        private AddeImagePreview imagePreview;
 
         /** _more_ */
         GeoSelection geoSelection;
@@ -1347,9 +1296,9 @@ public class AddeImageDataSource extends ImageDataSource {
             this.source          = source;
             this.descriptor      = descriptor;
 
-            createImagePreview(source);
+            this.imagePreview = createImagePreview(source);
             display = new NavigatedMapPanel(null, true, true,
-                                            image_preview.getPreviewImage(),
+                                            imagePreview.getPreviewImage(),
                                             this.source);
 
 
@@ -1547,18 +1496,20 @@ public class AddeImageDataSource extends ImageDataSource {
          *
          * @throws IOException _more_
          */
-        private void createImagePreview(String source) throws IOException {
+        private AddeImagePreview createImagePreview(String source) throws IOException {
 
             int selIndex = -1;
 
             //LastBandNames = SelectedBandNames;
             //LastCalInfo = CalString;
             getDataContext().getIdv().showWaitCursor();
-            image_preview = new AddeImagePreview(this.aAdapter,
+            AddeImagePreview image = new AddeImagePreview(this.aAdapter,
                     this.descriptor);
             getDataContext().getIdv().showNormalCursor();
             //String bandInfo = "test";
             // lblBandInfo = new JLabel(bandInfo);
+
+            return image;
         }
 
 
@@ -1580,7 +1531,7 @@ public class AddeImageDataSource extends ImageDataSource {
          * @return _more_
          */
         public AddeImagePreview getAddeImagePreview() {
-            return image_preview;
+            return imagePreview;
         }
 
         /**
@@ -1792,19 +1743,18 @@ public class AddeImageDataSource extends ImageDataSource {
 
         try {
 
-            AreaAdapter   aa = new AreaAdapter(this.baseSource, false);
+            //AreaAdapter   aa = new AreaAdapter(this.source, false);
 
             MapProjection mProjection = (MapProjection) acs;
 
             if (null == previewSelection) {
 
-                previewSelection = new ImagePreviewSelection(this, aa,
-                        baseSource, this.descriptor);
+                previewSelection = new ImagePreviewSelection(this, areaAdapter,
+                        source, this.descriptor);
 
                 advancedSelection = new AddeImageSelectionPanel(this,
-                        dataChoice, this.baseSource, baseAnav,
+                        dataChoice, this.source, baseAnav,
                         this.descriptor, mProjection, previewSelection);
-
             } else {
                 previewSelection.setDataChoice(dataChoice);
             }

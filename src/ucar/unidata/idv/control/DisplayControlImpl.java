@@ -922,6 +922,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected Gridded2DSet last2DSet = null;
 
+    public boolean isRBBChanged = false;
     /**
      * Default constructor. This is called when the control is
      * unpersisted through the {@link ucar.unidata.xml.XmlEncoder}
@@ -2727,7 +2728,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     dataSelection.getGeoSelection(true);
                 geoSelection.setScreenLatLonRect(
                     getNavigatedDisplay().getLatLonRect());
-                if (isRubberBandBoxChanged()) {
+                isRBBChanged = isRubberBandBoxChanged();
+                if (isRBBChanged) {
                     reloadDataSource();
                     setProjectionInView(true);
                 }
