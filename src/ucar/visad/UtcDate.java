@@ -396,12 +396,12 @@ public final class UtcDate {
      * Create a DateTime object.
      *
      * @param dateString the string specifying the date
-     * @param tz  the associated time zone
      * @param pattern the format pattern
      *
      * @return the DateTime object
      * @throws VisADException problem decoding string or creating Data object
      */
+    
     public static DateTime createDateTime(String dateString, String pattern)
             throws VisADException {
         return createDateTime(dateString, pattern, DateTime.DEFAULT_TIMEZONE);
