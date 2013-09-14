@@ -204,7 +204,7 @@ def lap(S):
   </div>
   """
   grads = grad(S)
-  return div(ur(grads),vr(grads))
+  return div(grads)
 
 def lav(S,level1=None,level2=None, unit=None):
   """ Layer Average of a multi layer grid
