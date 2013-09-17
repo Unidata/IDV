@@ -23,6 +23,8 @@ package ucar.unidata.util;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import visad.ContourControl;
+
 /**
  * A class to hold and transfer contour level settings, as to and from the
  * dialog box ContLevelDialog.
@@ -77,6 +79,9 @@ public class ContourInfo {
 
     /** label frequency (number per line) */
     private int labelFreq = DEFAULT_LABEL_FREQ;
+    
+    /** which lines to label (every Nth) */
+    private int labelLineSkip = ContourControl.EVERY_NTH_DEFAULT;
     
     /** label (font) size */
     private int labelSize = DEFAULT_LABEL_SIZE;
@@ -165,7 +170,7 @@ public class ContourInfo {
         this(levelsString, base, min, max, labelOn, dashOn, isColorFilled,
              width, DEFAULT_DASHED_STYLE);
     }
-
+    
     /**
      * Construct an object to hold and transfer contour level settings,
      * such as to and from the dialog box ContLevelDialog.
@@ -185,7 +190,8 @@ public class ContourInfo {
                        boolean isColorFilled, int width, int dashedStyle) {
         this(levelsString, base, min, max, labelOn, dashOn, isColorFilled,
              width, DEFAULT_DASHED_STYLE, 
-             DEFAULT_LABEL_FREQ, DEFAULT_LABEL_SIZE, null,
+             DEFAULT_LABEL_FREQ, ContourControl.EVERY_NTH_DEFAULT,
+             DEFAULT_LABEL_SIZE, null,
              DEFAULT_LABEL_ALIGNMENT);
     }
 
@@ -202,14 +208,49 @@ public class ContourInfo {
      * @param isColorFilled  flag for color filling contours
      * @param width          line width
      * @param dashedStyle    dashedStyle
+     * @param labelFreq      how many times to label each line
      * @param labelSize      the label (font) size
      * @param font           the font - Font or HersheyFont
      * @param align      the label alignment - true to be along contours
      */
+    
     public ContourInfo(String levelsString, float base, float min, float max,
                        boolean labelOn, boolean dashOn,
                        boolean isColorFilled, int width, int dashedStyle,
                        int labelFreq,
+                       int labelSize, Object font, boolean align) {
+
+        this(levelsString, base, min, max, labelOn, dashOn, isColorFilled,
+                width, dashedStyle, 
+                labelFreq, ContourControl.EVERY_NTH_DEFAULT,
+                labelSize, font,
+                align);
+    }
+    
+    /**
+     * Construct an object to hold and transfer contour level settings,
+     * such as to and from the dialog box ContLevelDialog.
+     *
+     * @param levelsString   the contour levels as a string
+     * @param base           the contour level below which one line must have
+     * @param min            the lower limit of plotted contour values
+     * @param max            the upper limit of same
+     * @param labelOn        whether labels are
+     * @param dashOn         whether lines below base value are dashed or not
+     * @param isColorFilled  flag for color filling contours
+     * @param width          line width
+     * @param dashedStyle    dashedStyle
+     * @param labelFreq      how many times to label each line
+     * @param labelLineSkip  label every Nth line
+     * @param labelSize      the label (font) size
+     * @param font           the font - Font or HersheyFont
+     * @param align      the label alignment - true to be along contours
+     */
+    
+    public ContourInfo(String levelsString, float base, float min, float max,
+                       boolean labelOn, boolean dashOn,
+                       boolean isColorFilled, int width, int dashedStyle,
+                       int labelFreq, int labelLineSkip,
                        int labelSize, Object font, boolean align) {
 
         if (isIrregularInterval(levelsString)) {
@@ -228,17 +269,18 @@ public class ContourInfo {
         this.lineWidth     = width;
         this.dashedStyle   = dashedStyle;
         this.labelFreq     = labelFreq;
+        this.labelLineSkip = labelLineSkip;
         this.labelSize     = labelSize;
         this.font          = font;
         this.alignLabels   = align;
     }
-
 
     /**
      * Construct an object to hold and transfer contour level settings,
      * such as to and from the dialog box ContLevelDialog using the
      * default values.
      */
+    
     public ContourInfo() {
         this((float) 0.0, (float) 0.0, (float) 0.0, (float) 0.0,
              DEFAULT_LABEL, DEFAULT_DASH, DEFAULT_FILL, DEFAULT_LINE_WIDTH);
@@ -354,7 +396,7 @@ public class ContourInfo {
         processParamString(params);
     }
 
-    /**
+	/**
      * Process the params string. It can either be of the form:
      * <pre>&interval;base;min;max;<pre>
      * or made up of any combination of name=value pairs. e.g.:
@@ -363,9 +405,10 @@ public class ContourInfo {
      * @param params The string params
      */
     public void processParamString(String params) {
+    	
         List toks = StringUtil.split(params, ";", true, true);
         // TODO: how to specify font
-        //interval=5;base=6;min=0;max=5
+        // interval=5;base=6;min=0;max=5
         if (params.indexOf("=") >= 0) {
             for (int i = 0; i < toks.size(); i++) {
                 List subToks = StringUtil.split(toks.get(i).toString(), "=");
@@ -396,6 +439,8 @@ public class ContourInfo {
                     labelSize = new Integer(value).intValue();
                 } else if (name.equals("labelfreq")) {
                     labelFreq = new Integer(value).intValue();
+                } else if (name.equals("labellineskip")) {
+                    labelLineSkip = new Integer(value).intValue();
                 } else if (name.equals("font")) {
                     //TODO: what should go here?
                 } else if (name.equals("align")) {
@@ -406,7 +451,7 @@ public class ContourInfo {
                 }
             }
         } else {
-            //interval;base;min;max
+            // interval;base;min;max
             if (toks.size() != 4) {
                 throw new IllegalArgumentException(
                     "Bad ContourInfo parameters:" + params
@@ -607,17 +652,18 @@ public class ContourInfo {
         this.lineWidth     = that.lineWidth;
         this.dashedStyle   = that.dashedStyle;
         this.labelFreq     = that.labelFreq;
+        this.labelLineSkip = that.labelLineSkip;
         this.labelSize     = that.labelSize;
         this.font          = that.font;
         this.alignLabels   = that.alignLabels;
     }
-
 
     /**
      * Set the parameters if they are defined in the other.
      *
      * @param that  other to use
      */
+    
     public void setIfDefined(ContourInfo that) {
         if (that.getIntervalDefined()) {
             this.interval = that.interval;
@@ -639,12 +685,13 @@ public class ContourInfo {
         }
         this.dashOn = that.dashOn;
         //??        this.isColorFilled = that.isColorFilled;
-        this.lineWidth   = that.lineWidth;
-        this.dashedStyle = that.dashedStyle;
-        this.labelSize   = that.labelSize;
-        this.labelFreq   = that.labelFreq;
-        this.font        = that.font;
-        this.alignLabels = that.alignLabels;
+        this.lineWidth     = that.lineWidth;
+        this.dashedStyle   = that.dashedStyle;
+        this.labelSize     = that.labelSize;
+        this.labelFreq     = that.labelFreq;
+        this.labelLineSkip = that.labelLineSkip;
+        this.font          = that.font;
+        this.alignLabels   = that.alignLabels;
     }
 
     /**
@@ -794,7 +841,7 @@ public class ContourInfo {
      * @return the contour levels
      */
     public float[] getContourLevels(String levelString) {
-        List    tokens = StringUtil.split(levelString, ";", true, true);
+        List<String> tokens = StringUtil.split(levelString, ";", true, true);
         float[] levels = null;
         for (int i = 0; i < tokens.size(); i++) {
             String  tok  = (String) tokens.get(i);
@@ -830,6 +877,22 @@ public class ContourInfo {
     }
     
     /**
+	 * @return the labelLineSkip
+	 */
+    
+	public int getLabelLineSkip() {
+		return labelLineSkip;
+	}
+
+	/**
+	 * @param labelLineSkip the labelLineSkip to set
+	 */
+	
+	public void setLabelLineSkip(int labelLineSkip) {
+		this.labelLineSkip = labelLineSkip;
+	}
+
+	/**
      * Get the label (font) size.
      *
      * @return the label (font) size
@@ -896,7 +959,7 @@ public class ContourInfo {
         if (levelString == null) {
             return null;
         }
-        List         tokens = StringUtil.split(levelString, ";", true, true);
+        List<String> tokens = StringUtil.split(levelString, ";", true, true);
         StringBuffer sb     = new StringBuffer();
         for (int i = 0; i < tokens.size(); i++) {
             String tok = (String) tokens.get(i);
