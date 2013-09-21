@@ -116,28 +116,16 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     protected JSlider elementMagSlider;
 
     /** _more_ */
-    JTextField lineMagFld = new JTextField();
-
-    /** _more_ */
-    JTextField eleMagFld = new JTextField();
-
-    /** _more_ */
     JLabel lineMagLbl = new JLabel();
 
+    /** _more_ */
+    private JPanel leMagPanel;
 
     /** _more_ */
-    private JPanel lMagPanel;
+    private static final int SLIDER_MAX = 29;
 
     /** _more_ */
-    private JPanel eMagPanel;
-
-
-
-    /** _more_ */
-    private static final int SLIDER_MAX = 1;
-
-    /** _more_ */
-    private static final int SLIDER_MIN = -29;
+    //private static final int SLIDER_MIN = -29;
 
     /** _more_ */
     private static final int SLIDER_WIDTH = 150;
@@ -237,6 +225,9 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     private String defaultType = TYPE_LATLON;
 
     /** _more_ */
+    private JPanel lockPanel;
+
+    /** _more_ */
     private JPanel latLonPanel;
 
     /** _more_ */
@@ -274,6 +265,60 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
     /** _more_ */
     boolean isFromRegionUpdate = false;
+
+    /** _more_ */
+    private double linesToElements = 1.0;
+
+    /** base number of lines of whole image or selected region */
+    private double baseNumLines = 0.0;
+
+    /** base number of lines of whole image or selected region */
+    private double baseNumElements = 0.0;
+
+    /** _more_ */
+    protected boolean amUpdating = false;
+
+    /** _more_ */
+    private String place;
+
+    /** _more_ */
+    MapProjection sampleProjection;
+
+    /** _more_ */
+    private int maxLines = 0;
+
+    /** _more_ */
+    private int maxEles = 0;
+
+    /** _more_ */
+    private AREAnav previewNav;
+
+    /** _more_ */
+    private AreaDirectory previewDir;
+
+    /** _more_ */
+    protected static final String PLACE_CENTER = "CENTER";
+
+    /** _more_ */
+    protected static final String PLACE_ULEFT = "ULEFT";
+
+    /** _more_ */
+    private String defaultPlace = PLACE_CENTER;
+
+    /** _more_ */
+    JLabel sizeLbl;
+
+    /** _more_ */
+    private JToggleButton linkBtn;
+
+    /** _more_ */
+    private JButton fullResBtn;
+
+    /** _more_ */
+    JLabel rawSizeLbl = new JLabel();
+
+    /** _more_ */
+    DataChoice dataChoice;
 
     /**
      * Construct a AddeImageSelectionPanel
@@ -335,12 +380,31 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         convertToLatLon();     */
         //
         this.previewDir       = aDir;
+        this.baseNumLines     = aDir.getLines();
+        this.baseNumElements  = aDir.getElements();
         this.sampleProjection = sample;
         this.place = AddeImageDataSource.getKey(source,
                 AddeImageURL.KEY_PLACE);
 
-        previewLineRes = Math.abs(lineMag);
-        previewEleRes  = Math.abs(elementMag);
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param lines _more_
+     */
+    public void setBaseNumLines(int lines) {
+        this.baseNumLines = lines;
+    }
+
+    /**
+     * _more_
+     *
+     * @param eles _more_
+     */
+    public void setBaseNumElements(int eles) {
+        this.baseNumElements = eles;
     }
 
     /**
@@ -430,13 +494,14 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
         // calc the new width and height using the value from image size widget
         int newNumEles = getNumEles();
+        int mag0       = getElementMagValue();
+        newNumEles *= Math.abs(mag0);
         double newWidth = rect.getWidth()
-                          * (newNumEles * 1.0
-                             / dataSource.previewSelection.getPreNumEles());
+                          * (newNumEles * 1.0 / this.baseNumElements);
         newRect.setWidth(newWidth);
 
         navigatedPanel.setSelectedRegion(newRect);
-        dataSource.previewSelection.setPreNumEles(newNumEles);
+        //dataSource.previewSelection.setPreNumEles(newNumEles);
         updatePlace();
     }
 
@@ -455,13 +520,16 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
         // calc the new width and height using the value from image size widget
         int newNumLines = getNumLines();
+        //int  mag = getLineMag();
+        int mag0 = getLineMagValue();
+        newNumLines *= Math.abs(mag0);
         double newHeight = rect.getHeight()
-                           * (newNumLines * 1.0
-                              / dataSource.previewSelection.getPreNumLines());
+                           * (newNumLines * 1.0 / this.baseNumLines);
         newRect.setHeight(newHeight);
 
         navigatedPanel.setSelectedRegion(newRect);
-        dataSource.previewSelection.setPreNumLines(newNumLines);
+        //dataSource.previewSelection.setPreNumLines(newNumLines);
+        this.baseNumLines = newNumLines;
         updatePlace();
     }
 
@@ -494,25 +562,11 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         coordinateTypeComboBox.setEnabled(enable);
         locationComboBox.setEnabled(enable);
         enablePanel(locationPanel, enable);
-        enablePanel(lMagPanel, enable);
-        enablePanel(eMagPanel, enable);
+        enablePanel(lockPanel, enable);
+        enablePanel(leMagPanel, enable);
         enablePanel(sizePanel, enable);
-
     }
 
-    /**
-     * _more_
-     */
-    private void setElementMag() {
-        int val = 1;
-        try {
-            val = Integer.parseInt(eleMagFld.getText().trim());
-        } catch (Exception e) {
-            System.out.println(" setElementMag e=" + e);
-            return;
-        }
-        setElementMag(val);
-    }
 
     /**
      * _more_
@@ -634,157 +688,36 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         return comp;
     }
 
-    /**
-     * _more_
-     *
-     * @param str _more_
-     * @param numDec _more_
-     *
-     * @return _more_
-     */
-    private String truncateNumericString(String str, int numDec) {
-        int indx = str.indexOf(".") + numDec + 1;
-        if (indx >= str.length()) {
-            indx = str.length();
-        }
-        return str.substring(0, indx);
-    }
 
     /**
      * _more_
      *
-     * @return _more_
+     * @param autoSetSize _more_
      */
-    public int getLineMag() {
-        return this.lineMag;
-    }
-
-    /**
-     * _more_
-     *
-     * @param val _more_
-     */
-    public void setLineMag(int val) {
-        if (val > SLIDER_MAX) {
-            val = SLIDER_MAX;
-        }
-        if (val < SLIDER_MIN - 1) {
-            val = SLIDER_MIN - 1;
-        }
-        if (val == -1) {
-            val = 1;
-        }
-        this.lineMag = val;
-    }
-
-    /**
-     * _more_
-     *
-     * @param val _more_
-     */
-    private void setLineMagSlider(int val) {
-        if (val == 1) {
-            val = -1;
-        }
-        if (val > SLIDER_MAX) {
-            val = -1;
-        }
-        if (val < SLIDER_MIN) {
-            val = SLIDER_MIN - 1;
-        }
-        lineMagSlider.setValue(val + 1);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public int getElementMag() {
-        return this.elementMag;
-    }
-
-    /**
-     * _more_
-     */
-    private void setLineMag() {
-        int val = 1;
-        try {
-            val = Integer.parseInt(lineMagFld.getText().trim());
-        } catch (Exception e) {}
-        setLineMag(val);
-    }
-
-    /**
-     * _more_
-     *
-     * @param val _more_
-     */
-    public void setElementMag(int val) {
-        if (val > SLIDER_MAX) {
-            val = SLIDER_MAX;
-        }
-        if (val < SLIDER_MIN - 1) {
-            val = SLIDER_MIN - 1;
-        }
-        if (val == -1) {
-            val = 1;
-        }
-        this.elementMag = val;
-
-    }
-
-    /**
-     * _more_
-     *
-     * @param recomputeLineEleRatio _more_
-     */
-    protected void elementMagSliderChanged(boolean recomputeLineEleRatio) {
+    protected void elementMagSliderChanged(boolean autoSetSize) {
         int value = getElementMagValue();
-        setElementMag(value);
-
-        elementMagLbl.setText("Ele  Mag=");
-        eleMagFld.setText(new Integer(value).toString());
-    }
-
-    /**
-     * _more_
-     *
-     * @param autoSetSize _more_
-     */
-    private void changeLineMagSlider(boolean autoSetSize) {
-        int value = getLineMag();
-        setLineMagSlider(value);
-    }
-
-    /**
-     * _more_
-     *
-     * @param autoSetSize _more_
-     */
-    private void changeEleMagSlider(boolean autoSetSize) {
-        int value = getElementMag();
-        setElementMagSlider(value);
-    }
-
-    /**
-     * _more_
-     *
-     * @param val _more_
-     */
-    private void setElementMagSlider(int val) {
-        if (val == 1) {
-            val = -1;
+        if ((Math.abs(value) < SLIDER_MAX)) {
+            int lineMag = getLineMagValue();
+            if (lineMag > value) {
+                linesToElements = Math.abs(lineMag / (double) value);
+            } else {
+                linesToElements = Math.abs((double) value / lineMag);
+            }
         }
-        if (val > SLIDER_MAX) {
-            val = -1;
+
+        elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
+
+        if (autoSetSize) {
+            if (value > 0) {
+                numElementsFld.setText("" + (int) (baseNumElements * value));
+            } else {
+                numElementsFld.setText("" + (int) (baseNumElements
+                        / (double) -value));
+            }
         }
-        if (val < SLIDER_MIN) {
-            val = SLIDER_MIN - 1;
-        }
-        elementMagSlider.setValue(val + 1);
+
     }
+
 
     /**
      * Handle the line mag slider changed event
@@ -794,14 +727,62 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     protected void lineMagSliderChanged(boolean autoSetSize) {
         try {
             int value = getLineMagValue();
-            setLineMag(value);
+            //setLineMag(value);
+            lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
 
-            lineMagLbl.setText("Line Mag=");
-            lineMagFld.setText(new Integer(value).toString());
+            if (autoSetSize) {
+                if (value > 0) {
+                    numLinesFld.setText("" + (int) (baseNumLines * value));
+                } else {
+                    numLinesFld.setText("" + (int) (baseNumLines
+                            / (double) -value));
+                }
+            }
+
+            if (value == 1) {                   // special case
+                if (linesToElements < 1.0) {
+                    value = (int) (-value / linesToElements);
+                } else {
+                    value = (int) (value * linesToElements);
+                }
+            } else if (value > 1) {
+                value = (int) (value * linesToElements);
+
+            } else {
+                value = (int) (value / linesToElements);
+            }
+
+            value               = (value > 0)
+                                  ? value - 1
+                                  : value + 1;  // since slider is one off
+            amSettingProperties = true;
+            elementMagSlider.setValue(value);
+            amSettingProperties = false;
+            elementMagSliderChanged(autoSetSize);
 
         } catch (Exception exc) {
             System.out.println("Setting line magnification" + exc);
         }
+    }
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setElementMagSlider(int value) {
+        this.elementMagSlider.setValue(value);
+        this.elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
+    }
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setLineMagSlider(int value) {
+        this.lineMagSlider.setValue(value);
+        this.lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
     }
 
     /**
@@ -810,8 +791,10 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
      * @return The magnification value for the line
      */
     protected int getLineMagValue() {
-        int val = getMagValue(lineMagSlider);
-        return val;
+        if (lineMagSlider == null) {
+            return lineMag;
+        }
+        return getMagValue(lineMagSlider);
     }
 
     /**
@@ -820,6 +803,9 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
      * @return The magnification value for the element
      */
     protected int getElementMagValue() {
+        if (elementMagSlider == null) {
+            return elementMag;
+        }
         int val = getMagValue(elementMagSlider);
         //   setElementMag(val);
         return val;
@@ -834,11 +820,8 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     private int getMagValue(JSlider slider) {
         //Value is [-SLIDER_MAX,SLIDER_MAX]. We change 0 and -1 to 1
         int value = slider.getValue();
-        if (value == 0) {
-            value = SLIDER_MAX;
-            return value;
-        } else if (value < SLIDER_MIN) {
-            value = SLIDER_MIN;
+        if (value >= 0) {
+            return value + 1;
         }
         return value - 1;
     }
@@ -876,8 +859,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
             public void actionPerformed(ActionEvent e) {
                 boolean showMagSection =
                     !((JCheckBox) e.getSource()).isSelected();
-                enablePanel(lMagPanel, showMagSection);
-                enablePanel(eMagPanel, showMagSection);
+                enablePanel(leMagPanel, showMagSection);
             }
         });
 
@@ -1002,57 +984,62 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         allComps.add(GuiUtils.rLabel("  "));
         allComps.add(GuiUtils.left(locationPanel));
 
+        // image size and mag factor link
+        allComps.add(new JLabel(" "));
+        allComps.add(new JLabel(" "));
+        lockPanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
+            new JLabel(" "),
+            getLinkButton() }, 2, GuiUtils.WT_N, GuiUtils.WT_N));
+        allComps.add(GuiUtils.rLabel("LinkImageSizeAndMag:"));
+        allComps.add(GuiUtils.left(lockPanel));
+
+
         // image size
         allComps.add(new JLabel(" "));
         allComps.add(new JLabel(" "));
-        ActionListener sizeChange = new ActionListener() {
+        ActionListener lSizeChange = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                int lines = getNumLines() * Math.abs(getLineMag());
+                int lines = getNumLines() * Math.abs(getLineMagValue());
                 if (lines > maxLines) {
                     lines = maxLines;
                 }
-
-                int eles = getNumEles() * Math.abs(getElementMag());
+                updateImageHeightSize();
+            }
+        };
+        ActionListener eSizeChange = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                int eles = getNumEles() * Math.abs(getElementMagValue());
                 if (eles > maxEles) {
                     eles = maxEles;
                 }
-                if (isNumLinesChanges()) {
-                    updateImageHeightSize();
-                }
-
-                if (isNumElemsChanges()) {
-                    updateImageWidthSize();
-                }
+                updateImageWidthSize();
             }
         };
-        FocusListener sizeFocusChange = new FocusListener() {
+        FocusListener lSizeFocusChange = new FocusListener() {
             public void focusGained(FocusEvent fe) {}
             public void focusLost(FocusEvent fe) {
-                int lines = getNumLines() * Math.abs(getLineMag());
+                int lines = getNumLines() * Math.abs(getLineMagValue());
                 if (lines > maxLines) {
                     lines = maxLines;
                 }
-
-                int eles = getNumEles() * Math.abs(getElementMag());
+                updateImageHeightSize();
+            }
+        };
+        FocusListener eSizeFocusChange = new FocusListener() {
+            public void focusGained(FocusEvent fe) {}
+            public void focusLost(FocusEvent fe) {
+                int eles = getNumEles() * Math.abs(getElementMagValue());
                 if (eles > maxEles) {
                     eles = maxEles;
                 }
-
-                if (isNumLinesChanges()) {
-                    updateImageHeightSize();
-                }
-
-                if (isNumElemsChanges()) {
-                    updateImageWidthSize();
-                }
+                updateImageWidthSize();
             }
         };
-
         this.maxLines = this.previewDir.getLines();
         this.maxEles  = this.previewDir.getElements();
 
-        int lmag = getLineMag();
-        int emag = getElementMag();
+        int lmag = getLineMagValue();
+        int emag = getElementMagValue();
         if (lmag < 0) {
             this.numLines = this.maxLines / Math.abs(lmag);
         }
@@ -1062,12 +1049,12 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
 
         setNumLines(this.numLines);
         numLinesFld = new JTextField(Integer.toString(this.numLines), 4);
-        numLinesFld.addActionListener(sizeChange);
-        numLinesFld.addFocusListener(sizeFocusChange);
+        numLinesFld.addActionListener(lSizeChange);
+        numLinesFld.addFocusListener(lSizeFocusChange);
         setNumEles(this.numEles);
         numElementsFld = new JTextField(Integer.toString(this.numEles), 4);
-        numElementsFld.addActionListener(sizeChange);
-        numElementsFld.addFocusListener(sizeFocusChange);
+        numElementsFld.addActionListener(eSizeChange);
+        numElementsFld.addFocusListener(eSizeFocusChange);
         numLinesFld.setToolTipText("Number of lines");
         numElementsFld.setToolTipText("Number of elements");
         GuiUtils.tmpInsets = dfltGridSpacing;
@@ -1079,30 +1066,19 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         fullResBtn.setContentAreaFilled(false);
         fullResBtn.setToolTipText("Set fields to retrieve full image");
 
-        lockBtn = GuiUtils.getToggleImageButton(IdvUIManager.ICON_UNLOCK,
-                IdvUIManager.ICON_LOCK, 0, 0, true);
-        lockBtn.setContentAreaFilled(false);
-        lockBtn.setSelected(true);
-        lockBtn.setToolTipText(
-            "Unlock to automatically change size when changing magnification");
-
         rawSizeLbl = new JLabel(" Raw size: " + this.maxLines + " X "
                                 + this.maxEles);
         sizePanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
             numLinesFld, new JLabel(" X "), numElementsFld, sizeLbl,
-            new JLabel(" "), fullResBtn, new JLabel("  "), lockBtn, rawSizeLbl
-        }, 9, GuiUtils.WT_N, GuiUtils.WT_N));
+            new JLabel(" "), fullResBtn, new JLabel("  "), rawSizeLbl
+        }, 8, GuiUtils.WT_N, GuiUtils.WT_N));
 
         allComps.add(GuiUtils.rLabel("Image Size:"));
         allComps.add(GuiUtils.left(sizePanel));
 
         // Magnification
-        propComp = GuiUtils.hbox(new Component[] { new JLabel("") }, 1);
-        addPropComp("Magnification: ", propComp);
-        allComps.add(GuiUtils.rLabel("Magnification:"));
-        allComps.add(GuiUtils.left(propComp));
-        //GuiUtils.tmpInsets = GRID_INSETS;
-
+        allComps.add(new JLabel(" "));
+        allComps.add(new JLabel(" "));
         //line mag
         boolean oldAmSettingProperties = amSettingProperties;
         amSettingProperties = true;
@@ -1111,127 +1087,61 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
                 if (amSettingProperties) {
                     return;
                 }
-                int val = getMagValue(lineMagSlider);
-                setLineMag(val);
-                lineMagSliderChanged(true);
+                lineMagSliderChanged(getLinkButton().isSelected());
 
             }
         };
 
-        ActionListener lineMagChange = new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (amSettingProperties) {
-                    return;
-                }
-                setLineMag();
-                changeLineMagSlider(true);
-            }
-        };
-        FocusListener lineMagFocusChange = new FocusListener() {
-            public void focusGained(FocusEvent fe) {}
-            public void focusLost(FocusEvent fe) {
-                if (amSettingProperties) {
-                    return;
-                }
-                setLineMag();
-                changeLineMagSlider(true);
-            }
-        };
-        JComponent[] lineMagComps = GuiUtils.makeSliderPopup(SLIDER_MIN,
-                                        SLIDER_MAX, -3, lineListener);
-        lineMagSlider = (JSlider) lineMagComps[1];
-        lineMagSlider.setPreferredSize(new Dimension(SLIDER_WIDTH,
-                SLIDER_HEIGHT));
-        lineMagSlider.setMajorTickSpacing(1);
-        lineMagSlider.setSnapToTicks(true);
-        lineMagSlider.setExtent(1);
-        int mag = getLineMag();
-        setLineMagSlider(mag);
-        lineMagComps[0].setToolTipText("Change the line magnification");
-        lineMagSlider.setToolTipText(
-            "Slide to set line magnification factor");
-        String str = "Line Mag=";
-        lineMagFld = new JTextField(Integer.toString(mag), 3);
-        lineMagFld.addFocusListener(lineMagFocusChange);
-        lineMagFld.addActionListener(lineMagChange);
-        lineMagLbl = GuiUtils.getFixedWidthLabel(StringUtil.padLeft(str, 4));
-
-        amSettingProperties = oldAmSettingProperties;
-
-        GuiUtils.tmpInsets  = dfltGridSpacing;
-        lMagPanel = GuiUtils.doLayout(new Component[] { lineMagLbl,
-                lineMagFld,
-                GuiUtils.inset(lineMagComps[1], new Insets(0, 4, 0, 0)) }, 5,
-                    GuiUtils.WT_N, GuiUtils.WT_N);
-        propComp = GuiUtils.hbox(new Component[] { lMagPanel }, 1);
-
-        allComps.add(GuiUtils.rLabel(""));
-        allComps.add(GuiUtils.left(propComp));
-
-        //element mag
-        amSettingProperties = true;
         ChangeListener elementListener = new ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 if (amSettingProperties) {
                     return;
                 }
-                int val = getMagValue(elementMagSlider);
-                setElementMag(val);
-                elementMagSliderChanged(true);
+                elementMagSliderChanged(getLinkButton().isSelected());
             }
         };
-        ActionListener eleMagChange = new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (amSettingProperties) {
-                    return;
-                }
-                setElementMag();
-                changeEleMagSlider(true);
-            }
-        };
-        FocusListener eleMagFocusChange = new FocusListener() {
-            public void focusGained(FocusEvent fe) {}
-            public void focusLost(FocusEvent fe) {
-                if (amSettingProperties) {
-                    return;
-                }
-                setElementMag();
-                changeEleMagSlider(true);
-            }
-        };
-        JComponent[] elementMagComps = GuiUtils.makeSliderPopup(SLIDER_MIN,
-                                           SLIDER_MAX, 0, elementListener);
+
+        JComponent[] lineMagComps = GuiUtils.makeSliderPopup(-SLIDER_MAX, 1,
+                                        0, lineListener);
+        lineMagSlider = (JSlider) lineMagComps[1];
+        lineMagSlider.setMajorTickSpacing(1);
+        lineMagSlider.setSnapToTicks(true);
+        lineMagSlider.setExtent(1);
+        lineMagSlider.getModel().setValue(lmag);
+        lineMagComps[0].setToolTipText("Change the line magnification");
+        JComponent[] elementMagComps = GuiUtils.makeSliderPopup(-SLIDER_MAX,
+                                           1, 0, elementListener);
         elementMagSlider = (JSlider) elementMagComps[1];
-        elementMagSlider.setPreferredSize(new Dimension(SLIDER_WIDTH,
-                SLIDER_HEIGHT));
         elementMagSlider.setExtent(1);
         elementMagSlider.setMajorTickSpacing(1);
         elementMagSlider.setSnapToTicks(true);
-        mag = getElementMag();
-        setElementMagSlider(mag);
+        elementMagSlider.setValue(emag);
         elementMagComps[0].setToolTipText("Change the element magnification");
+        lineMagSlider.setToolTipText(
+            "Slide to set line magnification factor");
+        lineMagLbl = GuiUtils.getFixedWidthLabel(
+            StringUtil.padLeft(String.valueOf(lmag), 3));
         elementMagSlider.setToolTipText(
             "Slide to set element magnification factor");
-        eleMagFld = new JTextField(Integer.toString(mag), 3);
-        eleMagFld.addFocusListener(eleMagFocusChange);
-        eleMagFld.addActionListener(eleMagChange);
-        str = "Ele  Mag=";
-        elementMagLbl = GuiUtils.getFixedWidthLabel(StringUtil.padLeft(str,
-                4));
-
+        elementMagLbl = GuiUtils.getFixedWidthLabel(
+            StringUtil.padLeft(String.valueOf(emag), 3));
         amSettingProperties = oldAmSettingProperties;
 
-        GuiUtils.tmpInsets  = dfltGridSpacing;
-        eMagPanel = GuiUtils.doLayout(new Component[] { elementMagLbl,
-                eleMagFld,
-                GuiUtils.inset(elementMagComps[1],
-                               new Insets(0, 4, 0, 0)) }, 5, GuiUtils.WT_N,
-                                   GuiUtils.WT_N);
-        propComp = GuiUtils.hbox(new Component[] { eMagPanel }, 1);
+
+        GuiUtils.tmpInsets  = new Insets(0, 0, 0, 0);
+        leMagPanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
+            lineMagLbl,
+            GuiUtils.inset(lineMagComps[0], new Insets(0, 4, 0, 0)),
+            new JLabel("    X"), elementMagLbl,
+            GuiUtils.inset(elementMagComps[0], new Insets(0, 4, 0, 0)) }, 6,
+                GuiUtils.WT_N, GuiUtils.WT_N));
+
+        propComp = GuiUtils.hbox(new Component[] { leMagPanel }, 1);
         // allComps.add(GuiUtils.left(propComp));
         // allComps.add(GuiUtils.lLabel(" "));
-        allComps.add(GuiUtils.rLabel(""));
+        allComps.add(GuiUtils.rLabel("Magnification:"));
         allComps.add(GuiUtils.left(propComp));
+
 
 
         //all
@@ -1239,8 +1149,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
                                 GuiUtils.WT_N);
         advance = GuiUtils.top(imagePanel);
         boolean showMagSection = !prograssiveCbx.isSelected();
-        enablePanel(lMagPanel, showMagSection);
-        enablePanel(eMagPanel, showMagSection);
+        enablePanel(leMagPanel, showMagSection);
         enablePanel(sizePanel, showMagSection);
         String s0 = AddeImageDataSource.getKey(this.source,
                         AddeImageURL.KEY_LINEELE);
@@ -1278,28 +1187,26 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     }
 
     /**
-     * _more_
+     * Get the "lock" button
      *
-     * @return _more_
+     * @return  the lock button
      */
-    boolean isNumLinesChanges() {
-        if (dataSource.previewSelection.getPreNumLines() == 0) {
-            return false;
+    private JToggleButton getLinkButton() {
+        if (linkBtn == null) {
+            linkBtn = GuiUtils.getToggleImageButton(
+                "/auxdata/ui/icons/link_break.png",
+                "/auxdata/ui/icons/link.png", 0, 0, true);
+            linkBtn.setContentAreaFilled(false);
+            linkBtn.setSelected(true);
+            linkBtn.setToolTipText(
+                "Link changing image size with magnification factors");
+
         }
-        return dataSource.previewSelection.getPreNumLines() != getNumLines();
+        return linkBtn;
+
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    boolean isNumElemsChanges() {
-        if (dataSource.previewSelection.getPreNumEles() == 0) {
-            return false;
-        }
-        return dataSource.previewSelection.getPreNumEles() != getNumEles();
-    }
+
 
     /**
      * _more_
@@ -1440,9 +1347,9 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
             double[][] el1 = macs.fromReference(ll);
         } catch (Exception e) {}
         this.areaElement = (int) Math.floor(el[0][0] + 0.5)
-                           * Math.abs(this.elementMag);
+                           * Math.abs(getElementMagValue());
         this.areaLine = (int) Math.floor(el[1][0] + 0.5)
-                        * Math.abs(this.lineMag);
+                        * Math.abs(getLineMagValue());
         el                = this.baseAnav.areaCoordToImageCoord(el);
         this.imageElement = (int) Math.floor(el[0][0] + 0.5);
         this.imageLine    = (int) Math.floor(el[1][0] + 0.5);
@@ -1456,8 +1363,9 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         double[][] ll  = new double[2][1];
 
         double[][] el  = new double[2][1];
-        el[0][0] = (double) (el1[0][0] / Math.abs(this.elementMag) + 0.5);
-        el[1][0] = (double) (el1[1][0] / Math.abs(this.lineMag) + 0.5);
+        el[0][0] = (double) (el1[0][0] / Math.abs(getElementMagValue())
+                             + 0.5);
+        el[1][0] = (double) (el1[1][0] / Math.abs(getLineMagValue()) + 0.5);
         try {
             //AREACoordinateSystem macs = (AREACoordinateSystem)sampleProjection;
             ll = this.baseAnav.toLatLon(el);
@@ -1720,12 +1628,6 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         setNumLines(this.maxLines);
         setNumEles(this.maxEles);
 
-        setLineMag(1);
-        setElementMag(1);
-        setLineMagSlider(1);
-
-        setElementMagSlider(1);
-
         amUpdating = true;
         lineMagSliderChanged(false);
         elementMagSliderChanged(false);
@@ -1773,54 +1675,5 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         }
     }
 
-    /** _more_ */
-    protected boolean amUpdating = false;
 
-    /** _more_ */
-    private String place;
-
-    /** _more_ */
-    MapProjection sampleProjection;
-
-    /** _more_ */
-    private int previewLineRes = 1;
-
-    /** _more_ */
-    private int previewEleRes = 1;
-
-    /** _more_ */
-    private int maxLines = 0;
-
-    /** _more_ */
-    private int maxEles = 0;
-
-    /** _more_ */
-    private AREAnav previewNav;
-
-    /** _more_ */
-    private AreaDirectory previewDir;
-
-    /** _more_ */
-    protected static final String PLACE_CENTER = "CENTER";
-
-    /** _more_ */
-    protected static final String PLACE_ULEFT = "ULEFT";
-
-    /** _more_ */
-    private String defaultPlace = PLACE_CENTER;
-
-    /** _more_ */
-    JLabel sizeLbl;
-
-    /** _more_ */
-    private JToggleButton lockBtn;
-
-    /** _more_ */
-    private JButton fullResBtn;
-
-    /** _more_ */
-    JLabel rawSizeLbl = new JLabel();
-
-    /** _more_ */
-    DataChoice dataChoice;
 }

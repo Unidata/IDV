@@ -205,6 +205,17 @@ public class RubberBandBox extends LineDrawing {
         return rubberBandBox;
     }
 
+
+    /**
+     * _more_
+     */
+    public void reSetBounds() {
+        try {
+            bounds = new Gridded2DSet(new RealTupleType(xType, yType), null,
+                                      1);
+        } catch (Exception ee) {}
+    }
+
     /**
      * Returns a clone of this instance suitable for another VisAD display.
      * Underlying data objects are not cloned.

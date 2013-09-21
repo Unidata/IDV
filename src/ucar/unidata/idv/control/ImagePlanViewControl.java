@@ -117,6 +117,10 @@ public class ImagePlanViewControl extends PlanViewControl {
         */
         //gridDisplay.setUseRGBTypeForSelect(true);
         addAttributedDisplayable(gridDisplay);
+        MapProjectionDisplay mpd =
+                  (MapProjectionDisplay) getNavigatedDisplay();
+        RubberBandBox rbb =  mpd.getRubberBandBox();
+        rbb.reSetBounds();
         return gridDisplay;
     }
 

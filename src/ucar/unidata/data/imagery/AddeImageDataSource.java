@@ -45,6 +45,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.awt.image.BufferedImage;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -91,7 +92,7 @@ public class AddeImageDataSource extends ImageDataSource {
     AREAnav baseAnav = null;
 
     /** _more_ */
-    AreaAdapter  areaAdapter = null;
+    AreaAdapter areaAdapter = null;
 
     /** _more_ */
     int eMag;
@@ -301,8 +302,8 @@ public class AddeImageDataSource extends ImageDataSource {
         if (t instanceof Boolean) {
             isProgressiveResolution = ((Boolean) t).booleanValue();
             if ( !isProgressiveResolution) {
-                dlMag = advancedSelection.getLineMag();
-                deMag = advancedSelection.getElementMag();
+                dlMag = advancedSelection.getLineMagValue();
+                deMag = advancedSelection.getElementMagValue();
             }
         }
         boolean useDisplayArea = false;
@@ -512,10 +513,10 @@ public class AddeImageDataSource extends ImageDataSource {
 
         outLine   = inLine / inLineMag;
         // alway in the center of the image and this is why it is divided by 2
-        int    cline       = inLine / 2;
-        int    celem       = inElem / 2;
-        eMag  = inElemMag;
-        lMag  = inLineMag;
+        int cline = inLine / 2;
+        int celem = inElem / 2;
+        eMag = inElemMag;
+        lMag = inLineMag;
         String locateValue = cline + " " + celem;
 
         String magStr1 = "-" + String.valueOf(inLineMag) + " " + "-"
@@ -1263,11 +1264,6 @@ public class AddeImageDataSource extends ImageDataSource {
         /** _more_ */
         AddeImageDataSource imageDataSource;
 
-        /** _more_ */
-        int preNumLines = 0;
-
-        /** _more_ */
-        int preNumEles = 0;
 
         /** _more_ */
         JComboBox regionOptionLabelBox;
@@ -1296,7 +1292,7 @@ public class AddeImageDataSource extends ImageDataSource {
             this.source          = source;
             this.descriptor      = descriptor;
 
-            this.imagePreview = createImagePreview(source);
+            this.imagePreview    = createImagePreview(source);
             display = new NavigatedMapPanel(null, true, true,
                                             imagePreview.getPreviewImage(),
                                             this.source);
@@ -1455,6 +1451,7 @@ public class AddeImageDataSource extends ImageDataSource {
             if (selectedObject.equals(USE_SELECTEDREGION)) {
                 // only progressiveResolution and mag can be changed
                 advancedSelection.enablePanelAll(true);
+                advancedSelection.prograssiveCbx.doClick();
             } else {
                 advancedSelection.enablePanelAll(false);
             }
@@ -1494,9 +1491,12 @@ public class AddeImageDataSource extends ImageDataSource {
          *
          * @param source _more_
          *
+         *
+         * @return _more_
          * @throws IOException _more_
          */
-        private AddeImagePreview createImagePreview(String source) throws IOException {
+        private AddeImagePreview createImagePreview(String source)
+                throws IOException {
 
             int selIndex = -1;
 
@@ -1504,7 +1504,7 @@ public class AddeImageDataSource extends ImageDataSource {
             //LastCalInfo = CalString;
             getDataContext().getIdv().showWaitCursor();
             AddeImagePreview image = new AddeImagePreview(this.aAdapter,
-                    this.descriptor);
+                                         this.descriptor);
             getDataContext().getIdv().showNormalCursor();
             //String bandInfo = "test";
             // lblBandInfo = new JLabel(bandInfo);
@@ -1662,10 +1662,11 @@ public class AddeImageDataSource extends ImageDataSource {
                 latlon[0][0] = (float) gInfo.getMinLat();
                 float[][] lrLinEle   = baseAnav.toLinEle(latlon);
                 int       displayNum = (int) rect.getWidth();
-                int lines = (int) (lrLinEle[1][0] - ulLinEle[1][0])
-                            * Math.abs(lMag);
-                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
-                            * Math.abs(eMag);
+                int       lines      = (int) (lrLinEle[1][0]
+                                           - ulLinEle[1][0]);
+                //* Math.abs(lMag);
+                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0]);
+                //* Math.abs(eMag);
                 // set latlon coord
                 imageDataSource.advancedSelection.setIsFromRegionUpdate(true);
                 imageDataSource.advancedSelection.coordinateTypeComboBox
@@ -1683,47 +1684,22 @@ public class AddeImageDataSource extends ImageDataSource {
                 imageDataSource.advancedSelection.setNumEles(elems);
                 imageDataSource.advancedSelection.setIsFromRegionUpdate(
                     false);
-                preNumEles  = elems;
-                preNumLines = lines;
+
+                // update the mag slider
+                imageDataSource.advancedSelection.setElementMagSlider(
+                    -Math.abs(eMag));
+                imageDataSource.advancedSelection.setLineMagSlider(
+                    -Math.abs(lMag));
+                imageDataSource.advancedSelection.setBaseNumElements(elems
+                        * Math.abs(eMag));
+                imageDataSource.advancedSelection.setBaseNumLines(lines
+                        * Math.abs(lMag));
+
             }
 
         }
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public int getPreNumLines() {
-            return preNumLines;
-        }
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public int getPreNumEles() {
-            return preNumEles;
-        }
-
-        /**
-         * _more_
-         *
-         * @param num _more_
-         */
-        public void setPreNumLines(int num) {
-            preNumLines = num;
-        }
-
-        /**
-         * _more_
-         *
-         * @param num _more_
-         */
-        public void setPreNumEles(int num) {
-            preNumEles = num;
-        }
     }
 
     /** _more_ */
@@ -1749,12 +1725,12 @@ public class AddeImageDataSource extends ImageDataSource {
 
             if (null == previewSelection) {
 
-                previewSelection = new ImagePreviewSelection(this, areaAdapter,
-                        source, this.descriptor);
+                previewSelection = new ImagePreviewSelection(this,
+                        areaAdapter, source, this.descriptor);
 
                 advancedSelection = new AddeImageSelectionPanel(this,
-                        dataChoice, this.source, baseAnav,
-                        this.descriptor, mProjection, previewSelection);
+                        dataChoice, this.source, baseAnav, this.descriptor,
+                        mProjection, previewSelection);
             } else {
                 previewSelection.setDataChoice(dataChoice);
             }
