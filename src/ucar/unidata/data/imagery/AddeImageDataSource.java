@@ -1571,6 +1571,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
             ProjectionRect rect =
                 display.getNavigatedPanel().getSelectedRegion();
+            boolean hasCorner = false;
             if (rect == null) {
                 // no region subset, full image
             } else {
@@ -1579,7 +1580,7 @@ public class AddeImageDataSource extends ImageDataSource {
                     projectionImpl.getLatLonBoundingBox(rect);
                 GeoLocationInfo gInfo;
                 if (latLonRect.getHeight() != latLonRect.getHeight()) {
-                    //conner point outside the earth
+                    //corner point outside the earth
 
                     LatLonPointImpl cImpl =
                         projectionImpl.projToLatLon(rect.x
@@ -1644,7 +1645,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                     - ulImpl.getLongitude());
                         minLon = ulImpl.getLongitude();
                     }
-
+                    hasCorner = true;
                     gInfo = new GeoLocationInfo(maxLat,
                             LatLonPointImpl.lonNormal(minLon), minLat,
                             LatLonPointImpl.lonNormal(maxLon));
@@ -1672,13 +1673,23 @@ public class AddeImageDataSource extends ImageDataSource {
                 imageDataSource.advancedSelection.coordinateTypeComboBox
                     .setSelectedIndex(0);
                 // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
-                imageDataSource.advancedSelection.setPlace("ULEFT");
-                imageDataSource.advancedSelection.setLatitude(
-                    gInfo.getMaxLat());
-                imageDataSource.advancedSelection.setLongitude(
-                    gInfo.getMinLon());
-                imageDataSource.advancedSelection.convertToLineEle();
-
+                if(!hasCorner){
+                    imageDataSource.advancedSelection.setPlace("ULEFT");
+                    imageDataSource.advancedSelection.setLatitude(
+                        gInfo.getMaxLat());
+                    imageDataSource.advancedSelection.setLongitude(
+                        gInfo.getMinLon());
+                    imageDataSource.advancedSelection.convertToLineEle();
+                } else {
+                    imageDataSource.advancedSelection.setPlace("CENTER");
+                    double centerLat = (gInfo.getMaxLat() + gInfo.getMinLat())/2;
+                    double centerLon = (gInfo.getMaxLon() + gInfo.getMinLon())/2;
+                    imageDataSource.advancedSelection.setLatitude(
+                            centerLat);
+                    imageDataSource.advancedSelection.setLongitude(
+                            centerLon);
+                    imageDataSource.advancedSelection.convertToLineEle();
+                }
                 // update the size
                 imageDataSource.advancedSelection.setNumLines(lines);
                 imageDataSource.advancedSelection.setNumEles(elems);

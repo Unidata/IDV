@@ -179,7 +179,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                     projectionImpl.getLatLonBoundingBox(rect);
                 GeoLocationInfo gInfo;
                 if(latLonRect.getHeight() != latLonRect.getHeight()){
-                    //conner point outside the earth
+                    //corner point outside the earth
                     hasConner = true;
                     LatLonPointImpl cImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth()/2, rect.y + rect.getHeight()/2);
                     LatLonPointImpl urImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth(), rect.y + rect.getHeight());
