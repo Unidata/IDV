@@ -22,9 +22,11 @@ package ucar.unidata.data.imagery;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.util.LogUtil;
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.xml.XmlUtil;
 
 import visad.Data;
 import visad.DataReference;
@@ -41,9 +43,12 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -56,6 +61,8 @@ import java.util.List;
 
 public class AddeImageDataSource extends ImageDataSource {
 
+    public static boolean hasInitialized = false;
+    public static HashMap hashmap = new HashMap();
 
     /**
      *  The parameterless ctor unpersisting.
@@ -190,6 +197,25 @@ public class AddeImageDataSource extends ImageDataSource {
         }
         return newFiles;
     }
+
+    public HashMap getStringForDataValueHashtable(String dataChoiceName) {
+        if (!hasInitialized) {
+            // read in XML
+            Element root = getIdv().getResourceManager()
+                .getXmlResources(IdvResourceManager.RSC_TRANSLATIONS).getRoot(0);
+            List datasources = XmlUtil.findChildren(root, "datasource");
+            // not sure about this one
+            List cases = XmlUtil.findChildren((Element) datasources.get(0), "case");
+            for (int i =0; i < cases.size(); i++) {
+                Element child = (Element) cases.get(i);
+                String value = XmlUtil.getAttribute(child, "value");
+                String translation = XmlUtil.getAttribute(child, "translation");
+                hashmap.put(Integer.parseInt(value), translation);
+            }
+        }
+        hasInitialized = true;
+        return hashmap;
+    }
     
     /**
      * For cases where each data value has an English meaning,
@@ -198,7 +224,7 @@ public class AddeImageDataSource extends ImageDataSource {
      * For AddeImageDataSource, used to return a description corresponding
      * to values of the NEXRAD L3 Hydrometeor Classification product.
      * 
-     * @param val  the data value to translae
+     * @param val  the data value to translate
      * @param dataChoiceName to determine what translation table to use
      * @return the string translation of the data point 
      */
@@ -208,38 +234,7 @@ public class AddeImageDataSource extends ImageDataSource {
             // list of codes found here:
             // (51.2.2) http://www.roc.noaa.gov/wsr88d/PublicDocs/ICDs/2620003R.pdf
             String str;
-            switch (val) {
-                case 0:  str = "SNR&lt;Threshold";  // black
-                         break;
-                case 10:  str = "Biological";  // medium gray
-                         break;
-                case 20:  str = "AP/Ground Clutter";  // dark gray
-                         break;
-                case 30:  str = "Ice Crystals";  // light pink
-                         break;
-                case 40:  str = "Dry Snow";  // light blue
-                         break;
-                case 50:  str = "Wet Snow";  // medium blue
-                         break;
-                case 60:  str = "Light-Moderate Rain";  // light green
-                         break;
-                case 70:  str = "Heavy Rain";  // medium green
-                         break;
-                case 80:  str = "Big Drops Rain";  // dark yellow
-                         break;
-                case 90:  str = "Graupel";  // medium pink
-                         break;
-                case 100: str = "Hail, Possibly With Rain";  // red
-                         break;
-                // classification algorithm reports "unknown type" here.
-                // How to distinguish this from "McV doesnt understand the code"?
-                case 140: str = "Unknown Type";  // purple
-                         break;
-                case 150: str = "RF";  // dark purple
-                         break;
-                default: str = "No translation available";
-                         break;
-            }
+            str = (String) getStringForDataValueHashtable(dataChoiceName).get(val);
             return str;
         } else {
             return null;

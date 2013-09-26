@@ -216,6 +216,10 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     public static final IdvResource RSC_ALIASES =
         new XmlIdvResource("idv.resource.aliases", "Data aliases",
                            "aliases\\.xml$", true);
+    
+    public static final IdvResource RSC_TRANSLATIONS =
+            new XmlIdvResource("idv.resource.translations", "Int to string translations",
+                               "translations\\.xml$", true);
 
     /** Points to canned bundles */
     public static final IdvResource RSC_BUNDLEXML =
