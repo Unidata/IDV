@@ -121,6 +121,12 @@ public class AddeImageDataSource extends ImageDataSource {
     /** _more_ */
     private AREACoordinateSystem acs;
 
+    /** _more_ */
+    BandInfo bandId;
+
+    /** _more_ */
+    Hashtable allBandDirs;
+
     /**
      *  The parameterless ctor unpersisting.
      */
@@ -192,18 +198,10 @@ public class AddeImageDataSource extends ImageDataSource {
         AddeImageDescriptor aid   = (AddeImageDescriptor) descs.get(0);
         this.source = getPreviewSource(aid.getSource(), aid.getDirectory());
 
+        allBandDirs     = (Hashtable) properties.get("allBands");
         this.descriptor = aid;
-        // sourceProps     = properties;
-        if (baseAnav == null) {
-
-            try {
-                areaAdapter = new AreaAdapter(this.source, false);
-                AreaFile areaFile = areaAdapter.getAreaFile();
-                baseAnav = areaFile.getNavigation();
-                acs      = new AREACoordinateSystem(areaFile);
-            } catch (Exception e) {}
-
-        }
+        ArrayList oj = (ArrayList) properties.get("bandinfo");
+        this.bandId = (BandInfo) oj.get(0);
     }
 
     /**
@@ -341,9 +339,10 @@ public class AddeImageDataSource extends ImageDataSource {
                 double minLon = geoSelection.getBoundingBox().getMinLon();
                 // double maxLat, double minLat, double maxLon, double minLon
                 if (useDisplayArea) {
-                    AddeImageDescriptor desc =
-                        (AddeImageDescriptor) descriptors.get(0);
-                    int[] dir = desc.getDirectory().getDirectoryBlock();
+                    BandInfo id = (BandInfo) dataChoice.getId();
+                    AreaDirectory thisDir =
+                        (AreaDirectory) allBandDirs.get(id.getBandNumber());
+                    int[] dir = thisDir.getDirectoryBlock();
                     descriptors =
                         geoSpaceSubsetA(geoSelection.getScreenBound(),
                                         unitStr, eMag, lMag, baseAnav,
@@ -382,9 +381,10 @@ public class AddeImageDataSource extends ImageDataSource {
                                              deMag, "CENTER",
                                              isProgressiveResolution);
             } else {  // use default
-                AddeImageDescriptor desc =
-                    (AddeImageDescriptor) descriptors.get(0);
-                int[]  dir         = desc.getDirectory().getDirectoryBlock();
+                BandInfo id = (BandInfo) dataChoice.getId();
+                AreaDirectory thisDir =
+                    (AreaDirectory) allBandDirs.get(id.getBandNumber());
+                int[]  dir         = thisDir.getDirectoryBlock();
                 int    lines       = dir[8];  //2726
                 int    elems       = dir[9];  //1732
 
@@ -498,6 +498,7 @@ public class AddeImageDataSource extends ImageDataSource {
         elFactor =
             (int) Math.ceil(aDir.getCenterLatitudeResolution()
                             / aDir.getCenterLongitudeResolution() - 0.5);
+        System.out.println("Line and element ratio = " + elFactor);
         int lineFactor = 1;
         int elemFactor = 1;
 
@@ -1295,7 +1296,7 @@ public class AddeImageDataSource extends ImageDataSource {
             this.imagePreview    = createImagePreview(source);
             display = new NavigatedMapPanel(null, true, true,
                                             imagePreview.getPreviewImage(),
-                                            this.source);
+                                            this.aAdapter.getAreaFile());
 
 
             chkUseFull = new JCheckBox("Use Default");
@@ -1673,7 +1674,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 imageDataSource.advancedSelection.coordinateTypeComboBox
                     .setSelectedIndex(0);
                 // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
-                if(!hasCorner){
+                if ( !hasCorner) {
                     imageDataSource.advancedSelection.setPlace("ULEFT");
                     imageDataSource.advancedSelection.setLatitude(
                         gInfo.getMaxLat());
@@ -1682,12 +1683,12 @@ public class AddeImageDataSource extends ImageDataSource {
                     imageDataSource.advancedSelection.convertToLineEle();
                 } else {
                     imageDataSource.advancedSelection.setPlace("CENTER");
-                    double centerLat = (gInfo.getMaxLat() + gInfo.getMinLat())/2;
-                    double centerLon = (gInfo.getMaxLon() + gInfo.getMinLon())/2;
-                    imageDataSource.advancedSelection.setLatitude(
-                            centerLat);
-                    imageDataSource.advancedSelection.setLongitude(
-                            centerLon);
+                    double centerLat = (gInfo.getMaxLat()
+                                        + gInfo.getMinLat()) / 2;
+                    double centerLon = (gInfo.getMaxLon()
+                                        + gInfo.getMinLon()) / 2;
+                    imageDataSource.advancedSelection.setLatitude(centerLat);
+                    imageDataSource.advancedSelection.setLongitude(centerLon);
                     imageDataSource.advancedSelection.convertToLineEle();
                 }
                 // update the size
@@ -1732,19 +1733,41 @@ public class AddeImageDataSource extends ImageDataSource {
 
             //AreaAdapter   aa = new AreaAdapter(this.source, false);
 
-            MapProjection mProjection = (MapProjection) acs;
+            BandInfo id = (BandInfo) dataChoice.getId();
 
-            if (null == previewSelection) {
+            if ( !id.equals(this.bandId)) {
+                // now different band selected, and the preview and advanced need to be recreated
 
+                AreaDirectory thisDir =
+                    (AreaDirectory) allBandDirs.get(id.getBandNumber());
+                this.source = getPreviewSource(this.source, thisDir);
+                this.source =
+                    replaceKey(this.source, "BAND",
+                               Integer.toString(id.getBandNumber()));
+                this.descriptor = new AddeImageDescriptor(thisDir, null);;
+
+            }
+
+            if ((baseAnav == null) || !id.equals(this.bandId)) {
+
+                try {
+                    areaAdapter = new AreaAdapter(this.source, false);
+                    AreaFile areaFile = areaAdapter.getAreaFile();
+                    baseAnav = areaFile.getNavigation();
+                    acs      = new AREACoordinateSystem(areaFile);
+                } catch (Exception e) {}
+
+                this.bandId = id;
                 previewSelection = new ImagePreviewSelection(this,
                         areaAdapter, source, this.descriptor);
 
                 advancedSelection = new AddeImageSelectionPanel(this,
                         dataChoice, this.source, baseAnav, this.descriptor,
-                        mProjection, previewSelection);
-            } else {
-                previewSelection.setDataChoice(dataChoice);
+                        acs, previewSelection);
             }
+
+
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(LogUtil.getCurrentWindow(),
                                           ex.getMessage(), "Exception", 0);

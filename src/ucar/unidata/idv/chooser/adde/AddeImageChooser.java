@@ -358,6 +358,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /** Mapping of area directory to list of BandInfos */
     protected Hashtable bandTable;
 
+    /** _more_ */
+    protected Hashtable bandDirs;
+
     /**
      *  The list of currently loaded AddeImageDescriptor-s
      */
@@ -1696,7 +1699,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         String       descriptor  = getDescriptor();
         String       pos = (getDoAbsoluteTimes() || (archiveDay != null))
                            ? "all"
-                           : "0";
+                           : "1";
 
 
         StringBuffer addeCmdBuff = getGroupUrl(REQ_IMAGEDIR, getGroup());
@@ -1748,7 +1751,16 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 //TODO:  Add a setBands method to AreaDirectory to replace
                 // bandTable
                 bandTable = new Hashtable(numImages);
-                lastAD    = null;
+                bandDirs  = new Hashtable();
+                int len = dirs[0].length;
+                bandDirs = new Hashtable(len);
+                for (int i = 0; i < len; i++) {
+                    AreaDirectory dir    = dirs[0][i];
+                    int           bindex = dirs[0][i].getBands()[0];
+
+                    bandDirs.put(bindex, dir);
+                }
+                lastAD = null;
                 for (int i = 0; i < numImages; i++) {
                     int bandIndex = 0;
                     lastAD = (AreaDirectory) dirs[i][0];
@@ -3403,7 +3415,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         if ((bandName != null) && !(bandName.equals(ALLBANDS.toString()))) {
             ht.put(DATA_NAME_KEY, bandName);
         }
-
+        ht.put("allBands", bandDirs);
         makeDataSource(ids, "ADDE.IMAGE", ht);
         saveServerState();
         // uncheck the check box every time click the add source button

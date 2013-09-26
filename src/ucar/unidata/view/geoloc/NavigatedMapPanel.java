@@ -197,16 +197,16 @@ public class NavigatedMapPanel extends JPanel {
      * @param makeNavToolBar _more_
      * @param makeMoveToolBar _more_
      * @param preview_image _more_
-     * @param preview_image_source _more_
+     * @param af _more_
      */
     public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
                              boolean makeMoveToolBar,
                              BufferedImage preview_image,
-                             String preview_image_source) {
+                             AreaFile af) {
         init(defaultMaps, makeNavToolBar, makeMoveToolBar);
         this.preview_image = preview_image;
         try {
-            AreaFile af = new AreaFile(preview_image_source);
+            //AreaFile af = new AreaFile(preview_image_source);
             AREACoordinateSystem acs = null;
             acs = new AREACoordinateSystem(af);
             //   this.project = new MapProjectionProjection(acs);
