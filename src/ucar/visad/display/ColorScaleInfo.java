@@ -21,10 +21,10 @@
 package ucar.visad.display;
 
 
-import ucar.unidata.ui.drawing.Glyph;
-import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.StringUtil;
+
+import visad.Unit;
+
 
 import java.awt.Color;
 import java.awt.Font;
@@ -99,6 +99,12 @@ public class ColorScaleInfo {
 
     /** This keeps track of whether we need to update the X, Y and orientation */
     private boolean dirty = true;
+
+    /** The unit of the info displayed in the color scale */
+    private Unit unit;
+
+    /** Is the unit displayed on color scale */
+    private boolean unitVisible;
 
     /** default ctor */
     public ColorScaleInfo() {
@@ -238,6 +244,8 @@ public class ColorScaleInfo {
         this.isVisible    = that.isVisible;
         this.labelVisible = that.labelVisible;
         this.useAlpha     = that.useAlpha;
+        this.unit         = that.unit;
+        this.unitVisible  = that.unitVisible;
     }
 
     /**
@@ -364,7 +372,7 @@ public class ColorScaleInfo {
             orient    = ColorScale.getDefaultOrient(placement);
             x         = getX(orient, placement);
             y         = getY(orient, placement);
-            labelSide = placement.equals(RIGHT)
+            labelSide = (placement.equals(RIGHT) || placement.equals(BOTTOM))
                         ? ColorScale.SECONDARY
                         : ColorScale.PRIMARY;
         }
@@ -526,7 +534,7 @@ public class ColorScaleInfo {
 
     /**
      *     Gets the useAlpha property
-     *    
+     *
      *     @return the useAlpha
      */
     public boolean getUseAlpha() {
@@ -588,4 +596,39 @@ public class ColorScaleInfo {
                + " label side: " + labelSide + " x/y:" + x + "/" + y;
     }
 
+    /**
+     * Sets the unit.
+     *
+     * @param unit the new unit
+     */
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
+
+    /**
+     * Gets the unit.
+     *
+     * @return the unit
+     */
+    public Unit getUnit() {
+        return unit;
+    }
+
+    /**
+     * Checks if is unit visible.
+     *
+     * @return true, if is unit visible
+     */
+    public boolean isUnitVisible() {
+        return unitVisible;
+    }
+
+    /**
+     * Sets the unit visible.
+     *
+     * @param unitVisible the new unit visible
+     */
+    public void setUnitVisible(boolean unitVisible) {
+        this.unitVisible = unitVisible;
+    }
 }

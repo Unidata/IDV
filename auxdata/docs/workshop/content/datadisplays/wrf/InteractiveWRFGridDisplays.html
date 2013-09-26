@@ -135,6 +135,53 @@ would rather see a vector plot (as opposed to a barb plot), simply select
 creating the display.
 </p>
 
+
+<div class="pagetitle">Trajectory Display</div>
+
+[ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/FlowPlanViewControl.html" [ht::cimg ./images/traj.gif]]
+
+<ol class="step">
+<li>Clear any existing displays by clicking the red and white eraser symbol found just below the Main Menu bar on either the Dashboard to Main View window.</li>
+<li>Make sure your WRF ouput is [ht::popup "InteractiveWRFLoadOutput.html" loaded] (or utilize the bundle we just created).</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 2D grid] tab. Select
+    [ht::param Pressure Reduced to MSL @ msl]
+    field and the [ht::display Contour Plan View] 
+    display, and then click the 
+    [ht::command Create Display] button. This will
+    allow us beter select an area of interest for
+    the trajectory display.</li>
+<li>In the [ht::command Field Selector] panel,
+    expand the [ht::param 3D grid] tab. Scroll down and expand the
+    [ht::param Derived] tab. Select the
+    [ht::param Grid 3D Trajectory] field and the
+    [ht::display Trajectory Colored By Parameter] display, and then click
+    the [ht::command Create Display] button.  </li>
+
+<li>In the [ht::command Field Selector] box that appears,
+    expand the [ht::param 2D grid] tab. Find your WRF data
+    and expand this list. Scroll down and expand the
+    [ht::param 3D grid] and select the
+    [ht::param Specific humidity] and then click
+    the [ht::command OK] button.  </li>
+
+<li>The [ht::command Dashboard] window will come to the front of your display and
+    show you the Trajectory Controls. Select [ht::param 950] as the [ht::param Level] 
+    (initial
+    level of the trajectories), select [ht::param Rectangle] for the [ht::param Trajectory Initial Area], and set the [ht::param Initial Area Skip Factor] to [ht::param 5]. </li>
+<li>Return to the Main View window and click-and-drag to set the rectangular
+    area of interest using the rubber-band widget. If you make a mistake, return
+    to the Trajectory Controls on the [ht::command Dashboard] and click the scissors icon. </li>
+<li>Once you've selected the initial area for your trajectories, return to the
+    Trajectory Controls in the [ht::command Dashboard] window and click [ht::command Create Trajectory]. </li>
+ 
+ <li>In the [ht::command Displays] panel, select [ht::param Speficif_humidity_isob.].
+    Click [ht::menu {Edit} {Properties}], select the [ht::param Color Scale Tab]
+    and check the box next to [ht::param visible]. Click [ht::command OK] to apply
+    the changes.</li>    
+</ol>
+
+
 <div class="pagetitle">Hovm&ouml;ller Diagrams</div>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/HovmollerControl.html" [ht::cimg ./images/WRF_Hov_detached.png]]

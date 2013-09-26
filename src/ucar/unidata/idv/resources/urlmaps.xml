@@ -14,6 +14,10 @@
         new="thredds.ucar.edu/thredds/"/>
     <urlmap
         type="opendap"
+        old="motherlode.ucar.edu:-1/thredds/"
+        new="thredds.ucar.edu/thredds/"/>
+    <urlmap
+        type="opendap"
         old="motherlode.ucar.edu:8081/thredds/"
         new="thredds-test.ucar.edu/thredds/"/>
     <urlmap

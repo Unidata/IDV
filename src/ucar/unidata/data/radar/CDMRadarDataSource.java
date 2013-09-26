@@ -23,33 +23,48 @@ package ucar.unidata.data.radar;
 
 import ucar.nc2.units.DateUnit;
 
-
-import ucar.unidata.data.*;
-import ucar.unidata.idv.DisplayControl;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.chooser.TDSRadarChooser;
+import ucar.unidata.data.CompositeDataChoice;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
-
-import ucar.unidata.util.*;
+import ucar.unidata.util.DateSelection;
+import ucar.unidata.util.DatedObject;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.ObjectArray;
 
 import ucar.visad.Util;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.Data;
+import visad.DateTime;
+import visad.Real;
+import visad.RealType;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 
-import java.util.*;
 
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.JComboBox;
 
 
 /**
  * A data source for radar data through the netCDF Common Data Model (CDM)
  * Radial Datatype API.
  * @author IDV Development Team
- * @version $Revision: 1.25 $
  */
 public class CDMRadarDataSource extends RadarDataSource {
 
@@ -74,14 +89,15 @@ public class CDMRadarDataSource extends RadarDataSource {
     /** station */
     private NamedStation namedStation = null;
 
-    /** _more_ */
+    /** is RHI flag */
     private boolean isRHI = false;
 
-    /** _more_          */
+    /** initial times */
     List<DateTime> initTimes;
 
-    /** _more_ */
+    /** flag for relative times */
     private boolean isRelativeTime = false;
+
     /**
      * Zero-argument constructor for construction via unpersistence.
      */
@@ -157,10 +173,10 @@ public class CDMRadarDataSource extends RadarDataSource {
     }
 
     /**
-     * _more_
+     * Reload the data
      *
-     * @param object _more_
-     * @param properties _more_
+     * @param object  the object
+     * @param properties the properties
      */
     public void reloadData(Object object, Hashtable properties) {
         super.reloadData();
@@ -207,7 +223,7 @@ public class CDMRadarDataSource extends RadarDataSource {
             if (getProperties() != null) {
 
                 Object t = getProperties().get("UseTimeDriver");
-                if (t instanceof Boolean && useDriverTime == false) {
+                if ((t instanceof Boolean) && (useDriverTime == false)) {
                     useDriverTime = ((Boolean) t).booleanValue();
                 }
                 Object d = getProperties().get("TimeDriver");
@@ -215,10 +231,10 @@ public class CDMRadarDataSource extends RadarDataSource {
                     TimeDriver = (Object) d;
                 }
             }
-            DateSelection  dateSelection = query.getDateSelection();
-            List           times         = dateSelection.getTimes();
-            List           urls          = new ArrayList();
-            StringBuffer   errlog        = new StringBuffer();
+            DateSelection dateSelection = query.getDateSelection();
+            List          times         = dateSelection.getTimes();
+            List          urls          = new ArrayList();
+            StringBuffer  errlog        = new StringBuffer();
 
 
             TDSRadarDatasetCollection collection =
@@ -228,7 +244,7 @@ public class CDMRadarDataSource extends RadarDataSource {
             if ((times == null) || (times.size() == 0) || useDriverTime) {
                 List allTimes        = new ArrayList();
                 List collectionTimes = null;
-                if (useDriverTime && initTimes != null) {
+                if (useDriverTime && (initTimes != null)) {
 
                     collectionTimes = initTimes;
                     for (int timeIdx = 0; timeIdx < collectionTimes.size();
@@ -245,7 +261,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                     }
                     times = DatedObject.unwrap(allTimes);
 
-                }  else {
+                } else {
                     List timeSpan = collection.getRadarTimeSpan();
                     Date fromDate =
                         DateUnit.getStandardOrISO((String) timeSpan.get(0));
@@ -301,8 +317,9 @@ public class CDMRadarDataSource extends RadarDataSource {
                     isRelativeTime = true;
                 }
             }
-            if(times == null || times.size() == 0)
+            if ((times == null) || (times.size() == 0)) {
                 return;
+            }
             for (int i = 0; i < times.size(); i++) {
                 Date date = (Date) times.get(i);
                 java.net.URI uri =
@@ -325,17 +342,17 @@ public class CDMRadarDataSource extends RadarDataSource {
      */
     protected boolean isRealTime() {
         boolean isRealTime = super.isRealTime();
-        return ( isRealTime  || isRelativeTime);
+        return (isRealTime || isRelativeTime);
     }
 
     /**
-     * _more_
+     * Get all times for the time driver
      *
-     * @param dataChoice _more_
-     * @param selection _more_
-     * @param timeDriverTimes _more_
+     * @param dataChoice  the DataChoice
+     * @param selection   the DataSelection
+     * @param timeDriverTimes  the time driver times
      *
-     * @return _more_
+     * @return  the list of times
      */
     public List<DateTime> getAllTimesForTimeDriver(DataChoice dataChoice,
             DataSelection selection, List<DateTime> timeDriverTimes) {
@@ -346,16 +363,15 @@ public class CDMRadarDataSource extends RadarDataSource {
         List                      collectionTimes = null;
 
         RadarQuery query = (RadarQuery) getProperty(PROP_RADARQUERY);
-        if(query != null) {
-            StringBuffer              errlog          = new StringBuffer();
-            Date fromDate =
-                DateUnit.getStandardOrISO(timeDriverTimes.get(0).dateString()
-                                          + "T"
-                                          + timeDriverTimes.get(0).timeString());
+        if (query != null) {
+            StringBuffer errlog = new StringBuffer();
+            Date fromDate = DateUnit.getStandardOrISO(
+                                timeDriverTimes.get(0).dateString() + "T"
+                                + timeDriverTimes.get(0).timeString());
             Date toDate = DateUnit.getStandardOrISO(timeDriverTimes.get(num
                               - 1).dateString() + "T"
-                                                + timeDriverTimes.get(num
-                                                    - 1).timeString());
+                                  + timeDriverTimes.get(num
+                                      - 1).timeString());
             try {
                 collection = TDSRadarDatasetCollection.factory("test",
                         query.getCollectionUrl(), errlog);
@@ -371,10 +387,9 @@ public class CDMRadarDataSource extends RadarDataSource {
 
         List results = null;
         try {
-            results = DataUtil.selectDatesFromList(collectionTimes, timeDriverTimes );
-        } catch (Exception e){
-
-        }
+            results = DataUtil.selectDatesFromList(collectionTimes,
+                    timeDriverTimes);
+        } catch (Exception e) {}
         initTimes = results;
 
         return results;

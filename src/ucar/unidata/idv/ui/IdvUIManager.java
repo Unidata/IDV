@@ -39,20 +39,7 @@ import ucar.unidata.data.ListDataChoice;
 import ucar.unidata.data.UserOperandValue;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.gis.maps.MapData;
-import ucar.unidata.idv.ControlDescriptor;
-import ucar.unidata.idv.DisplayControl;
-import ucar.unidata.idv.History;
-import ucar.unidata.idv.IdvConstants;
-import ucar.unidata.idv.IdvManager;
-import ucar.unidata.idv.IdvPersistenceManager;
-import ucar.unidata.idv.IdvPreferenceManager;
-import ucar.unidata.idv.IdvResourceManager;
-import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.MapViewManager;
-import ucar.unidata.idv.SavedBundle;
-import ucar.unidata.idv.ViewDescriptor;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.ViewState;
+import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.DisplaySettingsDialog;
 import ucar.unidata.idv.control.MapDisplayControl;
@@ -3650,6 +3637,9 @@ public class IdvUIManager extends IdvManager {
         props.append("Location: ");
         props.append(System.getProperty("java.home"));
         props.append("<br> ");
+        props.append("netCDF-Java version: ");
+        props.append(LibVersionUtil.getNcidvVersion());
+        props.append("<br> ");
         props.append("Java 3D Version: ");
         // look for java3d
         Class c = null;
@@ -6029,7 +6019,7 @@ public class IdvUIManager extends IdvManager {
         append(extra, "java.heap",
                Misc.format(Runtime.getRuntime().maxMemory() / 1000000.0)
                + " " + Msg.msg("MB"));
-
+        append(extra, "ncIdv.version", LibVersionUtil.getNcidvVersion());
         return extra;
     }
 

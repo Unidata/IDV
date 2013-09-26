@@ -260,7 +260,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         Range range     =
             getGridDataInstance().getRange(getColorRangeIndex());
         Unit  u = getGridDataInstance().getRawUnit(getColorRangeIndex());
-        if ( !Misc.equals(u, colorUnit) && Unit.canConvert(u, colorUnit)) {
+        if (colorUnit != null  && !Misc.equals(u, colorUnit) && Unit.canConvert(u, colorUnit)) {
             range = new Range(colorUnit.toThis(range.getMin(), u),
                               colorUnit.toThis(range.getMax(), u));
         }

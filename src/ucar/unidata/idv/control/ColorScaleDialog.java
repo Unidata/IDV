@@ -22,28 +22,23 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.ui.FontSelector;
-
-
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
 
-import ucar.visad.display.ColorScale;
 import ucar.visad.display.ColorScaleInfo;
 
-import java.awt.*;
-import java.awt.event.*;
 
-import java.io.*;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.rmi.RemoteException;
-
-import java.util.*;
-
-import javax.swing.*;
-
-import javax.swing.event.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
 
 
 /**
@@ -79,6 +74,9 @@ public class ColorScaleDialog implements ActionListener {
 
     /** checkbox for visibility */
     private JCheckBox visibilityCbx;
+
+    /** checkbox for unit display */
+    private JCheckBox unitCbx;
 
     /** checkbox for label visibility */
     private JCheckBox labelVisibilityCbx;
@@ -130,6 +128,7 @@ public class ColorScaleDialog implements ActionListener {
         }
         //orientationBox.setSelectedItem(myInfo.getOrientation());
         visibilityCbx.setSelected(myInfo.getIsVisible());
+        unitCbx.setSelected(myInfo.isUnitVisible());
         labelVisibilityCbx.setSelected(myInfo.getLabelVisible());
         alphaCbx.setSelected(myInfo.getUseAlpha());
 
@@ -173,11 +172,13 @@ public class ColorScaleDialog implements ActionListener {
         }
         myInfo.setLabelColor(colorSwatch.getSwatchColor());
         myInfo.setIsVisible(visibilityCbx.isSelected());
+        myInfo.setUnitVisible(unitCbx.isSelected());
         myInfo.setLabelVisible(labelVisibilityCbx.isSelected());
         myInfo.setUseAlpha(alphaCbx.isSelected());
         myInfo.setLabelFont(fontSelector.getFont());
         try {
             if (displayControl != null) {
+                myInfo.setUnit(displayControl.getDisplayUnit());
                 displayControl.setColorScaleInfo(
                     new ColorScaleInfo(getInfo()));
             }
@@ -195,12 +196,13 @@ public class ColorScaleDialog implements ActionListener {
      */
     private void doMakeContents(boolean showDialog) {
         placementBox = new JComboBox(positions);
-        colorSwatch = new GuiUtils.ColorSwatch(myInfo.getLabelColor(),
+        colorSwatch  = new GuiUtils.ColorSwatch(myInfo.getLabelColor(),
                 "Color Scale Label Color");
         final JComponent colorComp = colorSwatch.getSetPanel();
         visibilityCbx = new JCheckBox("", myInfo.getIsVisible());
-        alphaCbx = new JCheckBox("", myInfo.getUseAlpha());
-        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
+        unitCbx       = new JCheckBox("Show Unit", myInfo.isUnitVisible());
+        alphaCbx      = new JCheckBox("", myInfo.getUseAlpha());
+        fontSelector  = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
         fontSelector.setFont(myInfo.getLabelFont());
 
@@ -221,6 +223,8 @@ public class ColorScaleDialog implements ActionListener {
             GuiUtils.leftRight(placementBox, GuiUtils.filler()),
             GuiUtils.rLabel("Labels: "),
             GuiUtils.leftRight(labelVisibilityCbx, GuiUtils.filler()),
+            GuiUtils.filler(),
+            GuiUtils.leftRight(unitCbx,GuiUtils.filler()),
             GuiUtils.filler(),
             GuiUtils.leftRight(GuiUtils.rLabel("Font: "),
                                fontSelector.getComponent()),

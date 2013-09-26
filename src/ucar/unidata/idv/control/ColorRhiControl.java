@@ -918,6 +918,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
     protected FieldImpl make2DData(FieldImpl inputfieldImpl)
             throws VisADException, RemoteException {
         FieldImpl fi             = null;
+        GriddedSet domainSet = null;
         boolean   istimeSequence = GridUtil.isTimeSequence(inputfieldImpl);
         if (istimeSequence) {
             Set timeSet  = inputfieldImpl.getDomainSet();
@@ -927,6 +928,8 @@ public class ColorRhiControl extends ColorCrossSectionControl {
             for (int ti = 0; ti < numTimes; ti++) {
                 FieldImpl one3DFI = (FieldImpl) inputfieldImpl.getSample(ti);
                 FieldImpl one2DFI = make2DDataAtOneTime(one3DFI);
+                if(domainSet == null)
+                    domainSet = (GriddedSet) GridUtil.getSpatialDomain(one2DFI);
                 if (ti == 0) {
                     FunctionType fiFunction =
                         new FunctionType(timeType,
@@ -940,7 +943,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
         } else {
             fi = make2DDataAtOneTime(inputfieldImpl);
         }
-
+        dataVerticalRange = getCrossSectionVerticalRange(domainSet);
         return fi;
     }
 
