@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 
@@ -62,7 +63,7 @@ import org.w3c.dom.Element;
 public class AddeImageDataSource extends ImageDataSource {
 
     public static boolean hasInitialized = false;
-    public static HashMap hashmap = new HashMap();
+    public static Map<Integer, String> hashmap = new HashMap<Integer, String>();
 
     /**
      *  The parameterless ctor unpersisting.
@@ -198,7 +199,7 @@ public class AddeImageDataSource extends ImageDataSource {
         return newFiles;
     }
 
-    public HashMap getStringForDataValueHashtable(String dataChoiceName) {
+    public Map<Integer, String> getStringForDataValueHashtable(String dataChoiceName) {
         if (!hasInitialized) {
             // read in XML
             Element root = getIdv().getResourceManager()
