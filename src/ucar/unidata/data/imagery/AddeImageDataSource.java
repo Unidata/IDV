@@ -43,7 +43,6 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -62,8 +61,8 @@ import org.w3c.dom.Element;
 
 public class AddeImageDataSource extends ImageDataSource {
 
-    public static boolean hasInitialized = false;
-    public static Map<Integer, String> hashmap = new HashMap<Integer, String>();
+    public static boolean hasInitializedTranslations = false;
+    public static Map<Integer, String> translations = new Hashtable<Integer, String>();
 
     /**
      *  The parameterless ctor unpersisting.
@@ -200,10 +199,11 @@ public class AddeImageDataSource extends ImageDataSource {
     }
 
     public Map<Integer, String> getStringForDataValueHashtable(String dataChoiceName) {
-        if (!hasInitialized) {
+        if (!hasInitializedTranslations) {
             // read in XML
             Element root = getIdv().getResourceManager()
                 .getXmlResources(IdvResourceManager.RSC_TRANSLATIONS).getRoot(0);
+            // loop through datasources list, using "name" attribute as hashtable key
             List datasources = XmlUtil.findChildren(root, "datasource");
             // not sure about this one
             List cases = XmlUtil.findChildren((Element) datasources.get(0), "case");
@@ -211,11 +211,11 @@ public class AddeImageDataSource extends ImageDataSource {
                 Element child = (Element) cases.get(i);
                 String value = XmlUtil.getAttribute(child, "value");
                 String translation = XmlUtil.getAttribute(child, "translation");
-                hashmap.put(Integer.parseInt(value), translation);
+                translations.put(Integer.parseInt(value), translation);
             }
         }
-        hasInitialized = true;
-        return hashmap;
+        hasInitializedTranslations = true;
+        return translations;
     }
     
     /**

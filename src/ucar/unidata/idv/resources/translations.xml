@@ -17,9 +17,3 @@
         <!--<case value="default" translation="No translation available" />-->
     </datasource>
 </cursor_readout_translations>
-
-
-<!-- main task:
-     read in this xml as a hashmap for each data source.
-     < int value >  maps to  < string translation >
-     -->
