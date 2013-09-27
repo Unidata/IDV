@@ -62,7 +62,8 @@ import org.w3c.dom.Element;
 public class AddeImageDataSource extends ImageDataSource {
 
     public static boolean hasInitializedTranslations = false;
-    public static Map<Integer, String> translations = new Hashtable<Integer, String>();
+    public static Map<String, Map<Integer,String>> translationTables = 
+            new Hashtable<String, Map<Integer, String>>();
 
     /**
      *  The parameterless ctor unpersisting.
@@ -198,24 +199,29 @@ public class AddeImageDataSource extends ImageDataSource {
         return newFiles;
     }
 
-    public Map<Integer, String> getStringForDataValueHashtable(String dataChoiceName) {
+    public Map<String, Map<Integer, String>> getStringForDataValueHashtable(String dataChoiceName) {
         if (!hasInitializedTranslations) {
             // read in XML
             Element root = getIdv().getResourceManager()
                 .getXmlResources(IdvResourceManager.RSC_TRANSLATIONS).getRoot(0);
             // loop through datasources list, using "name" attribute as hashtable key
             List datasources = XmlUtil.findChildren(root, "datasource");
-            // not sure about this one
-            List cases = XmlUtil.findChildren((Element) datasources.get(0), "case");
-            for (int i =0; i < cases.size(); i++) {
-                Element child = (Element) cases.get(i);
-                String value = XmlUtil.getAttribute(child, "value");
-                String translation = XmlUtil.getAttribute(child, "translation");
-                translations.put(Integer.parseInt(value), translation);
+            for (int i = 0; i < datasources.size(); i++) {
+                Element dataSource = (Element) datasources.get(i);
+                String dataSourceName = XmlUtil.getAttribute(dataSource, "name");
+                List cases = XmlUtil.findChildren(dataSource, "case");
+                Hashtable<Integer, String> translations = new Hashtable<Integer, String>();
+                for (int j = 0; j < cases.size(); j++) {
+                    Element child = (Element) cases.get(j);
+                    String value = XmlUtil.getAttribute(child, "value");
+                    String translation = XmlUtil.getAttribute(child, "translation");
+                    translations.put(Integer.parseInt(value), translation);
+                }
+                translationTables.put(dataSourceName, translations);
             }
         }
         hasInitializedTranslations = true;
-        return translations;
+        return translationTables;
     }
     
     /**
@@ -234,9 +240,7 @@ public class AddeImageDataSource extends ImageDataSource {
             // this is the Hydrometeor Classification product
             // list of codes found here:
             // (51.2.2) http://www.roc.noaa.gov/wsr88d/PublicDocs/ICDs/2620003R.pdf
-            String str;
-            str = (String) getStringForDataValueHashtable(dataChoiceName).get(val);
-            return str;
+            return getStringForDataValueHashtable(dataChoiceName).get("nexrad hydrometeor classification").get(val);
         } else {
             return null;
         }
