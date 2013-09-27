@@ -422,7 +422,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 } else {
                     newelems = (int) Math.floor(elems / eleMag + 0.5);
                 }
-
+                System.out.println(
+                        "newLine X newElement : " + newLines  + " " + newelems);
                 try {
                     descriptors = reSetImageDataDescriptor(descriptors,
                             AddeImageURL.KEY_LINEELE, locateValue, "CENTER",

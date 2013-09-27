@@ -356,8 +356,8 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
         String magVal = AddeImageDataSource.getKey(source,
                             AddeImageURL.KEY_MAG);
         String[] magVals = magVal.split(" ");
-        this.elementMag = new Integer(magVals[0]).intValue();
-        this.lineMag    = new Integer(magVals[1]).intValue();
+        this.elementMag = new Integer(magVals[1]).intValue();
+        this.lineMag    = new Integer(magVals[0]).intValue();
 
 
         // init information for the location and the default is LATLON
