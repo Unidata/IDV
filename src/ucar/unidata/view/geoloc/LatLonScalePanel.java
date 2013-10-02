@@ -107,6 +107,9 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      */
     private FontSelector fontSelector;
 
+    /** Is the label angled away from the axis or not */
+    private JCheckBox labelRelief;
+
     /**
      * Create a new dialog for setting the coordinate range of the display
      *
@@ -127,7 +130,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         setLayout(new BorderLayout());
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
-        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false,
+        fontSelector       = new FontSelector(FontSelector.COMBOBOX_UI, false,
                                         false);
 
         JPanel latPanel = GuiUtils.doLayout(new Component[] {
@@ -169,6 +172,12 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
                                  GuiUtils.rLabel(" 0-360 Longitude"),
                                  use360 = new JCheckBox("", false) }, 4,
                                      GuiUtils.WT_NY, GuiUtils.WT_N);
+
+        JPanel reliefPanel = GuiUtils.doLayout(new Component[] {
+                                 GuiUtils.rLabel("Axis label relief:"),
+                                 labelRelief = new JCheckBox("", true) }, 4,
+                                     GuiUtils.WT_NY, GuiUtils.WT_N);
+
         coordFormat.setEditable(true);
         coordFormat.setEnabled(true);
 
@@ -180,7 +189,8 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
                 GuiUtils.filler() }, 2, GuiUtils.WT_YY, GuiUtils.WT_N);
 
         List<?> pnls = Arrays.asList(new Component[] { GuiUtils.left(pnl),
-                GuiUtils.left(formatPanel), GuiUtils.left(fontPanel) });
+                GuiUtils.left(reliefPanel), GuiUtils.left(formatPanel),
+                GuiUtils.left(fontPanel) });
 
         this.add("Center", GuiUtils.doLayout(pnls, 1, 5, 5));
 
@@ -227,6 +237,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         yVisible.setSelected(latScaleInfo.isVisible());
         coordFormat.setSelectedItem(latScaleInfo.getCoordFormat());
         use360.setSelected(latScaleInfo.isUse360());
+        labelRelief.setSelected(latScaleInfo.isLabelRelief());
         fontSelector.setFont(latScaleInfo.getFont());
     }
 
@@ -241,6 +252,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         xVisible.setSelected(lonScaleInfo.isVisible());
         coordFormat.setSelectedItem(lonScaleInfo.getCoordFormat());
         use360.setSelected(lonScaleInfo.isUse360());
+        labelRelief.setSelected(lonScaleInfo.isLabelRelief());
         fontSelector.setFont(lonScaleInfo.getFont());
     }
 
@@ -261,7 +273,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLatInfo.setCoordFormat(coordFormat.getSelectedItem() + "");
         newLatInfo.setFont(fontSelector.getFont());
         newLatInfo.setUse360(use360.isSelected());
-
+        newLatInfo.setLabelRelief(labelRelief.isSelected());
 
         if ( !newLatInfo.equals(latScaleInfo)) {
             latScaleInfo = newLatInfo;
@@ -278,6 +290,7 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         newLonInfo.setCoordFormat(coordFormat.getSelectedItem() + "");
         newLonInfo.setFont(fontSelector.getFont());
         newLonInfo.setUse360(use360.isSelected());
+        newLonInfo.setLabelRelief(labelRelief.isSelected());
 
         if ( !newLonInfo.equals(lonScaleInfo)) {
             lonScaleInfo = newLonInfo;

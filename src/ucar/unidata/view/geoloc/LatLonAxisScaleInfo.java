@@ -52,6 +52,9 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
     /** Use 360 degree angles. */
     private boolean use360;
 
+    /** Does the label have relief angling away from the axis */
+    private boolean labelRelief;
+
     /**
      * Instantiates a new lat lon scale info.
      */
@@ -151,7 +154,26 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
     }
 
     /**
+     * Checks if label has relief.
+     *
+     * @return true, if label has relief
+     */
+    public boolean isLabelRelief() {
+        return labelRelief;
+    }
+
+    /**
+     * Sets the label relief.
+     *
+     * @param labelRelief the new label relief
+     */
+    public void setLabelRelief(boolean labelRelief) {
+        this.labelRelief = labelRelief;
+    }
+
+    /**
      * {@inheritDoc}
+     *
      */
     @Override
     public int hashCode() {
@@ -166,6 +188,9 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         result = prime * result + ((increment == null)
                                    ? 0
                                    : increment.hashCode());
+        result = prime * result + (labelRelief
+                                   ? 1231
+                                   : 1237);
         result = prime * result + minorDivision;
         result = prime * result + (use360
                                    ? 1231
@@ -178,6 +203,7 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /**
      * {@inheritDoc}
+     *
      */
     @Override
     public boolean equals(Object obj) {
@@ -210,6 +236,9 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
                 return false;
             }
         } else if ( !increment.equals(other.increment)) {
+            return false;
+        }
+        if (labelRelief != other.labelRelief) {
             return false;
         }
         if (minorDivision != other.minorDivision) {
