@@ -21,21 +21,22 @@
 package ucar.unidata.ui;
 
 
+import ucar.unidata.util.GuiUtils;
+
+
 import java.awt.BorderLayout;
+
+import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner.DateEditor;
 import javax.swing.SpinnerDateModel;
-
-import ucar.unidata.util.GuiUtils;
-
-import com.toedter.calendar.JCalendar;
-import com.toedter.calendar.JDateChooser;
 
 
 
@@ -50,17 +51,8 @@ public class DateTimePicker extends JPanel {
     /** the default time zone */
     private static TimeZone defaultTimeZone;
 
-    /** the time zone */
-    private TimeZone myTimeZone;
-
-    /** the date chooser */
-    private JDateChooser dateChooser;
-
     /** the SpinnerDateModel */
-    SpinnerDateModel timeModel;
-
-    /** the JCalendar */
-    JCalendar jc;
+    SpinnerDateModel datetimeModel;
 
     /**
      * Default  ctor
@@ -83,33 +75,29 @@ public class DateTimePicker extends JPanel {
      * @param includeHours   true to have an hour picker
      */
     public DateTimePicker(Date date, boolean includeHours) {
-        myTimeZone = getDefaultTimeZone();
-        jc         = new JCalendar();
         Calendar calendar = getCalendar(null);
-        jc.getDayChooser().setCalendar(calendar);
-        jc.setCalendar(calendar);
-
-        dateChooser = new JDateChooser(jc, new Date(), null, null);
-        //dateChooser = new JDateChooser(jc);
         setLayout(new BorderLayout());
 
-
-        // Create a date spinner that controls the hours
-        timeModel = new SpinnerDateModel(calendar.getTime(), null, null,
+        datetimeModel = new SpinnerDateModel(calendar.getTime(), null, null,
                                          Calendar.HOUR_OF_DAY);
-        javax.swing.JSpinner spinner = new javax.swing.JSpinner(timeModel);
-        javax.swing.JSpinner.DateEditor editor =
-            new javax.swing.JSpinner.DateEditor(spinner, "HH:mm");
-        spinner.setEditor(editor);
-        JComponent timeComp;
+        javax.swing.JSpinner spinner = new javax.swing.JSpinner(datetimeModel);
+        DateEditor           editor;
         if (includeHours) {
-            timeComp = GuiUtils.hbox(spinner,
-                                     new JLabel(" "
-                                         + TimeZone.getDefault().getID()), 5);
+            editor = new DateEditor(spinner, "yyyy-MM-dd HH:mm");
         } else {
-            timeComp = new JLabel(" " + TimeZone.getDefault().getID());
+            editor = new DateEditor(spinner, "yyyy-MM-dd");
         }
-        add(BorderLayout.CENTER, GuiUtils.hbox(dateChooser, timeComp));
+
+        spinner.setEditor(editor);
+        SimpleDateFormat format =
+            ((DateEditor) spinner.getEditor()).getFormat();
+        format.setTimeZone(
+            TimeZone.getTimeZone(TimeZone.getTimeZone("GMT").getID()));
+
+        JPanel timeComp = GuiUtils.hbox(spinner, new JLabel(" "
+                              + getDefaultTimeZone().getID()), 5);
+
+        add(BorderLayout.CENTER, timeComp);
         if (date != null) {
             setDate(date);
         }
@@ -143,14 +131,14 @@ public class DateTimePicker extends JPanel {
      * @return  the date
      */
     public Date getDate() {
-        Date     d  = dateChooser.getDate();
+        Date     d  = datetimeModel.getDate();
         Calendar c0 = getCalendar(d);
         Calendar c1 = new GregorianCalendar(c0.get(Calendar.YEAR),
                                             c0.get(Calendar.MONTH),
                                             c0.get(Calendar.DAY_OF_MONTH));
 
-        if (timeModel != null) {
-            Date     time    = timeModel.getDate();
+        if (datetimeModel != null) {
+            Date     time    = datetimeModel.getDate();
             Calendar timeCal = getCalendar(time);
             c1.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
             c1.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
@@ -181,8 +169,6 @@ public class DateTimePicker extends JPanel {
      * @param d  the new Date
      */
     public void setDate(Date d) {
-        Calendar c = getCalendar(d);
-        dateChooser.setDate(c.getTime());
-        timeModel.setValue(d);
+        datetimeModel.setValue(d);
     }
 }
