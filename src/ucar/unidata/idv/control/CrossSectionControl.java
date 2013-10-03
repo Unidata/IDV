@@ -1020,17 +1020,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     private Component doMakeVerticalRangeWidget() {
 
-    /*
-        Range r = getVerticalAxisRange();
-        if (r == null) {
-            try {
-                r = getRange();
-            } catch (Exception e) {}
-        }
-        rangeLabel = new JLabel("  Range: " + ((r != null)
-                ? r.toString()
-                : "     "));
-   */
         rangeLabel = new JLabel("  Range: ");
 
         rdButton = new JButton("Change");
