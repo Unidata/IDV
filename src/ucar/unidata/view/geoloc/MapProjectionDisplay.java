@@ -442,6 +442,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         if (latScale != null) {
             latScale.setVisible(getLatScaleInfo().isVisible());
+            latScale.setLabelRelief(getLatScaleInfo().isLabelRelief());
 
             updateLatScale(latScale);
         }
@@ -586,6 +587,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         if (lonScale != null) {
             lonScale.setVisible(getLonScaleInfo().isVisible());
+            lonScale.setLabelRelief(getLonScaleInfo().isLabelRelief());
 
             if (isSouthPole()) {
                 updateSouthPoleLonScale(lonScale);
@@ -635,8 +637,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    topLat     = calcLatTop();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base =
-            Misc.parseNumber(getLatScaleInfo().getBaseLabel());
+        double       base = Misc.parseNumber(getLatScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLatScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
@@ -694,10 +695,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    leftLon         = calcLonBase();
         double                    rightLon        = calcLonTop();
         boolean                   isMeridianCross = leftLon > rightLon;
-        Hashtable<Double, String> labelTable = new Hashtable<Double,
+        Hashtable<Double, String> labelTable      = new Hashtable<Double,
                                                    String>();
-        double       base =
-            Misc.parseNumber(getLonScaleInfo().getBaseLabel());
+        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
@@ -773,8 +773,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    bottomLat  = calcLatBase();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base =
-            Misc.parseNumber(getLonScaleInfo().getBaseLabel());
+        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
@@ -996,7 +995,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         setDisplayInactive();
 
         double[] zRange = zMap.getRange();
-        String title = verticalParameter.getName() + "("
+        String   title  = verticalParameter.getName() + "("
                        + verticalRangeUnit.getIdentifier() + ")";
 
         updateVertScale(verticalScale, title, zRange, minVerticalRange,
@@ -1510,7 +1509,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws  VisADException         Couldn't create necessary VisAD object
      * @throws  RemoteException        Couldn't create a remote object
      */
-    public void setMapProjection(MapProjection mapProjection) 
+    public void setMapProjection(MapProjection mapProjection)
             throws VisADException, RemoteException {
         setMapProjection(mapProjection, true);
     }
@@ -1520,13 +1519,14 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      *
      * @param  mapProjection   map projection coordinate system
      *
-     * @param  resetDisplayProjMatrix  yes/no change the current VisAD Display projection matrix 
+     * @param  resetDisplayProjMatrix  yes/no change the current VisAD Display projection matrix
      *                                 when the map projection is changed.
      *
      * @throws  VisADException         Couldn't create necessary VisAD object
      * @throws  RemoteException        Couldn't create a remote object
      */
-    public void setMapProjection(MapProjection mapProjection, boolean resetDisplayProjMatrix)
+    public void setMapProjection(MapProjection mapProjection,
+                                 boolean resetDisplayProjMatrix)
             throws VisADException, RemoteException {
         if (mapProjection.equals(this.mapProjection)) {
             return;
@@ -1642,7 +1642,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             xy        = coordinateSystem.toReference(xy);
             values[0] = xy[0];
             values[1] = xy[1];
-            xyRegion =
+            xyRegion  =
                 new Gridded2DSet(RealTupleType.SpatialCartesian2DTuple,
                                  values, 2);
         } else {
@@ -1860,10 +1860,10 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             // to be equal to the range of the projection if the
             // X coordinate is approximately equal to Longitude.
             // For now, this is only LatLonProjections and TrivalMP's
-            double minLon    = -360;
-            double maxLon    = 360.;
-            double centerLon = 0;
-            MapProjection mp =
+            double        minLon    = -360;
+            double        maxLon    = 360.;
+            double        centerLon = 0;
+            MapProjection mp        =
                 ((MapProjection3DAdapter) coordinateSystem)
                     .getMapProjection();
             boolean isLatLon = false;
@@ -2017,8 +2017,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
         // TODO: java2d
         // if(true) return;
-        VisADRay ray = getRay(x, y);
-        EarthLocation el = getEarthLocation(ray.position[0], ray.position[1],
+        VisADRay      ray = getRay(x, y);
+        EarthLocation el  = getEarthLocation(ray.position[0], ray.position[1],
                                             ray.position[2]);
 
         updateLocation(el);
@@ -2167,25 +2167,26 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws VisADException     VisAD problem
      */
     private void resetMapParameters() throws VisADException, RemoteException {
-       resetMapParameters(true);
+        resetMapParameters(true);
     }
 
 
     /**
      * Method called to reset all the map parameters after a change.
      *
-     * @param resetDisplayProjMatrix   yes/no change the current VisAD Display projection matrix 
+     * @param resetDisplayProjMatrix   yes/no change the current VisAD Display projection matrix
      *                                 when the map projection is changed.
      *
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    private void resetMapParameters(boolean resetDisplayProjMatrix) throws VisADException, RemoteException {
+    private void resetMapParameters(boolean resetDisplayProjMatrix)
+            throws VisADException, RemoteException {
         setDisplayInactive();
         setDisplayTypes();
         if (resetDisplayProjMatrix) {
-           resetProjection();  // make it the right size
-           setAspect();
+            resetProjection();  // make it the right size
+            setAspect();
         }
         makeLatScales();
         makeLonScales();
@@ -2466,7 +2467,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             super(Display.DisplaySpatialCartesianTuple,
                   new Unit[] { CommonUnit.degree,
                                CommonUnit.degree, null });
-            this.mapProjection = mapProjection;
+            this.mapProjection       = mapProjection;
             this.theCoordinateSystem =
                 new CachingCoordinateSystem(this.mapProjection);
             latIndex = mapProjection.getLatitudeIndex();

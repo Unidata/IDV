@@ -6,9 +6,9 @@ ucar.  (Unless overwritten by a calling ant process or by a command line
 argument -Dfoo=bar) -->
 
 
-<project basedir="../../../../" default="example" name="ExampleIdv">
+<project basedir="../../../../../" default="example" name="ExampleIdv">
 
-    <import file="../../../build.xml"/>
+    <import file="../../../../../build.xml"/>
 
     <target name="example" depends="init">
         <javac

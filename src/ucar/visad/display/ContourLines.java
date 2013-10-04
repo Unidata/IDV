@@ -20,17 +20,21 @@
 
 package ucar.visad.display;
 
-
-import ucar.unidata.beans.*;
+import java.rmi.RemoteException;
 
 import ucar.unidata.util.ContourInfo;
 
-import visad.*;
-
-import java.rmi.RemoteException;
-
-import java.util.Iterator;
-
+import visad.BadMappingException;
+import visad.ContourControl;
+import visad.Display;
+import visad.GraphicsModeControl;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.Unit;
+import visad.VisADException;
 
 /**
  * Provides support for a Displayable that comprises a set of contour lines.
@@ -85,6 +89,7 @@ import java.util.Iterator;
  * @author Steven R. Emmerson
  * @version $Revision: 1.30 $
  */
+
 public abstract class ContourLines extends LineDrawing {
 
     /**
@@ -145,14 +150,16 @@ public abstract class ContourLines extends LineDrawing {
     private volatile double labelFactor = 1.;
 
     /** label frequency */
-    private volatile int labelFreq = 1;
+    private volatile int labelFreq = ContourControl.LABEL_FREQ_LO;
+    
+    /** label every Nth line */
+    private volatile int labelSkip = ContourControl.EVERY_NTH_DEFAULT;
 
     /** label font */
     private volatile Object labelFont = null;
 
     /** label alignment */
     private boolean alignLabels = true;
-
 
     /**
      * The {@link visad.Unit} for the display.
@@ -171,6 +178,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
+    
     public ContourLines(String name, RealType contourRealType)
             throws VisADException, RemoteException {
 
@@ -192,6 +200,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
+    
     public ContourLines(ContourLines that)
             throws VisADException, RemoteException {
 
@@ -215,6 +224,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
+    
     protected void setContourRealType(RealType realType)
             throws RemoteException, VisADException {
 
@@ -231,6 +241,7 @@ public abstract class ContourLines extends LineDrawing {
      * @return                  The RealType of the contoured parameter.  May
      *                          be <code>null</code>.
      */
+    
     public RealType getContourRealType() {
         return contourRealType;
     }
@@ -243,6 +254,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
+    
     protected void setRange(float min, float max)
             throws RemoteException, VisADException {
 
@@ -263,6 +275,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException  Java RMI failure.
      * @see #CONTOUR_LEVELS
      */
+    
     public final void setContourLevels(ContourLevels contourLevels)
             throws RemoteException, VisADException {
 
@@ -291,6 +304,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException  Java RMI failure.
      * @see #CONTOUR_LEVELS
      */
+    
     public final void setContourInterval(float inter, float base, float min,
                                          float max)
             throws RemoteException, VisADException {
@@ -311,6 +325,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException  Java RMI failure.
      * @see #CONTOUR_LEVELS
      */
+    
     public final void setContourInterval(float inter, float base, float min,
                                          float max, boolean dash)
             throws RemoteException, VisADException {
@@ -331,9 +346,6 @@ public abstract class ContourLines extends LineDrawing {
         }
         */
 
-        //System.out.println("           ContourLiness int="+inter+"  base="+base+
-        //                 "  min = "+min+"  max = "+max); 
-
         setContourLevels(new RegularContourLevels(inter, base, min, max,
                 dash));
     }
@@ -348,9 +360,10 @@ public abstract class ContourLines extends LineDrawing {
      * <code>super.setScalarMaps(ScalarMapSet)</code>.
      * @param maps              The set of ScalarMap-s to be added.
      * @throws BadMappingException      The RealType of the contour parameter
-     *                          has not been set or its ScalarMap is alread in
+     *                          has not been set or its ScalarMap is already in
      *                          the set.
      */
+    
     protected void setScalarMaps(ScalarMapSet maps)
             throws BadMappingException {
 
@@ -369,6 +382,7 @@ public abstract class ContourLines extends LineDrawing {
      * @return          The Contour levels.  The default value is an empty
      *                  set of levels.
      */
+    
     public final ContourLevels getContourLevels() {
         return contourLevels;
     }
@@ -378,6 +392,7 @@ public abstract class ContourLines extends LineDrawing {
      * @return          The contour values.
      * @throws VisADException   VisAD failure.
      */
+    
     public final float[] getContourValues() throws VisADException {
         return contourLevels.getLevels(rangeMinimum, rangeMaximum);
     }
@@ -390,6 +405,7 @@ public abstract class ContourLines extends LineDrawing {
      * @exception VisADException   VisAD failure.
      * @exception RemoteException  Java RMI failure.
      */
+    
     public void setContourInfo(ContourInfo contourInfo)
             throws VisADException, RemoteException {
 
@@ -404,6 +420,7 @@ public abstract class ContourLines extends LineDrawing {
                 contourInfo.getDashOn()));
         setLabeling(contourInfo.getIsLabeled());
         setLabelFreq(contourInfo.getLabelFreq());
+        setLabelSkip(contourInfo.getLabelLineSkip());
         setLineWidth(contourInfo.getLineWidth());
         setDashedStyle(contourInfo.getDashedStyle());
         setFont(contourInfo.getFont(), contourInfo.getLabelSize(),
@@ -418,6 +435,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException  unable to set this
      * @throws RemoteException  unable to set this on remote display
      */
+    
     public void setColorFill(boolean yesorno)
             throws VisADException, RemoteException {
         if (yesorno != colorFill) {
@@ -436,6 +454,7 @@ public abstract class ContourLines extends LineDrawing {
      * Ask if color filled contours are enabled.
      * @return true if using color-filled contours.
      */
+    
     public boolean getColorFillEnabled() {
         return colorFill;
     }
@@ -447,6 +466,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
+    
     public final void setLabeling(boolean on)
             throws VisADException, RemoteException {
 
@@ -468,6 +488,7 @@ public abstract class ContourLines extends LineDrawing {
      * @return                  <code>true</code> if and only if the contour
      *                          lines should be labeled.
      */
+    
     public final boolean isLabeling() {
         return labeling;
     }
@@ -478,15 +499,14 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
+    
     public void setDisplayUnit(Unit unit)
             throws VisADException, RemoteException {
-        //Make sure this unit is ok
+        // Make sure this unit is ok
         checkUnit(contourRealType, unit);
         super.setDisplayUnit(unit);
         applyDisplayUnit(contourMap, contourRealType);
     }
-
-
 
     /**
      * Set the contour levels.  Assumes that the control is not null.
@@ -494,6 +514,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException  Java RMI Exception
      * @throws VisADException   Problem setting the contour levels
      */
+    
     private void setContourLevels() throws VisADException, RemoteException {
         if (contourLevels != defaultContourLevels) {
             if ((rangeMinimum != rangeMinimum)
@@ -524,6 +545,25 @@ public abstract class ContourLines extends LineDrawing {
             }
         }
     }
+    
+    /**
+     * Set the label skip
+     * @param  skip	label skip
+     *
+     * @throws RemoteException Java RMI Exception
+     * @throws VisADException Problem setting the dashed style
+     */
+
+    public void setLabelSkip(int skip)
+            throws RemoteException, VisADException {
+
+    	if (skip != labelSkip) {
+            labelSkip = skip;
+            if (contourControl != null) {
+                contourControl.setEveryNth(labelSkip);
+            }
+        }
+    }
 
     /**
      * Set the dashed style.
@@ -532,6 +572,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException Java RMI Exception
      * @throws VisADException Problem setting the dashed style
      */
+    
     public void setDashedStyle(int style)
             throws RemoteException, VisADException {
 
@@ -554,6 +595,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws RemoteException Java RMI Exception
      * @throws VisADException Problem setting the dashed style
      */
+    
     public void setFont(Object font, int size, boolean align)
             throws RemoteException, VisADException {
 
@@ -580,6 +622,7 @@ public abstract class ContourLines extends LineDrawing {
      * Set the dashed style.
      * @return  dashed line style
      */
+    
     public int getDashedStyle() {
         return dashedStyle;
     }
@@ -588,6 +631,7 @@ public abstract class ContourLines extends LineDrawing {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
+    
     private void setContourMap() throws RemoteException, VisADException {
 
         ScalarMap oldContourMap = contourMap;
@@ -596,8 +640,8 @@ public abstract class ContourLines extends LineDrawing {
             public void controlChanged(ScalarMapControlEvent event)
                     throws RemoteException, VisADException {
                 int id = event.getId();
-                if ((id == event.CONTROL_ADDED)
-                        || (id == event.CONTROL_REPLACED)) {
+                if ((id == ScalarMapEvent.CONTROL_ADDED)
+                        || (id == ScalarMapEvent.CONTROL_REPLACED)) {
                     contourControl = (ContourControl) contourMap.getControl();
                     if (contourControl != null) {
                         setContourLevels();
@@ -607,6 +651,7 @@ public abstract class ContourLines extends LineDrawing {
                         contourControl.setLabelFont(labelFont);
                         contourControl.setLabelSize(labelFactor);
                         contourControl.setLabelFreq(labelFreq);
+                        contourControl.setEveryNth(labelSkip);
                         contourControl.setAlignLabels(alignLabels);
                     }
                 }
