@@ -363,11 +363,9 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     private void initReadout(IdvWindow w) {
         if ((w != null) && (readout != null)) {
-
-            // GuiUtils.setFixedWidthFont(w.getMsgLabel());
             readout.setValueDisplay(w.getMsgLabel());
-            setReadoutFormat();
         }
+        setReadoutFormat();
     }
 
     /**
@@ -714,7 +712,7 @@ public abstract class NavigatedViewManager extends ViewManager {
     protected void verticalRangeChanged() {}
 
     /**
-     * Set the format for the curso readout
+     * Set the format for the cursor readout.
      */
     protected void setReadoutFormat() {
         if (readout != null) {
