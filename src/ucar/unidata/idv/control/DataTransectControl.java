@@ -280,6 +280,13 @@ public class DataTransectControl extends CrossSectionControl {
         ((TrackDisplayable) getVerticalCSDisplay()).setTrack(twoDData);
     }
 
+    /** return lineRange for widgets
+    *
+    */
+    public Range getLineRange() {
+      return lineRange;
+    }
+
 
     /**
      * Add an entry into the range menu
