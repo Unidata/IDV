@@ -408,6 +408,12 @@
        location="%IDVPATH%/aliases.xml"/>
   </resources>
 
+  <resources name="idv.resource.translations">
+      <resource
+          label="Translations"
+          location="%IDVPATH%/translations.xml"/>
+  </resources>
+
 <!-- Where do we find the default bundle(s) that is(are) used at start up   -->
   <resources name="idv.resource.bundles">
     <resource location="%USERPATH%/default.xidv"/>

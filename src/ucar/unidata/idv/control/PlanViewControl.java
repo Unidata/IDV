@@ -24,6 +24,8 @@ package ucar.unidata.idv.control;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
@@ -70,6 +72,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -262,11 +265,30 @@ public abstract class PlanViewControl extends GridDisplayControl {
             return null;
         }
         List result = new ArrayList();
+        
+        String dcName = getDataChoice().getName();
+        Map<Integer, String> translations =
+                getIdv().getResourceManager().
+                getTranslationsHashtable().get(dcName);
+        boolean areWeTranslating;
+        if (translations == null) {
+            areWeTranslating = false;
+        } else {
+            areWeTranslating = true;
+        }
+        
+        int samplingModeValue;
+        if (areWeTranslating) {
+            // Need to force NEAREST_NEIGHBOR we are going to convert
+            // the data value to an English meaning.  Wouldn't ever
+            // make sense to do WEIGHTED_AVERAGE for this case.
+            samplingModeValue = getSamplingModeValue(NEAREST_NEIGHBOR);
+        } else {
+            samplingModeValue = getSamplingModeValue(
+                getObjectStore().get(PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE));
+        }
         Real r = GridUtil.sampleToReal(
-                     currentSlice, el, animationValue,
-                     getSamplingModeValue(
-                         getObjectStore().get(
-                             PREF_SAMPLING_MODE, DEFAULT_SAMPLING_MODE)));
+                     currentSlice, el, animationValue, samplingModeValue);
         if (r != null) {
             ReadoutInfo readoutInfo = new ReadoutInfo(this, r, el,
                                           animationValue);
@@ -276,10 +298,17 @@ public abstract class PlanViewControl extends GridDisplayControl {
         }
 
         if ((r != null) && !r.isMissing()) {
+            
+            String formatted;
+            if (areWeTranslating) {
+                formatted = translations.get((int) r.getValue());
+            } else {
+                formatted = formatForCursorReadout(r);
+            }
 
             result.add("<tr><td>" + getMenuLabel()
                        + ":</td><td  align=\"right\">"
-                       + formatForCursorReadout(r) + ((currentLevel != null)
+                       + formatted + ((currentLevel != null)
                     ? ("@" + currentLevel)
                     : "") + "</td></tr>");
         }
