@@ -22,9 +22,11 @@ package ucar.unidata.data.imagery;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.util.LogUtil;
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.xml.XmlUtil;
 
 import visad.Data;
 import visad.DataReference;
@@ -44,6 +46,9 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -190,5 +195,8 @@ public class AddeImageDataSource extends ImageDataSource {
         }
         return newFiles;
     }
+
+
+
 
 }
