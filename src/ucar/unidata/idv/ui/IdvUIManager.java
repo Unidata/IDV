@@ -1603,6 +1603,49 @@ public class IdvUIManager extends IdvManager {
                 if ((settings != null) && (settings.size() > 0)) {
                     props.put("initialSettings", settings);
                 }
+                ViewManager vm =  getIdv().getViewManager();
+                if ((vm != null) && (vm instanceof TransectViewManager)) {
+                    DisplayControl dc =
+                        getIdv().doMakeControl("transectdrawingcontrol");
+                    // searching for the shared group map view and move the control there
+                    List    vmList = vm.getVMManager().getViewManagers();
+                    Boolean moved  = false;
+                    for (int ii = 0; ii < vmList.size(); ii++) {
+                        ViewManager vm0 = (ViewManager) vmList.get(ii);
+                        if (vm0 instanceof TransectViewManager) {
+                            String grp0 = (String) vm0.getShareGroup();
+                            if (vm0.getShareViews() && (grp0 != null)) {
+                                for (int j = 0; j < vmList.size(); j++) {
+                                    ViewManager vm1 = (ViewManager) vmList.get(j);
+                                    if (vm1 instanceof MapViewManager) {
+                                        String grp1 =
+                                                (String) vm1.getShareGroup();
+                                        if (grp0.equals(grp1) && (j != ii)) {
+                                            dc.moveTo(vm1);
+                                            moved = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ( !moved) {
+                        if (dc.getDefaultViewManager() != null) {
+                            dc.moveTo(dc.getDefaultViewManager());
+                        } else {
+                            List vms = vm.getVMManager().getViewManagers();
+                            for (int ii = 0; ii < vms.size(); ii++) {
+                                ViewManager mvm = (ViewManager) vms.get(ii);
+                                if (mvm instanceof MapViewManager) {
+                                    dc.moveTo(mvm);
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                }
                 getIdv().doMakeControl(Misc.newList(dataChoice), cd, props,
                                        dataSelection);
             }
