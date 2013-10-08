@@ -75,6 +75,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 
 
@@ -487,6 +488,10 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
 
     /** System transect objects */
     private List nonLocalTransects;
+
+    public static boolean hasInitializedTranslations = false;
+    public static Map<String, Map<Integer,String>> translationTables = 
+            new Hashtable<String, Map<Integer, String>>();
 
 
     /**
@@ -1885,5 +1890,29 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
         return displaySettingsTimestamp;
     }
 
+    public Map<String, Map<Integer, String>> getTranslationsHashtable() {
+        if (!hasInitializedTranslations) {
+            // read in XML
+            Element root = getIdv().getResourceManager()
+                .getXmlResources(IdvResourceManager.RSC_TRANSLATIONS).getRoot(0);
+            // loop through datasources list, using "name" attribute as hashtable key
+            List datachoices = XmlUtil.findChildren(root, "datachoice");
+            for (int i = 0; i < datachoices.size(); i++) {
+                Element dataSource = (Element) datachoices.get(i);
+                String dataSourceName = XmlUtil.getAttribute(dataSource, "name");
+                List cases = XmlUtil.findChildren(dataSource, "case");
+                Hashtable<Integer, String> translations = new Hashtable<Integer, String>();
+                for (int j = 0; j < cases.size(); j++) {
+                    Element child = (Element) cases.get(j);
+                    String value = XmlUtil.getAttribute(child, "value");
+                    String translation = XmlUtil.getAttribute(child, "translation");
+                    translations.put(Integer.parseInt(value), translation);
+                }
+                translationTables.put(dataSourceName, translations);
+            }
+        }
+        hasInitializedTranslations = true;
+        return translationTables;
+    }
 
 }

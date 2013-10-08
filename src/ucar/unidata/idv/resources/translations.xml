@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <cursor_readout_translations>
-    <datasource name="nexrad hydrometeor classification">
+    <datachoice name="7_Band16_HC">
         <case value="0" translation="SNR&lt;Threshold" />
         <case value="10" translation="Biological" />
         <case value="20" translation="AP/Ground Clutter" />
@@ -15,5 +15,5 @@
         <case value="140" translation="Unknown Type" />
         <case value="150" translation="RF" />
         <!--<case value="default" translation="No translation available" />-->
-    </datasource>
+    </datachoice>
 </cursor_readout_translations>

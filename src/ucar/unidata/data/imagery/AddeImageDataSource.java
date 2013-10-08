@@ -61,9 +61,6 @@ import org.w3c.dom.Element;
 
 public class AddeImageDataSource extends ImageDataSource {
 
-    public static boolean hasInitializedTranslations = false;
-    public static Map<String, Map<Integer,String>> translationTables = 
-            new Hashtable<String, Map<Integer, String>>();
 
     /**
      *  The parameterless ctor unpersisting.
@@ -199,51 +196,7 @@ public class AddeImageDataSource extends ImageDataSource {
         return newFiles;
     }
 
-    public Map<String, Map<Integer, String>> getStringForDataValueHashtable(String dataChoiceName) {
-        if (!hasInitializedTranslations) {
-            // read in XML
-            Element root = getIdv().getResourceManager()
-                .getXmlResources(IdvResourceManager.RSC_TRANSLATIONS).getRoot(0);
-            // loop through datasources list, using "name" attribute as hashtable key
-            List datasources = XmlUtil.findChildren(root, "datasource");
-            for (int i = 0; i < datasources.size(); i++) {
-                Element dataSource = (Element) datasources.get(i);
-                String dataSourceName = XmlUtil.getAttribute(dataSource, "name");
-                List cases = XmlUtil.findChildren(dataSource, "case");
-                Hashtable<Integer, String> translations = new Hashtable<Integer, String>();
-                for (int j = 0; j < cases.size(); j++) {
-                    Element child = (Element) cases.get(j);
-                    String value = XmlUtil.getAttribute(child, "value");
-                    String translation = XmlUtil.getAttribute(child, "translation");
-                    translations.put(Integer.parseInt(value), translation);
-                }
-                translationTables.put(dataSourceName, translations);
-            }
-        }
-        hasInitializedTranslations = true;
-        return translationTables;
-    }
-    
-    /**
-     * For cases where each data value has an English meaning,
-     * (e.g., quality flags).  Useful for cursor readouts.
-     * 
-     * For AddeImageDataSource, used to return a description corresponding
-     * to values of the NEXRAD L3 Hydrometeor Classification product.
-     * 
-     * @param val  the data value to translate
-     * @param dataChoiceName to determine what translation table to use
-     * @return the string translation of the data point 
-     */
-    public String getStringForDataValue(int val, String dataChoiceName) {
-        if (dataChoiceName.startsWith("7_Band16")) {
-            // this is the Hydrometeor Classification product
-            // list of codes found here:
-            // (51.2.2) http://www.roc.noaa.gov/wsr88d/PublicDocs/ICDs/2620003R.pdf
-            return getStringForDataValueHashtable(dataChoiceName).get("nexrad hydrometeor classification").get(val);
-        } else {
-            return null;
-        }
-    }
+
+
 
 }

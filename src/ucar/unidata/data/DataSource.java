@@ -591,7 +591,6 @@ public interface DataSource {
      */
     public boolean canAddCurrentName(DataChoice dataChoice);
 
-
     /**
      * Reload data.
      *
@@ -599,26 +598,6 @@ public interface DataSource {
      * @param properties the properties
      */
     public void reloadData(Object object, Hashtable properties);
-    
-    /**
-     * For cases where each data value has an English meaning,
-     * (e.g., quality flags).  Useful for cursor readouts
-     * 
-     * @param val  the data value to translae
-     * @param dataChoiceName to determine what translation table to use
-     * @return the string translation of the data point 
-     */
-    public String getStringForDataValue(int val, String dataChoiceName);
-    
-    /**
-     * Determine whether we can convert a data point to an English meaning 
-     * for a given data choice name.  Needed for cursor readout functionality
-     * so it can determine whether to force NEAREST_NEIGHBOR sampling
-     * 
-     * @param dataChoiceName to determine whether we have a string translation table
-     * @return whether we can convert a data value to an English meaning
-     */
-    public boolean hasStringForDataValue(String dataChoiceName);
 
   /**
    * Sets the default save. The idea here is the user should just be allowed to

@@ -72,6 +72,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -264,9 +265,18 @@ public abstract class PlanViewControl extends GridDisplayControl {
             return null;
         }
         List result = new ArrayList();
-        // TODO: check length of getDataSources, handle intelligently...?
-        DataSource ds = (DataSource) getDataSources().get(0);
-        boolean areWeTranslating = ds.hasStringForDataValue(getDataChoice().getName());
+        
+        String dcName = getDataChoice().getName();
+        Map<Integer, String> translations =
+                getIdv().getResourceManager().
+                getTranslationsHashtable().get(dcName);
+        boolean areWeTranslating;
+        if (translations == null) {
+            areWeTranslating = false;
+        } else {
+            areWeTranslating = true;
+        }
+        
         int samplingModeValue;
         if (areWeTranslating) {
             // Need to force NEAREST_NEIGHBOR we are going to convert
@@ -291,8 +301,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             
             String formatted;
             if (areWeTranslating) {
-                formatted = ds.getStringForDataValue(
-                        (int) r.getValue(), getDataChoice().getName());
+                formatted = translations.get((int) r.getValue());
             } else {
                 formatted = formatForCursorReadout(r);
             }
