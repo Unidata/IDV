@@ -2450,14 +2450,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean isInTransectView() {
         ViewManager vm = getViewManager();
         if ((vm != null) && (vm instanceof TransectViewManager)) {
-            List tdcList =
+         /*   List tdcList =
                 getIdv().getVMManager().findTransectDrawingControls();
             if (tdcList.size() == 0) {
                 // ViewPanelImpl.VMInfo vmInfos = vm.get
                 DisplayControl dc =
-                    vm.getIdv().doMakeControl("transectdrawingcontrol");
+                    getIdv().doMakeControl("transectdrawingcontrol");
                 vm.getIdv().addDisplayControl(dc);
-                // searching for the shared group map view and move the control there 
+               // searching for the shared group map view and move the control there
                 List    vmList = vm.getVMManager().getViewManagers();
                 Boolean moved  = false;
                 for (int i = 0; i < vmList.size(); i++) {
@@ -2495,7 +2495,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     }
 
                 }
-            }
+            }   */
             return true;
         }
         return false;
