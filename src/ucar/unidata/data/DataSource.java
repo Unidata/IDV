@@ -591,7 +591,6 @@ public interface DataSource {
      */
     public boolean canAddCurrentName(DataChoice dataChoice);
 
-
     /**
      * Reload data.
      *

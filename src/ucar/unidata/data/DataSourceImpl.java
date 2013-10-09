@@ -4069,7 +4069,6 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         return this.everChangedName;
     }
 
-
     /**
      * {@inheritDoc}
      */

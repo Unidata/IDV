@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<cursor_readout_translations>
+    <datachoice name="7_Band16_HC">
+        <case value="0" translation="SNR&lt;Threshold" />
+        <case value="10" translation="Biological" />
+        <case value="20" translation="AP/Ground Clutter" />
+        <case value="30" translation="Ice Crystals" />
+        <case value="40" translation="Dry Snow" />
+        <case value="50" translation="Wet Snow" />
+        <case value="60" translation="Light-Moderate Rain" />
+        <case value="70" translation="Heavy Rain" />
+        <case value="80" translation="Big Drops Rain" />
+        <case value="90" translation="Graupel" />
+        <case value="100" translation="Hail, Possibly With Rain" />
+        <case value="140" translation="Unknown Type" />
+        <case value="150" translation="RF" />
+        <!--<case value="default" translation="No translation available" />-->
+    </datachoice>
+</cursor_readout_translations>
