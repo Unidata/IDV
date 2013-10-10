@@ -205,6 +205,8 @@ public class NavigatedMapPanel extends JPanel {
                              AreaFile af) {
         init(defaultMaps, makeNavToolBar, makeMoveToolBar);
         this.preview_image = preview_image;
+        Renderer mapRender = new ucar.unidata.gis.worldmap.WorldMap();
+        addMapRenderer(mapRender);
         try {
             //AreaFile af = new AreaFile(preview_image_source);
             AREACoordinateSystem acs = null;
@@ -260,7 +262,17 @@ public class NavigatedMapPanel extends JPanel {
      * @return The map panel
      */
     protected NavigatedPanel doMakeMapPanel() {
-        return new NavigatedPanel();
+        return new NavigatedPanel() {
+
+            public void resetZoom() {
+                NavigatedPanel np = getNavigatedPanel();
+                ProjectionRect rect =
+                        new ProjectionRect(project.getDefaultMapArea());
+                np.setMapArea(rect);
+
+                drawG();
+            }
+        };
     }
 
 
