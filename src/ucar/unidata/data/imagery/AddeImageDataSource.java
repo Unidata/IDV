@@ -401,8 +401,8 @@ public class AddeImageDataSource extends ImageDataSource {
                     //         (int) rect.getHeight()) - 1;
                     lineMag = eleMag / elFactor;
                 } else {
-                    eleMag  = Math.abs(eMag);
-                    lineMag = Math.abs(lMag);
+                    eleMag  = Math.abs(deMag);
+                    lineMag = Math.abs(dlMag);
                 }
 
                 System.out.println(
