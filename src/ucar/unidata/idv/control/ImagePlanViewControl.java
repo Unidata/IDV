@@ -33,6 +33,7 @@ import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.adde.AddeImageChooser;
 import ucar.unidata.util.*;
 
+import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
@@ -117,10 +118,16 @@ public class ImagePlanViewControl extends PlanViewControl {
         */
         //gridDisplay.setUseRGBTypeForSelect(true);
         addAttributedDisplayable(gridDisplay);
-        MapProjectionDisplay mpd =
-                  (MapProjectionDisplay) getNavigatedDisplay();
-        RubberBandBox rbb =  mpd.getRubberBandBox();
-        rbb.reSetBounds();
+        if(!inGlobeDisplay()) {
+            MapProjectionDisplay mpd =
+                      (MapProjectionDisplay) getNavigatedDisplay();
+            RubberBandBox rbb =  mpd.getRubberBandBox();
+            rbb.reSetBounds();
+        } else { //now in globe display
+            GlobeDisplay gd =  (GlobeDisplay)getNavigatedDisplay();
+            RubberBandBox rbb = gd.getRubberBandBox();
+            rbb.reSetBounds();
+        }
         return gridDisplay;
     }
 
