@@ -205,8 +205,8 @@ public class NavigatedMapPanel extends JPanel {
                              AreaFile af) {
         init(defaultMaps, makeNavToolBar, makeMoveToolBar);
         this.preview_image = preview_image;
-        Renderer mapRender = new ucar.unidata.gis.worldmap.WorldMap();
-        addMapRenderer(mapRender);
+        //Renderer mapRender = new ucar.unidata.gis.worldmap.WorldMap();
+        //addMapRenderer(mapRender);
         try {
             //AreaFile af = new AreaFile(preview_image_source);
             AREACoordinateSystem acs = null;

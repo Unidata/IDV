@@ -28,6 +28,7 @@ import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
 import ucar.unidata.util.Debug;
 
+import javax.naming.NameNotFoundException;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.RenderingHints;
@@ -136,7 +137,9 @@ public abstract class GisFeatureRenderer
         while (siter.hasNext()) {
             Shape       s           = (Shape) siter.next();
             Rectangle2D shapeBounds = s.getBounds2D();
-            if (shapeBounds.intersects(clipRect)) {
+            // if shapeBounds contains NaN, then just draw it
+            if (shapeBounds.intersects(clipRect)
+                    || shapeBounds.getMaxX() != shapeBounds.getMaxX()) {
                 g.draw(s);
             }
         }
