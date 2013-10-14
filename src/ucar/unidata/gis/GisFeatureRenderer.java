@@ -138,8 +138,7 @@ public abstract class GisFeatureRenderer
             Shape       s           = (Shape) siter.next();
             Rectangle2D shapeBounds = s.getBounds2D();
             // if shapeBounds contains NaN, then just draw it
-            if (shapeBounds.intersects(clipRect)
-                    || shapeBounds.getMaxX() != shapeBounds.getMaxX()) {
+            if (shapeBounds.intersects(clipRect)){
                 g.draw(s);
             }
         }
