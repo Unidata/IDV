@@ -147,10 +147,12 @@ public abstract class AbstractGisFeature implements GisFeature {
                     }
                 }
 
-                if ((i == 0) || displayProject.crossSeam(pt, lastW)) {
-                    path.moveTo((float) pt.getX(), (float) pt.getY());
-                } else {
-                    path.lineTo((float) pt.getX(), (float) pt.getY());
+                if(pt.getX() == pt.getX()) {
+                    if ((i == 0) || displayProject.crossSeam(pt, lastW) || lastW.x != lastW.x) {
+                        path.moveTo((float) pt.getX(), (float) pt.getY());
+                    } else {
+                        path.lineTo((float) pt.getX(), (float) pt.getY());
+                    }
                 }
 
                 lastW.setLocation(pt);
