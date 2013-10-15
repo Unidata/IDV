@@ -270,7 +270,7 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
     protected void timeChanged(Real time) {
         try {
             super.timeChanged(time);
-            dataNode.setTime(new DateTime(time));
+            if (time != null) dataNode.setTime(new DateTime(time));
             if (getProfilesVisibility()) {
                 AnimationWidget aniWidget = this.getAnimationWidget();
                 int idx = 0;
