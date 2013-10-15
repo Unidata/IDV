@@ -310,6 +310,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
         GuiUtils.makeMouseOverBorder(evalBtn);
         evalBtn.setToolTipText("Save and Evaluate Formula");
 
+
         formulaField = new JTextField(formula, 25);
         formulaField.setToolTipText(
             "<html>Right-click to add procedures from library</html>");
@@ -332,7 +333,11 @@ public class FormulaDialog extends JFrame implements ActionListener {
         });
 
         nameField   = new JTextField(name, 25);
+        nameField.setToolTipText(
+                "<html>Name is used with the parameter defaults</html>");
         descField   = new JTextField(description, 25);
+        descField.setToolTipText(
+                "<html>The description is shown in Field Selector</html>");
         categoryBox = new JComboBox();
         categoryBox.setEditable(true);
         categoryBox.addItem("");
@@ -610,13 +615,13 @@ public class FormulaDialog extends JFrame implements ActionListener {
         advancedIconBtn.addActionListener(advancedListener);
         
         JLabel descriptionLabel = GuiUtils.rLabel("Description: ");
-        JLabel idLabel = GuiUtils.rLabel("ID: ");
+        JLabel idLabel = GuiUtils.rLabel("Name: ");
         JLabel formulaLabel = GuiUtils.rLabel("Formula: ");
         
         descriptionLabel.setToolTipText("The description is shown in Field Selector");
-        idLabel.setToolTipText("ID is used with the parameter defaults");
+        idLabel.setToolTipText("Name is used with the parameter defaults");
         formulaLabel.setToolTipText("Mathematical formula to be used");
-        
+               
         GuiUtils.tmpInsets = new Insets(4, 4, 0, 4);
             Container topPanel = GuiUtils.doLayout(new Component[] {
             descriptionLabel, descField,
@@ -1111,7 +1116,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
         	if (((descField.getText() == null) || (descField.getText().isEmpty())) ||
         	((nameField.getText() == null) || (nameField.getText().isEmpty())) ||
         	((formulaField.getText() == null) || (formulaField.getText().isEmpty()))) {
-        		JOptionPane.showMessageDialog(this, "Values for Description, ID and Forumla must be entered");
+        		JOptionPane.showMessageDialog(this, "Values for Description, Name and Forumla must be entered");
         	}
         	else {
         		if (addOrChange()) {
@@ -1125,7 +1130,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
         	if (((descField.getText() == null) || (descField.getText().isEmpty())) ||
         	((nameField.getText() == null) || (nameField.getText().isEmpty())) ||
         	((formulaField.getText() == null) || (formulaField.getText().isEmpty()))) {
-        		JOptionPane.showMessageDialog(this, "Values for Description, ID and Forumla must be entered");
+        		JOptionPane.showMessageDialog(this, "Values for Description, Name and Forumla must be entered");
         	}
         	else {
         		if (addOrChange()) {
