@@ -12359,7 +12359,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             double[][] xyPoints) {
         ucar.unidata.geoloc.LatLonPoint[] latlonPoints =
             new ucar.unidata.geoloc.LatLonPoint[xyPoints[0].length];
+
+        if(inGlobeDisplay()) {
+            for (int i = 0; i < xyPoints.length; i++) {
+                latlonPoints[i] =
+                        new LatLonPointImpl(xyPoints[0][i], xyPoints[1][i]);
+            }
+            return latlonPoints;
+        }
+
         NavigatedDisplay navDisplay = getMapDisplay();
+
         for (int i = 0; i < xyPoints.length; i++) {
             EarthLocation llpoint =
                 navDisplay.getEarthLocation(xyPoints[0][i], xyPoints[1][i],
@@ -12367,7 +12377,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             latlonPoints[i] =
                 new LatLonPointImpl(llpoint.getLatitude().getValue(),
                                     llpoint.getLongitude().getValue());
-
         }
 
         return latlonPoints;
@@ -12379,10 +12388,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return _more_
      */
     public boolean isRubberBandBoxChanged() {
+        RubberBandBox rubberBandBox = null;
+        if(!inGlobeDisplay()) {
+            MapProjectionDisplay mpd =
+                (MapProjectionDisplay) getNavigatedDisplay();
+            rubberBandBox = mpd.getRubberBandBox();
+        } else {
+            GlobeDisplay gd =  (GlobeDisplay)getNavigatedDisplay();
+            rubberBandBox = gd.getRubberBandBox();
+        }
 
-        MapProjectionDisplay mpd =
-            (MapProjectionDisplay) getNavigatedDisplay();
-        RubberBandBox rubberBandBox = mpd.getRubberBandBox();
         float[]       boundHi       = rubberBandBox.getBounds().getHi();
 
         if ((boundHi[0] == 0) && (boundHi[1] == 0)) {
