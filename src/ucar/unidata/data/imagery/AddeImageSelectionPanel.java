@@ -23,45 +23,28 @@ package ucar.unidata.data.imagery;
 
 import edu.wisc.ssec.mcidas.AREAnav;
 import edu.wisc.ssec.mcidas.AreaDirectory;
-import edu.wisc.ssec.mcidas.AreaFile;
 import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
-import ucar.unidata.idv.ui.IdvUIManager;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.view.geoloc.NavigatedMapPanel;
 
 import ucar.unidata.view.geoloc.NavigatedPanel;
-
-import ucar.visad.MapProjectionProjection;
-import ucar.visad.display.RubberBandBox;
 
 import visad.*;
 
 import visad.data.mcidas.AREACoordinateSystem;
-import visad.data.mcidas.AreaAdapter;
-import visad.data.mcidas.BaseMapAdapter;
 
 import visad.georef.MapProjection;
-import visad.georef.NavigatedCoordinateSystem;
 
 import java.awt.*;
-import java.awt.List;
 import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.BufferedImage;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 import java.io.IOException;
-
-import java.rmi.RemoteException;
 
 import java.text.ParseException;
 
@@ -261,7 +244,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     JPanel sizePanel;
 
     /** _more_ */
-    AddeImageDataSource.ImagePreviewSelection region;
+    AddeImagePreviewPanel region;
 
     /** _more_ */
     boolean isFromRegionUpdate = false;
@@ -335,11 +318,11 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
      * @throws ParseException _more_
      * @throws VisADException _more_
      */
-    AddeImageSelectionPanel(AddeImageDataSource dataSource, DataChoice dc,
+    public AddeImageSelectionPanel(AddeImageDataSource dataSource, DataChoice dc,
                             String source, AREAnav baseAnav,
                             AddeImageDescriptor descriptor,
                             MapProjection sample,
-                            AddeImageDataSource.ImagePreviewSelection region)
+                            AddeImagePreviewPanel region)
             throws IOException, ParseException, VisADException {
 
         super("Advanced");

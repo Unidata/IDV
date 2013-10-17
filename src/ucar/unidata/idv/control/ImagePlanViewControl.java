@@ -21,24 +21,16 @@
 package ucar.unidata.idv.control;
 
 
-import edu.wisc.ssec.mcidas.*;
-import edu.wisc.ssec.mcidas.adde.AddeImageURL;
-
 import ucar.unidata.data.*;
-import ucar.unidata.data.grid.DerivedGridFactory;
 import ucar.unidata.data.imagery.*;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.idv.MapViewManager;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.chooser.adde.AddeImageChooser;
 import ucar.unidata.util.*;
 
 import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
-import ucar.visad.data.AreaImageFlatField;
-import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
 
@@ -46,28 +38,14 @@ import ucar.visad.display.RubberBandBox;
 
 import visad.*;
 
-import visad.data.mcidas.AREACoordinateSystem;
-
 import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-import visad.georef.MapProjection;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.geom.Rectangle2D;
-
-import java.awt.image.BufferedImage;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
-
-
-import javax.swing.*;
 
 
 /**
@@ -164,13 +142,13 @@ public class ImagePlanViewControl extends PlanViewControl {
         boolean hasConner = false;
         if (dsImpl instanceof AddeImageDataSource) {
             AddeImageDataSource aImageDS = (AddeImageDataSource) dsImpl;
-            AddeImageDataSource.ImagePreviewSelection regionSelection =
-                aImageDS.previewSelection;
+            AddeImagePreviewPanel regionSelection =
+                aImageDS.getPreviewSelection();
             AddeImageSelectionPanel advanceSelection =
-                aImageDS.advancedSelection;
+                aImageDS.getAdvancedSelection();
 
             ProjectionRect rect =
-                regionSelection.display.getNavigatedPanel()
+                regionSelection.getNavigatedMapPanel().getNavigatedPanel()
                     .getSelectedRegion();
             if ( !aImageDS.getIsReload()) {
                 isProgressiveResolution =
@@ -181,7 +159,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             //boolean isRBBChanged = isRubberBandBoxChanged();
             if (rect != null && !isRBBChanged) {
                 ProjectionImpl projectionImpl =
-                    regionSelection.display.getProjectionImpl();
+                    regionSelection.getNavigatedMapPanel().getProjectionImpl();
                 LatLonRect latLonRect =
                     projectionImpl.getLatLonBoundingBox(rect);
                 GeoLocationInfo gInfo;

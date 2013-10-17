@@ -915,12 +915,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * _more_
      */
-    boolean isProgressiveResolution = false;
+    public boolean isProgressiveResolution = false;
 
     /**
      * _more_
      */
-    protected Gridded2DSet last2DSet = null;
+    public Gridded2DSet last2DSet = null;
 
     public boolean isRBBChanged = false;
     /**
@@ -12448,4 +12448,24 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             boolean canDoProgressiveResolution) {
         this.canDoProgressiveResolution = canDoProgressiveResolution;
     }
+
+
+    public boolean getIsProgressiveResolution(){
+        return this.isProgressiveResolution;
+    }
+
+    public void setIsProgressiveResolution(boolean  isPG){
+        this.isProgressiveResolution = isPG;
+    }
+    /**
+     * _more_
+     */
+    public Gridded2DSet getLast2DSet(){
+        return this.last2DSet;
+    }
+
+    public void setLast2DSet(Gridded2DSet g2s){
+        this.last2DSet = g2s;
+    }
+
 }

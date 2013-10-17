@@ -207,7 +207,7 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
      * @param imageSource   ADDE URL
      * @return  corresponding image metadata
      */
-    private AreaDirectory processSourceAsAddeUrl(String imageSource) {
+    protected AreaDirectory processSourceAsAddeUrl(String imageSource) {
         int imageDataIndex = imageSource.indexOf("imagedata?");
         int imageDirIndex  = imageSource.indexOf("imagedir");
         if ((imageDataIndex <= 0) && (imageDirIndex <= 0)) {
