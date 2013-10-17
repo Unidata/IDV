@@ -1228,13 +1228,13 @@ public class AddeImageDataSource extends ImageDataSource {
     protected AddeImagePreviewPanel previewSelection;
 
     /** _more_ */
-    protected AddeImageSelectionPanel advancedSelection;
+    protected AddeImageAdvancedPanel advancedSelection;
 
     public AddeImagePreviewPanel getPreviewSelection(){
         return this.previewSelection;
     }
 
-    public AddeImageSelectionPanel getAdvancedSelection(){
+    public AddeImageAdvancedPanel getAdvancedSelection(){
         return this.advancedSelection;
     }
 
@@ -1280,7 +1280,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 previewSelection = new AddeImagePreviewPanel(this,
                         areaAdapter, source, this.descriptor, baseAnav, advancedSelection);
 
-                advancedSelection = new AddeImageSelectionPanel(this,
+                advancedSelection = new AddeImageAdvancedPanel(this,
                         dataChoice, this.source, baseAnav, this.descriptor,
                         acs, previewSelection);
             }

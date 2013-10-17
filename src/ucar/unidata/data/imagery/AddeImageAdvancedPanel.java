@@ -62,7 +62,7 @@ import javax.swing.event.ChangeListener;
  * Time: 10:36 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AddeImageSelectionPanel extends DataSelectionComponent {
+public class AddeImageAdvancedPanel extends DataSelectionComponent {
 
     /** _more_ */
     public JPanel advance;
@@ -304,7 +304,7 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
     DataChoice dataChoice;
 
     /**
-     * Construct a AddeImageSelectionPanel
+     * Construct a AddeImageAdvancedPanel
      *
      * @param dataSource _more_
      * @param dc _more_
@@ -318,11 +318,11 @@ public class AddeImageSelectionPanel extends DataSelectionComponent {
      * @throws ParseException _more_
      * @throws VisADException _more_
      */
-    public AddeImageSelectionPanel(AddeImageDataSource dataSource, DataChoice dc,
-                            String source, AREAnav baseAnav,
-                            AddeImageDescriptor descriptor,
-                            MapProjection sample,
-                            AddeImagePreviewPanel region)
+    public AddeImageAdvancedPanel(AddeImageDataSource dataSource, DataChoice dc,
+                                  String source, AREAnav baseAnav,
+                                  AddeImageDescriptor descriptor,
+                                  MapProjection sample,
+                                  AddeImagePreviewPanel region)
             throws IOException, ParseException, VisADException {
 
         super("Advanced");

@@ -84,7 +84,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
     JComboBox regionOptionLabelBox;
 
     /** _more_ */
-    AddeImageSelectionPanel advancedSelection;
+    AddeImageAdvancedPanel advancedSelection;
 
     /** _more_ */
     AREAnav baseAnav;
@@ -112,7 +112,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
                                  AreaAdapter adapter, String source,
                                  AddeImageDescriptor descriptor,
                                  AREAnav baseAnav,
-                                 AddeImageSelectionPanel advancedSelection)
+                                 AddeImageAdvancedPanel advancedSelection)
             throws IOException, ParseException, VisADException {
         super("Region");
         this.imageDataSource = imageDataSource;

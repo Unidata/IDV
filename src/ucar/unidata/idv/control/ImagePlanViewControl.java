@@ -144,7 +144,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             AddeImageDataSource aImageDS = (AddeImageDataSource) dsImpl;
             AddeImagePreviewPanel regionSelection =
                 aImageDS.getPreviewSelection();
-            AddeImageSelectionPanel advanceSelection =
+            AddeImageAdvancedPanel advanceSelection =
                 aImageDS.getAdvancedSelection();
 
             ProjectionRect rect =
