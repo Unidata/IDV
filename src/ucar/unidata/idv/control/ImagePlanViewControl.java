@@ -96,13 +96,13 @@ public class ImagePlanViewControl extends PlanViewControl {
         */
         //gridDisplay.setUseRGBTypeForSelect(true);
         addAttributedDisplayable(gridDisplay);
-        if(!inGlobeDisplay()) {
+        if ( !inGlobeDisplay()) {
             MapProjectionDisplay mpd =
-                      (MapProjectionDisplay) getNavigatedDisplay();
-            RubberBandBox rbb =  mpd.getRubberBandBox();
+                (MapProjectionDisplay) getNavigatedDisplay();
+            RubberBandBox rbb = mpd.getRubberBandBox();
             rbb.reSetBounds();
-        } else { //now in globe display
-            GlobeDisplay gd =  (GlobeDisplay)getNavigatedDisplay();
+        } else {  //now in globe display
+            GlobeDisplay  gd  = (GlobeDisplay) getNavigatedDisplay();
             RubberBandBox rbb = gd.getRubberBandBox();
             rbb.reSetBounds();
         }
@@ -136,10 +136,11 @@ public class ImagePlanViewControl extends PlanViewControl {
      */
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
+
         List dsList = new ArrayList();
         dataChoice.getDataSources(dsList);
-        DataSourceImpl dsImpl = (DataSourceImpl) dsList.get(0);
-        boolean hasConner = false;
+        DataSourceImpl dsImpl    = (DataSourceImpl) dsList.get(0);
+        boolean        hasConner = false;
         if (dsImpl instanceof AddeImageDataSource) {
             AddeImageDataSource aImageDS = (AddeImageDataSource) dsImpl;
             AddeImagePreviewPanel regionSelection =
@@ -157,63 +158,89 @@ public class ImagePlanViewControl extends PlanViewControl {
 
             String regionOption = regionSelection.getRegionOption();
             //boolean isRBBChanged = isRubberBandBoxChanged();
-            if (rect != null && !isRBBChanged) {
+            if ((rect != null) && !isRBBChanged) {
                 ProjectionImpl projectionImpl =
-                    regionSelection.getNavigatedMapPanel().getProjectionImpl();
+                    regionSelection.getNavigatedMapPanel()
+                        .getProjectionImpl();
                 LatLonRect latLonRect =
                     projectionImpl.getLatLonBoundingBox(rect);
                 GeoLocationInfo gInfo;
-                if(latLonRect.getHeight() != latLonRect.getHeight()){
+                if (latLonRect.getHeight() != latLonRect.getHeight()) {
                     //corner point outside the earth
                     hasConner = true;
-                    LatLonPointImpl cImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth()/2, rect.y + rect.getHeight()/2);
-                    LatLonPointImpl urImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth(), rect.y + rect.getHeight());
-                    LatLonPointImpl ulImpl = projectionImpl.projToLatLon(rect.x, rect.y + rect.getHeight());
-                    LatLonPointImpl lrImpl = projectionImpl.projToLatLon(rect.x + rect.getWidth(), rect.y);
-                    LatLonPointImpl llImpl = projectionImpl.projToLatLon(rect.x, rect.y);
+                    LatLonPointImpl cImpl =
+                        projectionImpl.projToLatLon(rect.x
+                            + rect.getWidth() / 2, rect.y
+                                + rect.getHeight() / 2);
+                    LatLonPointImpl urImpl =
+                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
+                            rect.y + rect.getHeight());
+                    LatLonPointImpl ulImpl =
+                        projectionImpl.projToLatLon(rect.x,
+                            rect.y + rect.getHeight());
+                    LatLonPointImpl lrImpl =
+                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
+                            rect.y);
+                    LatLonPointImpl llImpl =
+                        projectionImpl.projToLatLon(rect.x, rect.y);
 
                     double maxLat = Double.NaN;
                     double minLat = Double.NaN;
                     double maxLon = Double.NaN;
                     double minLon = Double.NaN;
-                    if(cImpl.getLatitude() != cImpl.getLatitude()) {
+                    if (cImpl.getLatitude() != cImpl.getLatitude()) {
                         //do nothing
-                    } else if(ulImpl.getLatitude() != ulImpl.getLatitude()){
-                       //upper left conner
-                        maxLat = cImpl.getLatitude() + (cImpl.getLatitude() - lrImpl.getLatitude());
+                    } else if (ulImpl.getLatitude() != ulImpl.getLatitude()) {
+                        //upper left conner
+                        maxLat = cImpl.getLatitude()
+                                 + (cImpl.getLatitude()
+                                    - lrImpl.getLatitude());
                         minLat = lrImpl.getLatitude();
                         maxLon = lrImpl.getLongitude();
-                        minLon = cImpl.getLongitude() - (lrImpl.getLongitude() - cImpl.getLongitude());
-                    } else if(urImpl.getLatitude() != urImpl.getLatitude()){
+                        minLon = cImpl.getLongitude()
+                                 - (lrImpl.getLongitude()
+                                    - cImpl.getLongitude());
+                    } else if (urImpl.getLatitude() != urImpl.getLatitude()) {
                         //upper right conner
-                        maxLat = cImpl.getLatitude() + (cImpl.getLatitude() - llImpl.getLatitude());
+                        maxLat = cImpl.getLatitude()
+                                 + (cImpl.getLatitude()
+                                    - llImpl.getLatitude());
                         minLat = llImpl.getLatitude();
-                        maxLon = cImpl.getLongitude() + (cImpl.getLongitude() - lrImpl.getLongitude());
+                        maxLon = cImpl.getLongitude()
+                                 + (cImpl.getLongitude()
+                                    - lrImpl.getLongitude());
                         minLon = lrImpl.getLongitude();
-                    } else if(llImpl.getLatitude() != llImpl.getLatitude()){
+                    } else if (llImpl.getLatitude() != llImpl.getLatitude()) {
                         // lower left conner
                         maxLat = urImpl.getLatitude();
-                        minLat = cImpl.getLatitude() - (urImpl.getLatitude() - cImpl.getLatitude() );
+                        minLat = cImpl.getLatitude()
+                                 - (urImpl.getLatitude()
+                                    - cImpl.getLatitude());
                         maxLon = urImpl.getLongitude();
-                        minLon = cImpl.getLongitude() - (urImpl.getLongitude() - cImpl.getLongitude());
-                    } else if(lrImpl.getLatitude() != lrImpl.getLatitude()){
+                        minLon = cImpl.getLongitude()
+                                 - (urImpl.getLongitude()
+                                    - cImpl.getLongitude());
+                    } else if (lrImpl.getLatitude() != lrImpl.getLatitude()) {
                         // lower right conner
                         maxLat = ulImpl.getLatitude();
-                        minLat = cImpl.getLatitude() - (ulImpl.getLatitude() - cImpl.getLatitude());
-                        maxLon = cImpl.getLongitude() + (cImpl.getLongitude() - ulImpl.getLongitude());
+                        minLat = cImpl.getLatitude()
+                                 - (ulImpl.getLatitude()
+                                    - cImpl.getLatitude());
+                        maxLon = cImpl.getLongitude()
+                                 + (cImpl.getLongitude()
+                                    - ulImpl.getLongitude());
                         minLon = ulImpl.getLongitude();
                     }
 
                     gInfo = new GeoLocationInfo(maxLat,
                             LatLonPointImpl.lonNormal(minLon), minLat,
                             LatLonPointImpl.lonNormal(maxLon));
-                    dataSelection.putProperty(
-                            DataSelection.PROP_HASSCONNER,
+                    dataSelection.putProperty(DataSelection.PROP_HASSCONNER,
                             hasConner);
                 } else {
                     gInfo = new GeoLocationInfo(latLonRect);
                 }
-                GeoSelection    gs    = new GeoSelection(gInfo);
+                GeoSelection gs = new GeoSelection(gInfo);
                 NavigatedDisplay navDisplay =
                     (NavigatedDisplay) getViewManager().getMaster();
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
@@ -232,8 +259,9 @@ public class ImagePlanViewControl extends PlanViewControl {
                 Rectangle screenBoundRect = navDisplay.getScreenBounds();
                 gs.setScreenBound(screenBoundRect);
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
-                if (dataSelection.getGeoSelection() != null && !regionSelection.getRegionOption().equals(
-                        "Use Display Area")) {
+                if ((dataSelection.getGeoSelection() != null)
+                        && !regionSelection.getRegionOption().equals(
+                            "Use Display Area")) {
                     LatLonPoint[] llp0 =
                         dataSelection.getGeoSelection()
                             .getRubberBandBoxPoints();
@@ -282,12 +310,14 @@ public class ImagePlanViewControl extends PlanViewControl {
 
         boolean result = super.setData(dataChoice);
         if ( !result) {
-            if(hasConner)
+            if (hasConner) {
                 userMessage("Selected region bounding box is not big enough");
-            else
+            } else {
                 userMessage("Selected image(s) not available");
+            }
         }
         return result;
+
     }
 
     /**

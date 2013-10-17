@@ -194,23 +194,28 @@ public class AddeImageDataSource extends ImageDataSource {
     }
 
 
+    /**
+     * _more_
+     */
     public void initAfterUnpersistence() {
-        if(this.source == null) {
-            List imageList = getImageList();
-            AddeImageDescriptor desc1 = (AddeImageDescriptor)imageList.get(0);
+        if (this.source == null) {
+            List                imageList = getImageList();
+            AddeImageDescriptor desc1 =
+                (AddeImageDescriptor) imageList.get(0);
             this.source = desc1.getSource();
-            allBandDirs  = (Hashtable)getProperties().get("allBands");
+            allBandDirs = (Hashtable) getProperties().get("allBands");
             ArrayList oj = (ArrayList) getProperties().get("bandinfo");
             this.bandId = (BandInfo) oj.get(0);
             AreaDirectory thisDir = desc1.processSourceAsAddeUrl(this.source);
-                   // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
+            // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
             this.source = getPreviewSource(this.source, thisDir);
             this.source =
-                    replaceKey(this.source, "BAND",
-                            Integer.toString(this.bandId.getBandNumber()));
+                replaceKey(this.source, "BAND",
+                           Integer.toString(this.bandId.getBandNumber()));
             this.descriptor = new AddeImageDescriptor(thisDir, null);
         }
     }
+
     /**
      * _more_
      *
@@ -429,8 +434,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 } else {
                     newelems = (int) Math.floor(elems / eleMag + 0.5);
                 }
-                System.out.println(
-                        "newLine X newElement : " + newLines  + " " + newelems);
+                System.out.println("newLine X newElement : " + newLines + " "
+                                   + newelems);
                 try {
                     descriptors = reSetImageDataDescriptor(descriptors,
                             AddeImageURL.KEY_LINEELE, locateValue, "CENTER",
@@ -503,12 +508,14 @@ public class AddeImageDataSource extends ImageDataSource {
         int    inElem    = dir[9];  //Integer.parseInt(elemStr);
         int    inLineMag = 1;  //  = Integer.parseInt(strTok1.nextToken());
         int    inElemMag = 1;  //  = Integer.parseInt(strTok1.nextToken());
-        if(aDir.getCenterLatitudeResolution() == aDir.getCenterLatitudeResolution())
+        if (aDir.getCenterLatitudeResolution()
+                == aDir.getCenterLatitudeResolution()) {
             elFactor =
                 (int) Math.ceil(aDir.getCenterLatitudeResolution()
                                 / aDir.getCenterLongitudeResolution() - 0.5);
-        else
+        } else {
             elFactor = 1;
+        }
         System.out.println("Line and element ratio = " + elFactor);
         int lineFactor = 1;
         int elemFactor = 1;
@@ -1230,11 +1237,21 @@ public class AddeImageDataSource extends ImageDataSource {
     /** _more_ */
     protected AddeImageAdvancedPanel advancedSelection;
 
-    public AddeImagePreviewPanel getPreviewSelection(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public AddeImagePreviewPanel getPreviewSelection() {
         return this.previewSelection;
     }
 
-    public AddeImageAdvancedPanel getAdvancedSelection(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public AddeImageAdvancedPanel getAdvancedSelection() {
         return this.advancedSelection;
     }
 
@@ -1278,7 +1295,8 @@ public class AddeImageDataSource extends ImageDataSource {
 
                 this.bandId = id;
                 previewSelection = new AddeImagePreviewPanel(this,
-                        areaAdapter, source, this.descriptor, baseAnav, advancedSelection);
+                        areaAdapter, source, this.descriptor, baseAnav,
+                        advancedSelection);
 
                 advancedSelection = new AddeImageAdvancedPanel(this,
                         dataChoice, this.source, baseAnav, this.descriptor,

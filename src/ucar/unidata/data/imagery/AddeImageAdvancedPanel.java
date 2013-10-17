@@ -318,8 +318,9 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
      * @throws ParseException _more_
      * @throws VisADException _more_
      */
-    public AddeImageAdvancedPanel(AddeImageDataSource dataSource, DataChoice dc,
-                                  String source, AREAnav baseAnav,
+    public AddeImageAdvancedPanel(AddeImageDataSource dataSource,
+                                  DataChoice dc, String source,
+                                  AREAnav baseAnav,
                                   AddeImageDescriptor descriptor,
                                   MapProjection sample,
                                   AddeImagePreviewPanel region)
@@ -806,7 +807,7 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         if (value >= 0) {
             return value + 1;
         }
-        return value ;
+        return value;
     }
 
 
