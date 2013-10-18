@@ -24,6 +24,7 @@ package ucar.unidata.idv.control;
 import ucar.unidata.data.*;
 import ucar.unidata.data.imagery.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.util.*;
 
@@ -136,7 +137,15 @@ public class ImagePlanViewControl extends PlanViewControl {
      */
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
-
+        boolean fromBundle = getIdv().getStateManager().getProperty(
+                IdvConstants.PROP_LOADINGXML, false);
+        if(fromBundle){
+            boolean result = super.setData(dataChoice);
+            if ( !result) {
+                userMessage("Selected image(s) not available");
+            }
+            return result;
+        }
         List dsList = new ArrayList();
         dataChoice.getDataSources(dsList);
         DataSourceImpl dsImpl    = (DataSourceImpl) dsList.get(0);
