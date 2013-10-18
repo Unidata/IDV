@@ -27,6 +27,10 @@ import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.idv.IdvCommandLinePrefs;
+import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.IdvPersistenceManager;
+import ucar.unidata.idv.LibVersionUtil;
 import ucar.unidata.util.*;
 
 
@@ -293,7 +297,8 @@ public class AddeImageDataSource extends ImageDataSource {
         List         descriptors = super.getDescriptors(dataChoice, subset);
         GeoSelection geoSelection            = subset.getGeoSelection();
         boolean      isProgressiveResolution = true;
-
+        boolean fromBundle = getIdv().getStateManager().getProperty(
+                IdvConstants.PROP_LOADINGXML, false);
         //if (isReload) {
         // try {
         //    descriptors = reloadDescriptors(descriptors, subset);
@@ -301,7 +306,20 @@ public class AddeImageDataSource extends ImageDataSource {
         // }
 
        // when geoSelection is null, it is from the old bundle and return the desscriptors.
-       if(geoSelection == null)
+        boolean isOldBundle = false;
+        if(fromBundle) {
+            String vsrStr = IdvPersistenceManager.getBundleIdvVersion();
+
+            if(vsrStr == null)
+                isOldBundle = true;
+            else {
+                String[] segs = vsrStr.split("-");
+                String dstr = segs[segs.length-1];
+                if( Long.parseLong(dstr)>= Long.parseLong("20130430164800"))
+                    isOldBundle = false;
+            }
+        }
+        if(isOldBundle) //geoSelection == null)
            return descriptors;
         Rectangle rect    = geoSelection.getScreenBound();
         String    unitStr = getUnitString(dataChoice.getDescription());
@@ -397,7 +415,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                              isProgressiveResolution);
             } else {  // use default
                 BandInfo id = (BandInfo) dataChoice.getId();
-                AreaDirectory thisDir =
+                 AreaDirectory thisDir =
                     (AreaDirectory) allBandDirs.get(id.getBandNumber());
                 int[]  dir         = thisDir.getDirectoryBlock();
                 int    lines       = dir[8];  //2726
