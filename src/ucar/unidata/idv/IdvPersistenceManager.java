@@ -244,6 +244,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** for saving favorites */
     private boolean catSelected;
 
+    static public String bundleIdvVersion;
     /**
      * The ctor
      *
@@ -3360,6 +3361,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
 
         String version = (String) ht.get(ID_VERSION);
+        bundleIdvVersion = version;
         if (version == null) {
             version = getStateManager().getVersion();
         }
@@ -3945,6 +3947,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
     }
 
-
+    static public String getBundleIdvVersion(){
+        return bundleIdvVersion;
+    }
 
 }
