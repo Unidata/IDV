@@ -300,6 +300,9 @@ public class AddeImageDataSource extends ImageDataSource {
         //   } catch (Exception ee) {}
         // }
 
+       // when geoSelection is null, it is from the old bundle and return the desscriptors.
+       if(geoSelection == null)
+           return descriptors;
         Rectangle rect    = geoSelection.getScreenBound();
         String    unitStr = getUnitString(dataChoice.getDescription());
 
