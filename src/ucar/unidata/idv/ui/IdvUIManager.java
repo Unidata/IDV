@@ -39,20 +39,7 @@ import ucar.unidata.data.ListDataChoice;
 import ucar.unidata.data.UserOperandValue;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.gis.maps.MapData;
-import ucar.unidata.idv.ControlDescriptor;
-import ucar.unidata.idv.DisplayControl;
-import ucar.unidata.idv.History;
-import ucar.unidata.idv.IdvConstants;
-import ucar.unidata.idv.IdvManager;
-import ucar.unidata.idv.IdvPersistenceManager;
-import ucar.unidata.idv.IdvPreferenceManager;
-import ucar.unidata.idv.IdvResourceManager;
-import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.MapViewManager;
-import ucar.unidata.idv.SavedBundle;
-import ucar.unidata.idv.ViewDescriptor;
-import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.ViewState;
+import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.DisplaySettingsDialog;
 import ucar.unidata.idv.control.MapDisplayControl;
@@ -1615,6 +1602,49 @@ public class IdvUIManager extends IdvManager {
                     dcd.getDataSelectionWidget().getSelectedSettings();
                 if ((settings != null) && (settings.size() > 0)) {
                     props.put("initialSettings", settings);
+                }
+                ViewManager vm =  getIdv().getViewManager();
+                if ((vm != null) && (vm instanceof TransectViewManager)) {
+                    DisplayControl dc =
+                        getIdv().doMakeControl("transectdrawingcontrol");
+                    // searching for the shared group map view and move the control there
+                    List    vmList = vm.getVMManager().getViewManagers();
+                    Boolean moved  = false;
+                    for (int ii = 0; ii < vmList.size(); ii++) {
+                        ViewManager vm0 = (ViewManager) vmList.get(ii);
+                        if (vm0 instanceof TransectViewManager) {
+                            String grp0 = (String) vm0.getShareGroup();
+                            if (vm0.getShareViews() && (grp0 != null)) {
+                                for (int j = 0; j < vmList.size(); j++) {
+                                    ViewManager vm1 = (ViewManager) vmList.get(j);
+                                    if (vm1 instanceof MapViewManager) {
+                                        String grp1 =
+                                                (String) vm1.getShareGroup();
+                                        if (grp0.equals(grp1) && (j != ii)) {
+                                            dc.moveTo(vm1);
+                                            moved = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ( !moved) {
+                        if (dc.getDefaultViewManager() != null) {
+                            dc.moveTo(dc.getDefaultViewManager());
+                        } else {
+                            List vms = vm.getVMManager().getViewManagers();
+                            for (int ii = 0; ii < vms.size(); ii++) {
+                                ViewManager mvm = (ViewManager) vms.get(ii);
+                                if (mvm instanceof MapViewManager) {
+                                    dc.moveTo(mvm);
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
                 }
                 getIdv().doMakeControl(Misc.newList(dataChoice), cd, props,
                                        dataSelection);
@@ -3649,6 +3679,9 @@ public class IdvUIManager extends IdvManager {
         props.append("<br> ");
         props.append("Location: ");
         props.append(System.getProperty("java.home"));
+        props.append("<br> ");
+        props.append("netCDF-Java version: ");
+        props.append(LibVersionUtil.getNcidvVersion());
         props.append("<br> ");
         props.append("Java 3D Version: ");
         // look for java3d
@@ -6029,7 +6062,7 @@ public class IdvUIManager extends IdvManager {
         append(extra, "java.heap",
                Misc.format(Runtime.getRuntime().maxMemory() / 1000000.0)
                + " " + Msg.msg("MB"));
-
+        append(extra, "ncIdv.version", LibVersionUtil.getNcidvVersion());
         return extra;
     }
 

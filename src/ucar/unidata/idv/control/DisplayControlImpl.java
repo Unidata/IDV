@@ -2433,14 +2433,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean isInTransectView() {
         ViewManager vm = getViewManager();
         if ((vm != null) && (vm instanceof TransectViewManager)) {
-            List tdcList =
+         /*   List tdcList =
                 getIdv().getVMManager().findTransectDrawingControls();
             if (tdcList.size() == 0) {
                 // ViewPanelImpl.VMInfo vmInfos = vm.get
                 DisplayControl dc =
-                    vm.getIdv().doMakeControl("transectdrawingcontrol");
+                    getIdv().doMakeControl("transectdrawingcontrol");
                 vm.getIdv().addDisplayControl(dc);
-                // searching for the shared group map view and move the control there 
+               // searching for the shared group map view and move the control there
                 List    vmList = vm.getVMManager().getViewManagers();
                 Boolean moved  = false;
                 for (int i = 0; i < vmList.size(); i++) {
@@ -2478,7 +2478,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     }
 
                 }
-            }
+            }   */
             return true;
         }
         return false;
@@ -5588,8 +5588,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             }
         };
-        Window     f       = GuiUtils.getWindow(contents);
-        JComponent buttons = GuiUtils.makeApplyOkCancelButtons(listener);
+        Window     f            = GuiUtils.getWindow(contents);
+        JComponent buttons      = GuiUtils.makeApplyOkCancelButtons(listener);
         JComponent propContents = GuiUtils.inset(GuiUtils.centerBottom(jtp,
                                       buttons), 5);
         Msg.translateTree(jtp, true);
@@ -6064,7 +6064,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
             if (dataSelectionWidget != null) {
                 List oldSelectedTimes = getDataSelection().getTimes();
-                List selectedTimes =
+                List selectedTimes    =
                     dataSelectionWidget.getSelectedDateTimes();
                 if ( !Misc.equals(oldSelectedTimes, selectedTimes)) {
                     getDataSelection().setTimes(selectedTimes);
@@ -6095,7 +6095,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (csd != null) {
             csd.doApply();
         }
-
+        if(idFld == null)
+            return true;
         setId(idFld.getText());
         visbilityAnimationPause = new Integer(
             visbilityAnimationPauseFld.getText().trim()).intValue();
@@ -6125,10 +6126,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             for (Enumeration keys = methodNameToSettingsMap.keys();
                     keys.hasMoreElements(); ) {
-                String    key  = (String) keys.nextElement();
+                String    key       = (String) keys.nextElement();
                 JCheckBox cbx = (JCheckBox) methodNameToSettingsMap.get(key);
-                boolean   flag = cbx.isSelected();
-                Method theMethod = Misc.findMethod(getClass(), key,
+                boolean   flag      = cbx.isSelected();
+                Method    theMethod = Misc.findMethod(getClass(), key,
                                        new Class[] { Boolean.TYPE });
 
                 theMethod.invoke(this, new Object[] { new Boolean(flag) });
@@ -6734,7 +6735,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         try {
             List v = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
-            boolean addOk = true;
+            boolean                                   addOk = true;
             Hashtable<ViewManager, List<DisplayInfo>> vmMap =
                 new Hashtable<ViewManager, List<DisplayInfo>>();
             List<ViewManager> vms = new ArrayList<ViewManager>();
@@ -7870,6 +7871,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             updateListOrLegendWithMacro(MACRO_DISPLAYUNIT);
 
             displayUnitChanged(oldUnit, newUnit);
+            if ( !applyProperties()) {
+                return false;
+            }
         } catch (Exception exc) {
             //logException ("Error setting unit from: " + oldUnit + " to: " + newUnit + "\n", exc);
             userMessage("Error setting unit from: " + oldUnit + " to: "
@@ -7887,7 +7891,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param macro  the macro to check for
      */
     private void updateListOrLegendWithMacro(String macro) {
-        boolean listUpdate = getDisplayListTemplate().indexOf(macro) >= 0;
+        boolean listUpdate   = getDisplayListTemplate().indexOf(macro) >= 0;
         boolean legendUpdate =
             ((getLegendLabelTemplate().indexOf(macro) >= 0)
              || (getExtraLabelTemplate().indexOf(macro) >= 0));
@@ -8362,7 +8366,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     })[0];
                     if (index >= 0) {
                         RealTuple rt = DataUtility.getSample(timeSet, index);
-                        DateTime dataTime =
+                        DateTime  dataTime =
                             new DateTime((Real) rt.getComponent(0));
 
                         currentTime = dataTime;
@@ -8793,7 +8797,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List items  = new ArrayList();
         List colors = getDisplayConventions().getColorNameList();
         for (Iterator iter = colors.iterator(); iter.hasNext(); ) {
-            String colorName = iter.next().toString();
+            String      colorName = iter.next().toString();
             final Color menuColor =
                 getDisplayConventions().getColor(colorName);
             JMenuItem mi = new JMenuItem(colorName.substring(0,
@@ -9213,6 +9217,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         info.setPlacement(ColorScaleInfo.TOP);
         info.setLabelColor(ColorScale.DEFAULT_LABEL_COLOR);
         info.setIsVisible(false);
+        info.setUnit(getDisplayUnit());
         ViewManager vm = getDefaultViewManager();
         Font        f  = null;
         if (vm != null) {

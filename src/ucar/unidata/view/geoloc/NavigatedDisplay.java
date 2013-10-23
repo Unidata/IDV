@@ -177,13 +177,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     private int rotateTimeStamp = 0;
 
     /** rotate x flag */
-    private double rotateX = 0;
+    private double rotateXMultiplier = 0;
 
     /** rotate y flag */
-    private double rotateY = -1;
+    private double rotateYMultiplier = -1;
 
     /** rotate z flag */
-    private double rotateZ = 0;
+    private double rotateZMultiplier = 0;
 
     /** flag for perspective view */
     private boolean isPerspective = true;
@@ -367,11 +367,10 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param roty  y rotation
      * @param rotz  z rotation
      */
-    public void setRotationMultiplierMatrix(double rotx, double roty,
-                                            double rotz) {
-        rotateX = rotx;
-        rotateY = roty;
-        rotateZ = rotz;
+    public void setRotationMultiplierMatrix(double rotx, double roty, double rotz) {
+        rotateXMultiplier = rotx;
+        rotateYMultiplier = roty;
+        rotateZMultiplier = rotz;
     }
 
     /**
@@ -2447,9 +2446,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                     transA[2]);
         }
 
-        double[] t1 = display.make_matrix(rotateX / scale, rotateY / scale,
-                                          rotateZ / scale, 1.0, 0.0, 0.0,
-                                          0.0);
+        double[] t1 = display.make_matrix(rotateXMultiplier / scale, rotateYMultiplier / scale, 
+                rotateZMultiplier / scale, 1.0, 0.0, 0.0, 0.0);
 
         t1 = mouseBehavior.multiply_matrix(t1, myMatrix);
 

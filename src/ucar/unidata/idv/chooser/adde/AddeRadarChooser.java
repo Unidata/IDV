@@ -384,7 +384,8 @@ public class AddeRadarChooser extends AddeImageChooser {
                 if (group.indexOf("tdw") >= 0 && descriptor.equals("tr0")) {
                     descrForIds = name;
                     break;
-                } else if (descriptor.equals("n0r")
+                } else if (descriptor.equals("n0q") 
+                		|| descriptor.equals("n0r")
                         || descriptor.startsWith("bref")) {
                     descrForIds = name;
                     break;

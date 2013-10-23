@@ -24,46 +24,74 @@ package ucar.visad;
 import org.w3c.dom.Element;
 
 import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
+import ucar.nc2.time.Calendar;
 
 import ucar.unidata.data.point.PointOb;
-
 import ucar.unidata.geoloc.ProjectionRect;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlDelegate;
 import ucar.unidata.xml.XmlDelegateImpl;
 import ucar.unidata.xml.XmlEncoder;
-import ucar.unidata.xml.XmlObjectFactory;
-import ucar.unidata.xml.XmlPersistable;
 import ucar.unidata.xml.XmlUtil;
 
-import visad.*;
+import ucar.visad.data.CalendarDateTime;
+
+import visad.CMYCoordinateSystem;
+import visad.CachingCoordinateSystem;
+import visad.CartesianProductCoordinateSystem;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.CylindricalCoordinateSystem;
+import visad.DateTime;
+import visad.Display;
+import visad.DisplayRealType;
+import visad.ErrorEstimate;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FlowSphericalCoordinateSystem;
+import visad.FunctionType;
+import visad.GriddedSet;
+import visad.HSVCoordinateSystem;
+import visad.IdentityCoordinateSystem;
+import visad.MathType;
+import visad.PolarCoordinateSystem;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.ScaledUnit;
+import visad.Set;
+import visad.SetType;
+import visad.SphericalCoordinateSystem;
+import visad.Text;
+import visad.TextType;
+import visad.UnionSet;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.bom.WindPolarCoordinateSystem;
 
 import visad.data.mcidas.AREACoordinateSystem;
-import visad.data.mcidas.GRIDCoordinateSystem;
 import visad.data.vis5d.Vis5DCoordinateSystem;
-import visad.data.visad.BinaryReader;
 
-import visad.data.visad.BinaryWriter;
+import visad.georef.EarthLocationLite;
+import visad.georef.EarthLocationTuple;
+import visad.georef.LatLonTuple;
+import visad.georef.NamedLocationTuple;
+import visad.georef.TrivialMapProjection;
+import visad.georef.TrivialNavigation;
 
-import visad.georef.*;
+import visad.meteorology.ImageSequenceImpl;
 
-import visad.meteorology.*;
-
-import java.io.ByteArrayInputStream;
-
-import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-import javax.media.j3d.*;
-
-import javax.vecmath.*;
+import javax.vecmath.Color3f;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3f;
 
 
 /**
@@ -469,6 +497,16 @@ public class VisADPersistence {
                     exc.printStackTrace();
                     return null;
                 }
+            }
+        });
+
+        addDelegate(CalendarDateTime.class, new XmlDelegateImpl() {
+            public Element createElement(XmlEncoder e, Object o) {
+                CalendarDateTime r = (CalendarDateTime) o;
+                List args = Misc.newList(new Double(r.getValue()),
+                                         r.getCalendar());
+                List types = Misc.newList(Double.TYPE, Calendar.class);
+                return e.createObjectConstructorElement(o, args, types);
             }
         });
 

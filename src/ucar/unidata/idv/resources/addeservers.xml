@@ -25,9 +25,31 @@ they essentially get it from their container type tag.
        names="RTWXTEXT"
        type="wxtext"/>
   </server>
+  <server name="atm.ucar.edu" active="true">
+    <group
+            names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+            type="image"/>
+    <group
+            names="RTNEXRAD, NEXRALL"
+            type="radar"/>
+    <group
+            names="RTWXTEXT"
+            type="wxtext"/>
+  </server>
+  <server name="adde.ssec.wisc.edu" active="true">
+    <group
+            names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+            type="image"/>
+    <group
+            names="RTNEXRAD, NEXRALL"
+            type="radar"/>
+    <group
+            names="RTWXTEXT"
+            type="wxtext"/>
+  </server>
   <server name="stratus.al.noaa.gov">
     <group
-       names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINCOMP,TOPO"
+       names="RTIMAGES,CIMSS,GINIEAST,GINIWEST,GINCOMP,TOPO"
        type="image"/>
     <group
        names="RTGRIDS"
@@ -39,7 +61,7 @@ they essentially get it from their container type tag.
        names="RTWXTEXT"
        type="wxtext"/>
   </server>
-
+<!--
   <server name="weather2.admin.niu.edu">
     <group
        names="GINICOMP,GINIEAST,GINIWEST"
@@ -59,6 +81,8 @@ they essentially get it from their container type tag.
        names="RTWXTEXT"
        type="wxtext"/>
   </server>
+  -->
+    <!--
   <server name="twister.millersville.edu">
     <group
        names="CIMSS,GINICOMP,GINIEAST,GINIWEST,NEXRCOMP,RTIMAGES,TOPO"
@@ -69,9 +93,10 @@ they essentially get it from their container type tag.
        names="ERAU"
        type="image"/>
   </server>
+  -->
 <!--
   <server name="pscwx.plymouth.edu"/>
--->
+
   <server name="idd.unl.edu">
     <group
        names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO"
@@ -83,6 +108,7 @@ they essentially get it from their container type tag.
        names="RTWXTEXT"
        type="wxtext"/>
   </server>
+  -->
 <!--
   <server name="io.sca.uqam.ca">
     <group
@@ -90,26 +116,40 @@ they essentially get it from their container type tag.
        type="image"/>
   </server>
 -->
+    <!--
   <server name="unidata2.ssec.wisc.edu">
-<!--
+
     <group
        names="GOESEAST,EAST,WEST"
        type="image"/>
--->
+
     <group
        names="GOESEAST"
        type="image"/>
   </server>
+  -->
   <server name="goessouth.unidata.ucar.edu">
     <group
        names="SOUTH"
        type="image"/>
   </server>
+  <server name="goeseast.unidata.ucar.edu">
+        <group
+                names="EAST"
+                type="image"/>
+  </server>
+  <server name="goeswest.unidata.ucar.edu">
+        <group
+                names="WEST"
+                type="image"/>
+  </server>
+    <!--
   <server name="nanuk.eosdis.nasa.gov">
     <group
        names="NANUK"
        type="image"/>
   </server>
+  -->
   <server name="satepsanone.nesdis.noaa.gov">
     <group
        names="PUB"

@@ -106,7 +106,14 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         updatePositionWidget();
     }
 
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Range getDefaultVerticalRange() {
+        return new Range(0, 20000);
+    }
 
     /**
      * Set the data in the control
@@ -118,7 +125,7 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
      * @throws VisADException   VisAD error
      */
     protected boolean setData(DataChoice choice)
-            throws VisADException, RemoteException {        
+            throws VisADException, RemoteException {
         if ( !super.setData(choice)) {
             System.out.println("set data is false");
             return false;
@@ -502,35 +509,34 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
     protected void setPosition(EarthLocation startLoc, EarthLocation endLoc)
             throws VisADException, RemoteException {
 
-        double x1 = 0;
-        double y1 = 0;
+        double   x1   = 0;
+        double   y1   = 0;
         double[] box1 = earthToBox(startLoc);
-                if (box1 != null) {
-                    x1 = box1[0];
-                    y1 = box1[1];
-                }
+        if (box1 != null) {
+            x1 = box1[0];
+            y1 = box1[1];
+        }
 
-         RealTuple start =
-                new RealTuple(RealTupleType.SpatialCartesian2DTuple,
-                              new double[] { x1,
-                                             y1 });
+        RealTuple start =
+            new RealTuple(RealTupleType.SpatialCartesian2DTuple,
+                          new double[] { x1,
+                                         y1 });
 
 
-        double x2 = 0;
-        double y2 = 0;
+        double   x2   = 0;
+        double   y2   = 0;
         double[] box2 = earthToBox(startLoc);
-                if (box2 != null) {
-                    x2 = box2[0];
-                    y2 = box2[1];
-                }
-         RealTuple end =
-                new RealTuple(RealTupleType.SpatialCartesian2DTuple,
-                              new double[] { x2,
-                                             y2 });
+        if (box2 != null) {
+            x2 = box2[0];
+            y2 = box2[1];
+        }
+        RealTuple end = new RealTuple(RealTupleType.SpatialCartesian2DTuple,
+                                      new double[] { x2,
+                y2 });
         csSelector.setPosition(start, end);
 
         startLocation = startLoc;
-        endLocation = endLoc;
+        endLocation   = endLoc;
         csSelector.setZValue(0.99);
         setCSLineLength(defaultLen);
         setRequestProperties();

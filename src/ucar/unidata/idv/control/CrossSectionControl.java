@@ -258,6 +258,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** auto scale checkbox */
     private JCheckBox autoscaleCbx;
 
+    /** Change axis range button */
+    private JButton rdButton;
+
     /** list of levels */
     private List levelsList;
 
@@ -269,6 +272,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
     /** horizontal skip value */
     int skipValue = 0;
+
+    /** _more_ */
+    Range dataVerticalRange = null;
+
     /**
      * Default constructor.  Sets the appropriate attribute flags.
      */
@@ -1012,16 +1019,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @return  the component
      */
     private Component doMakeVerticalRangeWidget() {
-        Range r = getVerticalAxisRange();
-        if (r == null) {
-            try {
-                r = getRange();
-            } catch (Exception e) {}
-        }
-        rangeLabel = new JLabel("  Range: " + ((r != null)
-                ? r.toString()
-                : "     "));
-        JButton rdButton = new JButton("Change");
+
+        rangeLabel = new JLabel("  Range: ");
+
+        rdButton = new JButton("Change");
         rdButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 RangeDialog rd = new RangeDialog(CrossSectionControl.this,
@@ -1029,8 +1030,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                                      "Change Vertical Axis Range",
                                      "setVerticalAxisRange");
                 rd.showDialog();
-                rangeLabel.setText("  Range: "
-                                   + getVerticalAxisRange().toString());
+                Range r = getVerticalAxisRange();
+                rangeLabel.setText("  Range: " + 
+                        getDisplayConventions().format(r.getMin())+"/"+
+                        getDisplayConventions().format(r.getMax()));
             }
         });
         Component c = GuiUtils.hbox(rdButton, rangeLabel);
@@ -1038,6 +1041,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             autoscaleCbx = GuiUtils.makeCheckbox("Auto-scale?", this,
                     "autoScaleYAxis");
             c = GuiUtils.leftRight(c, autoscaleCbx);
+            if (autoscaleCbx.isSelected()) rdButton.setEnabled(false);
         }
         return c;
 
@@ -1225,9 +1229,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     private RealTuple getXYPosition(double x, double y, double z,
                                     boolean convert)
             throws VisADException, RemoteException {
-        Coord     to      = (convert)
-                            ? convertToDisplay(new Coord(x, y, z))
-                            : new Coord(x, y, z);
+        Coord to = (convert)
+                   ? convertToDisplay(new Coord(x, y, z))
+                   : new Coord(x, y, z);
 
 
         RealTuple xyTuple =
@@ -1573,7 +1577,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             List            points = transect.getPoints();
             LatLonPointImpl llp0   = (LatLonPointImpl) points.get(0);
             LatLonPointImpl llp1   = (LatLonPointImpl) points.get(1);
-            EarthLocation   el0    = makeEarthLocation(llp0.getLatitude(),
+            EarthLocation el0 = makeEarthLocation(llp0.getLatitude(),
                                     llp0.getLongitude(), 0.0);
             EarthLocation el1 = makeEarthLocation(llp1.getLatitude(),
                                     llp1.getLongitude(), 0.0);
@@ -1625,12 +1629,14 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         startLocation = elArray[0];
         endLocation   = elArray[1];
-        if (startLocation.equals(endLocation)) return;
+        if (startLocation.equals(endLocation)) {
+            return;
+        }
         LatLonPoint      latLon1 = startLocation.getLatLonPoint();
         LatLonPoint      latLon2 = endLocation.getLatLonPoint();
 
         GridDataInstance gdi     = getGridDataInstance();
-        FieldImpl        slice   = gdi.sliceAlongLatLonLine(
+        FieldImpl slice = gdi.sliceAlongLatLonLine(
                               latLon1, latLon2,
                               getSamplingModeValue(
                                   getObjectStore().get(
@@ -1728,6 +1734,20 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                           getVerticalAxisRange());
         }
         crossSectionView.getXSDisplay().reScale();
+        if (rangeLabel != null && autoscaleCbx != null) {
+          try {
+            Range r = getDataVerticalRange();
+            if (!autoscaleCbx.isSelected()) {
+                r = getVerticalAxisRange();
+            } else if (getLineRange() != null) {
+                r = getLineRange();
+            }
+            rangeLabel.setText("  Range: " + 
+                getDisplayConventions().format(r.getMin())+"/"+
+                getDisplayConventions().format(r.getMax()));
+            rangeLabel.repaint();
+          } catch (Exception erl) {}
+        }
     }
 
     /**
@@ -1743,10 +1763,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             } catch (Exception exc) {
                 logException("Setting Y Axis Range: ", exc);
             }
-        }
-        if (rangeLabel != null) {
-            rangeLabel.setText("  Range: "
-                               + getVerticalAxisRange().toString());
         }
     }
 
@@ -1803,7 +1819,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         FieldImpl grid2D = null;
         // from the input Field of fome (time->((a,b,c) -> parm)
         // get the (a,b,c) part
-        GriddedSet domainSet;
+        GriddedSet domainSet = null;
         if (GridUtil.isConstantSpatialDomain(xsectSequence)) {
             domainSet = (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
             GriddedSet newDomain = make2DDomainSet(domainSet);
@@ -1835,9 +1851,69 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                 grid2D.setSamples(newSamples, false, false);
             }
         }
+        dataVerticalRange = getCrossSectionVerticalRange(domainSet);
         return grid2D;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param domainSet _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public Range getCrossSectionVerticalRange(GriddedSet domainSet)
+            throws VisADException {
+
+        float[][] elp    = GridUtil.getEarthLocationPoints(domainSet);
+        float[]   values = null;
+        if(elp.length == 2){
+            values = elp[1];
+        } else if(elp.length == 3){
+            values = elp[2];
+        }
+
+        float     pMin   = values[0];
+        float     pMax   = values[0];
+
+        int       length = values.length;
+        for (int i = 0; i < length; i++) {
+            float value = values[i];
+            //Note: we don't check for Float.isNaN (value) because if value is a
+            //NaN then each test below is false;
+            if (pMax < value) {
+                pMax = value;
+            }
+            if (pMin > value) {
+                pMin = value;
+            }
+        }
+        Range result = new Range(pMin, pMax);
+
+        return result;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Range getDefaultVerticalRange() {
+        return new Range(0, 16000.0);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Range getDataVerticalRange() {
+        return dataVerticalRange;
+    }
     /**
      * Make the domain for the 2D grid
      *
@@ -1934,8 +2010,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         RealTupleType xzRTT   = new RealTupleType(xType, RealType.Altitude);
 
         Gridded2DSet  vcsG2DS = (dataIs3D)
-                                ? new Gridded2DSet(xzRTT, plane, sizeX, sizeZ,
-                                    (CoordinateSystem) null,
+                                ? new Gridded2DSet(xzRTT, plane, sizeX,
+                                    sizeZ, (CoordinateSystem) null,
                                     new Unit[] { CommonUnits.KILOMETER,
                 CommonUnit.meter }, (ErrorEstimate[]) null, false, false)
                                 : new Gridded2DSet(xzRTT, plane, sizeX,
@@ -2120,6 +2196,24 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         if (autoscaleCbx != null) {
             autoscaleCbx.setSelected(value);
+            if (autoscaleCbx.isSelected()) {
+              rdButton.setEnabled(false);
+              if (rangeLabel != null) {
+                Range r = getDataVerticalRange();
+                if (getLineRange() != null) r = getLineRange();
+                rangeLabel.setText("  Range: " + 
+                        getDisplayConventions().format(r.getMin())+"/"+
+                        getDisplayConventions().format(r.getMax()));
+              }
+            } else {
+              rdButton.setEnabled(true);
+              if (rangeLabel != null) {
+                Range r = getVerticalAxisRange();
+                rangeLabel.setText("  Range: " + 
+                        getDisplayConventions().format(r.getMin())+"/"+
+                        getDisplayConventions().format(r.getMax()));
+              }
+            }
         }
     }
 
@@ -2130,6 +2224,14 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public boolean getAutoScaleYAxis() {
         return autoScaleYAxis;
+    }
+
+    /** 
+     * get line range -- should be overridden by sub classes that 
+     * actually set the value
+     */
+    public Range getLineRange() {
+      return null;
     }
 
 

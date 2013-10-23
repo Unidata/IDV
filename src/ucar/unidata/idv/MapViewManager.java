@@ -2396,10 +2396,11 @@ public class MapViewManager extends NavigatedViewManager {
         if ( !super.applyProperties()) {
             return false;
         }
-        if (globeBackgroundDisplayable != null) {
+        if (useGlobeDisplay && (globeBackgroundDisplayable != null)) {
             globeBackgroundColor = globeBackgroundColorComp.getBackground();
             globeBackgroundLevel = globeBackgroundLevelSlider.getValue();
             setGlobeBackground((GlobeDisplay) getMapDisplay());
+            return true;
         }
         return applyAxisVisibility();
     }

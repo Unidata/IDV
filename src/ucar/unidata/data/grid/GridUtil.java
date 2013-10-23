@@ -2429,6 +2429,10 @@ public class GridUtil {
         if (isSinglePointDomain(grid)) {
             return grid;
         }
+        if (is3D(grid) && !isVolume(grid)) {
+            grid = make2DGridFromSlice(grid, false);
+        }
+
         if ((getTimeSet(grid) == null) || isConstantSpatialDomain(grid)) {
             fi = slice(
                 grid,

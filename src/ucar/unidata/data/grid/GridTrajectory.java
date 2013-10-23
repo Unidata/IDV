@@ -726,7 +726,7 @@ public class GridTrajectory {
             vFI = GridUtil.make2DGridFromSlice(vFI, false);
             sFI = GridUtil.make2DGridFromSlice(sFI, false);
         }
-        LogUtil.message("Calculation grid trajectories...");
+        LogUtil.message("Calculating grid trajectories...");
         final List<TrajInfo> result   = new ArrayList<TrajInfo>();
         List<Future>         pthreads = new ArrayList<Future>();
         for (int i = 0; i < numPoints; i++) {

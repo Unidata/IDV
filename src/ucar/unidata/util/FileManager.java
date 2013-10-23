@@ -196,9 +196,12 @@ public class FileManager {
             System.out.println("OS ==  " + osName + " def =" + defDir);
         }
         boolean isWindose = (0 <= osName.indexOf("Windows"));
+        boolean isMac = (System.getProperty("mrj.version") != null);
 
         if (isWindose) {
             defaultDirs.add("C:/");
+        } else if (isMac) {
+            defaultDirs.add(System.getProperty("user.home"));
         }
 
         File            defaultDirectory = findDefaultDirectory(defaultDirs);
@@ -273,7 +276,10 @@ public class FileManager {
                             }
                         }
                         if (newFileName != null) {
-                            chooser.setSelectedFile(new File(newFileName));
+                            File newFile = new File(newFileName);
+                            if (newFile.equals(lastFile)) {
+                                chooser.setSelectedFile(newFile);
+                            }
                         }
                     }
                 }

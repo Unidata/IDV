@@ -2535,7 +2535,6 @@ public class TextPointDataSource extends PointDataSource {
             //Sample the data to see if we need to show the metadata gui
             Data sample = makeObs(dataChoice, null, null, null, true, true);
 
-            /*  Remove this option ... Control cannot subset/clip correctly
             List cloudCats =
                 DataCategory.parseCategories("Point Cloud;pointcloud", true);
             for (String varname : varNames) {
@@ -2544,7 +2543,6 @@ public class TextPointDataSource extends PointDataSource {
                                         varname, cloudCats, (Hashtable) null);
                 addDataChoice(choice);
             }
-            */
             if (isTrajectoryEnabled()) {
 
                 //                System.err.println ("sample:" + sample);

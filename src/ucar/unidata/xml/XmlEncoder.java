@@ -21,6 +21,9 @@
 package ucar.unidata.xml;
 
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,20 +52,94 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-
-
+import java.util.Properties;
 
 /**
  * See the package.html This class is in part responsible for (de)serializing
  * bundles.
  */
 public class XmlEncoder extends XmlUtil {
+
+
+    /**
+     * MethodKey class for cache keys.
+     *
+     */
+    private static class MethodKey {
+
+        /** Class          */
+        private Class<?> clazz;
+
+        /** method          */
+        private String method;
+
+        /** param types          */
+        private Class<?>[] paramTypes;
+
+        /**
+         * Method key constructor
+         *
+         * @param clazz the class
+         * @param method the method
+         * @param paramTypes _more_
+         */
+        public MethodKey(Class<?> clazz, String method,
+                         Class<?>[] paramTypes) {
+            this.clazz      = clazz;
+            this.method     = method;
+            this.paramTypes = paramTypes;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
+			result = prime * result
+					+ ((method == null) ? 0 : method.hashCode());
+			result = prime * result + Arrays.hashCode(paramTypes);
+			return result;
+		}
+
+        /**
+         * {@inheritDoc}
+         */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			MethodKey other = (MethodKey) obj;
+			if (clazz == null) {
+				if (other.clazz != null)
+					return false;
+			} else if (!clazz.equals(other.clazz))
+				return false;
+			if (method == null) {
+				if (other.method != null)
+					return false;
+			} else if (!method.equals(other.method))
+				return false;
+			if (!Arrays.equals(paramTypes, other.paramTypes))
+				return false;
+			return true;
+		}
+        
+    }
 
 
     /** Used to synchronize the toXml/toObject methods */
@@ -341,14 +418,23 @@ public class XmlEncoder extends XmlUtil {
     private ArrayList errorMessages;
 
     /**
+     * The method cache
+     */
+    private static Cache methodCache;
+
+    static { //initializing method cache
+      URL resource = XmlEncoder.class.getResource("/ucar/unidata/xml/ehcache.xml");
+      CacheManager cacheManager = CacheManager.create(resource);
+      cacheManager.addCache(XmlEncoder.class.toString());
+        methodCache = CacheManager.getInstance().getCache(XmlEncoder.class.toString());
+    }
+
+    /**
      *  Create a new XmlEncoder.
      */
     public XmlEncoder() {
         addDefaultDelegates();
     }
-
-
-
 
     /**
      *  Define the set of default delegates (e.g., for Rectangle, Font, etc.) for common objects
@@ -1632,7 +1718,7 @@ public class XmlEncoder extends XmlUtil {
         ArrayList v       = new ArrayList();
         for (int i = 0; i < methods.length; i++) {
             Method propMethod = methods[i];
-            String name   = propMethod.getName();
+            String name       = propMethod.getName();
             if ( !name.startsWith("get") && !name.startsWith("is")) {
                 continue;
             }
@@ -2245,29 +2331,40 @@ public class XmlEncoder extends XmlUtil {
         }
 
         try {
-            //TODO: Cache the results of method lookup.
-            Method theMethod = Misc.findMethod(object.getClass(), methodName,
-                                   paramTypes);
-            if (theMethod == null) {
-                /*
-                for (int i = 0; i < paramTypes.length; i++) {
-                    System.err.println("type:" + paramTypes[i]);
-                }
-                Method[]  methods = object.getClass().getMethods();
-                for (int i = 0; i < methods.length; i++) {
-                    if(methodName.equals(methods[i].getName())) {
-                        Class[]types = methods[i].getParameterTypes();
-                        for (int j = 0; j < types.length; j++) {
+            MethodKey mk = new MethodKey(object.getClass(), methodName,
+                                         paramTypes);
+            net.sf.ehcache.Element e = methodCache.get(mk);
+            Method                 theMethod;
+            if (e == null) {
+                theMethod = Misc.findMethod(object.getClass(), methodName,
+                                            paramTypes);
+                if (theMethod == null) {
+                    /*
+                    for (int i = 0; i < paramTypes.length; i++) {
+                        System.err.println("type:" + paramTypes[i]);
+                    }
+                    Method[]  methods = object.getClass().getMethods();
+                    for (int i = 0; i < methods.length; i++) {
+                        if(methodName.equals(methods[i].getName())) {
+                            Class[]types = methods[i].getParameterTypes();
+                            for (int j = 0; j < types.length; j++) {
+                            }
                         }
                     }
-                }
-                */
+                    */
 
-                throw new IllegalArgumentException("Unable to find method: "
+                    throw new IllegalArgumentException(
+                        "Unable to find method: "
                         + object.getClass().getName() + "." + methodName);
+                } else {
+                    theMethod.invoke(object, params);
+                    methodCache.put(new net.sf.ehcache.Element(mk, theMethod));
+                }
             } else {
+                theMethod = (Method) e.getObjectValue();
                 theMethod.invoke(object, params);
             }
+
         } catch (Exception exc) {
             String paramString = "";
             for (int i = 0; i < paramTypes.length; i++) {
@@ -2651,8 +2748,8 @@ public class XmlEncoder extends XmlUtil {
                             valueElement));
                 }
             } catch (Exception exc) {
-                logException("Error evaluating method: " + propMethod.getName()
-                             + "\n", exc);
+                logException("Error evaluating method: "
+                             + propMethod.getName() + "\n", exc);
 
             }
         }

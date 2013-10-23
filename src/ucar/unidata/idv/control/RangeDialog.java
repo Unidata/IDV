@@ -215,19 +215,33 @@ public class RangeDialog implements RangeWidget, Removable {
      */
     public void setRangeFromPopup(String cmd) {
         Range r = null;
-        if (cmd.equals(CMD_RANGE_COLORTABLE)) {
-            ColorTable originalCT =
-                displayControl.getOldColorTableOrInitialColorTable();
-            if (originalCT != null) {
-                r = originalCT.getRange();
+        if(!(displayControl instanceof DataTransectControl) &&
+                displayControl instanceof CrossSectionControl){
+            CrossSectionControl csc = (CrossSectionControl)displayControl;
+            if (cmd.equals(CMD_RANGE_DATA)) {
+                r = csc.getDataVerticalRange();
+                if(r == null)
+                    r = csc.getDefaultVerticalRange();
+            } else if (cmd.equals(CMD_RANGE_DEFAULT)) {
+                try {
+                    r = csc.getDefaultVerticalRange();
+                } catch (Exception e) {}
             }
-        } else if (cmd.equals(CMD_RANGE_DATA)) {
-            r = displayControl.getColorRangeFromData();
-        } else if (cmd.equals(CMD_RANGE_DEFAULT)) {
-            try {
+        } else {
+            if (cmd.equals(CMD_RANGE_COLORTABLE)) {
+                ColorTable originalCT =
+                    displayControl.getOldColorTableOrInitialColorTable();
+                if (originalCT != null) {
+                    r = originalCT.getRange();
+                }
+            } else if (cmd.equals(CMD_RANGE_DATA)) {
                 r = displayControl.getColorRangeFromData();
-                // r = displayControl.getInitialRange();
-            } catch (Exception e) {}
+            } else if (cmd.equals(CMD_RANGE_DEFAULT)) {
+                try {
+                    r = displayControl.getColorRangeFromData();
+                    // r = displayControl.getInitialRange();
+                } catch (Exception e) {}
+            }
         }
         setRangeDialog(r);
     }

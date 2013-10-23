@@ -591,13 +591,21 @@ public interface DataSource {
      */
     public boolean canAddCurrentName(DataChoice dataChoice);
 
-
     /**
-     * _more_
+     * Reload data.
      *
-     * @param object _more_
-     * @param properties _more_
+     * @param object the object
+     * @param properties the properties
      */
     public void reloadData(Object object, Hashtable properties);
 
+  /**
+   * Sets the default save. The idea here is the user should just be allowed to
+   * select a default option when saving a zidv bundle rather than being asked
+   * additional questions.
+   * 
+   * @param selected
+   *          the new default save
+   */
+    public void setDefaultSave(boolean selected);
 }
