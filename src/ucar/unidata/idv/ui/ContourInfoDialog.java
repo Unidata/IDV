@@ -37,10 +37,7 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
-import java.text.DecimalFormat;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -52,7 +49,9 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 /**
  * A JFrame widget to get contouring info from the user.
@@ -133,11 +132,8 @@ public class ContourInfoDialog implements ActionListener {
     /** current action command */
     private String current_action_command = null;
     
-    /** Number formatter for contour lines to skip when labeling */
-    private final static DecimalFormat df = new DecimalFormat("000");
-    
-    /** input box for contour label line skip count */
-    private JFormattedTextField jftfLineSkip = null;
+    /** input spinner for contour label line skip count */
+    private JSpinner js = null;
 
     /**
      * Construct the widget.
@@ -267,28 +263,28 @@ public class ContourInfoDialog implements ActionListener {
         // initialize to min value
         labelFreqSlider.setValue(ContourControl.LABEL_FREQ_LO);
 
-        jftfLineSkip = new JFormattedTextField(df);
-        jftfLineSkip.setValue(ContourControl.EVERY_NTH_DEFAULT);
-        jftfLineSkip.setColumns(3);
-
-        Component[] labelcomps = new Component[] {
-            GuiUtils.rLabel("Font:"), GuiUtils.left(fontBox),
-            GuiUtils.rLabel("Size:"), GuiUtils.left(fontSizeBox),
-            GuiUtils.rLabel("Align:"), GuiUtils.left(alignBox),
-            GuiUtils.rLabel("Frequency:"), GuiUtils.left(labelFreqSlider),
-            GuiUtils.rLabel("Label Every Nth Line:"), GuiUtils.left(jftfLineSkip)
-        };
-        labelPanel = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
-                                       GuiUtils.WT_N);
+        // TJJ Oct 2013
+        // Use a spinner here, best choice for the UI since 
+        //  - No error checking needed
+        //  - Almost always, user will want a small integer value
+        
+        Integer defaultInterval = new Integer(ContourControl.EVERY_NTH_DEFAULT);
+        // NOTE: value of zero here implies "no labels"
+        Integer minInterval = new Integer(0);
+        Integer maxInterval = new Integer(ContourControl.EVERY_NTH_MAX);
+        Integer intervalStep = new Integer(1);
+        SpinnerNumberModel snm =
+           new SpinnerNumberModel(defaultInterval, minInterval, maxInterval, intervalStep);
+        js = new JSpinner(snm);
+        // grab the underlying text field temporarily so we can disable hand-editing
+        JFormattedTextField jftfLineSkip = getTextField(js);
+        if (jftfLineSkip != null ) {
+        	jftfLineSkip.setColumns(3);
+        	jftfLineSkip.setEditable(false);
+        }
 
         toggleBtn = new JCheckBox("Labels:", true);
         toggleBtn.setToolTipText("Toggle contour labels");
-        toggleBtn.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                GuiUtils.enableTree(labelPanel,
-                                    ((JCheckBox) e.getSource()).isSelected());
-            }
-        });
 
         Component[] comps = new Component[] {
             GuiUtils.rLabel("Contour Interval:"),
@@ -307,7 +303,13 @@ public class ContourInfoDialog implements ActionListener {
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
                 Misc.createIntervalList(1, 5, 1), true),
             GuiUtils.right(dashBtn), styleBox,
-            GuiUtils.top(GuiUtils.right(toggleBtn)), labelPanel
+            GuiUtils.right(GuiUtils.right(toggleBtn)), new JLabel(""),
+            
+            GuiUtils.rLabel("Font:"), GuiUtils.center(fontBox),
+            GuiUtils.rLabel("Size:"), GuiUtils.center(fontSizeBox),
+            GuiUtils.rLabel("Align:"), GuiUtils.center(alignBox),
+            GuiUtils.rLabel("Frequency:"), GuiUtils.center(labelFreqSlider),
+            GuiUtils.rLabel("Label Every Nth Line:"), GuiUtils.center(js)
         };
 
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
@@ -409,10 +411,15 @@ public class ContourInfoDialog implements ActionListener {
                     .getId()).booleanValue();
             int new_label_freq = labelFreqSlider.getValue();
             int new_line_skip = ContourControl.EVERY_NTH_DEFAULT;
-            int tmpSkip = ((Number) jftfLineSkip.getValue()).intValue();
+            int tmpSkip = ((Number) js.getValue()).intValue();
            
         	if ((tmpSkip > 0) && (tmpSkip <= ContourControl.EVERY_NTH_MAX)) {
         		new_line_skip = tmpSkip;
+        	}
+        	
+        	// treat skip of zero like labeling is off
+        	if (tmpSkip == 0) {
+        		new_isLabelled = false;
         	}
 
             // permit mino == maxo the case of one contour line
@@ -535,6 +542,23 @@ public class ContourInfoDialog implements ActionListener {
         }
     }
 
+	/**
+	 * Return the formatted text field used by the editor, or null if the editor
+	 * doesn't descend from JSpinner.DefaultEditor.
+	 */
+
+	public JFormattedTextField getTextField(JSpinner spinner) {
+		JComponent editor = spinner.getEditor();
+		if (editor instanceof JSpinner.DefaultEditor) {
+			return ((JSpinner.DefaultEditor) editor).getTextField();
+		} else {
+			LogUtil.message("Unexpected editor type: "
+					+ spinner.getEditor().getClass()
+					+ " isn't a descendant of DefaultEditor");
+			return null;
+		}
+	}
+    
     /**
      * Show the dialog box and wait for results and deal with them.
      * @param transfer a ContourInfo data object to transfer all values
@@ -564,7 +588,7 @@ public class ContourInfoDialog implements ActionListener {
         dashBtn.setSelected(myInfo.getDashOn());
         dashBtn.setEnabled( !myInfo.getIsFilled());
         labelFreqSlider.setValue(transfer.getLabelFreq());
-        jftfLineSkip.setValue(transfer.getLabelLineSkip());
+        js.setValue(transfer.getLabelLineSkip());
         widthBox.setSelectedItem(new Integer(myInfo.getLineWidth()));
         styleBox.setSelectedIndex(myInfo.getDashedStyle() - 1);
         styleBox.setEnabled(myInfo.getDashOn());
