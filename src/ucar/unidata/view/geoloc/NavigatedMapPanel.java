@@ -545,15 +545,16 @@ public class NavigatedMapPanel extends JPanel {
             g2d.drawImage(preview_image, 0, 0, this);
 
         }
-        g2d.setColor(Color.BLUE);
-        g2d.draw(gp);
-        g2d.setColor(Color.CYAN);
 
+        if(gp!=null){
+            g2d.setColor(Color.BLUE);
+            g2d.draw(gp);
+            g2d.setColor(Color.CYAN);
+        }
 
         for (int i = 0; i < mapRenderers.size(); i++) {
             ((Renderer) mapRenderers.get(i)).draw(gNP, atI);
         }
-
         annotateMap(gNP);
         gNP.dispose();
 
