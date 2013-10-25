@@ -768,7 +768,9 @@ public class GeoGridDataSource extends GridDataSource {
                     varNames.add(name);
                 }
             }
-            return writeNc(prefix, changeLinks, varNames);
+            return (currentDataChoices.size() > 0)
+                ? writeNc(prefix, changeLinks, varNames)
+                : null;
         }
 
 
