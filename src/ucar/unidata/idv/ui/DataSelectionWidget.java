@@ -21,18 +21,10 @@
 package ucar.unidata.idv.ui;
 
 
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSelectionComponent;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DerivedDataChoice;
-import ucar.unidata.data.GeoSelection;
-import ucar.unidata.data.GeoSelectionPanel;
-import ucar.unidata.idv.ControlDescriptor;
-import ucar.unidata.idv.DisplayControl;
-import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.ViewManager;
+import ucar.unidata.data.*;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.idv.*;
 import ucar.unidata.idv.chooser.TimesChooser;
 import ucar.unidata.idv.control.MapDisplayControl;
 import ucar.unidata.ui.Timeline;
@@ -41,13 +33,14 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+
 import ucar.visad.Util;
 
+import visad.georef.EarthLocation;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -225,7 +218,25 @@ public class DataSelectionWidget {
     /** the time selection type */
     private String timeOption = USE_DEFAULTTIMES;
 
+    /** _more_ */
+    public String USE_DEFAULTREGION = "Use Default";
 
+    /** _more_ */
+    public String USE_SELECTEDREGION = "Use Selected";
+
+    /** _more_ */
+    public String USE_DISPLAYREGION = "Use Display Area";
+
+    /** _more_ */
+    private String[] regionSubsetOptionLabels = new String[] {
+                                                    USE_DEFAULTREGION,
+            USE_SELECTEDREGION, USE_DISPLAYREGION };
+
+    /** _more_ */
+    JComboBox regionOptionLabelBox;
+
+    /** _more_ */
+    private String regionOption = USE_DEFAULTREGION;
 
     /**
      * Constructor  for when we are a part of the {@link DataSelector}
@@ -676,7 +687,8 @@ public class DataSelectionWidget {
             areaComponent   = geoSelectionPanel.getAreaComponent();
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
-                GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
+                GuiUtils.enableTree(areaComponent,
+                                    regionOption.equals(USE_SELECTEDREGION));
             }
             if (oldPanel != null) {
                 geoSelectionPanel.initWith(oldPanel);
@@ -684,11 +696,13 @@ public class DataSelectionWidget {
 
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
-                GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
+                GuiUtils.enableTree(areaComponent,
+                                    regionOption.equals(USE_SELECTEDREGION));
                 areaTab.add(
                     GuiUtils.topCenter(
-                        GuiUtils.inset(GuiUtils.right(areaCbx), 0),
-                        areaComponent));
+                        GuiUtils.inset(
+                            GuiUtils.right(regionOptionLabelBox),
+                            0), areaComponent));
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
@@ -778,15 +792,60 @@ public class DataSelectionWidget {
         dataSelection.putProperty(DataSelection.PROP_ASTIMEDRIVER,
                 timeOption.equals(AS_DRIVERTIMES));
                 */
-
+        dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
+                                  regionOption);
         GeoSelection geoSelection = getGeoSelection();
+
+
         if (geoSelection != null) {
+            NavigatedDisplay navDisplay =
+                (NavigatedDisplay) idv.getViewManager().getMaster();
+            Rectangle screenBoundRect = navDisplay.getScreenBounds();
+            geoSelection.setScreenBound(screenBoundRect);
+            try {
+                geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
+            } catch (Exception e) {}
+
             if (strideCbx.isSelected()) {
                 geoSelection.clearStride();
             }
-            if (areaCbx.isSelected()) {
+            if ( !regionOption.equals(USE_SELECTEDREGION)) {
                 geoSelection.setBoundingBox(null);
                 geoSelection.setUseFullBounds(false);
+            }
+
+            if (idv.getViewManager() instanceof MapViewManager) {
+                if (regionOption.equals(USE_DISPLAYREGION)) {
+                    idv.getViewManager().setProjectionFromData(false);
+                    List<TwoFacedObject> coords = null;
+
+                    try {
+                        coords = navDisplay.getScreenSidesCoordinates();
+                    } catch (Exception e) {}
+                    double[]      elid = (double[]) coords.get(1).getId();
+                    EarthLocation el   = navDisplay.getEarthLocation(elid);
+                    double maxLat =
+                        el.getLatLonPoint().getLatitude().getValue();
+                    elid = (double[]) coords.get(2).getId();
+                    el   = navDisplay.getEarthLocation(elid);
+                    double minLat =
+                        el.getLatLonPoint().getLatitude().getValue();
+                    elid = (double[]) coords.get(3).getId();
+                    el   = navDisplay.getEarthLocation(elid);
+                    double maxLon =
+                        el.getLatLonPoint().getLongitude().getValue();
+                    elid = (double[]) coords.get(4).getId();
+                    el   = navDisplay.getEarthLocation(elid);
+                    double minLon =
+                        el.getLatLonPoint().getLongitude().getValue();
+                    GeoLocationInfo glInfo =
+                        new GeoLocationInfo(
+                            maxLat, LatLonPointImpl.lonNormal(minLon),
+                            minLat, LatLonPointImpl.lonNormal(maxLon));
+
+                    geoSelection.setBoundingBox(glInfo);
+                }
+
             }
         }
 
@@ -919,7 +978,32 @@ public class DataSelectionWidget {
      *
      * @return The GUI
      */
+
     private JComponent doMakeContents() {
+        regionOptionLabelBox = new JComboBox();
+
+        //added
+        regionOptionLabelBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                String selectedObj =
+                    (String) regionOptionLabelBox.getSelectedItem();
+                setRegionOptions(selectedObj);
+                if (areaComponent != null) {
+                    GuiUtils.enableTree(
+                        areaComponent,
+                        regionOption.equals(USE_SELECTEDREGION));
+                }
+            }
+
+        });
+
+        //timeDeclutterFld = new JTextField("" + getTimeDeclutterMinutes(), 5);
+        GuiUtils.enableTree(regionOptionLabelBox, true);
+
+        List regionOptionNames = Misc.toList(regionSubsetOptionLabels);
+
+        GuiUtils.setListData(regionOptionLabelBox, regionOptionNames);
+
         areaCbx = new JCheckBox("Use Default", true);
         areaCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -954,6 +1038,18 @@ public class DataSelectionWidget {
         return selectionContainer;
     }
 
+    /**
+     * _more_
+     *
+     * @param selectedObject _more_
+     */
+    public void setRegionOptions(String selectedObject) {
+
+        regionOption = selectedObject.toString();
+        if (selectedObject.equals(USE_DEFAULTREGION)) {}
+        else if (selectedObject.equals(USE_SELECTEDREGION)) {}
+        else if (selectedObject.equals(USE_DISPLAYREGION)) {}
+    }
 
     /**
      * Get the list of all dttms
