@@ -319,7 +319,10 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
      */
     public void setAdvancedPanel(String selectedObject) {
         if (advancedSelection == null) {
-            return;
+            if(this.imageDataSource.getAdvancedSelection() != null)
+                advancedSelection = this.imageDataSource.getAdvancedSelection();
+            else
+                return;
         }
 
         regionOption = selectedObject.toString();
