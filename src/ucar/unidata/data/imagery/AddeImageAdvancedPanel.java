@@ -830,7 +830,10 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
      */
     protected JComponent doMakeContents() {
 
-        java.util.List allComps        = new ArrayList();
+        java.util.List allComps0        = new ArrayList();
+        java.util.List allComps1        = new ArrayList();
+        java.util.List allComps2        = new ArrayList();
+        java.util.List allComps3        = new ArrayList();
         Insets         dfltGridSpacing = new Insets(4, 0, 4, 0);
         String         dfltLblSpacing  = " ";
         JComponent     propComp        = null;
@@ -847,12 +850,12 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
             }
         });
 
-        allComps.add(GuiUtils.rLabel("ProgressiveResolution:"));
-        allComps.add(GuiUtils.left(prograssiveCbx));
+        allComps0.add(GuiUtils.rLabel("Progressive Resolution:"));
+        allComps0.add(GuiUtils.left(prograssiveCbx));
 
         // coordinate types
-        allComps.add(new JLabel(" "));
-        allComps.add(new JLabel(" "));
+        allComps1.add(new JLabel(" "));
+        allComps1.add(new JLabel(" "));
 
         coordinateTypeComboBox = new JComboBox(coordinateTypes);
         coordinateTypeComboBox.addActionListener(new ActionListener() {
@@ -862,18 +865,18 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
             }
         });
 
-        allComps.add(GuiUtils.rLabel("Coordinate Type:"));
-        allComps.add(GuiUtils.left(coordinateTypeComboBox));
+        allComps1.add(GuiUtils.rLabel(" Coordinates: "));
+        allComps1.add(GuiUtils.left(coordinateTypeComboBox));
 
         // location
-        allComps.add(new JLabel(" "));
-        allComps.add(new JLabel(" "));
+        allComps1.add(new JLabel(" "));
+        allComps1.add(new JLabel(" "));
         locationComboBox = new JComboBox(locations);
         setPlace(this.place);
 
 
-        allComps.add(GuiUtils.rLabel("Location:"));
-        allComps.add(GuiUtils.left(locationComboBox));
+        allComps1.add(GuiUtils.rLabel(" Location: "));
+        allComps1.add(GuiUtils.left(locationComboBox));
 
         ActionListener latLonChange = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -965,22 +968,23 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         locationPanel.addCard(latLonPanel);
         locationPanel.addCard(lineElementPanel);
 
-        allComps.add(GuiUtils.rLabel("  "));
-        allComps.add(GuiUtils.left(locationPanel));
+        allComps1.add(GuiUtils.rLabel("  "));
+        allComps1.add(GuiUtils.left(locationPanel));
 
         // image size and mag factor link
-        allComps.add(new JLabel(" "));
-        allComps.add(new JLabel(" "));
+        allComps1.add(new JLabel(" "));
+        allComps1.add(new JLabel(" "));
+
         lockPanel = GuiUtils.left(GuiUtils.doLayout(new Component[] {
             new JLabel(" "),
             getLinkButton() }, 2, GuiUtils.WT_N, GuiUtils.WT_N));
-        allComps.add(GuiUtils.rLabel("LinkImageSizeAndMag:"));
-        allComps.add(GuiUtils.left(lockPanel));
+        allComps2.add(GuiUtils.rLabel("Link Image Size And Magnification:"));
+        allComps2.add(GuiUtils.left(lockPanel));
 
 
         // image size
-        allComps.add(new JLabel(" "));
-        allComps.add(new JLabel(" "));
+        allComps3.add(new JLabel(" "));
+        allComps3.add(new JLabel(" "));
         ActionListener lSizeChange = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 int lines = getNumLines() * Math.abs(getLineMagValue());
@@ -1057,12 +1061,12 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
             new JLabel(" "), fullResBtn, new JLabel("  "), rawSizeLbl
         }, 8, GuiUtils.WT_N, GuiUtils.WT_N));
 
-        allComps.add(GuiUtils.rLabel("Image Size:"));
-        allComps.add(GuiUtils.left(sizePanel));
+        allComps3.add(GuiUtils.rLabel("Image Size:"));
+        allComps3.add(GuiUtils.left(sizePanel));
 
         // Magnification
-        allComps.add(new JLabel(" "));
-        allComps.add(new JLabel(" "));
+        allComps3.add(new JLabel(" "));
+        allComps3.add(new JLabel(" "));
         //line mag
         boolean oldAmSettingProperties = amSettingProperties;
         amSettingProperties = true;
@@ -1123,14 +1127,18 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         propComp = GuiUtils.hbox(new Component[] { leMagPanel }, 1);
         // allComps.add(GuiUtils.left(propComp));
         // allComps.add(GuiUtils.lLabel(" "));
-        allComps.add(GuiUtils.rLabel("Magnification:"));
-        allComps.add(GuiUtils.left(propComp));
+        allComps3.add(GuiUtils.rLabel("Magnification:"));
+        allComps3.add(GuiUtils.left(propComp));
 
 
 
         //all
-        JPanel imagePanel = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NY,
-                                GuiUtils.WT_N);
+        JPanel imagePanel = GuiUtils.vbox(
+                GuiUtils.doLayout(allComps0, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                GuiUtils.doLayout(allComps1, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                GuiUtils.doLayout(allComps2, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                GuiUtils.doLayout(allComps3, 2, GuiUtils.WT_NY, GuiUtils.WT_N));
+
         advance = GuiUtils.top(imagePanel);
         boolean showMagSection = !prograssiveCbx.isSelected();
         enablePanel(leMagPanel, showMagSection);
