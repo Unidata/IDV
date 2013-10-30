@@ -12385,6 +12385,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public boolean isRubberBandBoxChanged() {
         RubberBandBox rubberBandBox = null;
+        if(!this.isProgressiveResolution)
+            return false;
         if(!inGlobeDisplay()) {
             MapProjectionDisplay mpd =
                 (MapProjectionDisplay) getNavigatedDisplay();
