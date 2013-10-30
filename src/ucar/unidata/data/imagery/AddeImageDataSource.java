@@ -194,7 +194,9 @@ public class AddeImageDataSource extends ImageDataSource {
         allBandDirs     = (Hashtable) properties.get("allBands");
         this.descriptor = aid;
         ArrayList oj = (ArrayList) properties.get("bandinfo");
-        this.bandId = (BandInfo) oj.get(0);
+        if (oj != null) {
+            this.bandId = (BandInfo) oj.get(0);
+        }
     }
 
 
@@ -209,13 +211,17 @@ public class AddeImageDataSource extends ImageDataSource {
             this.source = desc1.getSource();
             allBandDirs = (Hashtable) getProperties().get("allBands");
             ArrayList oj = (ArrayList) getProperties().get("bandinfo");
-            this.bandId = (BandInfo) oj.get(0);
+            if (oj != null) {
+                this.bandId = (BandInfo) oj.get(0);
+            }
             AreaDirectory thisDir = desc1.processSourceAsAddeUrl(this.source);
             // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
             this.source = getPreviewSource(this.source, thisDir);
-            this.source =
-                replaceKey(this.source, "BAND",
-                           Integer.toString(this.bandId.getBandNumber()));
+            if (oj != null) {
+                this.source =
+                    replaceKey(this.source, "BAND",
+                               Integer.toString(this.bandId.getBandNumber()));
+            }
             this.descriptor = new AddeImageDescriptor(thisDir, null);
         }
     }
@@ -298,21 +304,24 @@ public class AddeImageDataSource extends ImageDataSource {
         GeoSelection geoSelection            = subset.getGeoSelection();
         boolean      isProgressiveResolution = true;
         boolean fromBundle = getIdv().getStateManager().getProperty(
-                IdvConstants.PROP_LOADINGXML, false);
+                                 IdvConstants.PROP_LOADINGXML, false);
         //if (isReload) {
         // try {
         //    descriptors = reloadDescriptors(descriptors, subset);
         //   } catch (Exception ee) {}
         // }
 
-       // when geoSelection is null, it is from the old bundle and return the desscriptors.
+        // when geoSelection is null, it is from the old bundle and return the desscriptors.
         boolean isOldBundle = false;
-        if(fromBundle) {
-            if( subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION) == null )
+        if (fromBundle) {
+            if (subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION)
+                    == null) {
                 isOldBundle = true;
+            }
         }
-        if(isOldBundle) //geoSelection == null)
-           return descriptors;
+        if (isOldBundle) {  //geoSelection == null)
+            return descriptors;
+        }
         Rectangle rect    = geoSelection.getScreenBound();
         String    unitStr = getUnitString(dataChoice.getDescription());
 
@@ -407,7 +416,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                              isProgressiveResolution);
             } else {  // use default
                 BandInfo id = (BandInfo) dataChoice.getId();
-                 AreaDirectory thisDir =
+                AreaDirectory thisDir =
                     (AreaDirectory) allBandDirs.get(id.getBandNumber());
                 int[]  dir         = thisDir.getDirectoryBlock();
                 int    lines       = dir[8];  //2726
@@ -1281,10 +1290,14 @@ public class AddeImageDataSource extends ImageDataSource {
         try {
 
             //AreaAdapter   aa = new AreaAdapter(this.source, false);
+            BandInfo id = null;
+            if (dataChoice.getId() instanceof BandInfo) {
+                id = (BandInfo) dataChoice.getId();
+            } else {
+                return;
+            }
 
-            BandInfo id = (BandInfo) dataChoice.getId();
-
-            if ( !id.equals(this.bandId)) {
+            if ((id != null) && !id.equals(this.bandId)) {
                 // now different band selected, and the preview and advanced need to be recreated
 
                 AreaDirectory thisDir =
@@ -1304,7 +1317,10 @@ public class AddeImageDataSource extends ImageDataSource {
                     AreaFile areaFile = areaAdapter.getAreaFile();
                     baseAnav = areaFile.getNavigation();
                     acs      = new AREACoordinateSystem(areaFile);
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                    LogUtil.userErrorMessage(
+                        "Error in initDataSelectionComponents  e=" + e);
+                }
 
                 this.bandId = id;
                 previewSelection = new AddeImagePreviewPanel(this,
@@ -1317,8 +1333,9 @@ public class AddeImageDataSource extends ImageDataSource {
             }
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(LogUtil.getCurrentWindow(),
-                                          ex.getMessage(), "Exception", 0);
+            JOptionPane.showMessageDialog(
+                LogUtil.getCurrentWindow(), ex.getMessage(),
+                "Error in initDataSelectionComponents 2", 0);
             getDataContext().getIdv().showNormalCursor();
             return;
         }
