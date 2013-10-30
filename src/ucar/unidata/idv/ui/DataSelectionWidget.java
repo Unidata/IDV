@@ -238,6 +238,26 @@ public class DataSelectionWidget {
     /** _more_ */
     private String regionOption = USE_DEFAULTREGION;
 
+    /** _more_ */
+    public String USE_DEFAULTSTRIDE = "Use Default";
+
+    /** _more_ */
+    public String USE_SELECTEDSTRIDE = "Use Selected";
+
+    /** _more_ */
+    public String USE_PROGRESSIVE = "Use Progressive Resolution";
+
+    /** _more_ */
+    private String[] strideOptionLabels = new String[] {
+            USE_DEFAULTSTRIDE,
+            USE_SELECTEDREGION, USE_PROGRESSIVE };
+
+    /** _more_ */
+    JComboBox strideOptionLabelBox;
+
+    /** _more_ */
+    private String strideOption = USE_DEFAULTSTRIDE;
+
     /**
      * Constructor  for when we are a part of the {@link DataSelector}
      *
@@ -706,18 +726,13 @@ public class DataSelectionWidget {
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
-                GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
+                GuiUtils.enableTree(strideComponent, strideOption.equals(USE_SELECTEDSTRIDE));
+
                 strideTab.add(
                     GuiUtils.top(
                         GuiUtils.topCenter(
                             GuiUtils.inset(
-                                GuiUtils.right(strideCbx),
-                                new Insets(0, 0, 5, 0)), strideComponent)));
-                strideTab.add(
-                    GuiUtils.top(
-                        GuiUtils.topCenter(
-                            GuiUtils.inset(
-                                GuiUtils.right(strideCbx),
+                                GuiUtils.right(strideOptionLabelBox),
                                 new Insets(0, 0, 5, 0)), strideComponent)));
                 selectionTab.add("Stride", strideTab);
             }
@@ -754,6 +769,7 @@ public class DataSelectionWidget {
      */
     public DataSelection createDataSelection(boolean addLevels) {
         DataSelection dataSelection = null;
+        boolean isProgressiveResolution = false;
         //if (getUseAllTimes()) {
         if (getUseAllTimes() || chooserDoTimeMatching
                 || timeOption.equals(USE_DRIVERTIMES)) {
@@ -794,6 +810,12 @@ public class DataSelectionWidget {
                 */
         dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
                                   regionOption);
+        isProgressiveResolution = strideOption.equals(USE_PROGRESSIVE);
+        dataSelection.putProperty(
+                DataSelection.PROP_PROGRESSIVERESOLUTION,
+                isProgressiveResolution);
+        dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
+                regionOption);
         GeoSelection geoSelection = getGeoSelection();
 
 
@@ -806,7 +828,7 @@ public class DataSelectionWidget {
                 geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
             } catch (Exception e) {}
 
-            if (strideCbx.isSelected()) {
+            if (strideOption == USE_DEFAULTSTRIDE) {
                 geoSelection.clearStride();
             }
             if ( !regionOption.equals(USE_SELECTEDREGION)) {
@@ -981,13 +1003,14 @@ public class DataSelectionWidget {
 
     private JComponent doMakeContents() {
         regionOptionLabelBox = new JComboBox();
+        strideOptionLabelBox = new JComboBox();
 
         //added
         regionOptionLabelBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 String selectedObj =
                     (String) regionOptionLabelBox.getSelectedItem();
-                setRegionOptions(selectedObj);
+                regionOption = selectedObj.toString();
                 if (areaComponent != null) {
                     GuiUtils.enableTree(
                         areaComponent,
@@ -1012,6 +1035,31 @@ public class DataSelectionWidget {
                 }
             }
         });
+
+        //added
+        strideOptionLabelBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                String selectedObj =
+                        (String) strideOptionLabelBox.getSelectedItem();
+                strideOption = selectedObj.toString();
+                if (strideComponent != null) {
+                    GuiUtils.enableTree(
+                            strideComponent,
+                            strideOption.equals(USE_SELECTEDSTRIDE));
+                    if(strideOption.equals(USE_PROGRESSIVE)){
+                        geoSelectionPanel.enableZComponents(true);
+                    }
+                }
+            }
+
+        });
+
+        //timeDeclutterFld = new JTextField("" + getTimeDeclutterMinutes(), 5);
+        GuiUtils.enableTree(regionOptionLabelBox, true);
+
+        List strideOptionNames = Misc.toList(strideOptionLabels);
+
+        GuiUtils.setListData(strideOptionLabelBox, strideOptionNames);
 
         strideCbx = new JCheckBox("Use Default", true);
         strideCbx.addActionListener(new ActionListener() {
@@ -1038,18 +1086,6 @@ public class DataSelectionWidget {
         return selectionContainer;
     }
 
-    /**
-     * _more_
-     *
-     * @param selectedObject _more_
-     */
-    public void setRegionOptions(String selectedObject) {
-
-        regionOption = selectedObject.toString();
-        if (selectedObject.equals(USE_DEFAULTREGION)) {}
-        else if (selectedObject.equals(USE_SELECTEDREGION)) {}
-        else if (selectedObject.equals(USE_DISPLAYREGION)) {}
-    }
 
     /**
      * Get the list of all dttms

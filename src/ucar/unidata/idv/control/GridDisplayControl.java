@@ -23,6 +23,7 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.ViewManager;
@@ -100,7 +101,9 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
     /**
      *  cstr does nothing yet; usually made from a subclass.
      */
-    public GridDisplayControl() {}
+    public GridDisplayControl() {
+        setCanDoProgressiveResolution(true);
+    }
 
 
 
@@ -281,8 +284,15 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      */
     protected DataInstance doMakeDataInstance(DataChoice dataChoice)
             throws RemoteException, VisADException {
+        DataSelection ds = getDataSelection();
+        Object t = ds.getProperty(
+                DataSelection.PROP_PROGRESSIVERESOLUTION);
+        if (t != null) {
+            isProgressiveResolution = ((Boolean) t).booleanValue();
+        }
+
         return gridDataInstance = new GridDataInstance(dataChoice,
-                getDataSelection(), getRequestProperties());
+                ds, getRequestProperties());
     }
 
 
@@ -711,4 +721,21 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected boolean shouldAddDisplayListener() {
+        return true;
+    }
+
+    /**
+     * Signal base class to add this as a control listener
+     *
+     * @return Add as control listener
+     */
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
 }

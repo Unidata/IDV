@@ -25,19 +25,7 @@ import ucar.nc2.time.Calendar;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
-import ucar.unidata.data.DataCancelException;
-import ucar.unidata.data.DataChangeListener;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.DataOperand;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSelectionComponent;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DataTimeRange;
-import ucar.unidata.data.DerivedDataChoice;
-import ucar.unidata.data.GeoSelection;
-import ucar.unidata.data.GeoSelectionPanel;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -920,7 +908,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * _more_
      */
-    public Gridded2DSet last2DSet = null;
+    protected Gridded2DSet last2DSet = null;
 
     public boolean isRBBChanged = false;
     /**
@@ -7695,6 +7683,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     isProgressiveResolution =
                         ((JCheckBox) e.getSource()).isSelected();
                     try {
+                        dataSelection.putProperty(
+                                DataSelection.PROP_PROGRESSIVERESOLUTION,
+                                isProgressiveResolution);
                         GeoSelection geoSelection =
                             dataSelection.getGeoSelection(true);
                         geoSelection.setScreenLatLonRect(
@@ -12461,16 +12452,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     public void setIsProgressiveResolution(boolean  isPG){
         this.isProgressiveResolution = isPG;
-    }
-    /**
-     * _more_
-     */
-    public Gridded2DSet getLast2DSet(){
-        return this.last2DSet;
-    }
-
-    public void setLast2DSet(Gridded2DSet g2s){
-        this.last2DSet = g2s;
     }
 
 }
