@@ -84,4 +84,4 @@ fi
 # idv_maxpermgensize=128
 
 # Sun OS users: To run in 64 bit mode, add -d64 before -Xmx.  
-${java} -Xmx${idv_memory}m -XX:MaxPermSize=${idv_maxpermgensize}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
+${java} -Xms${idv_memory}m -Xmx${idv_memory}m -XX:MaxPermSize=${idv_maxpermgensize}m -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
