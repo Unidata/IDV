@@ -1526,10 +1526,14 @@ public class MapViewManager extends NavigatedViewManager {
               new Boolean(getShowBottomLegend()) },
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
               new Boolean(getShowAnimationBoxes()) },
-            { "Show Clock", IdvConstants.PROP_SHOWCLOCK,
+            { "Show Clock On Dashboard", IdvConstants.PROP_SHOWCLOCK_DASH,
               new Boolean(
                   getStateManager().getPreferenceOrProperty(
-                      IdvConstants.PROP_SHOWCLOCK, "true")) },
+                      IdvConstants.PROP_SHOWCLOCK_DASH, "true")) },
+            { "Show Clock On View Windows", IdvConstants.PROP_SHOWCLOCK_VIEW,
+                    new Boolean(
+                            getStateManager().getPreferenceOrProperty(
+                                    IdvConstants.PROP_SHOWCLOCK_VIEW, "false")) },
             { "Show Overview Map", PREF_SHOWPIP,
               new Boolean(getStore().get(PREF_SHOWPIP, false)) }
         };

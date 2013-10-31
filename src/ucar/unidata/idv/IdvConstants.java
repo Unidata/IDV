@@ -314,7 +314,10 @@ public interface IdvConstants {
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
     /** Property used for showing the clock */
-    public static final String PROP_SHOWCLOCK = "idv.monitor.showclock";
+    public static final String PROP_SHOWCLOCK_DASH = "idv.monitor.showclock.dashboard";
+
+    /** Property used for showing the clock */
+    public static final String PROP_SHOWCLOCK_VIEW = "idv.monitor.showclock.view";
 
     /** Property for the minimum frame cycle time */
     public static final String PROP_MINIMUMFRAMECYCLETIME =

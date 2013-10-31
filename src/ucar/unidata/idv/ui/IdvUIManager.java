@@ -258,8 +258,12 @@ public class IdvUIManager extends IdvManager {
     public static final String COMP_COMPONENT_HTML = "idv.component.html";
 
 
-    /** The identifier of the  toolbar component */
-    public static final String COMP_MEMORYMONITOR = "idv.memorymonitor";
+    /** The identifier of the  toolbar component on view window */
+    public static final String COMP_MEMORYMONITOR_VIEW = "idv.memorymonitor.view";
+
+    /** The identifier of the  toolbar component on dashboard */
+    public static final String COMP_MEMORYMONITOR_DASH = "idv.memorymonitor.dashboard";
+
 
     /** The identifier of the  wait label */
     public static final String COMP_WAITLABEL = "idv.waitlabel";
@@ -3849,13 +3853,16 @@ public class IdvUIManager extends IdvManager {
 
         RovingProgress progress = doMakeRovingProgressBar();
         window.setComponent(COMP_PROGRESSBAR, progress);
-
+        Boolean showClock = getStateManager().getPreferenceOrProperty(
+                PROP_SHOWCLOCK_VIEW, false);
+        if (window.getSkinPath().contains("dashboard.xml")) {
+            showClock = getStateManager().getPreferenceOrProperty(
+                    PROP_SHOWCLOCK_DASH,
+                    true);
+        }
         MemoryMonitor mm = new MemoryMonitor(
                                80,
-                               new Boolean(
-                                   getStateManager().getPreferenceOrProperty(
-                                       PROP_SHOWCLOCK,
-                                       "true")).booleanValue());
+                               showClock);
         window.addRemovable(mm);
 
         //      mm.setLabelFont (DisplayConventions.getWindowLabelFont ());
