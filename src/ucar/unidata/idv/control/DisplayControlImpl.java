@@ -2716,10 +2716,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     dataSelection.getGeoSelection(true);
                 geoSelection.setScreenLatLonRect(
                     getNavigatedDisplay().getLatLonRect());
-                isRBBChanged = isRubberBandBoxChanged();
-                if (isRBBChanged) {
-                    reloadDataSource();
-                    setProjectionInView(true);
+
+                List dataSources = getDataSources();
+                for (int i = 0; i < dataSources.size(); i++) {
+                    isRBBChanged = isRubberBandBoxChanged();
+                    if(isRBBChanged){
+                        ((DataSource) dataSources.get(i)).reloadData();
+                        setProjectionInView(true);
+                    }
                 }
             } catch (Exception e) {}
         }
@@ -5021,6 +5025,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
     }
 
+    /**
+     * Reload the data sources
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException VisAD problem
+     */
+    public void reloadDataSourceAsRBBChanged() throws RemoteException, VisADException {
+        List dataSources = getDataSources();
+        for (int i = 0; i < dataSources.size(); i++) {
+            boolean isRbbChanged = isRubberBandBoxChanged();
+            ((DataSource) dataSources.get(i)).reloadData();
+        }
+    }
     /**
      * reload the data source in a thread.
      *
