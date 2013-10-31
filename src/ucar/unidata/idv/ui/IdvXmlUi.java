@@ -438,17 +438,30 @@ public class IdvXmlUi extends XmlUi {
             return idv.getIdvUIManager().doMakeMenuBar(window);
         }
 
-        if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR)) {
+        if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR_DASH)) {
             MemoryMonitor monitor =
                 new MemoryMonitor(
                     80,
                     new Boolean(
                         idv.getStateManager().getPreferenceOrProperty(
-                            IdvConstants.PROP_SHOWCLOCK,
+                            IdvConstants.PROP_SHOWCLOCK_DASH,
                             "true")).booleanValue());
             memoryMonitors.add(monitor);
             return monitor;
         }
+
+        if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR_VIEW)) {
+            MemoryMonitor monitor =
+                    new MemoryMonitor(
+                            80,
+                            new Boolean(
+                                    idv.getStateManager().getPreferenceOrProperty(
+                                            IdvConstants.PROP_SHOWCLOCK_VIEW,
+                                            "false")).booleanValue());
+            memoryMonitors.add(monitor);
+            return monitor;
+        }
+
 
         if (tagName.equals(IdvUIManager.COMP_STATUSBAR)) {
             return idv.getIdvUIManager().doMakeStatusBar(window);
