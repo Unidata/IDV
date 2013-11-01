@@ -5026,19 +5026,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * Reload the data sources
-     *
-     * @throws RemoteException Java RMI problem
-     * @throws VisADException VisAD problem
-     */
-    public void reloadDataSourceAsRBBChanged() throws RemoteException, VisADException {
-        List dataSources = getDataSources();
-        for (int i = 0; i < dataSources.size(); i++) {
-            boolean isRbbChanged = isRubberBandBoxChanged();
-            ((DataSource) dataSources.get(i)).reloadData();
-        }
-    }
-    /**
      * reload the data source in a thread.
      *
      * @throws RemoteException Java RMI problem
