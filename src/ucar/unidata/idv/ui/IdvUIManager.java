@@ -39,7 +39,22 @@ import ucar.unidata.data.ListDataChoice;
 import ucar.unidata.data.UserOperandValue;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.gis.maps.MapData;
-import ucar.unidata.idv.*;
+import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.History;
+import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.IdvManager;
+import ucar.unidata.idv.IdvPersistenceManager;
+import ucar.unidata.idv.IdvPreferenceManager;
+import ucar.unidata.idv.IdvResourceManager;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.LibVersionUtil;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.SavedBundle;
+import ucar.unidata.idv.TransectViewManager;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.ViewState;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.DisplaySettingsDialog;
 import ucar.unidata.idv.control.MapDisplayControl;
@@ -259,10 +274,12 @@ public class IdvUIManager extends IdvManager {
 
 
     /** The identifier of the  toolbar component on view window */
-    public static final String COMP_MEMORYMONITOR_VIEW = "idv.memorymonitor.view";
+    public static final String COMP_MEMORYMONITOR_VIEW =
+        "idv.memorymonitor.view";
 
     /** The identifier of the  toolbar component on dashboard */
-    public static final String COMP_MEMORYMONITOR_DASH = "idv.memorymonitor.dashboard";
+    public static final String COMP_MEMORYMONITOR_DASH =
+        "idv.memorymonitor.dashboard";
 
 
     /** The identifier of the  wait label */
@@ -1607,7 +1624,7 @@ public class IdvUIManager extends IdvManager {
                 if ((settings != null) && (settings.size() > 0)) {
                     props.put("initialSettings", settings);
                 }
-                ViewManager vm =  getIdv().getViewManager();
+                ViewManager vm = getIdv().getViewManager();
                 if ((vm != null) && (vm instanceof TransectViewManager)) {
                     DisplayControl dc =
                         getIdv().doMakeControl("transectdrawingcontrol");
@@ -1620,10 +1637,11 @@ public class IdvUIManager extends IdvManager {
                             String grp0 = (String) vm0.getShareGroup();
                             if (vm0.getShareViews() && (grp0 != null)) {
                                 for (int j = 0; j < vmList.size(); j++) {
-                                    ViewManager vm1 = (ViewManager) vmList.get(j);
+                                    ViewManager vm1 =
+                                        (ViewManager) vmList.get(j);
                                     if (vm1 instanceof MapViewManager) {
                                         String grp1 =
-                                                (String) vm1.getShareGroup();
+                                            (String) vm1.getShareGroup();
                                         if (grp0.equals(grp1) && (j != ii)) {
                                             dc.moveTo(vm1);
                                             moved = true;
@@ -3853,16 +3871,14 @@ public class IdvUIManager extends IdvManager {
 
         RovingProgress progress = doMakeRovingProgressBar();
         window.setComponent(COMP_PROGRESSBAR, progress);
-        Boolean showClock = getStateManager().getPreferenceOrProperty(
-                PROP_SHOWCLOCK_VIEW, false);
+        Boolean showClock =
+            getStateManager().getPreferenceOrProperty(PROP_SHOWCLOCK_VIEW,
+                false);
         if (window.getSkinPath().contains("dashboard.xml")) {
             showClock = getStateManager().getPreferenceOrProperty(
-                    PROP_SHOWCLOCK_DASH,
-                    true);
+                PROP_SHOWCLOCK_DASH, true);
         }
-        MemoryMonitor mm = new MemoryMonitor(
-                               80,
-                               showClock);
+        MemoryMonitor mm = new MemoryMonitor(80, showClock);
         window.addRemovable(mm);
 
         //      mm.setLabelFont (DisplayConventions.getWindowLabelFont ());

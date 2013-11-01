@@ -21,20 +21,24 @@
 package ucar.unidata.util;
 
 
-import ucar.unidata.util.GuiUtils;
-
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
 
-import javax.swing.*;
-
-import javax.swing.event.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 
 /**
