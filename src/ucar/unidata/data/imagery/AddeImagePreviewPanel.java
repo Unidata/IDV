@@ -85,13 +85,13 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
     //final AddeImageDataSource this;
 
     /** _more_ */
-    public String USE_DEFAULTREGION = "Use Default";
+    public String USE_DEFAULTREGION = DataSelection.PROP_USEDEFAULT;
 
     /** _more_ */
-    public String USE_SELECTEDREGION = "Use Selected";
+    public String USE_SELECTEDREGION = DataSelection.PROP_USESELECTED;
 
     /** _more_ */
-    public String USE_DISPLAYREGION = "Use Display Area";
+    public String USE_DISPLAYREGION = DataSelection.PROP_USEDISPLAYAREA;
 
     /** _more_ */
     private String[] regionSubsetOptionLabels = new String[] {
@@ -165,7 +165,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
         this.eMag  = imageDataSource.getEMag();
         this.lMag  = imageDataSource.getLMag();
 
-        chkUseFull = new JCheckBox("Use Default");
+        chkUseFull = new JCheckBox(DataSelection.PROP_USEDEFAULT);
 
         chkUseFull.setSelected(true);
         getRegionsList();

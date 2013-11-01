@@ -225,7 +225,7 @@ public class DataSelectionWidget {
     public String USE_SELECTEDREGION = "Use Selected";
 
     /** _more_ */
-    public String USE_DISPLAYREGION = "Use Display Area";
+    public String USE_DISPLAYREGION = DataSelection.PROP_USEDISPLAYAREA;
 
     /** _more_ */
     private String[] regionSubsetOptionLabels = new String[] {

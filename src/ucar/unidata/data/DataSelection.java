@@ -66,9 +66,16 @@ public class DataSelection {
     public final static String PROP_REGIONOPTION = "Region_Selection_Option";
 
     /** region option */
-    public final static String PROP_HASSCONNER = "Region_Selection_Has_Conner";
+    public final static String PROP_HASCORNER = "Region_Selection_Has_Conner";
 
+    /** region option */
+    public final static String PROP_USEDISPLAYAREA = "Use Display Area";
 
+    /** region option */
+    public final static String PROP_USEDEFAULT = "Use Default";
+
+    /** region option */
+    public final static String PROP_USESELECTED = "Use Selected";
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
@@ -600,6 +607,21 @@ public class DataSelection {
         return new Boolean(o.toString()).booleanValue();
     }
 
+    /**
+     * Get the named object property
+     *
+     * @param name   name of property
+     * @param dflt   default value
+     *
+     * @return  the value of the property or the default
+     */
+    public String getProperty(String name, String dflt) {
+        Object o = getProperty(name);
+        if (o == null) {
+            return dflt;
+        }
+        return o.toString();
+    }
     /**
      * put the property
      *

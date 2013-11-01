@@ -149,7 +149,7 @@ public class ImagePlanViewControl extends PlanViewControl {
         List dsList = new ArrayList();
         dataChoice.getDataSources(dsList);
         DataSourceImpl dsImpl    = (DataSourceImpl) dsList.get(0);
-        boolean        hasConner = false;
+        boolean        hasCorner = false;
         if (dsImpl instanceof AddeImageDataSource) {
             AddeImageDataSource aImageDS = (AddeImageDataSource) dsImpl;
             AddeImagePreviewPanel regionSelection =
@@ -176,7 +176,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                 GeoLocationInfo gInfo;
                 if (latLonRect.getHeight() != latLonRect.getHeight()) {
                     //corner point outside the earth
-                    hasConner = true;
+                    hasCorner = true;
                     LatLonPointImpl cImpl =
                         projectionImpl.projToLatLon(rect.x
                             + rect.getWidth() / 2, rect.y
@@ -244,8 +244,8 @@ public class ImagePlanViewControl extends PlanViewControl {
                     gInfo = new GeoLocationInfo(maxLat,
                             LatLonPointImpl.lonNormal(minLon), minLat,
                             LatLonPointImpl.lonNormal(maxLon));
-                    dataSelection.putProperty(DataSelection.PROP_HASSCONNER,
-                            hasConner);
+                    dataSelection.putProperty(DataSelection.PROP_HASCORNER,
+                            hasCorner);
                 } else {
                     gInfo = new GeoLocationInfo(latLonRect);
                 }
@@ -270,7 +270,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                 gs.setScreenLatLonRect(navDisplay.getLatLonRect());
                 if ((dataSelection.getGeoSelection() != null)
                         && !regionSelection.getRegionOption().equals(
-                            "Use Display Area")) {
+                        DataSelection.PROP_USEDISPLAYAREA)) {
                     LatLonPoint[] llp0 =
                         dataSelection.getGeoSelection()
                             .getRubberBandBoxPoints();
@@ -319,7 +319,7 @@ public class ImagePlanViewControl extends PlanViewControl {
 
         boolean result = super.setData(dataChoice);
         if ( !result) {
-            if (hasConner) {
+            if (hasCorner) {
                 userMessage("Selected region bounding box is not big enough");
             } else {
                 userMessage("Selected image(s) not available");

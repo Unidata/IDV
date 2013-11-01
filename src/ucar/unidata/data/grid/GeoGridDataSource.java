@@ -1549,18 +1549,15 @@ public class GeoGridDataSource extends GridDataSource {
         //        System.out.println("need volume = " + needVolume + " " + geoGrid.getCoordinateSystem().getVerticalTransform());
 
         StringBuffer filename = new StringBuffer("grid_" + paramName);
-        boolean      isProgressiveResolution = false;
+
         String       regionOption            = null;
         Object t = givenDataSelection.getProperty(
                        DataSelection.PROP_PROGRESSIVERESOLUTION);
-        Object r =
-            givenDataSelection.getProperty(DataSelection.PROP_REGIONOPTION);
-        if (r != null) {
-            regionOption = (String) r;
-        }
-        if (t != null) {
-            isProgressiveResolution = ((Boolean) t).booleanValue();
-        }
+
+        regionOption = givenDataSelection.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULT);
+        boolean      isProgressiveResolution = givenDataSelection.getProperty(
+                DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+
 
         try {
             Range ensRange   = makeRange(ensDim, null, 1);

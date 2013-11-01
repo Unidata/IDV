@@ -319,9 +319,10 @@ public class AddeImageDataSource extends ImageDataSource {
                 isOldBundle = true;
             }
         }
-        if (isOldBundle) {  //geoSelection == null)
+        if (isOldBundle || allBandDirs == null) {  //geoSelection == null)
             return descriptors;
         }
+
         Rectangle rect    = geoSelection.getScreenBound();
         String    unitStr = getUnitString(dataChoice.getDescription());
 
@@ -329,29 +330,23 @@ public class AddeImageDataSource extends ImageDataSource {
         int       dlMag   = 0;
         int       deMag   = 0;
 
-        Object t =
-            subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION);
-        if (t instanceof Boolean) {
-            isProgressiveResolution = ((Boolean) t).booleanValue();
-            if ( !isProgressiveResolution) {
-                dlMag = advancedSelection.getLineMagValue();
-                deMag = advancedSelection.getElementMagValue();
-            }
-        }
-        boolean useDisplayArea = false;
-        boolean hasConner      = false;
-        Object  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION);
-        if (t1 != null) {
-            String areaOpt = (String) t1;
-            if (t1.equals("Use Display Area")) {
-                useDisplayArea = true;
-            }
+
+        isProgressiveResolution = subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, true);
+
+        if ( !isProgressiveResolution) {
+            dlMag = advancedSelection.getLineMagValue();
+            deMag = advancedSelection.getElementMagValue();
         }
 
-        Object t2 = subset.getProperty(DataSelection.PROP_HASSCONNER);
-        if (t2 != null) {
-            hasConner = (Boolean) t2;
+        boolean useDisplayArea = false;
+
+        String  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULT);
+        if (t1 != null && t1.equals(DataSelection.PROP_USEDISPLAYAREA)) {
+            useDisplayArea = true;
         }
+
+        boolean hasCorner = subset.getProperty(DataSelection.PROP_HASCORNER, false);
+
         if (geoSelection != null) {  //&& !isReload) {
             // applies the rubberbandbox geosubset here
             //GeoSelection gs = subset.getGeoSelection();
@@ -384,7 +379,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                         minLon, elFactor, dlMag, deMag,
                                         "CENTER", isProgressiveResolution,
                                         dir);
-                } else if (hasConner) {
+                } else if (hasCorner) {
                     descriptors =
                         geoSpaceSubset(geoSelection.getScreenBound(),
                                        unitStr, eMag, lMag, baseAnav,
@@ -874,15 +869,15 @@ public class AddeImageDataSource extends ImageDataSource {
             int newelems;
 
             if (lineMag == 1) {
-                newLines = lines;
+                newLines = (int)(lines * 1.25);
             } else {
-                newLines = (int) Math.floor(lines / lineMag + 0.5);
+                newLines = (int) (Math.floor(lines / lineMag + 0.5)* 1.25);
             }
 
             if (eleMag == 1) {
-                newelems = elems;
+                newelems = (int)(elems * 1.25);
             } else {
-                newelems = (int) Math.floor(elems / eleMag + 0.5);
+                newelems = (int) (Math.floor(elems / eleMag + 0.5) * 1.25);
             }
 
             System.out.println("Line: lines " + lines + " lineMag " + lineMag
@@ -1022,15 +1017,15 @@ public class AddeImageDataSource extends ImageDataSource {
             int newelems;
 
             if (lineMag == 1) {
-                newLines = lines;
+                newLines = (int)(lines * 1.25);
             } else {
-                newLines = (int) Math.floor(lines / lineMag + 0.5);
+                newLines = (int) (Math.floor(lines / lineMag + 0.5) * 1.25);
             }
 
             if (eleMag == 1) {
-                newelems = elems;
+                newelems = (int)(elems * 1.25);
             } else {
-                newelems = (int) Math.floor(elems / eleMag + 0.5);
+                newelems = (int) (Math.floor(elems / eleMag + 0.5) * 1.25);
             }
 
             System.out.println("Line: lines " + lines + " lineMag " + lineMag
