@@ -1566,7 +1566,7 @@ public abstract class XmlUtil {
         MyErrorHandler errorHandler = new MyErrorHandler();
         builder.setErrorHandler(errorHandler);
         try {
-            return builder.parse(new ByteArrayInputStream(xml.getBytes()));
+            return builder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
         } catch (Exception exc) {
             //            System.err.println("OOps:" + xml);
             throw new IllegalStateException("Error parsing xml: "
