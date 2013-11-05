@@ -5029,7 +5029,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws VisADException VisAD problem
      */
     public void reloadDataSource() throws RemoteException, VisADException {
-        List dataSources = getDataSources();
+        List dataSources = Misc.makeUnique(getDataSources());
         for (int i = 0; i < dataSources.size(); i++) {
             ((DataSource) dataSources.get(i)).reloadData();
         }
