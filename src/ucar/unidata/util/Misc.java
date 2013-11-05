@@ -23,7 +23,6 @@ package ucar.unidata.util;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,18 +37,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 import java.text.DecimalFormat;
 import java.text.ParseException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -58,6 +53,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -699,24 +695,14 @@ public class Misc {
     }
 
     /**
-     * Make the list unique
+     * Make the list unique.
      *
+     * @param <E> the element type
      * @param l initial list
-     *
      * @return unique list
      */
-    public static List makeUnique(List l) {
-        List      result = new ArrayList();
-        Hashtable ht     = new Hashtable();
-        for (int i = 0; i < l.size(); i++) {
-            Object o = l.get(i);
-            if (ht.get(o) != null) {
-                continue;
-            }
-            ht.put(o, o);
-            result.add(o);
-        }
-        return result;
+    public static <E> List<E> makeUnique(List<E> l) {
+      return new ArrayList<E>(new HashSet<E>(l));
     }
 
 

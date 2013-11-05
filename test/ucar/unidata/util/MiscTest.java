@@ -25,7 +25,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -33,6 +36,27 @@ import java.util.Map;
  * The tests for the Misc class.
  */
 public class MiscTest {
+
+  /**
+   * Test the Misc.decodeLatLon method.
+   */
+  @Test
+  public void testMakeUnique() {
+    List<Integer> listDup = Arrays.asList(1,3,4,5,1);
+    List<Integer> listUnique = Misc.makeUnique(listDup);
+    String error = "Misc.makeUnique not working";
+    assertEquals(error,
+        listUnique.size(), 4);
+    
+    listDup = Arrays.asList(1,3,null,5,1);
+    listUnique = Misc.makeUnique(listDup);
+    assertEquals(error,
+        listUnique.size(), 4);
+    
+    listUnique = Misc.makeUnique(Collections.<Integer>emptyList());
+    assertEquals(error,
+        listUnique.size(), 0);
+  }
 
 
     /**
