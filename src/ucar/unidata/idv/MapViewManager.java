@@ -47,7 +47,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.view.geoloc.AxisScaleInfo;
 import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.LatLonAxisScaleInfo;
 import ucar.unidata.view.geoloc.LatLonScalePanel;
@@ -102,7 +101,12 @@ import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
 import java.text.Collator;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -1365,7 +1369,7 @@ public class MapViewManager extends NavigatedViewManager {
                                                       Object>();
 
         Collection<String> projNames =
-                new TreeSet<String>(Collator.getInstance());
+            new TreeSet<String>(Collator.getInstance());
 
         for (int p = 0; p < projections.size(); p++) {
             String projName = ((ProjectionImpl) projections.get(p)).getName();
@@ -1377,7 +1381,8 @@ public class MapViewManager extends NavigatedViewManager {
         Object defaultProj = getDefaultProjection();
         if (defaultProj != null) {
             if (defaultProj instanceof ProjectionImpl) {
-                projBox.setSelectedItem(((ProjectionImpl) defaultProj).getName());
+                projBox.setSelectedItem(
+                    ((ProjectionImpl) defaultProj).getName());
             } else {
                 projBox.setSelectedItem(defaultProj);
             }
@@ -1526,10 +1531,14 @@ public class MapViewManager extends NavigatedViewManager {
               new Boolean(getShowBottomLegend()) },
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
               new Boolean(getShowAnimationBoxes()) },
-            { "Show Clock", IdvConstants.PROP_SHOWCLOCK,
+            { "Show Clock On Dashboard", IdvConstants.PROP_SHOWCLOCK_DASH,
               new Boolean(
                   getStateManager().getPreferenceOrProperty(
-                      IdvConstants.PROP_SHOWCLOCK, "true")) },
+                      IdvConstants.PROP_SHOWCLOCK_DASH, "true")) },
+            { "Show Clock On View Windows", IdvConstants.PROP_SHOWCLOCK_VIEW,
+              new Boolean(
+                  getStateManager().getPreferenceOrProperty(
+                      IdvConstants.PROP_SHOWCLOCK_VIEW, "false")) },
             { "Show Overview Map", PREF_SHOWPIP,
               new Boolean(getStore().get(PREF_SHOWPIP, false)) }
         };
@@ -3864,8 +3873,4 @@ public class MapViewManager extends NavigatedViewManager {
             d.setLonScaleInfo(axisScaleInfo);
         }
     }
-
-
-
-
 }
