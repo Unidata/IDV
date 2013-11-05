@@ -20,9 +20,11 @@
 
 package ucar.unidata.util;
 
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,14 +39,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 import java.text.DecimalFormat;
 import java.text.ParseException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -265,11 +271,11 @@ public class Misc {
         formatted =
             formatted.replaceAll("SS", StringUtil.padZero(format.contains("s")
                 ? seconds
-                : (int)Math.round(dseconds), 2));
+                : (int) Math.round(dseconds), 2));
         if (format.indexOf("H") >= 0) {
-            if (use360) {            // should we ignore or add E?
+            if (use360) {                         // should we ignore or add E?
                 formatted = formatted.replace("H", "");
-            } else if (Math.abs(value) == 180) {     // 180 line - subject to debate
+            } else if (Math.abs(value) == 180) {  // 180 line - subject to debate
                 formatted = formatted.replace("H", "");
             } else if (value < 0) {  // South/West
                 formatted = formatted.replace("H", (isLatitude)
@@ -702,7 +708,7 @@ public class Misc {
      * @return unique list
      */
     public static <E> List<E> makeUnique(List<E> l) {
-      return new ArrayList<E>(new HashSet<E>(l));
+        return new ArrayList<E>(new HashSet<E>(l));
     }
 
 
@@ -2044,7 +2050,7 @@ public class Misc {
         }
         try {
             // hack to also accept lower case e for exponent
-            value = value.replace("e","E"); 
+            value = value.replace("e", "E");
             return formatter.parse(value).doubleValue();
         } catch (ParseException pe) {
             throw new NumberFormatException(pe.getMessage());
