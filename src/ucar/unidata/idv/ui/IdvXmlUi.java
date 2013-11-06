@@ -459,7 +459,7 @@ public class IdvXmlUi extends XmlUi {
                     new Boolean(
                         idv.getStateManager().getPreferenceOrProperty(
                             IdvConstants.PROP_SHOWCLOCK_VIEW,
-                            "false")).booleanValue());
+                            "true")).booleanValue());
             memoryMonitors.add(monitor);
             return monitor;
         }

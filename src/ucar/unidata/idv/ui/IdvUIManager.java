@@ -3873,8 +3873,8 @@ public class IdvUIManager extends IdvManager {
         window.setComponent(COMP_PROGRESSBAR, progress);
         Boolean showClock =
             getStateManager().getPreferenceOrProperty(PROP_SHOWCLOCK_VIEW,
-                false);
-        if (window.getSkinPath().contains("dashboard.xml")) {
+                true);
+        if (!window.getIsAMainWindow()) {
             showClock = getStateManager().getPreferenceOrProperty(
                 PROP_SHOWCLOCK_DASH, true);
         }

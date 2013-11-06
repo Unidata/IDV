@@ -1538,7 +1538,7 @@ public class MapViewManager extends NavigatedViewManager {
             { "Show Clock On View Windows", IdvConstants.PROP_SHOWCLOCK_VIEW,
               new Boolean(
                   getStateManager().getPreferenceOrProperty(
-                      IdvConstants.PROP_SHOWCLOCK_VIEW, "false")) },
+                      IdvConstants.PROP_SHOWCLOCK_VIEW, "true")) },
             { "Show Overview Map", PREF_SHOWPIP,
               new Boolean(getStore().get(PREF_SHOWPIP, false)) }
         };
