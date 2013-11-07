@@ -25,7 +25,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ucar.ma2.Range;
 import ucar.unidata.collab.SharableImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IntegratedDataViewer;
@@ -57,9 +59,7 @@ import visad.DateTime;
 import visad.VisADException;
 
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -70,6 +70,7 @@ import java.lang.reflect.Constructor;
 import java.rmi.RemoteException;
 
 import java.util.*;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -2318,6 +2319,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
+    int xstride = 0;
+    int ystride = 0;
     public synchronized Data getData(DataChoice dataChoice,
                                      DataCategory category,
                                      DataSelection incomingDataSelection,
@@ -2345,6 +2348,9 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         DataSelection selection = DataSelection.merge(incomingDataSelection,
                                       getDataSelection());
+        boolean  isProgressiveResolution = selection.getProperty(
+                DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+
         Object baseCacheKey = createCacheKey(dataChoice, selection,
                                              requestProperties);
         List cacheKey = ((baseCacheKey != null)
@@ -2378,6 +2384,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                                 + dataChoice);
                 cachedData = getDataInner(dataChoice, category, selection,
                                           requestProperties);
+                if(isProgressiveResolution){
+                    // this reset the x/y stride after PR changing
+                    selection.getGeoSelection().setXStride(0);
+                    selection.getGeoSelection().setYStride(0);
+                }
                 LogUtil.message("");
             } finally {
                 decrOutstandingGetDataCalls();

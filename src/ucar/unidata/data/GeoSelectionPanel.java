@@ -484,6 +484,17 @@ public class GeoSelectionPanel extends JPanel {
     }
 
 
+
+    /**
+     * Set the bounds from the field
+     */
+    public void reSetBoundsFromFields() {
+        NavigatedPanel np = mapPanel.getNavigatedPanel();
+        np.setSelectedRegion((LatLonRect)null);
+        np.repaint();
+
+        mapPanel.repaint();
+    }
     /**
      * Is enabled
      *

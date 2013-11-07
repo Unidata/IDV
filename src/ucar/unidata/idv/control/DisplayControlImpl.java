@@ -910,7 +910,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected Gridded2DSet last2DSet = null;
 
+    /**
+     * _more_
+     */
     public boolean isRBBChanged = false;
+
     /**
      * Default constructor. This is called when the control is
      * unpersisted through the {@link ucar.unidata.xml.XmlEncoder}
@@ -2717,7 +2721,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 geoSelection.setScreenLatLonRect(
                     getNavigatedDisplay().getLatLonRect());
 
-                List dataSources = getDataSources();
+                List dataSources = Misc.makeUnique(getDataSources());
                 for (int i = 0; i < dataSources.size(); i++) {
                     isRBBChanged = isRubberBandBoxChanged();
                     if(isRBBChanged){
@@ -3211,7 +3215,28 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             throws RemoteException, VisADException {
 
         //Make the new DataInstance through the factory call
+        if(dataChoice instanceof DerivedDataChoice){
+            DataSelection mySelection = dataChoice.getDataSelection();
+            if(mySelection == null){
+                mySelection = new DataSelection();
+            }
+            GeoSelection gs = new GeoSelection();
+            NavigatedDisplay navDisplay =
+                   (NavigatedDisplay) getViewManager().getMaster();
+            Rectangle screenBoundRect = navDisplay.getScreenBounds();
+                   gs.setScreenBound(screenBoundRect);
+                   gs.setScreenLatLonRect(navDisplay.getLatLonRect());
+            mySelection.setGeoSelection(gs);
+            dataChoice.setDataSelection(mySelection);
+        }
         DataInstance di = doMakeDataInstance(dataChoice);
+
+        if(dataChoice instanceof DerivedDataChoice){
+            DirectDataChoice ddc = (DirectDataChoice)((DerivedDataChoice) dataChoice).getChoices().get(0);
+            DataSelection ds = ddc.getDataSelection();
+            if(ds != null)
+                isProgressiveResolution = ds.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+        }
 
         if (cachedData != null) {
             Object id   = dataChoice.getId();
@@ -5019,7 +5044,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @throws VisADException VisAD problem
      */
     public void reloadDataSource() throws RemoteException, VisADException {
-        List dataSources = getDataSources();
+        List dataSources = Misc.makeUnique(getDataSources());
         for (int i = 0; i < dataSources.size(); i++) {
             ((DataSource) dataSources.get(i)).reloadData();
         }
@@ -12414,9 +12439,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             try {
                 ucar.unidata.geoloc.LatLonPoint[] llp0 =
                     getLatLonPoints(rubberBandBox.getBounds().getDoubles());
+                GeoLocationInfo gInfo = new GeoLocationInfo(
+                        llp0[0].getLatitude(), llp0[0].getLongitude(),
+                        llp0[1].getLatitude(), llp0[1].getLongitude());
                 geoSelection.setRubberBandBoxPoints(llp0);
                 geoSelection.setScreenBound(
                     getNavigatedDisplay().getScreenBounds());
+                geoSelection.setBoundingBox(gInfo);
             } catch (Exception e) {}
             dataSelection.setGeoSelection(geoSelection);
             List          dataSources = getDataSources();

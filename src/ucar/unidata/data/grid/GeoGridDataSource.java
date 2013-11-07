@@ -1551,13 +1551,15 @@ public class GeoGridDataSource extends GridDataSource {
         StringBuffer filename = new StringBuffer("grid_" + paramName);
 
         String       regionOption            = null;
-        Object t = givenDataSelection.getProperty(
-                       DataSelection.PROP_PROGRESSIVERESOLUTION);
 
         regionOption = givenDataSelection.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULT);
         boolean      isProgressiveResolution = givenDataSelection.getProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION, false);
 
+        if(!isProgressiveResolution && dataChoice.getDataSelection() != null){
+            isProgressiveResolution =
+                    dataChoice.getDataSelection().getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+        }
 
         try {
             Range ensRange   = makeRange(ensDim, null, 1);
@@ -1570,7 +1572,7 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_r_" + fromLevelIndex + "_" + toLevelIndex);
             }
 
-            if(geoSelection != null){
+        /*    if(geoSelection != null){
                 LatLonPoint[] llp0 = geoSelection.getRubberBandBoxPoints();
                 if(llp0 != null){
                     if(isReload || (this.haveBeenUnPersisted)) {
@@ -1580,6 +1582,7 @@ public class GeoGridDataSource extends GridDataSource {
                     }
                 }
             }
+            */
             if (isProgressiveResolution) {
                 int xLenght = geoGrid.getXDimension().getLength();
                 int yLength = geoGrid.getYDimension().getLength();

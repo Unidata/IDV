@@ -23,15 +23,26 @@
 package ucar.unidata.data;
 
 
+import ucar.unidata.data.grid.GeoGridDataSource;
+import ucar.unidata.data.imagery.AddeImageAdvancedPanel;
+import ucar.unidata.data.imagery.AddeImageDataSource;
+import ucar.unidata.data.imagery.AddeImagePreviewPanel;
+import ucar.unidata.data.imagery.AddeImageSelection;
+import ucar.unidata.geoloc.*;
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.util.TwoFacedObject;
 
 
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlEncoder;
 
 
 
 import visad.*;
+import visad.georef.*;
 
+import java.awt.*;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
@@ -329,6 +340,146 @@ public class DirectDataChoice extends DataChoice {
         //      if (dataSelection == null) {
         //          dataSelection = dataSource.getDataSelection ();
         //      }
+        boolean fromDerived = false;
+
+        if( requestProperties.get("fromderived") != null){
+            fromDerived = (Boolean)requestProperties.get("fromderived");
+        }
+        if(fromDerived){
+            boolean isProgressiveResolution = false;
+            boolean hasCorner = false;
+            String regionOption = null;
+            if(dataSource instanceof AddeImageDataSource){
+                AddeImageDataSource aImageDS = (AddeImageDataSource) dataSource;
+                AddeImagePreviewPanel regionSelection =
+                        aImageDS.getPreviewSelection();
+                AddeImageAdvancedPanel advanceSelection =
+                        aImageDS.getAdvancedSelection();
+
+                ProjectionRect rect =
+                        regionSelection.getNavigatedMapPanel().getNavigatedPanel()
+                                .getSelectedRegion();
+
+                isProgressiveResolution =
+                        advanceSelection.getIsProgressiveResolution();
+
+
+                regionOption = regionSelection.getRegionOption();
+
+                //boolean isRBBChanged = isRubberBandBoxChanged();
+                if ((rect != null)) {
+                    ProjectionImpl projectionImpl =
+                            regionSelection.getNavigatedMapPanel()
+                                    .getProjectionImpl();
+                    LatLonRect latLonRect =
+                            projectionImpl.getLatLonBoundingBox(rect);
+                    GeoLocationInfo gInfo;
+                    if (latLonRect.getHeight() != latLonRect.getHeight()) {
+                        //corner point outside the earth
+                        hasCorner = true;
+                        LatLonPointImpl cImpl =
+                                projectionImpl.projToLatLon(rect.x
+                                        + rect.getWidth() / 2, rect.y
+                                        + rect.getHeight() / 2);
+                        LatLonPointImpl urImpl =
+                                projectionImpl.projToLatLon(rect.x + rect.getWidth(),
+                                        rect.y + rect.getHeight());
+                        LatLonPointImpl ulImpl =
+                                projectionImpl.projToLatLon(rect.x,
+                                        rect.y + rect.getHeight());
+                        LatLonPointImpl lrImpl =
+                                projectionImpl.projToLatLon(rect.x + rect.getWidth(),
+                                        rect.y);
+                        LatLonPointImpl llImpl =
+                                projectionImpl.projToLatLon(rect.x, rect.y);
+
+                        double maxLat = Double.NaN;
+                        double minLat = Double.NaN;
+                        double maxLon = Double.NaN;
+                        double minLon = Double.NaN;
+                        if (cImpl.getLatitude() != cImpl.getLatitude()) {
+                            //do nothing
+                        } else if (ulImpl.getLatitude() != ulImpl.getLatitude()) {
+                            //upper left conner
+                            maxLat = cImpl.getLatitude()
+                                    + (cImpl.getLatitude()
+                                    - lrImpl.getLatitude());
+                            minLat = lrImpl.getLatitude();
+                            maxLon = lrImpl.getLongitude();
+                            minLon = cImpl.getLongitude()
+                                    - (lrImpl.getLongitude()
+                                    - cImpl.getLongitude());
+                        } else if (urImpl.getLatitude() != urImpl.getLatitude()) {
+                            //upper right conner
+                            maxLat = cImpl.getLatitude()
+                                    + (cImpl.getLatitude()
+                                    - llImpl.getLatitude());
+                            minLat = llImpl.getLatitude();
+                            maxLon = cImpl.getLongitude()
+                                    + (cImpl.getLongitude()
+                                    - lrImpl.getLongitude());
+                            minLon = lrImpl.getLongitude();
+                        } else if (llImpl.getLatitude() != llImpl.getLatitude()) {
+                            // lower left conner
+                            maxLat = urImpl.getLatitude();
+                            minLat = cImpl.getLatitude()
+                                    - (urImpl.getLatitude()
+                                    - cImpl.getLatitude());
+                            maxLon = urImpl.getLongitude();
+                            minLon = cImpl.getLongitude()
+                                    - (urImpl.getLongitude()
+                                    - cImpl.getLongitude());
+                        } else if (lrImpl.getLatitude() != lrImpl.getLatitude()) {
+                            // lower right conner
+                            maxLat = ulImpl.getLatitude();
+                            minLat = cImpl.getLatitude()
+                                    - (ulImpl.getLatitude()
+                                    - cImpl.getLatitude());
+                            maxLon = cImpl.getLongitude()
+                                    + (cImpl.getLongitude()
+                                    - ulImpl.getLongitude());
+                            minLon = ulImpl.getLongitude();
+                        }
+
+                        gInfo = new GeoLocationInfo(maxLat,
+                                LatLonPointImpl.lonNormal(minLon), minLat,
+                                LatLonPointImpl.lonNormal(maxLon));
+                        dataSelection.putProperty(DataSelection.PROP_HASCORNER,
+                                hasCorner);
+                    } else {
+                        gInfo = new GeoLocationInfo(latLonRect);
+                    }
+                    GeoSelection gs = new GeoSelection(gInfo);
+                  //  NavigatedDisplay navDisplay =
+                  //          (NavigatedDisplay) getViewManager().getMaster();
+                  //  Rectangle screenBoundRect = navDisplay.getScreenBounds();
+                  //  gs.setScreenBound(screenBoundRect);
+                 //   gs.setScreenLatLonRect(navDisplay.getLatLonRect());
+                    if ( !isProgressiveResolution) {
+                        gs.setXStride(aImageDS.getEleMag());
+                        gs.setYStride(aImageDS.getLineMag());
+                    }
+                    dataSelection.setGeoSelection(gs);
+                    if(myDataSelection != null)
+                        myDataSelection.setGeoSelection(gs);
+                }
+
+                dataSelection.putProperty(
+                        DataSelection.PROP_PROGRESSIVERESOLUTION,
+                        isProgressiveResolution);
+                if(regionOption != null)
+                    dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
+                            regionOption);
+                if(myDataSelection != null){
+                    myDataSelection.putProperty(
+                            DataSelection.PROP_PROGRESSIVERESOLUTION,
+                            isProgressiveResolution);
+                    if(regionOption != null)
+                        myDataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
+                                regionOption);
+                }
+            }
+        }
         Data data =
             dataSource.getData(this, category,
                                DataSelection.merge(dataSelection,

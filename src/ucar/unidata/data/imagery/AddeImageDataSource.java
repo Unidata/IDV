@@ -253,16 +253,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                   requestProperties);
     }
 
-    /**
-     * _more_
-     *
-     * @param data _more_
-     *
-     * @return _more_
-     */
-    protected boolean shouldCache(Data data) {
-        return false;
-    }
+
 
     /**
      * _more_
@@ -464,7 +455,7 @@ public class AddeImageDataSource extends ImageDataSource {
         // geoSelection.setXStride(eleMag);
         // geoSelection.setYStride(lineMag);
 
-        isReload = false;
+
         return descriptors;
 
 
@@ -694,6 +685,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
         isReload = true;
         super.reloadData();
+        isReload = false;
     }
 
     /**
@@ -1286,7 +1278,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
             //AreaAdapter   aa = new AreaAdapter(this.source, false);
             BandInfo id = null;
-            if (dataChoice.getId() instanceof BandInfo) {
+            if (dataChoice.getId() instanceof BandInfo && allBandDirs != null) {
                 id = (BandInfo) dataChoice.getId();
             } else {
                 return;

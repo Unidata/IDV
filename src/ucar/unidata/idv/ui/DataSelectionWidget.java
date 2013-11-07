@@ -1016,6 +1016,9 @@ public class DataSelectionWidget {
                         areaComponent,
                         regionOption.equals(USE_SELECTEDREGION));
                 }
+                if(areaComponent != null && !regionOption.equals(USE_SELECTEDREGION)){
+                     geoSelectionPanel.reSetBoundsFromFields();
+                }
             }
 
         });
