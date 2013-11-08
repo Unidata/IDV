@@ -3109,7 +3109,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             //            colorRange  = null;
             //            selectRange = null;
         }
-
+        if ( !inGlobeDisplay()) {
+            MapProjectionDisplay mpd =
+                    (MapProjectionDisplay) getNavigatedDisplay();
+            RubberBandBox rbb = mpd.getRubberBandBox();
+            if(rbb != null)
+                rbb.reSetBounds();
+        } else {  //now in globe display
+            GlobeDisplay  gd  = (GlobeDisplay) getNavigatedDisplay();
+            RubberBandBox rbb = gd.getRubberBandBox();
+            if(rbb != null)
+                rbb.reSetBounds();
+        }
         return ok;
     }
 
