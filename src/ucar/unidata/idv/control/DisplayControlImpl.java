@@ -12459,14 +12459,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 ds = d.getDataSelection();
                 ds.setGeoSelection(geoSelection);
             }
-            if(!inGlobeDisplay()) {
-                MapProjectionDisplay mpd =
-                        (MapProjectionDisplay) getNavigatedDisplay();
-                mpd.setRubberBandBox(null);
-            } else {
-                GlobeDisplay gd =  (GlobeDisplay)getNavigatedDisplay();
-                gd.setRubberBandBox(null);
-            }
+
             return true;
         }
         return false;
