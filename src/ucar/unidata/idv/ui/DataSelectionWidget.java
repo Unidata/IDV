@@ -250,8 +250,7 @@ public class DataSelectionWidget {
     public String USE_PROGRESSIVE = "Use Progressive Resolution";
 
     /** _more_ */
-    private String[] strideOptionLabels = new String[] {
-            USE_DEFAULTSTRIDE,
+    private String[] strideOptionLabels = new String[] { USE_DEFAULTSTRIDE,
             USE_SELECTEDREGION, USE_PROGRESSIVE };
 
     /** _more_ */
@@ -728,7 +727,8 @@ public class DataSelectionWidget {
                 selectionTab.add("Region", areaTab);
             }
             if (strideComponent != null) {
-                GuiUtils.enableTree(strideComponent, strideOption.equals(USE_SELECTEDSTRIDE));
+                GuiUtils.enableTree(strideComponent,
+                                    strideOption.equals(USE_SELECTEDSTRIDE));
 
                 strideTab.add(
                     GuiUtils.top(
@@ -770,9 +770,9 @@ public class DataSelectionWidget {
      * @return new data selection
      */
     public DataSelection createDataSelection(boolean addLevels) {
-        DataSelection dataSelection = null;
-        boolean isProgressiveResolution = false;
-        boolean hasCorner = false;
+
+        DataSelection dataSelection           = null;
+        boolean       isProgressiveResolution = false;
         //if (getUseAllTimes()) {
         if (getUseAllTimes() || chooserDoTimeMatching
                 || timeOption.equals(USE_DRIVERTIMES)) {
@@ -811,187 +811,19 @@ public class DataSelectionWidget {
         dataSelection.putProperty(DataSelection.PROP_ASTIMEDRIVER,
                 timeOption.equals(AS_DRIVERTIMES));
                 */
-        GeoSelection geoSelection = null;
-        NavigatedDisplay navDisplay =
-                (NavigatedDisplay) idv.getViewManager().getMaster();
 
-        if(lastDataSource instanceof AddeImageDataSource) {
-            AddeImageDataSource aImageDS = (AddeImageDataSource) lastDataSource;
-            AddeImagePreviewPanel regionSelection =
-                    aImageDS.getPreviewSelection();
-            AddeImageAdvancedPanel advanceSelection =
-                    aImageDS.getAdvancedSelection();
-
-            isProgressiveResolution =
-                        advanceSelection.getIsProgressiveResolution();
-            regionOption = regionSelection.getRegionOption();
-            GeoLocationInfo gInfo = null;
-            if (regionOption.equals(DataSelection.PROP_USESELECTED)) {
-                ProjectionRect rect =
-                        regionSelection.getNavigatedMapPanel().getNavigatedPanel()
-                                .getSelectedRegion();
-                ProjectionImpl projectionImpl =
-                        regionSelection.getNavigatedMapPanel()
-                                .getProjectionImpl();
-                LatLonRect latLonRect =
-                        projectionImpl.getLatLonBoundingBox(rect);
-
-                if (latLonRect.getHeight() != latLonRect.getHeight()) {
-                    //corner point outside the earth
-                    hasCorner = true;
-                    LatLonPointImpl cImpl =
-                            projectionImpl.projToLatLon(rect.x
-                                    + rect.getWidth() / 2, rect.y
-                                    + rect.getHeight() / 2);
-                    LatLonPointImpl urImpl =
-                            projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                                    rect.y + rect.getHeight());
-                    LatLonPointImpl ulImpl =
-                            projectionImpl.projToLatLon(rect.x,
-                                    rect.y + rect.getHeight());
-                    LatLonPointImpl lrImpl =
-                            projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                                    rect.y);
-                    LatLonPointImpl llImpl =
-                            projectionImpl.projToLatLon(rect.x, rect.y);
-
-                    double maxLat = Double.NaN;
-                    double minLat = Double.NaN;
-                    double maxLon = Double.NaN;
-                    double minLon = Double.NaN;
-                    if (cImpl.getLatitude() != cImpl.getLatitude()) {
-                        //do nothing
-                    } else if (ulImpl.getLatitude() != ulImpl.getLatitude()) {
-                        //upper left conner
-                        maxLat = cImpl.getLatitude()
-                                + (cImpl.getLatitude()
-                                - lrImpl.getLatitude());
-                        minLat = lrImpl.getLatitude();
-                        maxLon = lrImpl.getLongitude();
-                        minLon = cImpl.getLongitude()
-                                - (lrImpl.getLongitude()
-                                - cImpl.getLongitude());
-                    } else if (urImpl.getLatitude() != urImpl.getLatitude()) {
-                        //upper right conner
-                        maxLat = cImpl.getLatitude()
-                                + (cImpl.getLatitude()
-                                - llImpl.getLatitude());
-                        minLat = llImpl.getLatitude();
-                        maxLon = cImpl.getLongitude()
-                                + (cImpl.getLongitude()
-                                - lrImpl.getLongitude());
-                        minLon = lrImpl.getLongitude();
-                    } else if (llImpl.getLatitude() != llImpl.getLatitude()) {
-                        // lower left conner
-                        maxLat = urImpl.getLatitude();
-                        minLat = cImpl.getLatitude()
-                                - (urImpl.getLatitude()
-                                - cImpl.getLatitude());
-                        maxLon = urImpl.getLongitude();
-                        minLon = cImpl.getLongitude()
-                                - (urImpl.getLongitude()
-                                - cImpl.getLongitude());
-                    } else if (lrImpl.getLatitude() != lrImpl.getLatitude()) {
-                        // lower right conner
-                        maxLat = ulImpl.getLatitude();
-                        minLat = cImpl.getLatitude()
-                                - (ulImpl.getLatitude()
-                                - cImpl.getLatitude());
-                        maxLon = cImpl.getLongitude()
-                                + (cImpl.getLongitude()
-                                - ulImpl.getLongitude());
-                        minLon = ulImpl.getLongitude();
-                    }
-
-                    gInfo = new GeoLocationInfo(maxLat,
-                            LatLonPointImpl.lonNormal(minLon), minLat,
-                            LatLonPointImpl.lonNormal(maxLon));
-                    dataSelection.putProperty(DataSelection.PROP_HASCORNER,
-                            hasCorner);
-
-                } else {
-                    gInfo = new GeoLocationInfo(latLonRect);
-                }
-
+        GeoSelection geoSelection = getGeoSelection();
+        /* if (geoSelection != null) {
+            if (strideCbx.isSelected()) {
+                geoSelection.clearStride();
             }
-
-            geoSelection = new GeoSelection(gInfo);
-            if(gInfo != null)
-                geoSelection.setBoundingBox(gInfo);
-
-            if ( !isProgressiveResolution) {
-                geoSelection.setXStride(aImageDS.getEleMag());
-                geoSelection.setYStride(aImageDS.getLineMag());
+            if (areaCbx.isSelected()) {
+                geoSelection.setBoundingBox(null);
+                geoSelection.setUseFullBounds(false);
             }
+        }  */
 
-        } else {
-            // anything other than adde image
-            isProgressiveResolution = strideOption.equals(USE_PROGRESSIVE);
-            geoSelection = getGeoSelection();
-            if(geoSelection != null) {
-                if (strideOption == USE_DEFAULTSTRIDE) {
-                    geoSelection.clearStride();
-                }
-                if ( !regionOption.equals(USE_SELECTEDREGION)) {
-                    geoSelection.setBoundingBox(null);
-                    geoSelection.setUseFullBounds(false);
-                }
 
-            }
-        }
-
-        if (idv.getViewManager() instanceof MapViewManager) {
-            if (regionOption.equals(USE_DISPLAYREGION)) {
-                idv.getViewManager().setProjectionFromData(false);
-                List<TwoFacedObject> coords = null;
-
-                try {
-                    coords = navDisplay.getScreenSidesCoordinates();
-                } catch (Exception e) {}
-                double[]      elid = (double[]) coords.get(1).getId();
-                EarthLocation el   = navDisplay.getEarthLocation(elid);
-                double maxLat =
-                        el.getLatLonPoint().getLatitude().getValue();
-                elid = (double[]) coords.get(2).getId();
-                el   = navDisplay.getEarthLocation(elid);
-                double minLat =
-                        el.getLatLonPoint().getLatitude().getValue();
-                elid = (double[]) coords.get(3).getId();
-                el   = navDisplay.getEarthLocation(elid);
-                double maxLon =
-                        el.getLatLonPoint().getLongitude().getValue();
-                elid = (double[]) coords.get(4).getId();
-                el   = navDisplay.getEarthLocation(elid);
-                double minLon =
-                        el.getLatLonPoint().getLongitude().getValue();
-                GeoLocationInfo glInfo =
-                        new GeoLocationInfo(
-                                maxLat, LatLonPointImpl.lonNormal(minLon),
-                                minLat, LatLonPointImpl.lonNormal(maxLon));
-
-                geoSelection.setBoundingBox(glInfo);
-            }
-        }
-
-        dataSelection.putProperty(DataSelection.PROP_HASCORNER,
-                hasCorner);
-        dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
-                regionOption);
-        dataSelection.putProperty(
-                DataSelection.PROP_PROGRESSIVERESOLUTION,
-                isProgressiveResolution);
-
-        if (geoSelection != null) {
-
-            Rectangle screenBoundRect = navDisplay.getScreenBounds();
-            geoSelection.setScreenBound(screenBoundRect);
-            try {
-                geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
-            } catch (Exception e) {}
-
-        }
-
-        dataSelection.setGeoSelection(geoSelection);
 
         Object[] levelRange = getSelectedLevelRange();
         if ((levelRange != null) && (levelRange.length > 0)) {
@@ -1009,7 +841,81 @@ public class DataSelectionWidget {
                 comp.applyToDataSelection(dataSelection);
             }
         }
+        // add PR logic here
+        NavigatedDisplay navDisplay =
+            (NavigatedDisplay) idv.getViewManager().getMaster();
+        Object isPR = dataSelection.getProperty(
+                          DataSelection.PROP_PROGRESSIVERESOLUTION);
 
+        if (isPR == null) {
+            // anything other than adde image
+            isProgressiveResolution = strideOption.equals(USE_PROGRESSIVE);
+            dataSelection.setGeoSelection(geoSelection);
+            if (geoSelection != null) {
+                if (strideOption == USE_DEFAULTSTRIDE) {
+                    geoSelection.clearStride();
+                }
+                if ( !regionOption.equals(USE_SELECTEDREGION)) {
+                    geoSelection.setBoundingBox(null);
+                    geoSelection.setUseFullBounds(false);
+                }
+            }
+            dataSelection.putProperty(
+                DataSelection.PROP_PROGRESSIVERESOLUTION,
+                isProgressiveResolution);
+            dataSelection.putProperty(
+                    DataSelection.PROP_REGIONOPTION,
+                    regionOption);
+        } else {
+            geoSelection = dataSelection.getGeoSelection();
+            regionOption =
+                dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
+                                          USE_DEFAULTREGION);
+        }
+
+        if (idv.getViewManager() instanceof MapViewManager) {
+            if (regionOption.equals(USE_DISPLAYREGION)) {
+                idv.getViewManager().setProjectionFromData(false);
+                List<TwoFacedObject> coords = null;
+
+                try {
+                    coords = navDisplay.getScreenSidesCoordinates();
+                } catch (Exception e) {}
+                double[]      elid = (double[]) coords.get(1).getId();
+                EarthLocation el   = navDisplay.getEarthLocation(elid);
+                double maxLat = el.getLatLonPoint().getLatitude().getValue();
+                elid = (double[]) coords.get(2).getId();
+                el   = navDisplay.getEarthLocation(elid);
+                double minLat = el.getLatLonPoint().getLatitude().getValue();
+                elid = (double[]) coords.get(3).getId();
+                el   = navDisplay.getEarthLocation(elid);
+                double maxLon = el.getLatLonPoint().getLongitude().getValue();
+                elid = (double[]) coords.get(4).getId();
+                el   = navDisplay.getEarthLocation(elid);
+                double minLon = el.getLatLonPoint().getLongitude().getValue();
+                GeoLocationInfo glInfo =
+                    new GeoLocationInfo(maxLat,
+                                        LatLonPointImpl.lonNormal(minLon),
+                                        minLat,
+                                        LatLonPointImpl.lonNormal(maxLon));
+
+                geoSelection.setBoundingBox(glInfo);
+            }
+        }
+
+
+        if (geoSelection != null) {
+
+            Rectangle screenBoundRect = navDisplay.getScreenBounds();
+            geoSelection.setScreenBound(screenBoundRect);
+            try {
+                geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
+            } catch (Exception e) {}
+
+        }
+
+
+        //
         List selectedMembers = getSelectedMembers();
         if ((selectedMembers != null) && (selectedMembers.size() > 0)) {
             Hashtable props = new Hashtable();
@@ -1018,6 +924,7 @@ public class DataSelectionWidget {
         }
 
         return dataSelection;
+
     }
 
 
@@ -1136,8 +1043,9 @@ public class DataSelectionWidget {
                         areaComponent,
                         regionOption.equals(USE_SELECTEDREGION));
                 }
-                if(areaComponent != null && !regionOption.equals(USE_SELECTEDREGION)){
-                     geoSelectionPanel.reSetBoundsFromFields();
+                if ((areaComponent != null)
+                        && !regionOption.equals(USE_SELECTEDREGION)) {
+                    geoSelectionPanel.reSetBoundsFromFields();
                 }
             }
 
@@ -1163,13 +1071,13 @@ public class DataSelectionWidget {
         strideOptionLabelBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 String selectedObj =
-                        (String) strideOptionLabelBox.getSelectedItem();
+                    (String) strideOptionLabelBox.getSelectedItem();
                 strideOption = selectedObj.toString();
                 if (strideComponent != null) {
                     GuiUtils.enableTree(
-                            strideComponent,
-                            strideOption.equals(USE_SELECTEDSTRIDE));
-                    if(strideOption.equals(USE_PROGRESSIVE)){
+                        strideComponent,
+                        strideOption.equals(USE_SELECTEDSTRIDE));
+                    if (strideOption.equals(USE_PROGRESSIVE)) {
                         geoSelectionPanel.enableZComponents(true);
                     }
                 }
