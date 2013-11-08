@@ -918,9 +918,9 @@ public class DataSelectionWidget {
         //
         List selectedMembers = getSelectedMembers();
         if ((selectedMembers != null) && (selectedMembers.size() > 0)) {
-            Hashtable props = new Hashtable();
-            props.put("prop.gridmembers", selectedMembers);
-            dataSelection.setProperties(props);
+            //Hashtable props = new Hashtable();
+            //props.put("prop.gridmembers", selectedMembers);
+            dataSelection.putProperty("prop.gridmembers", selectedMembers);
         }
 
         return dataSelection;

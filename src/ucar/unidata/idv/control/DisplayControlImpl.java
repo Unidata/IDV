@@ -3232,7 +3232,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         DataInstance di = doMakeDataInstance(dataChoice);
 
         if(dataChoice instanceof DerivedDataChoice){
-            DirectDataChoice ddc = (DirectDataChoice)((DerivedDataChoice) dataChoice).getChoices().get(0);
+            DerivedDataChoice derivedDataChoice = (DerivedDataChoice) dataChoice;
+            while (derivedDataChoice.getChoices().get(0) instanceof DerivedDataChoice) {
+                derivedDataChoice = (DerivedDataChoice)derivedDataChoice.getChoices().get(0);
+            }
+            DirectDataChoice ddc = (DirectDataChoice)(derivedDataChoice.getChoices().get(0));
             DataSelection ds = ddc.getDataSelection();
             if(ds != null)
                 isProgressiveResolution = ds.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, false);
