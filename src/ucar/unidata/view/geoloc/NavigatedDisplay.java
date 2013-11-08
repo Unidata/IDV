@@ -699,7 +699,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @param  box RubberBandBox to use
      */
-    protected void setRubberBandBox(RubberBandBox box) {
+    public void setRubberBandBox(RubberBandBox box) {
         rubberBandBox = box;
     }
 

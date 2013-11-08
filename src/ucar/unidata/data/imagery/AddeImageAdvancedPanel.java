@@ -1508,6 +1508,16 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
      * @param dataSelection _more_
      */
     public void applyToDataSelection(DataSelection dataSelection) {
+        GeoSelection geoSelection = dataSelection.getGeoSelection();
+        if(geoSelection != null){
+            dataSelection.putProperty(
+                    DataSelection.PROP_PROGRESSIVERESOLUTION,
+                    getIsProgressiveResolution());
+            if(!getIsProgressiveResolution()) {
+                geoSelection.setXStride(Math.abs(elementMagSlider.getValue()));
+                geoSelection.setYStride(Math.abs(lineMagSlider.getValue()));
+            }
+        }
 
         //do something
 
