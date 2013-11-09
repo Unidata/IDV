@@ -3109,18 +3109,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             //            colorRange  = null;
             //            selectRange = null;
         }
-        if ( !inGlobeDisplay()) {
-            MapProjectionDisplay mpd =
-                    (MapProjectionDisplay) getNavigatedDisplay();
-            RubberBandBox rbb = mpd.getRubberBandBox();
-            if(rbb != null)
-                rbb.reSetBounds();
-        } else {  //now in globe display
-            GlobeDisplay  gd  = (GlobeDisplay) getNavigatedDisplay();
-            RubberBandBox rbb = gd.getRubberBandBox();
-            if(rbb != null)
-                rbb.reSetBounds();
-        }
         return ok;
     }
 
@@ -3901,7 +3889,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         } catch (VisADException ve) {
             logException("Getting display list data", ve);
-        } catch (RemoteException re) {}
+        }catch (RemoteException re) {}
         return data;
 
     }
@@ -3935,6 +3923,20 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         } catch (VisADException ve) {
             logException("Getting display list displayable", ve);
         } catch (RemoteException re) {}
+
+        if ( !inGlobeDisplay()) {
+            MapProjectionDisplay mpd =
+                    (MapProjectionDisplay) getNavigatedDisplay();
+            RubberBandBox rbb = mpd.getRubberBandBox();
+            if(rbb != null)
+                rbb.reSetBounds();
+        } else {  //now in globe display
+            GlobeDisplay  gd  = (GlobeDisplay) getNavigatedDisplay();
+            RubberBandBox rbb = gd.getRubberBandBox();
+            if(rbb != null)
+                rbb.reSetBounds();
+        }
+
         return displayListDisplayable;
     }
 
@@ -12448,7 +12450,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         // get the displayCS here:
 
         Gridded2DSet new2DSet = rubberBandBox.getBounds();
-        if ((rubberBandBox != null) && !new2DSet.equals(last2DSet)) {
+        if ((rubberBandBox.getBounds() != null) && !new2DSet.equals(last2DSet)) {
             last2DSet = new2DSet;
             GeoSelection geoSelection = dataSelection.getGeoSelection(true);
             try {
