@@ -2319,8 +2319,6 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    int xstride = 0;
-    int ystride = 0;
     public synchronized Data getData(DataChoice dataChoice,
                                      DataCategory category,
                                      DataSelection incomingDataSelection,

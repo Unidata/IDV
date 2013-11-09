@@ -373,7 +373,6 @@ public class GeoSelection {
 
         if ((highPriority.boundingBox == null)
                 && (highPriority.rubberBandBoxPoints == null)) {
-            bbox                = null;
             rubberBandBoxPoints = null;
         }
 
