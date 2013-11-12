@@ -44,11 +44,12 @@ REM PermGenSpace errors, uncomment the line below.
 REM set idv_maxpermgensize=128
 
 @echo on    
-jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=%idv_maxpermgensize%m -Didv.enableStereo=false -jar idv.jar %*
+jre\bin\java -Xms%idv_memory%m -Xmx%idv_memory%m -XX:PermSize=%idv_maxpermgensize%m -XX:MaxPermSize=%idv_maxpermgensize%m -XX:+DisableExplicitGC -Didv.enableStereo=false -jar idv.jar %*
 @echo off
 
 REM Use the line below instead if you want to use the D3D version of Java 3D
-REM jre\bin\java -Xmx%idv_memory%m -XX:MaxPermSize=%idv_maxpermgensize%m -Dj3d.rend=d3d -jar idv.jar %*
+REM jre\bin\java -Xms%idv_memory%m -Xmx%idv_memory%m -XX:PermSize=%idv_maxpermgensize%m -XX:MaxPermSize=%idv_maxpermgensize%m -XX:+DisableExplicitGC -Dj3d.rend=d3d -jar idv.jar %*
+
 	    
 endlocal
    

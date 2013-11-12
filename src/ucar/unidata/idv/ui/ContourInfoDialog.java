@@ -20,6 +20,7 @@
 
 package ucar.unidata.idv.ui;
 
+
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
@@ -31,16 +32,14 @@ import visad.Unit;
 
 import visad.util.HersheyFont;
 
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
-import java.text.DecimalFormat;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -52,7 +51,10 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
 
 /**
  * A JFrame widget to get contouring info from the user.
@@ -61,7 +63,6 @@ import javax.swing.JTextField;
  * in the event Listeners appearing in the constructor.
  *
  * @author Unidata Development Team
- * @version $Revision: 1.21 $
  */
 
 public class ContourInfoDialog implements ActionListener {
@@ -124,20 +125,16 @@ public class ContourInfoDialog implements ActionListener {
     private String title;
 
     /** contour alignments */
-    private TwoFacedObject[] aligns = { 
-    		new TwoFacedObject("Along Contours",
-    		new Boolean(true)),
-    		new TwoFacedObject("Horizontal",
-    		new Boolean(false)) };
+    private TwoFacedObject[] aligns = { new TwoFacedObject("Along Contours",
+                                          new Boolean(true)),
+                                        new TwoFacedObject("Horizontal",
+                                            new Boolean(false)) };
 
     /** current action command */
     private String current_action_command = null;
-    
-    /** Number formatter for contour lines to skip when labeling */
-    private final static DecimalFormat df = new DecimalFormat("000");
-    
-    /** input box for contour label line skip count */
-    private JFormattedTextField jftfLineSkip = null;
+
+    /** input spinner for contour label line skip count */
+    private JSpinner js = null;
 
     /**
      * Construct the widget.
@@ -147,7 +144,7 @@ public class ContourInfoDialog implements ActionListener {
      * @param title  title for frame
      * @param showApplyBtn Should we show the apply button
      */
-    
+
     public ContourInfoDialog(String title, boolean showApplyBtn) {
         this(title, showApplyBtn, null);
     }
@@ -161,7 +158,7 @@ public class ContourInfoDialog implements ActionListener {
      * @param showApplyBtn Should we show the apply button
      * @param unit Unit to show. May be null.
      */
-    
+
     public ContourInfoDialog(String title, boolean showApplyBtn, Unit unit) {
         this(title, showApplyBtn, unit, true);
     }
@@ -174,7 +171,7 @@ public class ContourInfoDialog implements ActionListener {
      * @param unit Unit to show. May be null.
      * @param doDialog show as dialog
      */
-    
+
     public ContourInfoDialog(String title, boolean showApplyBtn, Unit unit,
                              boolean doDialog) {
         this.title = title;
@@ -186,7 +183,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return The field
      */
-    
+
     private JTextField makeField() {
         JTextField fld = new JTextField("", 6);
         fld.addActionListener(new ActionListener() {
@@ -208,7 +205,7 @@ public class ContourInfoDialog implements ActionListener {
      * @param unit The unit to show as a label.
      * @param doDialog show as dialog
      */
-    
+
     private void doMakeContents(boolean showApplyBtn, Unit unit,
                                 boolean doDialog) {
 
@@ -254,7 +251,8 @@ public class ContourInfoDialog implements ActionListener {
         labelFreqSlider.setMajorTickSpacing(2);
         labelFreqSlider.setPaintTicks(true);
         // Create the label table
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer,
+                                                    JLabel>();
         labelTable.put(new Integer(ContourControl.LABEL_FREQ_LO),
                        new JLabel("Lo"));
         labelTable.put(new Integer(ContourControl.LABEL_FREQ_MED),
@@ -267,28 +265,29 @@ public class ContourInfoDialog implements ActionListener {
         // initialize to min value
         labelFreqSlider.setValue(ContourControl.LABEL_FREQ_LO);
 
-        jftfLineSkip = new JFormattedTextField(df);
-        jftfLineSkip.setValue(ContourControl.EVERY_NTH_DEFAULT);
-        jftfLineSkip.setColumns(3);
+        // TJJ Oct 2013
+        // Use a spinner here, best choice for the UI since 
+        //  - No error checking needed
+        //  - Almost always, user will want a small integer value
 
-        Component[] labelcomps = new Component[] {
-            GuiUtils.rLabel("Font:"), GuiUtils.left(fontBox),
-            GuiUtils.rLabel("Size:"), GuiUtils.left(fontSizeBox),
-            GuiUtils.rLabel("Align:"), GuiUtils.left(alignBox),
-            GuiUtils.rLabel("Frequency:"), GuiUtils.left(labelFreqSlider),
-            GuiUtils.rLabel("Label Every Nth Line:"), GuiUtils.left(jftfLineSkip)
-        };
-        labelPanel = GuiUtils.doLayout(labelcomps, 2, GuiUtils.WT_NY,
-                                       GuiUtils.WT_N);
+        Integer defaultInterval =
+            new Integer(ContourControl.EVERY_NTH_DEFAULT);
+        // NOTE: value of zero here implies "no labels"
+        Integer minInterval  = new Integer(0);
+        Integer maxInterval  = new Integer(ContourControl.EVERY_NTH_MAX);
+        Integer intervalStep = new Integer(1);
+        SpinnerNumberModel snm = new SpinnerNumberModel(defaultInterval,
+                                     minInterval, maxInterval, intervalStep);
+        js = new JSpinner(snm);
+        // grab the underlying text field temporarily so we can disable hand-editing
+        JFormattedTextField jftfLineSkip = getTextField(js);
+        if (jftfLineSkip != null) {
+            jftfLineSkip.setColumns(3);
+            jftfLineSkip.setEditable(false);
+        }
 
         toggleBtn = new JCheckBox("Labels:", true);
         toggleBtn.setToolTipText("Toggle contour labels");
-        toggleBtn.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                GuiUtils.enableTree(labelPanel,
-                                    ((JCheckBox) e.getSource()).isSelected());
-            }
-        });
 
         Component[] comps = new Component[] {
             GuiUtils.rLabel("Contour Interval:"),
@@ -307,7 +306,12 @@ public class ContourInfoDialog implements ActionListener {
             widthBox = GuiUtils.createValueBox(this, "lineWidth", 1,
                 Misc.createIntervalList(1, 5, 1), true),
             GuiUtils.right(dashBtn), styleBox,
-            GuiUtils.top(GuiUtils.right(toggleBtn)), labelPanel
+            GuiUtils.right(GuiUtils.right(toggleBtn)), new JLabel(""),
+            GuiUtils.rLabel("Font:"), GuiUtils.center(fontBox),
+            GuiUtils.rLabel("Size:"), GuiUtils.center(fontSizeBox),
+            GuiUtils.rLabel("Align:"), GuiUtils.center(alignBox),
+            GuiUtils.rLabel("Frequency:"), GuiUtils.center(labelFreqSlider),
+            GuiUtils.rLabel("Label Every Nth Line:"), GuiUtils.center(js)
         };
 
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
@@ -332,7 +336,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return gui contents
      */
-    
+
     public JComponent getContents() {
         return contents;
     }
@@ -342,7 +346,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return label widget contents
      */
-    
+
     public JComponent getLabelPanel() {
         return labelPanel;
     }
@@ -352,7 +356,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return Was this successful
      */
-    
+
     public boolean doApply() {
 
         try {
@@ -408,12 +412,17 @@ public class ContourInfoDialog implements ActionListener {
                 ((Boolean) ((TwoFacedObject) alignBox.getSelectedItem())
                     .getId()).booleanValue();
             int new_label_freq = labelFreqSlider.getValue();
-            int new_line_skip = ContourControl.EVERY_NTH_DEFAULT;
-            int tmpSkip = ((Number) jftfLineSkip.getValue()).intValue();
-           
-        	if ((tmpSkip > 0) && (tmpSkip <= ContourControl.EVERY_NTH_MAX)) {
-        		new_line_skip = tmpSkip;
-        	}
+            int new_line_skip  = ContourControl.EVERY_NTH_DEFAULT;
+            int tmpSkip        = ((Number) js.getValue()).intValue();
+
+            if ((tmpSkip > 0) && (tmpSkip <= ContourControl.EVERY_NTH_MAX)) {
+                new_line_skip = tmpSkip;
+            }
+
+            // treat skip of zero like labeling is off
+            if (tmpSkip == 0) {
+                new_isLabelled = false;
+            }
 
             // permit mino == maxo the case of one contour line
             // now set the data of the ContourInfo
@@ -515,7 +524,7 @@ public class ContourInfoDialog implements ActionListener {
      * (ok or cancel).
      * @param evt ActionEvent
      */
-    
+
     public void actionPerformed(ActionEvent evt) {
         String cmd = evt.getActionCommand();
         current_action_command = cmd;
@@ -536,11 +545,30 @@ public class ContourInfoDialog implements ActionListener {
     }
 
     /**
+     * Return the formatted text field used by the editor, or null if the editor
+     * doesn't descend from JSpinner.DefaultEditor.
+     *
+     * @param spinner the spinner
+     * @return the text field
+     */
+    public JFormattedTextField getTextField(JSpinner spinner) {
+        JComponent editor = spinner.getEditor();
+        if (editor instanceof JSpinner.DefaultEditor) {
+            return ((JSpinner.DefaultEditor) editor).getTextField();
+        } else {
+            LogUtil.message("Unexpected editor type: "
+                            + spinner.getEditor().getClass()
+                            + " isn't a descendant of DefaultEditor");
+            return null;
+        }
+    }
+
+    /**
      * Show the dialog box and wait for results and deal with them.
      * @param transfer a ContourInfo data object to transfer all values
      * @return boolean if the user entered data ok.
      */
-    
+
     public boolean showDialog(ContourInfo transfer) {
         ok = true;
         setState(transfer);
@@ -552,7 +580,7 @@ public class ContourInfoDialog implements ActionListener {
      * Show the dialog box and wait for results and deal with them.
      * @param transfer a ContourInfo data object to transfer all values
      */
-    
+
     public void setState(ContourInfo transfer) {
         myInfo = transfer;
         intervalFld.setText(transfer.getIntervalString());
@@ -564,7 +592,7 @@ public class ContourInfoDialog implements ActionListener {
         dashBtn.setSelected(myInfo.getDashOn());
         dashBtn.setEnabled( !myInfo.getIsFilled());
         labelFreqSlider.setValue(transfer.getLabelFreq());
-        jftfLineSkip.setValue(transfer.getLabelLineSkip());
+        js.setValue(transfer.getLabelLineSkip());
         widthBox.setSelectedItem(new Integer(myInfo.getLineWidth()));
         styleBox.setSelectedIndex(myInfo.getDashedStyle() - 1);
         styleBox.setEnabled(myInfo.getDashOn());
@@ -582,7 +610,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return the corresponding TFO
      */
-    
+
     private TwoFacedObject makeTwoFacedFont(Object font) {
         if (font == null) {
             return new TwoFacedObject("Default", font);
@@ -601,7 +629,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return  the font (Font, HersheyFont or null)
      */
-    
+
     public static Object getContourFont(Object fontSpec) {
         Object font = fontSpec;
         if ((fontSpec != null)
@@ -629,7 +657,7 @@ public class ContourInfoDialog implements ActionListener {
      *
      * @return The info
      */
-    
+
     public ContourInfo getInfo() {
         return myInfo;
     }

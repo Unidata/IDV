@@ -22,14 +22,14 @@ package ucar.unidata.idv.ui;
 
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
-import ucar.unidata.idv.*;
+import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.IdvPersistenceManager;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ViewDescriptor;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.IdvChooserManager;
-
 import ucar.unidata.ui.ComponentGroup;
 import ucar.unidata.ui.ComponentHolder;
 import ucar.unidata.ui.FineLineBorder;
@@ -37,7 +37,6 @@ import ucar.unidata.ui.HtmlComponent;
 import ucar.unidata.ui.RovingProgress;
 import ucar.unidata.ui.XmlUi;
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.MemoryMonitor;
@@ -46,20 +45,23 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
 
-import java.awt.*;
-import java.awt.event.*;
+
+import java.awt.Component;
 
 import java.lang.reflect.Constructor;
 
 import java.util.ArrayList;
-
-import java.util.Hashtable;
 import java.util.List;
 
-import javax.help.*;
+import javax.help.HelpSet;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 
 
 /**
@@ -438,17 +440,30 @@ public class IdvXmlUi extends XmlUi {
             return idv.getIdvUIManager().doMakeMenuBar(window);
         }
 
-        if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR)) {
+        if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR_DASH)) {
             MemoryMonitor monitor =
                 new MemoryMonitor(
                     80,
                     new Boolean(
                         idv.getStateManager().getPreferenceOrProperty(
-                            IdvConstants.PROP_SHOWCLOCK,
+                            IdvConstants.PROP_SHOWCLOCK_DASH,
                             "true")).booleanValue());
             memoryMonitors.add(monitor);
             return monitor;
         }
+
+        if (tagName.equals(IdvUIManager.COMP_MEMORYMONITOR_VIEW)) {
+            MemoryMonitor monitor =
+                new MemoryMonitor(
+                    80,
+                    new Boolean(
+                        idv.getStateManager().getPreferenceOrProperty(
+                            IdvConstants.PROP_SHOWCLOCK_VIEW,
+                            "true")).booleanValue());
+            memoryMonitors.add(monitor);
+            return monitor;
+        }
+
 
         if (tagName.equals(IdvUIManager.COMP_STATUSBAR)) {
             return idv.getIdvUIManager().doMakeStatusBar(window);

@@ -1,44 +1,44 @@
 /*
- * $Id: MemoryMonitor.java,v 1.12 2006/12/27 19:53:50 jeffmc Exp $
- *
- * Copyright  1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.util;
 
 
-import ucar.unidata.util.GuiUtils;
-
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
 
-import javax.swing.*;
-
-import javax.swing.event.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -46,7 +46,7 @@ import javax.swing.event.*;
  *
  *
  * @author Unidata development team
- * @version %I%, %G%
+ *
  */
 public class MemoryMonitor extends JPanel implements Runnable, Removable {
 
@@ -81,8 +81,8 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
     /** flag for in the red */
     private boolean inTheRed = false;
 
-    /** Keep track of the last time we ran the gc and cleared the cache */
-    private static long lastTimeRanGC = -1;
+    /** Keep track of the last time we cleared the cache */
+    private static long lastTimeClearCache = -1;
 
 
     /** _more_ */
@@ -95,8 +95,6 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
     private static SimpleDateFormat clockFormat =
         new SimpleDateFormat("HH:mm:ss z");
 
-
-
     /** _more_ */
     private String memoryLabel = "";
 
@@ -106,8 +104,6 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
     public MemoryMonitor() {
         this(80);
     }
-
-
 
 
     /**
@@ -154,8 +150,8 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
         label2 = new JLabel("");
 
         Font f = label1.getFont();
-        label1.setToolTipText("Used memory/Max used memory/Max memory");
-        label2.setToolTipText("Used memory/Max used memory/Max memory");
+        label1.setToolTipText("Used memory/Max memory");
+        label2.setToolTipText("Used memory/Max memory");
         //        f = f.deriveFont(8.0f);
         label1.setFont(f);
         label2.setFont(f);
@@ -205,8 +201,8 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
         }
 
 
-        popup.add(GuiUtils.makeMenuItem("Clear Memory & Cache",
-                                        MemoryMonitor.this, "runGC"));
+        popup.add(GuiUtils.makeMenuItem("Clear Cache", MemoryMonitor.this,
+                                        "clearCache"));
         popup.show(this, event.getX(), event.getY());
     }
 
@@ -276,12 +272,47 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
 
 
     /**
-     * Run the GC and clear the cache
+     * Clear the cache
      */
-    public void runGC() {
+    public void clearCache() {
         CacheManager.clearCache();
-        Runtime.getRuntime().gc();
-        lastTimeRanGC = System.currentTimeMillis();
+    }
+
+    /**
+     * Convert byte size into human-readable format in Java
+     *
+     * @param bytes : number of bytes to convert
+     * @param useBaseTwoUnits : true: binary units (base 2), false: use base 10
+     * @return String with value and unit
+     *
+     * modified based on StackOverflow:
+     * http://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
+     *
+     */
+
+    private static String humanReadableByteCount(long bytes,
+            boolean useBaseTwoUnits) {
+        int unit = useBaseTwoUnits
+                   ? 1000
+                   : 1024;
+        if (bytes < unit) {
+            return bytes + " B";
+        }
+        int    exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (useBaseTwoUnits
+                      ? "KMGTPE"
+                      : "kMGTPE").charAt(exp - 1) + (useBaseTwoUnits
+                ? "i"
+                : "");
+        String humanReadable;
+        if ( !pre.toLowerCase().contains("k") && !pre.contains("M")) {
+            humanReadable = String.format("%.3f %sB",
+                                          bytes / Math.pow(unit, exp), pre);
+        } else {
+            humanReadable = String.format("%.1f %sB",
+                                          bytes / Math.pow(unit, exp), pre);
+        }
+        return humanReadable;
     }
 
     /**
@@ -289,22 +320,21 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
      */
     private void showStats() {
         try {
-            double totalMemory   = (double) Runtime.getRuntime().maxMemory();
-            double highWaterMark =
-                (double) Runtime.getRuntime().totalMemory();
-            double freeMemory = (double) Runtime.getRuntime().freeMemory();
-            double usedMemory = (highWaterMark - freeMemory);
+            long maxTotalMemory = Runtime.getRuntime().maxMemory();
+            long currentAllocatedMemory = Runtime.getRuntime().totalMemory();
+            long currentFreeAllocatedMemory =
+                Runtime.getRuntime().freeMemory();
+            long currentUsedMemory = (currentAllocatedMemory
+                                      - currentFreeAllocatedMemory);
 
+            int percent = (int) (100.0
+                                 * (currentUsedMemory / maxTotalMemory));
 
-            int    percent    = (int) (100.0 * (usedMemory / totalMemory));
-            totalMemory   = totalMemory / 1000000.0;
-            usedMemory    = usedMemory / 1000000.0;
-            highWaterMark = highWaterMark / 1000000.0;
             String text;
-            memoryLabel = " " + fmt.format(usedMemory) + "/"
-                          + fmt.format(highWaterMark) + "/"
-                          + fmt.format(totalMemory) + " " + Msg.msg("MB");
 
+            memoryLabel = humanReadableByteCount(currentUsedMemory, false)
+                          + "/"
+                          + humanReadableByteCount(maxTotalMemory, false);
             if (showClock) {
                 //                g.setFont(clockFont);
                 Date d = new Date();
@@ -319,22 +349,19 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
             //            label2.setText(" (" + percent + "%)  ");
 
             long now = System.currentTimeMillis();
-            if (lastTimeRanGC < 0) {
-                lastTimeRanGC = now;
+            if (lastTimeClearCache < 0) {
+                lastTimeClearCache = now;
             }
 
             //For the threshold  use the physical memory
-            percent = (int) (100.0 * (usedMemory / totalMemory));
+            percent = (int) (100.0 * (currentUsedMemory / maxTotalMemory));
             if (percent > percentThreshold) {
                 timesAboveThreshold++;
                 if (timesAboveThreshold > 5) {
                     //Only run the GC every 5 seconds
-                    if (now - lastTimeRanGC > 5000) {
-                        //For now just clear the cache. Don't run the gc
-                        //                        System.err.println("clearing cache");
+                    if (now - lastTimeClearCache > 5000) {
                         CacheManager.clearCache();
-                        //                        runGC();
-                        lastTimeRanGC = now;
+                        lastTimeClearCache = now;
                     }
                     if ( !inTheRed) {
                         setInTheRed(true);
@@ -345,7 +372,7 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
                     setInTheRed(false);
                 }
                 timesAboveThreshold = 0;
-                lastTimeRanGC       = now;
+                lastTimeClearCache  = now;
             }
         } catch (IllegalStateException ise) {}
     }
@@ -408,4 +435,3 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
 
 
 }
-

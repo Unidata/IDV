@@ -21,23 +21,15 @@
 package ucar.unidata.idv.ui;
 
 
-import org.python.core.*;
-import org.python.util.*;
-
-
-import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataCategory;
-import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataGroup;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.DerivedDataDescriptor;
 import ucar.unidata.data.DerivedNeed;
-
-import ucar.unidata.idv.*;
-
+import ucar.unidata.idv.ControlDescriptor;
+import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.ui.CheckboxCategoryPanel;
 import ucar.unidata.ui.ParamField;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
@@ -46,10 +38,17 @@ import ucar.unidata.util.Resource;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -57,10 +56,24 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.BoxLayout;
-import javax.swing.event.*;
-import javax.swing.text.JTextComponent;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 
 
@@ -77,7 +90,7 @@ import javax.swing.text.JTextComponent;
  * for updating any guis, writing out the formulas to disk, etc.
  *
  * @author Jeff McWhirter
- * @version $Revision: 1.64 $
+ * 
  */
 
 
@@ -225,13 +238,13 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
 
     /**
-     * _more_
+     * Instantiates a new formula dialog.
      *
-     * @param idv _more_
-     * @param ddd _more_
-     * @param src _more_
-     * @param categories _more_
-     * @param newFormula _more_
+     * @param idv the idv
+     * @param ddd the ddd
+     * @param src the src
+     * @param categories the categories
+     * @param newFormula the new formula
      */
     public FormulaDialog(IntegratedDataViewer idv, DerivedDataDescriptor ddd,
                          Component src, List categories, boolean newFormula) {
@@ -310,6 +323,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
         GuiUtils.makeMouseOverBorder(evalBtn);
         evalBtn.setToolTipText("Save and Evaluate Formula");
 
+
         formulaField = new JTextField(formula, 25);
         formulaField.setToolTipText(
             "<html>Right-click to add procedures from library</html>");
@@ -331,8 +345,12 @@ public class FormulaDialog extends JFrame implements ActionListener {
             }
         });
 
-        nameField   = new JTextField(name, 25);
-        descField   = new JTextField(description, 25);
+        nameField = new JTextField(name, 25);
+        nameField.setToolTipText(
+            "<html>Name is used with the parameter defaults</html>");
+        descField = new JTextField(description, 25);
+        descField.setToolTipText(
+            "<html>The description is shown in Field Selector</html>");
         categoryBox = new JComboBox();
         categoryBox.setEditable(true);
         categoryBox.addItem("");
@@ -458,7 +476,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
         double[] stretchyY = new double[] { 0, 0, 0, 1 };
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         JPanel bottomPanel = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Description:"), descField,
+
             GuiUtils.rLabel("Group:"), categoryBox,
             GuiUtils.rLabel("Displays:"), radioBtnPanel,
             GuiUtils.top(allOnOffPanel), cdScroll,
@@ -608,15 +626,23 @@ public class FormulaDialog extends JFrame implements ActionListener {
         checkAdvancedState(advancedBtn, advancedIconBtn);
         advancedBtn.addActionListener(advancedListener);
         advancedIconBtn.addActionListener(advancedListener);
+
+        JLabel descriptionLabel = GuiUtils.rLabel("Description: ");
+        JLabel idLabel          = GuiUtils.rLabel("Name: ");
+        JLabel formulaLabel     = GuiUtils.rLabel("Formula: ");
+
+        descriptionLabel.setToolTipText(
+            "The description is shown in Field Selector");
+        idLabel.setToolTipText("Name is used with the parameter defaults");
+        formulaLabel.setToolTipText("Mathematical formula to be used");
+
         GuiUtils.tmpInsets = new Insets(4, 4, 0, 4);
         Container topPanel = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Name:"), nameField,
-            GuiUtils.rLabel("       Formula:"),
+            descriptionLabel, descField, idLabel, nameField, formulaLabel,
             GuiUtils.centerRight(formulaField,
                                  GuiUtils.hbox(evalBtn, jythonBtn)),
             GuiUtils.rLabel("Advanced"), GuiUtils.left(advancedIconBtn)
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
-
         JPanel innerPanel = GuiUtils.doLayout(Misc.newList(topPanel,
                                 theBottomPanel), 1, GuiUtils.WT_Y,
                                     GuiUtils.WT_NY);
@@ -1097,16 +1123,39 @@ public class FormulaDialog extends JFrame implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String cmd = event.getActionCommand();
+
         if (cmd.equals(CMD_ADD)) {
-            if (addOrChange()) {
-                closeFormulaDialog();
+            if (((descField.getText() == null) || (descField.getText()
+                    .isEmpty())) || ((nameField
+                    .getText() == null) || (nameField.getText()
+                    .isEmpty())) || ((formulaField
+                    .getText() == null) || (formulaField.getText()
+                    .isEmpty()))) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Values for Description, Name and Forumla must be entered");
+            } else {
+                if (addOrChange()) {
+                    closeFormulaDialog();
+                }
             }
             return;
         }
 
         if (cmd.equals(CMD_CHANGE)) {
-            if (addOrChange()) {
-                closeFormulaDialog();
+            if (((descField.getText() == null) || (descField.getText()
+                    .isEmpty())) || ((nameField
+                    .getText() == null) || (nameField.getText()
+                    .isEmpty())) || ((formulaField
+                    .getText() == null) || (formulaField.getText()
+                    .isEmpty()))) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Values for Description, Name and Forumla must be entered");
+            } else {
+                if (addOrChange()) {
+                    closeFormulaDialog();
+                }
             }
             return;
         }

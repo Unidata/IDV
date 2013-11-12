@@ -103,7 +103,11 @@ import java.rmi.RemoteException;
 
 import java.text.Collator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -1528,10 +1532,14 @@ public class MapViewManager extends NavigatedViewManager {
               new Boolean(getShowBottomLegend()) },
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
               new Boolean(getShowAnimationBoxes()) },
-            { "Show Clock", IdvConstants.PROP_SHOWCLOCK,
+            { "Show Clock On Dashboard", IdvConstants.PROP_SHOWCLOCK_DASH,
               new Boolean(
                   getStateManager().getPreferenceOrProperty(
-                      IdvConstants.PROP_SHOWCLOCK, "true")) },
+                      IdvConstants.PROP_SHOWCLOCK_DASH, "true")) },
+            { "Show Clock On View Windows", IdvConstants.PROP_SHOWCLOCK_VIEW,
+              new Boolean(
+                  getStateManager().getPreferenceOrProperty(
+                      IdvConstants.PROP_SHOWCLOCK_VIEW, "true")) },
             { "Show Overview Map", PREF_SHOWPIP,
               new Boolean(getStore().get(PREF_SHOWPIP, false)) }
         };

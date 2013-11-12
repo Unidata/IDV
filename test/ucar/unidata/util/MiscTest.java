@@ -23,9 +23,13 @@ package ucar.unidata.util;
 
 import org.junit.Test;
 
+
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -33,6 +37,24 @@ import java.util.Map;
  * The tests for the Misc class.
  */
 public class MiscTest {
+
+    /**
+     * Test the Misc.decodeLatLon method.
+     */
+    @Test
+    public void testMakeUnique() {
+        List<Integer> listDup    = Arrays.asList(1, 3, 4, 5, 1);
+        List<Integer> listUnique = Misc.makeUnique(listDup);
+        String        error      = "Misc.makeUnique not working";
+        assertEquals(error, listUnique.size(), 4);
+
+        listDup    = Arrays.asList(1, 3, null, 5, 1);
+        listUnique = Misc.makeUnique(listDup);
+        assertEquals(error, listUnique.size(), 4);
+
+        listUnique = Misc.makeUnique(Collections.<Integer>emptyList());
+        assertEquals(error, listUnique.size(), 0);
+    }
 
 
     /**
@@ -42,9 +64,9 @@ public class MiscTest {
     public void testDecodeLatLonsString() {
 
         /** The Constant DELTA. */
-        final double                                          DELTA = 0.001;
+        final double DELTA = 0.001;
 
-        @SuppressWarnings("serial") final Map<String, Double> map   =
+        @SuppressWarnings("serial") final Map<String, Double> map =
             new HashMap<String, Double>() {
             {
                 put("4:25:W", -4.416666666);
@@ -89,13 +111,13 @@ public class MiscTest {
                      Misc.formatLatitude(12.555, "DD MM' SS\""));
 
         assertEquals(errorMsg, "12 33' 19.8\"",
-                Misc.formatLatitude(12.5555, "DD MM' SS.s\""));
+                     Misc.formatLatitude(12.5555, "DD MM' SS.s\""));
 
         assertEquals(errorMsg, "-12 33' 19.8\"",
-                Misc.formatLatitude(-12.5555, "DD MM' SS.s\""));
+                     Misc.formatLatitude(-12.5555, "DD MM' SS.s\""));
 
         assertEquals(errorMsg, "-0 06' 00.0\"",
-                Misc.formatLatitude(-0.1, "DD MM' SS.s\""));
+                     Misc.formatLatitude(-0.1, "DD MM' SS.s\""));
 
         //Testing cardinalities
         assertEquals(errorMsg, "12N", Misc.formatLatitude(12, "DDH"));

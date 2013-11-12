@@ -20,6 +20,7 @@
 
 package ucar.unidata.util;
 
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
@@ -58,6 +59,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -269,11 +271,11 @@ public class Misc {
         formatted =
             formatted.replaceAll("SS", StringUtil.padZero(format.contains("s")
                 ? seconds
-                : (int)Math.round(dseconds), 2));
+                : (int) Math.round(dseconds), 2));
         if (format.indexOf("H") >= 0) {
-            if (use360) {            // should we ignore or add E?
+            if (use360) {                         // should we ignore or add E?
                 formatted = formatted.replace("H", "");
-            } else if (Math.abs(value) == 180) {     // 180 line - subject to debate
+            } else if (Math.abs(value) == 180) {  // 180 line - subject to debate
                 formatted = formatted.replace("H", "");
             } else if (value < 0) {  // South/West
                 formatted = formatted.replace("H", (isLatitude)
@@ -699,24 +701,14 @@ public class Misc {
     }
 
     /**
-     * Make the list unique
+     * Make the list unique.
      *
+     * @param <E> the element type
      * @param l initial list
-     *
      * @return unique list
      */
-    public static List makeUnique(List l) {
-        List      result = new ArrayList();
-        Hashtable ht     = new Hashtable();
-        for (int i = 0; i < l.size(); i++) {
-            Object o = l.get(i);
-            if (ht.get(o) != null) {
-                continue;
-            }
-            ht.put(o, o);
-            result.add(o);
-        }
-        return result;
+    public static <E> List<E> makeUnique(List<E> l) {
+        return new ArrayList<E>(new HashSet<E>(l));
     }
 
 
@@ -2058,7 +2050,7 @@ public class Misc {
         }
         try {
             // hack to also accept lower case e for exponent
-            value = value.replace("e","E"); 
+            value = value.replace("e", "E");
             return formatter.parse(value).doubleValue();
         } catch (ParseException pe) {
             throw new NumberFormatException(pe.getMessage());

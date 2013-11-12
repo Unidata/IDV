@@ -21,8 +21,6 @@
 /**
  * Class for IDV related constants.
  *
- * @author MetApps Development Team
- * @version $Revision: 1.111 $ $Date: 2007/06/11 11:32:17 $
  */
 
 package ucar.unidata.idv;
@@ -314,7 +312,12 @@ public interface IdvConstants {
     public static final String PROP_DATAHOLDERBOUNDS = "dataholderbounds";
 
     /** Property used for showing the clock */
-    public static final String PROP_SHOWCLOCK = "idv.monitor.showclock";
+    public static final String PROP_SHOWCLOCK_DASH =
+        "idv.monitor.showclock.dashboard";
+
+    /** Property used for showing the clock */
+    public static final String PROP_SHOWCLOCK_VIEW =
+        "idv.monitor.showclock.view";
 
     /** Property for the minimum frame cycle time */
     public static final String PROP_MINIMUMFRAMECYCLETIME =
@@ -421,8 +424,9 @@ public interface IdvConstants {
     public static final String PROP_SHOWFORMULAS = "idv.ui.showformulas";
 
     /** Preference used for showing the toolbar */
-    public static final String PREF_WINDOW_SHOWTOOLBAR = "idv.window.showtoolbar";
-    
+    public static final String PREF_WINDOW_SHOWTOOLBAR =
+        "idv.window.showtoolbar";
+
     /**
      *  Should we size the window wrt the screen size
      */
@@ -588,9 +592,9 @@ public interface IdvConstants {
     /** default max perm gen memory usage  (megabytes) */
     public static final int DEFAULT_MAX_PERMGENSIZE = 128;
 
-    /** IDV use time driver preference*/
+    /** IDV use time driver preference */
     public static final String PROP_USE_TIMEDRIVER = "idv.usetimedriver";
-    
+
     /** Preference to store what choosers to show */
     public static final String PROP_CHOOSERS = "idv.choosers";
 
@@ -660,7 +664,8 @@ public interface IdvConstants {
         GridDisplayControl.INITIAL_PROBE_EARTHLOCATION;
 
     /** The id of the preference for asking the user if they would like to be warned about a large remote data request */
-    public static final String PREF_LARGE_REMOTE_DATA_WARN = "idv.largeremoterequest.warn";
+    public static final String PREF_LARGE_REMOTE_DATA_WARN =
+        "idv.largeremoterequest.warn";
 
 
 }
