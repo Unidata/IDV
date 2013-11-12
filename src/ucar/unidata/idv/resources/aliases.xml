@@ -32,7 +32,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
       name="PRESSURE"
      label="Pressure"
-     aliases="p,P,SLP, PRE, seaLevelPress, seaLevelPressure, pres,pressure,Pressure,P_msl,Pm_msl,Psl_et,psl,air_pressure_at_sea_level,MSLP_Eta_Reduction,Mean_sea_level_pressure_ETA_model,PSFC,Pressure_reduced_to_MSL,Mean_sea_level_pressure,PMSL_NONE,EMSL_NONE,PMSL,Pressure_reduced_to_MSL_weightedMean_msl,PRES_surface,Pressure_surface,Pressure_potential_vorticity_surface,MSLP_Eta_model_reduction_msl,Pressure_reduced_to_MSL_msl"/>
+     aliases="p,P,SLP, PRE, seaLevelPress, seaLevelPressure, pres,pressure,Pressure,P_msl,Pm_msl,Psl_et,psl,air_pressure_at_sea_level,MSLP_Eta_Reduction,Mean_sea_level_pressure_ETA_model,PSFC,Pressure_reduced_to_MSL,Mean_sea_level_pressure,PMSL_NONE,EMSL_NONE,PMSL,Pressure_reduced_to_MSL_weightedMean_msl,PRES_surface,Pressure_surface,Pressure_potential_vorticity_surface,MSLP_Eta_model_reduction_msl,Pressure_reduced_to_MSL_msl,MSLP_MAPS_System_Reduction_msl"/>
   <alias
      name="ALTIMETER"
      label="Altimeter Setting"
