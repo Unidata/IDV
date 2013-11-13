@@ -2729,8 +2729,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         setProjectionInView(true);
                     }
                 }
-                if(isRBBChanged)
-                    geoSelection.setBoundingBox(null);
             } catch (Exception e) {}
         }
     }
