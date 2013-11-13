@@ -500,7 +500,7 @@ public class CaptureManager {
         String filename = FileManager.getWriteFile(IdvConstants.FILTER_CPT,
                                                    IdvConstants.SUFFIX_CPT);
         if (filename != null) {
-            String xml = idv.encodeObject(captureList, true);
+            String xml = idv.encodeObject(captureList, true, true);
             try {
                 IOUtil.writeFile(filename, xml);
             } catch (Exception exc) {

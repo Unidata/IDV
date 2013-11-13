@@ -2165,7 +2165,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 }
 
                 IOUtil.writeFile(positionFilename,
-                                 idv.encodeObject(positions, true));
+                                 idv.encodeObject(positions, true, true));
             } catch (IOException ioe) {
                 LogUtil.userErrorMessage("Error writing positions:" + ioe);
 
