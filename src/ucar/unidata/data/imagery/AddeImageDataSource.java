@@ -341,7 +341,7 @@ public class AddeImageDataSource extends ImageDataSource {
         if (geoSelection != null) {  //&& !isReload) {
             // applies the rubberbandbox geosubset here
             //GeoSelection gs = subset.getGeoSelection();
-            if ((geoSelection.getRubberBandBoxPoints() != null) && isReload) {
+            if ((geoSelection.getRubberBandBoxPoints() != null)) {
                 double[] latLons =
                     getLatLonPoints(geoSelection.getRubberBandBoxPoints());
                 descriptors = geoSpaceSubset(geoSelection.getScreenBound(),
@@ -351,7 +351,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                              latLons[3], elFactor, dlMag,
                                              deMag, "ULEFT",
                                              isProgressiveResolution);
-            } else if (geoSelection.getBoundingBox() != null) {
+            } else if (geoSelection.getBoundingBox() != null ) {
                 //use selected
                 double maxLat = geoSelection.getBoundingBox().getMaxLat();
                 double minLat = geoSelection.getBoundingBox().getMinLat();
@@ -521,9 +521,8 @@ public class AddeImageDataSource extends ImageDataSource {
             elFactor =
                 (int) Math.ceil(aDir.getCenterLatitudeResolution()
                                 / aDir.getCenterLongitudeResolution() - 0.5);
-        } else {
-            elFactor = 1;
         }
+
         System.out.println("Line and element ratio = " + elFactor);
         int lineFactor = 1;
         int elemFactor = 1;

@@ -620,6 +620,7 @@ public class GeoGridDataSource extends GridDataSource {
         getDataChoices();
         super.reloadData();
 
+        isReload = false;
         /**
          *  not sure if we want to do this since we might have
          *  cachedflatfields out there that are pointing at the old
@@ -1362,9 +1363,21 @@ public class GeoGridDataSource extends GridDataSource {
             throws VisADException, RemoteException {
         //        synchronized (readLock) {
         //        System.err.println("getData:" + getFilePath() +" field="+dataChoice);
+        boolean isPR = givenDataSelection.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+        boolean fromBundle = getIdv().getStateManager().getProperty(
+                IdvConstants.PROP_LOADINGXML, false);
+        if(isPR && (isReload || fromBundle)){
+            ucar.unidata.geoloc.LatLonPoint[] llp0 =  givenDataSelection.getGeoSelection().getRubberBandBoxPoints();
+            if(llp0 != null) {
+                GeoLocationInfo gInfo1 = new GeoLocationInfo(
+                        llp0[0].getLatitude(), llp0[0].getLongitude(),
+                        llp0[1].getLatitude(), llp0[1].getLongitude());
+                givenDataSelection.getGeoSelection().setBoundingBox(gInfo1);
+            }
+        }
         Data data = makeFieldImpl(dataChoice, givenDataSelection,
                                   requestProperties);
-        isReload = false;
+
         return data;
         //        }
     }
@@ -1589,6 +1602,7 @@ public class GeoGridDataSource extends GridDataSource {
                 int xLenght = geoGrid.getXDimension().getLength();
                 int yLength = geoGrid.getYDimension().getLength();
 
+
                 if (geoSelection.getLatLonRect() != null) {
                     // spatial subset or usedisplayarea
                     LatLonRect bbox = geoSelection.getLatLonRect();
@@ -1604,6 +1618,8 @@ public class GeoGridDataSource extends GridDataSource {
                     yLength = yRange.length();
                     xLenght = xRange.length();
                 }
+
+
                 Rectangle rect    = geoSelection.getScreenBound();
 
                 int       xstride = calculateStrideFactor(xLenght,

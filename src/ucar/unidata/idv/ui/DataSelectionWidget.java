@@ -900,6 +900,8 @@ public class DataSelectionWidget {
                                         LatLonPointImpl.lonNormal(maxLon));
 
                 geoSelection.setBoundingBox(glInfo);
+            } else if(regionOption.equals(USE_DEFAULTREGION) && geoSelection != null) {
+                geoSelection.setBoundingBox(null);
             }
         }
 
@@ -908,6 +910,7 @@ public class DataSelectionWidget {
 
             Rectangle screenBoundRect = navDisplay.getScreenBounds();
             geoSelection.setScreenBound(screenBoundRect);
+            geoSelection.setRubberBandBoxPoints(null);
             try {
                 geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
             } catch (Exception e) {}

@@ -371,10 +371,10 @@ public class GeoSelection {
                 ? highPriority.screenLatLonRect
                 : lowPriority.screenLatLonRect);
 
-        if ((highPriority.boundingBox == null)
+     /*   if ((highPriority.boundingBox == null)
                 && (highPriority.rubberBandBoxPoints == null)) {
             rubberBandBoxPoints = null;
-        }
+        }  */
 
         if (highPriority.getUseFullBounds()
                 && (highPriority.boundingBox == null)) {

@@ -12456,13 +12456,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             try {
                 ucar.unidata.geoloc.LatLonPoint[] llp0 =
                     getLatLonPoints(rubberBandBox.getBounds().getDoubles());
-                GeoLocationInfo gInfo = new GeoLocationInfo(
+                GeoLocationInfo gInfo1 = new GeoLocationInfo(
                         llp0[0].getLatitude(), llp0[0].getLongitude(),
                         llp0[1].getLatitude(), llp0[1].getLongitude());
                 geoSelection.setRubberBandBoxPoints(llp0);
                 geoSelection.setScreenBound(
                     getNavigatedDisplay().getScreenBounds());
-                geoSelection.setBoundingBox(gInfo);
+               // geoSelection.setBoundingBox(gInfo);
             } catch (Exception e) {}
             dataSelection.setGeoSelection(geoSelection);
             List          dataSources = getDataSources();
