@@ -2896,7 +2896,7 @@ public class ImageGenerator extends IdvManager {
     public void writeMovie(String filename, String params) throws Exception {
         String isl = makeXmlFromString(params);
 
-        String xml = "<movie file=\"" + filename + "\" imagesuffix=\".png\">"
+        String xml = XmlUtil.getHeader()+"\n<movie file=\"" + filename + "\" imagesuffix=\".png\">"
                      + isl + "</movie>";
         captureMovie(applyMacros(filename), makeElement(xml));
     }
@@ -4087,7 +4087,7 @@ public class ImageGenerator extends IdvManager {
     public void writeImage(String filename, String params, float qual)
             throws Exception, Throwable {
         String isl = makeXmlFromString(params);
-        String xml = "<image file=\"" + filename + "\" quality=\"" + qual
+        String xml = XmlUtil.getHeader()+"\n<image file=\"" + filename + "\" quality=\"" + qual
                      + "\">" + isl + "</image>";
         captureImage(applyMacros(filename), makeElement(xml));
     }
