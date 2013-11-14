@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.ma2.Range;
+
 import ucar.unidata.collab.SharableImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -2346,10 +2347,14 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         DataSelection selection = DataSelection.merge(incomingDataSelection,
                                       getDataSelection());
-        boolean  isProgressiveResolution = selection.getProperty(
-                DataSelection.PROP_PROGRESSIVERESOLUTION, false);
 
-        Object baseCacheKey = createCacheKey(dataChoice, selection,
+        DataSelection lselection = selection.cloneMe();
+
+        boolean isProgressiveResolution =
+            selection.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION,
+                                  false);
+
+        Object baseCacheKey = createCacheKey(dataChoice, lselection,
                                              requestProperties);
         List cacheKey = ((baseCacheKey != null)
                          ? Misc.newList(baseCacheKey)
@@ -2382,11 +2387,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                                 + dataChoice);
                 cachedData = getDataInner(dataChoice, category, selection,
                                           requestProperties);
-                if(isProgressiveResolution){
-                    // this reset the x/y stride after PR changing
-                    selection.getGeoSelection().setXStride(0);
-                    selection.getGeoSelection().setYStride(0);
-                }
+
                 LogUtil.message("");
             } finally {
                 decrOutstandingGetDataCalls();
@@ -4083,15 +4084,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      */
     @Override
     public void setDefaultSave(boolean defaultsave) {
-      this.defaultSave  = defaultsave;
+        this.defaultSave = defaultsave;
     }
-    
+
     /**
      * Gets the default save.
      *
      * @return the default save
      */
-    public boolean getDefaultSave(){
-      return defaultSave;
+    public boolean getDefaultSave() {
+        return defaultSave;
     }
 }

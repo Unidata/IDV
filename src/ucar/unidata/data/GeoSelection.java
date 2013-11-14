@@ -81,6 +81,8 @@ public class GeoSelection {
     private Real level;
 
     /* Screen Bound*/
+
+    /** _more_ */
     Rectangle screenBoundRect;
 
     /** _more_ */
@@ -125,8 +127,9 @@ public class GeoSelection {
         if (that.rubberBandBoxPoints != null) {
             this.rubberBandBoxPoints = that.rubberBandBoxPoints;
         }
-        if(that.screenLatLonRect != null)
+        if (that.screenLatLonRect != null) {
             this.screenLatLonRect = that.screenLatLonRect;
+        }
     }
 
 
@@ -221,6 +224,7 @@ public class GeoSelection {
      * @param level _more_
      * @param screenBoundRect _more_
      * @param rubberBandBoxPoints _more_
+     * @param screenLatLonRect _more_
      */
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
                         int xStride, int yStride, int zStride, Real level,
@@ -345,36 +349,38 @@ public class GeoSelection {
         if (lowPriority == null) {
             return new GeoSelection(highPriority);
         }
-        int             xStride = highPriority.hasXStride()
-                                  ? highPriority.xStride
-                                  : lowPriority.xStride;
-        int             yStride = highPriority.hasYStride()
-                                  ? highPriority.yStride
-                                  : lowPriority.yStride;
-        int             zStride = highPriority.hasZStride()
-                                  ? highPriority.zStride
-                                  : lowPriority.zStride;
-        GeoLocationInfo bbox = ((highPriority.boundingBox != null)
-                                ? highPriority.boundingBox
-                                : lowPriority.boundingBox);
+        int             xStride         = highPriority.hasXStride()
+                                          ? highPriority.xStride
+                                          : lowPriority.xStride;
+        int             yStride         = highPriority.hasYStride()
+                                          ? highPriority.yStride
+                                          : lowPriority.yStride;
+        int             zStride         = highPriority.hasZStride()
+                                          ? highPriority.zStride
+                                          : lowPriority.zStride;
+        GeoLocationInfo bbox            = ((highPriority.boundingBox != null)
+                                           ? highPriority.boundingBox
+                                           : lowPriority.boundingBox);
 
-        Rectangle screenBoundRect = ((highPriority.screenBoundRect != null)
-                                     ? highPriority.screenBoundRect
-                                     : lowPriority.screenBoundRect);
+        Rectangle       screenBoundRect = highPriority.screenBoundRect;
+        // ((highPriority.screenBoundRect != null)
+        //  ? highPriority.screenBoundRect
+        //  : lowPriority.screenBoundRect);
 
-        LatLonPoint[] rubberBandBoxPoints =
-            ((highPriority.rubberBandBoxPoints != null)
-             ? highPriority.rubberBandBoxPoints
-             : lowPriority.rubberBandBoxPoints);
+        LatLonPoint[] rubberBandBoxPoints = highPriority.rubberBandBoxPoints;
+        //  ((highPriority.rubberBandBoxPoints != null)
+        //  ? highPriority.rubberBandBoxPoints
+        //   : lowPriority.rubberBandBoxPoints);
 
-        LatLonRect screenLatLonRect = ((highPriority.screenLatLonRect != null)
-                ? highPriority.screenLatLonRect
-                : lowPriority.screenLatLonRect);
+        LatLonRect screenLatLonRect = highPriority.screenLatLonRect;
+        // ((highPriority.screenLatLonRect != null)
+        //  ? highPriority.screenLatLonRect
+        //  : lowPriority.screenLatLonRect);
 
-     /*   if ((highPriority.boundingBox == null)
-                && (highPriority.rubberBandBoxPoints == null)) {
-            rubberBandBoxPoints = null;
-        }  */
+        /*   if ((highPriority.boundingBox == null)
+                   && (highPriority.rubberBandBoxPoints == null)) {
+               rubberBandBoxPoints = null;
+           }  */
 
         if (highPriority.getUseFullBounds()
                 && (highPriority.boundingBox == null)) {
@@ -674,7 +680,7 @@ public class GeoSelection {
      *
      * @param screenLatLonRect _more_
      */
-    public void setScreenLatLonRect (LatLonRect screenLatLonRect) {
+    public void setScreenLatLonRect(LatLonRect screenLatLonRect) {
         this.screenLatLonRect = screenLatLonRect;
     }
 
@@ -686,6 +692,7 @@ public class GeoSelection {
     public LatLonRect getScreenLatLonRect() {
         return this.screenLatLonRect;
     }
+
     /**
      * _more_
      *
