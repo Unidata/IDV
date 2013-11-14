@@ -2607,7 +2607,6 @@ Misc.run(new Runnable() {
     }
 
 
-
     /**
      * Return the xml representation of the given object. If
      * prettyPrint is true then format the xml with tabs, etc.
@@ -2617,7 +2616,25 @@ Misc.run(new Runnable() {
      * @return Xml representation of the given object
      */
     public String encodeObject(Object object, boolean prettyPrint) {
-        return XmlUtil.toString(getEncoderForWrite().toElement(object),
+        return encodeObject(object, prettyPrint, false);
+    }
+
+
+    /**
+     * Return the xml representation of the given object. If
+     * prettyPrint is true then format the xml with tabs, etc.
+     *
+     * @param object The object to xmlize
+     * @param prettyPrint Should the string xml be formatted
+     * @param withHeader  should we add the XML header
+     * @return Xml representation of the given object
+     */
+    public String encodeObject(Object object, boolean prettyPrint, boolean withHeader) {
+        return withHeader 
+                //TODO: consolidate the with header stuff in XmlUtil
+                ? XmlUtil.toStringWithHeader(getEncoderForWrite().toElement(object),
+                        "  ", "\n", prettyPrint)
+                : XmlUtil.toString(getEncoderForWrite().toElement(object),
                                 prettyPrint);
     }
 

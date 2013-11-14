@@ -1870,7 +1870,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
     private void writeDisplaySettings() {
         try {
             displaySettingsTimestamp++;
-            String xml = getIdv().encodeObject(localDisplaySettings, true);
+            String xml = getIdv().encodeObject(localDisplaySettings, true, true);
             ResourceCollection rc =
                 getResourceManager().getResources(
                     IdvResourceManager.RSC_DISPLAYSETTINGS);

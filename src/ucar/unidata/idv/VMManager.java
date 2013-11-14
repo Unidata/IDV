@@ -411,7 +411,7 @@ public class VMManager extends IdvManager {
                 if (rc.isWritableResource(i)) {
                     File f = new File(rc.get(i).toString());
                     String contents = getIdv().encodeObject(localViewpoints,
-                                          true);
+                                          true, true);
                     IOUtil.writeFile(f, contents);
                     return;
                 }

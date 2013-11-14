@@ -1067,7 +1067,7 @@ public class DerivedDataDescriptor {
                 (DerivedDataDescriptor) descriptors.get(i);
             top.appendChild(ddd.toXml(doc));
         }
-        return XmlUtil.toString(top);
+        return XmlUtil.toStringWithHeader(top);
 
     }
 

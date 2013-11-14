@@ -2142,7 +2142,7 @@ public class DrawingControl extends DisplayControlImpl {
                 DrawingGlyph g = (DrawingGlyph) glyphs.get(i);
                 root.appendChild(g.getElement(doc));
             }
-            return XmlUtil.toString(root);
+            return XmlUtil.toStringWithHeader(root);
 
         } catch (Exception exc) {
             logException("Exporting drawing", exc);
