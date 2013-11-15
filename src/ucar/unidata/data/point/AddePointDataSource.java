@@ -434,6 +434,9 @@ public class AddePointDataSource extends PointDataSource {
                     obs = PointObFactory.makePointObsFromField(
                         (FieldImpl) data, getBinRoundTo(), getBinWidth());
                     Trace.call2("AddePointDataSource.makePointObsFromField");
+                    if (!canSaveDataToLocalDisk() && bbox != null) {  
+                        obs = PointObFactory.subSet(obs, bbox);
+                    }
 
                     datas.add(obs);
                     //putCache (source, obs);
