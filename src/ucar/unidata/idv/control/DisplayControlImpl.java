@@ -7762,7 +7762,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                             ds = d.getDataSelection();
                             ds.setGeoSelection(geoSelection);
                         }
-                        reloadDataSource();
+                        // reloadDataSource();
                     } catch (Exception d) {}
                 }
             });

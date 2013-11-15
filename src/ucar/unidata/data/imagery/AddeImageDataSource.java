@@ -416,10 +416,12 @@ public class AddeImageDataSource extends ImageDataSource {
 
 
                 if (isProgressiveResolution) {
-                    eleMag = calculateMagFactor(elems, (int) rect.getWidth());
+                    // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
+                    lineMag = calculateMagFactor(lines, (int) rect.getHeight());
                     // lineMag = calculateMagFactor(lines,
                     //         (int) rect.getHeight()) - 1;
-                    lineMag = eleMag / elFactor;
+                    //lineMag = eleMag / elFactor;
+                    eleMag = lineMag * elFactor;
                 } else {
                     eleMag  = Math.abs(deMag);
                     lineMag = Math.abs(dlMag);
