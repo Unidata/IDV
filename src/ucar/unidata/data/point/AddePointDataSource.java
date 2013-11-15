@@ -28,6 +28,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
@@ -181,7 +182,16 @@ public class AddePointDataSource extends PointDataSource {
             throws Exception {
 
         String source = sources.get(0).toString();
-        source = processUrl(source, null, null, null, false);
+        // See if there is a data subset
+        LatLonRect bbox = null;
+        DataSelection ds = getDataSelection();
+        if (ds != null) {
+            GeoSelection gs = ds.getGeoSelection();
+            if (gs != null) {
+                bbox = gs.getLatLonRect();
+            }
+        }
+        source = processUrl(source, null, null, bbox, false);
         List addeUrls = AddeUtil.generateTimeUrls(this, source,
                             timeDriverSelection);
         List<String> urls = new ArrayList<String>();
@@ -424,6 +434,9 @@ public class AddePointDataSource extends PointDataSource {
                     obs = PointObFactory.makePointObsFromField(
                         (FieldImpl) data, getBinRoundTo(), getBinWidth());
                     Trace.call2("AddePointDataSource.makePointObsFromField");
+                    if (!canSaveDataToLocalDisk() && bbox != null) {  
+                        obs = PointObFactory.subSet(obs, bbox);
+                    }
 
                     datas.add(obs);
                     //putCache (source, obs);
