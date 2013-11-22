@@ -575,6 +575,15 @@ public class DerivedDataChoice extends ListDataChoice {
                         dataSelection.putProperty(
                                 DataSelection.PROP_USESTIMEDRIVER, false);
                     }
+                    Object ud0 =
+                            ds0.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION);
+                    if ((ud0 != null) && ((Boolean) ud0).booleanValue()) {
+                        dataSelection.putProperty(
+                                DataSelection.PROP_PROGRESSIVERESOLUTION, true);
+                    } else {
+                        dataSelection.putProperty(
+                                DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+                    }
                 }
                 //Add this data choice to the list of data choices
                 childrenChoices.add(selectedChoice);
