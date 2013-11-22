@@ -1775,7 +1775,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         selectRegionMode = value;
         if (value) {
             setToolTipText(
-                "<html>Drag to select region<br>Press 'Delete' (or Control-D) to clear selected region<br>Press Control-R to reset selected region</html>");
+                "<html>Change to Select a Region option in the menu and Drag to select region<br>Press 'Delete' (or Control-D) to clear selected region<br>Press Control-R to reset selected region</html>");
         }
     }
 
