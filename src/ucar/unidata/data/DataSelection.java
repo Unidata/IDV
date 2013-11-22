@@ -76,7 +76,7 @@ public class DataSelection {
     public final static String PROP_USEDEFAULT = "Use Default";
 
     /** region option */
-    public final static String PROP_USESELECTED = "Selected a Region";
+    public final static String PROP_USESELECTED = "Select a Region";
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(

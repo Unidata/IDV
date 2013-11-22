@@ -2376,7 +2376,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
          * first = false;
          */
 
-
+        // System.out.println(cacheKey.hashCode());
         Data cachedData = ((cacheKey != null)
                            ? (Data) getCache(cacheKey)
                            : null);
@@ -2394,6 +2394,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
             if ((cacheKey != null) && (cachedData != null)
                     && shouldCache(dataChoice, cachedData)) {
+                // System.out.println(cacheKey.hashCode());
                 putCache(cacheKey, cachedData);
             }
         } else {}
