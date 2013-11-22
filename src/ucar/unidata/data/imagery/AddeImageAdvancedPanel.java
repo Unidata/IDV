@@ -423,6 +423,9 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         NavigatedPanel navigatedPanel =
             dataSource.previewSelection.display.getNavigatedPanel();
         ProjectionRect rect = navigatedPanel.getSelectedRegion();
+        if (rect == null) {
+            return;
+        }
         ProjectionImpl projectionImpl =
             dataSource.previewSelection.display.getProjectionImpl();
         ProjectionRect newRect = new ProjectionRect();
@@ -469,8 +472,10 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
     public void updateImageWidthSize() {
         NavigatedPanel navigatedPanel =
             dataSource.previewSelection.display.getNavigatedPanel();
-        ProjectionRect rect    = navigatedPanel.getSelectedRegion();
-
+        ProjectionRect rect = navigatedPanel.getSelectedRegion();
+        if (rect == null) {
+            return;
+        }
         ProjectionRect newRect = new ProjectionRect();
         newRect.setX(rect.getX());
         newRect.setY(rect.getY());
@@ -495,8 +500,10 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
     public void updateImageHeightSize() {
         NavigatedPanel navigatedPanel =
             dataSource.previewSelection.display.getNavigatedPanel();
-        ProjectionRect rect    = navigatedPanel.getSelectedRegion();
-
+        ProjectionRect rect = navigatedPanel.getSelectedRegion();
+        if (rect == null) {
+            return;
+        }
         ProjectionRect newRect = new ProjectionRect();
         newRect.setX(rect.getX());
         newRect.setY(rect.getY());
@@ -830,10 +837,10 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
      */
     protected JComponent doMakeContents() {
 
-        java.util.List allComps0        = new ArrayList();
-        java.util.List allComps1        = new ArrayList();
-        java.util.List allComps2        = new ArrayList();
-        java.util.List allComps3        = new ArrayList();
+        java.util.List allComps0       = new ArrayList();
+        java.util.List allComps1       = new ArrayList();
+        java.util.List allComps2       = new ArrayList();
+        java.util.List allComps3       = new ArrayList();
         Insets         dfltGridSpacing = new Insets(4, 0, 4, 0);
         String         dfltLblSpacing  = " ";
         JComponent     propComp        = null;
@@ -1050,7 +1057,8 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
 
         fullResBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/arrow_out.png", this,
-                                     "setToFullResolution");
+                                     "setToFullResolution",
+                                     new Boolean(true));
         fullResBtn.setContentAreaFilled(false);
         fullResBtn.setToolTipText("Set fields to retrieve full image");
 
@@ -1134,10 +1142,15 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
 
         //all
         JPanel imagePanel = GuiUtils.vbox(
-                GuiUtils.doLayout(allComps0, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
-                GuiUtils.doLayout(allComps1, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
-                GuiUtils.doLayout(allComps2, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
-                GuiUtils.doLayout(allComps3, 2, GuiUtils.WT_NY, GuiUtils.WT_N));
+                                GuiUtils.doLayout(
+                                    allComps0, 2, GuiUtils.WT_NY,
+                                    GuiUtils.WT_N), GuiUtils.doLayout(
+                                        allComps1, 2, GuiUtils.WT_NY,
+                                        GuiUtils.WT_N), GuiUtils.doLayout(
+                                            allComps2, 2, GuiUtils.WT_NY,
+                                            GuiUtils.WT_N), GuiUtils.doLayout(
+                                                allComps3, 2, GuiUtils.WT_NY,
+                                                GuiUtils.WT_N));
 
         advance = GuiUtils.top(imagePanel);
         boolean showMagSection = !prograssiveCbx.isSelected();
@@ -1509,13 +1522,55 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
      */
     public void applyToDataSelection(DataSelection dataSelection) {
         GeoSelection geoSelection = dataSelection.getGeoSelection();
-        if(geoSelection != null){
-            dataSelection.putProperty(
-                    DataSelection.PROP_PROGRESSIVERESOLUTION,
-                    getIsProgressiveResolution());
-            if(!getIsProgressiveResolution()) {
-                geoSelection.setXStride(Math.abs(elementMagSlider.getValue()));
+
+        dataSelection.putProperty(DataSelection.PROP_PROGRESSIVERESOLUTION,
+                                  getIsProgressiveResolution());
+
+        if (geoSelection != null) {
+            if ( !getIsProgressiveResolution()) {
+                geoSelection.setXStride(
+                    Math.abs(elementMagSlider.getValue()));
                 geoSelection.setYStride(Math.abs(lineMagSlider.getValue()));
+            }
+        }
+
+        if (geoSelection == null) {
+            String regionOption =
+                dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
+                                          DataSelection.PROP_USEDEFAULT);
+            if (regionOption.equals(DataSelection.PROP_USESELECTED)) {
+                String source = descriptor.getSource();
+
+                if (getCoordinateType() == TYPE_LATLON) {
+                    String locateValue = Misc.format(getLatitude()) + " "
+                                         + Misc.format(getLongitude());
+                    source = AddeImageDataSource.replaceKey(source,
+                            AddeImageURL.KEY_LATLON, AddeImageURL.KEY_LATLON,
+                            locateValue);
+                } else {
+                    String locateValue = getLine() + " " + getElement();
+                    source = AddeImageDataSource.replaceKey(source,
+                            AddeImageURL.KEY_LINEELE, locateValue);
+                }
+
+                if (getPlace() == "CENTER") {
+                    source = AddeImageDataSource.replaceKey(source,
+                            AddeImageURL.KEY_PLACE, "CENTER");
+                } else {
+                    source = AddeImageDataSource.replaceKey(source,
+                            AddeImageURL.KEY_PLACE, "ULEFT");
+                }
+
+                String sizeValue = getNumLines() + " " + getNumEles();
+                source = AddeImageDataSource.replaceKey(source,
+                        AddeImageURL.KEY_SIZE, sizeValue);
+                String magValue = String.valueOf(getLineMagValue()) + " "
+                                  + String.valueOf(getElementMagValue());
+                source = AddeImageDataSource.replaceKey(source,
+                        AddeImageURL.KEY_MAG, magValue);
+                source = AddeImageDataSource.replaceKey(source,
+                        AddeImageURL.KEY_SPAC, 1);
+                dataSelection.putProperty("advancedURL", source);
             }
         }
 
@@ -1621,20 +1676,64 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
 
     /**
      * Set to full resolution
+     *
+     * @param update _more_
      */
-    public void setToFullResolution() {
+    public void setToFullResolution(Boolean update) {
         setPlace(PLACE_CENTER);
         setLatitude(this.previewDir.getCenterLatitude());
         setLongitude(this.previewDir.getCenterLongitude());
         convertToLinEle();
-        setNumLines(this.maxLines);
-        setNumEles(this.maxEles);
+
+
+        if (update) {
+            setMagSliders(1, 1);
+            setNumLines(this.maxLines);
+            updateImageHeightSize();
+            setNumEles(this.maxEles);
+            updateImageWidthSize();
+        } else {
+            setNumLines(this.maxLines / Math.abs(getLineMagValue()));
+            setNumEles(this.maxEles / Math.abs(getElementMagValue()));
+        }
 
         amUpdating = true;
         lineMagSliderChanged(false);
         elementMagSliderChanged(false);
         amUpdating = false;
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param lineValue _more_
+     * @param elementValue _more_
+     */
+    private void setMagSliders(int lineValue, int elementValue) {
+        if (lineMagSlider != null) {
+            if (lineValue > 0) {
+                lineValue--;
+            } else if (lineValue < 0) {
+                lineValue++;
+            }
+            if (elementValue > 0) {
+                elementValue--;
+            } else if (elementValue < 0) {
+                elementValue++;
+            }
+
+
+            lineMagSlider.setValue(lineValue);
+            elementMagSlider.setValue(elementValue);
+            lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(), 3));
+            elementMagLbl.setText(StringUtil.padLeft(""
+                    + getElementMagValue(), 3));
+            linesToElements = Math.abs(lineValue / (double) elementValue);
+            if (Double.isNaN(linesToElements)) {
+                linesToElements = 1.0;
+            }
+        }
     }
 
     /**

@@ -36,6 +36,7 @@ import ucar.unidata.util.*;
 
 import visad.*;
 
+import visad.data.dods.StringVariableAdapter;
 import visad.data.mcidas.AREACoordinateSystem;
 import visad.data.mcidas.AreaAdapter;
 
@@ -341,7 +342,7 @@ public class AddeImageDataSource extends ImageDataSource {
         if (geoSelection != null) {  //&& !isReload) {
             // applies the rubberbandbox geosubset here
             //GeoSelection gs = subset.getGeoSelection();
-            if ((geoSelection.getRubberBandBoxPoints() != null)) {
+            if ((geoSelection.getRubberBandBoxPoints() != null) && isReload ) {
                 double[] latLons =
                     getLatLonPoints(geoSelection.getRubberBandBoxPoints());
                 descriptors = geoSpaceSubset(geoSelection.getScreenBound(),
@@ -351,41 +352,97 @@ public class AddeImageDataSource extends ImageDataSource {
                                              latLons[3], elFactor, dlMag,
                                              deMag, "ULEFT",
                                              isProgressiveResolution);
-            } else if (geoSelection.getBoundingBox() != null ) {
-                //use selected
-                double maxLat = geoSelection.getBoundingBox().getMaxLat();
-                double minLat = geoSelection.getBoundingBox().getMinLat();
-                double maxLon = geoSelection.getBoundingBox().getMaxLon();
-                double minLon = geoSelection.getBoundingBox().getMinLon();
-                // double maxLat, double minLat, double maxLon, double minLon
-                if (useDisplayArea) {
-                    BandInfo id = (BandInfo) dataChoice.getId();
-                    AreaDirectory thisDir =
-                        (AreaDirectory) allBandDirs.get(id.getBandNumber());
-                    int[] dir = thisDir.getDirectoryBlock();
-                    descriptors =
-                        geoSpaceSubsetA(geoSelection.getScreenBound(),
-                                        unitStr, eMag, lMag, baseAnav,
-                                        descriptors, maxLat, minLat, maxLon,
-                                        minLon, elFactor, dlMag, deMag,
-                                        "CENTER", isProgressiveResolution,
-                                        dir);
-                } else if (hasCorner) {
-                    descriptors =
-                        geoSpaceSubset(geoSelection.getScreenBound(),
-                                       unitStr, eMag, lMag, baseAnav,
-                                       descriptors, maxLat, minLat, maxLon,
-                                       minLon, elFactor, dlMag, deMag,
-                                       "CENTER", isProgressiveResolution);
+            } else if (t1.equals(DataSelection.PROP_USESELECTED) ) {
+                if(geoSelection.getBoundingBox() != null){
+                    //use selected
+                    double maxLat = geoSelection.getBoundingBox().getMaxLat();
+                    double minLat = geoSelection.getBoundingBox().getMinLat();
+                    double maxLon = geoSelection.getBoundingBox().getMaxLon();
+                    double minLon = geoSelection.getBoundingBox().getMinLon();
+                    // double maxLat, double minLat, double maxLon, double minLon
+                    if (useDisplayArea) {
+                        BandInfo id = (BandInfo) dataChoice.getId();
+                        AreaDirectory thisDir =
+                            (AreaDirectory) allBandDirs.get(id.getBandNumber());
+                        int[] dir = thisDir.getDirectoryBlock();
+                        descriptors =
+                            geoSpaceSubsetA(geoSelection.getScreenBound(),
+                                            unitStr, eMag, lMag, baseAnav,
+                                            descriptors, maxLat, minLat, maxLon,
+                                            minLon, elFactor, dlMag, deMag,
+                                            "CENTER", isProgressiveResolution,
+                                            dir);
+                    } else if (hasCorner) {
+                        descriptors =
+                            geoSpaceSubset(geoSelection.getScreenBound(),
+                                           unitStr, eMag, lMag, baseAnav,
+                                           descriptors, maxLat, minLat, maxLon,
+                                           minLon, elFactor, dlMag, deMag,
+                                           "CENTER", isProgressiveResolution);
+                    } else {
+                        descriptors =
+                            geoSpaceSubset(geoSelection.getScreenBound(),
+                                           unitStr, eMag, lMag, baseAnav,
+                                           descriptors, maxLat, minLat, maxLon,
+                                           minLon, elFactor, dlMag, deMag,
+                                           "ULEFT", isProgressiveResolution);
+                    }
                 } else {
-                    descriptors =
-                        geoSpaceSubset(geoSelection.getScreenBound(),
-                                       unitStr, eMag, lMag, baseAnav,
-                                       descriptors, maxLat, minLat, maxLon,
-                                       minLon, elFactor, dlMag, deMag,
-                                       "ULEFT", isProgressiveResolution);
-                }
+                    String adSource = (String)subset.getProperty("advancedURL");
+                    String sizeValue = getKey(adSource, AddeImageURL.KEY_SIZE);
+                    String magValue = getKey(adSource, AddeImageURL.KEY_MAG);
+                    List<String> sizeList = StringUtil.split(sizeValue, " ");
+                    List<String> magsList = StringUtil.split(magValue, " ");
+                    int    lines  =  Integer.parseInt(sizeList.get(0))
+                            * Math.abs(Integer.parseInt(magsList.get(0)));
+                    int    elems       = Integer.parseInt(sizeList.get(1))
+                            * Math.abs(Integer.parseInt(magsList.get(1)));
 
+                    String lineele = getKey(adSource, AddeImageURL.KEY_LINEELE);
+                    String latlon =  getKey(adSource, AddeImageURL.KEY_LATLON);
+                    String place =  getKey(adSource, AddeImageURL.KEY_PLACE);
+                    if (isProgressiveResolution) {
+                        // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
+                        lineMag = calculateMagFactor(lines, (int) rect.getHeight());
+                        // lineMag = calculateMagFactor(lines,
+                        //         (int) rect.getHeight()) - 1;
+                        //lineMag = eleMag / elFactor;
+                        eleMag = lineMag * elFactor;
+                    } else {
+                        eleMag  = Math.abs(deMag);
+                        lineMag = Math.abs(dlMag);
+                    }
+
+                    System.out.println(
+                            "Magnification factor of line X element : " + lineMag
+                                    + " " + eleMag);
+                    int newLines;
+                    int newelems;
+
+                    if (lineMag == 1) {
+                        newLines = lines;
+                    } else {
+                        newLines = (int) Math.floor(lines / lineMag + 0.5);
+                    }
+
+                    if (eleMag == 1) {
+                        newelems = elems;
+                    } else {
+                        newelems = (int) Math.floor(elems / eleMag + 0.5);
+                    }
+                    System.out.println("newLine X newElement : " + newLines + " "
+                            + newelems);
+                    try {
+                        if(lineele.length() > 0)
+                            descriptors = reSetImageDataDescriptor(descriptors,
+                                    AddeImageURL.KEY_LINEELE, lineele, place,
+                                    newLines, newelems, lineMag, eleMag, unitStr);
+                        else
+                            descriptors = reSetImageDataDescriptor(descriptors,
+                                    AddeImageURL.KEY_LATLON, latlon, place,
+                                    newLines, newelems, lineMag, eleMag, unitStr);
+                    } catch (Exception e) {}
+                }
             } else if (useDisplayArea) {
 
                 LatLonRect llrect = geoSelection.getScreenLatLonRect();

@@ -23,6 +23,7 @@ package ucar.unidata.data.imagery;
 
 import edu.wisc.ssec.mcidas.AREAnav;
 
+import edu.wisc.ssec.mcidas.AreaFile;
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
@@ -34,6 +35,7 @@ import ucar.unidata.view.geoloc.NavigatedMapPanel;
 
 import visad.VisADException;
 
+import visad.data.mcidas.AREACoordinateSystem;
 import visad.data.mcidas.AreaAdapter;
 
 import java.awt.event.FocusEvent;
@@ -428,11 +430,17 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
      */
     public void applyToDataSelection(DataSelection dataSelection) {
         boolean hasCorner = false;
+        boolean isFull = false;
         regionOption = getRegionOption();
         GeoLocationInfo gInfo = null;
         if (regionOption.equals(DataSelection.PROP_USESELECTED)) {
             ProjectionRect rect =
                     display.getNavigatedPanel().getSelectedRegion();
+            if(rect == null){
+                dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
+                        regionOption);
+                return;
+            }
             ProjectionImpl projectionImpl =
                     getNavigatedMapPanel().getProjectionImpl();
             LatLonRect latLonRect =
@@ -463,6 +471,12 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
                 double minLon = Double.NaN;
                 if (cImpl.getLatitude() != cImpl.getLatitude()) {
                     //do nothing
+                } else if (ulImpl.getLatitude() != ulImpl.getLatitude() &&
+                        urImpl.getLatitude() != urImpl.getLatitude() &&
+                        llImpl.getLatitude() != llImpl.getLatitude() &&
+                        lrImpl.getLatitude() != lrImpl.getLatitude()) {
+
+                    isFull = true;
                 } else if (ulImpl.getLatitude() != ulImpl.getLatitude()) {
                     //upper left conner
                     maxLat = cImpl.getLatitude()
@@ -516,7 +530,8 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
         }
 
         geoSelection = new GeoSelection(gInfo);
-
+        if(isFull)
+            geoSelection.setUseFullBounds(true);
         dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
                 regionOption);
         dataSelection.putProperty(DataSelection.PROP_HASCORNER,
@@ -525,6 +540,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
 
     }
 
+
     /**
      * _more_
      */
@@ -532,6 +548,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
 
         ProjectionRect rect = display.getNavigatedPanel().getSelectedRegion();
         boolean        hasCorner = false;
+        boolean        isFull = false;
         if (rect == null) {
             // no region subset, full image
         } else {
@@ -560,6 +577,12 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
                 double minLon = Double.NaN;
                 if (cImpl.getLatitude() != cImpl.getLatitude()) {
                     //do nothing
+                } else if (ulImpl.getLatitude() != ulImpl.getLatitude() &&
+                        urImpl.getLatitude() != urImpl.getLatitude() &&
+                        llImpl.getLatitude() != llImpl.getLatitude() &&
+                        lrImpl.getLatitude() != lrImpl.getLatitude() ) {
+
+                    isFull = true;
                 } else if (ulImpl.getLatitude() != ulImpl.getLatitude()) {
                     //upper left conner
                     maxLat = cImpl.getLatitude()
@@ -622,7 +645,9 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
             imageDataSource.advancedSelection.coordinateTypeComboBox
                 .setSelectedIndex(0);
             // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
-            if ( !hasCorner) {
+            if(isFull){
+                imageDataSource.advancedSelection.setToFullResolution(new Boolean(false));
+            } else if ( !hasCorner) {
                 imageDataSource.advancedSelection.setPlace("ULEFT");
                 imageDataSource.advancedSelection.setLatitude(
                     gInfo.getMaxLat());
@@ -640,20 +665,21 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
                 imageDataSource.advancedSelection.convertToLineEle();
             }
             // update the size
-            imageDataSource.advancedSelection.setNumLines(lines);
-            imageDataSource.advancedSelection.setNumEles(elems);
-            imageDataSource.advancedSelection.setIsFromRegionUpdate(false);
+            if(!isFull) {
+                imageDataSource.advancedSelection.setNumLines(lines);
+                imageDataSource.advancedSelection.setNumEles(elems);
+                imageDataSource.advancedSelection.setIsFromRegionUpdate(false);
 
-            // update the mag slider
-            imageDataSource.advancedSelection.setElementMagSlider(
-                -Math.abs(eMag));
-            imageDataSource.advancedSelection.setLineMagSlider(
-                -Math.abs(lMag));
-            imageDataSource.advancedSelection.setBaseNumElements(elems
-                    * Math.abs(eMag));
-            imageDataSource.advancedSelection.setBaseNumLines(lines
-                    * Math.abs(lMag));
-
+                // update the mag slider
+                imageDataSource.advancedSelection.setElementMagSlider(
+                    -Math.abs(eMag));
+                imageDataSource.advancedSelection.setLineMagSlider(
+                    -Math.abs(lMag));
+                imageDataSource.advancedSelection.setBaseNumElements(elems
+                        * Math.abs(eMag));
+                imageDataSource.advancedSelection.setBaseNumLines(lines
+                        * Math.abs(lMag));
+            }
         }
 
     }
