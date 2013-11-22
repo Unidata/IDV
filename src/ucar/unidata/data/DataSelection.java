@@ -21,6 +21,7 @@
 package ucar.unidata.data;
 
 
+import ucar.unidata.util.HashCodeUtils;
 import ucar.unidata.util.Misc;
 
 import visad.DateTime;
@@ -69,13 +70,13 @@ public class DataSelection {
     public final static String PROP_HASCORNER = "Region_Selection_Has_Conner";
 
     /** region option */
-    public final static String PROP_USEDISPLAYAREA = "Use Display Area";
+    public final static String PROP_USEDISPLAYAREA = "Match Display Area";
 
     /** region option */
     public final static String PROP_USEDEFAULT = "Use Default";
 
     /** region option */
-    public final static String PROP_USESELECTED = "Use Selected";
+    public final static String PROP_USESELECTED = "Selected a Region";
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
@@ -418,7 +419,10 @@ public class DataSelection {
      * @return  the hash code
      */
     public int hashCode() {
-        return Misc.hashcode(times) ^ Misc.hashcode(properties);
+        return HashCodeUtils.hash(HashCodeUtils.hash( Misc.hashcode(times),
+                Misc.hashcode(properties)), Misc.hashcode(geoSelection));
+
+      //  return Misc.hashcode(times) ^ Misc.hashcode(properties);
     }
 
 

@@ -580,7 +580,8 @@ public class GeoSelection {
      */
     public String toString() {
         return "x:" + xStride + " " + "y:" + yStride + " " + "z:" + zStride
-               + " bbox:" + boundingBox;
+               + " bbox:" + boundingBox + " rbbBox:" +  rubberBandBoxPoints
+       ;
     }
 
 
@@ -612,7 +613,11 @@ public class GeoSelection {
         int seed = ((boundingBox != null)
                     ? boundingBox.hashCode()
                     : HashCodeUtils.SEED);
-        return HashCodeUtils.hash(HashCodeUtils.hash(HashCodeUtils.hash(seed,
+
+        int seed1 = ((rubberBandBoxPoints != null)
+                    ? rubberBandBoxPoints.hashCode()
+                    : HashCodeUtils.SEED);
+        return HashCodeUtils.hash(HashCodeUtils.hash(HashCodeUtils.hash(HashCodeUtils.hash(seed1, seed),
                 xStride), yStride), zStride);
     }
 
@@ -634,7 +639,8 @@ public class GeoSelection {
                && (this.yStride == that.yStride)
                && (this.zStride == that.zStride)
                && Misc.equals(this.boundingBox, that.boundingBox)
-               && Misc.equals(this.level, that.level);
+               && Misc.equals(this.level, that.level)
+               && Misc.equals(this.rubberBandBoxPoints, that.rubberBandBoxPoints);
     }
 
 
