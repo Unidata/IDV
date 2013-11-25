@@ -2713,26 +2713,50 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * and have not received another one in some time delta
      */
     public void viewpointChanged() {
-        if (canDoProgressiveResolution) {
-            try {
-                // check if this is rubber band event, if not do nothing
-                GeoSelection geoSelection =
-                    dataSelection.getGeoSelection(true);
-                geoSelection.setScreenLatLonRect(
-                    getNavigatedDisplay().getLatLonRect());
-
-                List dataSources = Misc.makeUnique(getDataSources());
-                for (int i = 0; i < dataSources.size(); i++) {
-                    isRBBChanged = isRubberBandBoxChanged();
-                    if (isRBBChanged) {
-                        ((DataSource) dataSources.get(i)).reloadData();
-                        setProjectionInView(true);
-                    }
-                }
-            } catch (Exception e) {}
+    	//System.out.println("viewpointChanged");
+        if (getCanDoProgressiveResolution()) {
+            if (isRBBChanged) {
+            	loadDataFromViewBounds();
+                isRBBChanged = false;
+            }
         }
     }
 
+    /**
+     * Method to calculate screen bounds to load new data
+     */
+    private void loadDataFromViewBounds() {
+
+    	RubberBandBox rubberBandBox = null;
+        NavigatedDisplay nd = getNavigatedDisplay();
+        // TODO:  This needs to be re-written to get the lat/lon bounds from the
+        // screen.  There is no need to pass around the RBB bounds.
+        if (nd != null) {
+            rubberBandBox = nd.getRubberBandBox();
+            float[] boundHi = rubberBandBox.getBounds().getHi();
+            if ((boundHi[0] == 0) && (boundHi[1] == 0)) {
+                return;
+            }
+            GeoSelection geoSelection = getDataSelection().getGeoSelection(true);
+            try {
+                ucar.unidata.geoloc.LatLonPoint[] llp0 =
+                    getLatLonPoints(rubberBandBox.getBounds().getDoubles());
+                GeoLocationInfo gInfo =
+                    new GeoLocationInfo(llp0[0].getLatitude(),
+                                        llp0[0].getLongitude(),
+                                        llp0[1].getLatitude(),
+                                        llp0[1].getLongitude());
+                geoSelection.setRubberBandBoxPoints(llp0);
+                geoSelection.setScreenBound(
+                    getNavigatedDisplay().getScreenBounds());
+                // geoSelection.setBoundingBox(gInfo);
+            } catch (Exception e) {}
+            getDataSelection().setGeoSelection(geoSelection);
+            try {
+                reloadDataSourceInThread();
+            } catch (Exception e) {};
+        }
+    }
 
     /**
      * Handle animation change events
@@ -3934,21 +3958,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             logException("Getting display list displayable", ve);
         } catch (RemoteException re) {}
 
-        if ( !inGlobeDisplay()) {
-            MapProjectionDisplay mpd =
-                (MapProjectionDisplay) getNavigatedDisplay();
-            RubberBandBox rbb = mpd.getRubberBandBox();
-            if (rbb != null) {
-                rbb.reSetBounds();
-            }
-        } else {  //now in globe display
-            GlobeDisplay  gd  = (GlobeDisplay) getNavigatedDisplay();
-            RubberBandBox rbb = gd.getRubberBandBox();
-            if (rbb != null) {
-                rbb.reSetBounds();
-            }
+        
+        /*  don't need to do this.
+        NavigatedDisplay nd = getNavigatedDisplay();
+        RubberBandBox rbb = nd.getRubberBandBox();
+        if (rbb != null) {
+        	System.out.println("resetting rbb bounds");
+            rbb.reSetBounds();
         }
-
+        */
         return displayListDisplayable;
     }
 
@@ -6624,6 +6642,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                        MapViewManager.PROP_COMPONENT_RESIZED)) {
             reDisplayColorScales();
         }
+        if (property.equals(NavigatedViewManager.SHARE_RUBBERBAND)) {
+        	System.out.println("rubber band changed");
+        	isRBBChanged = true;
+        }
     }
 
     /**
@@ -7745,6 +7767,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         dataSelection.putProperty(
                             DataSelection.PROP_PROGRESSIVERESOLUTION,
                             isProgressiveResolution);
+                        /*
                         GeoSelection geoSelection =
                             dataSelection.getGeoSelection(true);
                         geoSelection.setScreenLatLonRect(
@@ -7763,6 +7786,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                             ds.setGeoSelection(geoSelection);
                         }
                         // reloadDataSource();
+                         */
                     } catch (Exception d) {}
                 }
             });
@@ -12443,6 +12467,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return _more_
      */
     public boolean isRubberBandBoxChanged() {
+    	if (true) {
+    		return isRBBChanged;
+    	}
         RubberBandBox rubberBandBox = null;
         if ( !this.isProgressiveResolution) {
             return false;
@@ -12496,12 +12523,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
-     * _more_
+     * Can we do progresive resolution from this display
      *
-     * @return _more_
+     * @return  true if display and view supports it
      */
     public boolean getCanDoProgressiveResolution() {
-        return this.canDoProgressiveResolution;
+        MapViewManager mvm = getMapViewManager();
+        if (mvm == null) {
+            return this.canDoProgressiveResolution;
+        }
+        return this.canDoProgressiveResolution && 
+               mvm.getUseProgressiveResolution();
     }
 
     /**

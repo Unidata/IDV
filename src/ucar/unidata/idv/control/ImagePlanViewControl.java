@@ -97,6 +97,7 @@ public class ImagePlanViewControl extends PlanViewControl {
         */
         //gridDisplay.setUseRGBTypeForSelect(true);
         addAttributedDisplayable(gridDisplay);
+        /** Don't need this - get the change from the view
         if ( !inGlobeDisplay()) {
             MapProjectionDisplay mpd =
                 (MapProjectionDisplay) getNavigatedDisplay();
@@ -109,6 +110,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             if(rbb != null)
                 rbb.reSetBounds();
         }
+        */
         return gridDisplay;
     }
 

@@ -554,7 +554,7 @@ public abstract class NavigatedViewManager extends ViewManager {
         }
         
         if (dataId.equals(SHARE_RUBBERBAND)) {
-    	    System.out.println("Rubber Band Box changed from share");
+    	    //System.out.println("NVM: Rubber Band Box changed from share");
             notifyDisplayControls(SHARE_RUBBERBAND);
             return;
         }
@@ -571,7 +571,7 @@ public abstract class NavigatedViewManager extends ViewManager {
         if ( !getInitDone()) {
             return;
         }
-    	System.out.println("Rubber Band Box changed");
+    	//System.out.println("NVM: Rubber Band Box changed");
     	doShare(SHARE_RUBBERBAND, "");
     	notifyDisplayControls(SHARE_RUBBERBAND);
     }
