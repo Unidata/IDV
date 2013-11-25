@@ -421,13 +421,13 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
 
 
         NavigatedPanel navigatedPanel =
-            dataSource.previewSelection.display.getNavigatedPanel();
+            dataSource.addeImageDataSelection.getRegionPanel().display.getNavigatedPanel();
         ProjectionRect rect = navigatedPanel.getSelectedRegion();
         if (rect == null) {
             return;
         }
         ProjectionImpl projectionImpl =
-            dataSource.previewSelection.display.getProjectionImpl();
+            dataSource.addeImageDataSelection.getRegionPanel().display.getProjectionImpl();
         ProjectionRect newRect = new ProjectionRect();
         newRect.setHeight(rect.getHeight());
         newRect.setWidth(rect.getWidth());
@@ -471,7 +471,7 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
 
     public void updateImageWidthSize() {
         NavigatedPanel navigatedPanel =
-            dataSource.previewSelection.display.getNavigatedPanel();
+            dataSource.addeImageDataSelection.getRegionPanel().display.getNavigatedPanel();
         ProjectionRect rect = navigatedPanel.getSelectedRegion();
         if (rect == null) {
             return;
@@ -499,7 +499,7 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
      */
     public void updateImageHeightSize() {
         NavigatedPanel navigatedPanel =
-            dataSource.previewSelection.display.getNavigatedPanel();
+            dataSource.addeImageDataSelection.getRegionPanel().display.getNavigatedPanel();
         ProjectionRect rect = navigatedPanel.getSelectedRegion();
         if (rect == null) {
             return;
@@ -1176,8 +1176,8 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         MasterPanel.add(labelsPanel, "North");
         MasterPanel.add(jsp, "Center");
 
-        if (dataSource.previewSelection != null) {
-            String opStr = dataSource.previewSelection.getRegionOptions();
+        if (dataSource.addeImageDataSelection.getRegionPanel() != null) {
+            String opStr = dataSource.addeImageDataSelection.getRegionPanel().getRegionOptions();
 
             if (opStr.equals("Use Selected")) {
                 enablePanelAll(true);

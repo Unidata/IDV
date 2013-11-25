@@ -320,12 +320,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
      * @param selectedObject _more_
      */
     public void setAdvancedPanel(String selectedObject) {
-        if (advancedSelection == null) {
-            if(this.imageDataSource.getAdvancedSelection() != null)
-                advancedSelection = this.imageDataSource.getAdvancedSelection();
-            else
-                return;
-        }
+
 
         regionOption = selectedObject.toString();
         if (selectedObject.equals(USE_SELECTEDREGION)) {
@@ -641,43 +636,43 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
             int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0]);
             //* Math.abs(eMag);
             // set latlon coord
-            imageDataSource.advancedSelection.setIsFromRegionUpdate(true);
-            imageDataSource.advancedSelection.coordinateTypeComboBox
+            imageDataSource.addeImageDataSelection.getAdvancedPanel().setIsFromRegionUpdate(true);
+            imageDataSource.addeImageDataSelection.getAdvancedPanel().coordinateTypeComboBox
                 .setSelectedIndex(0);
             // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
             if(isFull){
-                imageDataSource.advancedSelection.setToFullResolution(new Boolean(false));
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setToFullResolution(new Boolean(false));
             } else if ( !hasCorner) {
-                imageDataSource.advancedSelection.setPlace("ULEFT");
-                imageDataSource.advancedSelection.setLatitude(
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setPlace("ULEFT");
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setLatitude(
                     gInfo.getMaxLat());
-                imageDataSource.advancedSelection.setLongitude(
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setLongitude(
                     gInfo.getMinLon());
-                imageDataSource.advancedSelection.convertToLineEle();
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().convertToLineEle();
             } else {
-                imageDataSource.advancedSelection.setPlace("CENTER");
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setPlace("CENTER");
                 double centerLat = (gInfo.getMaxLat() + gInfo.getMinLat())
                                    / 2;
                 double centerLon = (gInfo.getMaxLon() + gInfo.getMinLon())
                                    / 2;
-                imageDataSource.advancedSelection.setLatitude(centerLat);
-                imageDataSource.advancedSelection.setLongitude(centerLon);
-                imageDataSource.advancedSelection.convertToLineEle();
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setLatitude(centerLat);
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setLongitude(centerLon);
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().convertToLineEle();
             }
             // update the size
             if(!isFull) {
-                imageDataSource.advancedSelection.setNumLines(lines);
-                imageDataSource.advancedSelection.setNumEles(elems);
-                imageDataSource.advancedSelection.setIsFromRegionUpdate(false);
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setNumLines(lines);
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setNumEles(elems);
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setIsFromRegionUpdate(false);
 
                 // update the mag slider
-                imageDataSource.advancedSelection.setElementMagSlider(
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setElementMagSlider(
                     -Math.abs(eMag));
-                imageDataSource.advancedSelection.setLineMagSlider(
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setLineMagSlider(
                     -Math.abs(lMag));
-                imageDataSource.advancedSelection.setBaseNumElements(elems
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setBaseNumElements(elems
                         * Math.abs(eMag));
-                imageDataSource.advancedSelection.setBaseNumLines(lines
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setBaseNumLines(lines
                         * Math.abs(lMag));
             }
         }

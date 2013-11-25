@@ -326,8 +326,8 @@ public class AddeImageDataSource extends ImageDataSource {
         isProgressiveResolution = subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, true);
 
         if ( !isProgressiveResolution) {
-            dlMag = advancedSelection.getLineMagValue();
-            deMag = advancedSelection.getElementMagValue();
+            dlMag = addeImageDataSelection.getAdvancedPanel().getLineMagValue();
+            deMag = addeImageDataSelection.getAdvancedPanel().getElementMagValue();
         }
 
         boolean useDisplayArea = false;
@@ -1299,27 +1299,14 @@ public class AddeImageDataSource extends ImageDataSource {
 
 
     /** _more_ */
-    protected AddeImagePreviewPanel previewSelection;
-
-    /** _more_ */
-    protected AddeImageAdvancedPanel advancedSelection;
-
+    protected AddeImageDataSelection addeImageDataSelection;
     /**
      * _more_
      *
      * @return _more_
      */
-    public AddeImagePreviewPanel getPreviewSelection() {
-        return this.previewSelection;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public AddeImageAdvancedPanel getAdvancedSelection() {
-        return this.advancedSelection;
+    public AddeImageDataSelection getAddeImageDataSelection() {
+        return this.addeImageDataSelection;
     }
 
 
@@ -1368,13 +1355,10 @@ public class AddeImageDataSource extends ImageDataSource {
                 }
 
                 this.bandId = id;
-                previewSelection = new AddeImagePreviewPanel(this,
-                        areaAdapter, source, this.descriptor, baseAnav,
-                        advancedSelection);
 
-                advancedSelection = new AddeImageAdvancedPanel(this,
-                        dataChoice, this.source, baseAnav, this.descriptor,
-                        acs, previewSelection);
+                addeImageDataSelection = new AddeImageDataSelection(this, dataChoice,
+                        source, baseAnav, this.descriptor,  acs, areaAdapter);
+
             }
 
         } catch (Exception ex) {
@@ -1384,8 +1368,8 @@ public class AddeImageDataSource extends ImageDataSource {
             getDataContext().getIdv().showNormalCursor();
             return;
         }
-        components.add(previewSelection);
-        components.add(advancedSelection);
+        components.add(addeImageDataSelection.getRegionPanel());
+        components.add(addeImageDataSelection.getAdvancedPanel());
     }
 
     /**
