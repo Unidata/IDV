@@ -342,16 +342,18 @@ public class AddeImageDataSource extends ImageDataSource {
         if (geoSelection != null) {  //&& !isReload) {
             // applies the rubberbandbox geosubset here
             //GeoSelection gs = subset.getGeoSelection();
-            if ((geoSelection.getRubberBandBoxPoints() != null) && isReload ) {
-                double[] latLons =
-                    getLatLonPoints(geoSelection.getRubberBandBoxPoints());
+            if ((geoSelection.getBoundingBox() != null) && isReload ) {
+                //double[] latLons =
+                //    getLatLonPoints(geoSelection.getRubberBandBoxPoints());
+                double maxLat = geoSelection.getBoundingBox().getMaxLat();
+                double minLat = geoSelection.getBoundingBox().getMinLat();
+                double maxLon = geoSelection.getBoundingBox().getMaxLon();
+                double minLon = geoSelection.getBoundingBox().getMinLon();
                 descriptors = geoSpaceSubset(geoSelection.getScreenBound(),
                                              null, eMag, lMag, baseAnav,
-                                             descriptors, latLons[0],
-                                             latLons[1], latLons[2],
-                                             latLons[3], elFactor, dlMag,
-                                             deMag, "ULEFT",
-                                             isProgressiveResolution);
+                                             descriptors, maxLat, minLat, maxLon,
+                                             minLon, elFactor, dlMag,
+                                             deMag, "ULEFT", isProgressiveResolution);
             } else if (t1.equals(DataSelection.PROP_USESELECTED) ) {
                 if(geoSelection.getBoundingBox() != null){
                     //use selected

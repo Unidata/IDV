@@ -1367,12 +1367,13 @@ public class GeoGridDataSource extends GridDataSource {
         boolean fromBundle = getIdv().getStateManager().getProperty(
                 IdvConstants.PROP_LOADINGXML, false);
         if(isPR && (isReload || fromBundle)){
-            ucar.unidata.geoloc.LatLonPoint[] llp0 =  givenDataSelection.getGeoSelection().getRubberBandBoxPoints();
-            if(llp0 != null) {
-                GeoLocationInfo gInfo1 = new GeoLocationInfo(
-                        llp0[0].getLatitude(), llp0[0].getLongitude(),
-                        llp0[1].getLatitude(), llp0[1].getLongitude());
-                givenDataSelection.getGeoSelection().setBoundingBox(gInfo1);
+           // ucar.unidata.geoloc.LatLonPoint[] llp0 =  givenDataSelection.getGeoSelection().getRubberBandBoxPoints();
+            GeoLocationInfo gInfo = givenDataSelection.getGeoSelection().getBoundingBox();
+            if(gInfo != null) {
+                //GeoLocationInfo gInfo1 = new GeoLocationInfo(
+                //        llp0[0].getLatitude(), llp0[0].getLongitude(),
+                //        llp0[1].getLatitude(), llp0[1].getLongitude());
+                givenDataSelection.getGeoSelection().setBoundingBox(gInfo);
             }
         }
         Data data = makeFieldImpl(dataChoice, givenDataSelection,

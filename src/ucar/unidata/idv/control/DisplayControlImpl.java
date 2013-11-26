@@ -2746,10 +2746,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                         llp0[0].getLongitude(),
                                         llp0[1].getLatitude(),
                                         llp0[1].getLongitude());
-                geoSelection.setRubberBandBoxPoints(llp0);
+               // geoSelection.setRubberBandBoxPoints(llp0);
                 geoSelection.setScreenBound(
                     getNavigatedDisplay().getScreenBounds());
-                // geoSelection.setBoundingBox(gInfo);
+                geoSelection.setBoundingBox(gInfo);
             } catch (Exception e) {}
             getDataSelection().setGeoSelection(geoSelection);
             try {
@@ -12503,7 +12503,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                         llp0[0].getLongitude(),
                                         llp0[1].getLatitude(),
                                         llp0[1].getLongitude());
-                geoSelection.setRubberBandBoxPoints(llp0);
+                //geoSelection.setRubberBandBoxPoints(llp0);
                 geoSelection.setScreenBound(
                     getNavigatedDisplay().getScreenBounds());
                 // geoSelection.setBoundingBox(gInfo);

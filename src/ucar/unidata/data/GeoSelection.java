@@ -89,7 +89,7 @@ public class GeoSelection {
     LatLonRect screenLatLonRect;
 
     /** _more_ */
-    LatLonPoint[] rubberBandBoxPoints;
+    //LatLonPoint[] rubberBandBoxPoints;
 
     /**
      * ctor
@@ -124,9 +124,9 @@ public class GeoSelection {
         if (that.screenBoundRect != null) {
             this.screenBoundRect = that.screenBoundRect;
         }
-        if (that.rubberBandBoxPoints != null) {
-            this.rubberBandBoxPoints = that.rubberBandBoxPoints;
-        }
+        //if (that.rubberBandBoxPoints != null) {
+        //    this.rubberBandBoxPoints = that.rubberBandBoxPoints;
+        //}
         if (that.screenLatLonRect != null) {
             this.screenLatLonRect = that.screenLatLonRect;
         }
@@ -207,7 +207,7 @@ public class GeoSelection {
         this.zStride             = zStride;
         this.level               = level;
         this.screenBoundRect     = null;
-        this.rubberBandBoxPoints = null;
+        //this.rubberBandBoxPoints = null;
         this.screenLatLonRect    = null;
     }
 
@@ -223,13 +223,12 @@ public class GeoSelection {
      * @param zStride _more_
      * @param level _more_
      * @param screenBoundRect _more_
-     * @param rubberBandBoxPoints _more_
      * @param screenLatLonRect _more_
      */
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
                         int xStride, int yStride, int zStride, Real level,
                         Rectangle screenBoundRect,
-                        LatLonPoint[] rubberBandBoxPoints,
+                        //LatLonPoint[] rubberBandBoxPoints,
                         LatLonRect screenLatLonRect) {
 
         this.boundingBox         = boundingBox;
@@ -239,7 +238,7 @@ public class GeoSelection {
         this.zStride             = zStride;
         this.level               = level;
         this.screenBoundRect     = screenBoundRect;
-        this.rubberBandBoxPoints = rubberBandBoxPoints;
+        //this.rubberBandBoxPoints = rubberBandBoxPoints;
         this.screenLatLonRect    = screenLatLonRect;
     }
 
@@ -367,7 +366,7 @@ public class GeoSelection {
         //  ? highPriority.screenBoundRect
         //  : lowPriority.screenBoundRect);
 
-        LatLonPoint[] rubberBandBoxPoints = highPriority.rubberBandBoxPoints;
+        //LatLonPoint[] rubberBandBoxPoints = highPriority.rubberBandBoxPoints;
         //  ((highPriority.rubberBandBoxPoints != null)
         //  ? highPriority.rubberBandBoxPoints
         //   : lowPriority.rubberBandBoxPoints);
@@ -393,7 +392,7 @@ public class GeoSelection {
         GeoSelection newOne = new GeoSelection(bbox,
                                   highPriority.getUseFullBounds(), xStride,
                                   yStride, zStride, level, screenBoundRect,
-                                  rubberBandBoxPoints, screenLatLonRect);
+                                  screenLatLonRect);
 
         return newOne;
     }
@@ -580,8 +579,7 @@ public class GeoSelection {
      */
     public String toString() {
         return "x:" + xStride + " " + "y:" + yStride + " " + "z:" + zStride
-               + " bbox:" + boundingBox + " rbbBox:" +  rubberBandBoxPoints
-       ;
+               + " bbox:" + boundingBox;
     }
 
 
@@ -613,11 +611,7 @@ public class GeoSelection {
         int seed = ((boundingBox != null)
                     ? boundingBox.hashCode()
                     : HashCodeUtils.SEED);
-
-        int seed1 = ((rubberBandBoxPoints != null)
-                    ? rubberBandBoxPoints.hashCode()
-                    : HashCodeUtils.SEED);
-        return HashCodeUtils.hash(HashCodeUtils.hash(HashCodeUtils.hash(HashCodeUtils.hash(seed1, seed),
+        return HashCodeUtils.hash(HashCodeUtils.hash(HashCodeUtils.hash(seed,
                 xStride), yStride), zStride);
     }
 
@@ -639,8 +633,7 @@ public class GeoSelection {
                && (this.yStride == that.yStride)
                && (this.zStride == that.zStride)
                && Misc.equals(this.boundingBox, that.boundingBox)
-               && Misc.equals(this.level, that.level)
-               && Misc.equals(this.rubberBandBoxPoints, that.rubberBandBoxPoints);
+               && Misc.equals(this.level, that.level);
     }
 
 
@@ -697,24 +690,6 @@ public class GeoSelection {
      */
     public LatLonRect getScreenLatLonRect() {
         return this.screenLatLonRect;
-    }
-
-    /**
-     * _more_
-     *
-     * @param rubberBandBoxPoints _more_
-     */
-    public void setRubberBandBoxPoints(LatLonPoint[] rubberBandBoxPoints) {
-        this.rubberBandBoxPoints = rubberBandBoxPoints;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public LatLonPoint[] getRubberBandBoxPoints() {
-        return this.rubberBandBoxPoints;
     }
 
 }

@@ -910,7 +910,7 @@ public class DataSelectionWidget {
 
             Rectangle screenBoundRect = navDisplay.getScreenBounds();
             geoSelection.setScreenBound(screenBoundRect);
-            geoSelection.setRubberBandBoxPoints(null);
+            //geoSelection.setRubberBandBoxPoints(null);
             try {
                 geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
             } catch (Exception e) {}
