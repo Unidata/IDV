@@ -70,7 +70,13 @@ public class ImagePlanViewControl extends PlanViewControl {
     public ImagePlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
-        setCanDoProgressiveResolution(true);
+    }
+    
+    /**
+     * @override
+     */
+    protected boolean canDoProgressiveResolution() {
+    	return true;
     }
 
     /**
@@ -97,20 +103,6 @@ public class ImagePlanViewControl extends PlanViewControl {
         */
         //gridDisplay.setUseRGBTypeForSelect(true);
         addAttributedDisplayable(gridDisplay);
-        /** Don't need this - get the change from the view
-        if ( !inGlobeDisplay()) {
-            MapProjectionDisplay mpd =
-                (MapProjectionDisplay) getNavigatedDisplay();
-            RubberBandBox rbb = mpd.getRubberBandBox();
-            if(rbb != null)
-                rbb.reSetBounds();
-        } else {  //now in globe display
-            GlobeDisplay  gd  = (GlobeDisplay) getNavigatedDisplay();
-            RubberBandBox rbb = gd.getRubberBandBox();
-            if(rbb != null)
-                rbb.reSetBounds();
-        }
-        */
         return gridDisplay;
     }
 

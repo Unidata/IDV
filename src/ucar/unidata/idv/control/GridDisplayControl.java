@@ -101,8 +101,13 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
     /**
      *  cstr does nothing yet; usually made from a subclass.
      */
-    public GridDisplayControl() {
-        setCanDoProgressiveResolution(true);
+    public GridDisplayControl() {}
+
+    /**
+     * @override
+     */
+    protected boolean canDoProgressiveResolution() {
+    	return true;
     }
 
 

@@ -144,7 +144,7 @@ public class WorldWindReader {
             //            System.err.println ("name=" + name);
             entries.add(new Object[]{ name,
                                       new double[]{ minRange, maxRange },
-                                      new Rectangle2D.Double(lon1, lat1,
+                                      new Rectangle2D.Double(lon1, lat2,
                                       lon2 - lon1, lat2 - lat1) });
         }
         return entries;

@@ -1662,7 +1662,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
         // System.err.println ("left:" + left);
         // System.err.println ("right:" + right);
-        return new Rectangle2D.Double(left, bottom, right - left,
+        return new Rectangle2D.Double(left, top, right - left,
                                       top - bottom);
     }
 

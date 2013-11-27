@@ -21,30 +21,15 @@
 package ucar.unidata.data;
 
 
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
-
-import ucar.unidata.util.GuiUtils;
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.HashCodeUtils;
 import ucar.unidata.util.Misc;
-import ucar.unidata.view.geoloc.*;
-import ucar.unidata.view.geoloc.NavigatedMapPanel;
-
-import ucar.visad.display.RubberBandBox;
-
-import visad.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.event.*;
+import visad.Real;
 
 
 /**
@@ -270,7 +255,7 @@ public class GeoSelection {
      *
      * @param rect  rect
      */
-    public void setLatLonRect(Rectangle2D.Float rect) {
+    public void setLatLonRect(Rectangle2D rect) {
         this.boundingBox = new GeoLocationInfo(rect);
     }
 

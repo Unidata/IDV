@@ -78,7 +78,7 @@ public class GeoLocationInfo {
 
 
 
-    public GeoLocationInfo(Rectangle2D.Float rect) { 
+    public GeoLocationInfo(Rectangle2D rect) { 
 	this(rect.getY(), rect.getX(), rect.getY()-rect.getHeight(),
 	     rect.getX()+rect.getWidth());
     }

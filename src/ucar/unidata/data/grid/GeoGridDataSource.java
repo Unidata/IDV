@@ -317,7 +317,7 @@ public class GeoGridDataSource extends GridDataSource {
      *
      * @param rect rectangle
      */
-    public void setDefaultSelectionBounds(Rectangle2D.Float rect) {
+    public void setDefaultSelectionBounds(Rectangle2D rect) {
         getDataSelection().getGeoSelection(true).setLatLonRect(rect);
     }
 

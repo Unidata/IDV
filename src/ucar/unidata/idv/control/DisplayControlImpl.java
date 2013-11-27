@@ -897,11 +897,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** default type */
     private String smoothingType = LABEL_NONE;
 
-    /** can do progressive resolution */
-    private boolean canDoProgressiveResolution = false;
-
     /**
-     * _more_
+     * Flag for progressive resolution.  
      */
     public boolean isProgressiveResolution = false;
 
@@ -913,7 +910,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * _more_
      */
-    public boolean isRBBChanged = false;
+    public boolean reloadFromBounds = false;
 
     /**
      * Default constructor. This is called when the control is
@@ -2643,10 +2640,19 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !getHaveInitialized()) {
             return;
         }
+    	//System.out.println("control changed");
+        checkBoundsChange();
+    }
+        
+    /**
+     * Check to see if the screen bounds have changed
+     */
+    protected void checkBoundsChange() {
         Rectangle2D newBounds = calculateRectangle();
         if (Misc.equals(newBounds, lastBounds)) {
             return;
         }
+    	//System.out.println("control/bounds changed");
         if ((lastBounds != null) && (newBounds != null)) {
             if (boundsClose(lastBounds.getX(), newBounds
                     .getX()) && boundsClose(lastBounds.getY(), newBounds
@@ -2714,10 +2720,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void viewpointChanged() {
     	//System.out.println("viewpointChanged");
-        if (getCanDoProgressiveResolution()) {
-            if (isRBBChanged) {
+        if (getShoulDoProgressiveResolution()) {
+            if (reloadFromBounds) {
             	loadDataFromViewBounds();
-                isRBBChanged = false;
+                reloadFromBounds = false;
             }
         }
     }
@@ -2727,32 +2733,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private void loadDataFromViewBounds() {
 
-    	RubberBandBox rubberBandBox = null;
         NavigatedDisplay nd = getNavigatedDisplay();
-        // TODO:  This needs to be re-written to get the lat/lon bounds from the
-        // screen.  There is no need to pass around the RBB bounds.
         if (nd != null) {
-            rubberBandBox = nd.getRubberBandBox();
-            float[] boundHi = rubberBandBox.getBounds().getHi();
-            if ((boundHi[0] == 0) && (boundHi[1] == 0)) {
-                return;
-            }
-            GeoSelection geoSelection = getDataSelection().getGeoSelection(true);
+            GeoSelection geoSelection = 
+            	getDataSelection().getGeoSelection(true);
             try {
-                ucar.unidata.geoloc.LatLonPoint[] llp0 =
-                    getLatLonPoints(rubberBandBox.getBounds().getDoubles());
-                GeoLocationInfo gInfo =
-                    new GeoLocationInfo(llp0[0].getLatitude(),
-                                        llp0[0].getLongitude(),
-                                        llp0[1].getLatitude(),
-                                        llp0[1].getLongitude());
-               // geoSelection.setRubberBandBoxPoints(llp0);
-                geoSelection.setScreenBound(
-                    getNavigatedDisplay().getScreenBounds());
-                geoSelection.setBoundingBox(gInfo);
-            } catch (Exception e) {}
-            getDataSelection().setGeoSelection(geoSelection);
-            try {
+        	    Rectangle2D bbox = nd.getLatLonBox();
+                geoSelection.setScreenBound( nd.getScreenBounds());
+                geoSelection.setLatLonRect(bbox);
+                getDataSelection().setGeoSelection(geoSelection);
                 reloadDataSourceInThread();
             } catch (Exception e) {};
         }
@@ -3958,15 +3947,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             logException("Getting display list displayable", ve);
         } catch (RemoteException re) {}
 
-        
-        /*  don't need to do this.
-        NavigatedDisplay nd = getNavigatedDisplay();
-        RubberBandBox rbb = nd.getRubberBandBox();
-        if (rbb != null) {
-        	System.out.println("resetting rbb bounds");
-            rbb.reSetBounds();
-        }
-        */
         return displayListDisplayable;
     }
 
@@ -6621,6 +6601,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         } catch (Exception exc) {
             logException("Applying z position", exc);
         }
+        //System.out.println("projection changed");
+        if (getShoulDoProgressiveResolution()) {
+        	reloadFromBounds = true;
+        	lastBounds = null;
+        	checkBoundsChange();
+        }
     }
 
     /**
@@ -6643,8 +6629,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             reDisplayColorScales();
         }
         if (property.equals(NavigatedViewManager.SHARE_RUBBERBAND)) {
-        	System.out.println("rubber band changed");
-        	isRBBChanged = true;
+        	reloadFromBounds = true;
         }
     }
 
@@ -7755,7 +7740,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     GuiUtils.rLabel("Smoothing:"), doMakeSmoothingWidget()));
         }
 
-        if (canDoProgressiveResolution) {
+        if (canDoProgressiveResolution()) {
             JCheckBox toggle = new JCheckBox("", isProgressiveResolution);
             toggle.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -7767,7 +7752,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         dataSelection.putProperty(
                             DataSelection.PROP_PROGRESSIVERESOLUTION,
                             isProgressiveResolution);
-                        /*
+                        /* TODO: Remove all this
                         GeoSelection geoSelection =
                             dataSelection.getGeoSelection(true);
                         geoSelection.setScreenLatLonRect(
@@ -12465,11 +12450,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * _more_
      *
      * @return _more_
-     */
     public boolean isRubberBandBoxChanged() {
-    	if (true) {
-    		return isRBBChanged;
-    	}
         RubberBandBox rubberBandBox = null;
         if ( !this.isProgressiveResolution) {
             return false;
@@ -12521,29 +12502,32 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         return false;
     }
+     */
 
     /**
      * Can we do progresive resolution from this display
      *
      * @return  true if display and view supports it
      */
-    public boolean getCanDoProgressiveResolution() {
+    public boolean getShoulDoProgressiveResolution() {
+    	boolean shouldDo = 
+            canDoProgressiveResolution() &&
+            getIsProgressiveResolution();
         MapViewManager mvm = getMapViewManager();
-        if (mvm == null) {
-            return this.canDoProgressiveResolution;
+        if (mvm != null) {
+            shouldDo = shouldDo &&
+            mvm.getUseProgressiveResolution();
         }
-        return this.canDoProgressiveResolution && 
-               mvm.getUseProgressiveResolution();
+        return shouldDo;
     }
 
     /**
-     * _more_
-     *
-     * @param canDoProgressiveResolution _more_
+     * Does this control support progressive resolution?  Subclasses should
+     * override.
+     * @return false
      */
-    public void setCanDoProgressiveResolution(
-            boolean canDoProgressiveResolution) {
-        this.canDoProgressiveResolution = canDoProgressiveResolution;
+    protected boolean canDoProgressiveResolution() {
+    	return false;
     }
 
 
