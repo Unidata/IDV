@@ -2742,7 +2742,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 geoSelection.setScreenBound( nd.getScreenBounds());
                 geoSelection.setLatLonRect(bbox);
                 getDataSelection().setGeoSelection(geoSelection);
-                reloadDataSourceInThread();
+                dataChanged();
             } catch (Exception e) {};
         }
     }
