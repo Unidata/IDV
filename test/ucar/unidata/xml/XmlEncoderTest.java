@@ -23,6 +23,10 @@ package ucar.unidata.xml;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.junit.Test;
@@ -32,6 +36,38 @@ import org.junit.Test;
  * Testing the XMLEncoder class.
  */
 public class XmlEncoderTest {
+
+    /**
+     * Testing XML deserialization of {@link java.util.Map Maps}.
+     */
+    @Test
+    public void testMap() {
+        Map<String, String> testMap = new HashMap<String, String>(3);
+        testMap.put("1", "a");
+        testMap.put("2", "ab");
+        testMap.put("3", "abc");
+        XmlEncoder encoder = new XmlEncoder();
+        String     xml     = encoder.toXml(testMap);
+        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(xml);
+        Object object = encoder.toObject(encoder.toElement(testMap));
+        assertEquals(testMap, object);
+    }
+
+    /**
+     * Testing XML deserialization of {@link java.util.Set Sets}.
+     */
+    @Test
+    public void testSet() {
+        Set<String> testSet = new HashSet<String>(3);
+        testSet.add("a");
+        testSet.add("ab");
+        testSet.add("abc");
+        XmlEncoder encoder = new XmlEncoder();
+        String     xml     = encoder.toXml(testSet);
+        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(xml);
+        Object object = encoder.toObject(encoder.toElement(testSet));
+        assertEquals(testSet, object);
+    }
 
     /**
      * Testing XML (de)serialization of a class that has an enum.
