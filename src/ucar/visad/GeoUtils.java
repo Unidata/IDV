@@ -225,12 +225,14 @@ public class GeoUtils {
             //Try it as lat/lon
             if ((latString == null) || (lonString == null)) {
                 String tmp = address;
-                while (tmp.indexOf("  ") >= 0) {
-                    tmp = StringUtil.replace(address, "  ", " ");
-                }
+
                 // allow for "lat,lon" form as well..
                 while (tmp.indexOf(",") >= 0) {
                     tmp = StringUtil.replace(address, ",", " ");
+                }
+
+                while (tmp.indexOf("  ") >= 0) {
+                    tmp = StringUtil.replace(address, "  ", " ");
                 }
 
                 List toks = StringUtil.split(tmp, " ");
