@@ -60,7 +60,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * See the package.html This class is in part responsible for (de)serializing
@@ -2784,8 +2786,8 @@ public class XmlEncoder extends XmlUtil {
      */
     public List getSpecialCaseElements(Object object) {
         if (object instanceof List) {
-            List elements = new ArrayList();
             List v        = (List) object;
+            List elements = new ArrayList(v.size());
             for (int i = 0; i < v.size(); i++) {
                 Element argumentElement = createElement(v.get(i));
                 if (argumentElement != null) {
@@ -2796,21 +2798,28 @@ public class XmlEncoder extends XmlUtil {
             return elements;
         }
 
-        if (object instanceof Hashtable) {
-            List      elements = new ArrayList();
-            Hashtable ht       = (Hashtable) object;
-            for (Enumeration keys = ht.keys(); keys.hasMoreElements(); ) {
-                Object  key           = keys.nextElement();
-                Element methodElement = createMethodElement("put");
-                methodElement.appendChild(createElement(key));
-                methodElement.appendChild(createElement(ht.get(key)));
+        if (object instanceof Map) {
+            Map<Object, Object> map      = (Map<Object, Object>) object;
+            List                elements = new ArrayList(map.size());
+            for (Map.Entry entry : map.entrySet()) {
+                Element methodElement = createMethodElement(METHOD_PUT);
+                methodElement.appendChild(createElement(entry.getKey()));
+                methodElement.appendChild(createElement(entry.getValue()));
                 elements.add(methodElement);
             }
             return elements;
         }
 
-
-
+        if (object instanceof Set) {
+            Set  s        = (Set) object;
+            List elements = new ArrayList(s.size());
+            for (Object o : s) {
+                Element methodElement = createMethodElement(METHOD_ADD);
+                methodElement.appendChild(createElement(o));
+                elements.add(methodElement);
+            }
+            return elements;
+        }
         /*
         if (object instanceof HashSet) {
             List      elements = new ArrayList();
