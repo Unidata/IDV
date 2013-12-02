@@ -225,9 +225,16 @@ public class GeoUtils {
             //Try it as lat/lon
             if ((latString == null) || (lonString == null)) {
                 String tmp = address;
-                while (tmp.indexOf("  ") >= 0) {
-                    tmp = StringUtil.replace(address, "  ", " ");
+
+                // allow for "lat,lon" form as well..
+                while (tmp.indexOf(",") >= 0) {
+                    tmp = StringUtil.replace(address, ",", " ");
                 }
+
+                while (tmp.indexOf("  ") >= 0) {
+                    tmp = StringUtil.replace(tmp, "  ", " ");
+                }
+
                 List toks = StringUtil.split(tmp, " ");
                 if ((toks != null) && (toks.size() == 2)) {
                     try {
@@ -247,53 +254,29 @@ public class GeoUtils {
                 }
             }
 
-            //Try yahoo
-            if (address.equals("ip") || address.equals("ipaddress")
-                    || address.equals("mymachine")) {
-                String url =
-                    "http://api.hostip.info/get_html.php?position=true";
-                String result = IOUtil.readContents(url, GeoUtils.class);
-                if ((master != null) && (master[0] != timestamp)) {
-                    return null;
-                }
-                //                System.err.println ("result:" + result);
-                result = result.toLowerCase();
-                Pattern pattern;
-                Matcher matcher;
-                pattern = Pattern.compile("latitude: *([0-9\\.-]+)");
-                matcher = pattern.matcher(result);
-                if (matcher.find()) {
-                    latString = matcher.group(1);
-                    pattern   = Pattern.compile("longitude: *([0-9\\.-]+)");
-                    matcher   = pattern.matcher(result);
-                    if (matcher.find()) {
-                        lonString = matcher.group(1);
-                    }
-                } else {
-                    return null;
-                }
-            }
             if ((latString == null) || (lonString == null)) {
                 try {
-                    //String url =
-                    //    "http://api.local.yahoo.com/MapsService/V1/geocode?appid=idvunidata&location="
-                    //    + encodedAddress;
                     String tmp = address;
                     while (tmp.indexOf(" ") >= 0) {
                         tmp = StringUtil.replace(address, " ", "+");
                     }
+
+                    // changed to Google 12/2013...
                     String url =
-                            "http://where.yahooapis.com/geocode?appid=idvunidata&location=" + tmp;
+                      "http://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address=" + tmp;
 
                     String result = IOUtil.readContents(url, GeoUtils.class);
+
                     if ((master != null) && (master[0] != timestamp)) {
                         return null;
                     }
-                    Element root    = XmlUtil.getRoot(result);
-                    Element latNode = XmlUtil.findDescendant(root,
-                                          "latitude");
-                    Element lonNode = XmlUtil.findDescendant(root,
-                                          "longitude");
+
+                    // descend from the root...just in case...
+                    Element root = XmlUtil.getRoot(result);
+                    Element locele = XmlUtil.findDescendantFromPath(root,"result.geometry.location");
+                    Element latNode = XmlUtil.findDescendant(locele, "lat");
+                    Element lonNode = XmlUtil.findDescendant(locele, "lng");
+
                     if ((latNode != null) && (lonNode != null)) {
                         latString = XmlUtil.getChildText(latNode);
                         lonString = XmlUtil.getChildText(lonNode);
@@ -304,7 +287,8 @@ public class GeoUtils {
 
 
 
-            /* Don't do these. yahoo seems pretty good
+            /******** Don't do these. Google seems pretty good
+
             //Maybe a zip code
             if ((latString == null) || (lonString == null)) {
                 if ((address.length() == 5)
@@ -370,7 +354,8 @@ public class GeoUtils {
                     lonString = matcher.group(2);
                 }
             }
-            */
+
+            ********** */
 
             if ((latString != null) && (lonString != null)) {
                 double lat = Misc.decodeLatLon(latString.trim());
