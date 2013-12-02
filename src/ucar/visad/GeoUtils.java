@@ -232,7 +232,7 @@ public class GeoUtils {
                 }
 
                 while (tmp.indexOf("  ") >= 0) {
-                    tmp = StringUtil.replace(address, "  ", " ");
+                    tmp = StringUtil.replace(tmp, "  ", " ");
                 }
 
                 List toks = StringUtil.split(tmp, " ");
