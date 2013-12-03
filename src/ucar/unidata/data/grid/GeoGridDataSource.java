@@ -1621,11 +1621,11 @@ public class GeoGridDataSource extends GridDataSource {
                 }
 
 
-                Rectangle rect    = geoSelection.getScreenBound();
+                Rectangle2D rect    = geoSelection.getScreenBound();
 
                 int       xstride = calculateStrideFactor(xLenght,
-                                        rect.width);
-                int ystride = calculateStrideFactor(yLength, rect.height);
+                                        (int) rect.getWidth());
+                int ystride = calculateStrideFactor(yLength, (int) rect.getHeight());
 
                 if (xstride == 1) {
                     xstride = 0;

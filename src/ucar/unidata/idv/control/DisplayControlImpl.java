@@ -2740,25 +2740,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             getViewManager().setProjectionFromData(false);
             try {
         	    Rectangle2D bbox = nd.getLatLonBox();
-                geoSelection.setScreenBound( nd.getScreenBounds());
+        	    Rectangle2D sbox = nd.getScreenBounds();
+                geoSelection.setScreenBound(sbox);
                 geoSelection.setLatLonRect(bbox);
                 getDataSelection().setGeoSelection(geoSelection);
 
                 getDataSelection().putProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDISPLAYAREA);
-                if(nd instanceof MapProjectionDisplay)  {
-                    MapProjectionDisplay md = (MapProjectionDisplay)nd;
-                    LatLonPointImpl llpi = md.getCenterLLP();
-                    System.out.print(llpi + "\n");
-                    double lat = (geoSelection.getBoundingBox().getMaxLat() +
-                            geoSelection.getBoundingBox().getMinLat())/2;
-                    double lon = (geoSelection.getBoundingBox().getMaxLon() +
-                            geoSelection.getBoundingBox().getMinLon())/2;
-                    LatLonPointImpl llpi0 =
-                            new LatLonPointImpl(lat,  lon);
-                    System.out.print(llpi0 + "\n");
-                    getDataSelection().putProperty("centerPosition", llpi0);
-                }
-
+                EarthLocation el = nd.screenToEarthLocation(
+            		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
+                LatLonPointImpl llpi =
+                    new LatLonPointImpl(el.getLatitude().getValue(),  
+                    		            el.getLongitude().getValue());
+                System.out.print(llpi + "\n");
+                double lat = (geoSelection.getBoundingBox().getMaxLat() +
+                        geoSelection.getBoundingBox().getMinLat())/2;
+                double lon = (geoSelection.getBoundingBox().getMaxLon() +
+                        geoSelection.getBoundingBox().getMinLon())/2;
+                LatLonPointImpl llpi0 =
+                        new LatLonPointImpl(lat,  lon);
+                System.out.print(llpi0 + "\n");
+                getDataSelection().putProperty("centerPosition", llpi0);
                 dataChanged();
             } catch (Exception e) {};
         }

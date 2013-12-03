@@ -21,38 +21,35 @@
 package ucar.unidata.data.imagery;
 
 
-import edu.wisc.ssec.mcidas.*;
-import edu.wisc.ssec.mcidas.adde.AddeImageURL;
-
-
-import ucar.unidata.data.*;
-import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.geoloc.*;
-import ucar.unidata.idv.IdvCommandLinePrefs;
-import ucar.unidata.idv.IdvConstants;
-import ucar.unidata.idv.IdvPersistenceManager;
-import ucar.unidata.idv.LibVersionUtil;
-import ucar.unidata.util.*;
-
-
-import visad.*;
-
-import visad.data.dods.StringVariableAdapter;
-import visad.data.mcidas.AREACoordinateSystem;
-import visad.data.mcidas.AreaAdapter;
-
-
-import java.awt.*;
-
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.io.RandomAccessFile;
-
-
 import java.rmi.RemoteException;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+
+import ucar.unidata.data.DataCategory;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.GeoSelection;
+import ucar.unidata.geoloc.LatLonPoint;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+import visad.Data;
+import visad.VisADException;
+import visad.data.mcidas.AREACoordinateSystem;
+import visad.data.mcidas.AreaAdapter;
+import edu.wisc.ssec.mcidas.AREAnav;
+import edu.wisc.ssec.mcidas.AreaDirectory;
+import edu.wisc.ssec.mcidas.AreaFile;
+import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 
 
 
@@ -313,7 +310,7 @@ public class AddeImageDataSource extends ImageDataSource {
             return descriptors;
         }
 
-        Rectangle rect    = geoSelection.getScreenBound();
+        Rectangle2D rect    = geoSelection.getScreenBound();
         String    unitStr = getUnitString(dataChoice.getDescription());
 
 
@@ -869,7 +866,7 @@ public class AddeImageDataSource extends ImageDataSource {
      * @return _more_
      */
 
-    public List geoSpaceSubsetD(Rectangle rect, String unit, int eMag,
+    public List geoSpaceSubsetD(Rectangle2D rect, String unit, int eMag,
                                int lMag, AREAnav baseAnav, List despList,
                                double maxLat, double minLat, double maxLon,
                                double minLon, int factor, int dlMag,
@@ -1003,7 +1000,7 @@ public class AddeImageDataSource extends ImageDataSource {
      *
      * @return _more_
      */
-    public List geoSpaceSubsetA(Rectangle rect, String unit, int eMag,
+    public List geoSpaceSubsetA(Rectangle2D rect, String unit, int eMag,
                                 int lMag, AREAnav baseAnav, List despList,
                                 double maxLat, double minLat, double maxLon,
                                 double minLon, int factor, int dlMag,
@@ -1130,7 +1127,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
     }
 
-    public List geoSpaceSubsetB(Rectangle rect, String unit, int eMag,
+    public List geoSpaceSubsetB(Rectangle2D rect, String unit, int eMag,
                                int lMag, AREAnav baseAnav, List despList,
                                double maxLat, double minLat, double maxLon,
                                double minLon, int factor, int dlMag,

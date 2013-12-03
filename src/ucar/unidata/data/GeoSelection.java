@@ -70,7 +70,7 @@ public class GeoSelection {
     /* Screen Bound*/
 
     /** _more_ */
-    Rectangle screenBoundRect;
+    Rectangle2D screenBoundRect;
 
     /** _more_ */
     // LatLonRect screenLatLonRect;
@@ -220,7 +220,7 @@ public class GeoSelection {
      */
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
                         int xStride, int yStride, int zStride, Real level,
-                        Rectangle screenBoundRect, boolean useDisplayArea) {
+                        Rectangle2D screenBoundRect, boolean useDisplayArea) {
         //LatLonPoint[] rubberBandBoxPoints,
         //LatLonRect screenLatLonRect) {
 
@@ -355,7 +355,7 @@ public class GeoSelection {
                                            ? highPriority.boundingBox
                                            : lowPriority.boundingBox);
 
-        Rectangle       screenBoundRect = highPriority.screenBoundRect;
+        Rectangle2D       screenBoundRect = highPriority.screenBoundRect;
         // ((highPriority.screenBoundRect != null)
         //  ? highPriority.screenBoundRect
         //  : lowPriority.screenBoundRect);
@@ -673,7 +673,7 @@ public class GeoSelection {
      *
      * @param screenBoundRect _more_
      */
-    public void setScreenBound(Rectangle screenBoundRect) {
+    public void setScreenBound(Rectangle2D screenBoundRect) {
         this.screenBoundRect = screenBoundRect;
     }
 
@@ -682,7 +682,7 @@ public class GeoSelection {
      *
      * @return _more_
      */
-    public Rectangle getScreenBound() {
+    public Rectangle2D getScreenBound() {
         return this.screenBoundRect;
     }
 
