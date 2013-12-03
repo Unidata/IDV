@@ -144,7 +144,8 @@ public class GeoSelectionPanel extends JPanel {
     /** for properties */
     private JCheckBox enabledCbx;
 
-
+    /** for properties */
+    private JCheckBox useDisplayAreaCbx;
     /**
      * ctor
      *
@@ -267,6 +268,8 @@ public class GeoSelectionPanel extends JPanel {
 
         List boxComps    = new ArrayList();
         List strideComps = new ArrayList();
+        List useDisplayAreaComps = new ArrayList();
+
         if (doStride) {
             lockBtn =
                 GuiUtils.getToggleButton("/auxdata/ui/icons/link_break.png",
@@ -308,6 +311,11 @@ public class GeoSelectionPanel extends JPanel {
             strideComps.add(GuiUtils.left(zStrideBox));
         }
 
+        {
+            useDisplayAreaCbx = new JCheckBox("", false);
+            useDisplayAreaComps.add(GuiUtils.rLabel("Match Display Area:"));
+            useDisplayAreaComps.add(GuiUtils.left(useDisplayAreaCbx));
+        }
         if (doBoundingBox) {
             ActionListener actionListener = new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
@@ -365,6 +373,7 @@ public class GeoSelectionPanel extends JPanel {
 
         if (fullVersion) {
             List comps = new ArrayList(strideComps);
+            comps.addAll(useDisplayAreaComps);
             comps.addAll(boxComps);
             GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
             return GuiUtils.doLayout(comps, 2, GuiUtils.WT_NY,
@@ -551,6 +560,9 @@ public class GeoSelectionPanel extends JPanel {
             }
         }
 
+        if(useDisplayAreaCbx != null){
+            geoSelection.setDisplayArea(useDisplayAreaCbx.isSelected());
+        }
 
         if (mapPanel != null) {
             //xxxx

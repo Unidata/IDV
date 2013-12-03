@@ -2737,11 +2737,28 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (nd != null) {
             GeoSelection geoSelection = 
             	getDataSelection().getGeoSelection(true);
+            getViewManager().setProjectionFromData(false);
             try {
         	    Rectangle2D bbox = nd.getLatLonBox();
                 geoSelection.setScreenBound( nd.getScreenBounds());
                 geoSelection.setLatLonRect(bbox);
                 getDataSelection().setGeoSelection(geoSelection);
+
+                getDataSelection().putProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDISPLAYAREA);
+                if(nd instanceof MapProjectionDisplay)  {
+                    MapProjectionDisplay md = (MapProjectionDisplay)nd;
+                    LatLonPointImpl llpi = md.getCenterLLP();
+                    System.out.print(llpi + "\n");
+                    double lat = (geoSelection.getBoundingBox().getMaxLat() +
+                            geoSelection.getBoundingBox().getMinLat())/2;
+                    double lon = (geoSelection.getBoundingBox().getMaxLon() +
+                            geoSelection.getBoundingBox().getMinLon())/2;
+                    LatLonPointImpl llpi0 =
+                            new LatLonPointImpl(lat,  lon);
+                    System.out.print(llpi0 + "\n");
+                    getDataSelection().putProperty("centerPosition", llpi0);
+                }
+
                 dataChanged();
             } catch (Exception e) {};
         }
@@ -3240,8 +3257,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             (NavigatedDisplay) getViewManager().getMaster();
         Rectangle screenBoundRect = navDisplay.getScreenBounds();
         gs.setScreenBound(screenBoundRect);
-        gs.setScreenLatLonRect(navDisplay.getLatLonRect());
+        //gs.setScreenLatLonRect(navDisplay.getLatLonRect());
         mySelection.setGeoSelection(gs);
+        if(navDisplay instanceof MapProjectionDisplay)  {
+            MapProjectionDisplay md = (MapProjectionDisplay)navDisplay;
+            LatLonPointImpl llpi = md.getCenterLLP();
+            System.out.print(llpi + "\n");
+            mySelection.putProperty("centerPosition", llpi);
+        }
         dataChoice.setDataSelection(mySelection);
         // }
         DataInstance di = doMakeDataInstance(dataChoice);

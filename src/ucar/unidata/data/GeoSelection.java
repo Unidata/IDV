@@ -21,15 +21,17 @@
 package ucar.unidata.data;
 
 
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.HashCodeUtils;
 import ucar.unidata.util.Misc;
+
 import visad.Real;
+
+
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -71,10 +73,12 @@ public class GeoSelection {
     Rectangle screenBoundRect;
 
     /** _more_ */
-    LatLonRect screenLatLonRect;
+    // LatLonRect screenLatLonRect;
 
     /** _more_ */
     //LatLonPoint[] rubberBandBoxPoints;
+
+    private boolean useDisplayArea = false;
 
     /**
      * ctor
@@ -98,7 +102,8 @@ public class GeoSelection {
      */
     public GeoSelection(GeoSelection that) {
         this();
-        this.useFullBounds = that.useFullBounds;
+        this.useFullBounds  = that.useFullBounds;
+        this.useDisplayArea = that.useDisplayArea;
         if (that.boundingBox != null) {
             this.boundingBox = new GeoLocationInfo(that.boundingBox);
         }
@@ -112,9 +117,9 @@ public class GeoSelection {
         //if (that.rubberBandBoxPoints != null) {
         //    this.rubberBandBoxPoints = that.rubberBandBoxPoints;
         //}
-        if (that.screenLatLonRect != null) {
-            this.screenLatLonRect = that.screenLatLonRect;
-        }
+        //if (that.screenLatLonRect != null) {
+        //    this.screenLatLonRect = that.screenLatLonRect;
+        //}
     }
 
 
@@ -166,7 +171,7 @@ public class GeoSelection {
      */
     public GeoSelection(GeoLocationInfo boundingBox, int xStride,
                         int yStride, int zStride, Real level) {
-        this(boundingBox, false, xStride, yStride, zStride, level);
+        this(boundingBox, false, xStride, yStride, zStride, level, false);
     }
 
 
@@ -181,19 +186,22 @@ public class GeoSelection {
      * @param yStride Y stride
      * @param zStride Z stride
      * @param level The level to use
+     * @param useDisplayArea _more_
      */
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
-                        int xStride, int yStride, int zStride, Real level) {
+                        int xStride, int yStride, int zStride, Real level,
+                        boolean useDisplayArea) {
 
-        this.boundingBox         = boundingBox;
-        this.useFullBounds       = useFullBounds;
-        this.xStride             = xStride;
-        this.yStride             = yStride;
-        this.zStride             = zStride;
-        this.level               = level;
-        this.screenBoundRect     = null;
+        this.boundingBox     = boundingBox;
+        this.useFullBounds   = useFullBounds;
+        this.xStride         = xStride;
+        this.yStride         = yStride;
+        this.zStride         = zStride;
+        this.level           = level;
+        this.screenBoundRect = null;
+        this.useDisplayArea  = useDisplayArea;
         //this.rubberBandBoxPoints = null;
-        this.screenLatLonRect    = null;
+        //this.screenLatLonRect    = null;
     }
 
 
@@ -208,23 +216,24 @@ public class GeoSelection {
      * @param zStride _more_
      * @param level _more_
      * @param screenBoundRect _more_
-     * @param screenLatLonRect _more_
+     * @param useDisplayArea _more_
      */
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
                         int xStride, int yStride, int zStride, Real level,
-                        Rectangle screenBoundRect,
-                        //LatLonPoint[] rubberBandBoxPoints,
-                        LatLonRect screenLatLonRect) {
+                        Rectangle screenBoundRect, boolean useDisplayArea) {
+        //LatLonPoint[] rubberBandBoxPoints,
+        //LatLonRect screenLatLonRect) {
 
-        this.boundingBox         = boundingBox;
-        this.useFullBounds       = useFullBounds;
-        this.xStride             = xStride;
-        this.yStride             = yStride;
-        this.zStride             = zStride;
-        this.level               = level;
-        this.screenBoundRect     = screenBoundRect;
+        this.boundingBox     = boundingBox;
+        this.useFullBounds   = useFullBounds;
+        this.xStride         = xStride;
+        this.yStride         = yStride;
+        this.zStride         = zStride;
+        this.level           = level;
+        this.screenBoundRect = screenBoundRect;
+        this.useDisplayArea  = useDisplayArea;
         //this.rubberBandBoxPoints = rubberBandBoxPoints;
-        this.screenLatLonRect    = screenLatLonRect;
+        //this.screenLatLonRect    = screenLatLonRect;
     }
 
     /**
@@ -356,7 +365,7 @@ public class GeoSelection {
         //  ? highPriority.rubberBandBoxPoints
         //   : lowPriority.rubberBandBoxPoints);
 
-        LatLonRect screenLatLonRect = highPriority.screenLatLonRect;
+        //LatLonRect screenLatLonRect = highPriority.screenLatLonRect;
         // ((highPriority.screenLatLonRect != null)
         //  ? highPriority.screenLatLonRect
         //  : lowPriority.screenLatLonRect);
@@ -377,7 +386,8 @@ public class GeoSelection {
         GeoSelection newOne = new GeoSelection(bbox,
                                   highPriority.getUseFullBounds(), xStride,
                                   yStride, zStride, level, screenBoundRect,
-                                  screenLatLonRect);
+                                  highPriority.getUseDisplayArea());
+        //screenLatLonRect);
 
         return newOne;
     }
@@ -640,6 +650,23 @@ public class GeoSelection {
         return useFullBounds;
     }
 
+    /**
+     *  Set the UseDisplayArea property.
+     *
+     *  @param value The new value for UseDisplayArea
+     */
+    public void setDisplayArea(boolean value) {
+        useDisplayArea = value;
+    }
+
+    /**
+     *  Get the UseDisplayArea property.
+     *
+     *  @return The UseDisplayArea
+     */
+    public boolean getUseDisplayArea() {
+        return useDisplayArea;
+    }
 
     /**
      * _more_
@@ -657,24 +684,6 @@ public class GeoSelection {
      */
     public Rectangle getScreenBound() {
         return this.screenBoundRect;
-    }
-
-    /**
-     * _more_
-     *
-     * @param screenLatLonRect _more_
-     */
-    public void setScreenLatLonRect(LatLonRect screenLatLonRect) {
-        this.screenLatLonRect = screenLatLonRect;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public LatLonRect getScreenLatLonRect() {
-        return this.screenLatLonRect;
     }
 
 }

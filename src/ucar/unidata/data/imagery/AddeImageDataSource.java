@@ -26,6 +26,7 @@ import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.idv.IdvCommandLinePrefs;
 import ucar.unidata.idv.IdvConstants;
@@ -78,9 +79,6 @@ public class AddeImageDataSource extends ImageDataSource {
 
     /** _more_ */
     private String choiceName;
-
-    /** _more_ */
-    boolean isReload = false;
 
     /** _more_ */
     AREAnav baseAnav = null;
@@ -322,7 +320,6 @@ public class AddeImageDataSource extends ImageDataSource {
         int       dlMag   = 0;
         int       deMag   = 0;
 
-
         isProgressiveResolution = subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, true);
 
         if ( !isProgressiveResolution) {
@@ -330,31 +327,16 @@ public class AddeImageDataSource extends ImageDataSource {
             deMag = addeImageDataSelection.getAdvancedPanel().getElementMagValue();
         }
 
-        boolean useDisplayArea = false;
+
 
         String  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULT);
-        if (t1 != null && t1.equals(DataSelection.PROP_USEDISPLAYAREA)) {
-            useDisplayArea = true;
-        }
+
 
         boolean hasCorner = subset.getProperty(DataSelection.PROP_HASCORNER, false);
 
-        if (geoSelection != null) {  //&& !isReload) {
-            // applies the rubberbandbox geosubset here
-            //GeoSelection gs = subset.getGeoSelection();
-            if ((geoSelection.getBoundingBox() != null) && isReload ) {
-                //double[] latLons =
-                //    getLatLonPoints(geoSelection.getRubberBandBoxPoints());
-                double maxLat = geoSelection.getBoundingBox().getMaxLat();
-                double minLat = geoSelection.getBoundingBox().getMinLat();
-                double maxLon = geoSelection.getBoundingBox().getMaxLon();
-                double minLon = geoSelection.getBoundingBox().getMinLon();
-                descriptors = geoSpaceSubset(geoSelection.getScreenBound(),
-                                             null, eMag, lMag, baseAnav,
-                                             descriptors, maxLat, minLat, maxLon,
-                                             minLon, elFactor, dlMag,
-                                             deMag, "ULEFT", isProgressiveResolution);
-            } else if (t1.equals(DataSelection.PROP_USESELECTED) ) {
+        if (geoSelection != null) {
+
+            if (t1.equals(DataSelection.PROP_USESELECTED) ) {
                 if(geoSelection.getBoundingBox() != null){
                     //use selected
                     double maxLat = geoSelection.getBoundingBox().getMaxLat();
@@ -362,7 +344,7 @@ public class AddeImageDataSource extends ImageDataSource {
                     double maxLon = geoSelection.getBoundingBox().getMaxLon();
                     double minLon = geoSelection.getBoundingBox().getMinLon();
                     // double maxLat, double minLat, double maxLon, double minLon
-                    if (useDisplayArea) {
+                   /* if (useDisplayArea) {
                         BandInfo id = (BandInfo) dataChoice.getId();
                         AreaDirectory thisDir =
                             (AreaDirectory) allBandDirs.get(id.getBandNumber());
@@ -374,20 +356,20 @@ public class AddeImageDataSource extends ImageDataSource {
                                             minLon, elFactor, dlMag, deMag,
                                             "CENTER", isProgressiveResolution,
                                             dir);
-                    } else if (hasCorner) {
+                    } else */ if (hasCorner) {
                         descriptors =
-                            geoSpaceSubset(geoSelection.getScreenBound(),
-                                           unitStr, eMag, lMag, baseAnav,
-                                           descriptors, maxLat, minLat, maxLon,
-                                           minLon, elFactor, dlMag, deMag,
-                                           "CENTER", isProgressiveResolution);
+                            geoSpaceSubsetB(geoSelection.getScreenBound(),
+                                    unitStr, eMag, lMag, baseAnav,
+                                    descriptors, maxLat, minLat, maxLon,
+                                    minLon, elFactor, dlMag, deMag,
+                                    "CENTER", isProgressiveResolution);
                     } else {
                         descriptors =
-                            geoSpaceSubset(geoSelection.getScreenBound(),
-                                           unitStr, eMag, lMag, baseAnav,
-                                           descriptors, maxLat, minLat, maxLon,
-                                           minLon, elFactor, dlMag, deMag,
-                                           "ULEFT", isProgressiveResolution);
+                            geoSpaceSubsetB(geoSelection.getScreenBound(),
+                                    unitStr, eMag, lMag, baseAnav,
+                                    descriptors, maxLat, minLat, maxLon,
+                                    minLon, elFactor, dlMag, deMag,
+                                    "ULEFT", isProgressiveResolution);
                     }
                 } else {
                     String adSource = (String)subset.getProperty("advancedURL");
@@ -445,20 +427,30 @@ public class AddeImageDataSource extends ImageDataSource {
                                     newLines, newelems, lineMag, eleMag, unitStr);
                     } catch (Exception e) {}
                 }
-            } else if (useDisplayArea) {
-
-                LatLonRect llrect = geoSelection.getScreenLatLonRect();
+            } else if (t1.equals(DataSelection.PROP_USEDISPLAYAREA)) {
+                double maxLat = geoSelection.getBoundingBox().getMaxLat();
+                double minLat = geoSelection.getBoundingBox().getMinLat();
+                double maxLon = geoSelection.getBoundingBox().getMaxLon();
+                double minLon = geoSelection.getBoundingBox().getMinLon();
+             /*   LatLonRect llrect = geoSelection.getScreenLatLonRect();
                 double     maxLat = llrect.getLatMax();
                 double     minLat = llrect.getLatMin();
-                double     maxLon = llrect.getLonMax();
-                double     minLon = llrect.getLonMin();
-
-                descriptors = geoSpaceSubset(geoSelection.getScreenBound(),
+                double     maxLon = Misc.normalizeLongitude(llrect.getLonMax());
+                double     minLon = Misc.normalizeLongitude(llrect.getLonMin());   */
+                LatLonPointImpl llp = (LatLonPointImpl)subset.getProperty("centerPosition");
+                if(llp != null)
+                    descriptors = geoSpaceSubsetD(geoSelection.getScreenBound(),
                                              unitStr, eMag, lMag, baseAnav,
                                              descriptors, maxLat, minLat,
                                              maxLon, minLon, elFactor, dlMag,
                                              deMag, "CENTER",
-                                             isProgressiveResolution);
+                                             isProgressiveResolution, llp);
+                else
+                    descriptors = geoSpaceSubsetB(geoSelection.getScreenBound(),
+                            null, eMag, lMag, baseAnav,
+                            descriptors, maxLat, minLat, maxLon,
+                            minLon, elFactor, dlMag,
+                            deMag, "ULEFT", isProgressiveResolution);
             } else {  // use default
                 BandInfo id = (BandInfo) dataChoice.getId();
                 AreaDirectory thisDir =
@@ -742,10 +734,7 @@ public class AddeImageDataSource extends ImageDataSource {
      * _more_
      */
     public void reloadData() {
-
-        isReload = true;
         super.reloadData();
-        isReload = false;
     }
 
     /**
@@ -880,33 +869,68 @@ public class AddeImageDataSource extends ImageDataSource {
      * @return _more_
      */
 
-    public List geoSpaceSubset(Rectangle rect, String unit, int eMag,
+    public List geoSpaceSubsetD(Rectangle rect, String unit, int eMag,
                                int lMag, AREAnav baseAnav, List despList,
                                double maxLat, double minLat, double maxLon,
                                double minLon, int factor, int dlMag,
                                int deMag, String placeValue,
-                               boolean isProgressiveResolution) {
+                               boolean isProgressiveResolution,
+                               LatLonPointImpl centerLLP) {
         // check if this is rubber band event, if not do nothing
 
 
         //now the rubberband is changed and the IDV is going to do sth.
         try {
-
+            AddeImageDescriptor dsep = (AddeImageDescriptor)despList.get(0);
+            int lines = 0;
+            int elems = 0;
             float[][] latlon = new float[2][1];
-            latlon[1][0] = (float) minLon;
+            float[][] lrLinEle;
+            float[][] ulLinEle;
+
+            //lines
+            latlon[1][0] = (float) centerLLP.getLongitude();
             latlon[0][0] = (float) maxLat;
-            float[][] ulLinEle = baseAnav.toLinEle(latlon);
+            ulLinEle = baseAnav.toLinEle(latlon);
+            if(ulLinEle[1][0] < 0 || ulLinEle[1][0] != ulLinEle[1][0]){
+                ulLinEle[1][0] = 0;
+            }
+
+            latlon[1][0] = (float) centerLLP.getLongitude();
+            latlon[0][0] = (float) minLat;
+            lrLinEle   = baseAnav.toLinEle(latlon);
+            if(lrLinEle[1][0] < 0 || lrLinEle[1][0] != lrLinEle[1][0]){
+                int ln = dsep.getDirectory().getDirectoryBlock()[8];
+                lrLinEle[1][0] = ln/Math.abs(eMag);
+            }
+
+            lines = (int) (lrLinEle[1][0] - ulLinEle[1][0])* Math.abs(eMag);;
+
+            //elems
+            latlon[1][0] = (float) minLon;
+            latlon[0][0] = (float) centerLLP.getLatitude();
+            ulLinEle = baseAnav.toLinEle(latlon);
+            if(ulLinEle[0][0] < 0 || ulLinEle[0][0] != ulLinEle[0][0]){
+                ulLinEle[0][0] = 0;
+            }
 
             latlon[1][0] = (float) maxLon;
-            latlon[0][0] = (float) minLat;
-            float[][] lrLinEle   = baseAnav.toLinEle(latlon);
-            int       displayNum = (int) rect.getWidth();
-            int lines = (int) (lrLinEle[1][0] - ulLinEle[1][0])
-                        * Math.abs(lMag);
-            int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
-                        * Math.abs(eMag);
+            latlon[0][0] = (float) centerLLP.getLatitude();
+            lrLinEle   = baseAnav.toLinEle(latlon);
+            if(lrLinEle[0][0] < 0 || lrLinEle[0][0] != lrLinEle[0][0]){
+                int en = dsep.getDirectory().getDirectoryBlock()[9];
+                lrLinEle[0][0] = en/Math.abs(eMag);
+            }
+
+            elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
+                    * Math.abs(eMag);
 
 
+            // check
+            if(lines > dsep.getDirectory().getDirectoryBlock()[8])
+                lines = dsep.getDirectory().getDirectoryBlock()[8];
+            if(elems > dsep.getDirectory().getDirectoryBlock()[9])
+                elems = dsep.getDirectory().getDirectoryBlock()[9];
             if (isProgressiveResolution) {
                 eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                 // int lineMag = calculateMagFactor(lines, (int) rect.getHeight());
@@ -921,15 +945,15 @@ public class AddeImageDataSource extends ImageDataSource {
             int newelems;
 
             if (lineMag == 1) {
-                newLines = (int)(lines * 1.25);
+                newLines = (int)(lines * 1.0);
             } else {
-                newLines = (int) (Math.floor(lines / lineMag + 0.5)* 1.25);
+                newLines = (int) (Math.floor(lines / lineMag + 0.5)* 1.);
             }
 
             if (eleMag == 1) {
-                newelems = (int)(elems * 1.25);
+                newelems = (int)(elems * 1.0);
             } else {
-                newelems = (int) (Math.floor(elems / eleMag + 0.5) * 1.25);
+                newelems = (int) (Math.floor(elems / eleMag + 0.5) * 1.);
             }
 
             System.out.println("Line: lines " + lines + " lineMag " + lineMag
@@ -941,8 +965,8 @@ public class AddeImageDataSource extends ImageDataSource {
             if (placeValue.equals("ULEFT")) {
                 locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
             } else {
-                double cLat = (maxLat + minLat) / 2;
-                double cLon = (maxLon + minLon) / 2;
+                double cLat = centerLLP.getLatitude();
+                double cLon = centerLLP.getLongitude();
 
                 locateValue = Misc.format(cLat) + " " + Misc.format(cLon);
             }
@@ -1106,6 +1130,82 @@ public class AddeImageDataSource extends ImageDataSource {
 
     }
 
+    public List geoSpaceSubsetB(Rectangle rect, String unit, int eMag,
+                               int lMag, AREAnav baseAnav, List despList,
+                               double maxLat, double minLat, double maxLon,
+                               double minLon, int factor, int dlMag,
+                               int deMag, String placeValue,
+                               boolean isProgressiveResolution) {
+        // check if this is rubber band event, if not do nothing
+
+
+        //now the rubberband is changed and the IDV is going to do sth.
+        try {
+
+            float[][] latlon = new float[2][1];
+            latlon[1][0] = (float) minLon;
+            latlon[0][0] = (float) maxLat;
+            float[][] ulLinEle = baseAnav.toLinEle(latlon);
+
+            latlon[1][0] = (float) maxLon;
+            latlon[0][0] = (float) minLat;
+            float[][] lrLinEle   = baseAnav.toLinEle(latlon);
+            int       displayNum = (int) rect.getWidth();
+            int lines = (int) (lrLinEle[1][0] - ulLinEle[1][0])
+                    * Math.abs(lMag);
+            int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
+                    * Math.abs(eMag);
+
+
+            if (isProgressiveResolution) {
+                eleMag = calculateMagFactor(elems, (int) rect.getWidth());
+                // int lineMag = calculateMagFactor(lines, (int) rect.getHeight());
+                lineMag = eleMag / factor;
+            } else {
+                eleMag  = Math.abs(deMag);
+                lineMag = Math.abs(dlMag);
+            }
+            System.out.println("Magnification factor of line X element : "
+                    + lineMag + " " + eleMag);
+            int newLines;
+            int newelems;
+
+            if (lineMag == 1) {
+                newLines = (int)(lines * 1.0);
+            } else {
+                newLines = (int) (Math.floor(lines / lineMag + 0.5));
+            }
+
+            if (eleMag == 1) {
+                newelems = (int)(elems * 1.0);
+            } else {
+                newelems = (int) (Math.floor(elems / eleMag + 0.5));
+            }
+
+            System.out.println("Line: lines " + lines + " lineMag " + lineMag
+                    + " newLines " + newLines + " displayH "
+                    + (int) rect.getHeight());
+
+
+            String locateValue = null;
+            if (placeValue.equals("ULEFT")) {
+                locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
+            } else {
+                double cLat = (maxLat + minLat) / 2;
+                double cLon = (maxLon + minLon) / 2;
+
+                locateValue = Misc.format(cLat) + " " + Misc.format(cLon);
+            }
+
+            return reSetImageDataDescriptor(despList,
+                    AddeImageURL.KEY_LATLON,
+                    locateValue, placeValue,
+                    newLines, newelems, lineMag,
+                    eleMag, unit);
+        } catch (Exception e) {}
+
+        return null;
+    }
     /**
      * _more_
      *
@@ -1374,23 +1474,7 @@ public class AddeImageDataSource extends ImageDataSource {
         components.add(addeImageDataSelection.getAdvancedPanel());
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean getIsReload() {
-        return isReload;
-    }
 
-    /**
-     * _more_
-     *
-     * @param isReload _more_
-     */
-    public void setIsReload(boolean isReload) {
-        this.isReload = isReload;
-    }
 
     /**
      * _more_

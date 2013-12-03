@@ -224,7 +224,7 @@ public class DataSelectionWidget {
     public String USE_DEFAULTREGION = "Use Default";
 
     /** _more_ */
-    public String USE_SELECTEDREGION = "Use Selected";
+    public String USE_SELECTEDREGION = DataSelection.PROP_USESELECTED;
 
     /** _more_ */
     public String USE_DISPLAYREGION = DataSelection.PROP_USEDISPLAYAREA;
@@ -717,6 +717,9 @@ public class DataSelectionWidget {
 
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
+                boolean useDA = dataSource.getDataSelection().getGeoSelection().getUseDisplayArea();
+                if(useDA)
+                    regionOptionLabelBox.setSelectedIndex(2);
                 GuiUtils.enableTree(areaComponent,
                                     regionOption.equals(USE_SELECTEDREGION));
                 areaTab.add(
@@ -729,7 +732,13 @@ public class DataSelectionWidget {
             if (strideComponent != null) {
                 GuiUtils.enableTree(strideComponent,
                                     strideOption.equals(USE_SELECTEDSTRIDE));
-
+                boolean usePR = false;
+                if (idv.getViewManager() instanceof MapViewManager) {
+                    MapViewManager mvm = (MapViewManager)idv.getViewManager();
+                    usePR = mvm.getUseProgressiveResolution();
+                }
+                if(usePR)
+                    strideOptionLabelBox.setSelectedIndex(2);
                 strideTab.add(
                     GuiUtils.top(
                         GuiUtils.topCenter(
@@ -911,9 +920,9 @@ public class DataSelectionWidget {
             Rectangle screenBoundRect = navDisplay.getScreenBounds();
             geoSelection.setScreenBound(screenBoundRect);
             //geoSelection.setRubberBandBoxPoints(null);
-            try {
-                geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
-            } catch (Exception e) {}
+            //try {
+            //    geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
+           // } catch (Exception e) {}
 
         }
 

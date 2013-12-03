@@ -28,6 +28,7 @@ import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -148,9 +149,14 @@ public class AddeImageDataSelection {
      */
     public void init() {
         // progressive checkbx
-        prograssiveCbx  = new JCheckBox("", true);
+        boolean usePR = false;
+        if (dataSource.getIdv().getViewManager() instanceof MapViewManager) {
+            MapViewManager mvm = (MapViewManager)dataSource.getIdv().getViewManager();
+            usePR = mvm.getUseProgressiveResolution();
+        }
+        prograssiveCbx  = new JCheckBox("", usePR);
 
-        prograssiveCbx1 = new JCheckBox("Progressive Resolution", true);
+        prograssiveCbx1 = new JCheckBox("Progressive Resolution", usePR);
 
         prograssiveCbx.addActionListener(new ActionListener() {
             @Override
@@ -169,7 +175,6 @@ public class AddeImageDataSelection {
             }
         });
 
-        //
     }
 
     /**
@@ -1283,6 +1288,10 @@ public class AddeImageDataSelection {
                 } else {
                     enablePanelAll(false);
                 }
+
+                if(!prograssiveCbx.isSelected()){
+                    enablePanel(leMagPanel, !prograssiveCbx.isSelected());
+                }
             }
 
 
@@ -2106,7 +2115,8 @@ public class AddeImageDataSelection {
                 return;
             }
             regionOption = selectedObject.toString();
-            if (selectedObject.equals(USE_SELECTEDREGION)) {
+            boolean isPR = prograssiveCbx1.isSelected();
+            if (selectedObject.equals(USE_SELECTEDREGION) || !isPR) {
                 // only progressiveResolution and mag can be changed
                 advancedPanel.enablePanelAll(true);
                 prograssiveCbx.doClick();

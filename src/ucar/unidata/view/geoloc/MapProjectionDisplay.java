@@ -1991,6 +1991,16 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                   workBearing.getAngle()));
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public LatLonPointImpl getCenterLLP() {
+        return centerLLP;
+    }
+
     /**
      * Handles a change in the position of the mouse-pointer.
      *
