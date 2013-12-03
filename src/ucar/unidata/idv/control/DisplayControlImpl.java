@@ -2751,15 +2751,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 LatLonPointImpl llpi =
                     new LatLonPointImpl(el.getLatitude().getValue(),  
                     		            el.getLongitude().getValue());
-                System.out.print(llpi + "\n");
-                double lat = (geoSelection.getBoundingBox().getMaxLat() +
-                        geoSelection.getBoundingBox().getMinLat())/2;
-                double lon = (geoSelection.getBoundingBox().getMaxLon() +
-                        geoSelection.getBoundingBox().getMinLon())/2;
-                LatLonPointImpl llpi0 =
-                        new LatLonPointImpl(lat,  lon);
-                System.out.print(llpi0 + "\n");
-                getDataSelection().putProperty("centerPosition", llpi0);
+                //System.out.print(llpi + "\n");
+
+                getDataSelection().putProperty("centerPosition", llpi);
                 dataChanged();
             } catch (Exception e) {};
         }
