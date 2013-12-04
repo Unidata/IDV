@@ -119,7 +119,7 @@ public class DataSelectionWidget {
     private JCheckBox strideCbx;
 
     /** Area Checkbox */
-    private JCheckBox areaCbx;
+    // private JCheckBox areaCbx1;
 
     /** Stride Component */
     private JComponent strideComponent;
@@ -813,7 +813,11 @@ public class DataSelectionWidget {
             if (strideCbx.isSelected()) {
                 geoSelection.clearStride();
             }
-            if (areaCbx.isSelected()) {
+           /* if (areaCbx.isSelected()) {
+                geoSelection.setBoundingBox(null);
+                geoSelection.setUseFullBounds(false);
+            } */
+            if (regionOption.equals(DataSelection.PROP_USEDEFAULT)) {
                 geoSelection.setBoundingBox(null);
                 geoSelection.setUseFullBounds(false);
             }
@@ -1058,6 +1062,7 @@ public class DataSelectionWidget {
 
         GuiUtils.setListData(regionOptionLabelBox, regionOptionNames);
 
+        /*
         areaCbx = new JCheckBox("Use Default", true);
         areaCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -1065,7 +1070,7 @@ public class DataSelectionWidget {
                     GuiUtils.enableTree(areaComponent, !areaCbx.isSelected());
                 }
             }
-        });
+        });  */
 
         //timeDeclutterFld = new JTextField("" + getTimeDeclutterMinutes(), 5);
         GuiUtils.enableTree(regionOptionLabelBox, true);
