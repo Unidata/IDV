@@ -32,6 +32,7 @@ import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
@@ -3381,7 +3382,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                                            .getText().trim()).doubleValue()));
         }
 
-
+        boolean useDisplayArea = geoSelectionPanel.getUseDisplayArea();
+        properties.put(DataSelection.PROP_USEDISPLAYAREA, useDisplayArea);
 
         return true;
     }

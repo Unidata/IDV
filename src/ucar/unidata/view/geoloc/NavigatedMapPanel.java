@@ -2,7 +2,7 @@
  * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
@@ -87,6 +87,8 @@ public class NavigatedMapPanel extends JPanel {
     /** navigated panel */
     protected NavigatedPanel navigatedPanel;
 
+    /** _more_ */
+    protected JComponent progressiveResolutionPanel;
 
     /** map renderers */
     private List mapRenderers = new ArrayList();
@@ -116,6 +118,9 @@ public class NavigatedMapPanel extends JPanel {
 
     /** _more_ */
     GeneralPath gp;
+
+    /** _more_ */
+    public JCheckBox prograssiveCbx;
 
     /**
      * Default constructor.  Uses the default map
@@ -187,23 +192,38 @@ public class NavigatedMapPanel extends JPanel {
      */
     public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
                              boolean makeMoveToolBar) {
-        init(defaultMaps, makeNavToolBar, makeMoveToolBar);
+        boolean makePRToolBar = !makeMoveToolBar;
+        init(defaultMaps, makeNavToolBar, makeMoveToolBar, makePRToolBar);
     }
 
     /**
-     * Construct a NavigatedMapPanel 
+     * Create a NMP with a set of maps
+     *
+     * @param defaultMaps   default set of maps.
+     * @param makeNavToolBar Make the nav toolbar
+     * @param makeMoveToolBar Make the move toolbar
+     * @param makePRToolBar _more_
+     */
+    public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
+                             boolean makeMoveToolBar, boolean makePRToolBar) {
+        init(defaultMaps, makeNavToolBar, makeMoveToolBar, makePRToolBar);
+    }
+
+    /**
+     * Construct a NavigatedMapPanel
      *
      * @param defaultMaps _more_
      * @param makeNavToolBar _more_
      * @param makeMoveToolBar _more_
      * @param preview_image _more_
      * @param af _more_
+     * @param makePRToolBar _more_
      */
     public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
                              boolean makeMoveToolBar,
-                             BufferedImage preview_image,
-                             AreaFile af) {
-        init(defaultMaps, makeNavToolBar, makeMoveToolBar);
+                             BufferedImage preview_image, AreaFile af,
+                             boolean makePRToolBar) {
+        init(defaultMaps, makeNavToolBar, makeMoveToolBar, makePRToolBar);
         this.preview_image = preview_image;
         //Renderer mapRender = new ucar.unidata.gis.worldmap.WorldMap();
         //addMapRenderer(mapRender);
@@ -230,8 +250,12 @@ public class NavigatedMapPanel extends JPanel {
                 new ProjectionRect(project.getDefaultMapArea());
             np.setMapArea(rect);
             //np.setSelectedRegionBounds(rect);
-            float ymag = ((AREACoordinateSystem)this.project).getDirBlock()[8]* 1.0f/data_height;
-            float xmag = ((AREACoordinateSystem)this.project).getDirBlock()[9] * 1.0f/(data_width);
+            float ymag =
+                ((AREACoordinateSystem) this.project).getDirBlock()[8] * 1.0f
+                / data_height;
+            float xmag =
+                ((AREACoordinateSystem) this.project).getDirBlock()[9] * 1.0f
+                / (data_width);
 
             if (null != this.preview_image) {
 
@@ -267,7 +291,7 @@ public class NavigatedMapPanel extends JPanel {
             public void resetZoom() {
                 NavigatedPanel np = getNavigatedPanel();
                 ProjectionRect rect =
-                        new ProjectionRect(project.getDefaultMapArea());
+                    new ProjectionRect(project.getDefaultMapArea());
                 np.setMapArea(rect);
 
                 drawG();
@@ -282,9 +306,10 @@ public class NavigatedMapPanel extends JPanel {
      * @param maps   list of maps
      * @param makeNavToolBar Make the nav tool bar
      * @param makeMoveToolBar Make the move tool bar
+     * @param makePRToolBar _more_
      */
     private void init(List maps, boolean makeNavToolBar,
-                      boolean makeMoveToolBar) {
+                      boolean makeMoveToolBar, boolean makePRToolBar) {
         if ((maps == null) || (maps.size() == 0)) {
             maps = DEFAULT_MAPS;
             if ((maps == null) || (maps.size() == 0)) {
@@ -353,8 +378,10 @@ public class NavigatedMapPanel extends JPanel {
         statusPanel.add(positionLabel, BorderLayout.CENTER);
         navigatedPanel.setPositionLabel(positionLabel);
         if (makeNavToolBar || makeMoveToolBar) {
+            JComponent bottomPanel = new JPanel(new java.awt.BorderLayout());
             JComponent toolPanel =
                 new JPanel(new FlowLayout(FlowLayout.LEFT));
+            progressiveResolutionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             if (makeNavToolBar) {
                 toolPanel.add(navigatedPanel.getNavToolBar());
             }
@@ -363,13 +390,57 @@ public class NavigatedMapPanel extends JPanel {
             }
             //            toolPanel =  GuiUtils.hbox(navigatedPanel.getNavToolBar(),
             //                                       navigatedPanel.getMoveToolBar());
-            add(toolPanel, BorderLayout.SOUTH);
+            prograssiveCbx = new JCheckBox("", false);
+            progressiveResolutionPanel.add(GuiUtils.rLabel("Progressive Resolution:"));
+            progressiveResolutionPanel.add(GuiUtils.left(prograssiveCbx));
+
+            bottomPanel.add(toolPanel, BorderLayout.WEST);
+            if (makePRToolBar) {
+                bottomPanel.add(progressiveResolutionPanel, BorderLayout.EAST);
+            }
+            // add(toolPanel, BorderLayout.SOUTH);
+            add(bottomPanel, BorderLayout.SOUTH);
         }
         add(navigatedPanel, BorderLayout.CENTER);
         //add(statusPanel, BorderLayout.SOUTH);
         redraw();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getUseProgressiveResolution() {
+        return prograssiveCbx.isSelected();
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JCheckBox getPrograssiveCbx() {
+        return prograssiveCbx;
+    }
+
+    /**
+     * _more_
+     *
+     * @param usePR _more_
+     */
+    public void setUseProgressiveResolution(boolean usePR) {
+        prograssiveCbx.setSelected(usePR);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JComponent getProgressiveResolutionPanel() {
+        return progressiveResolutionPanel;
+    }
 
     /**
      * Make the map list
@@ -546,7 +617,7 @@ public class NavigatedMapPanel extends JPanel {
 
         }
 
-        if(gp!=null){
+        if (gp != null) {
             g2d.setColor(Color.BLUE);
             g2d.draw(gp);
             g2d.setColor(Color.CYAN);

@@ -266,8 +266,8 @@ public class GeoSelectionPanel extends JPanel {
                                  boolean doBoundingBox,
                                  ProjectionImpl sampleProjection) {
 
-        List boxComps    = new ArrayList();
-        List strideComps = new ArrayList();
+        List boxComps            = new ArrayList();
+        List strideComps         = new ArrayList();
         List useDisplayAreaComps = new ArrayList();
 
         if (doStride) {
@@ -313,7 +313,8 @@ public class GeoSelectionPanel extends JPanel {
 
         {
             useDisplayAreaCbx = new JCheckBox("", false);
-            useDisplayAreaComps.add(GuiUtils.rLabel("Match Display Area:"));
+            useDisplayAreaComps.add(
+                GuiUtils.rLabel(DataSelection.PROP_USEDISPLAYAREA + ":"));
             useDisplayAreaComps.add(GuiUtils.left(useDisplayAreaCbx));
         }
         if (doBoundingBox) {
@@ -462,6 +463,24 @@ public class GeoSelectionPanel extends JPanel {
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JComponent getProgressiveResolutionPanel() {
+        return mapPanel.getProgressiveResolutionPanel();
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JCheckBox getPrograssiveCbx(){
+        return mapPanel.getPrograssiveCbx();
+    }
+
+    /**
      * Get the selected latlon area rect. May be null
      *
      * @return Area rectangle
@@ -499,7 +518,7 @@ public class GeoSelectionPanel extends JPanel {
      */
     public void reSetBoundsFromFields() {
         NavigatedPanel np = mapPanel.getNavigatedPanel();
-        np.setSelectedRegion((LatLonRect)null);
+        np.setSelectedRegion((LatLonRect) null);
         np.repaint();
 
         mapPanel.repaint();
@@ -560,9 +579,6 @@ public class GeoSelectionPanel extends JPanel {
             }
         }
 
-        if(useDisplayAreaCbx != null){
-            geoSelection.setDisplayArea(useDisplayAreaCbx.isSelected());
-        }
 
         if (mapPanel != null) {
             //xxxx
@@ -579,6 +595,45 @@ public class GeoSelectionPanel extends JPanel {
 
 
         return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getUseDisplayArea() {
+        if (useDisplayAreaCbx != null) {
+            return useDisplayAreaCbx.isSelected();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getUseProgressiveResolution() {
+        if (mapPanel != null) {
+            return mapPanel.getUseProgressiveResolution();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param usePR _more_
+     */
+    public void setUseProgressiveResolution(boolean usePR) {
+        if (mapPanel != null) {
+            mapPanel.setUseProgressiveResolution(usePR);
+        } else {
+            return;
+        }
     }
 
     /**
