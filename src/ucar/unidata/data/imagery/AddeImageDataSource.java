@@ -326,14 +326,14 @@ public class AddeImageDataSource extends ImageDataSource {
 
 
 
-        String  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULT);
+        String  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULTAREA);
 
 
         boolean hasCorner = subset.getProperty(DataSelection.PROP_HASCORNER, false);
 
         if (geoSelection != null) {
 
-            if (t1.equals(DataSelection.PROP_USESELECTED) ) {
+            if (t1.equals(DataSelection.PROP_USESELECTEDAREA) ) {
                 if(geoSelection.getBoundingBox() != null){
                     //use selected
                     double maxLat = geoSelection.getBoundingBox().getMaxLat();

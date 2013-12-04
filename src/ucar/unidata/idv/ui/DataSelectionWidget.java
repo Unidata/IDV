@@ -225,10 +225,11 @@ public class DataSelectionWidget {
     public String USE_DEFAULTREGION = "Use Default";
 
 
-    /** _more_ */
-    private String[] regionSubsetOptionLabels = new String[] {
-                                                    USE_DEFAULTREGION,
-            DataSelection.PROP_USESELECTED, DataSelection.PROP_USEDISPLAYAREA };
+    /** the regions selection options */
+    private TwoFacedObject[] regionSubsetOptions = new TwoFacedObject[] {
+    		new TwoFacedObject("Use Default Region", DataSelection.PROP_USEDEFAULTAREA),
+    		new TwoFacedObject("Select A Region", DataSelection.PROP_USESELECTEDAREA),
+    		new TwoFacedObject("Match Display Region" , DataSelection.PROP_USEDISPLAYAREA) };
 
     /** _more_ */
     JComboBox regionOptionLabelBox;
@@ -691,7 +692,7 @@ public class DataSelectionWidget {
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
                 GuiUtils.enableTree(areaComponent,
-                                    regionOption.equals(DataSelection.PROP_USESELECTED));
+                                    regionOption.equals(DataSelection.PROP_USESELECTEDAREA));
             }
             if (oldPanel != null) {
                 geoSelectionPanel.initWith(oldPanel);
@@ -706,7 +707,7 @@ public class DataSelectionWidget {
                         regionOptionLabelBox.setSelectedIndex(2);
                 }
                 GuiUtils.enableTree(areaComponent,
-                                    regionOption.equals(DataSelection.PROP_USESELECTED));
+                                    regionOption.equals(DataSelection.PROP_USESELECTEDAREA));
                 GuiUtils.enableTree(prComponent,
                         true);
                 areaTab.add(
@@ -817,7 +818,7 @@ public class DataSelectionWidget {
                 geoSelection.setBoundingBox(null);
                 geoSelection.setUseFullBounds(false);
             } */
-            if (regionOption.equals(DataSelection.PROP_USEDEFAULT)) {
+            if (regionOption.equals(DataSelection.PROP_USEDEFAULTAREA)) {
                 geoSelection.setBoundingBox(null);
                 geoSelection.setUseFullBounds(false);
             }
@@ -857,7 +858,7 @@ public class DataSelectionWidget {
                 if (strideCbx.isSelected() ){
                     geoSelection.clearStride();
                 }
-                if ( !regionOption.equals(DataSelection.PROP_USESELECTED)) {
+                if ( !regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
                     geoSelection.setBoundingBox(null);
                     geoSelection.setUseFullBounds(false);
                 }
@@ -1038,17 +1039,17 @@ public class DataSelectionWidget {
         //added
         regionOptionLabelBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                String selectedObj =
-                    (String) regionOptionLabelBox.getSelectedItem();
-                regionOption = selectedObj.toString();
+                TwoFacedObject selectedObj =
+                    (TwoFacedObject) regionOptionLabelBox.getSelectedItem();
+                regionOption = (String) selectedObj.getId();
                 if (areaComponent != null) {
                     GuiUtils.enableTree(
                         areaComponent,
-                        regionOption.equals(DataSelection.PROP_USESELECTED));
+                        regionOption.equals(DataSelection.PROP_USESELECTEDAREA));
                     GuiUtils.enableTree(prComponent, true);
                 }
                 if ((areaComponent != null)
-                        && !regionOption.equals(DataSelection.PROP_USESELECTED)) {
+                        && !regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
                     geoSelectionPanel.reSetBoundsFromFields();
                 }
             }
@@ -1058,7 +1059,7 @@ public class DataSelectionWidget {
         //timeDeclutterFld = new JTextField("" + getTimeDeclutterMinutes(), 5);
         GuiUtils.enableTree(regionOptionLabelBox, true);
 
-        List regionOptionNames = Misc.toList(regionSubsetOptionLabels);
+        List regionOptionNames = Misc.toList(regionSubsetOptions);
 
         GuiUtils.setListData(regionOptionLabelBox, regionOptionNames);
 

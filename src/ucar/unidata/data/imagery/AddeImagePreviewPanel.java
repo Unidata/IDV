@@ -87,10 +87,10 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
     //final AddeImageDataSource this;
 
     /** _more_ */
-    public String USE_DEFAULTREGION = DataSelection.PROP_USEDEFAULT;
+    public String USE_DEFAULTREGION = DataSelection.PROP_USEDEFAULTAREA;
 
     /** _more_ */
-    public String USE_SELECTEDREGION = DataSelection.PROP_USESELECTED;
+    public String USE_SELECTEDREGION = DataSelection.PROP_USESELECTEDAREA;
 
     /** _more_ */
     public String USE_DISPLAYREGION = DataSelection.PROP_USEDISPLAYAREA;
@@ -167,7 +167,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
         this.eMag  = imageDataSource.getEMag();
         this.lMag  = imageDataSource.getLMag();
 
-        chkUseFull = new JCheckBox(DataSelection.PROP_USEDEFAULT);
+        chkUseFull = new JCheckBox(DataSelection.PROP_USEDEFAULTAREA);
 
         chkUseFull.setSelected(true);
         getRegionsList();
@@ -428,7 +428,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
         boolean isFull = false;
         regionOption = getRegionOption();
         GeoLocationInfo gInfo = null;
-        if (regionOption.equals(DataSelection.PROP_USESELECTED)) {
+        if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
             ProjectionRect rect =
                     display.getNavigatedPanel().getSelectedRegion();
             if(rect == null){

@@ -2727,7 +2727,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         }
     }
-
+    
     /**
      * Method to calculate screen bounds to load new data
      */
@@ -3238,6 +3238,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private boolean initializeDataInstance(DataChoice dataChoice)
             throws RemoteException, VisADException {
 
+    	/*
         //Make the new DataInstance through the factory call
         // if(dataChoice instanceof DerivedDataChoice){
         DataSelection mySelection = dataChoice.getDataSelection();
@@ -3262,8 +3263,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         dataChoice.setDataSelection(mySelection);
         // }
+         * 
+         */
         DataInstance di = doMakeDataInstance(dataChoice);
 
+        /*
         if (dataChoice instanceof DerivedDataChoice) {
             DerivedDataChoice derivedDataChoice =
                 (DerivedDataChoice) dataChoice;
@@ -3281,6 +3285,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                    false);
             }
         }
+        */
 
         if (cachedData != null) {
             Object id   = dataChoice.getId();
@@ -3632,6 +3637,29 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected DataSelection updateDataSelection(DataSelection dataSelection)
             throws VisADException, RemoteException {
+    	
+    	// update the geoselection to include at least the screen bounds
+    	// and the screen lat/lon box if usedisplay area
+        GeoSelection geoSelection = 
+        	dataSelection.getGeoSelection(true);
+        // always update the screen size
+        NavigatedDisplay navDisplay = getNavigatedDisplay();
+      	Rectangle2D sbox = navDisplay.getScreenBounds();
+        geoSelection.setScreenBound(sbox);
+        if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
+        		DataSelection.PROP_USEDISPLAYAREA)) {
+      	    Rectangle2D bbox = navDisplay.getLatLonBox();
+            geoSelection.setLatLonRect(bbox);
+            dataSelection.setGeoSelection(geoSelection);
+            EarthLocation el = navDisplay.screenToEarthLocation(
+        		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
+            LatLonPointImpl llpi =
+                    new LatLonPointImpl(el.getLatitude().getValue(),  
+                    		            el.getLongitude().getValue());
+
+            dataSelection.putProperty("centerPosition", llpi);
+        }
+        
         if ( !getIdv().getUseTimeDriver()) {
             return dataSelection;
         }
@@ -7766,31 +7794,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     // loadDataInThread();
                     isProgressiveResolution =
                         ((JCheckBox) e.getSource()).isSelected();
-                    try {
-                        dataSelection.putProperty(
-                            DataSelection.PROP_PROGRESSIVERESOLUTION,
-                            isProgressiveResolution);
-                        /* TODO: Remove all this
-                        GeoSelection geoSelection =
-                            dataSelection.getGeoSelection(true);
-                        geoSelection.setScreenLatLonRect(
-                            getNavigatedDisplay().getLatLonRect());
-
-                        geoSelection.setScreenBound(
-                            getNavigatedDisplay().getScreenBounds());
-
-                        dataSelection.setGeoSelection(geoSelection);
-                        List          dataSources = getDataSources();
-                        DataSelection ds          = null;
-                        for (int i = 0; i < dataSources.size(); i++) {
-                            DataSourceImpl d =
-                                (DataSourceImpl) dataSources.get(i);
-                            ds = d.getDataSelection();
-                            ds.setGeoSelection(geoSelection);
-                        }
-                        // reloadDataSource();
-                         */
-                    } catch (Exception d) {}
+                    dataSelection.putProperty(
+                        DataSelection.PROP_PROGRESSIVERESOLUTION,
+                        isProgressiveResolution);
                 }
             });
             controlWidgets.add(new WrapperWidget(this,
@@ -12463,64 +12469,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         return latlonPoints;
     }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-    public boolean isRubberBandBoxChanged() {
-        RubberBandBox rubberBandBox = null;
-        if ( !this.isProgressiveResolution) {
-            return false;
-        }
-        if ( !inGlobeDisplay()) {
-            MapProjectionDisplay mpd =
-                (MapProjectionDisplay) getNavigatedDisplay();
-            rubberBandBox = mpd.getRubberBandBox();
-        } else {
-            GlobeDisplay gd = (GlobeDisplay) getNavigatedDisplay();
-            rubberBandBox = gd.getRubberBandBox();
-        }
-
-        float[] boundHi = rubberBandBox.getBounds().getHi();
-
-        if ((boundHi[0] == 0) && (boundHi[1] == 0)) {
-            return false;
-        }
-        // get the displayCS here:
-
-        Gridded2DSet new2DSet = rubberBandBox.getBounds();
-        if ((rubberBandBox.getBounds() != null)
-                && !new2DSet.equals(last2DSet)) {
-            last2DSet = new2DSet;
-            GeoSelection geoSelection = dataSelection.getGeoSelection(true);
-            try {
-                ucar.unidata.geoloc.LatLonPoint[] llp0 =
-                    getLatLonPoints(rubberBandBox.getBounds().getDoubles());
-                GeoLocationInfo gInfo1 =
-                    new GeoLocationInfo(llp0[0].getLatitude(),
-                                        llp0[0].getLongitude(),
-                                        llp0[1].getLatitude(),
-                                        llp0[1].getLongitude());
-                //geoSelection.setRubberBandBoxPoints(llp0);
-                geoSelection.setScreenBound(
-                    getNavigatedDisplay().getScreenBounds());
-                // geoSelection.setBoundingBox(gInfo);
-            } catch (Exception e) {}
-            dataSelection.setGeoSelection(geoSelection);
-            List          dataSources = getDataSources();
-            DataSelection ds          = null;
-            for (int i = 0; i < dataSources.size(); i++) {
-                DataSourceImpl d = (DataSourceImpl) dataSources.get(i);
-                ds = d.getDataSelection();
-                ds.setGeoSelection(geoSelection);
-            }
-
-            return true;
-        }
-        return false;
-    }
-     */
 
     /**
      * Can we do progresive resolution from this display

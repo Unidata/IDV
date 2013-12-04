@@ -70,13 +70,14 @@ public class DataSelection {
     public final static String PROP_HASCORNER = "Region_Selection_Has_Conner";
 
     /** region option */
-    public final static String PROP_USEDISPLAYAREA = "Match Display Area";
+    public final static String PROP_USEDISPLAYAREA = "Match_Display_Area";
 
     /** region option */
-    public final static String PROP_USEDEFAULT = "Use Default";
+    public final static String PROP_USEDEFAULTAREA = "Use_Default_Area";
 
     /** region option */
-    public final static String PROP_USESELECTED = "Select a Region";
+    public final static String PROP_USESELECTEDAREA = "Use_Selected_Area";
+    
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(

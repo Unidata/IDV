@@ -1568,7 +1568,7 @@ public class GeoGridDataSource extends GridDataSource {
 
         String       regionOption            = null;
 
-        regionOption = givenDataSelection.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULT);
+        regionOption = givenDataSelection.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULTAREA);
         boolean      isProgressiveResolution = givenDataSelection.getProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION, false);
 

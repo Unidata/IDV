@@ -1537,8 +1537,8 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         if (geoSelection == null) {
             String regionOption =
                 dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
-                                          DataSelection.PROP_USEDEFAULT);
-            if (regionOption.equals(DataSelection.PROP_USESELECTED)) {
+                                          DataSelection.PROP_USEDEFAULTAREA);
+            if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
                 String source = descriptor.getSource();
 
                 if (getCoordinateType() == TYPE_LATLON) {

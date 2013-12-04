@@ -33,6 +33,7 @@ import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.unidata.view.geoloc.NavigatedPanel;
 
@@ -1633,8 +1634,8 @@ public class AddeImageDataSelection {
             if (geoSelection == null) {
                 String regionOption = dataSelection.getProperty(
                                           DataSelection.PROP_REGIONOPTION,
-                                          DataSelection.PROP_USEDEFAULT);
-                if (regionOption.equals(DataSelection.PROP_USESELECTED)) {
+                                          DataSelection.PROP_USEDEFAULTAREA);
+                if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
                     String source = descriptor.getSource();
 
                     if (getCoordinateType() == TYPE_LATLON) {
@@ -1888,10 +1889,10 @@ public class AddeImageDataSelection {
         //final AddeImageDataSource this;
 
         /** _more_ */
-        public String USE_DEFAULTREGION = DataSelection.PROP_USEDEFAULT;
+        public String USE_DEFAULTREGION = DataSelection.PROP_USEDEFAULTAREA;
 
         /** _more_ */
-        public String USE_SELECTEDREGION = DataSelection.PROP_USESELECTED;
+        public String USE_SELECTEDREGION = DataSelection.PROP_USESELECTEDAREA;
 
         /** _more_ */
         public String USE_DISPLAYREGION = DataSelection.PROP_USEDISPLAYAREA;
@@ -1900,6 +1901,13 @@ public class AddeImageDataSelection {
         private String[] regionSubsetOptionLabels = new String[] {
                                                         USE_DEFAULTREGION,
                 USE_SELECTEDREGION, USE_DISPLAYREGION };
+        
+    /** the regions selection options */
+    private TwoFacedObject[] regionSubsetOptions = new TwoFacedObject[] {
+    		new TwoFacedObject("Use Default Region", DataSelection.PROP_USEDEFAULTAREA),
+    		new TwoFacedObject("Select A Region", DataSelection.PROP_USESELECTEDAREA),
+    		new TwoFacedObject("Match Display Region" , DataSelection.PROP_USEDISPLAYAREA) };
+
 
         /** _more_ */
         private JComponent regionsListInfo;
@@ -1940,7 +1948,7 @@ public class AddeImageDataSelection {
             this.eMag  = dataSource.getEMag();
             this.lMag  = dataSource.getLMag();
 
-            chkUseFull = new JCheckBox(DataSelection.PROP_USEDEFAULT);
+            chkUseFull = new JCheckBox(DataSelection.PROP_USEDEFAULTAREA);
 
             chkUseFull.setSelected(true);
             getRegionsList();
@@ -2020,8 +2028,8 @@ public class AddeImageDataSelection {
             //added
             regionOptionLabelBox.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent e) {
-                    String selectedObj =
-                        (String) regionOptionLabelBox.getSelectedItem();
+                    String selectedObj = (String)
+                        ((TwoFacedObject) regionOptionLabelBox.getSelectedItem()).getId();
                     setRegionOptions(selectedObj);
                     setAdvancedPanel(selectedObj);
 
@@ -2032,7 +2040,7 @@ public class AddeImageDataSelection {
             //timeDeclutterFld = new JTextField("" + getTimeDeclutterMinutes(), 5);
             GuiUtils.enableTree(regionOptionLabelBox, true);
 
-            List regionOptionNames = Misc.toList(regionSubsetOptionLabels);
+            List regionOptionNames = Misc.toList(regionSubsetOptions);
 
             GuiUtils.setListData(regionOptionLabelBox, regionOptionNames);
             //        JComponent top = GuiUtils.leftRight(new JLabel("Times"),
@@ -2058,7 +2066,8 @@ public class AddeImageDataSelection {
          */
         public String getRegionOptions() {
 
-            return (String) regionOptionLabelBox.getSelectedItem();
+            return (String) 
+                ((TwoFacedObject)regionOptionLabelBox.getSelectedItem()).getId();
         }
 
         /**
@@ -2206,7 +2215,7 @@ public class AddeImageDataSelection {
             boolean isFull    = false;
             regionOption = getRegionOption();
             GeoLocationInfo gInfo = null;
-            if (regionOption.equals(DataSelection.PROP_USESELECTED)) {
+            if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
                 ProjectionRect rect =
                     display.getNavigatedPanel().getSelectedRegion();
                 if (rect == null) {
