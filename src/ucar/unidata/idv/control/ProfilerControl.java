@@ -20,40 +20,16 @@
 
 package ucar.unidata.idv.control;
 
-
-import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.data.profiler.*;
-import ucar.unidata.idv.ControlContext;
-
-import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
-
-
-
-import visad.*;
-
-import java.awt.*;
-
-import java.awt.event.*;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
-
+import java.awt.event.ActionEvent;
 import java.rmi.RemoteException;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
+import visad.VisADException;
 
 /**
  * An abstract class that provides common services
@@ -62,6 +38,7 @@ import javax.swing.event.ChangeListener;
  * @author MetApps/Unidata
  * @version $Revision: 1.26 $
  */
+
 public abstract class ProfilerControl extends DisplayControlImpl {
 
     /** scale factor for the wind barbs */
@@ -78,7 +55,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
      */
     public ProfilerControl() {}
 
-
     /**
      * Make any extra components for the UI.
      * @return  extra components wrapped in a Component
@@ -86,7 +62,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
     protected JComponent doMakeExtraComponent() {
         return null;
     }
-
 
     /**
      * Make a combo box to select vertical separation of wind barbs, in m
@@ -100,7 +75,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
         return GuiUtils.label("  Vertical interval (m): ",
                               GuiUtils.wrap(intervalBox));
     }
-
 
     /**
      * Make the control widgets
@@ -131,7 +105,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
 
     }
 
-
     /**
      *  Override the base class method to catch any events.
      *
@@ -154,7 +127,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
 
     }
 
-
     /**
      * Method called after initialization.
      */
@@ -163,7 +135,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
         setFlowScale(flowScaleValue);
         setVerticalInterval(verticalIntervalValue);
     }
-
 
     /**
      * Use the value of the factor in the vert interval box
@@ -175,7 +146,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
         verticalIntervalValue = value;
     }
 
-
     /**
      * Get the vertical interval value
      * @return  vertical interval in meters
@@ -183,8 +153,6 @@ public abstract class ProfilerControl extends DisplayControlImpl {
     public float getVerticalInterval() {
         return verticalIntervalValue;
     }
-
-
 
     /**
      * Set the length of the wind barb
@@ -203,6 +171,5 @@ public abstract class ProfilerControl extends DisplayControlImpl {
     public float getFlowScale() {
         return flowScaleValue;
     }
-
 
 }
