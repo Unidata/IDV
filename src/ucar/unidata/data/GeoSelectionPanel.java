@@ -313,6 +313,15 @@ public class GeoSelectionPanel extends JPanel {
 
         {
             useDisplayAreaCbx = new JCheckBox("", false);
+            useDisplayAreaCbx.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    boolean showMap =
+                            !((JCheckBox) e.getSource()).isSelected();
+                    GuiUtils.enablePanel(mapPanel, showMap);
+                    //mapPanel.setEnabled(showMap);
+                }
+            });
             useDisplayAreaComps.add(
                 GuiUtils.rLabel(DataSelection.PROP_USEDISPLAYAREA + ":"));
             useDisplayAreaComps.add(GuiUtils.left(useDisplayAreaCbx));
@@ -413,7 +422,6 @@ public class GeoSelectionPanel extends JPanel {
             return tab;
         }
     }
-
 
     /**
      * Get the component that shows the stride. Used by the DataControlDialog

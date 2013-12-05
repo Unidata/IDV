@@ -155,7 +155,7 @@ public class AddeImageDataSelection {
             public void actionPerformed(ActionEvent e) {
                 boolean showMagSection =
                         !((JCheckBox) e.getSource()).isSelected();
-                advancedPanel.enablePanel(leMagPanel, showMagSection);
+                GuiUtils.enablePanel(leMagPanel, showMagSection);
             }
         });
     }
@@ -615,25 +615,6 @@ public class AddeImageDataSelection {
         /**
          * _more_
          *
-         * @param panel _more_
-         * @param enable _more_
-         */
-        public void enablePanel(JPanel panel, boolean enable) {
-
-            java.util.List cList = new ArrayList();
-            Component[]    ac    = panel.getComponents();
-            for (int i = 0; i < ac.length; i++) {
-                Component a = ac[i];
-                cList.add(a);
-            }
-
-            GuiUtils.enableComponents(cList, enable);
-        }
-
-
-        /**
-         * _more_
-         *
          * @param enable _more_
          */
         public void enablePanelAll(boolean enable) {
@@ -642,10 +623,10 @@ public class AddeImageDataSelection {
             }
             coordinateTypeComboBox.setEnabled(enable);
             locationComboBox.setEnabled(enable);
-            enablePanel(locationPanel, enable);
-            enablePanel(lockPanel, enable);
-            enablePanel(leMagPanel, enable);
-            enablePanel(sizePanel, enable);
+            GuiUtils.enablePanel(locationPanel, enable);
+            GuiUtils.enablePanel(lockPanel, enable);
+            GuiUtils.enablePanel(leMagPanel, enable);
+            GuiUtils.enablePanel(sizePanel, enable);
         }
 
 
@@ -1243,8 +1224,8 @@ public class AddeImageDataSelection {
 
             advance = GuiUtils.top(imagePanel);
             boolean showMagSection = !prograssiveCbx1.isSelected();
-            enablePanel(leMagPanel, showMagSection);
-            enablePanel(sizePanel, showMagSection);
+            GuiUtils.enablePanel(leMagPanel, showMagSection);
+            GuiUtils.enablePanel(sizePanel, showMagSection);
             String s0 = AddeImageDataSource.getKey(source,
                             AddeImageURL.KEY_LINEELE);
             if ((s0 != null) && (s0.length() > 1)) {
@@ -1275,7 +1256,7 @@ public class AddeImageDataSelection {
                 }
 
                 if(!prograssiveCbx1.isSelected()){
-                    enablePanel(leMagPanel, !prograssiveCbx1.isSelected());
+                    GuiUtils.enablePanel(leMagPanel, !prograssiveCbx1.isSelected());
                 }
             }
 
@@ -1942,7 +1923,7 @@ public class AddeImageDataSelection {
 
             this.addeImageDataSelection = addeImageDataSelection;
             this.imagePreview           = createImagePreview(source);
-            display = new NavigatedMapPanel(null, true, true,
+            display = new NavigatedMapPanel(null, true, false,
                                             imagePreview.getPreviewImage(),
                                             aAdapter.getAreaFile(), true);
             this.eMag  = dataSource.getEMag();

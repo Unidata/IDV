@@ -1520,6 +1520,24 @@ public class GuiUtils extends LayoutUtil {
 
 
     /**
+     * _more_
+     *
+     * @param panel _more_
+     * @param enable _more_
+     */
+    public static void enablePanel(JPanel panel, boolean enable) {
+
+        java.util.List cList = new ArrayList();
+        Component[]    ac    = panel.getComponents();
+        for (int i = 0; i < ac.length; i++) {
+            Component a = ac[i];
+            cList.add(a);
+        }
+
+        GuiUtils.enableComponents(cList, enable);
+    }
+
+    /**
      *  Make a scroll pane for the input box which may be used to hold
      * selection buttons later; size is given; text for a title in box.
      *
