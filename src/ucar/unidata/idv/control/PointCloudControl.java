@@ -21,75 +21,72 @@
 package ucar.unidata.idv.control;
 
 
-import org.w3c.dom.*;
-
+import org.w3c.dom.Element;
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.gis.KmlUtil;
-import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointCloudDataSource;
-
-import ucar.unidata.idv.control.drawing.*;
-import ucar.unidata.util.ColorTable;
+import ucar.unidata.idv.control.drawing.DrawingGlyph;
+import ucar.unidata.idv.control.drawing.GlyphCreatorCommand;
+import ucar.unidata.idv.control.drawing.PolyGlyph;
+import ucar.unidata.idv.control.drawing.ShapeGlyph;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.GeoUtils;
-
-import ucar.visad.Util;
 import ucar.visad.display.ImageRGBDisplayable;
-import ucar.visad.display.RGBDisplayable;
-
 import ucar.visad.display.VolumeDisplayable;
 
-import visad.*;
+import visad.ConstantMap;
+import visad.Data;
+import visad.Display;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Real;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Set;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
-
 import visad.georef.MapProjection;
-
-
 import visad.georef.TrivialMapProjection;
 
 import visad.util.DataUtility;
-import visad.util.SelectRangeWidget;
 
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.awt.geom.Rectangle2D;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JTabbedPane;
 
 
 /**
@@ -97,6 +94,7 @@ import javax.swing.event.*;
  *
  * @author IDV Development Team
  */
+
 public class PointCloudControl extends DrawingControl {
 
     /** the display for the volume renderer */
@@ -335,6 +333,10 @@ public class PointCloudControl extends DrawingControl {
 
         if (filename.toLowerCase().endsWith(".kml")) {
             exportKml(filename);
+            // TJJ Dec 2013 fix memory leak
+            if (os != null) {
+                os.close();
+            }
             return;
         }
 
@@ -570,11 +572,10 @@ public class PointCloudControl extends DrawingControl {
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
-        JComponent drawingControlComp = (JComponent) super.doMakeContents();
-
-        JComponent mine               = doMakeWidgetComponent();
-        JComponent controls           = super.doMakeControlsPanel();
-        JComponent shapes             = doMakeShapesPanel();
+        super.doMakeContents();
+        JComponent mine     = doMakeWidgetComponent();
+        JComponent controls = super.doMakeControlsPanel();
+        JComponent shapes   = doMakeShapesPanel();
         tabbedPane = new JTabbedPane();
         tabbedPane.add("Point Cloud", mine);
         tabbedPane.add("Clipping", controls);
@@ -634,10 +635,13 @@ public class PointCloudControl extends DrawingControl {
                     }
                     try {
                         colorRangeIndex = colorParamsBox.getSelectedIndex();
-                        RealType colorType =
-                            (RealType) colorParamsBox.getSelectedItem();
-                        //System.err.println("type:" + colorType);
-                        myDisplay.setRGBRealType(colorType);
+
+                        // TJJ Dec 2013, do NOT want to change display, 
+                        // this event handler should only affect current data
+                        // RealType colorType =
+                        //     (RealType) colorParamsBox.getSelectedItem();
+                        // myDisplay.setRGBRealType(colorType);
+
                         setRange(getColorRangeFromData());
                         setSelectRange(getRange());
                     } catch (Exception excp) {
@@ -756,11 +760,10 @@ public class PointCloudControl extends DrawingControl {
      */
     private void loadPointData(Data newData) throws Exception {
 
-        FieldImpl data     = (newData == null)
-                             ? (FieldImpl) getDataInstance().getData()
-                             : (FieldImpl) newData;
-        String    dataName = getDataInstance().getDataChoice().getName();
-        FlatField points   = null;
+        FieldImpl data   = (newData == null)
+                           ? (FieldImpl) getDataInstance().getData()
+                           : (FieldImpl) newData;
+        FlatField points = null;
         isSequence = GridUtil.isTimeSequence(data);
         if (isSequence) {
             points = (FlatField) data.getSample(0, false);
