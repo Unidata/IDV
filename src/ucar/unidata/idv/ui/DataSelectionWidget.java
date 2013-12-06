@@ -848,7 +848,7 @@ public class DataSelectionWidget {
         Object isPR = dataSelection.getProperty(
                           DataSelection.PROP_PROGRESSIVERESOLUTION);
 
-        if (isPR == null) {
+        if (isPR == null && geoSelectionPanel != null) {
             // anything other than adde image
             if(prograssiveCbx1 == null)
                 prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();

@@ -207,7 +207,7 @@ public class AddeImageDataSelection {
      * @version        Enter version here..., Sun, Nov 24, '13
      * @author         Enter your name here...
      */
-    class AddeImageAdvancedPanel extends DataSelectionComponent {
+    public class AddeImageAdvancedPanel extends DataSelectionComponent {
 
         /** _more_ */
         public JPanel advance;
@@ -1870,7 +1870,7 @@ public class AddeImageDataSelection {
      * @version        Enter version here..., Sun, Nov 24, '13
      * @author         Enter your name here...
      */
-    class AddeImagePreviewPanel extends DataSelectionComponent {
+    public class AddeImagePreviewPanel extends DataSelectionComponent {
 
         /** _more_ */
         protected NavigatedMapPanel display;
