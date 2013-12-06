@@ -134,7 +134,8 @@ public class AddeImageDataSelection {
 
         boolean usePR = false;
         if (dataSource.getIdv().getViewManager() instanceof MapViewManager) {
-            MapViewManager mvm = (MapViewManager)dataSource.getIdv().getViewManager();
+            MapViewManager mvm =
+                (MapViewManager) dataSource.getIdv().getViewManager();
             usePR = mvm.getUseProgressiveResolution();
         }
         //prograssiveCbx  = new JCheckBox("", usePR);
@@ -154,7 +155,7 @@ public class AddeImageDataSelection {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean showMagSection =
-                        !((JCheckBox) e.getSource()).isSelected();
+                    !((JCheckBox) e.getSource()).isSelected();
                 GuiUtils.enablePanel(leMagPanel, showMagSection);
             }
         });
@@ -413,6 +414,9 @@ public class AddeImageDataSelection {
 
         /** _more_ */
         AddeImageDataSelection addeImageDataSelection;
+
+        /** _more_ */
+        String previousPlace;
 
         /**
          * Construct a AddeImageAdvancedPanel
@@ -918,10 +922,6 @@ public class AddeImageDataSelection {
             String         dfltLblSpacing  = " ";
             JComponent     propComp        = null;
 
-
-
-
-
             //allComps0.add(GuiUtils.rLabel("Progressive Resolution:"));
             //allComps0.add(GuiUtils.left(prograssiveCbx));
 
@@ -944,7 +944,23 @@ public class AddeImageDataSelection {
             // location
             allComps1.add(new JLabel(" "));
             allComps1.add(new JLabel(" "));
+
+            ActionListener placeChange = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    if (previousPlace == null) {
+                        previousPlace = getPlace();
+                        return;
+                    }
+                    if ( !previousPlace.contains(getPlace())) {
+                        previousPlace = getPlace();
+                        updatePlace();
+                        // System.out.print(getPlace() + "uu");
+                    }
+                }
+            };
+
             locationComboBox = new JComboBox(locations);
+            locationComboBox.addActionListener(placeChange);
             setPlace(this.place);
 
 
@@ -1255,8 +1271,9 @@ public class AddeImageDataSelection {
                     enablePanelAll(false);
                 }
 
-                if(!prograssiveCbx1.isSelected()){
-                    GuiUtils.enablePanel(leMagPanel, !prograssiveCbx1.isSelected());
+                if ( !prograssiveCbx1.isSelected()) {
+                    GuiUtils.enablePanel(leMagPanel,
+                                         !prograssiveCbx1.isSelected());
                 }
             }
 
@@ -1612,47 +1629,51 @@ public class AddeImageDataSelection {
                 }
             }
 
-            if (geoSelection == null) {
-                String regionOption = dataSelection.getProperty(
-                                          DataSelection.PROP_REGIONOPTION,
+            //    if (geoSelection == null) {
+            String regionOption =
+                dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
                                           DataSelection.PROP_USEDEFAULTAREA);
-                if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
-                    String source = descriptor.getSource();
+            if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)
+                    || regionOption.equals(
+                        DataSelection.PROP_USEDEFAULTAREA)) {
+                String source = descriptor.getSource();
 
-                    if (getCoordinateType() == TYPE_LATLON) {
-                        String locateValue = Misc.format(getLatitude()) + " "
-                                             + Misc.format(getLongitude());
-                        source = AddeImageDataSource.replaceKey(source,
-                                AddeImageURL.KEY_LATLON,
-                                AddeImageURL.KEY_LATLON, locateValue);
-                    } else {
-                        String locateValue = getLine() + " " + getElement();
-                        source = AddeImageDataSource.replaceKey(source,
-                                AddeImageURL.KEY_LINEELE, locateValue);
-                    }
-
-                    if (getPlace() == "CENTER") {
-                        source = AddeImageDataSource.replaceKey(source,
-                                AddeImageURL.KEY_PLACE, "CENTER");
-                    } else {
-                        source = AddeImageDataSource.replaceKey(source,
-                                AddeImageURL.KEY_PLACE, "ULEFT");
-                    }
-
-                    String sizeValue = getNumLines() + " " + getNumEles();
+                if (getCoordinateType() == TYPE_LATLON) {
+                    String locateValue = Misc.format(getLatitude()) + " "
+                                         + Misc.format(getLongitude());
+                    source = AddeImageDataSource.removeKey(source,
+                            AddeImageURL.KEY_LINEELE);
                     source = AddeImageDataSource.replaceKey(source,
-                            AddeImageURL.KEY_SIZE, sizeValue);
-                    String magValue = String.valueOf(getLineMagValue()) + " "
-                                      + String.valueOf(getElementMagValue());
+                            AddeImageURL.KEY_LATLON, AddeImageURL.KEY_LATLON,
+                            locateValue);
+                } else {
+                    String locateValue = getLine() + " " + getElement();
+                    source = AddeImageDataSource.removeKey(source,
+                            AddeImageURL.KEY_LATLON);
                     source = AddeImageDataSource.replaceKey(source,
-                            AddeImageURL.KEY_MAG, magValue);
-                    source = AddeImageDataSource.replaceKey(source,
-                            AddeImageURL.KEY_SPAC, 1);
-                    dataSelection.putProperty("advancedURL", source);
+                            AddeImageURL.KEY_LINEELE, locateValue);
                 }
-            }
 
-            //do something
+                if (getPlace() == "CENTER") {
+                    source = AddeImageDataSource.replaceKey(source,
+                            AddeImageURL.KEY_PLACE, "CENTER");
+                } else {
+                    source = AddeImageDataSource.replaceKey(source,
+                            AddeImageURL.KEY_PLACE, "ULEFT");
+                }
+
+                String sizeValue = getNumLines() + " " + getNumEles();
+                source = AddeImageDataSource.replaceKey(source,
+                        AddeImageURL.KEY_SIZE, sizeValue);
+                String magValue = String.valueOf(getLineMagValue()) + " "
+                                  + String.valueOf(getElementMagValue());
+                source = AddeImageDataSource.replaceKey(source,
+                        AddeImageURL.KEY_MAG, magValue);
+                source = AddeImageDataSource.replaceKey(source,
+                        AddeImageURL.KEY_SPAC, 1);
+                dataSelection.putProperty("advancedURL", source);
+            }
+            //   }
 
         }
 
@@ -1816,7 +1837,6 @@ public class AddeImageDataSelection {
             }
         }
 
-
         /**
          * _more_
          */
@@ -1882,12 +1902,16 @@ public class AddeImageDataSelection {
         private String[] regionSubsetOptionLabels = new String[] {
                                                         USE_DEFAULTREGION,
                 USE_SELECTEDREGION, USE_DISPLAYREGION };
-        
-    /** the regions selection options */
-    private TwoFacedObject[] regionSubsetOptions = new TwoFacedObject[] {
-    		new TwoFacedObject("Use Default Region", DataSelection.PROP_USEDEFAULTAREA),
-    		new TwoFacedObject("Select A Region", DataSelection.PROP_USESELECTEDAREA),
-    		new TwoFacedObject("Match Display Region" , DataSelection.PROP_USEDISPLAYAREA) };
+
+        /** the regions selection options */
+        private TwoFacedObject[] regionSubsetOptions =
+            new TwoFacedObject[] {
+                new TwoFacedObject("Use Default Region",
+                                   DataSelection.PROP_USEDEFAULTAREA),
+                new TwoFacedObject("Select A Region",
+                                   DataSelection.PROP_USESELECTEDAREA),
+                new TwoFacedObject("Match Display Region",
+                                   DataSelection.PROP_USEDISPLAYAREA) };
 
 
         /** _more_ */
@@ -2009,8 +2033,9 @@ public class AddeImageDataSelection {
             //added
             regionOptionLabelBox.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent e) {
-                    String selectedObj = (String)
-                        ((TwoFacedObject) regionOptionLabelBox.getSelectedItem()).getId();
+                    String selectedObj =
+                        (String) ((TwoFacedObject) regionOptionLabelBox
+                            .getSelectedItem()).getId();
                     setRegionOptions(selectedObj);
                     setAdvancedPanel(selectedObj);
 
@@ -2047,8 +2072,8 @@ public class AddeImageDataSelection {
          */
         public String getRegionOptions() {
 
-            return (String) 
-                ((TwoFacedObject)regionOptionLabelBox.getSelectedItem()).getId();
+            return (String) ((TwoFacedObject) regionOptionLabelBox
+                .getSelectedItem()).getId();
         }
 
         /**
@@ -2192,108 +2217,11 @@ public class AddeImageDataSelection {
          */
         public void applyToDataSelection(DataSelection dataSelection) {
 
-            boolean hasCorner = false;
-            boolean isFull    = false;
+            //boolean hasCorner = false;
+            boolean isFull = false;
             regionOption = getRegionOption();
             GeoLocationInfo gInfo = null;
-            if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
-                ProjectionRect rect =
-                    display.getNavigatedPanel().getSelectedRegion();
-                if (rect == null) {
-                    dataSelection.putProperty(
-                        DataSelection.PROP_REGIONOPTION, regionOption);
-                    return;
-                }
-                ProjectionImpl projectionImpl =
-                    getNavigatedMapPanel().getProjectionImpl();
-                LatLonRect latLonRect =
-                    projectionImpl.getLatLonBoundingBox(rect);
 
-                if (latLonRect.getHeight() != latLonRect.getHeight()) {
-                    //corner point outside the earth
-                    hasCorner = true;
-                    LatLonPointImpl cImpl =
-                        projectionImpl.projToLatLon(rect.x
-                            + rect.getWidth() / 2, rect.y
-                                + rect.getHeight() / 2);
-                    LatLonPointImpl urImpl =
-                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                            rect.y + rect.getHeight());
-                    LatLonPointImpl ulImpl =
-                        projectionImpl.projToLatLon(rect.x,
-                            rect.y + rect.getHeight());
-                    LatLonPointImpl lrImpl =
-                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                            rect.y);
-                    LatLonPointImpl llImpl =
-                        projectionImpl.projToLatLon(rect.x, rect.y);
-
-                    double maxLat = Double.NaN;
-                    double minLat = Double.NaN;
-                    double maxLon = Double.NaN;
-                    double minLon = Double.NaN;
-                    if (cImpl.getLatitude() != cImpl.getLatitude()) {
-                        //do nothing
-                    } else if ((ulImpl.getLatitude() != ulImpl.getLatitude())
-                               && (urImpl.getLatitude()
-                                   != urImpl.getLatitude()) && (llImpl
-                                       .getLatitude() != llImpl
-                                       .getLatitude()) && (lrImpl
-                                       .getLatitude() != lrImpl
-                                       .getLatitude())) {
-
-                        isFull = true;
-                    } else if (ulImpl.getLatitude() != ulImpl.getLatitude()) {
-                        //upper left conner
-                        maxLat = cImpl.getLatitude()
-                                 + (cImpl.getLatitude()
-                                    - lrImpl.getLatitude());
-                        minLat = lrImpl.getLatitude();
-                        maxLon = lrImpl.getLongitude();
-                        minLon = cImpl.getLongitude()
-                                 - (lrImpl.getLongitude()
-                                    - cImpl.getLongitude());
-                    } else if (urImpl.getLatitude() != urImpl.getLatitude()) {
-                        //upper right conner
-                        maxLat = cImpl.getLatitude()
-                                 + (cImpl.getLatitude()
-                                    - llImpl.getLatitude());
-                        minLat = llImpl.getLatitude();
-                        maxLon = cImpl.getLongitude()
-                                 + (cImpl.getLongitude()
-                                    - lrImpl.getLongitude());
-                        minLon = lrImpl.getLongitude();
-                    } else if (llImpl.getLatitude() != llImpl.getLatitude()) {
-                        // lower left conner
-                        maxLat = urImpl.getLatitude();
-                        minLat = cImpl.getLatitude()
-                                 - (urImpl.getLatitude()
-                                    - cImpl.getLatitude());
-                        maxLon = urImpl.getLongitude();
-                        minLon = cImpl.getLongitude()
-                                 - (urImpl.getLongitude()
-                                    - cImpl.getLongitude());
-                    } else if (lrImpl.getLatitude() != lrImpl.getLatitude()) {
-                        // lower right conner
-                        maxLat = ulImpl.getLatitude();
-                        minLat = cImpl.getLatitude()
-                                 - (ulImpl.getLatitude()
-                                    - cImpl.getLatitude());
-                        maxLon = cImpl.getLongitude()
-                                 + (cImpl.getLongitude()
-                                    - ulImpl.getLongitude());
-                        minLon = ulImpl.getLongitude();
-                    }
-
-                    gInfo = new GeoLocationInfo(maxLat,
-                            LatLonPointImpl.lonNormal(minLon), minLat,
-                            LatLonPointImpl.lonNormal(maxLon));
-
-                } else {
-                    gInfo = new GeoLocationInfo(latLonRect);
-                }
-
-            }
 
             geoSelection = new GeoSelection(gInfo);
             if (isFull) {
@@ -2301,8 +2229,8 @@ public class AddeImageDataSelection {
             }
             dataSelection.putProperty(DataSelection.PROP_REGIONOPTION,
                                       regionOption);
-            dataSelection.putProperty(DataSelection.PROP_HASCORNER,
-                                      hasCorner);
+            //dataSelection.putProperty(DataSelection.PROP_HASCORNER,
+            //                          hasCorner);
             dataSelection.setGeoSelection(geoSelection);
 
 

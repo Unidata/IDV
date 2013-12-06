@@ -292,11 +292,6 @@ public class AddeImageDataSource extends ImageDataSource {
         boolean      isProgressiveResolution = true;
         boolean fromBundle = getIdv().getStateManager().getProperty(
                                  IdvConstants.PROP_LOADINGXML, false);
-        //if (isReload) {
-        // try {
-        //    descriptors = reloadDescriptors(descriptors, subset);
-        //   } catch (Exception ee) {}
-        // }
 
         // when geoSelection is null, it is from the old bundle and return the desscriptors.
         boolean isOldBundle = false;
@@ -324,106 +319,67 @@ public class AddeImageDataSource extends ImageDataSource {
             deMag = addeImageDataSelection.getAdvancedPanel().getElementMagValue();
         }
 
-
-
         String  t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULTAREA);
-
-
-        boolean hasCorner = subset.getProperty(DataSelection.PROP_HASCORNER, false);
 
         if (geoSelection != null) {
 
-            if (t1.equals(DataSelection.PROP_USESELECTEDAREA) ) {
-                if(geoSelection.getBoundingBox() != null){
-                    //use selected
-                    double maxLat = geoSelection.getBoundingBox().getMaxLat();
-                    double minLat = geoSelection.getBoundingBox().getMinLat();
-                    double maxLon = geoSelection.getBoundingBox().getMaxLon();
-                    double minLon = geoSelection.getBoundingBox().getMinLon();
-                    // double maxLat, double minLat, double maxLon, double minLon
-                   /* if (useDisplayArea) {
-                        BandInfo id = (BandInfo) dataChoice.getId();
-                        AreaDirectory thisDir =
-                            (AreaDirectory) allBandDirs.get(id.getBandNumber());
-                        int[] dir = thisDir.getDirectoryBlock();
-                        descriptors =
-                            geoSpaceSubsetA(geoSelection.getScreenBound(),
-                                            unitStr, eMag, lMag, baseAnav,
-                                            descriptors, maxLat, minLat, maxLon,
-                                            minLon, elFactor, dlMag, deMag,
-                                            "CENTER", isProgressiveResolution,
-                                            dir);
-                    } else */ if (hasCorner) {
-                        descriptors =
-                            geoSpaceSubsetB(geoSelection.getScreenBound(),
-                                    unitStr, eMag, lMag, baseAnav,
-                                    descriptors, maxLat, minLat, maxLon,
-                                    minLon, elFactor, dlMag, deMag,
-                                    "CENTER", isProgressiveResolution);
-                    } else {
-                        descriptors =
-                            geoSpaceSubsetB(geoSelection.getScreenBound(),
-                                    unitStr, eMag, lMag, baseAnav,
-                                    descriptors, maxLat, minLat, maxLon,
-                                    minLon, elFactor, dlMag, deMag,
-                                    "ULEFT", isProgressiveResolution);
-                    }
+            if (geoSelection.getBoundingBox() == null ) {
+
+                String adSource = (String)subset.getProperty("advancedURL");
+                String sizeValue = getKey(adSource, AddeImageURL.KEY_SIZE);
+                String magValue = getKey(adSource, AddeImageURL.KEY_MAG);
+                List<String> sizeList = StringUtil.split(sizeValue, " ");
+                List<String> magsList = StringUtil.split(magValue, " ");
+                int    lines  =  Integer.parseInt(sizeList.get(0))
+                        * Math.abs(Integer.parseInt(magsList.get(0)));
+                int    elems       = Integer.parseInt(sizeList.get(1))
+                        * Math.abs(Integer.parseInt(magsList.get(1)));
+
+                String lineele = getKey(adSource, AddeImageURL.KEY_LINEELE);
+                String latlon =  getKey(adSource, AddeImageURL.KEY_LATLON);
+                String place =  getKey(adSource, AddeImageURL.KEY_PLACE);
+                if (isProgressiveResolution) {
+                    // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
+                    lineMag = calculateMagFactor(lines, (int) rect.getHeight());
+                    // lineMag = calculateMagFactor(lines,
+                    //         (int) rect.getHeight()) - 1;
+                    //lineMag = eleMag / elFactor;
+                    eleMag = lineMag * elFactor;
                 } else {
-                    String adSource = (String)subset.getProperty("advancedURL");
-                    String sizeValue = getKey(adSource, AddeImageURL.KEY_SIZE);
-                    String magValue = getKey(adSource, AddeImageURL.KEY_MAG);
-                    List<String> sizeList = StringUtil.split(sizeValue, " ");
-                    List<String> magsList = StringUtil.split(magValue, " ");
-                    int    lines  =  Integer.parseInt(sizeList.get(0))
-                            * Math.abs(Integer.parseInt(magsList.get(0)));
-                    int    elems       = Integer.parseInt(sizeList.get(1))
-                            * Math.abs(Integer.parseInt(magsList.get(1)));
-
-                    String lineele = getKey(adSource, AddeImageURL.KEY_LINEELE);
-                    String latlon =  getKey(adSource, AddeImageURL.KEY_LATLON);
-                    String place =  getKey(adSource, AddeImageURL.KEY_PLACE);
-                    if (isProgressiveResolution) {
-                        // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
-                        lineMag = calculateMagFactor(lines, (int) rect.getHeight());
-                        // lineMag = calculateMagFactor(lines,
-                        //         (int) rect.getHeight()) - 1;
-                        //lineMag = eleMag / elFactor;
-                        eleMag = lineMag * elFactor;
-                    } else {
-                        eleMag  = Math.abs(deMag);
-                        lineMag = Math.abs(dlMag);
-                    }
-
-                    System.out.println(
-                            "Magnification factor of line X element : " + lineMag
-                                    + " " + eleMag);
-                    int newLines;
-                    int newelems;
-
-                    if (lineMag == 1) {
-                        newLines = lines;
-                    } else {
-                        newLines = (int) Math.floor(lines / lineMag + 0.5);
-                    }
-
-                    if (eleMag == 1) {
-                        newelems = elems;
-                    } else {
-                        newelems = (int) Math.floor(elems / eleMag + 0.5);
-                    }
-                    System.out.println("newLine X newElement : " + newLines + " "
-                            + newelems);
-                    try {
-                        if(lineele.length() > 0)
-                            descriptors = reSetImageDataDescriptor(descriptors,
-                                    AddeImageURL.KEY_LINEELE, lineele, place,
-                                    newLines, newelems, lineMag, eleMag, unitStr);
-                        else
-                            descriptors = reSetImageDataDescriptor(descriptors,
-                                    AddeImageURL.KEY_LATLON, latlon, place,
-                                    newLines, newelems, lineMag, eleMag, unitStr);
-                    } catch (Exception e) {}
+                    eleMag  = Math.abs(deMag);
+                    lineMag = Math.abs(dlMag);
                 }
+
+                System.out.println(
+                        "Magnification factor of line X element : " + lineMag
+                                + " " + eleMag);
+                int newLines;
+                int newelems;
+
+                if (lineMag == 1) {
+                    newLines = lines;
+                } else {
+                    newLines = (int) Math.floor(lines / lineMag + 0.5);
+                }
+
+                if (eleMag == 1) {
+                    newelems = elems;
+                } else {
+                    newelems = (int) Math.floor(elems / eleMag + 0.5);
+                }
+                System.out.println("newLine X newElement : " + newLines + " "
+                        + newelems);
+                try {
+                    if(lineele.length() > 0)
+                        descriptors = reSetImageDataDescriptor(descriptors,
+                                AddeImageURL.KEY_LINEELE, lineele, place,
+                                newLines, newelems, lineMag, eleMag, unitStr);
+                    else
+                        descriptors = reSetImageDataDescriptor(descriptors,
+                                AddeImageURL.KEY_LATLON, latlon, place,
+                                newLines, newelems, lineMag, eleMag, unitStr);
+                } catch (Exception e) {}
+
             } else if (t1.equals(DataSelection.PROP_USEDISPLAYAREA)) {
                 double maxLat = geoSelection.getBoundingBox().getMaxLat();
                 double minLat = geoSelection.getBoundingBox().getMinLat();
@@ -448,57 +404,6 @@ public class AddeImageDataSource extends ImageDataSource {
                             descriptors, maxLat, minLat, maxLon,
                             minLon, elFactor, dlMag,
                             deMag, "ULEFT", isProgressiveResolution);
-            } else {  // use default
-                BandInfo id = (BandInfo) dataChoice.getId();
-                AreaDirectory thisDir =
-                    (AreaDirectory) allBandDirs.get(id.getBandNumber());
-                int[]  dir         = thisDir.getDirectoryBlock();
-                int    lines       = dir[8];  //2726
-                int    elems       = dir[9];  //1732
-
-                int    cline       = lines / 2;
-                int    celem       = elems / 2;
-
-                String locateValue = cline + " " + celem;
-
-
-
-                if (isProgressiveResolution) {
-                    // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
-                    lineMag = calculateMagFactor(lines, (int) rect.getHeight());
-                    // lineMag = calculateMagFactor(lines,
-                    //         (int) rect.getHeight()) - 1;
-                    //lineMag = eleMag / elFactor;
-                    eleMag = lineMag * elFactor;
-                } else {
-                    eleMag  = Math.abs(deMag);
-                    lineMag = Math.abs(dlMag);
-                }
-
-                System.out.println(
-                    "Magnification factor of line X element : " + lineMag
-                    + " " + eleMag);
-                int newLines;
-                int newelems;
-
-                if (lineMag == 1) {
-                    newLines = lines;
-                } else {
-                    newLines = (int) Math.floor(lines / lineMag + 0.5);
-                }
-
-                if (eleMag == 1) {
-                    newelems = elems;
-                } else {
-                    newelems = (int) Math.floor(elems / eleMag + 0.5);
-                }
-                System.out.println("newLine X newElement : " + newLines + " "
-                                   + newelems);
-                try {
-                    descriptors = reSetImageDataDescriptor(descriptors,
-                            AddeImageURL.KEY_LINEELE, locateValue, "CENTER",
-                            newLines, newelems, lineMag, eleMag, unitStr);
-                } catch (Exception e) {}
             }
         }
 
