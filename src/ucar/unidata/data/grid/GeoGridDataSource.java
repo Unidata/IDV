@@ -225,8 +225,6 @@ public class GeoGridDataSource extends GridDataSource {
     private static GribVariableRenamer gribRenamer =
         new GribVariableRenamer();
 
-    /** _more_ */
-    boolean isReload = false;
 
     /**
      * Default constructor
@@ -610,7 +608,6 @@ public class GeoGridDataSource extends GridDataSource {
      * Clear out the data set
      */
     public void reloadData() {
-        isReload = true;
         myTimes   = null;
         dataset   = null;
         gcsVsTime = new Hashtable();
@@ -620,7 +617,6 @@ public class GeoGridDataSource extends GridDataSource {
         getDataChoices();
         super.reloadData();
 
-        isReload = false;
         /**
          *  not sure if we want to do this since we might have
          *  cachedflatfields out there that are pointing at the old
@@ -1366,7 +1362,7 @@ public class GeoGridDataSource extends GridDataSource {
         boolean isPR = givenDataSelection.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, false);
         boolean fromBundle = getIdv().getStateManager().getProperty(
                 IdvConstants.PROP_LOADINGXML, false);
-        if(isPR && (isReload || fromBundle)){
+        if(isPR &&  fromBundle){
            // ucar.unidata.geoloc.LatLonPoint[] llp0 =  givenDataSelection.getGeoSelection().getRubberBandBoxPoints();
             GeoLocationInfo gInfo = givenDataSelection.getGeoSelection().getBoundingBox();
             if(gInfo != null) {
@@ -2843,21 +2839,5 @@ public class GeoGridDataSource extends GridDataSource {
         return reverseTimes;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean getIsReload() {
-        return isReload;
-    }
 
-    /**
-     * _more_
-     *
-     * @param isReload _more_
-     */
-    public void setIsReload(boolean isReload) {
-        this.isReload = isReload;
-    }
 }
