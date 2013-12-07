@@ -796,6 +796,12 @@ public class DataSelectionWidget {
                                   timeOption.equals(USE_DRIVERTIMES)
                                   || chooserDoTimeMatching);
 
+
+        // check progressive resolution  for derived
+        ViewManager vm = idv.getViewManager();
+        boolean usePR = ((MapViewManager)vm).getUseProgressiveResolution();
+        dataSelection.putProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, usePR);
+
         /*
         if (chooserDoTimeMatching) {
             dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
@@ -848,7 +854,8 @@ public class DataSelectionWidget {
         Object isPR = dataSelection.getProperty(
                           DataSelection.PROP_PROGRESSIVERESOLUTION);
 
-        if (isPR == null && geoSelectionPanel != null) {
+        if (dataSelectionComponents != null && dataSelectionComponents.size() == 0
+                && geoSelectionPanel != null) {
             // anything other than adde image
             if(prograssiveCbx1 == null)
                 prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
@@ -876,37 +883,11 @@ public class DataSelectionWidget {
                                           USE_DEFAULTREGION);
         }
 
-        if (idv.getViewManager() instanceof MapViewManager) {
-            if (regionOption.equals(DataSelection.PROP_USEDISPLAYAREA)) {
-                idv.getViewManager().setProjectionFromData(false);
-                List<TwoFacedObject> coords = null;
 
-                try {
-                    coords = navDisplay.getScreenSidesCoordinates();
-                } catch (Exception e) {}
-                double[]      elid = (double[]) coords.get(1).getId();
-                EarthLocation el   = navDisplay.getEarthLocation(elid);
-                double maxLat = el.getLatLonPoint().getLatitude().getValue();
-                elid = (double[]) coords.get(2).getId();
-                el   = navDisplay.getEarthLocation(elid);
-                double minLat = el.getLatLonPoint().getLatitude().getValue();
-                elid = (double[]) coords.get(3).getId();
-                el   = navDisplay.getEarthLocation(elid);
-                double maxLon = el.getLatLonPoint().getLongitude().getValue();
-                elid = (double[]) coords.get(4).getId();
-                el   = navDisplay.getEarthLocation(elid);
-                double minLon = el.getLatLonPoint().getLongitude().getValue();
-                GeoLocationInfo glInfo =
-                    new GeoLocationInfo(maxLat,
-                                        LatLonPointImpl.lonNormal(minLon),
-                                        minLat,
-                                        LatLonPointImpl.lonNormal(maxLon));
-
-                geoSelection.setBoundingBox(glInfo);
-            } else if(regionOption.equals(USE_DEFAULTREGION) && geoSelection != null) {
-                geoSelection.setBoundingBox(null);
-            }
+        if(regionOption.equals(USE_DEFAULTREGION) && geoSelection != null) {
+            geoSelection.setBoundingBox(null);
         }
+
 
 
         if (geoSelection != null) {

@@ -436,7 +436,6 @@ public class AddeImageDataSelection {
 
             this.addeImageDataSelection = addeImageDataSelection;
 
-            // init information for the magnification
             String magVal = AddeImageDataSource.getKey(source,
                                 AddeImageURL.KEY_MAG);
             String[] magVals = magVal.split(" ");
@@ -459,8 +458,44 @@ public class AddeImageDataSelection {
             this.baseNumElements = aDir.getElements();
 
             this.place = AddeImageDataSource.getKey(source,
-                    AddeImageURL.KEY_PLACE);
+                    AddeImageURL.KEY_PLACE);;
 
+        }
+
+        /**
+         * _more_
+         */
+        public void reset() {
+            // init information for the magnification
+            String magVal = AddeImageDataSource.getKey(source,
+                                AddeImageURL.KEY_MAG);
+            String[] magVals = magVal.split(" ");
+            this.elementMag = new Integer(magVals[1]).intValue();
+            this.lineMag    = new Integer(magVals[0]).intValue();
+            setLineMagSlider(lineMag);
+            setElementMagSlider(elementMag);
+
+            // init information for the location and the default is LATLON
+            AreaDirectory aDir = descriptor.getDirectory();
+            this.isLineEle = true;
+            double cLat = aDir.getCenterLatitude();
+            double cLon = aDir.getCenterLongitude();
+            setLatitude(cLat);
+            setLongitude(cLon);
+            convertToLineEle();
+
+            //
+            this.previewDir      = aDir;
+            this.baseNumLines    = aDir.getLines();
+            this.baseNumElements = aDir.getElements();
+            int lines = (int) (baseNumLines / Math.abs(lineMag));
+            setNumLines(lines);
+            int elems = (int) (baseNumElements / Math.abs(elementMag));
+            setNumEles(elems);
+
+            this.place = AddeImageDataSource.getKey(source,
+                    AddeImageURL.KEY_PLACE);
+            setPlace(this.place);
 
         }
 
@@ -2038,6 +2073,11 @@ public class AddeImageDataSelection {
                             .getSelectedItem()).getId();
                     setRegionOptions(selectedObj);
                     setAdvancedPanel(selectedObj);
+                    if (selectedObj.equals(DataSelection.PROP_USEDEFAULTAREA)
+                            && (advancedPanel != null)) {
+                        advancedPanel.reset();
+                    }
+
 
                 }
 

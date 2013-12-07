@@ -1066,12 +1066,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
         }
 
-        // check progressive resolution  for derived
-        if(choices.size() > 0 && choices.get(0) instanceof DerivedDataChoice) {
-            ViewManager vm = getViewManager();
-            boolean usePR = ((MapViewManager)vm).getUseProgressiveResolution();
-            dataSelection.putProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, usePR);
-        }
+
 
         // we do this here because time driver properties 
         // might be changed by the display settings.
