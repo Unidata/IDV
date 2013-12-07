@@ -186,7 +186,7 @@ defineImage  http://www.wchstv.com/newsroom/wvtcam3.jpg {Charleston,WV}  -ll {38
 
 defineImage http://www.gettysburgaddress.com/GIFS/battle.jpg {Gettysburg,PA} -ll {39.82111,-77.22361} -dz -5
 defineImage http://www.nature.nps.gov/air/WebCams/parks/acadcam/acad.jpg {Acadia National Park, ME} -dz -5 -ll {44.378,-68.2588}
-defineImage http://vortex.plymouth.edu/webcam/2/latest.jpeg {Plymouth State University, NH} -dz -5 -ll {43.8,-71.7}
+defineImage http://vortex.plymouth.edu/webcam/1/latest.jpeg {Plymouth State University, NH} -dz -5 -ll {43.8,-71.7}
 
 
 

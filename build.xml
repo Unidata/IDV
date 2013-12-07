@@ -304,6 +304,8 @@ argument -Dfoo=bar) -->
             <include name="ucar/unidata/idv/**"/>
             <include name="ucar/unidata/data/**"/>
             <include name="ucar/unidata/util/**"/>
+            <!-- needed for old bundles -->
+            <include name="ucar/unidata/view/geoloc/AxisScaleInfo.java"/>
 <!--
             <include name="ucar/unidata/geoloc/**"/>
 -->
