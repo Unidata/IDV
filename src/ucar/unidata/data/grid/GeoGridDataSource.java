@@ -2048,8 +2048,7 @@ public class GeoGridDataSource extends GridDataSource {
             useDriverTime = givenDataSelection.getProperty(
                 DataSelection.PROP_USESTIMEDRIVER, false);
         }
-        if ((givenDataSelection != null) && useDriverTime
-                && (givenDataSelection.getTimeDriverTimes() != null)) {
+        if ((givenDataSelection != null)) {
             CalendarDateTime t0 =
                 new CalendarDateTime((DateTime) times.get(0));
             CalendarDate dt0 = t0.getCalendarDate();
@@ -2358,12 +2357,9 @@ public class GeoGridDataSource extends GridDataSource {
 
             } else {  // if (sizeZ > 1)
                 // Have 3D field (we expect); usually sizeZ > 1:
-                int xLength               =
-                    cfield.getXDimension().getLength();
-                int yLength               =
-                    cfield.getYDimension().getLength();
-                int zLength               =
-                    cfield.getZDimension().getLength();
+                int xLength               = cfield.getXDimension().getLength();
+                int yLength               = cfield.getYDimension().getLength();
+                int zLength               = cfield.getZDimension().getLength();
                 ucar.nc2.Dimension ensDim = cfield.getEnsembleDimension();
                 if (xLength * yLength * zLength > max3D) {
                     max3D  = xLength * yLength * zLength;

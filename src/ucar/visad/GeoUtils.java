@@ -24,22 +24,24 @@ package ucar.visad;
 import org.w3c.dom.Element;
 
 import ucar.unidata.geoloc.LatLonRect;
-
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
-
 import ucar.unidata.xml.XmlUtil;
 
-import visad.*;
+import visad.LinearLatLonSet;
+import visad.Real;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
+
 
 import java.rmi.RemoteException;
 
@@ -48,10 +50,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-
-import java.util.regex.*;
-
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 
 /**
@@ -225,9 +226,16 @@ public class GeoUtils {
             //Try it as lat/lon
             if ((latString == null) || (lonString == null)) {
                 String tmp = address;
-                while (tmp.indexOf("  ") >= 0) {
-                    tmp = StringUtil.replace(address, "  ", " ");
+
+                // allow for "lat,lon" form as well..
+                while (tmp.indexOf(",") >= 0) {
+                    tmp = StringUtil.replace(address, ",", " ");
                 }
+
+                while (tmp.indexOf("  ") >= 0) {
+                    tmp = StringUtil.replace(tmp, "  ", " ");
+                }
+
                 List toks = StringUtil.split(tmp, " ");
                 if ((toks != null) && (toks.size() == 2)) {
                     try {
@@ -247,53 +255,31 @@ public class GeoUtils {
                 }
             }
 
-            //Try yahoo
-            if (address.equals("ip") || address.equals("ipaddress")
-                    || address.equals("mymachine")) {
-                String url =
-                    "http://api.hostip.info/get_html.php?position=true";
-                String result = IOUtil.readContents(url, GeoUtils.class);
-                if ((master != null) && (master[0] != timestamp)) {
-                    return null;
-                }
-                //                System.err.println ("result:" + result);
-                result = result.toLowerCase();
-                Pattern pattern;
-                Matcher matcher;
-                pattern = Pattern.compile("latitude: *([0-9\\.-]+)");
-                matcher = pattern.matcher(result);
-                if (matcher.find()) {
-                    latString = matcher.group(1);
-                    pattern   = Pattern.compile("longitude: *([0-9\\.-]+)");
-                    matcher   = pattern.matcher(result);
-                    if (matcher.find()) {
-                        lonString = matcher.group(1);
-                    }
-                } else {
-                    return null;
-                }
-            }
             if ((latString == null) || (lonString == null)) {
                 try {
-                    //String url =
-                    //    "http://api.local.yahoo.com/MapsService/V1/geocode?appid=idvunidata&location="
-                    //    + encodedAddress;
                     String tmp = address;
                     while (tmp.indexOf(" ") >= 0) {
                         tmp = StringUtil.replace(address, " ", "+");
                     }
+
+                    // changed to Google 12/2013...
                     String url =
-                            "http://where.yahooapis.com/geocode?appid=idvunidata&location=" + tmp;
+                        "http://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address="
+                        + tmp;
 
                     String result = IOUtil.readContents(url, GeoUtils.class);
+
                     if ((master != null) && (master[0] != timestamp)) {
                         return null;
                     }
-                    Element root    = XmlUtil.getRoot(result);
-                    Element latNode = XmlUtil.findDescendant(root,
-                                          "latitude");
-                    Element lonNode = XmlUtil.findDescendant(root,
-                                          "longitude");
+
+                    // descend from the root...just in case...
+                    Element root = XmlUtil.getRoot(result);
+                    Element locele = XmlUtil.findDescendantFromPath(root,
+                                         "result.geometry.location");
+                    Element latNode = XmlUtil.findDescendant(locele, "lat");
+                    Element lonNode = XmlUtil.findDescendant(locele, "lng");
+
                     if ((latNode != null) && (lonNode != null)) {
                         latString = XmlUtil.getChildText(latNode);
                         lonString = XmlUtil.getChildText(lonNode);
@@ -304,73 +290,76 @@ public class GeoUtils {
 
 
 
-            /* Don't do these. yahoo seems pretty good
-            //Maybe a zip code
-            if ((latString == null) || (lonString == null)) {
-                if ((address.length() == 5)
-                        && Pattern.compile("\\d\\d\\d\\d\\d").matcher(
-                            address).find()) {
-                    String url =
-                        "http://www.census.gov/cgi-bin/gazetteer?city=&state=&zip="
-                        + address;
-                    String result = IOUtil.readContents(url, GeoUtils.class);
-                    if ((master != null) && (master[0] != timestamp)) {
-                        return null;
-                    }
-                    //Location: 39.991381 N, 105.239178 W<br>
-                    Pattern pattern =
-                        Pattern.compile("Location:\\s*([^,]+),([^<]+)<br>");
-                    Matcher matcher = pattern.matcher(result);
-                    if (matcher.find()) {
-                        latString = matcher.group(1);
-                        lonString = matcher.group(2);
-                    }
-                }
-            }
-
-            if ((master != null) && (master[0] != timestamp)) {
-                return null;
-            }
-
-            if ((latString == null) || (lonString == null)) {
-                String url = "http://rpc.geocoder.us/service/rest?address="
-                             + encodedAddress;
-                String result = IOUtil.readContents(url, GeoUtils.class);
-                if ((master != null) && (master[0] != timestamp)) {
-                    return null;
-                }
-                if (result.indexOf("<geo:long>") >= 0) {
-                    Element root    = XmlUtil.getRoot(result);
-                    Element latNode = XmlUtil.findDescendant(root, "geo:lat");
-                    Element lonNode = XmlUtil.findDescendant(root,
-                                          "geo:long");
-                    if ((latNode == null) || (lonNode == null)) {
-                        LogUtil.userErrorMessage("Error: Malformed response");
-                        return null;
-                    }
-                    latString = XmlUtil.getChildText(latNode);
-                    lonString = XmlUtil.getChildText(lonNode);
-                }
-            }
-
-
-            //Try the gazeteer
-            if ((latString == null) || (lonString == null)) {
-                String url = "http://www.census.gov/cgi-bin/gazetteer?"
-                             + encodedAddress;
-                String result = IOUtil.readContents(url, GeoUtils.class);
-                if ((master != null) && (master[0] != timestamp)) {
-                    return null;
-                }
-                Pattern pattern =
-                    Pattern.compile("Location:\\s*([^,]+),([^<]+)<br>");
-                Matcher matcher = pattern.matcher(result);
-                if (matcher.find()) {
-                    latString = matcher.group(1);
-                    lonString = matcher.group(2);
-                }
-            }
-            */
+            /**
+             * ****** Don't do these. Google seems pretty good
+             *
+             * //Maybe a zip code
+             * if ((latString == null) || (lonString == null)) {
+             *   if ((address.length() == 5)
+             *           && Pattern.compile("\\d\\d\\d\\d\\d").matcher(
+             *               address).find()) {
+             *       String url =
+             *           "http://www.census.gov/cgi-bin/gazetteer?city=&state=&zip="
+             *           + address;
+             *       String result = IOUtil.readContents(url, GeoUtils.class);
+             *       if ((master != null) && (master[0] != timestamp)) {
+             *           return null;
+             *       }
+             *       //Location: 39.991381 N, 105.239178 W<br>
+             *       Pattern pattern =
+             *           Pattern.compile("Location:\\s*([^,]+),([^<]+)<br>");
+             *       Matcher matcher = pattern.matcher(result);
+             *       if (matcher.find()) {
+             *           latString = matcher.group(1);
+             *           lonString = matcher.group(2);
+             *       }
+             *   }
+             * }
+             *
+             * if ((master != null) && (master[0] != timestamp)) {
+             *   return null;
+             * }
+             *
+             * if ((latString == null) || (lonString == null)) {
+             *   String url = "http://rpc.geocoder.us/service/rest?address="
+             *                + encodedAddress;
+             *   String result = IOUtil.readContents(url, GeoUtils.class);
+             *   if ((master != null) && (master[0] != timestamp)) {
+             *       return null;
+             *   }
+             *   if (result.indexOf("<geo:long>") >= 0) {
+             *       Element root    = XmlUtil.getRoot(result);
+             *       Element latNode = XmlUtil.findDescendant(root, "geo:lat");
+             *       Element lonNode = XmlUtil.findDescendant(root,
+             *                             "geo:long");
+             *       if ((latNode == null) || (lonNode == null)) {
+             *           LogUtil.userErrorMessage("Error: Malformed response");
+             *           return null;
+             *       }
+             *       latString = XmlUtil.getChildText(latNode);
+             *       lonString = XmlUtil.getChildText(lonNode);
+             *   }
+             * }
+             *
+             *
+             * //Try the gazeteer
+             * if ((latString == null) || (lonString == null)) {
+             *   String url = "http://www.census.gov/cgi-bin/gazetteer?"
+             *                + encodedAddress;
+             *   String result = IOUtil.readContents(url, GeoUtils.class);
+             *   if ((master != null) && (master[0] != timestamp)) {
+             *       return null;
+             *   }
+             *   Pattern pattern =
+             *       Pattern.compile("Location:\\s*([^,]+),([^<]+)<br>");
+             *   Matcher matcher = pattern.matcher(result);
+             *   if (matcher.find()) {
+             *       latString = matcher.group(1);
+             *       lonString = matcher.group(2);
+             *   }
+             * }
+             *
+             */
 
             if ((latString != null) && (lonString != null)) {
                 double lat = Misc.decodeLatLon(latString.trim());
@@ -475,35 +464,43 @@ public class GeoUtils {
         }
         return lonValues;
     }
-    
+
     /**
-     *  Normalize a longitude between the range of the max/min
-     *  @param lonRange the range of the longitude
-     *  @param value the longitude value
-     *  return longitude normalized to range
+     * Normalize a longitude between the range of the max/min.
+     *
+     * @param lonRange the range of the longitude
+     * @param value the longitude value
+     * @return longitude normalized to range
      */
     public static double normalizeLongitude(Range lonRange, double value) {
-    	if (value > 180 && (lonRange.getMin() < 0 || lonRange.getMax() < 0)) {
-    		return normalizeLongitude(value);
-    	} else if (value < 0 && (lonRange.getMin() > 180 || lonRange.getMax() > 180))	{
-    		return normalizeLongitude360(value);
-    	} 
-    	return value;
+        if ((value > 180)
+                && ((lonRange.getMin() < 0) || (lonRange.getMax() < 0))) {
+            return normalizeLongitude(value);
+        } else if ((value < 0)
+                   && ((lonRange.getMin() > 180)
+                       || (lonRange.getMax() > 180))) {
+            return normalizeLongitude360(value);
+        }
+        return value;
     }
 
     /**
-     *  Normalize a longitude between the range of the max/min
-     *  @param lonRange the range of the longitude
-     *  @param value the longitude value
-     *  return longitude normalized to range
+     * Normalize a longitude between the range of the max/min.
+     *
+     * @param lonRange the range of the longitude
+     * @param value the longitude value
+     * @return longitude normalized to range
      */
     public static float normalizeLongitude(Range lonRange, float value) {
-    	if (value > 180.f && (lonRange.getMin() < 0 || lonRange.getMax() < 0)) {
-    		return (float) normalizeLongitude(value);
-    	} else if (value < 0 && (lonRange.getMin() > 180 || lonRange.getMax() > 180))	{
-    		return (float) normalizeLongitude360(value);
-    	} 
-    	return value;
+        if ((value > 180.f)
+                && ((lonRange.getMin() < 0) || (lonRange.getMax() < 0))) {
+            return (float) normalizeLongitude(value);
+        } else if ((value < 0)
+                   && ((lonRange.getMin() > 180)
+                       || (lonRange.getMax() > 180))) {
+            return (float) normalizeLongitude360(value);
+        }
+        return value;
     }
 
     /**
