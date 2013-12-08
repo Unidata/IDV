@@ -1681,16 +1681,17 @@ public class AddeImageDataSelection {
                     source = AddeImageDataSource.replaceKey(source,
                             AddeImageURL.KEY_LATLON, AddeImageURL.KEY_LATLON,
                             locateValue);
-                      urlInfo.setLocateKey(AddeImageURL.KEY_LATLON);
-                      urlInfo.setLocationLat(getLatitude());
-                      urlInfo.setLocationLon(getLongitude());
+                    urlInfo.setLocateKey(AddeImageURL.KEY_LATLON);
+                    urlInfo.setLocateValue(locateValue);
+                    //urlInfo.setLocationLat(getLatitude());
+                    //urlInfo.setLocationLon(getLongitude());
                 } else {
                     String locateValue = getLine() + " " + getElement();
                     source = AddeImageDataSource.removeKey(source,
                             AddeImageURL.KEY_LATLON);
                     source = AddeImageDataSource.replaceKey(source,
                             AddeImageURL.KEY_LINEELE, locateValue);
-                    //  urlInfo.setLocateKey(AddeImageURL.KEY_LINEELE);
+                    urlInfo.setLocateKey(AddeImageURL.KEY_LINEELE);
                     //  urlInfo.setLocationLine(getLine());
                     //  urlInfo.setLocationElem(getElement());
                 }
@@ -1698,24 +1699,24 @@ public class AddeImageDataSelection {
                 if (getPlace() == "CENTER") {
                     source = AddeImageDataSource.replaceKey(source,
                             AddeImageURL.KEY_PLACE, "CENTER");
-                    //   urlInfo.setPlaceValue("CENTER");
+                    urlInfo.setPlaceValue("CENTER");
                 } else {
                     source = AddeImageDataSource.replaceKey(source,
                             AddeImageURL.KEY_PLACE, "ULEFT");
-                    //   urlInfo.setPlaceValue("ULEFT");
+                    urlInfo.setPlaceValue("ULEFT");
                 }
 
                 String sizeValue = getNumLines() + " " + getNumEles();
                 source = AddeImageDataSource.replaceKey(source,
                         AddeImageURL.KEY_SIZE, sizeValue);
-                //   urlInfo.setLines(getNumLines());
-                //   urlInfo.setElements(getNumEles());
+                urlInfo.setLines(getNumLines());
+                urlInfo.setElements(getNumEles());
                 String magValue = String.valueOf(getLineMagValue()) + " "
                                   + String.valueOf(getElementMagValue());
                 source = AddeImageDataSource.replaceKey(source,
                         AddeImageURL.KEY_MAG, magValue);
-                //   urlInfo.setElementMag(getElementMagValue());
-                //   urlInfo.setLineMag(getLineMagValue());
+                urlInfo.setElementMag(getElementMagValue());
+                urlInfo.setLineMag(getLineMagValue());
                 source = AddeImageDataSource.replaceKey(source,
                         AddeImageURL.KEY_SPAC, 1);
                 dataSelection.putProperty("advancedURL", source);
