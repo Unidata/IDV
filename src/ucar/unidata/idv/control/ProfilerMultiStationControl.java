@@ -20,6 +20,7 @@
 
 package ucar.unidata.idv.control;
 
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridDataInstance;
@@ -59,6 +60,7 @@ import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
+
 /**
  * Given an earth-located VisAD Field of multi-station NOAA Profiler data,
  * make a mapped wind data display, and make related controls.
@@ -94,7 +96,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
     private float currentLevel;
 
     /** level */
-     private float levelValue = 17000.0f;
+    private float levelValue = 17000.0f;
 
     /** level */
     private float initLevelValue = 3000.0f;
@@ -208,7 +210,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
 
         // TJJ Nov 2013, NOTE: code below does NOT step through
         // all times, the outer for-loop is doing nothing at present
-        
+
         // extract the multi-position FlatField of obs for each time step
         for (int i = 0; i < timeSet.getLength(); i++) {
             // get Profiler winds  for this one time step
@@ -450,7 +452,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
         ArrayList<RealTuple> locList = new ArrayList<RealTuple>();
         ArrayList<RealTuple> dsList  = new ArrayList<RealTuple>();
         // tmp list to store all locations we have seen at a specific z-level
-        ArrayList<RealTuple> seenLocations  = new ArrayList<RealTuple>();
+        ArrayList<RealTuple> seenLocations = new ArrayList<RealTuple>();
         if (verticalInt.getValue() != 0.0) {
             currentVerticalInt = verticalInt;
         }
@@ -468,7 +470,7 @@ public class ProfilerMultiStationControl extends ProfilerControl {
               zmax    = zlevel + interval;
 
         Set   timeSet = fieldImpl.getDomainSet();
-        
+
         // extract the multi-position FlatField of obs for each time step
         for (int i = 0; i < timeSet.getLength(); i++) {
             // get Profiler winds  for this one time step
@@ -490,66 +492,74 @@ public class ProfilerMultiStationControl extends ProfilerControl {
                 // test if this z altitude value matches level specs
                 // Separate 3D vs. Plan View logic, easier to follow
                 if (use3D) {
-                	// if the observation exceeds interval to next requested level
-                	if ((latlonz[2][j] - prvLevel) >= spacing) {
+                    // if the observation exceeds interval to next requested level
+                    if ((latlonz[2][j] - prvLevel) >= spacing) {
 
-                		// create and store a location tuple
-        				RealTuple location = new RealTuple(new Real[] {
-        						new Real(latlonz[0][j]),
-        						new Real(latlonz[1][j]),
-        						new Real(latlonz[2][j]), });
-        				locList.add(location);
-        				// note that we have seen this lat/lon at this level
-        				seenLocations.add(new RealTuple(new Real[] { new Real(latlonz[0][j]), new Real(latlonz[1][j])}));
+                        // create and store a location tuple
+                        RealTuple location = new RealTuple(new Real[] {
+                                                 new Real(latlonz[0][j]),
+                                new Real(latlonz[1][j]),
+                                new Real(latlonz[2][j]), });
+                        locList.add(location);
+                        // note that we have seen this lat/lon at this level
+                        seenLocations.add(new RealTuple(new Real[] {
+                            new Real(latlonz[0][j]),
+                            new Real(latlonz[1][j]) }));
 
-        				// the direction and speed data
-        				RealTuple dirspd = (RealTuple) oneTimeFF.getSample(j);
-        				dsList.add(dirspd);
-                		
-                		// TJJ Dec 2013
-                		// Ok, this may not be the best way to do this, but it works.
-                		// Need to catch all other locations at the same z-level while
-                		// sifting through the point cloud.  Just a brute-force 2nd
-                		// pass through the points (no noticeable performance delay
-                		// in the tests I ran).  if level requirement is ok, and it's
-                		// not a lat/lon we have already seen, add it to the location
-                		// and data lists
-                		
-        				for (int idx = 0; idx < oneTimeFF.getLength(); idx++) {
-        					// again, if the observation exceeds interval to next requested level
-        					if ((latlonz[2][idx] - prvLevel) >= spacing) {
-        						// create a temporary location tuple and check if we've seen it already
-        						RealTuple tmpLoc = new RealTuple(new Real[] { new Real(latlonz[0][idx]), new Real(latlonz[1][idx])});
-        						if (! seenLocations.contains(tmpLoc)) {
-        							// if not, must be a different station at this level, keep it
-        							RealTuple locOther = new RealTuple(new Real[] {
-        									new Real(latlonz[0][idx]),
-        									new Real(latlonz[1][idx]),
-        									new Real(latlonz[2][idx]), });
-        							locList.add(locOther);
+                        // the direction and speed data
+                        RealTuple dirspd = (RealTuple) oneTimeFF.getSample(j);
+                        dsList.add(dirspd);
 
-        							RealTuple dirspdOther = (RealTuple) oneTimeFF.getSample(idx);
-        							dsList.add(dirspdOther);
-        						}
-        						seenLocations.add(tmpLoc);
-        					}
-        				}
-        				// get ready for next altitude slice
-                		prvLevel = (int) latlonz[2][j];
-                		seenLocations.clear();
-                	}
+                        // TJJ Dec 2013
+                        // Ok, this may not be the best way to do this, but it works.
+                        // Need to catch all other locations at the same z-level while
+                        // sifting through the point cloud.  Just a brute-force 2nd
+                        // pass through the points (no noticeable performance delay
+                        // in the tests I ran).  if level requirement is ok, and it's
+                        // not a lat/lon we have already seen, add it to the location
+                        // and data lists
+
+                        for (int idx = 0; idx < oneTimeFF.getLength();
+                                idx++) {
+                            // again, if the observation exceeds interval to next requested level
+                            if ((latlonz[2][idx] - prvLevel) >= spacing) {
+                                // create a temporary location tuple and check if we've seen it already
+                                RealTuple tmpLoc =
+                                    new RealTuple(new Real[] {
+                                        new Real(latlonz[0][idx]),
+                                        new Real(latlonz[1][idx]) });
+                                if ( !seenLocations.contains(tmpLoc)) {
+                                    // if not, must be a different station at this level, keep it
+                                    RealTuple locOther =
+                                        new RealTuple(new Real[] {
+                                            new Real(latlonz[0][idx]),
+                                            new Real(latlonz[1][idx]),
+                                            new Real(latlonz[2][idx]), });
+                                    locList.add(locOther);
+
+                                    RealTuple dirspdOther =
+                                        (RealTuple) oneTimeFF.getSample(idx);
+                                    dsList.add(dirspdOther);
+                                }
+                                seenLocations.add(tmpLoc);
+                            }
+                        }
+                        // get ready for next altitude slice
+                        prvLevel = (int) latlonz[2][j];
+                        seenLocations.clear();
+                    }
                 } else {
-                	if ((latlonz[2][j] >= zmin) && (latlonz[2][j] <= zmax)) {
+                    if ((latlonz[2][j] >= zmin) && (latlonz[2][j] <= zmax)) {
 
-                		RealTuple location = new RealTuple(new Real[] {
-                				new Real(latlonz[0][j]),
-                				new Real(latlonz[1][j]),
-                				new Real(latlonz[2][j]), });
-                		locList.add(location);
+                        RealTuple location = new RealTuple(new Real[] {
+                                                 new Real(latlonz[0][j]),
+                                new Real(latlonz[1][j]),
+                                new Real(latlonz[2][j]), });
+                        locList.add(location);
 
-                		RealTuple dirspd = (RealTuple) oneTimeFF.getSample(j);
-                		dsList.add(dirspd);
-                	}
+                        RealTuple dirspd = (RealTuple) oneTimeFF.getSample(j);
+                        dsList.add(dirspd);
+                    }
                 }  // if this ob's altitude is ok, save it
 
             }      // end checking each ob in this oneTimeFF
