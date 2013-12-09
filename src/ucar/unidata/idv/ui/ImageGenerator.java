@@ -4194,7 +4194,8 @@ public class ImageGenerator extends IdvManager {
                                  : filename;
             for (int i = 0; i < viewManagers.size(); i++) {
                 ViewManager viewManager = (ViewManager) viewManagers.get(i);
-                viewManager.getAnimation().setCurrent(indices.get(j));
+                if (viewManager.getAnimation() != null)
+                   viewManager.getAnimation().setCurrent(indices.get(j));
                 putIndex(getProperties(), PROP_VIEWINDEX, idx);
                 String name = viewManager.getName();
                 if (name == null) {
