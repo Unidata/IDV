@@ -2759,10 +2759,11 @@ public class DerivedGridFactory {
         } else {
 
             // make FlatField  of saturation vapor pressure from temp
-            thetaFI = (FlatField) PotentialTemperature.create(temperFI,
+            thetaFI = (FlatField) PotentialTemperature.create(
                     (PisSequence == true)
                     ? pressFI.getSample(0)
-                    : pressFI);
+                    : pressFI,
+            		temperFI );
         }  // end single time
 
         return thetaFI;
