@@ -287,6 +287,7 @@ public class DerivedDataChoice extends ListDataChoice {
     /**
      * A utility to to add (uniquely) the given opName into the list of ops.
      *
+     * @param choice        The data choice associated with the operand being created.
      * @param opName        The operand name (e.g., D1)
      * @param data          The data associated  with the operand.
      * @param operands      The list of operand ({@link DataOperand}) objects.
@@ -295,8 +296,8 @@ public class DerivedDataChoice extends ListDataChoice {
      * @return The instance of the {@link DataOperand} that holds
      *         the opName/data pair.
      */
-    private static DataOperand addOperand(String opName, Object data,
-                                          List operands, Hashtable opsSoFar) {
+    private static DataOperand addOperand(DerivedDataChoice choice, String opName, Object data,
+            List operands, Hashtable opsSoFar) {
         DataOperand dataOperand = (DataOperand) opsSoFar.get(opName);
         if (dataOperand != null) {
             if ( !dataOperand.isBound()) {
@@ -304,13 +305,11 @@ public class DerivedDataChoice extends ListDataChoice {
             }
             return dataOperand;
         }
-        dataOperand = new DataOperand(opName, data);
+        dataOperand = new DataOperand(choice, opName, data);
         opsSoFar.put(opName, dataOperand);
         operands.add(dataOperand);
         return dataOperand;
     }
-
-
 
     /**
      *  Add the given operand op into the list of ops if it has not been
@@ -427,7 +426,7 @@ public class DerivedDataChoice extends ListDataChoice {
         for (int i = 0; i < childrenChoices.size(); i++) {
             DataChoice dc = (DataChoice) childrenChoices.get(i);
             if (dc instanceof UserDataChoice) {
-                DataOperand operand = new DataOperand(dc.getName(),
+                DataOperand operand = new DataOperand(this, dc.getName(),
                                           ((UserDataChoice) dc).getValue());
                 allUserOperands.add(operand);
                 if ( !operand.isBound()) {
@@ -475,11 +474,11 @@ public class DerivedDataChoice extends ListDataChoice {
             String     opName = dc.getName();
             if (dc instanceof UnboundDataChoice) {
                 //                System.err.println ("unbound choice");
-                addOperand(opName, null, operands, operandsSoFar);
+                addOperand(this, opName, null, operands, operandsSoFar);
             } else if (dc instanceof UserDataChoice) {
                 //                System.err.println ("UDC");
                 UserDataChoice userChoice = (UserDataChoice) dc;
-                addOperand(alias, userChoice.getValue(), operands,
+                addOperand(this, alias, userChoice.getValue(), operands,
                            operandsSoFar);
                 if ( !userChoice.persistent) {
                     userChoice.setValue(null);
@@ -487,10 +486,10 @@ public class DerivedDataChoice extends ListDataChoice {
             } else {
                 //Here, put the DataChoice in as the  data (sort of as a place holder for later).
                 //                System.err.println ("addOperand " + opName + " alias = " + alias );
-                addOperand(opName, dc, operands, operandsSoFar);
+                addOperand(this, opName, dc, operands, operandsSoFar);
                 if (userSelectedChoices.get(alias) == null) {
                     //                    System.err.println ("addOperand-alias " + alias);
-                    addOperand(alias, dc, operands, operandsSoFar);
+                    addOperand(this, alias, dc, operands, operandsSoFar);
                 }
             }
         }
@@ -503,7 +502,7 @@ public class DerivedDataChoice extends ListDataChoice {
         for (int i = 0; i < nonUserOperands.size(); i++) {
             DataOperand operand = (DataOperand) nonUserOperands.get(i);
             //            System.err.println ("addOperand-nonUser ");
-            addOperand(operand.getName(), null, operands, operandsSoFar);
+            addOperand(this, operand.getName(), null, operands, operandsSoFar);
         }
 
 

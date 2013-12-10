@@ -5718,13 +5718,33 @@ public class IdvUIManager extends IdvManager {
             if (fieldType == null) {
                 fieldType = FIELDTYPE_TEXT;
             }
-            String label         = operand.getLabel();
-            Object dflt          = operand.getUserDefault();
-            Object cacheKey      = Misc.newList(label, fieldType);
-            Object cachedOperand = operandCache.get(cacheKey);
+            
+            DerivedDataChoice formula = operand.getDataChoice();
+            String description        = operand.getDescription();
+            if (formula != null) {
+                description = formula.toString();
+            }
+            
+            String label            = operand.getLabel();
+            Object dflt             = operand.getUserDefault();
+            Object cacheKeyNewStyle = Misc.newList(description, label, fieldType);
+            Object cacheKey         = Misc.newList(label, fieldType);
+            
+            Object cachedOperand = null;
+            boolean oldStyle = operandCache.containsKey(cacheKey);
+            boolean newStyle = operandCache.containsKey(cacheKeyNewStyle);
+            
+            // if new style, always use that and ignore old style
+            // if no new style, proceed as before.
+            if (newStyle) {
+                cachedOperand = operandCache.get(cacheKeyNewStyle);
+            } else if (oldStyle) {
+                cachedOperand = operandCache.get(cacheKey);
+            }
             if (cachedOperand != null) {
                 dflt = cachedOperand;
             }
+            
             JCheckBox cbx = new JCheckBox("", operand.isPersistent());
             persistentCbxs.add(cbx);
             JComponent field     = null;
@@ -5837,11 +5857,18 @@ public class IdvUIManager extends IdvManager {
         }
         List values = new ArrayList();
         for (int i = 0; i < userOperands.size(); i++) {
-            DataOperand operand    = (DataOperand) userOperands.get(i);
-            String      label      = operand.getLabel();
-            Object      field      = fields.get(i);
-            Object      value      = null;
-            Object      cacheValue = null;
+            DataOperand       operand     = (DataOperand) userOperands.get(i);
+            String            description = operand.getDescription();
+            DerivedDataChoice formula     = operand.getDataChoice();
+            String            label       = operand.getLabel();
+            Object            field       = fields.get(i);
+            Object            value       = null;
+            Object            cacheValue  = null;
+            
+            if (formula != null) {
+                description = formula.toString();
+            }
+            
             if (field instanceof JTextComponent) {
                 value = ((JTextComponent) field).getText().trim();
             } else if (field instanceof JCheckBox) {
@@ -5864,13 +5891,13 @@ public class IdvUIManager extends IdvManager {
             if (fieldType == null) {
                 fieldType = "text";
             }
-            Object cacheKey = Misc.newList(label, fieldType);
+            
+            Object cacheKey = Misc.newList(description, label, fieldType);
             operandCache.put(cacheKey, cacheValue);
             values.add(new UserOperandValue(value, cbx.isSelected()));
         }
         getStore().putEncodedFile("operandcache.xml", operandCache);
         return values;
-
     }
 
 
