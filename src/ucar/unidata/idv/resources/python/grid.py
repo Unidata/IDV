@@ -24,7 +24,10 @@ def extractPressureFromNWPGrid(fieldimpl):
      to pressure in the standard atmosphere).
      User must be sure input is a suitable FlatField.
   """
-  ff = fieldimpl.getSample(0)
+  if (GridUtil.isTimeSequence(fieldimpl)):
+    ff = fieldimpl.getSample(0)
+  else:
+    ff = fieldimpl
   return DerivedGridFactory.createPressureGridFromDomain(ff)
 
 
