@@ -62,6 +62,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.rmi.RemoteException;
+import java.lang.Boolean;
 
 import java.util.ArrayList;
 
@@ -93,6 +94,8 @@ public class FrontGlyph extends PolyGlyph
     /** xml attribute for the scale for the front */
     public static final String ATTR_FRONTSCALE = "frontscale";
 
+    /** xml attribute for the flip state of the front */
+    public static final String ATTR_FRONTFLIP = "frontflip";
 
     /** Shows the fronts */
     private FrontDrawer frontDrawer;
@@ -386,6 +389,7 @@ public class FrontGlyph extends PolyGlyph
         super.initFromXml(control, node);
         frontType  = XmlUtil.getAttribute(node, ATTR_FRONTTYPE, frontType);
         frontScale = XmlUtil.getAttribute(node, ATTR_FRONTSCALE, frontScale);
+        flipIt = XmlUtil.getAttribute(node, ATTR_FRONTFLIP, flipIt);
         setName(FrontDrawer.getLabel(frontType));
     }
 
@@ -397,6 +401,7 @@ public class FrontGlyph extends PolyGlyph
      */
     protected void addAttributes(Element e) {
         super.addAttributes(e);
+        e.setAttribute(ATTR_FRONTFLIP, Boolean.toString(flipIt));
         e.setAttribute(ATTR_FRONTTYPE, frontType);
         e.setAttribute(ATTR_FRONTSCALE, frontScale + "");
     }
