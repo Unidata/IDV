@@ -38,10 +38,10 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
     private String coordFormat;
 
     /** The base label. */
-    private String baseLabel;
+    private double baseLabel;
 
     /** The  increment. */
-    private String increment;
+    private double increment;
 
     /** Minor division. */
     private int minorDivision;
@@ -84,8 +84,18 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
      *
      * @return the base label
      */
-    public String getBaseLabel() {
+    public double getBaseLabel() {
         return baseLabel;
+    }
+
+    /**
+     * Sets the base label.
+     * @deprecated
+     *
+     * @param baseLabel the new base label
+     */
+    public void setBaseLabel(String baseLabel) {
+    	setBaseLabel(Double.valueOf(baseLabel));
     }
 
     /**
@@ -93,7 +103,7 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
      *
      * @param baseLabel the new base label
      */
-    public void setBaseLabel(String baseLabel) {
+    public void setBaseLabel(double baseLabel) {
         this.baseLabel = baseLabel;
     }
 
@@ -102,8 +112,18 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
      *
      * @return the increment
      */
-    public String getIncrement() {
+    public double getIncrement() {
         return increment;
+    }
+
+    /**
+     * Sets the increment.
+     * @deprecated
+     *
+     * @param increment the new increment
+     */
+    public void setIncrement(String increment) {
+        setIncrement(Double.valueOf(increment));
     }
 
     /**
@@ -111,7 +131,7 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
      *
      * @param increment the new increment
      */
-    public void setIncrement(String increment) {
+    public void setIncrement(double increment) {
         this.increment = increment;
     }
 
@@ -179,15 +199,11 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
     public int hashCode() {
         final int prime  = 31;
         int       result = super.hashCode();
-        result = prime * result + ((baseLabel == null)
-                                   ? 0
-                                   : baseLabel.hashCode());
+        result = prime * result + (int) baseLabel;
         result = prime * result + ((coordFormat == null)
                                    ? 0
                                    : coordFormat.hashCode());
-        result = prime * result + ((increment == null)
-                                   ? 0
-                                   : increment.hashCode());
+        result = prime * result + (int) increment;
         result = prime * result + (labelRelief
                                    ? 1231
                                    : 1237);
@@ -217,12 +233,8 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
             return false;
         }
         LatLonAxisScaleInfo other = (LatLonAxisScaleInfo) obj;
-        if (baseLabel == null) {
-            if (other.baseLabel != null) {
+        if (!(baseLabel == other.baseLabel)) {
                 return false;
-            }
-        } else if ( !baseLabel.equals(other.baseLabel)) {
-            return false;
         }
         if (coordFormat == null) {
             if (other.coordFormat != null) {
@@ -231,12 +243,8 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
         } else if ( !coordFormat.equals(other.coordFormat)) {
             return false;
         }
-        if (increment == null) {
-            if (other.increment != null) {
+        if (!(increment == other.increment)) {
                 return false;
-            }
-        } else if ( !increment.equals(other.increment)) {
-            return false;
         }
         if (labelRelief != other.labelRelief) {
             return false;
