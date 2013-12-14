@@ -21,7 +21,6 @@
 package ucar.unidata.data.imagery;
 
 
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.io.RandomAccessFile;
 import java.rmi.RemoteException;
@@ -41,7 +40,6 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
 import visad.Data;
 import visad.VisADException;
 import visad.data.mcidas.AREACoordinateSystem;
@@ -325,19 +323,14 @@ public class AddeImageDataSource extends ImageDataSource {
 
             if (geoSelection.getBoundingBox() == null ) {
 
-                String adSource = (String)subset.getProperty("advancedURL");
-                String sizeValue = getKey(adSource, AddeImageURL.KEY_SIZE);
-                String magValue = getKey(adSource, AddeImageURL.KEY_MAG);
-                List<String> sizeList = StringUtil.split(sizeValue, " ");
-                List<String> magsList = StringUtil.split(magValue, " ");
-                int    lines  =  Integer.parseInt(sizeList.get(0))
-                        * Math.abs(Integer.parseInt(magsList.get(0)));
-                int    elems       = Integer.parseInt(sizeList.get(1))
-                        * Math.abs(Integer.parseInt(magsList.get(1)));
+                ImageDataSelectionInfo adSource = (ImageDataSelectionInfo)subset.getProperty("advancedURL");
 
-                String lineele = getKey(adSource, AddeImageURL.KEY_LINEELE);
-                String latlon =  getKey(adSource, AddeImageURL.KEY_LATLON);
-                String place =  getKey(adSource, AddeImageURL.KEY_PLACE);
+                int    lines  =  adSource.getLines() * Math.abs(adSource.getLineMag());;
+                int    elems       = adSource.getElements() * Math.abs(adSource.getElementMag());;;
+
+                String locationKey = adSource.getLocateKey();
+                String locationValue = adSource.getLocateValue();
+                String place =  adSource.getPlaceValue();
                 if (isProgressiveResolution) {
                     // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                     lineMag = calculateMagFactor(lines, (int) rect.getHeight());
@@ -370,13 +363,13 @@ public class AddeImageDataSource extends ImageDataSource {
                 System.out.println("newLine X newElement : " + newLines + " "
                         + newelems);
                 try {
-                    if(lineele.length() > 0)
+                    if(locationKey.equals(AddeImageURL.KEY_LINEELE))
                         descriptors = reSetImageDataDescriptor(descriptors,
-                                AddeImageURL.KEY_LINEELE, lineele, place,
+                                AddeImageURL.KEY_LINEELE, locationValue, place,
                                 newLines, newelems, lineMag, eleMag, unitStr);
                     else
                         descriptors = reSetImageDataDescriptor(descriptors,
-                                AddeImageURL.KEY_LATLON, latlon, place,
+                                AddeImageURL.KEY_LATLON, locationValue, place,
                                 newLines, newelems, lineMag, eleMag, unitStr);
                 } catch (Exception e) {}
 

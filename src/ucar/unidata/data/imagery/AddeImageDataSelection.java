@@ -245,10 +245,10 @@ public class AddeImageDataSelection {
         boolean amSettingProperties = false;
 
         /** _more_ */
-        private int lineMag;
+        private int lineMag1;
 
         /** _more_ */
-        private int elementMag;
+        private int elementMag1;
 
         /** _more_ */
         private String kmLbl = " km";
@@ -304,13 +304,13 @@ public class AddeImageDataSelection {
         private int numEles = defaultNumEles;
 
         /** _more_ */
-        private double latitude;
+        private double latitude1;
 
         /** _more_ */
         private double defaultLat = Double.NaN;
 
         /** _more_ */
-        private double longitude;
+        private double longitude1;
 
         /** _more_ */
         private double defaultLon = Double.NaN;
@@ -320,10 +320,10 @@ public class AddeImageDataSelection {
         private int imageLine;
 
         /** _more_ */
-        private int areaLine;
+        private int areaLine1;
 
         /** _more_ */
-        private int areaElement;
+        private int areaElement1;
 
         /** _more_ */
         private int imageElement;
@@ -380,7 +380,7 @@ public class AddeImageDataSelection {
         protected boolean amUpdating = false;
 
         /** _more_ */
-        private String place;
+        private String place1;
 
         /** _more_ */
         private int maxLines = 0;
@@ -418,6 +418,10 @@ public class AddeImageDataSelection {
         /** _more_ */
         String previousPlace;
 
+        ImageDataSelectionInfo urlInfo;
+
+        String coordinateType;
+
         /**
          * Construct a AddeImageAdvancedPanel
          *
@@ -435,30 +439,52 @@ public class AddeImageDataSelection {
             super("Advanced");
 
             this.addeImageDataSelection = addeImageDataSelection;
+            urlInfo = new ImageDataSelectionInfo(source);
 
-            String magVal = AddeImageDataSource.getKey(source,
+            /*String magVal = AddeImageDataSource.getKey(source,
                                 AddeImageURL.KEY_MAG);
             String[] magVals = magVal.split(" ");
             this.elementMag = new Integer(magVals[1]).intValue();
             this.lineMag    = new Integer(magVals[0]).intValue();
-
+            */
 
             // init information for the location and the default is LATLON
             AreaDirectory aDir = descriptor.getDirectory();
+
             this.isLineEle = true;
-            double cLat = aDir.getCenterLatitude();
+            //this.place = urlInfo.getPlaceValue();
+            this.coordinateType = urlInfo.getLocateKey();
+
+            if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
+                //this.latitude = urlInfo.getLocationLat();
+                //this.longitude = urlInfo.getLocationLon();
+                latLonWidget.setLat(urlInfo.getLocationLat());
+                latLonWidget.setLon(urlInfo.getLocationLon());
+                convertToLineEle();
+                urlInfo.setLocationElem(getElement());
+                urlInfo.setLocationLine(getLine());
+            } else {
+                //this.areaLine = urlInfo.getLocationLine();
+                //this.areaElement = urlInfo.getLocationElem();
+                centerLineFld.setText(Integer.toString(urlInfo.getLocationLine()));
+                centerElementFld.setText(Integer.toString(urlInfo.getLocationElem()));
+                convertToLatLon();
+                urlInfo.setLocationLat(getLatitude());
+                urlInfo.setLocationLon(getLongitude());
+            }
+         /*   double cLat = aDir.getCenterLatitude();
             double cLon = aDir.getCenterLongitude();
             setLatitude(cLat);
             setLongitude(cLon);
-            convertToLineEle();
+            convertToLineEle();    */
 
             //
             this.previewDir      = aDir;
             this.baseNumLines    = aDir.getLines();
             this.baseNumElements = aDir.getElements();
 
-            this.place = AddeImageDataSource.getKey(source,
-                    AddeImageURL.KEY_PLACE);;
+            //this.place = AddeImageDataSource.getKey(source,
+            //        AddeImageURL.KEY_PLACE);
 
         }
 
@@ -467,35 +493,49 @@ public class AddeImageDataSelection {
          */
         public void reset() {
             // init information for the magnification
+            urlInfo = new ImageDataSelectionInfo(source);
             String magVal = AddeImageDataSource.getKey(source,
                                 AddeImageURL.KEY_MAG);
             String[] magVals = magVal.split(" ");
-            this.elementMag = new Integer(magVals[1]).intValue();
-            this.lineMag    = new Integer(magVals[0]).intValue();
-            setLineMagSlider(lineMag);
-            setElementMagSlider(elementMag);
+            /*this.elementMag = new Integer(magVals[1]).intValue();
+            this.lineMag    = new Integer(magVals[0]).intValue();  */
+            setLineMagSlider(urlInfo.getLineMag());
+            setElementMagSlider(urlInfo.getElementMag());
 
             // init information for the location and the default is LATLON
             AreaDirectory aDir = descriptor.getDirectory();
-            this.isLineEle = true;
-            double cLat = aDir.getCenterLatitude();
-            double cLon = aDir.getCenterLongitude();
-            setLatitude(cLat);
-            setLongitude(cLon);
-            convertToLineEle();
+            this.coordinateType = urlInfo.getLocateKey();
+
+            if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
+                //this.latitude = urlInfo.getLocationLat();
+                //this.longitude = urlInfo.getLocationLon();
+                latLonWidget.setLat(urlInfo.getLocationLat());
+                latLonWidget.setLon(urlInfo.getLocationLon());
+                convertToLineEle();
+                urlInfo.setLocationElem(getElement());
+                urlInfo.setLocationLine(getLine());
+            } else {
+                //this.areaLine = urlInfo.getLocationLine();
+                //this.areaElement = urlInfo.getLocationElem();
+                centerLineFld.setText(Integer.toString(urlInfo.getLocationLine()));
+                centerElementFld.setText(Integer.toString(urlInfo.getLocationElem()));
+                convertToLatLon();
+                urlInfo.setLocationLat(getLatitude());
+                urlInfo.setLocationLon(getLongitude());
+            }
 
             //
             this.previewDir      = aDir;
             this.baseNumLines    = aDir.getLines();
             this.baseNumElements = aDir.getElements();
-            int lines = (int) (baseNumLines / Math.abs(lineMag));
+            int lines = (int) (baseNumLines / Math.abs(urlInfo.getLineMag()));
             setNumLines(lines);
-            int elems = (int) (baseNumElements / Math.abs(elementMag));
+            int elems = (int) (baseNumElements / Math.abs(urlInfo.getElementMag()));
             setNumEles(elems);
 
-            this.place = AddeImageDataSource.getKey(source,
-                    AddeImageURL.KEY_PLACE);
-            setPlace(this.place);
+            //this.place = AddeImageDataSource.getKey(source,
+            //        AddeImageURL.KEY_PLACE);
+            setPlace(urlInfo.getPlaceValue());
 
         }
 
@@ -829,6 +869,7 @@ public class AddeImageDataSelection {
         protected void lineMagSliderChanged(boolean autoSetSize) {
             try {
                 int value = getLineMagValue();
+                urlInfo.setLineMag(value);
                 //setLineMag(value);
                 lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
 
@@ -860,6 +901,7 @@ public class AddeImageDataSelection {
                                       : value + 1;  // since slider is one off
                 amSettingProperties = true;
                 elementMagSlider.setValue(value);
+                urlInfo.setElementMag(value);
                 amSettingProperties = false;
                 elementMagSliderChanged(autoSetSize);
 
@@ -876,6 +918,7 @@ public class AddeImageDataSelection {
         public void setElementMagSlider(int value) {
             this.elementMagSlider.setValue(value);
             this.elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
+            urlInfo.setElementMag(value);
         }
 
         /**
@@ -886,6 +929,7 @@ public class AddeImageDataSelection {
         public void setLineMagSlider(int value) {
             this.lineMagSlider.setValue(value);
             this.lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
+            urlInfo.setLineMag(value);
         }
 
         /**
@@ -895,7 +939,7 @@ public class AddeImageDataSelection {
          */
         protected int getLineMagValue() {
             if (lineMagSlider == null) {
-                return lineMag;
+                return urlInfo.getLineMag();
             }
             return getMagValue(lineMagSlider);
         }
@@ -907,7 +951,7 @@ public class AddeImageDataSelection {
          */
         protected int getElementMagValue() {
             if (elementMagSlider == null) {
-                return elementMag;
+                return urlInfo.getElementMag();
             }
             int val = getMagValue(elementMagSlider);
             //   setElementMag(val);
@@ -970,6 +1014,11 @@ public class AddeImageDataSelection {
                     int selectedIndex =
                         coordinateTypeComboBox.getSelectedIndex();
                     flipLocationPanel(selectedIndex);
+                    if(selectedIndex == 0){
+                        urlInfo.setLocateKey(AddeImageURL.KEY_LATLON);
+                    } else {
+                        urlInfo.setLocateKey(AddeImageURL.KEY_LINEELE);
+                    }
                 }
             });
 
@@ -996,7 +1045,7 @@ public class AddeImageDataSelection {
 
             locationComboBox = new JComboBox(locations);
             locationComboBox.addActionListener(placeChange);
-            setPlace(this.place);
+            setPlace(urlInfo.getPlaceValue());
 
 
             allComps1.add(GuiUtils.rLabel(" Location: "));
@@ -1046,7 +1095,7 @@ public class AddeImageDataSelection {
                 }
             };
             if ( !this.isLineEle) {
-                latLonWidget.setLatLon(this.latitude, this.longitude);
+                latLonWidget.setLatLon(urlInfo.getLocationLat(), urlInfo.getLocationLon());
             }
             String lineStr = "";
             String eleStr  = "";
@@ -1355,8 +1404,8 @@ public class AddeImageDataSelection {
                 int    ele  = this.imageElement;
                 int    lin  = this.imageLine;
                 if (type.equals(TYPE_AREA)) {
-                    ele = this.areaElement;
-                    lin = this.areaLine;
+                    ele = urlInfo.getLocationElem();
+                    lin = urlInfo.getLocationLine();
                 }
                 setElement(ele);
                 setLine(lin);
@@ -1403,14 +1452,15 @@ public class AddeImageDataSelection {
                 val = defaultLat;
             }
             setLatitude(val);
-            return this.latitude;
+            return val;
         }
 
         /**
          * _more_
          */
         private void setLatitude() {
-            this.latitude = latLonWidget.getLat();
+           // this.latitude = latLonWidget.getLat();
+            urlInfo.setLocationLat(latLonWidget.getLat());
         }
 
         /**
@@ -1423,7 +1473,8 @@ public class AddeImageDataSelection {
                 val = defaultLat;
             }
             latLonWidget.setLat(val);
-            this.latitude = val;
+            // this.latitude = val;
+            urlInfo.setLocationLat(val);
 
         }
 
@@ -1431,7 +1482,8 @@ public class AddeImageDataSelection {
          * _more_
          */
         private void setLongitude() {
-            this.longitude = latLonWidget.getLon();
+            //this.longitude = latLonWidget.getLon();
+            urlInfo.setLocationLon(latLonWidget.getLon());
         }
 
         /**
@@ -1449,7 +1501,7 @@ public class AddeImageDataSelection {
                 val = defaultLon;
             }
             setLongitude(val);
-            return this.longitude;
+            return val;
         }
 
         /**
@@ -1462,7 +1514,8 @@ public class AddeImageDataSelection {
                 val = defaultLon;
             }
             latLonWidget.setLon(val);
-            this.longitude = val;
+            //this.longitude = val;
+            urlInfo.setLocationLon(val);
         }
 
         /**
@@ -1478,11 +1531,13 @@ public class AddeImageDataSelection {
             try {
                 double[][] el1 = macs.fromReference(ll);
             } catch (Exception e) {}
-            this.areaElement = (int) Math.floor(el[0][0] + 0.5)
+            int elem = (int) Math.floor(el[0][0] + 0.5)
                                * Math.abs(getElementMagValue());
-            this.areaLine = (int) Math.floor(el[1][0] + 0.5)
+            int line = (int) Math.floor(el[1][0] + 0.5)
                             * Math.abs(getLineMagValue());
-            el                = baseAnav.areaCoordToImageCoord(el);
+            urlInfo.setLocationLine(line);
+            urlInfo.setLocationElem(elem);
+             el                = baseAnav.areaCoordToImageCoord(el);
             this.imageElement = (int) Math.floor(el[0][0] + 0.5);
             this.imageLine    = (int) Math.floor(el[1][0] + 0.5);
         }
@@ -1546,20 +1601,12 @@ public class AddeImageDataSelection {
          *
          * @param val _more_
          */
-        private void setNumberOfLines(int val) {
-            numLinesFld.setText(Integer.toString(val));
-        }
-
-        /**
-         * _more_
-         *
-         * @param val _more_
-         */
         public void setNumLines(int val) {
             this.numLines = val;
             if (val >= 0) {
-                setNumberOfLines(val);
+                numLinesFld.setText(Integer.toString(val));
             }
+            urlInfo.setLines(val);
         }
 
         /**
@@ -1587,17 +1634,9 @@ public class AddeImageDataSelection {
             val          = (int) ((double) val / 4.0 + 0.5) * 4;
             this.numEles = val;
             if (val >= 0) {
-                setNumberOfElements(val);
+                numElementsFld.setText(Integer.toString(val));
             }
-        }
-
-        /**
-         * _more_
-         *
-         * @param val _more_
-         */
-        private void setNumberOfElements(int val) {
-            numElementsFld.setText(Integer.toString(val));
+            urlInfo.setElements(val);
         }
 
         /**
@@ -1606,8 +1645,10 @@ public class AddeImageDataSelection {
         protected void setLineElement() {
             double[][] el = getLineElement();
 
-            this.areaElement = (int) Math.floor(el[0][0] + 0.5);
-            this.areaLine    = (int) Math.floor(el[1][0] + 0.5);
+            int elem = (int) Math.floor(el[0][0] + 0.5);
+            int line = (int) Math.floor(el[1][0] + 0.5);
+            urlInfo.setLocationElem(elem);
+            urlInfo.setLocationLine(line);
             double[][] vals = baseAnav.areaCoordToImageCoord(el);
             this.imageElement = (int) Math.floor(vals[0][0] + 0.5);
             this.imageLine    = (int) Math.floor(vals[1][0] + 0.5);
@@ -1650,7 +1691,7 @@ public class AddeImageDataSelection {
          */
         public void applyToDataSelection(DataSelection dataSelection) {
             GeoSelection geoSelection = dataSelection.getGeoSelection();
-            AddeImageURLInfo urlInfo = new AddeImageURLInfo(descriptor.getSource());
+
             dataSelection.putProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION,
                 getIsProgressiveResolution());
@@ -1671,58 +1712,11 @@ public class AddeImageDataSelection {
             if (regionOption.equals(DataSelection.PROP_USESELECTEDAREA)
                     || regionOption.equals(
                         DataSelection.PROP_USEDEFAULTAREA)) {
-                String source = descriptor.getSource();
 
-                if (getCoordinateType() == TYPE_LATLON) {
-                    String locateValue = Misc.format(getLatitude()) + " "
-                                         + Misc.format(getLongitude());
-                    source = AddeImageDataSource.removeKey(source,
-                            AddeImageURL.KEY_LINEELE);
-                    source = AddeImageDataSource.replaceKey(source,
-                            AddeImageURL.KEY_LATLON, AddeImageURL.KEY_LATLON,
-                            locateValue);
-                    urlInfo.setLocateKey(AddeImageURL.KEY_LATLON);
-                    urlInfo.setLocateValue(locateValue);
-                    //urlInfo.setLocationLat(getLatitude());
-                    //urlInfo.setLocationLon(getLongitude());
-                } else {
-                    String locateValue = getLine() + " " + getElement();
-                    source = AddeImageDataSource.removeKey(source,
-                            AddeImageURL.KEY_LATLON);
-                    source = AddeImageDataSource.replaceKey(source,
-                            AddeImageURL.KEY_LINEELE, locateValue);
-                    urlInfo.setLocateKey(AddeImageURL.KEY_LINEELE);
-                    //  urlInfo.setLocationLine(getLine());
-                    //  urlInfo.setLocationElem(getElement());
-                }
-
-                if (getPlace() == "CENTER") {
-                    source = AddeImageDataSource.replaceKey(source,
-                            AddeImageURL.KEY_PLACE, "CENTER");
-                    urlInfo.setPlaceValue("CENTER");
-                } else {
-                    source = AddeImageDataSource.replaceKey(source,
-                            AddeImageURL.KEY_PLACE, "ULEFT");
-                    urlInfo.setPlaceValue("ULEFT");
-                }
-
-                String sizeValue = getNumLines() + " " + getNumEles();
-                source = AddeImageDataSource.replaceKey(source,
-                        AddeImageURL.KEY_SIZE, sizeValue);
-                urlInfo.setLines(getNumLines());
-                urlInfo.setElements(getNumEles());
-                String magValue = String.valueOf(getLineMagValue()) + " "
-                                  + String.valueOf(getElementMagValue());
-                source = AddeImageDataSource.replaceKey(source,
-                        AddeImageURL.KEY_MAG, magValue);
-                urlInfo.setElementMag(getElementMagValue());
-                urlInfo.setLineMag(getLineMagValue());
-                source = AddeImageDataSource.replaceKey(source,
-                        AddeImageURL.KEY_SPAC, 1);
-                dataSelection.putProperty("advancedURL", source);
-                dataSelection.putProperty("urlInfo", urlInfo);
+                dataSelection.putProperty("advancedURL", urlInfo);
+                //System.out.println(urlInfo.getURLString());
             }
-            //   }
+
 
         }
 
@@ -1736,13 +1730,16 @@ public class AddeImageDataSelection {
          * @return _more_
          */
         public String getPlace() {
+            String pl = null;
             try {
-                this.place = translatePlace(
+                pl = translatePlace(
                     (String) locationComboBox.getSelectedItem());
+
             } catch (Exception e) {
-                this.place = defaultPlace;
+                pl = defaultPlace;
             }
-            return this.place;
+            urlInfo.setPlaceValue(pl);
+            return pl;
         }
 
         /**
@@ -1857,7 +1854,9 @@ public class AddeImageDataSelection {
 
 
                 lineMagSlider.setValue(lineValue);
+                urlInfo.setLineMag(lineValue);
                 elementMagSlider.setValue(elementValue);
+                urlInfo.setElementMag(elementValue);
                 lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(),
                         3));
                 elementMagLbl.setText(StringUtil.padLeft(""
@@ -1878,7 +1877,8 @@ public class AddeImageDataSelection {
             if (str.equals("")) {
                 str = defaultPlace;
             }
-            this.place = str;
+            //this.place = str;
+            urlInfo.setPlaceValue(str);
             if (str.equals(PLACE_CENTER)) {
                 locationComboBox.setSelectedItem("Center");
             } else {
@@ -2405,9 +2405,9 @@ public class AddeImageDataSelection {
                 //* Math.abs(lMag);
                 int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0]);
                 //* Math.abs(eMag);
-                // set latlon coord
+
                 advancedPanel.setIsFromRegionUpdate(true);
-                advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
+
                 // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
                 if (isFull) {
                     advancedPanel.setToFullResolution(new Boolean(false));
@@ -2426,6 +2426,8 @@ public class AddeImageDataSelection {
                     advancedPanel.convertToLineEle();
                     advancedPanel.setPlace("CENTER");
                 }
+                // set latlon coord
+                advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
                 // update the size
                 if ( !isFull) {
                     advancedPanel.setNumLines(lines);
