@@ -47,7 +47,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.view.geoloc.AxisScaleInfo;
 import ucar.unidata.view.geoloc.GlobeDisplay;
 import ucar.unidata.view.geoloc.LatLonAxisScaleInfo;
 import ucar.unidata.view.geoloc.LatLonScalePanel;

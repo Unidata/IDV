@@ -272,8 +272,7 @@ public class ContourInfoDialog implements ActionListener {
 
         Integer defaultInterval =
             new Integer(ContourControl.EVERY_NTH_DEFAULT);
-        // NOTE: value of zero here implies "no labels"
-        Integer minInterval  = new Integer(0);
+        Integer minInterval  = new Integer(1);
         Integer maxInterval  = new Integer(ContourControl.EVERY_NTH_MAX);
         Integer intervalStep = new Integer(1);
         SpinnerNumberModel snm = new SpinnerNumberModel(defaultInterval,
@@ -412,17 +411,7 @@ public class ContourInfoDialog implements ActionListener {
                 ((Boolean) ((TwoFacedObject) alignBox.getSelectedItem())
                     .getId()).booleanValue();
             int new_label_freq = labelFreqSlider.getValue();
-            int new_line_skip  = ContourControl.EVERY_NTH_DEFAULT;
-            int tmpSkip        = ((Number) js.getValue()).intValue();
-
-            if ((tmpSkip > 0) && (tmpSkip <= ContourControl.EVERY_NTH_MAX)) {
-                new_line_skip = tmpSkip;
-            }
-
-            // treat skip of zero like labeling is off
-            if (tmpSkip == 0) {
-                new_isLabelled = false;
-            }
+            int new_line_skip  = ((Number) js.getValue()).intValue();
 
             // permit mino == maxo the case of one contour line
             // now set the data of the ContourInfo

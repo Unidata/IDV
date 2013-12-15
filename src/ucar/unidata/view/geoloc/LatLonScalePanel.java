@@ -24,6 +24,7 @@ package ucar.unidata.view.geoloc;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
 
 
 import java.awt.BorderLayout;
@@ -231,8 +232,8 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      */
     private void populateLatScaleInfo() {
         latLabel.setText(latScaleInfo.getLabel());
-        latBaseLabel.setText(latScaleInfo.getBaseLabel());
-        latIncrement.setText(latScaleInfo.getIncrement());
+        latBaseLabel.setText(Misc.format(latScaleInfo.getBaseLabel()));
+        latIncrement.setText(Misc.format(latScaleInfo.getIncrement()));
         latMinorSpinner.setValue(latScaleInfo.getMinorDivision());
         yVisible.setSelected(latScaleInfo.isVisible());
         coordFormat.setSelectedItem(latScaleInfo.getCoordFormat());
@@ -246,8 +247,8 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
      */
     private void populateLonScaleInfo() {
         lonLabel.setText(lonScaleInfo.getLabel());
-        lonBaseLabel.setText(lonScaleInfo.getBaseLabel());
-        lonIncrement.setText(lonScaleInfo.getIncrement());
+        lonBaseLabel.setText(Misc.format(lonScaleInfo.getBaseLabel()));
+        lonIncrement.setText(Misc.format(lonScaleInfo.getIncrement()));
         lonMinorSpinner.setValue(lonScaleInfo.getMinorDivision());
         xVisible.setSelected(lonScaleInfo.isVisible());
         coordFormat.setSelectedItem(lonScaleInfo.getCoordFormat());
@@ -265,8 +266,8 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         LatLonAxisScaleInfo newLatInfo = new LatLonAxisScaleInfo();
 
         newLatInfo.setLabel(latLabel.getText());
-        newLatInfo.setBaseLabel(latBaseLabel.getText());
-        newLatInfo.setIncrement(latIncrement.getText());
+        newLatInfo.setBaseLabel(Misc.parseNumber(latBaseLabel.getText()));
+        newLatInfo.setIncrement(Misc.parseNumber(latIncrement.getText()));
         newLatInfo.setMinorDivision(
             Integer.valueOf(latMinorSpinner.getValue().toString()));
         newLatInfo.setVisible(yVisible.isSelected());
@@ -282,8 +283,8 @@ public class LatLonScalePanel extends JPanel implements ActionListener {
         LatLonAxisScaleInfo newLonInfo = new LatLonAxisScaleInfo();
 
         newLonInfo.setLabel(lonLabel.getText());
-        newLonInfo.setBaseLabel(lonBaseLabel.getText());
-        newLonInfo.setIncrement(lonIncrement.getText());
+        newLonInfo.setBaseLabel(Misc.parseNumber(lonBaseLabel.getText()));
+        newLonInfo.setIncrement(Misc.parseNumber(lonIncrement.getText()));
         newLonInfo.setMinorDivision(
             Integer.valueOf(lonMinorSpinner.getValue().toString()));
         newLonInfo.setVisible(xVisible.isSelected());
