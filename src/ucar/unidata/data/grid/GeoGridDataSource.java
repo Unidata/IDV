@@ -2044,7 +2044,7 @@ public class GeoGridDataSource extends GridDataSource {
             useDriverTime = givenDataSelection.getProperty(
                 DataSelection.PROP_USESTIMEDRIVER, false);
         }
-        if ((givenDataSelection != null)) {
+        if ((givenDataSelection != null && times.size() > 0)) {
             CalendarDateTime t0 =
                 new CalendarDateTime((DateTime) times.get(0));
             CalendarDate dt0 = t0.getCalendarDate();
