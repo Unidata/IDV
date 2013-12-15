@@ -637,11 +637,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    topLat     = calcLatTop();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLatScaleInfo().getBaseLabel());
+        double       base = getLatScaleInfo().getBaseLabel();
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLatScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc = Misc.parseNumber(getLatScaleInfo().getIncrement());
+        double       inc = getLatScaleInfo().getIncrement();
 
         // In case user inputs something bogus.
         if ((base < LAT_MIN) || (base > LAT_MAX)) {
@@ -697,11 +697,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         boolean                   isMeridianCross = leftLon > rightLon;
         Hashtable<Double, String> labelTable      = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
+        double       base = getLonScaleInfo().getBaseLabel();
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc = Misc.parseNumber(getLonScaleInfo().getIncrement());
+        double       inc = getLonScaleInfo().getIncrement();
         List<Double> increment    = new LinkedList<Double>();
 
         //Need to normalize the base in some circumstances
@@ -773,11 +773,11 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         double                    bottomLat  = calcLatBase();
         Hashtable<Double, String> labelTable = new Hashtable<Double,
                                                    String>();
-        double       base = Misc.parseNumber(getLonScaleInfo().getBaseLabel());
+        double       base = getLonScaleInfo().getBaseLabel();
         List<Double> majorTicks   = new ArrayList<Double>();
         int          minorTickInc = getLonScaleInfo().getMinorDivision();
         List<Double> minorTicks   = new ArrayList<Double>();
-        double       inc = Misc.parseNumber(getLonScaleInfo().getIncrement());
+        double       inc = getLonScaleInfo().getIncrement();
         List<Double> increment    = new LinkedList<Double>();
 
         // In case the user enters something bogus
@@ -1230,12 +1230,13 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         // The 2nd null check is kludgy, but sometimes LatLonAxisScaleInfo
         //deserialization will have problems in which case all fields 
         //are null. 
-        if ((latScaleInfo == null) || (latScaleInfo.getBaseLabel() == null)) {
+        //if ((latScaleInfo == null) || (latScaleInfo.getBaseLabel() == null)) {
+        if (latScaleInfo == null) {
             LatLonAxisScaleInfo lsi = new LatLonAxisScaleInfo();
 
             latScaleInfo = lsi;
             lsi.setLabel("Latitude");
-            lsi.setIncrement(10 + "");
+            lsi.setIncrement(10);
             lsi.setMinorDivision(1);
             lsi.setVisible(true);
             lsi.setCoordFormat(LatLonAxisScaleInfo.COORD_FORMATS[0]);
@@ -1244,7 +1245,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             double base = calcLatBase();
             double end  = calcLatTop();
             double inc  = Math.abs(end - base) / 10d;
-            lsi.setIncrement(makeIncrementNice(inc) + "");
+            lsi.setIncrement(makeIncrementNice(inc));
             base = (Math.floor(base / 10)) * 10;  // Make base nice (i.e. multiple of 10)            
             base = (base < -90)
                    ? -90
@@ -1252,7 +1253,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             base = (base > 90)
                    ? 90
                    : base;
-            latScaleInfo.setBaseLabel(base + "");
+            latScaleInfo.setBaseLabel(base);
         }
 
         return latScaleInfo;
@@ -1288,7 +1289,8 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         // The 2nd null check is kludgy, but sometimes LatLonAxisScaleInfo
         //deserialization will have problems in which case all fields 
         //are null. 
-        if ((lonScaleInfo == null) || (lonScaleInfo.getBaseLabel() == null)) {
+        //if ((lonScaleInfo == null) || (lonScaleInfo.getBaseLabel() == null)) {
+        if (lonScaleInfo == null) {
             LatLonAxisScaleInfo lsi = new LatLonAxisScaleInfo();
 
             lonScaleInfo = lsi;
@@ -1311,7 +1313,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
             }
 
             // Must deal with meridian
-            lsi.setIncrement(makeIncrementNice(inc) + "");
+            lsi.setIncrement(makeIncrementNice(inc));
             //
             base = (Math.floor(base / 10)) * 10;  // Make base nice (i.e. multiple of 10)
             base = (base < -180)
@@ -1322,7 +1324,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                    : base;
             lonScaleInfo.setBaseLabel((isSouthPole()
                                        ? Math.floor(base)
-                                       : Math.ceil(base)) + "");
+                                       : Math.ceil(base)));
         }
 
         return lonScaleInfo;
@@ -1989,16 +1991,6 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                                 workBearing.getDistance()));
         setCursorBearing(new Real(CURSOR_BEARING_TYPE,
                                   workBearing.getAngle()));
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public LatLonPointImpl getCenterLLP() {
-        return centerLLP;
     }
 
     /**

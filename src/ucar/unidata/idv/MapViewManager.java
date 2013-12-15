@@ -505,6 +505,12 @@ public class MapViewManager extends NavigatedViewManager {
                     PROP_CLIPDISTANCE_MAP_BACK,
                     NavigatedDisplay.CLIP_BACK_DEFAULT));
 
+            if (getLatAxisScaleInfo() != null) {
+            	mapDisplay.setLatScaleInfo(getLatAxisScaleInfo());
+            }
+            if (getLonAxisScaleInfo() != null) {
+            	mapDisplay.setLonScaleInfo(getLonAxisScaleInfo());
+            }
 
             if (initLatLonBounds == null) {
                 double[] aspect = getAspectRatio();
@@ -544,6 +550,7 @@ public class MapViewManager extends NavigatedViewManager {
             navDisplay.setPolygonOffsetFactor(
                 getStateManager().getProperty(
                     "idv.map.polygonoffsetfactor", 1));
+
         }
 
 

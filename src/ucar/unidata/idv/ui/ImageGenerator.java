@@ -6053,4 +6053,7 @@ public class ImageGenerator extends IdvManager {
         //A hack for now
         return "out of range";
     }
+
+
+
 }
