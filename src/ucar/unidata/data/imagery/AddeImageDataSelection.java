@@ -1713,7 +1713,7 @@ public class AddeImageDataSelection {
                     || regionOption.equals(
                         DataSelection.PROP_USEDEFAULTAREA)) {
 
-                dataSelection.putProperty("advancedURL", urlInfo);
+                dataSelection.putProperty("advancedURL", urlInfo.cloneMe());
                 //System.out.println(urlInfo.getURLString());
             }
 

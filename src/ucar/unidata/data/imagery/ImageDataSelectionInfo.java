@@ -189,6 +189,11 @@ public class ImageDataSelectionInfo {
         }
 
     }
+
+    public ImageDataSelectionInfo cloneMe(){
+        return new ImageDataSelectionInfo(this.getURLString());
+    }
+
     public void setPort(int port) {
         this.port = port;
     }
