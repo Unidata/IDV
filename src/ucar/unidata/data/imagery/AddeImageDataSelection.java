@@ -901,7 +901,7 @@ public class AddeImageDataSelection {
                                       : value + 1;  // since slider is one off
                 amSettingProperties = true;
                 elementMagSlider.setValue(value);
-                urlInfo.setElementMag(value);
+                urlInfo.setElementMag(getElementMagValue());
                 amSettingProperties = false;
                 elementMagSliderChanged(autoSetSize);
 
@@ -918,7 +918,7 @@ public class AddeImageDataSelection {
         public void setElementMagSlider(int value) {
             this.elementMagSlider.setValue(value);
             this.elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
-            urlInfo.setElementMag(value);
+            urlInfo.setElementMag(getElementMagValue());
         }
 
         /**
@@ -929,7 +929,7 @@ public class AddeImageDataSelection {
         public void setLineMagSlider(int value) {
             this.lineMagSlider.setValue(value);
             this.lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
-            urlInfo.setLineMag(value);
+            urlInfo.setLineMag(getLineMagValue());
         }
 
         /**
@@ -1854,9 +1854,9 @@ public class AddeImageDataSelection {
 
 
                 lineMagSlider.setValue(lineValue);
-                urlInfo.setLineMag(lineValue);
+                urlInfo.setLineMag(getLineMagValue());
                 elementMagSlider.setValue(elementValue);
-                urlInfo.setElementMag(elementValue);
+                urlInfo.setElementMag(getElementMagValue());
                 lineMagLbl.setText(StringUtil.padLeft("" + getLineMagValue(),
                         3));
                 elementMagLbl.setText(StringUtil.padLeft(""
