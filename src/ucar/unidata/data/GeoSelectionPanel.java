@@ -423,6 +423,7 @@ public class GeoSelectionPanel extends JPanel {
         }
     }
 
+
     /**
      * Get the component that shows the stride. Used by the DataControlDialog
      * to show the stride in  a separate tab
@@ -475,18 +476,18 @@ public class GeoSelectionPanel extends JPanel {
      *
      * @return _more_
      */
-    public JComponent getProgressiveResolutionPanel() {
+    /* public JComponent getProgressiveResolutionPanel() {
         return mapPanel.getProgressiveResolutionPanel();
-    }
+    }  */
 
     /**
      * _more_
      *
      * @return _more_
      */
-    public JCheckBox getPrograssiveCbx(){
+    /* public JCheckBox getPrograssiveCbx(){
         return mapPanel.getPrograssiveCbx();
-    }
+    } */
 
     /**
      * Get the selected latlon area rect. May be null
@@ -623,26 +624,26 @@ public class GeoSelectionPanel extends JPanel {
      *
      * @return _more_
      */
-    public boolean getUseProgressiveResolution() {
+    /*public boolean getUseProgressiveResolution() {
         if (mapPanel != null) {
             return mapPanel.getUseProgressiveResolution();
         } else {
             return false;
         }
-    }
+    } */
 
     /**
      * _more_
      *
      * @param usePR _more_
      */
-    public void setUseProgressiveResolution(boolean usePR) {
+    /* public void setUseProgressiveResolution(boolean usePR) {
         if (mapPanel != null) {
             mapPanel.setUseProgressiveResolution(usePR);
         } else {
             return;
         }
-    }
+    } */
 
     /**
      * _more_

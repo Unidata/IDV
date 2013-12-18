@@ -163,7 +163,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
         this.imagePreview      = createImagePreview(source);
         display = new NavigatedMapPanel(null, true, true,
                                         imagePreview.getPreviewImage(),
-                                        this.aAdapter.getAreaFile(), true);
+                                        this.aAdapter.getAreaFile());
         this.eMag  = imageDataSource.getEMag();
         this.lMag  = imageDataSource.getLMag();
 

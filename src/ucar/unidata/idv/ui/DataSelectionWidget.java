@@ -127,7 +127,7 @@ public class DataSelectionWidget {
     /** Area Component */
     private JComponent areaComponent;
 
-    private JComponent prComponent;
+    //private JComponent prComponent;
     /** Holds the area subset */
     private JPanel areaTab;
 
@@ -238,7 +238,7 @@ public class DataSelectionWidget {
     private String regionOption = USE_DEFAULTREGION;
 
     /** _more_ */
-    public JCheckBox prograssiveCbx1;
+    // public JCheckBox prograssiveCbx1;
 
 
     /**
@@ -688,7 +688,7 @@ public class DataSelectionWidget {
                 ((DataSourceImpl) dataSource).doMakeGeoSelectionPanel(false);
             strideComponent = geoSelectionPanel.getStrideComponent();
             areaComponent   = geoSelectionPanel.getAreaComponent();
-            prComponent = geoSelectionPanel.getProgressiveResolutionPanel(); //.getUseProgressiveResolution();
+            //prComponent = geoSelectionPanel.getProgressiveResolutionPanel(); //.getUseProgressiveResolution();
             if (areaComponent != null) {
                 areaComponent.setPreferredSize(new Dimension(200, 150));
                 GuiUtils.enableTree(areaComponent,
@@ -708,8 +708,8 @@ public class DataSelectionWidget {
                 }
                 GuiUtils.enableTree(areaComponent,
                                     regionOption.equals(DataSelection.PROP_USESELECTEDAREA));
-                GuiUtils.enableTree(prComponent,
-                        true);
+                //GuiUtils.enableTree(prComponent,
+                //        true);
                 areaTab.add(
                     GuiUtils.topCenter(
                         GuiUtils.inset(
@@ -721,7 +721,7 @@ public class DataSelectionWidget {
                     MapViewManager mvm = (MapViewManager)idv.getViewManager();
                     usePR = mvm.getUseProgressiveResolution();
                 }
-                geoSelectionPanel.setUseProgressiveResolution(usePR);
+                //geoSelectionPanel.setUseProgressiveResolution(usePR);
             }
             if (strideComponent != null) {
                 GuiUtils.enableTree(strideComponent, !strideCbx.isSelected());
@@ -857,9 +857,9 @@ public class DataSelectionWidget {
         if (dataSelectionComponents != null && dataSelectionComponents.size() == 0
                 && geoSelectionPanel != null) {
             // anything other than adde image
-            if(prograssiveCbx1 == null)
-                prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
-            isProgressiveResolution = prograssiveCbx1.isSelected();
+            //if(prograssiveCbx1 == null)
+            //    prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
+            isProgressiveResolution = getIsProgressiveResolution();
             dataSelection.setGeoSelection(geoSelection);
             if (geoSelection != null) {
                 if (strideCbx.isSelected() ){
@@ -914,7 +914,16 @@ public class DataSelectionWidget {
 
     }
 
-
+    public boolean getIsProgressiveResolution() {
+        boolean usePR = false;
+        if (idv.getViewManager() instanceof MapViewManager) {
+            MapViewManager mvm =
+                    (MapViewManager) idv.getViewManager();
+            usePR = mvm.getUseProgressiveResolution();
+        }
+        return usePR;
+        //return prograssiveCbx1.isSelected();
+    }
 
 
     /**
@@ -1027,7 +1036,7 @@ public class DataSelectionWidget {
                     GuiUtils.enableTree(
                         areaComponent,
                         regionOption.equals(DataSelection.PROP_USESELECTEDAREA));
-                    GuiUtils.enableTree(prComponent, true);
+                    //GuiUtils.enableTree(prComponent, true);
                 }
                 if ((areaComponent != null)
                         && !regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
@@ -1066,9 +1075,9 @@ public class DataSelectionWidget {
             }
         });
         //added
-        if(geoSelectionPanel != null) {
-            prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
-        }
+        //if(geoSelectionPanel != null) {
+        //    prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
+        //}
 
         timesComponent = getTimesList();
         selectionTab   = new JTabbedPane();

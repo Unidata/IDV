@@ -101,7 +101,7 @@ public class AddeImageDataSelection {
     //public JCheckBox prograssiveCbx;
 
     /** _more_ */
-    public JCheckBox prograssiveCbx1;
+    //public JCheckBox prograssiveCbx1;
 
     /** _more_ */
     public JPanel leMagPanel;
@@ -132,12 +132,7 @@ public class AddeImageDataSelection {
         this.sampleProjection = sample;
         this.aAdapter         = aAdapter;
 
-        boolean usePR = false;
-        if (dataSource.getIdv().getViewManager() instanceof MapViewManager) {
-            MapViewManager mvm =
-                (MapViewManager) dataSource.getIdv().getViewManager();
-            usePR = mvm.getUseProgressiveResolution();
-        }
+
         //prograssiveCbx  = new JCheckBox("", usePR);
 
         try {
@@ -149,8 +144,8 @@ public class AddeImageDataSelection {
             this.advancedPanel = new AddeImageAdvancedPanel(this);
         } catch (Exception e) {}
 
-        regionPanel.display.setUseProgressiveResolution(usePR);
-        prograssiveCbx1 = regionPanel.display.getPrograssiveCbx();
+        //regionPanel.display.setUseProgressiveResolution(usePR);
+        /*prograssiveCbx1 = regionPanel.display.getPrograssiveCbx();
         prograssiveCbx1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -158,7 +153,7 @@ public class AddeImageDataSelection {
                     !((JCheckBox) e.getSource()).isSelected();
                 GuiUtils.enablePanel(leMagPanel, showMagSection);
             }
-        });
+        });   */
     }
 
 
@@ -1323,7 +1318,7 @@ public class AddeImageDataSelection {
                                 GuiUtils.WT_NY, GuiUtils.WT_N));
 
             advance = GuiUtils.top(imagePanel);
-            boolean showMagSection = !prograssiveCbx1.isSelected();
+            boolean showMagSection = !getIsProgressiveResolution(); //prograssiveCbx1.isSelected();
             GuiUtils.enablePanel(leMagPanel, showMagSection);
             GuiUtils.enablePanel(sizePanel, showMagSection);
             String s0 = AddeImageDataSource.getKey(source,
@@ -1355,10 +1350,12 @@ public class AddeImageDataSelection {
                     enablePanelAll(false);
                 }
 
-                if ( !prograssiveCbx1.isSelected()) {
+                /*if ( !prograssiveCbx1.isSelected()) {
                     GuiUtils.enablePanel(leMagPanel,
                                          !prograssiveCbx1.isSelected());
-                }
+                }  */
+                GuiUtils.enablePanel(leMagPanel,
+                        !getIsProgressiveResolution());
             }
 
 
@@ -1434,7 +1431,14 @@ public class AddeImageDataSelection {
          * @return _more_
          */
         public boolean getIsProgressiveResolution() {
-            return prograssiveCbx1.isSelected();
+            boolean usePR = false;
+            if (dataSource.getIdv().getViewManager() instanceof MapViewManager) {
+                MapViewManager mvm =
+                        (MapViewManager) dataSource.getIdv().getViewManager();
+                usePR = mvm.getUseProgressiveResolution();
+            }
+            return usePR;
+            //return prograssiveCbx1.isSelected();
         }
 
         /**
@@ -1998,7 +2002,7 @@ public class AddeImageDataSelection {
             this.imagePreview           = createImagePreview(source);
             display = new NavigatedMapPanel(null, true, false,
                                             imagePreview.getPreviewImage(),
-                                            aAdapter.getAreaFile(), true);
+                                            aAdapter.getAreaFile());
             this.eMag  = dataSource.getEMag();
             this.lMag  = dataSource.getLMag();
 
@@ -2061,7 +2065,7 @@ public class AddeImageDataSelection {
         public JComponent getRegionsList(String cbxLabel) {
             if (regionsListInfo == null) {
                 regionsListInfo = makeRegionsListAndPanel(cbxLabel,
-                        prograssiveCbx1);
+                        null);
             }
 
             return regionsListInfo;
@@ -2168,8 +2172,8 @@ public class AddeImageDataSelection {
                 return;
             }
             regionOption = selectedObject.toString();
-            boolean isPR = prograssiveCbx1.isSelected();
-            if (selectedObject.equals(USE_SELECTEDREGION) || !isPR) {
+            //boolean isPR = prograssiveCbx1.isSelected();
+            if (selectedObject.equals(USE_SELECTEDREGION)) {
                 // only progressiveResolution and mag can be changed
                 advancedPanel.enablePanelAll(true);
                 //prograssiveCbx.doClick();
