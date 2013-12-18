@@ -41,6 +41,7 @@ import visad.*;
 
 import visad.georef.EarthLocation;
 
+import javax.swing.*;
 import java.awt.*;
 
 import java.rmi.RemoteException;
@@ -57,7 +58,8 @@ import java.util.List;
  */
 public class ImagePlanViewControl extends PlanViewControl {
 
-
+    /** The label to show the readout in the side legend */
+    private JLabel sideLegendReadout;
 
     //  NB: For now, we don't subclass ColorPlanViewControl because we get
     //  the DataRange widget from getControlWidgets.  Might want this in
@@ -79,6 +81,19 @@ public class ImagePlanViewControl extends PlanViewControl {
     	return true;
     }
 
+
+    protected JComponent getExtraLegendComponent(int legendType){
+        JComponent parentComp = super.getExtraLegendComponent(legendType);
+        if(legendType == BOTTOM_LEGEND){
+            return parentComp;
+        }
+
+        if(sideLegendReadout == null){
+            sideLegendReadout = new JLabel("<html><br></html>");
+        }
+
+        return GuiUtils.vbox(parentComp, sideLegendReadout);
+    }
     /**
      * Method to create the particular <code>DisplayableData</code> that
      * this this instance uses for data depictions.
@@ -140,6 +155,14 @@ public class ImagePlanViewControl extends PlanViewControl {
             if ( !result) {
                 userMessage("Selected image(s) not available");
             }
+            String magStr = (String)dataChoice.getProperty("MAG");
+            if(magStr != null){
+                if(sideLegendReadout == null){
+                    sideLegendReadout = new JLabel("<html><br></html>");
+                }
+                sideLegendReadout.setText("<html>" + magStr
+                        + "</html>");
+            }
             return result;
         }
 
@@ -152,6 +175,15 @@ public class ImagePlanViewControl extends PlanViewControl {
             } else {
                 userMessage("Selected image(s) not available");
             }
+        }
+        //sideLegendReadout
+        String magStr = (String)dataChoice.getProperty("MAG");
+        if(magStr != null){
+            if(sideLegendReadout == null){
+                sideLegendReadout = new JLabel("<html><br></html>");
+            }
+            sideLegendReadout.setText("<html>" + magStr
+                    + "</html>");
         }
         return result;
 

@@ -488,7 +488,9 @@ public class AddeImageDataSource extends ImageDataSource {
                 }
             }
         }
-
+        String magValue = "Magnification: " + "-" + Integer.toString(lineMag) + " " + "-"
+                + Integer.toString(eleMag);
+        dataChoice.setProperty("MAG", magValue);
         return descriptors;
 
 
