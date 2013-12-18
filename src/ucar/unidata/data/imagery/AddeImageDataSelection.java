@@ -156,7 +156,21 @@ public class AddeImageDataSelection {
         });   */
     }
 
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsProgressiveResolution() {
+        boolean usePR = false;
+        if (dataSource.getIdv().getViewManager() instanceof MapViewManager) {
+            MapViewManager mvm =
+                    (MapViewManager) dataSource.getIdv().getViewManager();
+            usePR = mvm.getUseProgressiveResolution();
+        }
+        return usePR;
+        //return prograssiveCbx1.isSelected();
+    }
 
     /**
      * _more_
@@ -1425,21 +1439,7 @@ public class AddeImageDataSelection {
 
 
 
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean getIsProgressiveResolution() {
-            boolean usePR = false;
-            if (dataSource.getIdv().getViewManager() instanceof MapViewManager) {
-                MapViewManager mvm =
-                        (MapViewManager) dataSource.getIdv().getViewManager();
-                usePR = mvm.getUseProgressiveResolution();
-            }
-            return usePR;
-            //return prograssiveCbx1.isSelected();
-        }
+
 
         /**
          * _more_
@@ -2180,6 +2180,8 @@ public class AddeImageDataSelection {
             } else {
                 advancedPanel.enablePanelAll(false);
             }
+            GuiUtils.enablePanel(leMagPanel,
+                    !getIsProgressiveResolution());
         }
 
         /**
