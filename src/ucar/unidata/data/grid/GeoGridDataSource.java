@@ -1586,13 +1586,18 @@ public class GeoGridDataSource extends GridDataSource {
             }
             */
             if (isProgressiveResolution) {
-                int xLenght = geoGrid.getXDimension().getLength();
+                int xLength = geoGrid.getXDimension().getLength();
                 int yLength = geoGrid.getYDimension().getLength();
 
 
                 if (geoSelection.getLatLonRect() != null) {
                     // spatial subset or usedisplayarea
-                    LatLonRect bbox = geoSelection.getLatLonRect();
+                    LatLonRect gsbox = geoSelection.getLatLonRect();
+                    LatLonRect grbox = geoGrid.getCoordinateSystem().getLatLonBoundingBox();
+                    LatLonRect bbox = grbox.intersect(gsbox);
+                    if (bbox == null) {
+                    	bbox = grbox;
+                    }
                     List yx_ranges =
                         geoGrid.getCoordinateSystem().getRangesFromLatLonRect(
                             bbox);
@@ -1603,13 +1608,13 @@ public class GeoGridDataSource extends GridDataSource {
                                        (Range) yx_ranges.get(1), 1);
 
                     yLength = yRange.length();
-                    xLenght = xRange.length();
+                    xLength = xRange.length();
                 }
 
 
                 Rectangle2D rect    = geoSelection.getScreenBound();
 
-                int       xstride = calculateStrideFactor(xLenght,
+                int       xstride = calculateStrideFactor(xLength,
                                         (int) rect.getWidth());
                 int ystride = calculateStrideFactor(yLength, (int) rect.getHeight());
 
@@ -1640,7 +1645,12 @@ public class GeoGridDataSource extends GridDataSource {
                 filename.append("_z_" + geoSelection.getZStrideToUse());
 
                 if (geoSelection.getLatLonRect() != null) {
-                    LatLonRect bbox = geoSelection.getLatLonRect();
+                    LatLonRect gsbox = geoSelection.getLatLonRect();
+                    LatLonRect grbox = geoGrid.getCoordinateSystem().getLatLonBoundingBox();
+                    LatLonRect bbox = grbox.intersect(gsbox);
+                    if (bbox == null) {
+                    	bbox = grbox;
+                    }
                     filename.append("_rect_" + cleanBBoxName(bbox));
                     List yx_ranges =
                         geoGrid.getCoordinateSystem().getRangesFromLatLonRect(
