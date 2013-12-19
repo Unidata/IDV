@@ -92,7 +92,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             sideLegendReadout = new JLabel("<html><br></html>");
         }
 
-        return GuiUtils.vbox(parentComp, sideLegendReadout);
+        return GuiUtils.vbox(sideLegendReadout, parentComp);
     }
     /**
      * Method to create the particular <code>DisplayableData</code> that
