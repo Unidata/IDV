@@ -867,6 +867,8 @@ public class AddeImageDataSelection {
                 }
             }
 
+            int elems = getNumEles();
+            urlInfo.setElements(elems);
         }
 
 
@@ -891,7 +893,8 @@ public class AddeImageDataSelection {
                                 / (double) -value));
                     }
                 }
-
+                int lines = getNumLines();
+                urlInfo.setLines(lines);
                 if (value == 1) {                   // special case
                     if (linesToElements < 1.0) {
                         value = (int) (-value / linesToElements);
@@ -979,7 +982,7 @@ public class AddeImageDataSelection {
             if (value >= 0) {
                 return value + 1;
             }
-            return value;
+            return value -1;
         }
 
 
