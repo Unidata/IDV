@@ -910,7 +910,7 @@ public class AddeImageDataSelection {
 
                 value               = (value > 0)
                                       ? value - 1
-                                      : value + 1;  // since slider is one off
+                                      : value;  // since slider is one off
                 amSettingProperties = true;
                 elementMagSlider.setValue(value);
                 urlInfo.setElementMag(getElementMagValue());
@@ -953,7 +953,8 @@ public class AddeImageDataSelection {
             if (lineMagSlider == null) {
                 return urlInfo.getLineMag();
             }
-            return getMagValue(lineMagSlider);
+            //return getMagValue(lineMagSlider);
+            return lineMagSlider.getValue();
         }
 
         /**
@@ -965,9 +966,9 @@ public class AddeImageDataSelection {
             if (elementMagSlider == null) {
                 return urlInfo.getElementMag();
             }
-            int val = getMagValue(elementMagSlider);
+            //int val = getMagValue(elementMagSlider);
             //   setElementMag(val);
-            return val;
+            return elementMagSlider.getValue();
         }
 
         /**
