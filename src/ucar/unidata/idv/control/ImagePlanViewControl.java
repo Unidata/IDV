@@ -41,13 +41,14 @@ import visad.*;
 
 import visad.georef.EarthLocation;
 
-import javax.swing.*;
 import java.awt.*;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.*;
 
 
 /**
@@ -73,22 +74,31 @@ public class ImagePlanViewControl extends PlanViewControl {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
     }
-    
+
     /**
      * @override
+     *
+     * @return _more_
      */
     protected boolean canDoProgressiveResolution() {
-    	return true;
+        return true;
     }
 
 
-    protected JComponent getExtraLegendComponent(int legendType){
+    /**
+     * _more_
+     *
+     * @param legendType _more_
+     *
+     * @return _more_
+     */
+    protected JComponent getExtraLegendComponent(int legendType) {
         JComponent parentComp = super.getExtraLegendComponent(legendType);
-        if(legendType == BOTTOM_LEGEND){
+        if (legendType == BOTTOM_LEGEND) {
             return parentComp;
         }
 
-        if(sideLegendReadout == null){
+        if (sideLegendReadout == null) {
             sideLegendReadout = new JLabel("<html><br></html>");
         }
 
@@ -149,24 +159,24 @@ public class ImagePlanViewControl extends PlanViewControl {
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
         boolean fromBundle = getIdv().getStateManager().getProperty(
-                IdvConstants.PROP_LOADINGXML, false);
-        if(fromBundle){
+                                 IdvConstants.PROP_LOADINGXML, false);
+        if (fromBundle) {
             boolean result = super.setData(dataChoice);
             if ( !result) {
                 userMessage("Selected image(s) not available");
             }
-            String magStr = (String)dataChoice.getProperty("MAG");
-            if(magStr != null){
-                if(sideLegendReadout == null){
+            String magStr = (String) dataChoice.getProperty("MAG");
+            if (magStr != null) {
+                if (sideLegendReadout == null) {
                     sideLegendReadout = new JLabel("<html><br></html>");
                 }
-                sideLegendReadout.setText("<html>" + magStr
-                        + "</html>");
+                sideLegendReadout.setText("<html>" + magStr + "</html>");
             }
             return result;
         }
 
-        boolean   hasCorner = dataSelection.getProperty(DataSelection.PROP_HASCORNER, false);
+        boolean hasCorner =
+            dataSelection.getProperty(DataSelection.PROP_HASCORNER, false);
 
         boolean result = super.setData(dataChoice);
         if ( !result) {
@@ -177,7 +187,12 @@ public class ImagePlanViewControl extends PlanViewControl {
             }
         }
         //sideLegendReadout
-        String magStr = (String)dataChoice.getProperty("MAG");
+        DataChoice dc0 = null;
+        if (dataChoice instanceof DerivedDataChoice) {
+            dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
+        } else
+            dc0 = dataChoice;
+        String magStr = (String)dc0.getProperty("MAG");
         if(magStr != null){
             if(sideLegendReadout == null){
                 sideLegendReadout = new JLabel("<html><br></html>");
