@@ -869,6 +869,7 @@ public class AddeImageDataSelection {
 
             int elems = getNumEles();
             urlInfo.setElements(elems);
+            regionPanel.setElemMag(value);
         }
 
 
@@ -893,14 +894,17 @@ public class AddeImageDataSelection {
                                 / (double) -value));
                     }
                 }
+
                 int lines = getNumLines();
                 urlInfo.setLines(lines);
+                regionPanel.setLineMag(value);
                 if (value == 1) {                   // special case
                     if (linesToElements < 1.0) {
                         value = (int) (-value / linesToElements);
                     } else {
                         value = (int) (value * linesToElements);
                     }
+
                 } else if (value > 1) {
                     value = (int) (value * linesToElements);
 
@@ -910,7 +914,7 @@ public class AddeImageDataSelection {
 
                 value               = (value > 0)
                                       ? value - 1
-                                      : value;  // since slider is one off
+                                      : value + 1;  // since slider is one off
                 amSettingProperties = true;
                 elementMagSlider.setValue(value);
                 urlInfo.setElementMag(getElementMagValue());
@@ -953,8 +957,8 @@ public class AddeImageDataSelection {
             if (lineMagSlider == null) {
                 return urlInfo.getLineMag();
             }
-            //return getMagValue(lineMagSlider);
-            return lineMagSlider.getValue();
+            return getMagValue(lineMagSlider);
+            //return lineMagSlider.getValue();
         }
 
         /**
@@ -966,9 +970,8 @@ public class AddeImageDataSelection {
             if (elementMagSlider == null) {
                 return urlInfo.getElementMag();
             }
-            //int val = getMagValue(elementMagSlider);
-            //   setElementMag(val);
-            return elementMagSlider.getValue();
+            return getMagValue(elementMagSlider);
+            //return elementMagSlider.getValue();
         }
 
         /**
@@ -1286,7 +1289,11 @@ public class AddeImageDataSelection {
             lineMagSlider.setMajorTickSpacing(1);
             lineMagSlider.setSnapToTicks(true);
             lineMagSlider.setExtent(1);
-            lineMagSlider.getModel().setValue(lmag);
+            if(lmag > 0)
+                lineMagSlider.setValue(lmag - 1);
+            else
+                lineMagSlider.setValue(lmag + 1);
+            //lineMagSlider.setValue(lmag + 1);
             lineMagComps[0].setToolTipText("Change the line magnification");
             JComponent[] elementMagComps =
                 GuiUtils.makeSliderPopup(-SLIDER_MAX, 1, 0, elementListener);
@@ -1294,7 +1301,10 @@ public class AddeImageDataSelection {
             elementMagSlider.setExtent(1);
             elementMagSlider.setMajorTickSpacing(1);
             elementMagSlider.setSnapToTicks(true);
-            elementMagSlider.setValue(emag);
+            if(emag > 0)
+                elementMagSlider.setValue(emag - 1);
+            else
+                elementMagSlider.setValue(emag + 1);
             elementMagComps[0].setToolTipText(
                 "Change the element magnification");
             lineMagSlider.setToolTipText(
@@ -2274,6 +2284,15 @@ public class AddeImageDataSelection {
             return MasterPanel;
         }
 
+        public void setElemMag(int value){
+            eMag = Math.abs(value);
+            baseAnav.setMag(lMag,eMag);
+        }
+
+        public void setLineMag(int value){
+            lMag = Math.abs(value);
+            baseAnav.setMag(lMag,eMag);
+        }
         /**
          * _more_
          *
@@ -2445,8 +2464,8 @@ public class AddeImageDataSelection {
                     advancedPanel.setIsFromRegionUpdate(false);
 
                     // update the mag slider
-                    advancedPanel.setElementMagSlider(-Math.abs(eMag));
-                    advancedPanel.setLineMagSlider(-Math.abs(lMag));
+                    // advancedPanel.setElementMagSlider(-Math.abs(eMag));
+                    //advancedPanel.setLineMagSlider(-Math.abs(lMag));
                     advancedPanel.setBaseNumElements(elems * Math.abs(eMag));
                     advancedPanel.setBaseNumLines(lines * Math.abs(lMag));
                 }
