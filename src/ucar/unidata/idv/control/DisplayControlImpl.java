@@ -3650,6 +3650,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         geoSelection.setScreenBound(sbox);
         if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
         		DataSelection.PROP_USEDISPLAYAREA)) {
+            getViewManager().setProjectionFromData(false);
       	    Rectangle2D bbox = navDisplay.getLatLonBox();
             geoSelection.setLatLonRect(bbox);
             dataSelection.setGeoSelection(geoSelection);
