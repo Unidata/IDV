@@ -138,6 +138,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** max flow range */
     protected Unit speedUnit = null;
 
+    /** speed index */
+    protected int spdIndex = 1;
+
     /**
      * Constructs from a name for the Displayable and the type of the
      * parameter, and the desired size of "scale"
@@ -465,7 +468,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         RealType[] realTypes = flowRealTupleType.getRealComponents();
         Unit[]     units     = flowRealTupleType.getDefaultUnits();
 
-        int        spdIndex  = 1;
+        spdIndex  = 1;
 
         // if data is u,v (so far as you can tell by units)
         if ((Unit.canConvert(units[0], CommonUnit.meterPerSecond)
@@ -815,6 +818,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public void setUseSpeedForColor(boolean yesno) {
         useSpeedForColor = yesno;
+        // set RealType to color by speed
+        if (useSpeedForColor && !isCartesian) {
+            //if ( !coloredByAnother) {
+        	try {
+                setRGBRealType(
+                    (RealType) flowRealTupleType.getComponent(spdIndex));
+        	} catch (Exception e) {}
+        }
     }
 
     /**
@@ -825,4 +836,5 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     public void setIgnoreExtraParameters(boolean yesno) {
         ignoreExtraParameters = yesno;
     }
+    
 }
