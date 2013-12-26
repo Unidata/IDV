@@ -492,8 +492,13 @@ public class AddeImageDataSource extends ImageDataSource {
                 }
             }
         }
-        String magValue = "Magnification: " + "-" + Integer.toString(lineMag) + " " + "-"
-                + Integer.toString(eleMag);
+        String magValue = null;
+        if(isProgressiveResolution){
+            magValue = "Magnification: " + "-" + Integer.toString(lineMag) + " " + "-"
+                    + Integer.toString(eleMag);
+        } else {
+            magValue = "Magnification: " + dlMag + " " + deMag;
+        }
         dataChoice.setProperty("MAG", magValue);
         return descriptors;
 
