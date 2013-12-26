@@ -838,6 +838,13 @@ public class RadarRhiControl extends ColorCrossSectionControl {
         return "Use Radar Projection";
     }
 
-
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return false;
+    }
 
 }

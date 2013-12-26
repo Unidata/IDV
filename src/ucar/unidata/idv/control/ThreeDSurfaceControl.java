@@ -874,4 +874,12 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         return true;
     }
 
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return false;
+    }
 }

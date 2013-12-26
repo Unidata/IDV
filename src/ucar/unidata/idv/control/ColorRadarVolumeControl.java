@@ -411,6 +411,13 @@ public class ColorRadarVolumeControl extends GridDisplayControl {
         getGridDisplayable().loadData(fieldImpl);
     }
 
-
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return false;
+    }
 
 }

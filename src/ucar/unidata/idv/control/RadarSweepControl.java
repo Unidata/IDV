@@ -426,11 +426,21 @@ public class RadarSweepControl extends ColorPlanViewControl {
         }
         return result;
     }
+
     public Bearing getBearing(LatLonPoint radarLocation, double lat, double lon) {
         Bearing b1 =
                 Bearing.calculateBearing(radarLocation.getLatitude().getValue(),
                         radarLocation.getLongitude().getValue(),
                         lat, lon, null);
         return b1;
+    }
+
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return false;
     }
 }

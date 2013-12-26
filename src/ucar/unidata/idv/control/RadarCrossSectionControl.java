@@ -542,6 +542,13 @@ public class RadarCrossSectionControl extends ColorCrossSectionControl {
         setRequestProperties();
     }
 
-
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return false;
+    }
 
 }

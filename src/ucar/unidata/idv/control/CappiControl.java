@@ -185,5 +185,12 @@ public class CappiControl extends ColorPlanViewControl {
         return "Use Radar Projection";
     }
 
-
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return false;
+    }
 }
