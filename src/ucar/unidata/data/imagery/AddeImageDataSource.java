@@ -468,17 +468,22 @@ public class AddeImageDataSource extends ImageDataSource {
                         } catch (Exception e) {}
                     } else {
                         LatLonRect bbox = mapInfo.getLatLonRect().intersect(ginfo.getLatLonRect());
-                        boolean con = ginfo.getLatLonRect().contains(llp);
-                        if ( !con ) {
-                            llp = new LatLonPointImpl(
-                                    thisDir.getCenterLatitude(),
-                                    thisDir.getCenterLongitude());
+                        if(bbox == null){
+                            bbox = mapInfo.getLatLonRect();
+                        } else {
+                            boolean con = ginfo.getLatLonRect().contains(llp);
+                            if ( !con ) {
+                                llp = new LatLonPointImpl(
+                                        thisDir.getCenterLatitude(),
+                                        thisDir.getCenterLongitude());
 
+                            }
                         }
                         maxLat = bbox.getLatMax();
                         minLat = bbox.getLatMin();
                         maxLon = bbox.getLonMax();
                         minLon = bbox.getLonMin();
+
                         descriptors =
                                 geoSpaceSubsetD(geoSelection.getScreenBound(),
                                         unitStr, eMag, lMag, baseAnav,
@@ -1004,6 +1009,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                 // int lineMag = calculateMagFactor(lines, (int) rect.getHeight());
                 lineMag = eleMag / factor;
+                lineMag = lineMag > 0? lineMag:1;
             } else {
                 eleMag  = Math.abs(deMag);
                 lineMag = Math.abs(dlMag);

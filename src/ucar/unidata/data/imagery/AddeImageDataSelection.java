@@ -127,7 +127,6 @@ public class AddeImageDataSelection {
         this.source           = source;
         this.descriptor       = descriptor;
         this.baseAnav         = baseAnav;
-        this.baseAnav         = baseAnav;
         this.dataChoice       = dc;
         this.sampleProjection = sample;
         this.aAdapter         = aAdapter;
@@ -1997,6 +1996,12 @@ public class AddeImageDataSelection {
         int lMag;
 
         /** _more_ */
+        int eMag0;
+
+        /** _more_ */
+        int lMag0;
+
+        /** _more_ */
         AddeImageDataSelection addeImageDataSelection;
 
         /**
@@ -2019,7 +2024,8 @@ public class AddeImageDataSelection {
                                             aAdapter.getAreaFile());
             this.eMag  = dataSource.getEMag();
             this.lMag  = dataSource.getLMag();
-
+            this.eMag0  = dataSource.getEMag();
+            this.lMag0  = dataSource.getLMag();
             chkUseFull = new JCheckBox(DataSelection.PROP_USEDEFAULTAREA);
 
             chkUseFull.setSelected(true);
@@ -2286,12 +2292,12 @@ public class AddeImageDataSelection {
 
         public void setElemMag(int value){
             eMag = Math.abs(value);
-            baseAnav.setMag(lMag,eMag);
+            //baseAnav.setMag(lMag,eMag);
         }
 
         public void setLineMag(int value){
             lMag = Math.abs(value);
-            baseAnav.setMag(lMag,eMag);
+            //baseAnav.setMag(lMag,eMag);
         }
         /**
          * _more_
@@ -2428,12 +2434,11 @@ public class AddeImageDataSelection {
                 latlon[1][0] = (float) gInfo.getMaxLon();
                 latlon[0][0] = (float) gInfo.getMinLat();
                 float[][] lrLinEle   = baseAnav.toLinEle(latlon);
-                int       displayNum = (int) rect.getWidth();
-                int       lines      = (int) (lrLinEle[1][0]
-                                           - ulLinEle[1][0]);
-                //* Math.abs(lMag);
-                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0]);
-                //* Math.abs(eMag);
+                //int       displayNum = (int) rect.getWidth();
+                int lines  = (int) (lrLinEle[1][0] - ulLinEle[1][0])
+                             * Math.abs(lMag0)/Math.abs(lMag);
+                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
+                             * Math.abs(eMag0)/Math.abs(eMag);
 
                 advancedPanel.setIsFromRegionUpdate(true);
 
