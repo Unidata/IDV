@@ -22,6 +22,7 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.util.ColorTable;
@@ -79,7 +80,8 @@ public class ImageControl extends BaseImageControl {
     /** topo flag */
     private boolean useTexture = true;
 
-
+    /** The label to show the readout in the side legend */
+    private JLabel sideLegendReadout;
     /**
      * Default constructor.  Sets the attribute flags used by
      * this particular <code>PlanViewControl</code>
@@ -130,6 +132,25 @@ public class ImageControl extends BaseImageControl {
         return true;
     }
 
+    /**
+     * _more_
+     *
+     * @param legendType _more_
+     *
+     * @return _more_
+     */
+    protected JComponent getExtraLegendComponent(int legendType) {
+        JComponent parentComp = super.getExtraLegendComponent(legendType);
+        if (legendType == BOTTOM_LEGEND) {
+            return parentComp;
+        }
+
+        if (sideLegendReadout == null) {
+            sideLegendReadout = new JLabel("<html><br></html>");
+        }
+
+        return GuiUtils.vbox(sideLegendReadout, parentComp);
+    }
 
     /**
      * Get control widgets specific to this control.
@@ -208,6 +229,20 @@ public class ImageControl extends BaseImageControl {
         FieldImpl fieldImpl = getGridDataInstance().getGrid();
         checkImageSize(fieldImpl);
         imageDisplay.loadData(getWorkingImage(fieldImpl));
+        //sideLegendReadout
+        DataChoice dc0 = null;
+        if (dataChoice instanceof DerivedDataChoice) {
+            dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
+        } else
+            dc0 = dataChoice;
+        String magStr = (String)dc0.getProperty("MAG");
+        if(magStr != null){
+            if(sideLegendReadout == null){
+                sideLegendReadout = new JLabel("<html><br></html>");
+            }
+            sideLegendReadout.setText("<html>" + magStr
+                    + "</html>");
+        }
         return true;
     }
 
