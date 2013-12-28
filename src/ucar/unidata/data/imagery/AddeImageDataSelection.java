@@ -2335,9 +2335,9 @@ public class AddeImageDataSelection {
                 display.getNavigatedPanel().getSelectedRegion();
             boolean hasCorner = false;
             boolean isFull    = false;
-            if (rect == null) {
+            if (rect != null) {
+                // rect == null do nothing
                 // no region subset, full image
-            } else {
                 ProjectionImpl projectionImpl = display.getProjectionImpl();
                 LatLonRect latLonRect =
                     projectionImpl.getLatLonBoundingBox(rect);
