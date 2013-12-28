@@ -884,7 +884,7 @@ public class AddeImageDataSource extends ImageDataSource {
                               + Integer.toString(eleMag);
             String source = imageDescriptor.getSource();
 
-            if (locateKey != AddeImageURL.KEY_LINEELE) {
+            if (!locateKey.equals(AddeImageURL.KEY_LINEELE)) {
                 source = replaceKey(source, AddeImageURL.KEY_LINEELE,
                                     AddeImageURL.KEY_LATLON, locateValue);
                 source = replaceKey(source, AddeImageURL.KEY_PLACE,
