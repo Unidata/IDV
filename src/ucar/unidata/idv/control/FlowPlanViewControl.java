@@ -123,6 +123,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
     /** the range dialog */
     RangeDialog rangeDialog;
+    
+    private boolean useSpeedForColor = false;
+    private int colorIndex = -1;
 
     /**
      * Create a new FlowPlanViewControl; set attribute flags
@@ -202,7 +205,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
         Trace.call1("FlowPlanView.setData");
-        getGridDisplay().setActive(false);
+        FlowDisplayable fd = getGridDisplay();
+        fd.setActive(false);
         boolean result = super.setData(dataChoice);
         if ( !result) {
             Trace.call2("FlowPlanView.setData");
@@ -211,9 +215,18 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if ( !getWindbarbs()) {
             setFlowRange();
         }
+        // If not u/v, always color by speed.
+        if (!useSpeedForColor) {
+        	useSpeedForColor = !fd.isCartesianWind();
+        }
+        fd.setUseSpeedForColor(useSpeedForColor);
+        if (useSpeedForColor) {
+            colorIndex = fd.getSpeedTypeIndex();
+        }
+        // end color by speed.
         setFlowScale(flowScaleValue);
         //        setSkipValue(skipValue);
-        getGridDisplay().setActive(true);
+        fd.setActive(true);
         Trace.call2("FlowPlanView.setData");
         return true;
     }
@@ -771,10 +784,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if (getGridDataInstance() == null) {
             return false;
         }
-        return (getGridDataInstance().getNumRealTypes()
+        return ((getGridDataInstance().getNumRealTypes()
                 > ((getIsThreeComponents())
                    ? 3
-                   : 2)) && !getMultipleIsTopography();
+                   : 2)) && !getMultipleIsTopography())
+                   || useSpeedForColor;
     }
 
     /**
@@ -784,6 +798,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @return  The index to be used for the color range.
      */
     protected int getColorRangeIndex() {
+    	if (colorIndex >= 0) {
+    		return colorIndex;
+    	}
         if (getMultipleIsTopography()) {
             return 0;
         }
@@ -849,7 +866,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @return  false  subclasses should override
      */
     public boolean showColorControlWidget() {
-        return !haveMultipleFields();
+        return !haveMultipleFields() && !useSpeedForColor;
     }
 
 

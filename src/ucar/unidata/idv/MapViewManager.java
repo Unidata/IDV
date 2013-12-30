@@ -2934,9 +2934,10 @@ public class MapViewManager extends NavigatedViewManager {
         if ((rect.getWidth() == 0) || (rect.getHeight() == 0)) {
             return false;
         } else {
+        	// Try to avoid short/wide and tall/narrow projections.
             if (rect.getWidth() / rect.getHeight() < 0.1) {
                 return false;
-            } else if (rect.getHeight() / rect.getWidth() < 0.1) {
+            } else if (rect.getHeight() / rect.getWidth() < 0.075) {
                 return false;
             }
         }

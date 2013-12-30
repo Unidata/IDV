@@ -25,6 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ucar.nc2.util.DiskCache2;
 import ucar.nc2.util.net.HTTPSession;
 
 import ucar.unidata.idv.IdvResourceManager;
@@ -342,10 +343,14 @@ public class DataManager {
             IOUtil.makeDir(nj22TmpFile);
             ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
             ucar.nc2.util.DiskCache.setCachePolicy(true);
-            // have to do this since nj2.2.20
-            ucar.nc2.iosp.grid.GridServiceProvider
-                .setIndexAlwaysInCache(dataContext.getIdv().getStateManager()
-                    .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true));
+            DiskCache2 dc = new DiskCache2(nj22TmpFile, false, -1, -1);
+            boolean doCache = dataContext.getIdv().getStateManager()
+                    .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true);
+            dc.setAlwaysUseCache(doCache);
+            ucar.nc2.grib.GribCollection.setDiskCache2(dc);
+
+            // Doesn't seem to work in nc 4.3
+            ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(doCache);
 
 
             visad.data.DataCacheManager.getCacheManager().setCacheDir(

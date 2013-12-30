@@ -1892,12 +1892,17 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
                 maxLon    = minLon + r2d2.getWidth();
                 centerLon = minLon + r2d2.getWidth() / 2;
 
+                adjustLons  = false;
                 // isLatLon  = true;
                 // TODO:  figure out this a little more.
             } else if (mp instanceof AREACoordinateSystem) {
 
                 // minLon    = -180;
                 // maxLon    = 180.;
+                adjustLons = false;
+            } else if (mp instanceof visad.jmet.GRIBCoordinateSystem) {
+            	// TODO:  not sure what we are really supposed to do, but
+            	// only GeoTIFF adapter uses this AFAIK
                 adjustLons = false;
             }
 
