@@ -343,8 +343,7 @@ public class DataManager {
             IOUtil.makeDir(nj22TmpFile);
             ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
             ucar.nc2.util.DiskCache.setCachePolicy(true);
-            DiskCache2 dc = new DiskCache2();
-            dc.setRootDirectory(nj22TmpFile);
+            DiskCache2 dc = new DiskCache2(nj22TmpFile, false, -1, -1);
             boolean doCache = dataContext.getIdv().getStateManager()
                     .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true);
             dc.setAlwaysUseCache(doCache);
