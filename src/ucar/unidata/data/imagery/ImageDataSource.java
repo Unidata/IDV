@@ -132,6 +132,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
     /** timeMap */
     private Hashtable timeMap = new Hashtable();
 
+    List descriptorsToUse;
 
 
     /**
@@ -334,7 +335,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         if (isFileBased()) {
             return false;
         }
-        List<BandInfo> bandInfos =
+        /* List<BandInfo> bandInfos =
             (List<BandInfo>) getProperty(PROP_BANDINFO, (Object) null);
         if ((bandInfos == null) || (bandInfos.size() == 0)) {
             return true;
@@ -345,7 +346,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         List l = bandInfos.get(0).getCalibrationUnits();
         if (l.size() > 1) {
             return false;
-        }
+        }  */
         return true;
     }
 
@@ -368,8 +369,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
         SimpleDateFormat sdf = new SimpleDateFormat("_"
                                    + DATAPATH_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        for (int i = 0; i < imageList.size(); i++) {
-            AddeImageDescriptor aid  = getDescriptor(imageList.get(i));
+        for (int i = 0; i < descriptorsToUse.size(); i++) {
+            AddeImageDescriptor aid  = (AddeImageDescriptor)descriptorsToUse.get(i); //getDescriptor(imageList.get(i));
             String              url  = aid.getSource();
             DateTime            dttm = (DateTime) timeMap.get(url);
             if (dttm != null) {
@@ -1196,7 +1197,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             throws VisADException, RemoteException {
 
         try {
-            List descriptorsToUse = new ArrayList();
+            descriptorsToUse = new ArrayList();
             if (hasBandInfo(dataChoice)) {
                 descriptorsToUse = getDescriptors(dataChoice, subset);
             } else {

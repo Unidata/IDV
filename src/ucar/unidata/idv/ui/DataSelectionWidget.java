@@ -739,7 +739,8 @@ public class DataSelectionWidget {
 
         if (dataSelectionComponents != null) {
             for (DataSelectionComponent comp : dataSelectionComponents) {
-                selectionTab.addTab(comp.getName(), comp.getContents());
+                if(comp != null)
+                    selectionTab.addTab(comp.getName(), comp.getContents());
             }
         }
 

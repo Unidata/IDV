@@ -31,6 +31,7 @@ import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.IdvPersistenceManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
@@ -216,8 +217,9 @@ public class AddeImageDataSource extends ImageDataSource {
      * _more_
      */
     public void initAfterUnpersistence() {
+        super.initAfterUnpersistence();
         if (this.source == null) {
-            List                imageList = getImageList();
+            //List                imageList1 = getImageList();
             AddeImageDescriptor desc1 =
                 (AddeImageDescriptor) imageList.get(0);
             this.source = desc1.getSource();
@@ -226,7 +228,13 @@ public class AddeImageDataSource extends ImageDataSource {
             if (oj != null) {
                 this.bandId = (BandInfo) oj.get(0);
             }
-            AreaDirectory thisDir = desc1.processSourceAsAddeUrl(this.source);
+            String zpath = (String)getIdv().getStateManager().getProperty(
+                    IdvPersistenceManager.PROP_ZIDVPATH);
+            AreaDirectory thisDir;
+            if(zpath != null && zpath.length() > 0)
+                thisDir = desc1.getDirectory();
+            else
+                thisDir = desc1.processSourceAsAddeUrl(this.source);
             // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
             this.source = getPreviewSource(this.source, thisDir);
             if (oj != null) {
@@ -1308,6 +1316,10 @@ public class AddeImageDataSource extends ImageDataSource {
             DataChoice dataChoice) {
 
         try {
+            String zpath = (String)getIdv().getStateManager().getProperty(
+                    IdvPersistenceManager.PROP_ZIDVPATH);
+            if(zpath != null && zpath.length() > 0) // is zidv
+                return;
 
             //AreaAdapter   aa = new AreaAdapter(this.source, false);
             BandInfo id = null;
