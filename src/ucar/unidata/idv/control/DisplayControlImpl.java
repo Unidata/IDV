@@ -6383,6 +6383,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
 
         }
+        
+        // DRM: Move Pr checkbox here
+        if (canDoProgressiveResolution()) {
+           items.add(GuiUtils.makeCheckboxMenuItem(MapViewManager.PR_LABEL, this,
+                "isProgressiveResolution", null));
+        }
 
 
 
@@ -7789,6 +7795,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     GuiUtils.rLabel("Smoothing:"), doMakeSmoothingWidget()));
         }
 
+        /* DRM: Move Pr checkbox to view menu
         if (canDoProgressiveResolution()) {
             JCheckBox toggle = new JCheckBox("", isProgressiveResolution);
             toggle.addActionListener(new ActionListener() {
@@ -7805,6 +7812,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel("Progressive Resolution:"), toggle));
         }
+        */
     }
 
     /**
@@ -12516,6 +12524,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void setIsProgressiveResolution(boolean isPG) {
         this.isProgressiveResolution = isPG;
+        if (dataSelection != null) {
+            dataSelection.putProperty(
+                DataSelection.PROP_PROGRESSIVERESOLUTION,
+                this.isProgressiveResolution);
+        }
     }
 
 }
