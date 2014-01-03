@@ -193,7 +193,7 @@ public class MapViewManager extends NavigatedViewManager {
     	"View.UseProgressiveResolution";
 
     /** label for progressive resolution/disclosure/whatever we call it */
-    private static final String PR_LABEL = "Use Progressive Disclosure";
+    public static final String PR_LABEL = "Use Progressive Disclosure";
     
     /** Preference for showing the globe background */
     public static final String PREF_SHOWGLOBEBACKGROUND =
