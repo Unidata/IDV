@@ -62,6 +62,9 @@ public class ImagePlanViewControl extends PlanViewControl {
     /** The label to show the readout in the side legend */
     private JLabel sideLegendReadout;
 
+    /** _more_ */
+    public List descripters;
+
     //  NB: For now, we don't subclass ColorPlanViewControl because we get
     //  the DataRange widget from getControlWidgets.  Might want this in
     //  the future.  It would be simpler if we wanted to include that.
@@ -161,6 +164,9 @@ public class ImagePlanViewControl extends PlanViewControl {
         boolean fromBundle = getIdv().getStateManager().getProperty(
                                  IdvConstants.PROP_LOADINGXML, false);
         if (fromBundle) {
+            if (descripters != null) {
+                dataChoice.setObjectProperty("descriptors", descripters);
+            }
             boolean result = super.setData(dataChoice);
             if ( !result) {
                 userMessage("Selected image(s) not available");
@@ -190,18 +196,37 @@ public class ImagePlanViewControl extends PlanViewControl {
         DataChoice dc0 = null;
         if (dataChoice instanceof DerivedDataChoice) {
             dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
-        } else
+        } else {
             dc0 = dataChoice;
-        String magStr = (String)dc0.getProperty("MAG");
-        if(magStr != null){
-            if(sideLegendReadout == null){
+        }
+        //save imagelist
+        descripters = getImageDescriptors(dataChoice);
+        String magStr = (String) dc0.getProperty("MAG");
+        if (magStr != null) {
+            if (sideLegendReadout == null) {
                 sideLegendReadout = new JLabel("<html><br></html>");
             }
-            sideLegendReadout.setText("<html>" + magStr
-                    + "</html>");
+            sideLegendReadout.setText("<html>" + magStr + "</html>");
         }
         return result;
 
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param dc _more_
+     *
+     * @return _more_
+     */
+    protected List getImageDescriptors(DataChoice dc) {
+        List dataSources = new ArrayList();
+
+        dc.getDataSources(dataSources);
+        AddeImageDataSource aids = (AddeImageDataSource) dataSources.get(0);
+
+        return aids.getDescriptorsToUse();
     }
 
     /**
@@ -356,5 +381,22 @@ public class ImagePlanViewControl extends PlanViewControl {
         return true;
     }
 
+    /**
+     * _more_
+     *
+     * @param descripters _more_
+     */
+    public void setDescripters(List descripters) {
+        this.descripters = descripters;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List getDescripters() {
+        return this.descripters;
+    }
 
 }

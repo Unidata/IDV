@@ -118,21 +118,6 @@ public class AddeImageDataSource extends ImageDataSource {
     /** _more_ */
     Hashtable allBandDirs;
 
-    /** _more_ */
-    public int newLines;
-
-    /** _more_ */
-    public int newElems;
-
-    /** _more_ */
-    public String locationKey;
-
-    /** _more_ */
-    public String locationValue;
-
-    /** _more_ */
-    public String place;
-
     /**
      *  The parameterless ctor unpersisting.
      */
@@ -218,7 +203,10 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     public void initAfterUnpersistence() {
         super.initAfterUnpersistence();
-        if (this.source == null) {
+        if(getTmpPaths() != null){  // zidv bundle
+            return;
+        }
+        if (this.source == null && imageList != null && imageList.size() > 0) {
             //List                imageList1 = getImageList();
             AddeImageDescriptor desc1 =
                 (AddeImageDescriptor) imageList.get(0);
@@ -320,23 +308,21 @@ public class AddeImageDataSource extends ImageDataSource {
 
         // when geoSelection is null, it is from the old bundle and return the desscriptors.
         //boolean isOldBundle = false;
+        if (allBandDirs == null) {  //geoSelection == null)
+            return descriptors;
+        }
         if (fromBundle) {
             if (subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION)
                     == null) {
                 //isOldBundle = true;
                 return descriptors;
             }
-        }
-        if (allBandDirs == null) {  //geoSelection == null)
-            return descriptors;
-        }
-
-        if(fromBundle){
+            // new bundle
+            if(getTmpPaths() != null)
+                return descriptors;
             try {
-                descriptors = reSetImageDataDescriptor(descriptors,
-                        locationKey, locationValue,
-                        place, newLines, newElems, lineMag, eleMag,
-                        unitStr);
+                List dList = (List)dataChoice.getProperty("descriptors");
+                descriptors = dList;
             } catch (Exception e) {}
 
             return descriptors;
@@ -375,9 +361,9 @@ public class AddeImageDataSource extends ImageDataSource {
                 int elems = adSource.getElements()
                             * Math.abs(adSource.getElementMag());;;
 
-                locationKey   = adSource.getLocateKey();
-                locationValue = adSource.getLocateValue();
-                place = adSource.getPlaceValue();
+                String locationKey   = adSource.getLocateKey();
+                String locationValue = adSource.getLocateValue();
+                String place = adSource.getPlaceValue();
                 if (isProgressiveResolution) {
                     // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                     lineMag = calculateMagFactor(lines,
@@ -394,8 +380,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 System.out.println(
                     "Magnification factor of line X element : " + lineMag
                     + " " + eleMag);
-                //int newLines;
-                //int newelems;
+                int newLines;
+                int newelems;
 
                 if (lineMag == 1) {
                     newLines = lines;
@@ -404,16 +390,16 @@ public class AddeImageDataSource extends ImageDataSource {
                 }
 
                 if (eleMag == 1) {
-                    newElems = elems;
+                    newelems = elems;
                 } else {
-                    newElems = (int) Math.floor(elems / eleMag + 0.5);
+                    newelems = (int) Math.floor(elems / eleMag + 0.5);
                 }
                 System.out.println("newLine X newElement : " + newLines + " "
-                                   + newElems);
+                                   + newelems);
                 try {
                     descriptors = reSetImageDataDescriptor(descriptors,
                             locationKey, locationValue,
-                            place, newLines, newElems, lineMag, eleMag,
+                            place, newLines, newelems, lineMag, eleMag,
                             unitStr);
                 } catch (Exception e) {}
 
@@ -457,7 +443,7 @@ public class AddeImageDataSource extends ImageDataSource {
                         int    cline       = lines / 2;
                         int    celem       = elems / 2;
 
-                        locationValue = cline + " " + celem;
+                        String locateValue = cline + " " + celem;
 
 
                         if (isProgressiveResolution) {
@@ -474,8 +460,8 @@ public class AddeImageDataSource extends ImageDataSource {
                         System.out.println(
                             "Magnification factor of line X element : "
                             + lineMag + " " + eleMag);
-                        // int newLines;
-                        // int newElems;
+                        int newLines;
+                        int newelems;
 
                         if (lineMag == 1) {
                             newLines = lines;
@@ -485,20 +471,16 @@ public class AddeImageDataSource extends ImageDataSource {
                         }
 
                         if (eleMag == 1) {
-                            newElems = elems;
+                            newelems = elems;
                         } else {
-                            newElems = (int) Math.floor(elems / eleMag + 0.5);
+                            newelems = (int) Math.floor(elems / eleMag + 0.5);
                         }
                         System.out.println("newLine X newElement : "
-                                           + newLines + " " + newElems);
-                        place = "CENTER";
-                        locationKey = AddeImageURL.KEY_LINEELE;
+                                           + newLines + " " + newelems);
                         try {
-                            descriptors =
-                                reSetImageDataDescriptor(descriptors,
-                                    AddeImageURL.KEY_LINEELE, locationValue,
-                                    place, newLines, newElems, lineMag,
-                                    eleMag, unitStr);
+                            descriptors = reSetImageDataDescriptor(descriptors,
+                                    AddeImageURL.KEY_LINEELE, locateValue,"CENTER",
+                                    newLines, newelems, lineMag, eleMag, unitStr);
                         } catch (Exception e) {}
                     } else {
                         LatLonRect bbox = mapInfo.getLatLonRect().intersect(
@@ -1054,8 +1036,8 @@ public class AddeImageDataSource extends ImageDataSource {
             }
             System.out.println("Magnification factor of line X element : "
                                + lineMag + " " + eleMag);
-            //int newLines;
-            //int newelems;
+            int newLines;
+            int newelems;
 
             if (lineMag == 1) {
                 newLines = (int) (lines * 1.0);
@@ -1064,9 +1046,9 @@ public class AddeImageDataSource extends ImageDataSource {
             }
 
             if (eleMag == 1) {
-                newElems = (int) (elems * 1.0);
+                newelems = (int) (elems * 1.0);
             } else {
-                newElems = (int) (Math.floor(elems / eleMag + 0.5) * 1.);
+                newelems = (int) (Math.floor(elems / eleMag + 0.5) * 1.);
             }
 
             System.out.println("Line: lines " + lines + " lineMag " + lineMag
@@ -1074,22 +1056,21 @@ public class AddeImageDataSource extends ImageDataSource {
                                + (int) rect.getHeight());
 
 
-            //String locateValue = null;
+            String locateValue = null;
             if (placeValue.equals("ULEFT")) {
-                locationValue = Misc.format(maxLat) + " " + Misc.format(minLon);
+                locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
             } else {
                 double cLat = centerLLP.getLatitude();
                 double cLon = centerLLP.getLongitude();
 
-                locationValue = Misc.format(cLat) + " " + Misc.format(cLon);
+                locateValue = Misc.format(cLat) + " " + Misc.format(cLon);
             }
 
-            locationKey = AddeImageURL.KEY_LATLON;
-            place = placeValue;
+
             return reSetImageDataDescriptor(despList,
                                             AddeImageURL.KEY_LATLON,
-                                            locationValue, placeValue,
-                                            newLines, newElems, lineMag,
+                                            locateValue, placeValue,
+                                            newLines, newelems, lineMag,
                                             eleMag, unit);
         } catch (Exception e) {}
 
@@ -1394,93 +1375,5 @@ public class AddeImageDataSource extends ImageDataSource {
         return lMag;
     }
 
-    /**
-     * _more_
-     *
-     * @param lines _more_
-     */
-    public void setNewLines(int lines) {
-        this.newLines = lines;
-    }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public int getNewLines() {
-        return this.newLines;
-    }
-
-    /**
-     * _more_
-     *
-     * @param lines _more_
-     */
-    public void setNwElems(int lines) {
-        this.newElems = lines;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public int getNwElems() {
-        return this.newElems;
-    }
-
-    /**
-     * _more_
-     *
-     * @param key _more_
-     */
-    public void setLocationKey(String key) {
-        this.locationKey = key;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getLocationKey() {
-        return this.locationKey;
-    }
-
-    /**
-     * _more_
-     *
-     * @param locationValue _more_
-     */
-    public void setLocationValue(String locationValue) {
-        this.locationValue = locationValue;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getLocationValue() {
-        return this.locationValue;
-    }
-
-    /**
-     * _more_
-     *
-     * @param place _more_
-     */
-    public void setPlace(String place) {
-        this.place = place;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public String getPlace() {
-        return this.place;
-    }
 }

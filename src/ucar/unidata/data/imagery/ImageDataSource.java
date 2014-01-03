@@ -32,6 +32,10 @@ import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataSourceImpl;
 import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.control.ImagePlanViewControl;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
@@ -364,13 +368,45 @@ public abstract class ImageDataSource extends DataSourceImpl {
     protected List saveDataToLocalDisk(String prefix, Object loadId,
                                        boolean changeLinks)
             throws Exception {
+        List<AddeImageDescriptor> descriptorsToSave = new ArrayList<AddeImageDescriptor>();
+        List displays = getIdv().getDisplayControls();
+        for (int i = 0; i < displays.size(); i++) {
+            DisplayControl dci = (DisplayControl)displays.get(i);
+            if(!(dci instanceof ImagePlanViewControl)) {
+                continue;
+            }
+            List dataChoices = dci.getDataChoices();
+            if (dataChoices == null) {
+                continue;
+            }
+            List finalOnes = new ArrayList();
+            for (int j = 0; j < dataChoices.size(); j++) {
+                ((DataChoice)dataChoices.get(j)).getFinalDataChoices(finalOnes);
+            }
+            for (int dcIdx = 0; dcIdx < finalOnes.size(); dcIdx++) {
+                DataChoice dc = (DataChoice)finalOnes.get(dcIdx);
+                if (!(dc instanceof DirectDataChoice)) {
+                    continue;
+                }
+                DirectDataChoice ddc = (DirectDataChoice) dc;
+                List<AddeImageDescriptor> dList = (List)ddc.getProperty("descriptors");
+                if(dList != null){
+                    for (AddeImageDescriptor descriptor : dList) {
+                        descriptorsToSave.add(descriptor);
+                    }
+                }
+
+            }
+        }
+
         List urls     = new ArrayList();
         List suffixes = new ArrayList();
         SimpleDateFormat sdf = new SimpleDateFormat("_"
                                    + DATAPATH_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        for (int i = 0; i < descriptorsToUse.size(); i++) {
-            AddeImageDescriptor aid  = (AddeImageDescriptor)descriptorsToUse.get(i); //getDescriptor(imageList.get(i));
+
+        for (int i = 0; i < descriptorsToSave.size(); i++) {
+            AddeImageDescriptor aid  = getDescriptor(descriptorsToSave.get(i));
             String              url  = aid.getSource();
             DateTime            dttm = (DateTime) timeMap.get(url);
             if (dttm != null) {
@@ -381,6 +417,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
             urls.add(url);
         }
+
         List newFiles = IOUtil.writeTo(urls, prefix, suffixes, loadId);
         // System.err.println ("files:" + newFiles);
         if (newFiles == null) {
@@ -577,6 +614,15 @@ public abstract class ImageDataSource extends DataSourceImpl {
         return imageList;
     }
 
+    /**
+     * Return the list of {@link AddeImageDescriptor}s that define this
+     * data source.
+     *
+     * @return The list of image descriptors.
+     */
+    public List getDescriptorsToUse() {
+        return descriptorsToUse;
+    }
     /**
      * Set the list of {@link AddeImageDescriptor}s that define this data
      * source.
