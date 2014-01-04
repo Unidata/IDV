@@ -308,12 +308,23 @@ public class AddeImageDataSource extends ImageDataSource {
 
         // when geoSelection is null, it is from the old bundle and return the desscriptors.
         //boolean isOldBundle = false;
-        if (allBandDirs == null) {  //geoSelection == null)
-            return descriptors;
-        }
+        //if (allBandDirs == null) {  //geoSelection == null)
+            //return descriptors;
+        //}
         if (fromBundle) {
             if (subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION)
                     == null) {
+                if(baseAnav == null){   //old bundle
+                    try {
+                        areaAdapter = new AreaAdapter(this.source, false);
+                        AreaFile areaFile = areaAdapter.getAreaFile();
+                        baseAnav = areaFile.getNavigation();
+                        acs      = new AREACoordinateSystem(areaFile);
+                    } catch (Exception e) {
+                        LogUtil.userErrorMessage(
+                                "Error in getDescriptors  e=" + e);
+                    }
+                }
                 //isOldBundle = true;
                 return descriptors;
             }
@@ -428,9 +439,15 @@ public class AddeImageDataSource extends ImageDataSource {
 
                 if (llp != null) {
                     BandInfo id = (BandInfo) dataChoice.getId();
-                    AreaDirectory thisDir =
-                        (AreaDirectory) allBandDirs.get(id.getBandNumber());
-                    int[] dir = thisDir.getDirectoryBlock();
+                    int[] dir = null;
+                    AreaDirectory thisDir = null;
+                    if(allBandDirs != null) {
+                        thisDir = (AreaDirectory) allBandDirs.get(id.getBandNumber());
+
+                    } else {
+                        thisDir = this.descriptor.getDirectory();
+                    }
+                    dir = thisDir.getDirectoryBlock();
                     // boolean inside = insideImageBoundingBox(llp.getLatitude(), llp.getLongitude()) ;
                     GeoLocationInfo ginfo = getImageBoundingBox(eMag, lMag,
                                                 dir[8], dir[9]);
