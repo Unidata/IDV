@@ -1617,12 +1617,13 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             b.height + b.height * pad
         };
 
-        double[] rangeX = { Double.NaN, Double.NaN };
+        double[] rangeXE = { Double.NaN, Double.NaN };
+        double[] rangeXW = { Double.NaN, Double.NaN };
         double[] rangeY = { Double.NaN, Double.NaN };
 
         for (int yidx = 0; yidx < ys.length; yidx++) {
             for (int xidx = 0; xidx < xs.length; xidx++) {
-                findMinMaxFromScreen((int) xs[xidx], (int) ys[yidx], rangeX,
+                findMinMaxFromScreen((int) xs[xidx], (int) ys[yidx], rangeXE, rangeXW,
                                      rangeY, normalizeLon);
             }
         }
@@ -1631,26 +1632,41 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             double percent = xidx / 100.0;
 
             findMinMaxFromScreen((int) (b.width * percent), b.height / 2,
-                                 rangeX, rangeY, normalizeLon);
+                                 rangeXE, rangeXW, rangeY, normalizeLon);
         }
 
-        double left   = rangeX[0];
-        double right  = rangeX[1];
+        double left;
+        double right;
+        if(rangeXE[0] == rangeXE[0] && rangeXW[0] == rangeXW[0]) {
+            //cross dateline
+            left   = rangeXE[0];
+            right  = rangeXW[1];
+        } else if(rangeXE[0] == rangeXE[0]) {
+            // 0 - 180
+            left   = rangeXE[0];
+            right  = rangeXE[1];
+        } else {
+            // -180 - 0
+            left   = rangeXW[0];
+            right  = rangeXW[1];
+        }
         double top    = rangeY[1];
         double bottom = rangeY[0];
 
-        if (left > right) {
-            double tmp = left;
+        if((left >= 0 && right >= 0) || (left <= 0 && right <= 0 )) {
+            if (left > right) {
+                double tmp = left;
 
-            left  = right;
-            right = tmp;
+                left  = right;
+                right = tmp;
+            }
         }
 
         if (top < bottom) {
             double tmp = top;
 
             top    = bottom;
-            bottom = top;
+            bottom = tmp;
         }
 
         double width  = right - left;
@@ -1688,13 +1704,14 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      *
      * @param x x position
      * @param y y position
-     * @param rangeX X range
+     * @param rangeXE X range for 0 - 180
+     * @param rangeXW X range for -180 - 0
      * @param rangeY Y range
      * @param normalizeLon  normalize longitudes to -180 to 180
      *
      * @throws VisADException problem accessing screen
      */
-    private void findMinMaxFromScreen(int x, int y, double[] rangeX,
+    private void findMinMaxFromScreen(int x, int y, double[] rangeXE, double[] rangeXW,
                                       double[] rangeY, boolean normalizeLon)
             throws VisADException {
         EarthLocation el   = screenToEarthLocation(x, y);
@@ -1714,13 +1731,24 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             tmpx = LatLonPointImpl.lonNormal(tmpx);
         }
 
-        if ((rangeX[0] != rangeX[0]) || (tmpx < rangeX[0])) {
-            rangeX[0] = tmpx;
+        if(tmpx > 0) {
+            if ((rangeXE[0] != rangeXE[0]) || (tmpx < rangeXE[0])) {
+                rangeXE[0] = tmpx;
+            }
+
+            if ((rangeXE[1] != rangeXE[1]) || (tmpx > rangeXE[1])) {
+                rangeXE[1] = tmpx;
+            }
+        } else {
+            if ((rangeXW[0] != rangeXW[0]) || (tmpx < rangeXW[0])) {
+                rangeXW[0] = tmpx;
+            }
+
+            if ((rangeXW[1] != rangeXW[1]) || (tmpx > rangeXW[1])) {
+                rangeXW[1] = tmpx;
+            }
         }
 
-        if ((rangeX[1] != rangeX[1]) || (tmpx > rangeX[1])) {
-            rangeX[1] = tmpx;
-        }
 
         if ((rangeY[0] != rangeY[0]) || (tmpy < rangeY[0])) {
             rangeY[0] = tmpy;
@@ -1793,18 +1821,20 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             }
         }
 
-        if (left > right) {
-            double tmp = left;
+        if((left >= 0 && right >= 0) || (left <= 0 && right <= 0 )) {
+            if (left > right) {
+                double tmp = left;
 
-            left  = right;
-            right = tmp;
+                left  = right;
+                right = tmp;
+            }
         }
 
         if (top < bottom) {
             double tmp = top;
 
             top    = bottom;
-            bottom = top;
+            bottom = tmp;
         }
 
         LatLonPointImpl llp1 = new LatLonPointImpl(bottom, left);

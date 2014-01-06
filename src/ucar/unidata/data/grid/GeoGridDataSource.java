@@ -1594,10 +1594,16 @@ public class GeoGridDataSource extends GridDataSource {
                     // spatial subset or usedisplayarea
                     LatLonRect gsbox = geoSelection.getLatLonRect();
                     LatLonRect grbox = geoGrid.getCoordinateSystem().getLatLonBoundingBox();
-                    LatLonRect bbox = grbox.intersect(gsbox);
-                    if (bbox == null) {
-                    	bbox = grbox;
+                    LatLonRect bbox;
+                    if(regionOption.equals(DataSelection.PROP_USESELECTEDAREA))
+                        bbox = gsbox;
+                    else {
+                        bbox = grbox.intersect(gsbox);
+                        if (bbox == null) {
+                            bbox = grbox;
+                        }
                     }
+
                     List yx_ranges =
                         geoGrid.getCoordinateSystem().getRangesFromLatLonRect(
                             bbox);

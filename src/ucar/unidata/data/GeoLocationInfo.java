@@ -96,8 +96,13 @@ public class GeoLocationInfo {
                            double maxLon) {
         this.maxLat = Math.max(maxLat, minLat);
         this.minLat = Math.min(maxLat, minLat);
-        this.minLon = Math.min(minLon, maxLon);
-        this.maxLon = Math.max(minLon, maxLon);
+        if((minLon >= 0 && maxLon >= 0 ) || (minLon <= 0 && maxLon <= 0)){
+            this.minLon = Math.min(minLon, maxLon);
+            this.maxLon = Math.max(minLon, maxLon);
+        } else {
+            this.minLon = minLon;
+            this.maxLon = maxLon;
+        }
     }
 
     /**
