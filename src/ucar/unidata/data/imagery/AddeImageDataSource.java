@@ -569,48 +569,80 @@ public class AddeImageDataSource extends ImageDataSource {
         int        eSize = elems / eMag;
         int        lSize = lines / lMag;
         try {
-            //maxlat, minlon
+            // minlon  using upper left corner
             int i = 0;
             int j = 0;
             el[0][0] = i;
             el[1][0] = j;
-            ll       = this.acs.toReference(el);
+            ll       = baseAnav.toLatLon(el);
             while ((ll[0][0] != ll[0][0]) && (i < eSize) && (j < lSize)) {
                 i++;
                 j++;
                 el[0][0] = i;
                 el[1][0] = j;
-                ll       = this.acs.toReference(el);
+                ll       = baseAnav.toLatLon(el);
             }
             if (ll[0][0] != ll[0][0]) {
-                maxLat = 90.0;
                 minLon = -180;
             } else {
-                maxLat = ll[0][0];
                 minLon = ll[1][0];
             }
 
-            //minlat, maxlon
+            //maxlon using lower right corner
             i        = eSize;
             j        = lSize;
             el[0][0] = i;
             el[1][0] = j;
-            ll       = this.acs.toReference(el);
+            ll       = baseAnav.toLatLon(el);
             while ((ll[0][0] != ll[0][0]) && (i > 0) && (j > 0)) {
                 i--;
                 j--;
                 el[0][0] = i;
                 el[1][0] = j;
-                ll       = this.acs.toReference(el);
+                ll       = baseAnav.toLatLon(el);
             }
             if (ll[0][0] != ll[0][0]) {
-                minLat = -90.0;
                 maxLon = 180;
             } else {
-                minLat = ll[0][0];
                 maxLon = ll[1][0];
             }
 
+            //maxlat   using middle line
+            i = eSize/2;
+            j = 0;
+            el[0][0] = i;
+            el[1][0] = j;
+            ll       = baseAnav.toLatLon(el);
+            while ((ll[0][0] != ll[0][0]) && (j < lSize)) {
+                j++;
+                el[0][0] = i;
+                el[1][0] = j;
+                ll       = baseAnav.toLatLon(el);
+            }
+            if (ll[0][0] != ll[0][0]) {
+                maxLat = 90.0;
+            } else {
+                maxLat = ll[0][0];
+            }
+
+            //minlat   using middle line
+            i        = eSize/2;
+            j        = lSize;
+            el[0][0] = i;
+            el[1][0] = j;
+            ll       = baseAnav.toLatLon(el);
+            while ((ll[0][0] != ll[0][0]) &&  (j > 0)) {
+                j--;
+                el[0][0] = i;
+                el[1][0] = j;
+                ll       = baseAnav.toLatLon(el);
+            }
+            if (ll[0][0] != ll[0][0]) {
+                minLat = -90.0;
+
+            } else {
+                minLat = ll[0][0];
+            }
         } catch (Exception e) {
             System.out.println("convertToLatLon e=" + e);
         }
