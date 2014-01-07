@@ -12,8 +12,15 @@ import java.lang.reflect.Method;
  */
 public class SystemMemoryManager {
 
-    /** Minimum memory for the IDV. */
-    public static final long MINIMUM_MEMORY = 512;
+  /** Minimum memory for the IDV. */
+  public static final long MINIMUM_MEMORY = 512;
+
+  /**
+   * Maximum memory for the IDV. This is a soft limit. Users can still shoot
+   * themselves in the foot if they want to by manually adjust higher via the
+   * edit preferences menu.
+   */
+  public static final long MAXIMUM_MEMORY = 1024 * 3;
 
     /** Max heap for a 32 bit OS. */
     private static final long OS_32_MAX = 1536;
@@ -87,9 +94,10 @@ public class SystemMemoryManager {
                         : INSTANCE.memory - MINIMUM_MEMORY;
         }
 
-        // If memory is available, must return at least MINIMUM_MEMORY.
+    // If memory is available, must return at least MINIMUM_MEMORY but not go
+    // over maximum memory.
         return isMemoryAvailable()
-               ? Math.max(returnVal, MINIMUM_MEMORY)
+               ? Math.min(Math.max(returnVal, MINIMUM_MEMORY), MAXIMUM_MEMORY)
                : INSTANCE.memory;
     }
 
