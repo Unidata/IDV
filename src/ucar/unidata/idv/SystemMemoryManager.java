@@ -1,10 +1,30 @@
+/*
+ * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
+ * 
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package ucar.unidata.idv;
 
-//~--- JDK imports ------------------------------------------------------------
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
+
 
 /**
  * Global to deal with IDV command line memory settings.
@@ -15,11 +35,19 @@ public class SystemMemoryManager {
     /** Minimum memory for the IDV. */
     public static final long MINIMUM_MEMORY = 512;
 
+    /**
+     * Maximum memory for the IDV. This is a soft limit. Users can still shoot
+     * themselves in the foot by manually adjusting higher via the
+     * edit preferences menu.
+     */
+    public static final long MAXIMUM_MEMORY = 1024 * 3;
+
     /** Max heap for a 32 bit OS. */
     private static final long OS_32_MAX = 1536;
 
     /** The INSTANCE. */
-    private static final SystemMemoryManager INSTANCE = new SystemMemoryManager();
+    private static final SystemMemoryManager INSTANCE =
+        new SystemMemoryManager();
 
     /** Is the OS 32 bit. */
     private final boolean is32;
@@ -43,8 +71,10 @@ public class SystemMemoryManager {
         long mem = -1;
 
         try {
-            final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-            final Method                m      = osBean.getClass().getMethod("getTotalPhysicalMemorySize");
+            final OperatingSystemMXBean osBean =
+                ManagementFactory.getOperatingSystemMXBean();
+            final Method m =
+                osBean.getClass().getMethod("getTotalPhysicalMemorySize");
 
             m.setAccessible(true);
             mem = (Long) m.invoke(osBean);
@@ -79,11 +109,12 @@ public class SystemMemoryManager {
     public static long getTotalMemory() {
         final long returnVal;
 
-        if (!isMemoryAvailable()) {
+        if ( !isMemoryAvailable()) {
             returnVal = INSTANCE.memory;
         } else {
             returnVal = INSTANCE.is32
-                        ? Math.min(INSTANCE.memory - MINIMUM_MEMORY, OS_32_MAX)
+                        ? Math.min(INSTANCE.memory - MINIMUM_MEMORY,
+                                   OS_32_MAX)
                         : INSTANCE.memory - MINIMUM_MEMORY;
         }
 
@@ -93,23 +124,26 @@ public class SystemMemoryManager {
                : INSTANCE.memory;
     }
 
-	/**
-	 * The default when the user first starts up should be to use 80% between
-	 * the "low and high-water mark", but they should be allowed to increase
-	 * that to 100% of the high-water mark. There are a couple of exceptions to
-	 * the 80% heuristic. The amount of memory returned will never be < 512GB.
-	 * Also, if on 32 bit OS be conservative and choose 70%. For example, if we
-	 * have 32 bit windows with 1536 of memory, the result will be 1229.
-	 * 
-	 * @return the default memory
-	 */
+    /**
+     * The default when the user first starts up should be to use 80% between
+     * the "low and high-water mark", but they should be allowed to increase
+     * that to 100% of the high-water mark. There are a couple of exceptions to
+     * the 80% heuristic. The amount of memory returned will never be < 512GB, and never > 3GB.
+     * Also, if on 32 bit OS be conservative and choose 70%. For example, if we
+     * have 32 bit windows with 1536 of memory, the result will be 1229.
+     *
+     * @return the default memory
+     */
     public static long getDefaultMemory() {
-        final double percent = INSTANCE.is32 ? 0.7 : 0.8;
+        final double percent = INSTANCE.is32
+                               ? 0.7
+                               : 0.8;
 
-        final long memory = Math.round(((getTotalMemory() - MINIMUM_MEMORY) * percent) + MINIMUM_MEMORY);
+        final long memory = Math.round(((getTotalMemory() - MINIMUM_MEMORY)
+                                        * percent) + MINIMUM_MEMORY);
 
         return isMemoryAvailable()
-               ? Math.max(memory, MINIMUM_MEMORY)
+               ? Math.min(Math.max(memory, MINIMUM_MEMORY), MAXIMUM_MEMORY)
                : MINIMUM_MEMORY;
     }
 
@@ -127,7 +161,8 @@ public class SystemMemoryManager {
             if (getTotalMemory() == MINIMUM_MEMORY) {
                 val = memory * 100f / MINIMUM_MEMORY;
             } else {
-                val = (memory - MINIMUM_MEMORY) * 100f / (getTotalMemory() - MINIMUM_MEMORY);
+                val = (memory - MINIMUM_MEMORY) * 100f
+                      / (getTotalMemory() - MINIMUM_MEMORY);
             }
         } else {
             val = -1;
@@ -145,7 +180,9 @@ public class SystemMemoryManager {
      */
     public static long convertToNumber(final int percent) {
         return isMemoryAvailable()
-               ? MINIMUM_MEMORY + Math.round((percent / 100f) * (getTotalMemory() - MINIMUM_MEMORY))
+               ? MINIMUM_MEMORY
+                 + Math.round((percent / 100f)
+                              * (getTotalMemory() - MINIMUM_MEMORY))
                : -1;
     }
 
