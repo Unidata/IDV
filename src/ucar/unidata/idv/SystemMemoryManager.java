@@ -118,10 +118,9 @@ public class SystemMemoryManager {
                         : INSTANCE.memory - MINIMUM_MEMORY;
         }
 
-        // If memory is available, must return at least MINIMUM_MEMORY but not go
-        // over maximum memory.
+        // If memory is available, must return at least MINIMUM_MEMORY.
         return isMemoryAvailable()
-               ? Math.min(Math.max(returnVal, MINIMUM_MEMORY), MAXIMUM_MEMORY)
+               ? Math.max(returnVal, MINIMUM_MEMORY)
                : INSTANCE.memory;
     }
 
@@ -144,7 +143,7 @@ public class SystemMemoryManager {
                                         * percent) + MINIMUM_MEMORY);
 
         return isMemoryAvailable()
-               ? Math.max(memory, MINIMUM_MEMORY)
+               ? Math.min(Math.max(memory, MINIMUM_MEMORY), MAXIMUM_MEMORY)
                : MINIMUM_MEMORY;
     }
 
