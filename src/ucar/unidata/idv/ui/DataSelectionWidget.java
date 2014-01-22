@@ -855,8 +855,13 @@ public class DataSelectionWidget {
         Object isPR = dataSelection.getProperty(
                           DataSelection.PROP_PROGRESSIVERESOLUTION);
 
-        if (dataSelectionComponents != null && dataSelectionComponents.size() == 0
-                && geoSelectionPanel != null) {
+        if (dataSelectionComponents != null && dataSelectionComponents.size() == 2 )
+        {
+            geoSelection = dataSelection.getGeoSelection();
+            regionOption =
+                    dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
+                            USE_DEFAULTREGION);
+        } else {
             // anything other than adde image
             //if(prograssiveCbx1 == null)
             //    prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
@@ -877,13 +882,7 @@ public class DataSelectionWidget {
             dataSelection.putProperty(
                     DataSelection.PROP_REGIONOPTION,
                     regionOption);
-        } else {
-            geoSelection = dataSelection.getGeoSelection();
-            regionOption =
-                dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
-                                          USE_DEFAULTREGION);
         }
-
 
         if(regionOption.equals(USE_DEFAULTREGION) && geoSelection != null) {
             geoSelection.setBoundingBox(null);
