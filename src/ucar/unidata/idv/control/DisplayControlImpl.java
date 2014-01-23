@@ -3648,8 +3648,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         NavigatedDisplay navDisplay = getNavigatedDisplay();
       	Rectangle2D sbox = navDisplay.getScreenBounds();
         geoSelection.setScreenBound(sbox);
+        boolean levelChanged = dataSelection.getProperty("levelChanged", false);
         if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
-        		DataSelection.PROP_USEDISPLAYAREA)) {
+        		DataSelection.PROP_USEDISPLAYAREA) && !levelChanged) {
             getViewManager().setProjectionFromData(false);
       	    Rectangle2D bbox = navDisplay.getLatLonBox();
             geoSelection.setLatLonRect(bbox);
@@ -3662,7 +3663,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
             dataSelection.putProperty("centerPosition", llpi);
         }
-        
+        if(levelChanged){
+            dataSelection.removeProperty("levelChanged");
+        }
         if ( !getIdv().getUseTimeDriver()) {
             return dataSelection;
         }
