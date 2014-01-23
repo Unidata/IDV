@@ -21,11 +21,15 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.NetcdfFileWriter;
+import ucar.nc2.rewrite.Rewrite;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.radar.CDMRadarDataSource;
 import ucar.unidata.data.radar.RadarConstants;
 
 import ucar.unidata.geoloc.Bearing;
@@ -442,5 +446,27 @@ public class RadarSweepControl extends ColorPlanViewControl {
      */
     protected boolean canDoProgressiveResolution() {
         return false;
+    }
+
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    public void doExport(String what, String filename) throws Exception {
+        if (what.contains("netcdf")) {
+                List sources = this.getDataSources();
+            CDMRadarDataSource cdmRadar = (CDMRadarDataSource)sources.get(0);
+            String fileIn = cdmRadar.getDataPaths().toString();
+
+            NetcdfFile ncfileIn = ucar.nc2.dataset.NetcdfDataset.openFile(fileIn, null);
+
+            NetcdfFileWriter.Version version = NetcdfFileWriter.Version.netcdf3;
+
+            NetcdfFileWriter ncOut = NetcdfFileWriter.createNew(version, filename);
+
+            //Rewrite rewrite = new Rewrite(ncfileIn, ncOut);
+            //rewrite.rewrite();
+            ncfileIn.close();
+        }
     }
 }
