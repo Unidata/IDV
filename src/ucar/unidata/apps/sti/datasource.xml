@@ -25,7 +25,7 @@
      id="FILE.DIAMONDPOINTTEXT"
      factory="ucar.unidata.data.point.DiamondPointDataSource"
      doesmultiples="true"
-     patterns="\.csv$,\.tsv$,\.txt$"
+     patterns="\.csv$,\.tsv$,\.txt$, \.AWS$"
      fileselection="true"
      label="Diamond Point Data files"/>
 
