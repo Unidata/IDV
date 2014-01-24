@@ -494,21 +494,21 @@ public class NavigatedPanel extends JPanel implements MouseListener,
             return bb;
         }
         ProjectionRect newRect          = new ProjectionRect(bb);
-        double         maxLon           = newRect.x + newRect.width;
+        double         maxLon           = newRect.getX() + newRect.getWidth();
         double         normalizedMaxLon = LatLonPointImpl.lonNormal(maxLon);
 
 
-        newRect.x += (normalizedMaxLon - maxLon);
+        newRect.setX(newRect.getX() + (normalizedMaxLon - maxLon));
 
-        double         minLon           = newRect.x;
+        double         minLon           = newRect.getX();
         double         normalizedMinLon = LatLonPointImpl.lonNormal(minLon);
 
-        newRect.x += (normalizedMinLon - minLon);
+        newRect.setX(newRect.getX() + (normalizedMinLon - minLon));
 
 
         //Try to normalize the rectangle
-        while(newRect.x+newRect.width>360) {
-            newRect.x-= 360;
+        while(newRect.getX()+newRect.getWidth()>360) {
+            newRect.setX(newRect.getX()- 360);
         }
 
         return newRect;

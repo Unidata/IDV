@@ -2369,20 +2369,20 @@ public class AddeImageDataSelection {
                     //corner point outside the earth
 
                     LatLonPointImpl cImpl =
-                        projectionImpl.projToLatLon(rect.x
-                            + rect.getWidth() / 2, rect.y
+                        projectionImpl.projToLatLon(rect.getX()
+                            + rect.getWidth() / 2, rect.getY()
                                 + rect.getHeight() / 2);
                     LatLonPointImpl urImpl =
-                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                            rect.y + rect.getHeight());
+                        projectionImpl.projToLatLon(rect.getX() + rect.getWidth(),
+                            rect.getY() + rect.getHeight());
                     LatLonPointImpl ulImpl =
-                        projectionImpl.projToLatLon(rect.x,
-                            rect.y + rect.getHeight());
+                        projectionImpl.projToLatLon(rect.getX(),
+                            rect.getY() + rect.getHeight());
                     LatLonPointImpl lrImpl =
-                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                            rect.y);
+                        projectionImpl.projToLatLon(rect.getX() + rect.getWidth(),
+                            rect.getY());
                     LatLonPointImpl llImpl =
-                        projectionImpl.projToLatLon(rect.x, rect.y);
+                        projectionImpl.projToLatLon(rect.getX(), rect.getY());
 
                     double maxLat = Double.NaN;
                     double minLat = Double.NaN;

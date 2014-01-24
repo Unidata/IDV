@@ -614,7 +614,7 @@ public class ProjectionManager implements ActionListener {
         if ((bb == null) || (current == null)) {
             return;
         }
-        current.setDefaultMapArea((ProjectionRect) bb.clone());
+        current.setDefaultMapArea(new ProjectionRect(bb));
         lm.sendEvent(new java.beans.PropertyChangeEvent(this,
                 PROPERTY_CHANGE, null, current));
     }

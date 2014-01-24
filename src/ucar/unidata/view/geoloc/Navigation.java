@@ -287,8 +287,7 @@ public class Navigation {
         if (debugMapArea) {
             System.out.println("Navigation setMapArea " + ma);
         }
-
-        bb.setRect(ma);
+        bb.setRect(ma.getX(), ma.getY(), ma.getWidth(), ma.getHeight());
         zoom.push();
 
         mapAreaIsSet = true;
