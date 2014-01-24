@@ -247,14 +247,22 @@ public class AddePointDataSource extends PointDataSource {
                 if (bbox != null) {
                     LatLonPoint ll = bbox.getLowerLeftPoint();
                     LatLonPoint ur = bbox.getUpperRightPoint();
+                    double lonMin;
+                    double lonMax;
+                                             
                     double latMin = Math.min(ll.getLatitude(),
                                              ur.getLatitude());
                     double latMax = Math.max(ll.getLatitude(),
                                              ur.getLatitude());
-                    double lonMin = Math.min(-1 * ll.getLongitude(),
+                    if(ll.getLongitude()*ur.getLongitude() >= 0) {
+                        lonMin = Math.min(-1 * ll.getLongitude(),
                                              -1 * ur.getLongitude());
-                    double lonMax = Math.max(-1 * ll.getLongitude(),
+                        lonMax = Math.max(-1 * ll.getLongitude(),
                                              -1 * ur.getLongitude());
+                    } else {
+                        lonMin = ll.getLongitude();
+                        lonMax = ur.getLongitude();
+                    }
                     llb = "LAT " + latMin + " " + latMax + ";LON " + lonMin
                           + " " + lonMax;
                 }

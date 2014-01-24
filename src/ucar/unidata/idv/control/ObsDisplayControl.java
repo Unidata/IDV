@@ -24,6 +24,7 @@ package ucar.unidata.idv.control;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.data.point.*;
@@ -793,6 +794,12 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
      */
     protected DataInstance doMakeDataInstance(DataChoice dataChoice)
             throws RemoteException, VisADException {
+        DataSelection ds = getDataSelection();
+        Object t = ds.getProperty(
+                DataSelection.PROP_PROGRESSIVERESOLUTION);
+        if (t != null) {
+            isProgressiveResolution = ((Boolean) t).booleanValue();
+        }
         return new PointDataInstance(dataChoice, getDataSelection(),
                                      getRequestProperties());
     }

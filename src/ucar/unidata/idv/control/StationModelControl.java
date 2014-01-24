@@ -401,6 +401,12 @@ public class StationModelControl extends ObsDisplayControl {
 
 
     /**
+     * @override
+     */
+    protected boolean canDoProgressiveResolution() {
+        return true;
+    }
+    /**
      * Initailize after we have been unpersisted.
      *
      * @param vc The context
