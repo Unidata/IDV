@@ -192,7 +192,7 @@ public class NavigatedMapPanel extends JPanel {
      */
     public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
                              boolean makeMoveToolBar) {
-       // boolean makePRToolBar = !makeMoveToolBar;
+        // boolean makePRToolBar = !makeMoveToolBar;
         init(defaultMaps, makeNavToolBar, makeMoveToolBar);
     }
 
@@ -207,8 +207,7 @@ public class NavigatedMapPanel extends JPanel {
      */
     public NavigatedMapPanel(List defaultMaps, boolean makeNavToolBar,
                              boolean makeMoveToolBar,
-                             BufferedImage preview_image,
-                             AreaFile af) {
+                             BufferedImage preview_image, AreaFile af) {
         init(defaultMaps, makeNavToolBar, makeMoveToolBar);
         this.preview_image = preview_image;
         //Renderer mapRender = new ucar.unidata.gis.worldmap.WorldMap();
@@ -231,13 +230,19 @@ public class NavigatedMapPanel extends JPanel {
             data_width  = preview_image.getWidth();
             data_height = preview_image.getHeight();
 
-            float samples[][] = (float[][]) null;
-            ProjectionRect rect =
-                new ProjectionRect(project.getDefaultMapArea());
+            float       samples[][] = (float[][]) null;
+            Rectangle2D rect2D      = project.getDefaultMapArea();
+            ProjectionRect rect = new ProjectionRect(rect2D.getMinX(),
+                                      rect2D.getMinY(), rect2D.getMaxX(),
+                                      rect2D.getMaxY());
             np.setMapArea(rect);
             //np.setSelectedRegionBounds(rect);
-            float ymag = ((AREACoordinateSystem)this.project).getDirBlock()[8]* 1.0f/data_height;
-            float xmag = ((AREACoordinateSystem)this.project).getDirBlock()[9] * 1.0f/(data_width);
+            float ymag =
+                ((AREACoordinateSystem) this.project).getDirBlock()[8] * 1.0f
+                / data_height;
+            float xmag =
+                ((AREACoordinateSystem) this.project).getDirBlock()[9] * 1.0f
+                / (data_width);
 
             if (null != this.preview_image) {
 
@@ -271,9 +276,11 @@ public class NavigatedMapPanel extends JPanel {
         return new NavigatedPanel() {
 
             public void resetZoom() {
-                NavigatedPanel np = getNavigatedPanel();
-                ProjectionRect rect =
-                        new ProjectionRect(project.getDefaultMapArea());
+                NavigatedPanel np     = getNavigatedPanel();
+                Rectangle2D    rect2D = project.getDefaultMapArea();
+                ProjectionRect rect = new ProjectionRect(rect2D.getMinX(),
+                                          rect2D.getMinY(), rect2D.getMaxX(),
+                                          rect2D.getMaxY());
                 np.setMapArea(rect);
 
                 drawG();
@@ -390,6 +397,8 @@ public class NavigatedMapPanel extends JPanel {
     /**
      * _more_
      *
+     *
+     * @param map _more_
      * @return _more_
      */
     //public boolean getUseProgressiveResolution() {
@@ -598,7 +607,7 @@ public class NavigatedMapPanel extends JPanel {
 
         }
 
-        if(gp!=null){
+        if (gp != null) {
             g2d.setColor(Color.BLUE);
             g2d.draw(gp);
             g2d.setColor(Color.CYAN);

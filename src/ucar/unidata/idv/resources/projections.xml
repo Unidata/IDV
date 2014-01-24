@@ -21,7 +21,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id11" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id11" />
           </property>
           <field name="x" >
@@ -60,7 +60,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id13" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id13" />
           </property>
           <field name="x" >
@@ -99,7 +99,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id15" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id15" />
           </property>
           <field name="x" >
@@ -138,7 +138,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id17" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id17" />
           </property>
           <field name="x" >
@@ -177,7 +177,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id19" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id19" />
           </property>
           <field name="x" >
@@ -216,7 +216,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id21" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id21" />
           </property>
           <field name="x" >
@@ -255,7 +255,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id23" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id23" />
           </property>
           <field name="x" >
@@ -285,7 +285,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id25" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id25" />
           </property>
           <field name="x" >
@@ -315,7 +315,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id3" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id3" />
           </property>
           <field name="x" >
@@ -345,7 +345,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id31" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id31" />
           </property>
           <field name="x" >
@@ -375,7 +375,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id5" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id5" />
           </property>
           <field name="x" >
@@ -414,7 +414,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id27" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id27" />
           </property>
           <field name="x" >
@@ -444,7 +444,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id29" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id29" />
           </property>
           <field name="x" >
@@ -480,7 +480,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id7" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id7" />
           </property>
           <field name="x" >
@@ -516,7 +516,7 @@
       </property>
       <property name="DefaultMapArea" >
         <object class="ucar.unidata.geoloc.ProjectionRect"  id="id9" >
-          <property name="Frame" >
+          <property name="Rect" >
             <object idref="id9" />
           </property>
           <field name="x" >

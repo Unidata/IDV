@@ -126,7 +126,13 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
      * @return the default MapArea of the Projection
      */
     public java.awt.geom.Rectangle2D getDefaultMapArea() {
-        return (java.awt.geom.Rectangle2D) projection.getDefaultMapArea();
+        ProjectionRect projRect = projection.getDefaultMapArea();
+        double         x        = projRect.getX();
+        double         y        = projRect.getY();
+        double         width    = projRect.getWidth();
+        double         height   = projRect.getHeight();
+
+        return new java.awt.geom.Rectangle2D.Double(x, y, width, height);
     }
 
     /**
@@ -138,7 +144,7 @@ public class ProjectionCoordinateSystem extends MapProjection implements XmlPers
         return projection;
     }
 
-    /** _more_          */
+    /** _more_ */
     public static boolean debug = false;
 
     /**
