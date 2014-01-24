@@ -66,9 +66,9 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableEnhanced;
 import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
+import ucar.nc2.dt.grid.CFGridWriter;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridDataset;
-import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
@@ -904,7 +904,7 @@ public class GeoGridDataSource extends GridDataSource {
         }
 
         String         path   = prefix;
-        NetcdfCFWriter writer = new NetcdfCFWriter();
+        CFGridWriter writer = new CFGridWriter();
 
         //Start the load, showing the dialog
         loadId = JobManager.getManager().startLoad("Copying data", true,

@@ -544,21 +544,7 @@ public class DataManager {
                 //                System.err.println ("bad:"+ exc);
             }
         }
-        ResourceCollection grib2Resources =
-            resourceManager.getResources(
-                IdvResourceManager.RSC_GRIB2LOOKUPTABLES);
-        for (int i = 0; i < grib2Resources.size(); i++) {
-            try {
-                String grib2TableName = grib2Resources.get(i).toString();
-                File   grib2TableFile = new File(grib2TableName);
-                if (grib2TableFile.exists()) {
-                    ucar.grib.grib2.ParameterTable.addParametersUser(
-                        grib2TableName);
-                }
-            } catch (Exception exc) {
-                //                System.err.println ("bad:"+ exc);
-            }
-        }
+
         ResourceCollection njResources =
             resourceManager.getResources(IdvResourceManager.RSC_NJCONFIG);
         StringBuilder errlog = new StringBuilder();

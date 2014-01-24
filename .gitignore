@@ -39,6 +39,7 @@ ide/intellij/.idea/libraries/ncIdv.xml
 ######################
 # OS generated files #
 ######################
+*.swp
 .DS_Store*
 ehthumbs.db
 Icon?
