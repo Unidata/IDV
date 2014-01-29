@@ -1190,7 +1190,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         getDataSelection().putProperty("levelChanged", true);
         //If we have no data or if its a slice then reset the data selection
         //to the new level and refetch data
-        if ((workingGrid == null) || !GridUtil.isVolume(workingGrid)) {
+        if ((workingGrid == null) || !GridUtil.isVolume(workingGrid) || level != null) {
             try {
                 showWaitCursor();
                 //Just to make sure the DI has it
