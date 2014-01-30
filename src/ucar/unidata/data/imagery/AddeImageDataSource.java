@@ -333,6 +333,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 return descriptors;
             try {
                 List dList = (List)dataChoice.getProperty("descriptors");
+                if(dList == null)
+                    return descriptors;
                 descriptors = dList;
             } catch (Exception e) {}
 
