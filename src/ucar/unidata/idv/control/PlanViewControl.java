@@ -1187,7 +1187,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (loadedAny && (level != null) && level.equals(currentLevel)) {
             return;
         }
-        if(!level.equals(currentLevel))
+        if(level != null && !level.equals(currentLevel))
             getDataSelection().putProperty("levelChanged", true);
         //If we have no data or if its a slice then reset the data selection
         //to the new level and refetch data
