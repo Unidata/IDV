@@ -48,6 +48,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -871,9 +872,26 @@ public class DataSelectionWidget {
                 if (strideCbx.isSelected() ){
                     geoSelection.clearStride();
                 }
-                if ( !regionOption.equals(DataSelection.PROP_USESELECTEDAREA)) {
+                if ( regionOption.equals(DataSelection.PROP_USEDEFAULTAREA)) {
                     geoSelection.setBoundingBox(null);
                     geoSelection.setUseFullBounds(false);
+                } else if(regionOption.equals(DataSelection.PROP_USEDISPLAYAREA)){
+                    Rectangle2D sbox = navDisplay.getScreenBounds();
+                    vm.setProjectionFromData(false);
+                    try{
+                        Rectangle2D bbox = navDisplay.getLatLonBox();
+                        geoSelection.setLatLonRect(bbox);
+                        dataSelection.setGeoSelection(geoSelection);
+                        visad.georef.EarthLocation el = navDisplay.screenToEarthLocation(
+                                (int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
+                        LatLonPointImpl llpi =
+                                new LatLonPointImpl(el.getLatitude().getValue(),
+                                        el.getLongitude().getValue());
+
+                        dataSelection.putProperty("centerPosition", llpi);
+                    } catch (Exception ee){
+
+                    }
                 }
             }
             dataSelection.putProperty(

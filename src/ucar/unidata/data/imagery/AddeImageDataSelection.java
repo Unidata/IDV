@@ -29,11 +29,14 @@ import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
 import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.NavigatedViewManager;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.view.geoloc.NavigatedMapPanel;
 import ucar.unidata.view.geoloc.NavigatedPanel;
 
@@ -42,11 +45,12 @@ import visad.VisADException;
 import visad.data.mcidas.AREACoordinateSystem;
 import visad.data.mcidas.AreaAdapter;
 
-import visad.georef.MapProjection;
+import visad.georef.*;
 
 import java.awt.*;
 import java.awt.event.*;
 
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 
 import java.text.ParseException;
@@ -1732,6 +1736,25 @@ public class AddeImageDataSelection {
 
                 dataSelection.putProperty("advancedURL", urlInfo.cloneMe());
                 //System.out.println(urlInfo.getURLString());
+            } else if(regionOption.equals(DataSelection.PROP_USEDISPLAYAREA)){
+                ViewManager vm = dataSource.getIdv().getViewManager();
+                NavigatedDisplay navDisplay = ((NavigatedViewManager) vm).getNavigatedDisplay();
+                Rectangle2D sbox = navDisplay.getScreenBounds();
+                dataSource.getIdv().getViewManager().setProjectionFromData(false);
+                try{
+                Rectangle2D bbox = navDisplay.getLatLonBox();
+                geoSelection.setLatLonRect(bbox);
+                dataSelection.setGeoSelection(geoSelection);
+                visad.georef.EarthLocation el = navDisplay.screenToEarthLocation(
+                        (int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
+                LatLonPointImpl llpi =
+                        new LatLonPointImpl(el.getLatitude().getValue(),
+                                el.getLongitude().getValue());
+
+                dataSelection.putProperty("centerPosition", llpi);
+                } catch (Exception ee){
+
+                }
             }
 
 
