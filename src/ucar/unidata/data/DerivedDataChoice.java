@@ -566,23 +566,22 @@ public class DerivedDataChoice extends ListDataChoice {
                 //
                 DataSelection ds0 = selectedChoice.getDataSelection();
                 if (ds0 != null) {
-                    Object ud =
-                            ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    if ((ud != null) && ((Boolean) ud).booleanValue()) {
-                        dataSelection.putProperty(
-                                DataSelection.PROP_USESTIMEDRIVER, true);
-                    } else {
-                        dataSelection.putProperty(
-                                DataSelection.PROP_USESTIMEDRIVER, false);
+                    // If any of the selected choices uses time driver, progressive resolution,
+                    // or use display area, set those properties on the derived choice
+                    boolean useTD = ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER, false);
+                    if (useTD) {
+                        dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, true);
                     }
-                    Object ud0 =
-                            ds0.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION);
-                    if ((ud0 != null) && ((Boolean) ud0).booleanValue()) {
-                        dataSelection.putProperty(
-                                DataSelection.PROP_PROGRESSIVERESOLUTION, true);
-                    } else {
-                        dataSelection.putProperty(
-                                DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+                    boolean useDA = Misc.equals(ds0.getProperty(DataSelection.PROP_REGIONOPTION),
+                            DataSelection.PROP_USEDISPLAYAREA);
+                    if (useDA) {
+                        dataSelection.putProperty(DataSelection.PROP_REGIONOPTION, 
+                                DataSelection.PROP_USEDISPLAYAREA);
+                    }
+                    // not sure if we need to do this anymore since
+                    boolean usePR = ds0.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+                    if (usePR) {
+                        dataSelection.putProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, true);
                     }
                 }
                 //Add this data choice to the list of data choices
