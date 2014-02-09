@@ -2756,7 +2756,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 //System.out.print(llpi + "\n");
 
                 getDataSelection().putProperty("centerPosition", llpi);
-                dataChanged();
+                dataChanged0();
             } catch (Exception e) {};
         }
     }
@@ -2969,6 +2969,25 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         showNormalCursor();
     }
 
+    public synchronized void dataChanged0() {
+        if ( !getHaveInitialized()) {
+            return;
+        }
+        showWaitCursor();
+        try {
+            //Set the flag so we kinow we are being notified of a data change event
+            inDataChangeCall = true;
+            //Now, reset the data
+            resetData();
+            //Clear the flag
+            inDataChangeCall = false;
+        } catch (Exception exc) {
+            inDataChangeCall = false;
+            logException("Handling new data for display: " + toString(), exc);
+        }
+        updateLegendAndList();
+        showNormalCursor();
+    }
 
     /**
      * Method called by other classes that share the the state.
