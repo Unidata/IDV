@@ -238,6 +238,15 @@ Another example is to read each line from a file using the [isl::tag foreach]:
 [isl::importxml foreachlineinafile.isl]
 [isl::importxml test.txt]
 
+[isl::tagdef for {A for loop} -attrs {start {start value} end {end value} increment {increment by value}}]
+The [isl::tag for] tag allows you to have a for loop.  The start, end and increment attributes
+define the value of the index property at each step in the loop. Here's an example:
+[isl::xml {
+  <for start="5" end="20" increment="2">
+     <echo message="printing index ${index}"/>
+  </for>
+}]
+
 [isl::tagdef exec {Execute a shell command} -attrs {command+ {some shell command to exec}}]
 The [isl::tag exec] tag allows you to execute external programs.
 For example, if you were generating images on one machine and then need to
