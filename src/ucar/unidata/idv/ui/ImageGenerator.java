@@ -1051,7 +1051,33 @@ public class ImageGenerator extends IdvManager {
         }
         return error("Unknown tag:" + tagName);
     }
+    
+    /**
+     * Process the "for" tag
+     * 
+     * @param node  the tag node
+     * @return true if successful
+     * @throws Throwable an error
+     */
+    protected boolean processTagFor(Element node) throws Throwable {
+        pushProperties();
+        int  start = XmlUtil.getAttribute(node, "start",0);
+        int  end = XmlUtil.getAttribute(node, "end",0);
+        int  inc = XmlUtil.getAttribute(node, "increment",1);
 
+        for(int i=start;i<end;i+=inc) {
+            putProperty("index", ""+i);
+            try {
+                if ( !processChildren(node)) {
+                    return false;
+                }
+            } catch (MyBreakException be) {
+                break;
+            } catch (MyContinueException ce) {}
+        }
+        popProperties();
+        return true;
+    }
 
     /**
      * Recursively call processNode on each of the children elements
