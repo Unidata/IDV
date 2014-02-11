@@ -4028,7 +4028,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private void reloadTimeDriverDataSources(DisplayControl displayControl) {
         List<DataSource> uniqueSources =
             Collections.synchronizedList(new ArrayList<DataSource>());
-        List<DataSource> dcSources = ((DisplayControlImpl)displayControl).getDataSources();
+        List<DataSource> dcSources = null;
+        if(displayControl != null)
+            dcSources = ((DisplayControlImpl)displayControl).getDataSources();
         if (idv.getUseTimeDriver()
                 && ((displayControl == null)
                     || displayControl.getIsTimeDriver())) {
@@ -4043,7 +4045,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     for (int i = 0; i < controlSources.size(); i++) {
                         DataSourceImpl ds =
                             (DataSourceImpl) controlSources.get(i);
-                        if ( !uniqueSources.contains(ds) && !dcSources.contains(ds)) {
+                        if(displayControl == null && !uniqueSources.contains(ds)){
+                            uniqueSources.add(ds);
+                        } else if (!uniqueSources.contains(ds) && !dcSources.contains(ds)) {
                             uniqueSources.add(ds);
                         }
                     }

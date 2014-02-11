@@ -206,6 +206,10 @@ public class AddeImageDataSource extends ImageDataSource {
         if(getTmpPaths() != null){  // zidv bundle
             return;
         }
+        String ver = IdvPersistenceManager.getBundleIdvVersion();
+        if(ver == null || Character.getNumericValue(ver.charAt(0)) < 5)
+            return;
+
         if (this.source == null && imageList != null && imageList.size() > 0) {
             //List                imageList1 = getImageList();
             AddeImageDescriptor desc1 =
@@ -222,7 +226,7 @@ public class AddeImageDataSource extends ImageDataSource {
             if(zpath != null && zpath.length() > 0)
                 thisDir = desc1.getDirectory();
             else
-                thisDir = desc1.processSourceAsAddeUrl(this.source);
+                thisDir = desc1.getDirectory(); //desc1.processSourceAsAddeUrl(this.source);
             // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
             this.source = getPreviewSource(this.source, thisDir);
             if (oj != null) {
@@ -314,7 +318,7 @@ public class AddeImageDataSource extends ImageDataSource {
         if (fromBundle) {
             if (subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION)
                     == null) {
-                if(baseAnav == null){   //old bundle
+                if(baseAnav == null && this.source != null){   //old bundle
                     try {
                         areaAdapter = new AreaAdapter(this.source, false);
                         AreaFile areaFile = areaAdapter.getAreaFile();
