@@ -73,11 +73,51 @@ Specific lat/lon values can be entered in the fields on the left.
 [ht::cimg images/DataSourceSpatialSubset.gif]
 
 A version of this spatial subsetting window is used in the Field
-Selector. Here, you explicitly enable these settings. The decimation
-and spatial subset are shown in different tabs:
+Selector. Here, you have drop down menu of items: [ug::button Use Default Region], [ug::button Select A Region] and
+[ug::button Match Display Region]. These options allow you to use the default region, or to select a region, or to match the region
+of the active view window's display area. The decimation and spatial subset are shown in different tabs:
 
 [ht::cimg images/DataSourceSpatialSubsetField.gif]
 
+
+The spatial subsetting window for the Satellite imagery also provides the preview of the dataset:
+
+[ht::cimg images/DataSourceSateSpatialSubsetField.gif]
+
+<p>
+    The advanced tab for the the satellite imagery allows you to override the default properties the
+    IDV uses to specify other aspects of the image data. The default values in the [ug::button Advanced]
+    tab reflect what is showing in the [ug::button Region] tab. By default, all the text fields in this
+    tab are disabled. To enable these text fields, you can select [ug::button Select A Region] in
+    the [ug::button Region] tab, all the text fields except the [ug::button Magnification] will be editable.
+    The information in the [ug::button Region] tab will be passed to the [ug::button Advanced] tab.
+    Any changes in the [ug::button Advanced] tab will also be passed back to the [ug::button Region] tab.
+    You need to uncheck the [ug::button Use Progressive Resolution] checkbox in the user preferences to enable
+    the [ug::button Magnification] text field.
+
+    [ht::cimg images/DataSourceSateAdvanced.gif]
+<p>
+
+    You can specify the placement point of the image (e.g., Center, Upper Left)
+    and its  location. Location can either be specified as an Line/Element
+    coordinate or as Latitude/Longitude.  Use the cycle buttons to select
+    the type of location to use.
+
+<p>
+    The map button, <img src="choosers/images/MapIcon16.png"> will list the various center and corner locations
+    of the different available map views. This allows you to choose a lat/lon position.
+
+<p>
+    Image size and magnification can also be set.  Click on the slider
+    icon to change the values.
+
+<p>
+    The linked button (<img src="choosers/images/Linked.gif">), when selected, will automatically change the image size
+    as the magnification is changed.
+
+<p>
+    The Full Resolution button <img src="choosers/images/arrow_out.png"> allows you to set the magnifcation,
+    image size and position to be the full image resolution.
 
 <subhead intoc="false" id="details">Details</subhead>
 The Details tab shows further information about the data source, e.g.:
