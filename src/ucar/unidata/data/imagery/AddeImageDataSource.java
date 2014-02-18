@@ -315,7 +315,7 @@ public class AddeImageDataSource extends ImageDataSource {
         //if (allBandDirs == null) {  //geoSelection == null)
             //return descriptors;
         //}
-        if (fromBundle) {
+        if (fromBundle || allBandDirs == null ) {
             if (subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION)
                     == null) {
                 if(baseAnav == null && this.source != null){   //old bundle
