@@ -188,6 +188,10 @@ public class ButtonTabbedPane extends JPanel {
         Rectangle b = button.getBounds();
         g.setColor(button.getBackground());
         g.setFont(button.getFont());
+        ((Graphics2D)g).setRenderingHint(
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+
         if (button.isSelected()) {
             g.setColor(BUTTON_ON_COLOR);
         }
@@ -346,7 +350,8 @@ public class ButtonTabbedPane extends JPanel {
     public JToggleButton addTab(String label, final Component contents) {
         final JToggleButton[] tmp    = { null };
         JToggleButton         button = tmp[0] = new JToggleButton(label) {
-            public void paint(Graphics g) {
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
                 paintButton(g, tmp[0]);
             }
         };
