@@ -1012,6 +1012,9 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
 
             g.setFont(BUTTON_FONT);
             FontMetrics   fm          = g.getFontMetrics(g.getFont());
+            ((Graphics2D)g).setRenderingHint(
+                RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
 
             JToggleButton btn         = controlInfo.button;
             Rectangle     b           = btn.getBounds();
@@ -1078,7 +1081,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
             JToggleButton btn = controlInfo.button =
                                     new JToggleButton(StringUtil.padRight("",
                                         20), true) {
-                public void paint(Graphics g) {
+                public void paintComponent(Graphics g) {
+                    super.paintComponent(g);
                     paintButton(g, controlInfo);
                 }
             };
