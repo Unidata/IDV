@@ -460,6 +460,19 @@ NUM TECH ERRS RETIRED COLOR DEFAULTS INT-DEFS RADII-DEFS LONG-NAME
         Hashtable seenDate = new Hashtable();
         initParams();
         int xcnt = 0;
+        // check if the tech num is included
+        // some actf files do not have tech num for some reasom.
+        List toks1 = StringUtil.split(lines.get(1), ",", true);
+        String techNum = (String) toks1.get(IDX_TECHNUM); 
+        if(techNum.length() > 0 && !techNum.matches("\\d+")){
+            IDX_TECH = IDX_TECH-1;
+            IDX_TAU = IDX_TAU-1;
+            IDX_LAT = IDX_LAT-1;
+            IDX_LON = IDX_LON-1;
+            IDX_VMAX = IDX_VMAX-1;
+            IDX_MSLP = IDX_MSLP-1;
+            IDX_TY = IDX_TY-1;
+        }
         for (int i = 0; i < lines.size(); i++) {
             String line = (String) lines.get(i);
             if (i == 0) {
