@@ -3382,7 +3382,10 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                                            .getText().trim()).doubleValue()));
         }
 
-        boolean useDisplayArea = geoSelectionPanel.getUseDisplayArea();
+        boolean useDisplayArea =  false;
+        if(geoSelectionPanel != null){
+            useDisplayArea = geoSelectionPanel.getUseDisplayArea();
+        }
         properties.put(DataSelection.PROP_USEDISPLAYAREA, useDisplayArea);
 
         return true;
