@@ -6,7 +6,7 @@ ucar.  (Unless overwritten by a calling ant process or by a command line
 argument -Dfoo=bar) -->
 
 
-<project basedir="../../../../" default="install_plugin" name="SimpleIdv">
+<project basedir="../../../../../" default="install_plugin" name="SimpleIdv">
 
     <import file="../../../../../build.xml"/>
 
@@ -28,7 +28,7 @@ argument -Dfoo=bar) -->
 
     <target name="jar" depends="simpleidv">
         <jar
-            basedir="${srcdir}"
+            basedir="${sourcedir}"
             compress="true"
             update="false"
             jarfile="${jars_dest}/simpleidv.jar">
