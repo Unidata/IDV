@@ -21,81 +21,68 @@
 package ucar.unidata.idv.control;
 
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.vecmath.Point3d;
+
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.Earth;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.view.geoloc.NavigatedDisplay;
-
 import ucar.visad.display.CrossSectionSelector;
-import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.DisplayableData;
-
-
-import ucar.visad.display.SelectorDisplayable;
-
-
-import visad.*;
-
-import visad.data.units.Parser;
-
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.Unit;
+import visad.VisADException;
+import visad.VisADRay;
 import visad.georef.EarthLocation;
-
 import visad.georef.EarthLocationTuple;
-
 import visad.georef.LatLonPoint;
 import visad.georef.LatLonTuple;
-
-
-
-import java.awt.*;
-
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
-
-import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-
-import java.util.Hashtable;
-import java.util.List;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.*;
-
-import javax.vecmath.Point3d;
-
-
 
 /**
  * Class to make a dragable line with end points which computes the
  * range and bearing between the end points.
  *
  * Also makes a JFrame with text display of range and bearing values, and
- * control buttoms to remove the whole thing etc.
+ * control buttons to remove the whole thing etc.
  *
  * @author Jeff McWhirter
  * @version  $Revision: 1.87 $
  */
+
 public class RangeAndBearingControl extends DisplayControlImpl implements ActionListener,
         PropertyChangeListener, DisplayableData.DragAdapter {
 
@@ -280,14 +267,64 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
             // move line to persisted location for line
             setSelectorPosition();
         }
+        initPlanetUIComponents();
         updateFields();
         setRangeAndBearing();
         return true;
     }
 
-
-
     /**
+     * TJJ 26 Feb 2014
+     * This method was created so we can be sure these UI components exist
+     * at initialization.  They were previously referenced in multiple places
+     * and unit changes were causing NPEs.
+     */
+    
+	private void initPlanetUIComponents() {
+
+		/*
+		 * Values taken from McIDAS-X.
+		 * 
+		 * rad = [2440.,6120.,6378.137,3393.5,71400.,60330., 25900., 24750.] ec
+		 * = [0., 0., 0.08181919, 0.1333386, 0.35412,0.41019,0.2086,0.2]
+		 * name=['Mercury','Venus', 'Earth','Mars','Jupiter','Saturn',
+		 * 'Uranus','Neptune']
+		 */
+
+		Earth[] planets = {
+				new Earth(6378.137 * 1000, 6356.752 * 1000, 0, "Earth"),
+				new Earth(2440.0 * 1000, 2440.0 * 1000, 0, "Mercury"),
+				new Earth(6120.0 * 1000, 6120.0 * 1000, 0, "Venus"),
+				new Earth(3393.5 * 1000, 3363.2 * 1000, 0, "Mars"),
+				new Earth(71400.0 * 1000, 66773.3 * 1000, 0, "Jupiter"),
+				new Earth(60330.0 * 1000, 55021.0 * 1000, 0, "Saturn"),
+				new Earth(25900.0 * 1000, 25330.2 * 1000, 0, "Uranus"),
+				new Earth(24750.0 * 1000, 24249.9 * 1000, 0, "Neptune") };
+
+		Vector<TwoFacedObject> tfos = new Vector<TwoFacedObject>();
+		TwoFacedObject selected = null;
+		for (Earth aPlanet : planets) {
+			TwoFacedObject tfo = new TwoFacedObject(aPlanet.getName() + " ("
+					+ aPlanet.getEquatorRadius() / 1000 + "x"
+					+ aPlanet.getPoleRadius() / 1000 + ")", aPlanet);
+			tfos.add(tfo);
+			if (Misc.equals(aPlanet, planet)) {
+				selected = tfo;
+			}
+		}
+		
+		planetCB = new JComboBox(tfos);
+		if (selected != null) {
+			planetCB.setSelectedItem(selected);
+		}
+
+		useListBtn = new JRadioButton("Use predefined:", (selected != null));
+		useFldBtn = new JRadioButton("Enter your own value:",
+				(selected == null));
+
+	}
+
+	/**
      * Set the stations used for the combo boxes
      */
     private void setStations() {
@@ -408,7 +445,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
     /**
      * Create a JTextField with a particular CMD
      *
-     * @param command   commmand to use for actions
+     * @param command   command to use for actions
      * @return   JTextField
      */
     private JTextField getField(String command) {
@@ -598,48 +635,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
      */
     protected void addPropertiesComponents(JTabbedPane jtp) {
         super.addPropertiesComponents(jtp);
-        /*
-          Values taken from McIDAS-X.
 
-          rad = [2440.,6120.,6378.137,3393.5,71400.,60330., 25900., 24750.]
-          ec = [0., 0., 0.08181919, 0.1333386, 0.35412,0.41019,0.2086,0.2]
-          name=['Mercury','Venus', 'Earth','Mars','Jupiter','Saturn', 'Uranus','Neptune']
-        */
-
-        Earth[] planets = {
-            new Earth(6378.137 * 1000, 6356.752 * 1000, 0, "Earth"),
-            new Earth(2440.0 * 1000, 2440.0 * 1000, 0, "Mercury"),
-            new Earth(6120.0 * 1000, 6120.0 * 1000, 0, "Venus"),
-            new Earth(3393.5 * 1000, 3363.2 * 1000, 0, "Mars"),
-            new Earth(71400.0 * 1000, 66773.3 * 1000, 0, "Jupiter"),
-            new Earth(60330.0 * 1000, 55021.0 * 1000, 0, "Saturn"),
-            new Earth(25900.0 * 1000, 25330.2 * 1000, 0, "Uranus"),
-            new Earth(24750.0 * 1000, 24249.9 * 1000, 0, "Neptune")
-        };
-
-        Vector<TwoFacedObject> tfos     = new Vector<TwoFacedObject>();
-        TwoFacedObject         selected = null;
-        for (Earth aPlanet : planets) {
-            TwoFacedObject tfo = new TwoFacedObject(aPlanet.getName() + " ("
-                                     + aPlanet.getEquatorRadius() / 1000
-                                     + "x" + aPlanet.getPoleRadius() / 1000
-                                     + ")", aPlanet);
-            tfos.add(tfo);
-            if (Misc.equals(aPlanet, planet)) {
-                selected = tfo;
-            }
-        }
-        planetCB = new JComboBox(tfos);
-        if (selected != null) {
-            planetCB.setSelectedItem(selected);
-        }
-        //        planetCB.setFont(Font.decode("monospaced"));
-
-
-
-        useListBtn = new JRadioButton("Use predefined:", (selected != null));
-        useFldBtn = new JRadioButton("Enter your own value:",
-                                     (selected == null));
         GuiUtils.buttonGroup(useListBtn, useFldBtn);
         rad1Fld = new JTextField(planet.getEquatorRadius() / 1000 + "", 10);
         rad2Fld = new JTextField(planet.getPoleRadius() / 1000 + "", 10);
