@@ -665,7 +665,8 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
         if ( !super.doApplyProperties()) {
             return false;
         }
-
+        if(planetCB == null)
+            return true;
         TwoFacedObject selected = (TwoFacedObject) planetCB.getSelectedItem();
 
         //For now just use the combobox
