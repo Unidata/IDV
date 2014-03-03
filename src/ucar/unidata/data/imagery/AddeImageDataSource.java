@@ -1352,11 +1352,17 @@ public class AddeImageDataSource extends ImageDataSource {
             DataChoice dataChoice) {
 
         try {
-            String zpath = (String)getIdv().getStateManager().getProperty(
+           /* String zpath = (String)getIdv().getStateManager().getProperty(
                     IdvPersistenceManager.PROP_ZIDVPATH);
             if(zpath != null && zpath.length() > 0) // is zidv
+                return; */
+            boolean fromBundle = getIdv().getStateManager().getProperty(
+                    IdvConstants.PROP_LOADINGXML, false);
+            
+            if(fromBundle) {
+                super.initDataSelectionComponents(components, dataChoice);
                 return;
-
+            }
             //AreaAdapter   aa = new AreaAdapter(this.source, false);
             BandInfo id = null;
             if ((dataChoice.getId() instanceof BandInfo)
