@@ -6287,7 +6287,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             names.add(MACRO_FHOUR);
             labels.add("Forecast Hour");
             names.add(MACRO_FHOUR2);
-            labels.add("Forecast Hour 2");
+            labels.add("Forecast Hour (value only)");
         }
     }
 
