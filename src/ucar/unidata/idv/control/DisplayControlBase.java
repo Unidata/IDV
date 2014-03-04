@@ -196,6 +196,9 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** forecast hour macro */
     public static final String MACRO_FHOUR = "%fhour%";
 
+    /** forecast hour macro without the 'H' -- user can format their own*/
+    public static final String MACRO_FHOUR2 = "%fhour2%";
+
     /** String used as the action command for the color setting button */
     public static final String CMD_COLORS = "cmd.colors";
 
