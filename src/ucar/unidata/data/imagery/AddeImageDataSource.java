@@ -258,7 +258,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
         this.choiceName = dataChoice.getName();
         if (this.choiceName != null) {
-            setProperty(PROP_DATACHOICENAME, this.choiceName);
+       //     setProperty(PROP_DATACHOICENAME, this.choiceName);
         }
 
         return super.getDataInner(dataChoice, category, dataSelection,
@@ -333,15 +333,21 @@ public class AddeImageDataSource extends ImageDataSource {
                 return descriptors;
             }
             // new bundle
-            if(getTmpPaths() != null)
-                return descriptors;
+            String zpath = (String)getIdv().getStateManager().getProperty(
+                    IdvPersistenceManager.PROP_ZIDVPATH);
             try {
-                List dList = (List)dataChoice.getProperty("descriptors");
-                if(dList == null)
+                descriptors = (List)dataChoice.getProperty("descriptors");
+                if( zpath != null) //zidv case
                     return descriptors;
-                descriptors = dList;
+                //descriptors = dList;
             } catch (Exception e) {}
-
+            BandInfo id = (BandInfo)dataChoice.getId();
+            AreaDirectory thisDir = 
+                    (AreaDirectory)allBandDirs.get(id.getBandNumber());
+            List dsList = new ArrayList();
+            dataChoice.getDataSources(dsList);
+            AddeImageDataSource ds = (AddeImageDataSource)dsList.get(0);
+            this.source = getPreviewSource(ds.source,thisDir);
             return descriptors;
         }
         Rectangle2D rect  = geoSelection.getScreenBound();
@@ -1356,13 +1362,7 @@ public class AddeImageDataSource extends ImageDataSource {
                     IdvPersistenceManager.PROP_ZIDVPATH);
             if(zpath != null && zpath.length() > 0) // is zidv
                 return; */
-            boolean fromBundle = getIdv().getStateManager().getProperty(
-                    IdvConstants.PROP_LOADINGXML, false);
-            
-            if(fromBundle) {
-                super.initDataSelectionComponents(components, dataChoice);
-                return;
-            }
+
             //AreaAdapter   aa = new AreaAdapter(this.source, false);
             BandInfo id = null;
             if ((dataChoice.getId() instanceof BandInfo)
