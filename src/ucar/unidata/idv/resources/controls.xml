@@ -1085,7 +1085,7 @@ Since this is confusing and needs more work lets remove this for now
   <control
      id="frontdrawingcontrol"
      categories="fronts"
-     class="ucar.unidata.idv.control.DrawingControl"
+     class="ucar.unidata.idv.control.FrontDrawingControl"
      label="Front Display"
      displaycategory="General"
      properties="windowVisible=true;showInTabs=true">

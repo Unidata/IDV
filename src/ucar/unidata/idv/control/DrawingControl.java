@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -19,6 +19,59 @@
  */
 
 package ucar.unidata.idv.control;
+
+
+import org.python.util.PythonInterpreter;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import ucar.unidata.collab.Sharable;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.idv.control.drawing.DrawingCommand;
+import ucar.unidata.idv.control.drawing.DrawingGlyph;
+import ucar.unidata.idv.control.drawing.FrontGlyph;
+import ucar.unidata.idv.control.drawing.GlyphCreatorCommand;
+import ucar.unidata.idv.control.drawing.HighLowGlyph;
+import ucar.unidata.idv.control.drawing.ImageGlyph;
+import ucar.unidata.idv.control.drawing.MovieGlyph;
+import ucar.unidata.idv.control.drawing.PolyGlyph;
+import ucar.unidata.idv.control.drawing.ShapeGlyph;
+import ucar.unidata.idv.control.drawing.SymbolGlyph;
+import ucar.unidata.idv.control.drawing.TextGlyph;
+import ucar.unidata.ui.FineLineBorder;
+import ucar.unidata.util.ColorTable;
+import ucar.unidata.util.FileManager;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.xml.XmlUtil;
+
+import ucar.visad.data.CalendarDateTime;
+import ucar.visad.display.Animation;
+import ucar.visad.display.CompositeDisplayable;
+import ucar.visad.display.Displayable;
+import ucar.visad.display.FrontDrawer;
+
+import visad.Data;
+import visad.DateTime;
+import visad.DisplayEvent;
+import visad.Gridded1DSet;
+import visad.Real;
+import visad.Set;
+import visad.SingletonSet;
+import visad.UnionSet;
+import visad.Unit;
+import visad.VisADException;
+import visad.VisADRay;
+
+import visad.georef.EarthLocation;
+
 
 import java.awt.Color;
 import java.awt.Component;
@@ -62,61 +115,13 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.AbstractTableModel;
 
-import org.python.util.PythonInterpreter;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.idv.control.drawing.DrawingCommand;
-import ucar.unidata.idv.control.drawing.DrawingGlyph;
-import ucar.unidata.idv.control.drawing.FrontGlyph;
-import ucar.unidata.idv.control.drawing.GlyphCreatorCommand;
-import ucar.unidata.idv.control.drawing.HighLowGlyph;
-import ucar.unidata.idv.control.drawing.ImageGlyph;
-import ucar.unidata.idv.control.drawing.MovieGlyph;
-import ucar.unidata.idv.control.drawing.PolyGlyph;
-import ucar.unidata.idv.control.drawing.ShapeGlyph;
-import ucar.unidata.idv.control.drawing.SymbolGlyph;
-import ucar.unidata.idv.control.drawing.TextGlyph;
-import ucar.unidata.ui.FineLineBorder;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.view.geoloc.NavigatedDisplay;
-import ucar.unidata.xml.XmlUtil;
-import ucar.visad.data.CalendarDateTime;
-import ucar.visad.display.Animation;
-import ucar.visad.display.CompositeDisplayable;
-import ucar.visad.display.Displayable;
-import ucar.visad.display.FrontDrawer;
-
-import visad.Data;
-import visad.DateTime;
-import visad.DisplayEvent;
-import visad.Gridded1DSet;
-import visad.Real;
-import visad.Set;
-import visad.SingletonSet;
-import visad.UnionSet;
-import visad.Unit;
-import visad.VisADException;
-import visad.VisADRay;
-import visad.georef.EarthLocation;
 
 /**
  * A MetApps Display Control for drawing lines on a navigated
  * display.
  *
  * @author MetApps development team
- * @version $Revision: 1.145 $
+ *
  */
 
 public class DrawingControl extends DisplayControlImpl {
@@ -2011,11 +2016,12 @@ public class DrawingControl extends DisplayControlImpl {
 
         items.add(GuiUtils.makeMenuItem("Remove All", this,
                                         "removeAllGlyphs"));
-        if(! checkFlag(FLAG_GRIDTRAJECTORY)) {
+        if ( !checkFlag(FLAG_GRIDTRAJECTORY)) {
             items.add(GuiUtils.makeMenuItem("Apply Color to Selected", this,
                                             "applyColorToAll"));
-            items.add(GuiUtils.makeMenuItem("Apply Z Position to Selected", this,
-                                            "applyZPosition", selectedGlyphs));
+            items.add(GuiUtils.makeMenuItem("Apply Z Position to Selected",
+                                            this, "applyZPosition",
+                                            selectedGlyphs));
         }
         super.getEditMenuItems(items, forMenuBar);
 
@@ -2094,18 +2100,22 @@ public class DrawingControl extends DisplayControlImpl {
      */
     private void doExport() {
         try {
-          loadAsMapData = null;
-          Boolean okayMap = true;
+            loadAsMapData = null;
+            Boolean okayMap = true;
 
-            for (int i = 0; i < glyphs.size(); i++) { 
-              if (((DrawingGlyph)glyphs.get(i)).getTagName() != 
-                                  DrawingGlyph.TAG_POLYGON) okayMap = false;
+            for (int i = 0; i < glyphs.size(); i++) {
+                if (((DrawingGlyph) glyphs.get(i)).getTagName()
+                        != DrawingGlyph.TAG_POLYGON) {
+                    okayMap = false;
+                }
             }
 
-              if (okayMap) {
-                loadAsMapData = new JCheckBox("Load polygons as map data", false);
-                loadAsMapData.setToolTipText("Load polygons in this xgrf file back in as map data");
-              }
+            if (okayMap) {
+                loadAsMapData = new JCheckBox("Load polygons as map data",
+                        false);
+                loadAsMapData.setToolTipText(
+                    "Load polygons in this xgrf file back in as map data");
+            }
 
             String filename = FileManager.getWriteFile(FILTER_XGRF,
                                   SUFFIX_XGRF, GuiUtils.top(loadAsMapData));
@@ -2117,7 +2127,7 @@ public class DrawingControl extends DisplayControlImpl {
                 return;
             }
             IOUtil.writeFile(filename, xml);
-            if ( (loadAsMapData != null) && (loadAsMapData.isSelected()) ) {
+            if ((loadAsMapData != null) && (loadAsMapData.isSelected())) {
                 getIdv().makeOneDataSource(filename, "FILE.MAPFILE", null);
             }
         } catch (Exception exc) {
@@ -2645,9 +2655,9 @@ public class DrawingControl extends DisplayControlImpl {
      *
      *
      * @author IDV Development Team
-     * @version $Revision: 1.145 $
+     * 
      */
-    private class GlyphTable extends JTable {
+    public class GlyphTable extends JTable {
 
         /** table model */
         GlyphTableModel myTableModel;
@@ -2810,7 +2820,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @author IDV Development Team
      * @version $Revision: 1.145 $
      */
-    private class GlyphTableModel extends AbstractTableModel {
+    public class GlyphTableModel extends AbstractTableModel {
 
         /** Ignore any events */
         boolean ignoreChanges = false;
@@ -2922,6 +2932,9 @@ public class DrawingControl extends DisplayControlImpl {
                 return "Type";
             }
             if (column == 2) {
+                return "Coordinates";
+            }
+            if (column == 3) {
                 return "Properties";
             }
             if ( !editable) {
