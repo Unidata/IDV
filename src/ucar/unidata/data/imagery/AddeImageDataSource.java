@@ -336,9 +336,10 @@ public class AddeImageDataSource extends ImageDataSource {
             String zpath = (String)getIdv().getStateManager().getProperty(
                     IdvPersistenceManager.PROP_ZIDVPATH);
             try {
-                descriptors = (List)dataChoice.getProperty("descriptors");
+
                 if( zpath != null) //zidv case
                     return descriptors;
+                descriptors = (List)dataChoice.getProperty("descriptors");
                 //descriptors = dList;
             } catch (Exception e) {}
             BandInfo id = (BandInfo)dataChoice.getId();
