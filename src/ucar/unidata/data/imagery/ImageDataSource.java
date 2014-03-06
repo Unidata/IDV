@@ -389,7 +389,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     continue;
                 }
                 DirectDataChoice ddc = (DirectDataChoice) dc;
-                List<AddeImageDescriptor> dList = (List)ddc.getProperty("descriptors");
+                List<AddeImageDescriptor> dList = (List)ddc.getProperty("descriptorsToSave");
                 if(dList != null){
                     for (AddeImageDescriptor descriptor : dList) {
                         descriptorsToSave.add(descriptor);

@@ -551,6 +551,9 @@ public class AddeImageDataSource extends ImageDataSource {
             magValue = "Magnification: " + dlMag + " " + deMag;
         }
         dataChoice.setProperty("MAG", magValue);
+        Hashtable dp = new Hashtable();
+        dp.put("descriptorsToSave", descriptors);
+        dataChoice.setProperties(dp);
         return descriptors;
 
 
