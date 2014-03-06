@@ -2647,7 +2647,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @author IDV Development Team
      * @version $Revision: 1.145 $
      */
-    private class GlyphTable extends JTable {
+    public class GlyphTable extends JTable {
 
         /** table model */
         GlyphTableModel myTableModel;
@@ -2810,7 +2810,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @author IDV Development Team
      * @version $Revision: 1.145 $
      */
-    private class GlyphTableModel extends AbstractTableModel {
+    public class GlyphTableModel extends AbstractTableModel {
 
         /** Ignore any events */
         boolean ignoreChanges = false;
@@ -2922,6 +2922,9 @@ public class DrawingControl extends DisplayControlImpl {
                 return "Type";
             }
             if (column == 2) {
+                return "Coordinates";
+            }
+            if (column == 3) {
                 return "Properties";
             }
             if ( !editable) {
