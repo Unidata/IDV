@@ -32,13 +32,16 @@ error_msg="IDV failed to start. Please contact support-idv@unidata.ucar.edu"
 dirname=`dirname $0`
 
 java="java"
-if test -f jre/bin/java; then
+
+JRE_INSTALL4J_VAR
+    
+if test -f ${jre}/bin/java; then
 # We are in the installer directory
-    java=./jre/bin/${java}
+    java=${jre}/bin/${java}
 else
 # Try using the dirname of this script
-    if test -f ${dirname}/jre/bin/java; then
-       java=${dirname}/jre/bin/${java}
+    if test -f ${dirname}/${jre}/bin/java; then
+       java=${dirname}/${jre}/bin/${java}
     else
        if test  ${JAVA_HOME}; then
 # Try using JAVA_HOME
@@ -84,4 +87,4 @@ fi
 # idv_maxpermgensize=128
 
 # Sun OS users: To run in 64 bit mode, add -d64 before -Xmx.  
-${java} -Xmx${idv_memory}m -XX:PermSize=${idv_maxpermgensize}m -XX:MaxPermSize=${idv_maxpermgensize}m -XX:+DisableExplicitGC -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
+${java} XDOCK_INSTALL4J_VAR -Djava.ext.dirs=${dirname}/Java3D -Xmx${idv_memory}m -XX:PermSize=${idv_maxpermgensize}m -XX:MaxPermSize=${idv_maxpermgensize}m -XX:+DisableExplicitGC -Didv.enableStereo=false -jar ${dirname}/idv.jar $*

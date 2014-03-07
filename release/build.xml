@@ -632,10 +632,6 @@ line using: and -Dbasedir=/some/other/dir
             <param name="todir" value="${webstart_jar_dir}"/>
         </antcall>
 
-        <antcall target="copyandsign">
-            <param name="file" value="simpleidv.jar"/>
-            <param name="todir" value="${webstart_jar_dir}"/>
-        </antcall>
     </target>
 
     <target name="copy">
@@ -676,7 +672,6 @@ line using: and -Dbasedir=/some/other/dir
                          visad.jar \
                          idv.jar \
                          ncIdv.jar \
-                         simpleidv.jar \
                          jython.jar" />
         </zip>
     </target>

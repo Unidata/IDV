@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.2" transformSequenceNumber="4">
-  <directoryPresets config="/share/idv/MacOScertificates/IDVSignSeanArms.p12" />
-  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="3.1.1" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
+<install4j version="5.1.7" transformSequenceNumber="4">
+  <directoryPresets config="foobar" />
+  <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="4.1" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -22,18 +22,18 @@
   </application>
   <files keepModificationTimes="false" missingFilesStrategy="warn" globalExcludeSuffixes="" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
     <filesets>
-      <fileset name="Linux Java3D" id="231" customizedId="" />
-      <fileset name="Mac OS-X" id="291" customizedId="" />
+      <fileset name="Java 3D" id="695" customizedId="" />
+      <fileset name="Mac OS-X" id="835" customizedId="" />
     </filesets>
     <roots>
-      <root id="232" fileset="231" location="" />
-      <root id="292" fileset="291" location="" />
+      <root id="696" fileset="695" location="" />
+      <root id="836" fileset="835" location="" />
     </roots>
     <mountPoints>
       <mountPoint id="175" root="" location="licenses" mode="755" />
       <mountPoint id="1" root="" location="" mode="755" />
-      <mountPoint id="233" root="232" location="" mode="755" />
-      <mountPoint id="293" root="292" location="" mode="755" />
+      <mountPoint id="697" root="696" location="" mode="755" />
+      <mountPoint id="837" root="836" location="" mode="755" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="175" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/LICENSE.apache" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -49,25 +49,19 @@
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/visad.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/jython.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/ncIdv.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/simpleidv.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/NOTICE" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/idv.gif" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV" overwriteMode="5" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.bat" overwriteMode="5" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/simpleIDV" overwriteMode="5" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/simpleIDV.bat" overwriteMode="5" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="233" file="${compiler:JREDIR}/jre/linux/java3d-1.3.1-linux.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="293" file="${compiler:SRCDIR}/libsrc/macos-java3d_jogl.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <dirEntry mountPoint="293" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/mac" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
-        <exclude>
-          <entry location="IDV.app/.svn" fileType="regular" />
-          <entry location="IDV.app/Contents/MacOS/.svn" fileType="regular" />
-          <entry location="IDV.app/Contents/.svn" fileType="regular" />
-          <entry location="IDV.app/Contents/Resources/.svn" fileType="regular" />
-          <entry location=".svn" fileType="regular" />
-        </exclude>
+      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-linux.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-solaris.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-windows.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-macosx.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <dirEntry mountPoint="837" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/mac" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
+        <exclude />
       </dirEntry>
+      <fileEntry mountPoint="837" file="${compiler:SRCDIR}/libsrc/osxjre.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
     </entries>
     <components>
       <component name="IDV Components" id="67" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
@@ -101,17 +95,17 @@
           <component id="67" />
         </dependencies>
       </component>
-      <component name="Java 3D 1.3" id="230" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="true" downloadable="false" hidden="false">
+      <component name="Java 3D" id="770" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="true" downloadable="false" hidden="false">
         <description />
         <include all="false">
-          <entry location=".i4j_fileset_231" fileType="regular" />
+          <entry location=".i4j_fileset_695" fileType="regular" />
         </include>
         <dependencies />
       </component>
-      <component name="OS X JOGL" id="295" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="true" downloadable="false" hidden="false">
+      <component name="Mac OS X" id="909" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="true" downloadable="false" hidden="false">
         <description />
         <include all="false">
-          <entry location=".i4j_fileset_291" fileType="regular" />
+          <entry location=".i4j_fileset_835" fileType="regular" />
         </include>
         <dependencies />
       </component>
@@ -122,7 +116,7 @@
     <launcher name="runIDV.bat" id="7" customizedId="" external="true" excludeFromMenu="true" unixMode="755" menuName="" externalFile="runIDV.bat" />
     <launcher name="simpleIDV" id="4" customizedId="" external="true" excludeFromMenu="false" unixMode="755" menuName="" externalFile="simpleIDV" />
     <launcher name="simpleIDV.bat" id="9" customizedId="" external="true" excludeFromMenu="true" unixMode="755" menuName="" externalFile="simpleIDV.bat" />
-    <launcher name="IDV" id="49" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="">
+    <launcher name="IDV" id="49" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="IDV" type="1" iconSet="true" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -162,7 +156,7 @@
       <customAttributes />
     </autoUpdate>
     <applications>
-      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.InstallerApplication">
@@ -229,6 +223,9 @@
                       <string>${compiler:SRCDIR}/src/ucar/unidata/idv/images/logo.gif</string>
                     </object>
                   </void>
+                  <void property="updateCheck">
+                    <boolean>false</boolean>
+                  </void>
                 </object>
               </java>
             </serializedBean>
@@ -243,7 +240,8 @@
                     <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" />
                   </java>
                 </serializedBean>
-                <condition>context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
+                <condition>context.getBooleanVariable("sys.confirmedUpdateInstallation")
+</condition>
               </action>
             </actions>
             <formComponents />
@@ -272,19 +270,161 @@
             <actions />
             <formComponents />
           </screen>
-          <screen name="" id="78" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <group name="Installation location loop" id="1212" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" />
+                <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                  <void property="loop">
+                    <boolean>true</boolean>
+                  </void>
+                  <void property="loopExpression">
+                    <object class="com.install4j.api.beans.ScriptProperty">
+                      <void property="value">
+                        <string>context.getVariable("yesno") != null &amp;&amp; context.getVariable("yesno").equals("no")
+</string>
+                      </void>
+                    </object>
+                  </void>
+                </object>
               </java>
             </serializedBean>
-            <condition>!context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
-            <validation />
-            <preActivation />
-            <postActivation />
-            <actions />
-            <formComponents />
-          </screen>
+            <beans>
+              <screen name="" id="1204" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen">
+                      <void property="validateApplicationId">
+                        <boolean>false</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>!context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
+                <validation />
+                <preActivation>// The only way we can get here is if we are looping for at least the second time.
+// Therefore, user did not want to overwrite thus provide a clean slate.
+if (context.getVariable("yesno") != null &amp;&amp; context.getVariable("yesno").equals("no")) {
+    context.setInstallationDirectory(new File(System.getProperty("user.home") + File.separator + context.getCompilerVariable("INSTALLDIR")));    
+}</preActivation>
+                <postActivation>//If we are no longer updating, set yesno to null so we can exit loop.
+if (!context.isUpdateInstallation()) {
+  context.setVariable("yesno", null);
+}</postActivation>
+                <actions>
+                  <action name="" id="1205" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction">
+                          <void property="excludedVariables">
+                            <array class="java.lang.String" length="1">
+                              <void index="0">
+                                <string>sys.installationDir</string>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>context.getVariable("sys.responseFile") == null</condition>
+                  </action>
+                </actions>
+                <formComponents />
+              </screen>
+              <screen name="Update confirmation" id="1206" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.screens.FormScreen">
+                      <void property="subTitle">
+                        <string>Do you wish to update that installation?</string>
+                      </void>
+                      <void property="title">
+                        <string>A previous installation has been detected.</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>context.isUpdateInstallation()</condition>
+                <validation />
+                <preActivation />
+                <postActivation />
+                <actions />
+                <formComponents>
+                  <group name="" id="1207" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" />
+                      </java>
+                    </serializedBean>
+                    <beans>
+                      <formComponent name="Yes" id="1208" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SingleRadiobuttonComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.SingleRadiobuttonComponent">
+                              <void property="initiallySelected">
+                                <boolean>true</boolean>
+                              </void>
+                              <void property="radioButtonLabel">
+                                <string>Yes, update the existing installation</string>
+                              </void>
+                              <void property="variableName">
+                                <string>yesno</string>
+                              </void>
+                              <void property="variableValue">
+                                <string>yes</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibilityScript />
+                      </formComponent>
+                      <formComponent name="No" id="1209" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SingleRadiobuttonComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.SingleRadiobuttonComponent">
+                              <void property="radioButtonLabel">
+                                <string>No, install into a different directory</string>
+                              </void>
+                              <void property="variableName">
+                                <string>yesno</string>
+                              </void>
+                              <void property="variableValue">
+                                <string>no</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibilityScript />
+                      </formComponent>
+                      <formComponent name="" id="1210" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibilityScript />
+                      </formComponent>
+                      <formComponent name="" id="1211" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.LabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.LabelComponent">
+                              <void property="labelText">
+                                <string>Click Next to continue, or Cancel to exit Setup.</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibilityScript />
+                      </formComponent>
+                    </beans>
+                  </group>
+                </formComponents>
+              </screen>
+            </beans>
+          </group>
           <screen name="" id="79" customizedId="" beanClass="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
@@ -329,131 +469,6 @@
                       </void>
                       <void property="variableName">
                         <string>createDesktopLinkAction</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript />
-                <visibilityScript />
-              </formComponent>
-            </formComponents>
-          </screen>
-          <screen name="Linux Options" id="227" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
-            <serializedBean>
-              <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.screens.FormScreen">
-                  <void property="subTitle">
-                    <string>Choose Java 3D Version</string>
-                  </void>
-                  <void property="title">
-                    <string>Java 3D Version</string>
-                  </void>
-                </object>
-              </java>
-            </serializedBean>
-            <condition>return Util.isLinux() &amp;&amp; context.getMediaName().indexOf("86") &gt;= 0 &amp;&amp; context.getMediaName().indexOf("64") &lt; 0;</condition>
-            <validation />
-            <preActivation />
-            <postActivation />
-            <actions />
-            <formComponents>
-              <formComponent name="" id="480" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.LabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.LabelComponent">
-                      <void property="labelText">
-                        <string>Which version of Java3D should be installed?</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript />
-                <visibilityScript />
-              </formComponent>
-              <formComponent name="" id="228" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="10" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent">
-                      <void property="radioButtonLabels">
-                        <array class="java.lang.String" length="2">
-                          <void index="0">
-                            <string>1.5 (Recommended)</string>
-                          </void>
-                          <void index="1">
-                            <string>1.3 (for compatibility)</string>
-                          </void>
-                        </array>
-                      </void>
-                      <void property="variableName">
-                        <string>java3DVersion</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript />
-                <visibilityScript />
-              </formComponent>
-            </formComponents>
-          </screen>
-          <screen name="Mac OS X Options" id="288" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
-            <serializedBean>
-              <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.screens.FormScreen">
-                  <void property="subTitle">
-                    <string>Which additional tasks should be performed?</string>
-                  </void>
-                  <void property="title">
-                    <string>Select Additional Tasks</string>
-                  </void>
-                </object>
-              </java>
-            </serializedBean>
-            <condition>return Util.isMacOS();</condition>
-            <validation />
-            <preActivation />
-            <postActivation />
-            <actions />
-            <formComponents>
-              <formComponent name="" id="475" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
-                      <void property="checkboxText">
-                        <string>Install JOGL (Java OpenGL)</string>
-                      </void>
-                      <void property="coupledComponentIds">
-                        <void method="add">
-                          <string>532</string>
-                        </void>
-                      </void>
-                      <void property="initiallySelected">
-                        <boolean>true</boolean>
-                      </void>
-                      <void property="variableName">
-                        <string>installJOGLAction</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <initScript />
-                <visibilityScript />
-              </formComponent>
-              <formComponent name="" id="532" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="10" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent">
-                      <void property="radioButtonLabels">
-                        <array class="java.lang.String" length="2">
-                          <void index="0">
-                            <string>For this user</string>
-                          </void>
-                          <void index="1">
-                            <string>For all users (Administrators only)</string>
-                          </void>
-                        </array>
-                      </void>
-                      <void property="variableName">
-                        <string>glForUser</string>
                       </void>
                     </object>
                   </java>
@@ -561,72 +576,6 @@
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Unzip Java 3D 1.3" id="229" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
-                      <void property="destinationDirectory">
-                        <object class="java.io.File">
-                          <string>./jre</string>
-                        </object>
-                      </void>
-                      <void property="overwriteMode">
-                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
-                      </void>
-                      <void property="zipFile">
-                        <object class="java.io.File">
-                          <string>java3d-1.3.1-linux.zip</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition>context.getVariable("java3DVersion") != null &amp;&amp; (Integer)context.getVariable("java3DVersion") == 1</condition>
-              </action>
-              <action name="Mac-OS Unzip JOGL User" id="290" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
-                      <void property="destinationDirectory">
-                        <object class="java.io.File">
-                          <string>${installer:sys.userHome}/Library/Java/Extensions</string>
-                        </object>
-                      </void>
-                      <void property="overwriteMode">
-                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
-                      </void>
-                      <void property="zipFile">
-                        <object class="java.io.File">
-                          <string>macos-java3d_jogl.zip</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition>context.getBooleanVariable("installJOGLAction") &amp;&amp; (((Integer) context.getVariable("glForUser")).intValue() == 0)</condition>
-              </action>
-              <action name="Mac-OS Unzip JOGL All" id="479" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
-                      <void property="destinationDirectory">
-                        <object class="java.io.File">
-                          <string>/Library/Java/Extensions</string>
-                        </object>
-                      </void>
-                      <void property="overwriteMode">
-                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
-                      </void>
-                      <void property="zipFile">
-                        <object class="java.io.File">
-                          <string>macos-java3d_jogl.zip</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition>context.getBooleanVariable("installJOGLAction") &amp;&amp; (((Integer) context.getVariable("glForUser")).intValue() == 1)</condition>
-              </action>
               <action name="Configure run_script with Install Directory" id="586" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -672,6 +621,256 @@
                 </serializedBean>
                 <condition />
               </action>
+              <action name="Windows Java 3D" id="704" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>./Java3D</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>j3d-windows.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Linux Java 3D" id="706" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>./Java3D</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>j3d-linux.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Mac OS X Java 3D" id="707" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>./Java3D</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>j3d-macosx.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Sun Java 3D" id="709" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>./Java3D</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>j3d-solaris.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Mac OS X JRE" id="1022" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>jre.bundle</string>
+                        </object>
+                      </void>
+                      <void property="dirMode">
+                        <string>777</string>
+                      </void>
+                      <void property="mode">
+                        <string>777</string>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>osxjre.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure runIDV with OS X JRE" id="1019" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>runIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="replaceValue">
+                        <string>jre="jre.bundle/Contents/Home"</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>JRE_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure runIDV with default JRE" id="1020" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>runIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="replaceValue">
+                        <string>jre="jre"</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>JRE_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure runIDV with OS X xdock option" id="1035" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>runIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Xdock:name=IDV</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>XDOCK_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure runIDV with no xdock option" id="1036" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>runIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="searchValue">
+                        <string>XDOCK_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Clean up zips" id="1075" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="backupForRollback">
+                        <boolean>false</boolean>
+                      </void>
+                      <void property="files">
+                        <array class="java.io.File" length="5">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>j3d-windows.zip</string>
+                            </object>
+                          </void>
+                          <void index="1">
+                            <object class="java.io.File">
+                              <string>j3d-linux.zip</string>
+                            </object>
+                          </void>
+                          <void index="2">
+                            <object class="java.io.File">
+                              <string>j3d-solaris.zip</string>
+                            </object>
+                          </void>
+                          <void index="3">
+                            <object class="java.io.File">
+                              <string>j3d-macosx.zip</string>
+                            </object>
+                          </void>
+                          <void index="4">
+                            <object class="java.io.File">
+                              <string>osxjre.zip</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
             </actions>
             <formComponents />
           </screen>
@@ -696,7 +895,7 @@
           </screen>
         </screens>
       </application>
-      <application name="" id="uninstaller" customizedId="" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+      <application name="" id="uninstaller" customizedId="" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.UninstallerApplication">
@@ -831,18 +1030,27 @@
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Linux Installer" id="3" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux-i386_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-i386-1.6.0_41_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="~" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Linux 32" id="3" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux-i386_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_51.tar.gz" manualJREEntry="true" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="~" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
         <launcher id="49" />
       </excludedLaunchers>
-      <excludedBeans />
+      <excludedBeans>
+        <bean refId="707" />
+        <bean refId="1022" />
+        <bean refId="1019" />
+        <bean refId="1035" />
+      </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="runIDV.bat" fileType="regular" />
         <entry location="simpleIDV.bat" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-solaris.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-windows.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-macosx.zip" fileType="regular" />
+        <entry location=".i4j_fileset_835" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -850,26 +1058,34 @@
         <customAttributes />
       </autoUpdate>
       <excludedComponents>
-        <component id="295" />
+        <component id="909" />
       </excludedComponents>
       <includedDownloadableComponents />
       <installerScript mode="1" file="">
         <content />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="Linux64 Installer" id="117" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.6.0_41_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="~" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Linux 64" id="117" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_51.tar.gz" manualJREEntry="true" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="~" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
         <launcher id="49" />
       </excludedLaunchers>
-      <excludedBeans />
+      <excludedBeans>
+        <bean refId="707" />
+        <bean refId="1022" />
+        <bean refId="1019" />
+        <bean refId="1035" />
+      </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="runIDV.bat" fileType="regular" />
         <entry location="simpleIDV.bat" fileType="regular" />
-        <entry location=".i4j_fileset_231" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-solaris.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-windows.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-macosx.zip" fileType="regular" />
+        <entry location=".i4j_fileset_835" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -877,60 +1093,16 @@
         <customAttributes />
       </autoUpdate>
       <excludedComponents>
-        <component id="230" />
-        <component id="295" />
+        <component id="909" />
       </excludedComponents>
       <includedDownloadableComponents />
       <installerScript mode="1" file="">
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="Windows" id="8" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.6.0_43_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
+    <windows name="Windows 32" id="8" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_51.tar.gz" manualJREEntry="true" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="2" />
-        <launcher id="4" />
-        <launcher id="9" />
-        <launcher id="49" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude />
-      <variables />
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="230" />
-        <component id="295" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-    </windows>
-    <windows name="Windows64" id="580" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.6.0_43_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
-      <excludedLaunchers>
-        <launcher id="2" />
-        <launcher id="4" />
-        <launcher id="9" />
-        <launcher id="49" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude />
-      <variables />
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="230" />
-        <component id="295" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-    </windows>
-    <macosFolder name="Mac OS X Folder" id="12" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="true" customInstallBaseDir="" contentFilesType="1" downloadURL="">
-      <excludedLaunchers>
-        <launcher id="2" />
-        <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
         <launcher id="49" />
@@ -938,8 +1110,10 @@
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
-        <entry location="runIDV.bat" fileType="regular" />
-        <entry location="simpleIDV.bat" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-linux.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-solaris.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-macosx.zip" fileType="regular" />
+        <entry location=".i4j_fileset_835" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -947,22 +1121,89 @@
         <customAttributes />
       </autoUpdate>
       <excludedComponents>
-        <component id="230" />
+        <component id="909" />
       </excludedComponents>
+      <includedDownloadableComponents />
+    </windows>
+    <windows name="Windows 64" id="580" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.7.0_51.tar.gz" manualJREEntry="true" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
+      <excludedLaunchers>
+        <launcher id="2" />
+        <launcher id="4" />
+        <launcher id="9" />
+        <launcher id="49" />
+      </excludedLaunchers>
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location=".i4j_external_696/j3d-linux.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-solaris.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-macosx.zip" fileType="regular" />
+        <entry location=".i4j_fileset_835" fileType="regular" />
+      </exclude>
+      <variables />
+      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
+        <commentFiles />
+        <customAttributes />
+      </autoUpdate>
+      <excludedComponents>
+        <component id="909" />
+      </excludedComponents>
+      <includedDownloadableComponents />
+    </windows>
+    <macosFolder name="Mac OS X" id="12" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="true" customInstallBaseDir="" contentFilesType="1" downloadURL="" signLaunchers="false">
+      <excludedLaunchers>
+        <launcher id="2" />
+        <launcher id="7" />
+        <launcher id="4" />
+        <launcher id="9" />
+        <launcher id="49" />
+      </excludedLaunchers>
+      <excludedBeans>
+        <bean refId="704" />
+        <bean refId="706" />
+        <bean refId="709" />
+        <bean refId="1020" />
+        <bean refId="1036" />
+      </excludedBeans>
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location="runIDV.bat" fileType="regular" />
+        <entry location="simpleIDV.bat" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-linux.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-solaris.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-windows.zip" fileType="regular" />
+      </exclude>
+      <variables />
+      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
+        <commentFiles />
+        <customAttributes />
+      </autoUpdate>
+      <excludedComponents />
       <includedDownloadableComponents />
     </macosFolder>
-    <unixInstaller name="Solaris x86" id="56" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="solaris-x86-1.6.0_41_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="~" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Solaris 32/64" id="56" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="solaris-x86-1.7.0_51.tar.gz" manualJREEntry="true" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="~" contentFilesType="1" downloadURL="">
       <excludedLaunchers>
         <launcher id="7" />
         <launcher id="4" />
         <launcher id="9" />
         <launcher id="49" />
       </excludedLaunchers>
-      <excludedBeans />
+      <excludedBeans>
+        <bean refId="704" />
+        <bean refId="706" />
+        <bean refId="707" />
+        <bean refId="1022" />
+        <bean refId="1019" />
+        <bean refId="1035" />
+      </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="runIDV.bat" fileType="regular" />
         <entry location="simpleIDV.bat" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-linux.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-windows.zip" fileType="regular" />
+        <entry location=".i4j_external_696/j3d-macosx.zip" fileType="regular" />
+        <entry location=".i4j_fileset_835" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -970,35 +1211,7 @@
         <customAttributes />
       </autoUpdate>
       <excludedComponents>
-        <component id="230" />
-        <component id="295" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-      <installerScript mode="1" file="">
-        <content />
-      </installerScript>
-    </unixInstaller>
-    <unixInstaller name="Solaris SPARC" id="61" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-sparc_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="solaris-sparc-1.6.0_41_j3d1.5.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="~" contentFilesType="1" downloadURL="">
-      <excludedLaunchers>
-        <launcher id="7" />
-        <launcher id="4" />
-        <launcher id="9" />
-        <launcher id="49" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location="runIDV.bat" fileType="regular" />
-        <entry location="simpleIDV.bat" fileType="regular" />
-      </exclude>
-      <variables />
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="230" />
-        <component id="295" />
+        <component id="909" />
       </excludedComponents>
       <includedDownloadableComponents />
       <installerScript mode="1" file="">
@@ -1012,11 +1225,17 @@
         <launcher id="9" />
         <launcher id="49" />
       </excludedLaunchers>
-      <excludedBeans />
+      <excludedBeans>
+        <bean refId="707" />
+        <bean refId="1022" />
+        <bean refId="1019" />
+        <bean refId="1035" />
+      </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="runIDV.bat" fileType="regular" />
         <entry location="simpleIDV.bat" fileType="regular" />
+        <entry location=".i4j_fileset_835" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1024,8 +1243,7 @@
         <customAttributes />
       </autoUpdate>
       <excludedComponents>
-        <component id="230" />
-        <component id="295" />
+        <component id="909" />
       </excludedComponents>
       <includedDownloadableComponents />
       <installerScript mode="1" file="">
