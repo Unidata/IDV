@@ -1,54 +1,56 @@
 /*
- * $Id: CMASoundingAdapter.java,v 1.4 2007/06/01 19:15:05 yuanho Exp $
- *
  * Copyright 1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 package ucar.unidata.data.sounding;
 
 
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
 
-import ucar.visad.Util;
 import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
 import ucar.visad.quantities.Gravity;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.DateTime;
+import visad.Unit;
+import visad.VisADException;
 
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import ucar.unidata.data.DataUtil;
 
 
 /**
@@ -56,7 +58,7 @@ import ucar.unidata.data.DataUtil;
  * file of upper air soundings from CMA.
  *
  * @author IDV development team
- * @version $Revision: 1.4 $
+ *
  */
 public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingAdapter {
 
@@ -72,9 +74,12 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
     /** unit for geopotential */
     private static final Unit GEOPOTENTIAL_UNIT;
 
+    /** Date formats */
     private List<SimpleDateFormat> formats;
 
-    private static final String []DATE_FORMATS = {"yyyy-MM-dd-HH-mm","yyyy-MM-dd-HH"};
+    /** date format */
+    private static final String[] DATE_FORMATS = { "yyyy-MM-dd-HH-mm",
+            "yyyy-MM-dd-HH" };
 
     static {
         try {
@@ -102,8 +107,8 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
     public CMASoundingAdapter(String filename) throws Exception {
         super("CMASoundingAdapter");
         this.filename = filename;
-        formats = new ArrayList<SimpleDateFormat>();
-        for(String fmt: DATE_FORMATS) {
+        formats       = new ArrayList<SimpleDateFormat>();
+        for (String fmt : DATE_FORMATS) {
             SimpleDateFormat sdf = new SimpleDateFormat(fmt);
             sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
             formats.add(sdf);
@@ -136,17 +141,21 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         }
     }
 
-
-
+    /**
+     * Parses the date.
+     *
+     * @param dttm the dttm
+     * @return the date time
+     */
     private DateTime parseDate(String dttm) {
         dttm = dttm.trim();
-        for(SimpleDateFormat sdf: formats) {
+        for (SimpleDateFormat sdf : formats) {
             try {
                 Date date = sdf.parse(dttm);
-                if(date!=null) {
+                if (date != null) {
                     return new DateTime(date);
                 }
-            } catch(Exception exc){}
+            } catch (Exception exc) {}
         }
         return null;
     }
@@ -171,12 +180,11 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         String       s            = IOUtil.readContents(filename);
         List<String> lines        = StringUtil.split(s, "\n", true, true);
         int          currentIndex = 0;
-        String       headerLine = lines.get(currentIndex++);
-        String          delim   = (headerLine.indexOf(",") >= 0)
-                                  ? ","
-                                  : " ";
-        List<String> toks = StringUtil.split(headerLine, delim, true,
-                                    true);
+        String       headerLine   = lines.get(currentIndex++);
+        String       delim        = (headerLine.indexOf(",") >= 0)
+                                    ? ","
+                                    : " ";
+        List<String> toks = StringUtil.split(headerLine, delim, true, true);
 
         while (currentIndex < lines.size()) {
 
@@ -188,7 +196,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                 tokNum++;
             }
             buf.append(toks.get(tokNum++));
-        // now should have something like 2007-1-27-0
+            // now should have something like 2007-1-27-0
             DateTime dt = parseDate(buf.toString());
 
             times.add(dt);
@@ -196,13 +204,14 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
             int endPtsIndex = currentIndex + numStations;
 
 
-                
-            // fill the station and sounding lists
-            SoundingStation currentStation = null;
-            List<SoundingLevelData> levels         = null;
-            int             numFound       = 0;
 
-            while (numFound < numStations && currentIndex < lines.size()) {
+            // fill the station and sounding lists
+            SoundingStation         currentStation = null;
+            List<SoundingLevelData> levels         = null;
+            int                     numFound       = 0;
+
+            while ((numFound < numStations)
+                    && (currentIndex < lines.size())) {
 
                 String dataLine = lines.get(currentIndex++);
                 if (dataLine == null) {
@@ -210,10 +219,10 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                 }
 
                 List<String> dtoks = StringUtil.split(dataLine, delim, true,
-                                    true);
+                                         true);
                 int numToks = dtoks.size();
                 if (numToks == 4) {  // new station
-                    if (levels != null && levels.size() >0) {
+                    if ((levels != null) && (levels.size() > 0)) {
                         SoundingOb so = new SoundingOb(currentStation, dt);
                         soundings.add(so);
                         soundingLevels.add(levels);
@@ -221,26 +230,25 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
                     }
                     currentStation = makeSoundingStationList(dtoks);
                     levels         = new ArrayList<SoundingLevelData>();
-                } else if(numToks == 6){
+                } else if (numToks == 6) {
                     appendLevelList(levels, dtoks);
-                } else if(numToks == 5) {
-                    if (levels != null && levels.size() > 0) {
+                } else if (numToks == 5) {
+                    if ((levels != null) && (levels.size() > 0)) {
                         SoundingOb so = new SoundingOb(currentStation, dt);
                         soundings.add(so);
                         soundingLevels.add(levels);
                         numFound++;
                     }
-                    toks = StringUtil.split(dataLine, delim, true,
-                                    true);
+                    toks = StringUtil.split(dataLine, delim, true, true);
                     break;
                 }
             }
             //last one
-            if ( currentIndex == lines.size()) {
-                    SoundingOb so = new SoundingOb(currentStation, dt);
-                    soundings.add(so);
-                    soundingLevels.add(levels);
-                    numFound++;
+            if (currentIndex == lines.size()) {
+                SoundingOb so = new SoundingOb(currentStation, dt);
+                soundings.add(so);
+                soundingLevels.add(levels);
+                numFound++;
             }
 
 
@@ -289,14 +297,14 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         // System.err.println("numStations = " + numStations);
 
         // get the station list and number of stations
-        stations       = new ArrayList<SoundingStation>(numStations);  // array of stations
-        soundings      = new ArrayList<SoundingOb>(numStations);  // array of soundings
+        stations = new ArrayList<SoundingStation>(numStations);  // array of stations
+        soundings = new ArrayList<SoundingOb>(numStations);  // array of soundings
         soundingLevels = new ArrayList<List<SoundingLevelData>>(numStations);
 
         // fill the station and sounding lists
-        SoundingStation currentStation = null;
-        List<SoundingLevelData>            levels         = null;
-        int             numFound       = 0;
+        SoundingStation         currentStation = null;
+        List<SoundingLevelData> levels         = null;
+        int                     numFound       = 0;
         while (true) {
 
             String data = br.readLine();
@@ -330,7 +338,8 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @param levels  the list of levels
      * @param tok  a list of tokens for the level
      */
-    private void appendLevels(List<SoundingLevelData> levels, StringTokenizer tok) {
+    private void appendLevels(List<SoundingLevelData> levels,
+                              StringTokenizer tok) {
         if (levels == null) {
             return;
         }
@@ -370,7 +379,8 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @param levels  the list of levels
      * @param toks  a list of tokens for the level
      */
-    private void appendLevelList(List<SoundingLevelData> levels, List<String> toks) {
+    private void appendLevelList(List<SoundingLevelData> levels,
+                                 List<String> toks) {
         if (levels == null) {
             return;
         }
@@ -468,7 +478,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         double elevvalue;
         try {
             //wmoID = new Integer((int) getValue(toks.get(0))).toString();
-            wmoID = toks.get(0);
+            wmoID     = toks.get(0);
             latvalue  = getValue(toks.get(1));
             lonvalue  = getValue(toks.get(2));
             elevvalue = getValue(toks.get(3));
@@ -486,7 +496,8 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
      * @param so  the SoundingOb
      * @param levels  list of SoundingLevelData
      */
-    protected void setRAOBData(SoundingOb so, List<SoundingLevelData> levels) {
+    protected void setRAOBData(SoundingOb so,
+                               List<SoundingLevelData> levels) {
         if (levels == null) {
             return;
         }
@@ -587,59 +598,4 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         }
         CMASoundingAdapter csa = new CMASoundingAdapter(args[0]);
     }
-
-    /**
-     * A class to hold sounding level data
-     *
-     * @author IDV Development Team
-     * @version $Revision: 1.4 $
-     */
-    private class SoundingLevelData {
-
-        /** the pressure */
-        public float pressure;
-
-        /** the height */
-        public float height;
-
-        /** the temperature */
-        public float temperature;
-
-        /** the dewpoint */
-        public float dewpoint;
-
-        /** the wind direction */
-        public float direction;
-
-        /** the wind speed */
-        public float speed;
-
-        /**
-         * Ctor
-         */
-        public SoundingLevelData() {}
-
-        /**
-         * Get a String representation of this object
-         *
-         * @return the String representation of this object
-         */
-        public String toString() {
-            StringBuffer b = new StringBuffer();
-            b.append("p: ");
-            b.append(pressure);
-            b.append(" z: ");
-            b.append(height);
-            b.append(" t: ");
-            b.append(temperature);
-            b.append(" dp: ");
-            b.append(dewpoint);
-            b.append(" wind: ");
-            b.append(direction);
-            b.append("/");
-            b.append(speed);
-            return b.toString();
-        }
-    }
 }
-
