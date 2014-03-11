@@ -70,6 +70,10 @@ public class SoundingFileBrowser {
     public static final PatternFileFilter FILTER_CMA_UA =
         new PatternFileFilter(".*\\.ta$", "CMA Upper Air files (*.ta)");
 
+    /** PatternFileFilter for GEMPAK upper air files */
+    public static final PatternFileFilter FILTER_GEM_UA =
+        new PatternFileFilter(".*\\.gem$", "GEMPAK Upper Air files (*.gem)");
+
     /** property for the sounding adapter */
     private Property soundingAdapterProperty;
 
@@ -140,7 +144,8 @@ public class SoundingFileBrowser {
                 String file =
                     FileManager.getReadFile("Select Upper Air File",
                                             Misc.newList(FILTER_NC,
-                                                FILTER_CMA_UA));
+                                                FILTER_CMA_UA,
+                                                FILTER_GEM_UA));
                 if (file == null) {
                     return;
                 }
