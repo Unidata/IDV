@@ -49,7 +49,9 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -105,6 +107,9 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
         soundings      = new ArrayList<>();
         soundingLevels = new ArrayList<>();
 
+
+        Set<DateTime> timeSet = new LinkedHashSet<>();
+
         //TODO: Not sure what to do with this formatter quite yet.
         FeatureDatasetPoint fdp =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
@@ -139,12 +144,13 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
                 stations.add(soundingStation);
                 SoundingOb so = new SoundingOb(soundingStation,
                                     new DateTime(pf.getTime()));
-                times.add(new DateTime(pf.getTime()));
+                timeSet.add(new DateTime(pf.getTime()));
 
                 soundings.add(so);
                 soundingLevels.add(sld);
             }
         }
+        times.addAll(timeSet);
     }
 
     /**
