@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2013 Unidata Program Center/University Corporation for
+ * Copyright 1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -181,6 +181,8 @@ public class DateUtil {
     private static final String[] formats = {
         "yyyy-MM-dd'T'HH:mm:ss Z", "yyyyMMdd'T'HHmmss Z",
         "yyyy/MM/dd HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss Z",
+        "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+        "yyyy-MM-dd HH:mm:ss'Z'", "yyyy-MM-dd HH:mm:ss.SSS'Z'",
         "EEE MMM dd HH:mm:ss Z yyyy", "yyyy-MM-dd'T'HH:mm:ss",
         "yyyyMMdd'T'HHmmss", "yyyy-MM-dd'T'HH:mm Z", "yyyyMMdd'T'HHmm Z",
         "yyyy-MM-dd'T'HH:mm", "yyyyMMdd'T'HHmm", "yyyy/MM/dd HH:mm:ss",

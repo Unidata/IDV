@@ -1,7 +1,7 @@
 /*
  * $Id: TrackAdapter.java,v 1.65 2007/04/16 20:34:57 jeffmc Exp $
  *
- * Copyright  1997-2013 Unidata Program Center/University Corporation for
+ * Copyright  1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
