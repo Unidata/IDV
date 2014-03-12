@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.nc2.util.DiskCache2;
-import ucar.nc2.util.net.HTTPSession;
+import ucar.httpclient.HTTPSession;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
@@ -347,7 +347,7 @@ public class DataManager {
             boolean doCache = dataContext.getIdv().getStateManager()
                     .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true);
             dc.setAlwaysUseCache(doCache);
-            ucar.nc2.grib.GribCollection.setDiskCache2(dc);
+            ucar.nc2.grib.collection.GribCollection.setDiskCache2(dc);
 
             // Doesn't seem to work in nc 4.3
             ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(doCache);
