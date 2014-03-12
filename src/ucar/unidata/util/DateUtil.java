@@ -181,6 +181,8 @@ public class DateUtil {
     private static final String[] formats = {
         "yyyy-MM-dd'T'HH:mm:ss Z", "yyyyMMdd'T'HHmmss Z",
         "yyyy/MM/dd HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss Z",
+        "yyyy-MM-dd'T'HH:mm:ss'Z'", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+        "yyyy-MM-dd HH:mm:ss'Z'", "yyyy-MM-dd HH:mm:ss.SSS'Z'",
         "EEE MMM dd HH:mm:ss Z yyyy", "yyyy-MM-dd'T'HH:mm:ss",
         "yyyyMMdd'T'HHmmss", "yyyy-MM-dd'T'HH:mm Z", "yyyyMMdd'T'HHmm Z",
         "yyyy-MM-dd'T'HH:mm", "yyyyMMdd'T'HHmm", "yyyy/MM/dd HH:mm:ss",
