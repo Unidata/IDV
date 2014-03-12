@@ -4,8 +4,6 @@
       <root url="jar://$PROJECT_DIR$/../../lib/visad.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="file://$PROJECT_DIR$/../../../visad/visad/core/src" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>
