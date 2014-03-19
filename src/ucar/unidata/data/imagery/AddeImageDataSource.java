@@ -427,7 +427,9 @@ public class AddeImageDataSource extends ImageDataSource {
                             unitStr);
                 } catch (Exception e) {}
 
-            } else if (t1.equals(DataSelection.PROP_USEDISPLAYAREA) || geoSelection.getBoundingBox() != null) {
+            } else if (t1.equals(DataSelection.PROP_USEDISPLAYAREA) || 
+            		    geoSelection.getBoundingBox() != null || 
+            		    geoSelection.getUseViewBounds()) {
                 double maxLat = geoSelection.getBoundingBox().getMaxLat();
                 double minLat = geoSelection.getBoundingBox().getMinLat();
                 double maxLon = geoSelection.getBoundingBox().getMaxLon();
