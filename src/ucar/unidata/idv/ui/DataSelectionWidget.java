@@ -832,6 +832,7 @@ public class DataSelectionWidget {
             if (regionOption.equals(DataSelection.PROP_USEDEFAULTAREA)) {
                 geoSelection.setBoundingBox(null);
                 geoSelection.setUseFullBounds(false);
+                geoSelection.setUseViewBounds(false);
             }
         }
 
@@ -870,7 +871,6 @@ public class DataSelectionWidget {
             //if(prograssiveCbx1 == null)
             //    prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
             isProgressiveResolution = getIsProgressiveResolution();
-            dataSelection.setGeoSelection(geoSelection);
             if (geoSelection != null) {
                 if (strideCbx.isSelected() ){
                     geoSelection.clearStride();
@@ -878,6 +878,7 @@ public class DataSelectionWidget {
                 if ( regionOption.equals(DataSelection.PROP_USEDEFAULTAREA)) {
                     geoSelection.setBoundingBox(null);
                     geoSelection.setUseFullBounds(false);
+                    geoSelection.setUseViewBounds(false);
                 } else if(regionOption.equals(DataSelection.PROP_USEDISPLAYAREA)){
                     Rectangle2D sbox = navDisplay.getScreenBounds();
                     vm.setProjectionFromData(false);
@@ -892,11 +893,13 @@ public class DataSelectionWidget {
                                         el.getLongitude().getValue());
 
                         dataSelection.putProperty("centerPosition", llpi);
+                        geoSelection.setUseViewBounds(true);
                     } catch (Exception ee){
 
                     }
                 }
             }
+            dataSelection.setGeoSelection(geoSelection);
             dataSelection.putProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION,
                 isProgressiveResolution);
