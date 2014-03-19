@@ -55,6 +55,9 @@ public class GeoSelection {
     /** A flag to note that even though the bounds are null here we really want to use the full spatial bounds */
     private boolean useFullBounds = false;
 
+    /** a flag to use the display bounds */
+    private boolean useViewBounds = false;
+    
     /** X stride */
     private int xStride = STRIDE_NONE;
 
@@ -105,6 +108,7 @@ public class GeoSelection {
         if (that.screenBoundRect != null) {
             this.screenBoundRect = that.screenBoundRect;
         }
+        this.useViewBounds  = that.useViewBounds;
 
     }
 
@@ -176,6 +180,8 @@ public class GeoSelection {
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
                         int xStride, int yStride, int zStride, Real level) {
 
+    	this(boundingBox, useFullBounds, xStride, yStride, zStride, level, null);
+    	/*
         this.boundingBox     = boundingBox;
         this.useFullBounds   = useFullBounds;
         this.xStride         = xStride;
@@ -183,6 +189,7 @@ public class GeoSelection {
         this.zStride         = zStride;
         this.level           = level;
         this.screenBoundRect = null;
+        */
     }
 
 
@@ -201,6 +208,25 @@ public class GeoSelection {
     public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
                         int xStride, int yStride, int zStride, Real level,
                         Rectangle2D screenBoundRect) {
+    	this(boundingBox, useFullBounds, xStride, yStride, zStride, level, screenBoundRect, false);
+    }
+    	
+    /**
+     * Construct a GeoSelection
+     *
+     * @param boundingBox _more_
+     * @param useFullBounds _more_
+     * @param xStride _more_
+     * @param yStride _more_
+     * @param zStride _more_
+     * @param level _more_
+     * @param screenBoundRect _more_
+     * @param useViewBounds _more_
+     */
+    public GeoSelection(GeoLocationInfo boundingBox, boolean useFullBounds,
+                        int xStride, int yStride, int zStride, Real level,
+                        Rectangle2D screenBoundRect, boolean useViewBounds) {
+    	
         this.boundingBox     = boundingBox;
         this.useFullBounds   = useFullBounds;
         this.xStride         = xStride;
@@ -208,6 +234,7 @@ public class GeoSelection {
         this.zStride         = zStride;
         this.level           = level;
         this.screenBoundRect = screenBoundRect;
+        this.useViewBounds = useViewBounds;
     }
 
     /**
@@ -582,6 +609,7 @@ public class GeoSelection {
         return (this.xStride == that.xStride)
                && (this.yStride == that.yStride)
                && (this.zStride == that.zStride)
+               && (this.useViewBounds == that.useViewBounds)
                && Misc.equals(this.boundingBox, that.boundingBox)
                && Misc.equals(this.level, that.level);
     }
@@ -603,6 +631,25 @@ public class GeoSelection {
      */
     public boolean getUseFullBounds() {
         return useFullBounds;
+    }
+
+
+    /**
+     *  Set the UseViewBounds property.
+     *
+     *  @param value The new value for UseViewBounds
+     */
+    public void setUseViewBounds(boolean value) {
+        useViewBounds = value;
+    }
+
+    /**
+     *  Get the UseViewBounds property.
+     *
+     *  @return The UseViewBounds
+     */
+    public boolean getUseViewBounds() {
+        return useViewBounds;
     }
 
 

@@ -312,7 +312,7 @@ public class GeoSelectionPanel extends JPanel {
         }
 
         {
-            useDisplayAreaCbx = new JCheckBox("", false);
+            useDisplayAreaCbx = new JCheckBox("", geoSelection.getUseViewBounds());
             useDisplayAreaCbx.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -323,7 +323,7 @@ public class GeoSelectionPanel extends JPanel {
                 }
             });
             useDisplayAreaComps.add(
-                GuiUtils.rLabel(DataSelection.PROP_USEDISPLAYAREA + ":"));
+                GuiUtils.rLabel("Match Display Region:"));
             useDisplayAreaComps.add(GuiUtils.left(useDisplayAreaCbx));
         }
         if (doBoundingBox) {
@@ -587,7 +587,9 @@ public class GeoSelectionPanel extends JPanel {
                 //                geoSelection.setZStride(GeoSelection.STRIDE_NONE);
             }
         }
-
+        if (useDisplayAreaCbx != null) {
+        	geoSelection.setUseViewBounds(useDisplayAreaCbx.isSelected());
+        }
 
         if (mapPanel != null) {
             //xxxx
