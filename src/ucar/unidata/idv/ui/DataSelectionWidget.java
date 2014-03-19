@@ -801,7 +801,10 @@ public class DataSelectionWidget {
 
         // check progressive resolution  for derived
         ViewManager vm = idv.getViewManager();
-        boolean usePR = ((MapViewManager)vm).getUseProgressiveResolution();
+        boolean usePR = false;
+        if(vm instanceof  MapViewManager)
+            usePR = ((MapViewManager)vm).getUseProgressiveResolution();
+
         dataSelection.putProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, usePR);
 
         /*
