@@ -21,11 +21,37 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.unidata.collab.Sharable;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.Range;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Trace;
+
+import ucar.visad.Util;
+import ucar.visad.display.DisplayableData;
+import ucar.visad.display.FlowDisplayable;
+import ucar.visad.display.WindBarbDisplayable;
+
+import visad.Data;
+import visad.FieldImpl;
+import visad.Real;
+import visad.RealTuple;
+import visad.Unit;
+import visad.VisADException;
+
+import visad.georef.EarthLocation;
+
+
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,26 +62,6 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
-
-import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.visad.Util;
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.FlowDisplayable;
-import ucar.visad.display.WindBarbDisplayable;
-import visad.Data;
-import visad.FieldImpl;
-import visad.Real;
-import visad.RealTuple;
-import visad.Unit;
-import visad.VisADException;
-import visad.georef.EarthLocation;
 
 
 
@@ -123,9 +129,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
     /** the range dialog */
     RangeDialog rangeDialog;
-    
+
+    /** _more_ */
     private boolean useSpeedForColor = false;
+
+    /** _more_ */
     private int colorIndex = -1;
+
+    /** use flow control 1 */
+    private static boolean useFlowControl1 = false;
 
     /**
      * Create a new FlowPlanViewControl; set attribute flags
@@ -133,14 +145,33 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     public FlowPlanViewControl() {
         setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH | FLAG_SMOOTHING);
     }
-    
-	/**
-	 * Method to call if projection changes. Handle flowscale.
-	 */
-	public void projectionChanged() {
-		super.projectionChanged();
-		setFlowScale(flowScaleValue);
-	}
+
+    /**
+     * Method to call if projection changes. Handle flowscale.
+     */
+    public void projectionChanged() {
+        super.projectionChanged();
+        setFlowScale(flowScaleValue);
+    }
+
+    /**
+     * getter for flag controlling which FlowControl is used (1 or 2)
+     *
+     * @return FlowControl flag
+     */
+    public static boolean getUseFlowControl1() {
+        return useFlowControl1;
+    }
+
+    /**
+     * setter for flag controlling which FlowControl is used (1 or 2)
+     *
+     * @param useFlowControl1 FlowControl flag
+     */
+    public static void setUseFlowControl1(boolean useFlowControl1) {
+        FlowPlanViewControl.useFlowControl1 = useFlowControl1;
+    }
+
 
     /**
      * Get the color table widget label text.
@@ -167,6 +198,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     protected DisplayableData createPlanDisplay()
             throws VisADException, RemoteException {
+        setUseFlowControl1( !getUseFlowControl1());
         FlowDisplayable planDisplay;
         if (isWindBarbs) {
             planDisplay =
@@ -175,10 +207,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                                            ? datachoice.toString()
                                            : ""), null);
         } else {
+
             planDisplay = new FlowDisplayable("FlowPlanViewControl_vectors_"
                     + ((datachoice != null)
                        ? datachoice.toString()
-                       : ""), null);
+                       : ""), null, getUseFlowControl1());
             if (getMultipleIsTopography()) {
                 planDisplay.setIgnoreExtraParameters(true);
             }
@@ -216,8 +249,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             setFlowRange();
         }
         // If not u/v, always color by speed.
-        if (!useSpeedForColor) {
-        	useSpeedForColor = !fd.isCartesianWind();
+        if ( !useSpeedForColor) {
+            useSpeedForColor = !fd.isCartesianWind();
         }
         fd.setUseSpeedForColor(useSpeedForColor);
         if (useSpeedForColor) {
@@ -655,7 +688,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         flowScaleValue = f;
         if (getGridDisplay() != null) {
             try {
-              getGridDisplay().setFlowScale(getDisplayScale()* scaleFactor * flowScaleValue);
+                getGridDisplay().setFlowScale(getDisplayScale() * scaleFactor
+                        * flowScaleValue);
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
@@ -785,10 +819,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             return false;
         }
         return ((getGridDataInstance().getNumRealTypes()
-                > ((getIsThreeComponents())
-                   ? 3
-                   : 2)) && !getMultipleIsTopography())
-                   || useSpeedForColor;
+                 > ((getIsThreeComponents())
+                    ? 3
+                    : 2)) && !getMultipleIsTopography()) || useSpeedForColor;
     }
 
     /**
@@ -798,9 +831,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @return  The index to be used for the color range.
      */
     protected int getColorRangeIndex() {
-    	if (colorIndex >= 0) {
-    		return colorIndex;
-    	}
+        if (colorIndex >= 0) {
+            return colorIndex;
+        }
         if (getMultipleIsTopography()) {
             return 0;
         }
