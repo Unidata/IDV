@@ -1639,6 +1639,9 @@ public class GeoGridDataSource extends GridDataSource {
             }
             System.out.println("new x y strides: " + geoSelection.getXStride() + " "
                     + geoSelection.getYStride());
+            String magValue = "Stride: " + geoSelection.getXStride() + " "
+                    + geoSelection.getYStride();
+            dataChoice.setProperty("MAG", magValue);
             if ((geoSelection != null)
                     && (geoSelection.hasSpatialSubset()
                         || geoSelection.getHasNonOneStride())) {

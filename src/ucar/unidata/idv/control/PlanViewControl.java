@@ -22,11 +22,9 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -74,16 +72,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -202,6 +191,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
     /** flag for ensembles */
     protected boolean haveEnsemble = false;
+
+    /** The label to show the readout in the side legend */
+    private JLabel sideLegendReadout;
 
     /**
      * Cstr; does nothing. See init() for creation actions.
@@ -733,11 +725,53 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         processRequestProperties();
 
+        // sideLegendReadout
+        boolean fromBundle = getIdv().getStateManager().getProperty(
+                IdvConstants.PROP_LOADINGXML, false);
+
+        if (fromBundle) {
+            String magStr = (String) dataChoice.getProperty("MAG");
+            if (magStr != null) {
+                if (sideLegendReadout == null) {
+                    sideLegendReadout = new JLabel("<html><br></html>");
+                }
+                sideLegendReadout.setText("<html>" + magStr + "</html>");
+            }
+        } else {
+            DataChoice dc0 = null;
+            if (dataChoice instanceof DerivedDataChoice) {
+                dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
+            } else {
+                dc0 = dataChoice;
+            }
+
+            String magStr = (String) dc0.getProperty("MAG");
+            if (magStr != null) {
+                if (sideLegendReadout == null) {
+                    sideLegendReadout = new JLabel("<html><br></html>");
+                }
+                sideLegendReadout.setText("<html>" + magStr + "</html>");
+            }
+        }
         Trace.call2("PlanView.setData");
         return true;
     }
 
+    /**
+     * Assume that any display controls that have a color table widget
+     * will want the color table to show up in the legend.
+     *
+     * @param  legendType  type of legend
+     * @return The extra JComponent to use in legend
+     */
+    protected JComponent getExtraLegendComponent(int legendType) {
+        JComponent parentComp = super.getExtraLegendComponent(legendType);
+        if (legendType == BOTTOM_LEGEND || sideLegendReadout == null) {
+            return parentComp;
+        }
 
+        return GuiUtils.vbox(sideLegendReadout, parentComp);
+    }
     /**
      * Wrapper around {@link #addTopographyMap(int)} to allow subclasses
      * to set their own index.

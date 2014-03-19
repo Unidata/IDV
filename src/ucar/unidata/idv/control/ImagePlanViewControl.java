@@ -87,26 +87,6 @@ public class ImagePlanViewControl extends PlanViewControl {
         return true;
     }
 
-
-    /**
-     * _more_
-     *
-     * @param legendType _more_
-     *
-     * @return _more_
-     */
-    protected JComponent getExtraLegendComponent(int legendType) {
-        JComponent parentComp = super.getExtraLegendComponent(legendType);
-        if (legendType == BOTTOM_LEGEND) {
-            return parentComp;
-        }
-
-        if (sideLegendReadout == null) {
-            sideLegendReadout = new JLabel("<html><br></html>");
-        }
-
-        return GuiUtils.vbox(sideLegendReadout, parentComp);
-    }
     /**
      * Method to create the particular <code>DisplayableData</code> that
      * this this instance uses for data depictions.
