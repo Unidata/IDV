@@ -203,14 +203,16 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     public void initAfterUnpersistence() {
         super.initAfterUnpersistence();
-        if(getTmpPaths() != null){  // zidv bundle
+        if (getTmpPaths() != null) {  // zidv bundle
             return;
         }
         String ver = IdvPersistenceManager.getBundleIdvVersion();
-        if(ver == null || Character.getNumericValue(ver.charAt(0)) < 5)
-            return;
+        if ((ver == null) || (Character.getNumericValue(ver.charAt(0)) < 5)) {
+            return;              //old bundle
+        }
 
-        if (this.source == null && imageList != null && imageList.size() > 0) {
+        if ((this.source == null) && (imageList != null)
+                && (imageList.size() > 0)) {
             //List                imageList1 = getImageList();
             AddeImageDescriptor desc1 =
                 (AddeImageDescriptor) imageList.get(0);
@@ -220,13 +222,14 @@ public class AddeImageDataSource extends ImageDataSource {
             if (oj != null) {
                 this.bandId = (BandInfo) oj.get(0);
             }
-            String zpath = (String)getIdv().getStateManager().getProperty(
-                    IdvPersistenceManager.PROP_ZIDVPATH);
+            String zpath = (String) getIdv().getStateManager().getProperty(
+                               IdvPersistenceManager.PROP_ZIDVPATH);
             AreaDirectory thisDir;
-            if(zpath != null && zpath.length() > 0)
+            if ((zpath != null) && (zpath.length() > 0)) {
                 thisDir = desc1.getDirectory();
-            else
-                thisDir = desc1.getDirectory(); //desc1.processSourceAsAddeUrl(this.source);
+            } else {
+                thisDir = (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
+            }
             // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
             this.source = getPreviewSource(this.source, thisDir);
             if (oj != null) {
@@ -258,7 +261,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
         this.choiceName = dataChoice.getName();
         if (this.choiceName != null) {
-       //     setProperty(PROP_DATACHOICENAME, this.choiceName);
+            //     setProperty(PROP_DATACHOICENAME, this.choiceName);
         }
 
         return super.getDataInner(dataChoice, category, dataSelection,
@@ -303,7 +306,8 @@ public class AddeImageDataSource extends ImageDataSource {
     protected List getDescriptors(DataChoice dataChoice,
                                   DataSelection subset) {
 
-        List         descriptors = super.getDescriptors(dataChoice, subset);
+        List<AddeImageDescriptor> descriptors =
+            super.getDescriptors(dataChoice, subset);
         GeoSelection geoSelection            = subset.getGeoSelection();
         boolean      isProgressiveResolution = true;
         boolean fromBundle = getIdv().getStateManager().getProperty(
@@ -313,42 +317,53 @@ public class AddeImageDataSource extends ImageDataSource {
         // when geoSelection is null, it is from the old bundle and return the desscriptors.
         //boolean isOldBundle = false;
         //if (allBandDirs == null) {  //geoSelection == null)
-            //return descriptors;
+        //return descriptors;
         //}
-        if (fromBundle || allBandDirs == null ) {
-            if (subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION)
-                    == null) {
-                if(baseAnav == null && this.source != null){   //old bundle
-                    try {
-                        areaAdapter = new AreaAdapter(this.source, false);
-                        AreaFile areaFile = areaAdapter.getAreaFile();
-                        baseAnav = areaFile.getNavigation();
-                        acs      = new AREACoordinateSystem(areaFile);
-                    } catch (Exception e) {
-                        LogUtil.userErrorMessage(
-                                "Error in getDescriptors  e=" + e);
-                    }
-                }
+        if (fromBundle) {
+            String ver = IdvPersistenceManager.getBundleIdvVersion();
+
+            if ((ver == null)
+                    || (Character.getNumericValue(ver.charAt(0)) < 5)) {
+                this.source = descriptors.get(0).getSource();
                 //isOldBundle = true;
-                return descriptors;
+                initOldBundle(dataChoice, descriptors, this.source);
+
+            }
+
+            if (baseAnav == null) {
+                try {
+                    areaAdapter = new AreaAdapter(this.source, false);
+                    AreaFile areaFile = areaAdapter.getAreaFile();
+                    baseAnav = areaFile.getNavigation();
+                    acs      = new AREACoordinateSystem(areaFile);
+                } catch (Exception e) {
+                    LogUtil.userErrorMessage(
+                        "Error in getDescriptors  e=" + e);
+                }
+            }
+
+            if ((ver == null)
+                    || (Character.getNumericValue(ver.charAt(0)) < 5)) {
+                return descriptors;    //old bundle
             }
             // new bundle
-            String zpath = (String)getIdv().getStateManager().getProperty(
-                    IdvPersistenceManager.PROP_ZIDVPATH);
+            String zpath = (String) getIdv().getStateManager().getProperty(
+                               IdvPersistenceManager.PROP_ZIDVPATH);
             try {
 
-                if( zpath != null) //zidv case
+                if (zpath != null) {  //zidv case
                     return descriptors;
-                descriptors = (List)dataChoice.getProperty("descriptors");
+                }
+                descriptors = (List) dataChoice.getProperty("descriptors");
                 //descriptors = dList;
             } catch (Exception e) {}
-            BandInfo id = (BandInfo)dataChoice.getId();
-            AreaDirectory thisDir = 
-                    (AreaDirectory)allBandDirs.get(id.getBandNumber());
-            List dsList = new ArrayList();
-            dataChoice.getDataSources(dsList);
-            AddeImageDataSource ds = (AddeImageDataSource)dsList.get(0);
-            this.source = getPreviewSource(ds.source,thisDir);
+            //BandInfo id = (BandInfo) dataChoice.getId();
+            //AreaDirectory thisDir =
+            //   (AreaDirectory) allBandDirs.get(id.getBandNumber());
+            //List dsList = new ArrayList();
+            //dataChoice.getDataSources(dsList);
+            //AddeImageDataSource ds = (AddeImageDataSource) dsList.get(0);
+            //this.source = getPreviewSource(ds.source, thisDir);
             return descriptors;
         }
         Rectangle2D rect  = geoSelection.getScreenBound();
@@ -387,7 +402,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
                 String locationKey   = adSource.getLocateKey();
                 String locationValue = adSource.getLocateValue();
-                String place = adSource.getPlaceValue();
+                String place         = adSource.getPlaceValue();
                 if (isProgressiveResolution) {
                     // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                     lineMag = calculateMagFactor(lines,
@@ -422,14 +437,13 @@ public class AddeImageDataSource extends ImageDataSource {
                                    + newelems);
                 try {
                     descriptors = reSetImageDataDescriptor(descriptors,
-                            locationKey, locationValue,
-                            place, newLines, newelems, lineMag, eleMag,
-                            unitStr);
+                            locationKey, locationValue, place, newLines,
+                            newelems, lineMag, eleMag, unitStr);
                 } catch (Exception e) {}
 
-            } else if (t1.equals(DataSelection.PROP_USEDISPLAYAREA) || 
-            		    geoSelection.getBoundingBox() != null || 
-            		    geoSelection.getUseViewBounds()) {
+            } else if (t1.equals(DataSelection.PROP_USEDISPLAYAREA)
+                       || (geoSelection.getBoundingBox() != null)
+                       || geoSelection.getUseViewBounds()) {
                 double maxLat = geoSelection.getBoundingBox().getMaxLat();
                 double minLat = geoSelection.getBoundingBox().getMinLat();
                 double maxLon = geoSelection.getBoundingBox().getMaxLon();
@@ -453,11 +467,12 @@ public class AddeImageDataSource extends ImageDataSource {
                     (LatLonPointImpl) subset.getProperty("centerPosition");
 
                 if (llp != null) {
-                    BandInfo id = (BandInfo) dataChoice.getId();
-                    int[] dir = null;
+                    BandInfo      id      = (BandInfo) dataChoice.getId();
+                    int[]         dir     = null;
                     AreaDirectory thisDir = null;
-                    if(allBandDirs != null) {
-                        thisDir = (AreaDirectory) allBandDirs.get(id.getBandNumber());
+                    if (allBandDirs != null) {
+                        thisDir = (AreaDirectory) allBandDirs.get(
+                            id.getBandNumber());
 
                     } else {
                         thisDir = this.descriptor.getDirectory();
@@ -510,9 +525,11 @@ public class AddeImageDataSource extends ImageDataSource {
                         System.out.println("newLine X newElement : "
                                            + newLines + " " + newelems);
                         try {
-                            descriptors = reSetImageDataDescriptor(descriptors,
-                                    AddeImageURL.KEY_LINEELE, locateValue,"CENTER",
-                                    newLines, newelems, lineMag, eleMag, unitStr);
+                            descriptors =
+                                reSetImageDataDescriptor(descriptors,
+                                    AddeImageURL.KEY_LINEELE, locateValue,
+                                    "CENTER", newLines, newelems, lineMag,
+                                    eleMag, unitStr);
                         } catch (Exception e) {}
                     } else {
                         LatLonRect bbox = mapInfo.getLatLonRect().intersect(
@@ -626,8 +643,8 @@ public class AddeImageDataSource extends ImageDataSource {
             }
 
             //maxlat   using middle line
-            i = eSize/2;
-            j = 0;
+            i        = eSize / 2;
+            j        = 0;
             el[0][0] = i;
             el[1][0] = j;
             ll       = baseAnav.toLatLon(el);
@@ -644,12 +661,12 @@ public class AddeImageDataSource extends ImageDataSource {
             }
 
             //minlat   using middle line
-            i        = eSize/2;
+            i        = eSize / 2;
             j        = lSize;
             el[0][0] = i;
             el[1][0] = j;
             ll       = baseAnav.toLatLon(el);
-            while ((ll[0][0] != ll[0][0]) &&  (j > 0)) {
+            while ((ll[0][0] != ll[0][0]) && (j > 0)) {
                 j--;
                 el[0][0] = i;
                 el[1][0] = j;
@@ -941,7 +958,7 @@ public class AddeImageDataSource extends ImageDataSource {
                               + Integer.toString(eleMag);
             String source = imageDescriptor.getSource();
 
-            if (!locateKey.equals(AddeImageURL.KEY_LINEELE)) {
+            if ( !locateKey.equals(AddeImageURL.KEY_LINEELE)) {
                 source = replaceKey(source, AddeImageURL.KEY_LINEELE,
                                     AddeImageURL.KEY_LATLON, locateValue);
                 source = replaceKey(source, AddeImageURL.KEY_PLACE,
@@ -1317,6 +1334,27 @@ public class AddeImageDataSource extends ImageDataSource {
         return returnString;
     }
 
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param descriptors _more_
+     * @param sourceStr _more_
+     */
+    protected void initOldBundle(DataChoice dataChoice,
+                                 List<AddeImageDescriptor> descriptors,
+                                 String sourceStr) {
+        allBandDirs = new Hashtable(1);
+        AreaDirectory dir0   = descriptors.get(0).getDirectory();
+        BandInfo      binfo  = (BandInfo) dataChoice.getId();
+        int           bindex = binfo.getBandNumber();
+
+        allBandDirs.put(bindex, dir0);
+        String   magVal  = getKey(sourceStr, AddeImageURL.KEY_MAG);
+        String[] magVals = magVal.split(" ");
+        eMag = new Integer(magVals[1]).intValue();
+        lMag = new Integer(magVals[0]).intValue();
+    }
 
     /**
      * _more_
@@ -1364,10 +1402,10 @@ public class AddeImageDataSource extends ImageDataSource {
             DataChoice dataChoice) {
 
         try {
-           /* String zpath = (String)getIdv().getStateManager().getProperty(
-                    IdvPersistenceManager.PROP_ZIDVPATH);
-            if(zpath != null && zpath.length() > 0) // is zidv
-                return; */
+            /* String zpath = (String)getIdv().getStateManager().getProperty(
+                     IdvPersistenceManager.PROP_ZIDVPATH);
+             if(zpath != null && zpath.length() > 0) // is zidv
+                 return; */
 
             //AreaAdapter   aa = new AreaAdapter(this.source, false);
             BandInfo id = null;
