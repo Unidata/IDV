@@ -844,6 +844,12 @@ public class DataSelectionWidget {
             regionOption =
                     dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
                             USE_DEFAULTREGION);
+            if (regionOption.equals(DataSelection.PROP_USEDISPLAYAREA) &&
+                    navDisplay != null){
+                geoSelection.setUseViewBounds(true);
+            } else {
+                geoSelection.setUseViewBounds(false);
+            }
         } else {
             if (geoSelection != null) {
                 if (strideCbx.isSelected() ){
