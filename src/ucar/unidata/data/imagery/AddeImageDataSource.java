@@ -483,7 +483,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                                 dir[8], dir[9]);
                     if (ginfo.getLatLonRect().containedIn(
                             mapInfo.getLatLonRect())) {
-                        //default
+                        //this is when the map area is large and totally covered the image area
                         int    lines       = dir[8];  //2726
                         int    elems       = dir[9];  //1732
 
