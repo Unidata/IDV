@@ -193,7 +193,7 @@ public class MapViewManager extends NavigatedViewManager {
     	"View.UseProgressiveResolution";
 
     /** label for progressive resolution/disclosure/whatever we call it */
-    public static final String PR_LABEL = "Use Progressive Disclosure";
+    public static final String PR_LABEL = "Enable Adaptive Resolution";
     
     /** Preference for showing the globe background */
     public static final String PREF_SHOWGLOBEBACKGROUND =
@@ -3202,7 +3202,7 @@ public class MapViewManager extends NavigatedViewManager {
                 "Automatically change viewpoint to the native data projection of new displays");
         }
         createCBMI(projMenu, PREF_USE_PROGRESSIVE_RESOLUTION).setToolTipText("" +
-        		"Progressively disclose higher resolution data on zoom");
+        		"Adapt the data resolution to match the display resolution");
         createCBMI(projMenu, PREF_SHAREVIEWS);
         projMenu.add(GuiUtils.makeMenuItem("Set Share Group", this,
                                            "showSharableDialog"));
