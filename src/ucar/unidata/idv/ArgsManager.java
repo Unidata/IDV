@@ -445,6 +445,17 @@ public class ArgsManager extends IdvManager {
 
 
     /**
+     * Clears out the automatic display creation arguments by setting
+     * {@link #initParams} and {@link #initDisplays} to
+     * {@link Collections#emptyList()}.
+     */
+    protected void clearAutomaticDisplayArgs() {
+        initParams = Collections.emptyList();
+        initDisplays = Collections.emptyList();
+    }
+
+
+    /**
      * Run the set of initial runnables
      */
     private void runInitRunnables() {
