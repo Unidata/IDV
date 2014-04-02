@@ -720,7 +720,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
-              <attribute name="Class-Path" value="Java3D/* auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
             </manifest>
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>

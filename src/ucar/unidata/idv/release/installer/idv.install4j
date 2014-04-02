@@ -627,7 +627,7 @@ if (!context.isUpdateInstallation()) {
                     <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
                       <void property="destinationDirectory">
                         <object class="java.io.File">
-                          <string>./Java3D</string>
+                          <string>./jre/lib/ext</string>
                         </object>
                       </void>
                       <void property="overwriteMode">
@@ -649,7 +649,7 @@ if (!context.isUpdateInstallation()) {
                     <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
                       <void property="destinationDirectory">
                         <object class="java.io.File">
-                          <string>./Java3D</string>
+                          <string>./jre/lib/ext</string>
                         </object>
                       </void>
                       <void property="overwriteMode">
@@ -671,7 +671,7 @@ if (!context.isUpdateInstallation()) {
                     <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
                       <void property="destinationDirectory">
                         <object class="java.io.File">
-                          <string>./Java3D</string>
+                          <string>${installer:sys.userHome}/Library/Java/Extensions</string>
                         </object>
                       </void>
                       <void property="overwriteMode">
@@ -693,7 +693,7 @@ if (!context.isUpdateInstallation()) {
                     <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
                       <void property="destinationDirectory">
                         <object class="java.io.File">
-                          <string>./Java3D</string>
+                          <string>./jre/lib/ext</string>
                         </object>
                       </void>
                       <void property="overwriteMode">
