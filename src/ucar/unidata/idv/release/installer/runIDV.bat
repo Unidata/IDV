@@ -48,7 +48,7 @@ jre\bin\java -Djava.ext.dirs=Java3D -Xmx%idv_memory%m -XX:PermSize=%idv_maxpermg
 @echo off
 
 REM Use the line below instead if you want to use the D3D version of Java 3D
-REM jre\bin\java -Djava.ext.dirs=Java3D -Xmx%idv_memory%m -XX:PermSize=%idv_maxpermgensize%m -XX:MaxPermSize=%idv_maxpermgensize%m -XX:+DisableExplicitGC -Dj3d.rend=d3d -jar idv.jar %*
+REM jre\bin\java -Xmx%idv_memory%m -XX:PermSize=%idv_maxpermgensize%m -XX:MaxPermSize=%idv_maxpermgensize%m -XX:+DisableExplicitGC -Dj3d.rend=d3d -jar idv.jar %*
 
 	    
 endlocal
