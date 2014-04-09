@@ -1163,6 +1163,8 @@ public class MapViewManager extends NavigatedViewManager {
         if (displayProjectionZoom != 0) {
             getMapDisplay().zoom(displayProjectionZoom);
         }
+        boolean useDisplayRegion = 
+        	getStateManager().getProperty(IdvConstants.PROP_USE_DISPLAYAREA, false);
 
         if (doNotSetProjection) {
             return;
@@ -1190,7 +1192,7 @@ public class MapViewManager extends NavigatedViewManager {
         }
 
         boolean setProjection = false;
-        if (thatProjection != null) {
+        if (thatProjection != null && !useDisplayRegion) {
             setProjection = setMapProjection(thatProjection, false,
                                              mvm.mainProjectionName);
         }

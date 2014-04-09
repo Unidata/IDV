@@ -1444,6 +1444,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
         boolean shouldAsk    = getStore().get(PREF_OPEN_ASK, true);
         boolean shouldRemove = getStore().get(PREF_OPEN_REMOVE, true);
         boolean shouldMerge  = getStore().get(PREF_OPEN_MERGE, true);
+        boolean matchDisplayRegion = 
+        	getStateManager().getProperty(PROP_USE_DISPLAYAREA, false);
 
         if (shouldAsk) {
             JCheckBox makeAsPreferenceCbx =
@@ -1453,6 +1455,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             JCheckBox removeCbx = new JCheckBox("Remove all displays & data",
                                       shouldRemove);
             JCheckBox changeDataCbx = getIdv().getChangeDataPathCbx();
+            JCheckBox useRegionCbx = new JCheckBox("Match Display Region", matchDisplayRegion);
             JPanel    btnPanel      = GuiUtils.left(removeCbx);
             JCheckBox mergeCbx =
                 new JCheckBox("Try to add displays to current windows",
@@ -1460,7 +1463,10 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             JPanel inner = GuiUtils.vbox(new Component[] {
                 btnPanel, mergeCbx,
                 // GuiUtils.filler(10,10),
-                changeDataCbx, GuiUtils.filler(10, 10), askCbx
+                changeDataCbx, 
+                useRegionCbx,
+                GuiUtils.filler(10, 10), 
+                askCbx
                 // new JLabel(
                 // "Note: This can be reset in the preferences window "),
             });
@@ -1492,6 +1498,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
             shouldRemove = removeCbx.isSelected();
             shouldMerge  = mergeCbx.isSelected();
+            matchDisplayRegion  = useRegionCbx.isSelected();
+            getStateManager().putProperty(PROP_USE_DISPLAYAREA, matchDisplayRegion);
 
             if (makeAsPreferenceCbx.isSelected()) {
                 getStore().put(PREF_OPEN_REMOVE, shouldRemove);
@@ -1502,7 +1510,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             getStore().save();
         }
 
-        return new boolean[] { true, shouldRemove, shouldMerge, shouldAsk };
+        return new boolean[] { true, shouldRemove, shouldMerge, shouldAsk, matchDisplayRegion };
     }
 
     /**

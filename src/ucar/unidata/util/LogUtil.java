@@ -563,7 +563,7 @@ public class LogUtil {
             if ((errorMessages != null) && (i < errorMessages.size())) {
                 message = (String) errorMessages.get(i);
             }
-            if (message.length() == 0) {
+            if (message != null && message.length() == 0) {
                 message = exc.getMessage();
             }
 
