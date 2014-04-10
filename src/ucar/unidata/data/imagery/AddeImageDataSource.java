@@ -312,6 +312,11 @@ public class AddeImageDataSource extends ImageDataSource {
         boolean      isProgressiveResolution = true;
         boolean fromBundle = getIdv().getStateManager().getProperty(
                                  IdvConstants.PROP_LOADINGXML, false);
+        boolean matchRegion = getIdv().getStateManager().getProperty(
+                IdvConstants.PROP_USE_DISPLAYAREA, false);
+        String t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION,
+                DataSelection.PROP_USEDEFAULTAREA);
+
         String unitStr = getUnitString(dataChoice.getDescription());
 
         // when geoSelection is null, it is from the old bundle and return the desscriptors.
@@ -351,7 +356,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                IdvPersistenceManager.PROP_ZIDVPATH);
             try {
 
-                if (zpath != null) {  //zidv case
+                if (zpath != null && zpath.length() > 0) {  //zidv case
                     return descriptors;
                 }
                 descriptors = (List) dataChoice.getProperty("descriptors");
@@ -364,7 +369,8 @@ public class AddeImageDataSource extends ImageDataSource {
             //dataChoice.getDataSources(dsList);
             //AddeImageDataSource ds = (AddeImageDataSource) dsList.get(0);
             //this.source = getPreviewSource(ds.source, thisDir);
-            return descriptors;
+            if(!matchRegion || !t1.equals(DataSelection.PROP_USEDISPLAYAREA))
+                return descriptors;
         }
         Rectangle2D rect  = geoSelection.getScreenBound();
 
@@ -384,8 +390,6 @@ public class AddeImageDataSource extends ImageDataSource {
                     .getElementMagValue();
         }
 
-        String t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION,
-                                       DataSelection.PROP_USEDEFAULTAREA);
 
         if (geoSelection != null) {
 
@@ -571,6 +575,10 @@ public class AddeImageDataSource extends ImageDataSource {
             magValue = "Magnification: " + dlMag + " " + deMag;
         }
         dataChoice.setProperty("MAG", magValue);
+
+        if(fromBundle)
+            return descriptors;
+
         Hashtable dp = new Hashtable();
         dp.put("descriptorsToSave", descriptors);
         dataChoice.setProperties(dp);
