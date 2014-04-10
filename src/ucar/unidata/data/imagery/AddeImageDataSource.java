@@ -369,7 +369,8 @@ public class AddeImageDataSource extends ImageDataSource {
             //dataChoice.getDataSources(dsList);
             //AddeImageDataSource ds = (AddeImageDataSource) dsList.get(0);
             //this.source = getPreviewSource(ds.source, thisDir);
-            if(!matchRegion || !t1.equals(DataSelection.PROP_USEDISPLAYAREA))
+            boolean mdr = dataChoice.getProperty("MatchDisplayRegion", false);
+            if(!matchRegion || !mdr)
                 return descriptors;
         }
         Rectangle2D rect  = geoSelection.getScreenBound();

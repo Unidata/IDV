@@ -147,6 +147,8 @@ public class ImagePlanViewControl extends PlanViewControl {
             if (descripters != null) {
                 dataChoice.setObjectProperty("descriptors", descripters);
             }
+            boolean mdr = getMatchDisplayRegion();
+            dataChoice.setProperty("MatchDisplayRegion", mdr);
             boolean result = super.setData(dataChoice);
             if ( !result) {
                 userMessage("Selected image(s) not available");
