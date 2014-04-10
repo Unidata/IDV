@@ -20,46 +20,31 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-
 package ucar.unidata.ui;
 
-
-import ucar.unidata.gis.maps.*;
-
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.util.Resource;
-import ucar.unidata.util.StringUtil;
-
-import java.awt.*;
-import java.awt.event.*;
-
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
-
 import java.beans.PropertyChangeListener;
-
-import java.io.*;
-
-import java.net.URL;
-
-import java.rmi.RemoteException;
-
-
-import java.util.*;
-
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
 
-import javax.swing.event.*;
-
+import ucar.unidata.gis.maps.MapData;
+import ucar.unidata.util.GuiUtils;
 
 /**
  * Panel to hold map gui items for one map
  */
-
 
 public class MapPanel extends JPanel {
 
@@ -117,12 +102,8 @@ public class MapPanel extends JPanel {
      */
     private void init() {
         setLayout(new GridLayout(1, 2));
-        setAlignmentY(this.CENTER_ALIGNMENT);
+        setAlignmentY(Component.CENTER_ALIGNMENT);
         String name = mapData.getDescription();
-        if (name.length() > 30) {
-            name = name.substring(0, 29);
-        }
-        name     = StringUtil.padRight(name, 30);
 
         shownCbx = new JCheckBox(name, mapData.getVisible());
         Font lblFont = shownCbx.getFont();
@@ -147,8 +128,8 @@ public class MapPanel extends JPanel {
         });
 
         JPanel p = new JPanel();
-        p.setAlignmentX(p.RIGHT_ALIGNMENT);
-        p.setAlignmentY(p.TOP_ALIGNMENT);
+        p.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        p.setAlignmentY(Component.TOP_ALIGNMENT);
         widthBox = new JComboBox(new String[] { "1.0", "1.5", "2.0", "2.5",
                 "3.0" });
         widthBox.setToolTipText("Set the line width");
@@ -256,4 +237,3 @@ public class MapPanel extends JPanel {
         return mapData;
     }
 }
-
