@@ -41,6 +41,7 @@ import javax.swing.JPanel;
 
 import ucar.unidata.gis.maps.MapData;
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.StringUtil;
 
 /**
  * Panel to hold map gui items for one map
@@ -51,10 +52,8 @@ public class MapPanel extends JPanel {
     /** This holds the data that describes the map */
     private MapData mapData;
 
-
     /** The visibility cbx */
     private JCheckBox shownCbx;
-
 
     /** The line width box */
     private JComboBox widthBox;
@@ -73,6 +72,9 @@ public class MapPanel extends JPanel {
 
     /** Are we updating the UI */
     private boolean updatingUI = false;
+    
+    /** Limit on map label string length */
+    private static final int MAP_LABEL_MAX_LENGTH = 35;
 
     /**
      * Create the MapPanel with the given MapData
@@ -104,15 +106,31 @@ public class MapPanel extends JPanel {
         setLayout(new GridLayout(1, 2));
         setAlignmentY(Component.CENTER_ALIGNMENT);
         String name = mapData.getDescription();
-
+        String longName = name;
+        boolean truncatedName = false;
+        
+        // TJJ Apr 2014
+        if (name.length() > MAP_LABEL_MAX_LENGTH) {
+        	// Pad with ellipses if we exceeded max length
+            name = name.substring(0, (MAP_LABEL_MAX_LENGTH - 3));
+            name = StringUtil.padRight(name, MAP_LABEL_MAX_LENGTH, ".");
+            truncatedName = true;
+        }
+        
         shownCbx = new JCheckBox(name, mapData.getVisible());
+
         Font lblFont = shownCbx.getFont();
         Font monoFont = new Font("Monospaced", lblFont.getStyle(),
                                  lblFont.getSize());
         shownCbx.setFont(monoFont);
 
-
+        // Tooltip for most rows
         shownCbx.setToolTipText("Toggle visibility");
+        
+        // For truncated rows, tooltip is full description of map name
+        if (truncatedName) {
+        	shownCbx.setToolTipText(longName);
+        }
 
         shownCbx.setHorizontalAlignment(JCheckBox.LEFT);
         add(shownCbx);
