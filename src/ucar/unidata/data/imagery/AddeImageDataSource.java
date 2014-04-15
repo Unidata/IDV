@@ -340,10 +340,9 @@ public class AddeImageDataSource extends ImageDataSource {
         //}
         if (fromBundle) {
             String ver = IdvPersistenceManager.getBundleIdvVersion();
-
+            this.source = descriptors.get(0).getSource();
             if ((ver == null)
                     || (Character.getNumericValue(ver.charAt(0)) < 5)) {
-                this.source = descriptors.get(0).getSource();
                 //isOldBundle = true;
                 initOldBundle(dataChoice, descriptors, this.source);
 
@@ -369,11 +368,10 @@ public class AddeImageDataSource extends ImageDataSource {
             String zpath = (String) getIdv().getStateManager().getProperty(
                                IdvPersistenceManager.PROP_ZIDVPATH);
             try {
-
                 if (zpath != null && zpath.length() > 0) {  //zidv case
                     return descriptors;
                 }
-                descriptors = (List) dataChoice.getProperty("descriptors");
+                //descriptors = (List) dataChoice.getProperty("descriptors");
                 //descriptors = dList;
             } catch (Exception e) {}
             //BandInfo id = (BandInfo) dataChoice.getId();
