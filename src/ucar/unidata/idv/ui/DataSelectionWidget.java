@@ -734,7 +734,7 @@ public class DataSelectionWidget {
                             GuiUtils.inset(
                                 GuiUtils.right(strideCbx),
                                 new Insets(0, 0, 5, 0)), strideComponent)));
-                selectionTab.add("Stride", strideTab);
+                selectionTab.add("Data Sampling", strideTab);
             }
         }
 

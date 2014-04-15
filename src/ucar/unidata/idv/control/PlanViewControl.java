@@ -729,6 +729,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
         boolean fromBundle = getIdv().getStateManager().getProperty(
                 IdvConstants.PROP_LOADINGXML, false);
 
+        /*
         if (fromBundle) {
             String magStr = (String) dataChoice.getProperty("MAG");
             if (magStr != null) {
@@ -736,8 +737,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     sideLegendReadout = new JLabel("<html><br></html>");
                 }
                 sideLegendReadout.setText("<html>" + magStr + "</html>");
+                sideLegendReadout.setToolTipText(
+                   "The data used for this display has been sampled below full resolution.");
             }
         } else {
+        */
             DataChoice dc0 = null;
             if (dataChoice instanceof DerivedDataChoice) {
                 dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
@@ -751,8 +755,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
                     sideLegendReadout = new JLabel("<html><br></html>");
                 }
                 sideLegendReadout.setText("<html>" + magStr + "</html>");
+                sideLegendReadout.setToolTipText(
+                		"The data used for this display has been sampled below full resolution.");
             }
-        }
+        //}
         Trace.call2("PlanView.setData");
         return true;
     }
