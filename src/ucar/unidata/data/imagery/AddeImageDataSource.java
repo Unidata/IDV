@@ -290,6 +290,20 @@ public class AddeImageDataSource extends ImageDataSource {
             return "PROD";
         } else if (description.contains("Radiance")) {
             return "RAD";
+        } else if (description.contains("Reflectivity")) {
+            return "ECHO";
+        } else if (description.contains("Vip level")) {
+            return "VIP";
+        } else if (description.contains("Vertical h2o")) {
+            return "H2O";
+        } else if (description.contains("Echo")) {
+            return "TOPS";
+        } else if (description.contains("Hydrometeor")) {
+            return "CLAS";
+        } else if (description.contains("Rsp1")) {
+            return "RSP1";
+        } else if (description.contains("Precipitation")) {
+            return "RAIN";
         } else {
             return "X";
         }
