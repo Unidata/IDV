@@ -394,7 +394,7 @@ public class ImageDataSelectionInfo {
     public String getLocateValue() {
         String locKey = getLocateKey();
 
-        if (locKey.equals(AddeImageURL.KEY_LINEELE)) {
+        if (locKey != null && locKey.equals(AddeImageURL.KEY_LINEELE)) {
 
             this.locateValue = this.locationLine + " " +  this.locationElem;
         } else {
