@@ -379,7 +379,7 @@ public class ImageDataSelectionInfo {
         //super.setLocateValue(value);
         String locKey = getLocateKey();
         List<String> locList = StringUtil.split(value, " ");
-        if (locKey.equals(AddeImageURL.KEY_LINEELE)) {
+        if (locKey != null && locKey.equals(AddeImageURL.KEY_LINEELE)) {
             this.locationLine = Integer.parseInt(locList.get(0));
             this.locationElem = Integer.parseInt(locList.get(1));
             this.locateValue = this.locationLine + " " +  this.locationElem;
