@@ -1521,6 +1521,11 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
             if (canonicalName != null) {
                 info = (ParamInfo) StringUtil.findMatch(
                     canonicalName.toLowerCase(), paramInfos, null);
+                if (info == null) {
+                    // try one more time without doing toLowerCase
+                    info = (ParamInfo) StringUtil.findMatch(
+                            canonicalName, paramInfos, null);
+                }
             }
         }
         return info;
