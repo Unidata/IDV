@@ -555,13 +555,19 @@ public class AddeImageDataSource extends ImageDataSource {
             }
         }
         String magValue = null;
-        if (isProgressiveResolution) {
-            magValue = "Magnification: " + "-" + Integer.toString(lineMag)
-                       + " " + "-" + Integer.toString(eleMag);
-        } else {
-            magValue = "Magnification: " + dlMag + " " + deMag;
+        if (isProgressiveResolution) { 
+        	if (eleMag > 1 || lineMag > 1) {
+            	magValue = DataUtil.makeSamplingLabel(eleMag, lineMag, "pixel");
+            //magValue = "Resolution: " + "-" + Integer.toString(lineMag)
+            //           + " " + "-" + Integer.toString(eleMag);
+            }
+        } else if (dlMag < -1 || deMag < -1) {
+            magValue = DataUtil.makeSamplingLabel(deMag, dlMag, "pixel");
+            //magValue = "Resolution: " + dlMag + " " + deMag;
         }
-        dataChoice.setProperty("MAG", magValue);
+        if (magValue != null) {
+            dataChoice.setProperty("MAG", magValue);
+        }
 
         if(fromBundle)
             return descriptors;

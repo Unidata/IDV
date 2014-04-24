@@ -1643,9 +1643,23 @@ public class GeoGridDataSource extends GridDataSource {
             }
             System.out.println("new x y strides: " + geoSelection.getXStride() + " "
                     + geoSelection.getYStride());
-            String magValue = "Stride: " + geoSelection.getXStride() + " "
-                    + geoSelection.getYStride();
-            dataChoice.setProperty("MAG", magValue);
+            int xStride = geoSelection.getXStride();
+            int yStride = geoSelection.getYStride();
+            // Set 0 or -1 to be 1
+            if (xStride < 1) {
+            	xStride = 1;
+            }
+            if (yStride < 1) {
+            	yStride = 1;
+            }
+            if ( xStride != 1 || yStride != 1) {
+            	/*
+                String magValue = "Resolution: " + xStride + " "
+                    + yStride;
+                    */
+            	String magValue = DataUtil.makeSamplingLabel(xStride, yStride, "grid point");
+                dataChoice.setProperty("MAG", magValue);
+            }
             if ((geoSelection != null)
                     && (geoSelection.hasSpatialSubset()
                         || geoSelection.getHasNonOneStride())) {
