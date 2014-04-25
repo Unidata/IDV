@@ -716,6 +716,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             excludes="${excludes}"
         >
            <manifest>
+              <attribute name=" Application-Name" value="Unidata's Integrated Data Viewer (IDV)"/>
               <attribute name="Implementation-Title" value="Unidata's Integrated Data Viewer (IDV)"/>
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
@@ -756,6 +757,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             excludes="${excludes}"
         >
            <manifest>
+              <attribute name=" Application-Name" value="Unidata's Integrated Data Viewer (IDV)"/>
               <attribute name="Implementation-Title" value="Unidata's Integrated Data Viewer (IDV)"/>
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
