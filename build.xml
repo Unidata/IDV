@@ -192,6 +192,10 @@ argument -Dfoo=bar) -->
             basedir="${srcdir}"
             compress="true"
             jarfile="${jars_dest}/auxdata.jar">
+           <manifest>
+              <attribute name="Application-Name" value="Unidata's Integrated Data Viewer (IDV)"/>
+           </manifest>
+
               <include name="auxdata/jython/libs/**"/>
               <include name="auxdata/maps/**"/>
               <include name="auxdata/ui/**"/>
