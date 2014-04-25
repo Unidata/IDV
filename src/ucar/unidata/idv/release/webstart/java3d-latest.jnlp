@@ -22,44 +22,80 @@
     <jar href="vecmath/1.6.0/vecmath.jar" download="eager"/>
   </resources>
 
-  <resources os="Windows">
-    <nativelib href="j3d/1.6.0/windows/joal-natives-windows-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/windows/gluegen-rt-natives-windows-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/windows/joal-natives-windows-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/windows/gluegen-rt-natives-windows-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/windows/jogl-all-natives-windows-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/windows/jogl-all-natives-windows-i586.jar" download="eager"/>
+  <resources os="Windows" arch="x86">
+    <nativelib href="j3d/1.6.0/joal-natives-windows-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-windows-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-windows-i586.jar" download="eager"/>
   </resources>
 
-  <resources os="Linux">
-    <nativelib href="j3d/1.6.0/linux/gluegen-rt-natives-linux-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/joal-natives-linux-armv6hf.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/gluegen-rt-natives-linux-armv6.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/joal-natives-linux-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/gluegen-rt-natives-linux-armv6hf.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/gluegen-rt-natives-linux-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/jogl-all-natives-linux-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/jogl-all-natives-linux-armv6.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/jogl-all-natives-linux-armv6hf.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/jogl-all-natives-linux-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/joal-natives-linux-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/linux/joal-natives-linux-armv6.jar" download="eager"/>
+  <resources os="Windows" arch="amd64">
+    <nativelib href="j3d/1.6.0/joal-natives-windows-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-windows-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-windows-amd64.jar" download="eager"/>
   </resources>
 
-  <resources os="SunOS">
-    <nativelib href="j3d/1.6.0/solaris/gluegen-rt-natives-solaris-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/solaris/joal-natives-solaris-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/solaris/gluegen-rt-natives-solaris-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/solaris/jogl-all-natives-solaris-amd64.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/solaris/jogl-all-natives-solaris-i586.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/solaris/joal-natives-solaris-amd64.jar" download="eager"/>
+  <resources os="Linux" arch="i386">
+    <nativelib href="j3d/1.6.0/joal-natives-linux-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-linux-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-linux-i586.jar" download="eager"/>
   </resources>
 
-  <resources os="Mac OS X">
+  <resources os="Linux" arch="x86">
+    <nativelib href="j3d/1.6.0/joal-natives-linux-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-linux-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-linux-i586.jar" download="eager"/>
+  </resources>
+
+  <resources os="Linux" arch="amd64">
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-linux-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-linux-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/joal-natives-linux-amd64.jar" download="eager"/>
+  </resources>
+
+  <resources os="Linux" arch="x86_64">
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-linux-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-linux-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/joal-natives-linux-amd64.jar" download="eager"/>
+  </resources>
+
+  <resources os="SunOS" arch="x86_64">
+    <nativelib href="j3d/1.6.0/joal-natives-solaris-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-solaris-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-solaris-i586.jar" download="eager"/>
+  </resources>
+
+  <resources os="SunOS" arch="x86">
+    <nativelib href="j3d/1.6.0/joal-natives-solaris-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-solaris-i586.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-solaris-i586.jar" download="eager"/>
+  </resources>
+
+  <resources os="SunOS" arch="amd64">
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-solaris-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-solaris-amd64.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/joal-natives-solaris-amd64.jar" download="eager"/>
+  </resources>
+
+  <resources os="Mac OS X" arch="ppc">
     <nativelib href="j3d/1.6.0/macosx/gluegen-rt-natives-macosx-universal.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/macosx/jocl-natives-macosx-universal.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/macosx/jogl-all-natives-macosx-universal.jar" download="eager"/>
-    <nativelib href="j3d/1.6.0/macosx/joal-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jocl-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/joal-natives-macosx-universal.jar" download="eager"/>
   </resources>
+
+  <resources os="Mac OS X" arch="i386">
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jocl-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/joal-natives-macosx-universal.jar" download="eager"/>
+  </resources>
+
+  <resources os="Mac OS X" arch="x86_64">
+    <nativelib href="j3d/1.6.0/gluegen-rt-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jocl-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/jogl-all-natives-macosx-universal.jar" download="eager"/>
+    <nativelib href="j3d/1.6.0/joal-natives-macosx-universal.jar" download="eager"/>
+  </resources>
+
   <component-desc />
 </jnlp>
