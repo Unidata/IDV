@@ -190,6 +190,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             }
             sideLegendReadout.setText("<html>" + magStr + "</html>");
         }
+
         return result;
 
     }

@@ -1652,14 +1652,14 @@ public class GeoGridDataSource extends GridDataSource {
             if (yStride < 1) {
             	yStride = 1;
             }
-            if ( xStride != 1 || yStride != 1) {
+          //  if ( xStride != 1 || yStride != 1) {
             	/*
                 String magValue = "Resolution: " + xStride + " "
                     + yStride;
                     */
-            	String magValue = DataUtil.makeSamplingLabel(xStride, yStride, "grid point");
-                dataChoice.setProperty("MAG", magValue);
-            }
+            String magValue = DataUtil.makeSamplingLabel(xStride, yStride, "grid point");
+            dataChoice.setProperty("MAG", magValue);
+          //  }
             if ((geoSelection != null)
                     && (geoSelection.hasSpatialSubset()
                         || geoSelection.getHasNonOneStride())) {
