@@ -1453,7 +1453,7 @@ public class XmlTree extends JTree {
             f.getContentPane().add(GuiUtils.makeScrollPane(t.getContents(),
                     200, 300));
             f.pack();
-            f.show();
+            f.setVisible(true);
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
         }

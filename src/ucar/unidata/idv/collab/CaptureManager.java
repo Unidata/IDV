@@ -683,7 +683,7 @@ public class CaptureManager {
             captureWindow = new JFrame("Capture Window");
             GuiUtils.packWindow(captureWindow, captureContents, true);
         }
-        captureWindow.show();
+        captureWindow.setVisible(true);
         captureWindow.toFront();
     }
 

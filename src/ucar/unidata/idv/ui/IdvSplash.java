@@ -228,7 +228,7 @@ public class IdvSplash extends JWindow {
                     Dimension ss =
                         Toolkit.getDefaultToolkit().getScreenSize();
                     d.setLocation(ss.width / 2 - 100, ss.height / 2 - 100);
-                    d.show();
+                    d.setVisible(true);
                 }
             }
         });
@@ -285,7 +285,7 @@ public class IdvSplash extends JWindow {
         ucar.unidata.util.Msg.translateTree(this);
 
 
-        show();
+        setVisible(true);
         toFront();
 
 

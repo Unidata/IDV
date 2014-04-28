@@ -1111,7 +1111,7 @@ public class ComponentGroup extends ComponentHolder {
         f.setLocation(300, 300);
         f.getContentPane().add(g2.getContents());
         f.pack();
-        f.show();
+        f.setVisible(true);
     }
 
 

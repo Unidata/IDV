@@ -1014,7 +1014,7 @@ public class GraphPaperLayout implements LayoutManager2 {
         f.getContentPane().add(editPanel.getContents());
         f.pack();
         f.setLocation(100, 100);
-        f.show();
+        f.setVisible(true);
 
     }
 

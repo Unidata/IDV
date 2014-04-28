@@ -1340,7 +1340,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (newOne) {
             GuiUtils.showDialogNearSrc(viewMenu, propertiesDialog);
         } else {
-            propertiesDialog.show();
+            propertiesDialog.setVisible(true);
         }
 
         propertiesDialogShown = true;
