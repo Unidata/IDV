@@ -387,7 +387,7 @@ public class RovingProgress extends JPanel implements Removable {
         RovingProgress mm = new RovingProgress(Color.blue);
         f.getContentPane().add(mm);
         f.pack();
-        f.show();
+        f.setVisible(true);
         mm.start();
     }
 

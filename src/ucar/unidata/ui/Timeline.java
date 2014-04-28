@@ -2773,7 +2773,7 @@ public class Timeline extends JPanel implements MouseListener,
             dialog.setLocation(new Point(200, 200));
         }
         dialogOK = false;
-        dialog.show();
+        dialog.setVisible(true);
         return dialogOK;
     }
 
@@ -2933,7 +2933,7 @@ public class Timeline extends JPanel implements MouseListener,
                 LayoutUtil.centerBottom(timeline.getContents(true), bottom));
             dialog.pack();
             dialog.setLocation(new Point(200, 200));
-            dialog.show();
+            dialog.setVisible(true);
 
         } catch (Throwable thr) {
             thr.printStackTrace();

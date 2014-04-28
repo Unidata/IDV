@@ -252,10 +252,10 @@ public abstract class WindowHolder implements ActionListener {
         }
         if (dialog != null) {
             dialog.setModal(modal);
-            dialog.show();
+            dialog.setVisible(true);
         }
         if (frame != null) {
-            frame.show();
+            frame.setVisible(true);
         }
 
         if (window != null) {

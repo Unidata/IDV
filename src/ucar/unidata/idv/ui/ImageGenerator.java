@@ -5660,7 +5660,7 @@ public class ImageGenerator extends IdvManager {
                 JFrame frame = GuiUtils.getFrame(viewManager.getContents());
                 if (frame != null) {
                     LogUtil.registerWindow(frame);
-                    frame.show();
+                    frame.setVisible(true);
                     GuiUtils.toFront(frame);
                     frame.setLocation(50, 50);
                     Misc.sleep(50);
@@ -5695,7 +5695,7 @@ public class ImageGenerator extends IdvManager {
                         GuiUtils.getFrame(viewManager.getContents());
                     if (frame != null) {
                         LogUtil.registerWindow(frame);
-                        frame.show();
+                        frame.setVisible(true);
                         GuiUtils.toFront(frame);
                         frame.setLocation(50, 50);
                         Misc.sleep(50);

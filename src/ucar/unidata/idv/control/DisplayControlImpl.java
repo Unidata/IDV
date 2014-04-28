@@ -5699,7 +5699,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (f != null) {
             GuiUtils.showDialogNearSrc(f, propertiesDialog);
         } else {
-            propertiesDialog.show();
+            propertiesDialog.setVisible(true);
         }
     }
 

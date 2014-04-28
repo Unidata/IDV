@@ -184,7 +184,7 @@ public class CursorReadoutWindow {
             window = new JWindow(parent);
             window.pack();
             setWindowLocation();
-            window.show();
+            window.setVisible(true);
         }
         double[] box =
             vm.getNavigatedDisplay().getSpatialCoordinatesFromScreen(

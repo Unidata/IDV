@@ -2557,7 +2557,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
         }
         setAnimationTimes();
         if (frame != null) {
-            frame.show();
+            frame.setVisible(true);
         }
     }
 

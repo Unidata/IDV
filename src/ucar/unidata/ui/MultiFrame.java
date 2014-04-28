@@ -132,7 +132,7 @@ public class MultiFrame {
     public void show() {
         JFrame theFrame = frame;
         if (theFrame != null) {
-            theFrame.show();
+            theFrame.setVisible(true);
         } else if (internalFrame != null) {
             internalFrame.show();
         }
