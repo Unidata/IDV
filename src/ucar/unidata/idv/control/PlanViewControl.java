@@ -193,7 +193,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     protected boolean haveEnsemble = false;
 
     /** The label to show the readout in the side legend */
-    private JLabel sideLegendReadout;
+    private String resolutionReadout;
 
     /**
      * Cstr; does nothing. See init() for creation actions.
@@ -725,59 +725,25 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         processRequestProperties();
 
-        // sideLegendReadout
-        boolean fromBundle = getIdv().getStateManager().getProperty(
-                IdvConstants.PROP_LOADINGXML, false);
-
-        /*
-        if (fromBundle) {
-            String magStr = (String) dataChoice.getProperty("MAG");
-            if (magStr != null) {
-                if (sideLegendReadout == null) {
-                    sideLegendReadout = new JLabel("<html><br></html>");
-                }
-                sideLegendReadout.setText("<html>" + magStr + "</html>");
-                sideLegendReadout.setToolTipText(
-                   "The data used for this display has been sampled below full resolution.");
-            }
+        DataChoice dc0 = null;
+        if (dataChoice instanceof DerivedDataChoice) {
+            dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
         } else {
-        */
-            DataChoice dc0 = null;
-            if (dataChoice instanceof DerivedDataChoice) {
-                dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
-            } else {
-                dc0 = dataChoice;
-            }
+            dc0 = dataChoice;
+        }
 
-            String magStr = (String) dc0.getProperty("MAG");
-            if (magStr != null) {
-                if (sideLegendReadout == null) {
-                    sideLegendReadout = new JLabel("<html><br></html>");
-                }
-                sideLegendReadout.setText("<html>" + magStr + "</html>");
-                sideLegendReadout.setToolTipText(
-                		"The data used for this display has been sampled below full resolution.");
-            }
-        //}
+        String magStr = (String) dc0.getProperty("MAG");
+        if (magStr != null && !magStr.isEmpty()) {
+        	resolutionReadout = magStr;
+        } else {
+        	resolutionReadout = null;
+        }
+        
         Trace.call2("PlanView.setData");
         return true;
     }
 
-    /**
-     * Assume that any display controls that have a color table widget
-     * will want the color table to show up in the legend.
-     *
-     * @param  legendType  type of legend
-     * @return The extra JComponent to use in legend
-     */
-    protected JComponent getExtraLegendComponent(int legendType) {
-        JComponent parentComp = super.getExtraLegendComponent(legendType);
-        if (legendType == BOTTOM_LEGEND || sideLegendReadout == null) {
-            return parentComp;
-        }
-
-        return GuiUtils.vbox(sideLegendReadout, parentComp);
-    }
+    
     /**
      * Wrapper around {@link #addTopographyMap(int)} to allow subclasses
      * to set their own index.
@@ -1471,8 +1437,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public void getLegendLabels(List labels, int legendType) {
         super.getLegendLabels(labels, legendType);
+        // TODO: - should this only be for side legends?
         if (currentLevel != null) {
             labels.add("Level: " + formatLevel(currentLevel));
+        }
+        if (resolutionReadout != null && !resolutionReadout.isEmpty()) {
+        	labels.add(resolutionReadout);
         }
     }
 
