@@ -379,12 +379,14 @@ public class AddeImageDataSource extends ImageDataSource {
 
 
         if (geoSelection != null) {
-
-            if (geoSelection.getBoundingBox() == null) {
-
-                ImageDataSelectionInfo adSource =
+            ImageDataSelectionInfo adSource =
                     (ImageDataSelectionInfo) subset.getProperty(
-                        "advancedURL");
+                            "advancedURL");
+            if (geoSelection.getBoundingBox() == null && adSource != null) {
+
+                //ImageDataSelectionInfo adSource =
+                 //   (ImageDataSelectionInfo) subset.getProperty(
+                 //       "advancedURL");
 
                 int lines = adSource.getLines()
                             * Math.abs(adSource.getLineMag());;
