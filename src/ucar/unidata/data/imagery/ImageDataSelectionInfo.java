@@ -66,6 +66,9 @@ public class ImageDataSelectionInfo {
     public String band;
 
     /** _more_ */
+    public String navType;
+
+    /** _more_ */
     public String unit;
 
     /** _more_ */
@@ -207,6 +210,8 @@ public class ImageDataSelectionInfo {
                 List<String> lList = StringUtil.split(value, " ");
                 setLineMag(Integer.parseInt(lList.get(0)));
                 setElementMag(Integer.parseInt(lList.get(1)));
+            } else if (key.startsWith("nav")) {    // navigator type
+                setNavType(value);
             } else {
                 leftovers.add(token);
             }
@@ -313,6 +318,24 @@ public class ImageDataSelectionInfo {
      */
     public String getBand() {
         return this.band;
+    }
+
+    /**
+     * _more_
+     *
+     * @param navType _more_
+     */
+    public void setNavType(String navType) {
+        this.navType = navType;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getNavType() {
+        return this.navType;
     }
 
     /**
@@ -820,6 +843,7 @@ public class ImageDataSelectionInfo {
         appendKeyValue(buf, AddeImageURL.KEY_UNIT, "" + getUnit());
         appendKeyValue(buf, AddeImageURL.KEY_MAG, "" + getMagValue());
         appendKeyValue(buf, AddeImageURL.KEY_SPAC, "" + getSpacing());
+        appendKeyValue(buf, AddeImageURL.KEY_NAV, "" + getNavType());
 
         if ( !leftovers.isEmpty()) {
             for (String leftover : leftovers) {

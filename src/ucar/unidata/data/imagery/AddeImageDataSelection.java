@@ -430,9 +430,17 @@ public class AddeImageDataSelection {
         /** _more_ */
         String previousPlace;
 
+        /** _more_ */
         ImageDataSelectionInfo urlInfo;
 
+        /** _more_ */
         String coordinateType;
+
+        /** _more_ */
+        String navType;
+
+        /** Widget for selecting image nav type */
+        protected JComboBox navComboBox;
 
         /**
          * Construct a AddeImageAdvancedPanel
@@ -466,6 +474,7 @@ public class AddeImageDataSelection {
             this.isLineEle = true;
             //this.place = urlInfo.getPlaceValue();
             this.coordinateType = urlInfo.getLocateKey();
+            this.navType = urlInfo.getNavType();
 
             if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
                 //this.latitude = urlInfo.getLocationLat();
@@ -517,6 +526,7 @@ public class AddeImageDataSelection {
             // init information for the location and the default is LATLON
             AreaDirectory aDir = descriptor.getDirectory();
             this.coordinateType = urlInfo.getLocateKey();
+            this.navType = urlInfo.getNavType();
 
             if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
                 //this.latitude = urlInfo.getLocationLat();
@@ -1016,6 +1026,7 @@ public class AddeImageDataSelection {
             java.util.List allComps1       = new ArrayList();
             java.util.List allComps2       = new ArrayList();
             java.util.List allComps3       = new ArrayList();
+            java.util.List allComps4       = new ArrayList();
             Insets         dfltGridSpacing = new Insets(4, 0, 4, 0);
             String         dfltLblSpacing  = " ";
             JComponent     propComp        = null;
@@ -1336,17 +1347,38 @@ public class AddeImageDataSelection {
             allComps3.add(GuiUtils.rLabel("Magnification:"));
             allComps3.add(GuiUtils.left(propComp));
 
+            //Navigator Type
+            allComps4.add(new JLabel(" "));
+            allComps4.add(new JLabel(" "));
+            navComboBox = new JComboBox();
+            GuiUtils.setListData(
+                    navComboBox,
+                    Misc.newList(
+                            new TwoFacedObject("Default", "X"),
+                            new TwoFacedObject("Lat/Lon", "LALO")));
+            navComboBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    int selectedIndex =
+                            navComboBox.getSelectedIndex();
 
+                    if(selectedIndex == 0){
+                        urlInfo.setNavType("X");
+                    } else {
+                        urlInfo.setNavType("LALO");
+                    }
+                }
+            });
+            allComps4.add(GuiUtils.rLabel("Navigation Type:"));
+            allComps4.add(GuiUtils.left(navComboBox));
 
             //all
             JPanel imagePanel =
-                GuiUtils.vbox(GuiUtils.doLayout(allComps0, 2, GuiUtils.WT_NY,
-                    GuiUtils.WT_N), GuiUtils.doLayout(allComps1, 2,
-                        GuiUtils.WT_NY,
-                        GuiUtils.WT_N), GuiUtils.doLayout(allComps2, 2,
-                            GuiUtils.WT_NY,
-                            GuiUtils.WT_N), GuiUtils.doLayout(allComps3, 2,
-                                GuiUtils.WT_NY, GuiUtils.WT_N));
+                GuiUtils.vbox(new Component []
+                        {GuiUtils.doLayout(allComps0, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                         GuiUtils.doLayout(allComps1, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                         GuiUtils.doLayout(allComps2, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                         GuiUtils.doLayout(allComps3, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                         GuiUtils.doLayout(allComps4, 2, GuiUtils.WT_NY, GuiUtils.WT_N)});
 
             advance = GuiUtils.top(imagePanel);
             boolean showMagSection = !getIsProgressiveResolution(); //prograssiveCbx1.isSelected();
@@ -1757,6 +1789,7 @@ public class AddeImageDataSelection {
                 }
             }
 
+            dataSelection.putProperty("navType", urlInfo.getNavType());
 
         }
 

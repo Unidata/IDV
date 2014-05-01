@@ -287,6 +287,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 IdvConstants.PROP_USE_DISPLAYAREA, false);
         String t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION,
                 DataSelection.PROP_USEDEFAULTAREA);
+        String navType = subset.getProperty("navType", "X");
 
         String unitStr = getUnitString(dataChoice.getDescription());
 
@@ -431,7 +432,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 try {
                     descriptors = reSetImageDataDescriptor(descriptors,
                             locationKey, locationValue, place, newLines,
-                            newelems, lineMag, eleMag, unitStr);
+                            newelems, lineMag, eleMag, unitStr, navType);
                 } catch (Exception e) {}
 
             } else if (t1.equals(DataSelection.PROP_USEDISPLAYAREA)
@@ -522,7 +523,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                 reSetImageDataDescriptor(descriptors,
                                     AddeImageURL.KEY_LINEELE, locateValue,
                                     "CENTER", newLines, newelems, lineMag,
-                                    eleMag, unitStr);
+                                    eleMag, unitStr, navType);
                         } catch (Exception e) {}
                     } else {
                         LatLonRect bbox = mapInfo.getLatLonRect().intersect(
@@ -549,7 +550,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                             descriptors, maxLat, minLat,
                                             maxLon, minLon, elFactor, dlMag,
                                             deMag, "CENTER",
-                                            isProgressiveResolution, llp);
+                                            isProgressiveResolution, llp, navType);
                     }
 
 
@@ -932,7 +933,7 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     static public List reSetImageDataDescriptor(List despList,
             String locateKey, String locateValue, String PlaceValue,
-            int lines, int elems, int lineMag, int eleMag, String unit)
+            int lines, int elems, int lineMag, int eleMag, String unit, String nav)
             throws RemoteException, VisADException {
 
         List descriptorList = new ArrayList();
@@ -975,6 +976,10 @@ public class AddeImageDataSource extends ImageDataSource {
             source = replaceKey(source, AddeImageURL.KEY_SPAC, 1);
             if (unit != null) {
                 source = replaceKey(source, AddeImageURL.KEY_UNIT, unit);
+            }
+
+            if(nav != null) {
+                source = replaceKey(source, AddeImageURL.KEY_NAV, nav);
             }
             imageDescriptor.setSource(source);
             descriptorList.add(imageDescriptor);
@@ -1050,7 +1055,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                 double minLon, int factor, int dlMag,
                                 int deMag, String placeValue,
                                 boolean isProgressiveResolution,
-                                LatLonPointImpl centerLLP) {
+                                LatLonPointImpl centerLLP, String nav) {
 
         // check if this is rubber band event, if not do nothing
 
@@ -1158,7 +1163,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                             AddeImageURL.KEY_LATLON,
                                             locateValue, placeValue,
                                             newLines, newelems, lineMag,
-                                            eleMag, unit);
+                                            eleMag, unit, nav);
         } catch (Exception e) {}
 
         return null;
