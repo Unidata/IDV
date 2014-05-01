@@ -21,78 +21,69 @@
 package ucar.unidata.idv.ui;
 
 
-
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
-
-
-
-import ucar.unidata.idv.*;
+import ucar.unidata.idv.IdvManager;
+import ucar.unidata.idv.IdvResourceManager;
+import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.ParamField;
-import ucar.unidata.ui.colortable.*;
-
-
-
+import ucar.unidata.ui.colortable.ColorTableCanvas;
+import ucar.unidata.ui.colortable.ColorTableEditor;
 import ucar.unidata.util.ColorTable;
-
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
-
 import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.ObjectPair;
-import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
-import ucar.visad.quantities.CommonUnits;
-
-import visad.*;
-
-import visad.jmet.MetUnits;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
+import visad.Unit;
 
 
-import java.io.File;
-import java.io.FileOutputStream;
 
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.StringTokenizer;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.table.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
 
 
 
@@ -1521,6 +1512,11 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
             if (canonicalName != null) {
                 info = (ParamInfo) StringUtil.findMatch(
                     canonicalName.toLowerCase(), paramInfos, null);
+                if (info == null) {
+                    // try one more time without doing toLowerCase
+                    info = (ParamInfo) StringUtil.findMatch(canonicalName,
+                            paramInfos, null);
+                }
             }
         }
         return info;
