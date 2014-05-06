@@ -279,9 +279,9 @@ public class ArgsManager extends IdvManager {
      * You can specify a set of initial parameter/display pairs
      * that will automatically be created with every data source
      * that gets loaded.
-     * This are defined with the  {@link IdvConstants.ARG_DISPLAY}
+     * This are defined with the  {@link IdvConstants#ARG_DISPLAY}
      */
-    List initParams = new ArrayList();
+    protected List initParams = new ArrayList();
 
     /**
      * Holds the  list of display names.
@@ -289,9 +289,9 @@ public class ArgsManager extends IdvManager {
      * You can specify a set of initial parameter/display pairs
      * that will automatically be created with every data source
      * that gets loaded.
-     * This are defined with the  {@link IdvConstants.ARG_DISPLAY}
+     * This are defined with the  {@link IdvConstants#ARG_DISPLAY}
      */
-    List initDisplays = new ArrayList();
+    protected List initDisplays = new ArrayList();
 
 
     /**
