@@ -233,7 +233,7 @@ public abstract class IdvLegend implements Removable {
             floatLegend();
         } else if (floatFrame != null) {
             floatFrame.setState(Frame.NORMAL);
-            floatFrame.show();
+            floatFrame.setVisible(true);
         }
         setFloatToolTip();
     }
@@ -392,7 +392,7 @@ public abstract class IdvLegend implements Removable {
         floatFrame.getContentPane().add(getContents());
         floatFrame.pack();
         floatFrame.setLocation(lastLocation);
-        floatFrame.show();
+        floatFrame.setVisible(true);
         setFloatToolTip();
     }
 

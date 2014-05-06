@@ -180,7 +180,7 @@ public class JobManager {
          * _more_
          */
         public void showDialog() {
-            getDialog().show();
+            getDialog().setVisible(true);
         }
 
         public JDialog getDialog() {

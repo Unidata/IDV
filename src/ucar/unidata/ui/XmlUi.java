@@ -3018,7 +3018,7 @@ public class XmlUi implements ActionListener, ItemListener {
             f.getContentPane().add(xmlUi.getContents());
             f.pack();
             f.setLocation(300, 300);
-            f.show();
+            f.setVisible(true);
         } catch (Exception exc) {
             System.err.println("Error:");
             exc.printStackTrace();

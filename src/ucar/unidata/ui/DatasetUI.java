@@ -657,7 +657,7 @@ public class DatasetUI {
 
             f.getContentPane().add(contents);
             f.pack();
-            f.show();
+            f.setVisible(true);
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
         }

@@ -808,7 +808,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
         predefinedDialog.getContentPane().add(contents);
         predefinedDialog.setLocation(predefinedBtn.getLocationOnScreen());
         predefinedDialog.pack();
-        predefinedDialog.show();
+        predefinedDialog.setVisible(true);
         return ok[0];
     }
 
@@ -907,11 +907,17 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
     }
 
     /**
-     * Show the properties dialog
+     * Show or hide the properties dialog. Also, if {@code visible} is
+     * {@code true}, {@link #updateTimeline()} is called.
+     *
+     * @param visible if {@code true}, call {@link #updateTimeline()} and makes
+     * the properties dialog visible. Otherwise hides the properties dialog.
      */
-    public void show() {
-        updateTimeline();
-        super.show();
+    @Override public void setVisible(boolean visible) {
+        if (visible) {
+            updateTimeline();
+        }
+        super.setVisible(visible);
     }
 
 

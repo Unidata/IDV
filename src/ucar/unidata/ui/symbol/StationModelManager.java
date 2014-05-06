@@ -208,7 +208,7 @@ public class StationModelManager extends ResourceManager {
         if (initModel != null) {
             smc.setStationModel(initModel);
         }
-        frame.show();
+        frame.setVisible(true);
     }
 
     /**

@@ -134,7 +134,7 @@ public class NetcdfFileBrowser extends SoundingFileBrowser {
 
         frame.getContentPane().add(ncfb.getContents());
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
     }
 }
 

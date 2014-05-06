@@ -6807,7 +6807,7 @@ public class GuiUtils extends LayoutUtil {
             this.getContentPane().add(contents);
             this.pack();
             this.setLocation(200, 200);
-            this.show();
+            this.setVisible(true);
         }
 
         /**

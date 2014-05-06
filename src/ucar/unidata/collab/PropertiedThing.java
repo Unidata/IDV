@@ -307,7 +307,7 @@ public abstract class PropertiedThing extends SharableImpl implements PropertyCh
                 }
                 propertiesDialog.setLocation(loc);
             }
-            propertiesDialog.show();
+            propertiesDialog.setVisible(true);
             propertiesDialog = null;
             return true;
         } catch (Exception exc) {

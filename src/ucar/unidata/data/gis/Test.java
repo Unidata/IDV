@@ -146,7 +146,7 @@ public class Test {
         });
         frame.getContentPane().add("South", save);
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
     }
 }
 

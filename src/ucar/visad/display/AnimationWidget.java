@@ -568,7 +568,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             propertiesDialog.setInfo(animationInfo);
         }
         propertiesDialog.boxPanel.applyProperties(boxPanel);
-        propertiesDialog.show();
+        propertiesDialog.setVisible(true);
     }
 
 

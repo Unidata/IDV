@@ -236,7 +236,7 @@ public class DataTreeDialog implements ActionListener {
             dialog.setLocation(50, 50);
         }
         dialog.pack();
-        dialog.show();
+        dialog.setVisible(true);
     }
 
 

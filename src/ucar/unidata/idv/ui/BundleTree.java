@@ -440,10 +440,13 @@ public class BundleTree extends DndTree {
 
 
     /**
-     * Show the window
+     * Show or hide {@link #frame}.
+     *
+     * @param visible if {@code true}, show {@code frame}. Otherwise hides
+     * {@code frame}.
      */
-    public void show() {
-        frame.show();
+    @Override public void setVisible(boolean visible) {
+        frame.setVisible(visible);
     }
 
 
