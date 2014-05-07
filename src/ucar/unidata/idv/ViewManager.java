@@ -809,6 +809,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     protected Rectangle windowBounds;
 
     /**
+     * Logo position selection. The initial value is taken from the first item in
+     * {@link #logoPoses}. Note: the value should be something that
+     * {@link #findLoc(String)} understands.
+     */
+    private String selectedLogoPosition = logoPoses[0].getId().toString();
+
+    /**
      *  A parameter-less ctor for the XmlEncoder based decoding.
      */
     public ViewManager() {}
@@ -1470,7 +1477,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         logoPositionBox = new JComboBox(logoPoses);
         logoPositionBox.setToolTipText("Set the logo position on the screen");
-        logoPositionBox.setSelectedItem(findLoc(logos[0]));
+        logoPositionBox.setSelectedItem(findLoc(selectedLogoPosition));
         logoOffsetTextField = new JTextField(logos[1]);
         logoOffsetTextField.setToolTipText(
             "Set an offset from the position (x,y)");
@@ -2019,6 +2026,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             String logoPos =
                 ((TwoFacedObject) logoPositionBox.getSelectedItem()).getId()
                     .toString();
+            selectedLogoPosition = logoPos;
             String logoOff = logoOffsetTextField.getText().trim();
 
             setLogoPosition(makeLogoPosition(logoPos, logoOff));
