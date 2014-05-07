@@ -1639,8 +1639,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double right;
         if(rangeXE[0] == rangeXE[0] && rangeXW[0] == rangeXW[0]) {
             //cross dateline
-            left   = rangeXE[0];
-            right  = rangeXW[1];
+            left   = rangeXW[0];
+            right  = rangeXE[1];
         } else if(rangeXE[0] == rangeXE[0]) {
             // 0 - 180
             left   = rangeXE[0];
