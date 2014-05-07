@@ -271,7 +271,7 @@ public class HelpTipDialog extends JDialog implements HyperlinkListener {
         Dimension ss   = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(ss.width / 2 - size.width / 2,
                     ss.height / 2 - size.height / 2);
-        show();
+        setVisible(true);
     }
 
     /**

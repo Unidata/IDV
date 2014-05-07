@@ -3065,7 +3065,7 @@ public class IdvUIManager extends IdvManager {
             tree = new BundleTree(this, bundleType);
             bundleTrees.put(key, tree);
         }
-        tree.show();
+        tree.setVisible(true);
     }
 
 

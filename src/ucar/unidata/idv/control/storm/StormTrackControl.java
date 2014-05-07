@@ -1629,7 +1629,7 @@ public class StormTrackControl extends DisplayControlImpl {
                         } catch (Exception exc) {
                             //Ignore this incase the component isn't being shown
                         }
-                        errorWindow.show();
+                        errorWindow.setVisible(true);
                     }
                     errors = errors + "Error " + currentMessage + "<br>";
                     yds.setStatus("Error:" + currentMessage);

@@ -821,7 +821,7 @@ public class DataControlDialog implements ActionListener {
         cpane.add("Center", GuiUtils.inset(contents, 5));
         dialog.setLocation(x, y);
         dialog.pack();
-        dialog.show();
+        dialog.setVisible(true);
     }
 
     /**

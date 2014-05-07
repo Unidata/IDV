@@ -298,7 +298,7 @@ public class DisplaySettingsDialog {
             GuiUtils.showDialogNearSrc(f, dialog);
         } else {
             dialog.setLocation(new Point(200, 200));
-            dialog.show();
+            dialog.setVisible(true);
         }
     }
 
