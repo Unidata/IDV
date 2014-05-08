@@ -1002,7 +1002,15 @@ public class AddeImageDataSelection {
             return value -1;
         }
 
-
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public void updateMagPanel(){
+            GuiUtils.enablePanel(leMagPanel,
+                    !getIsProgressiveResolution());
+        }
 
 
         /**

@@ -910,6 +910,8 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     public void reloadData() {
         super.reloadData();
+        if( addeImageDataSelection != null )
+            addeImageDataSelection.advancedPanel.updateMagPanel();
     }
 
     /**
