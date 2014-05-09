@@ -20,36 +20,25 @@
 
 package ucar.unidata.idv;
 
-
-import ucar.unidata.collab.*;
-import ucar.unidata.util.BooleanProperty;
-
-import ucar.unidata.util.GuiUtils;
-
-import ucar.unidata.xml.XmlObjectStore;
-
-
-import ucar.visad.display.*;
-
-import visad.*;
-
-import visad.georef.*;
-
-import java.awt.*;
-
-import java.beans.*;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.rmi.RemoteException;
-
-import java.text.DecimalFormat;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
-
+import ucar.unidata.util.BooleanProperty;
+import ucar.unidata.util.GuiUtils;
+import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.XSDisplay;
+import visad.VisADException;
 
 /**
  * A wrapper around a Cross Section (XSDisplay) display master.
@@ -69,9 +58,11 @@ public class CrossSectionViewManager extends ViewManager {
     /** clip state */
     private boolean clipOn = true;
 
-
     /** A border used in the gui. Keep this around to change the title */
     private TitledBorder csBorderTitle;
+
+    /** Gets set when the properties dialog is instantiated for first time */
+	private boolean propsComponentInstantiated = false;
 
     /**
      *  A paramterless ctor for XmlEncoder  based decoding.
@@ -202,9 +193,29 @@ public class CrossSectionViewManager extends ViewManager {
         */
     }
 
+	/**
+	 * This was added to avoid calling doApplyProperties on this view
+	 * if the Properties Dialog has not been instantiated.  This can
+	 * happen for example if the user does Edit -> Change Display Unit
+	 *  
+	 * @return the propsComponentInstantiated
+	 */
+    
+	public boolean isPropsComponentInstantiated() {
+		return propsComponentInstantiated;
+	}
 
+	/* (non-Javadoc)
+	 * @see ucar.unidata.idv.ViewManager#getPropertiesComponent()
+	 */
+	@Override
+	public JComponent getPropertiesComponent() {
+		JComponent jc = super.getPropertiesComponent();
+		propsComponentInstantiated = true;
+		return jc;
+	}
 
-    /**
+	/**
      * Get the default foreground color
      *
      * @return the color
