@@ -847,16 +847,18 @@ public class PropertiesDialog implements ActionListener {
 
 
     /**
-     * Se tthe title on the dialog window
+     * Set the title on the dialog window.
      */
     private void setDialogTitle() {
-	if(!doMultiple()) {
-	    dialog.setTitle(GuiUtils.getApplicationTitle() +"Layout Model Editor - Properties Dialog - "
-			    + symbol.getLabel());
-	} else {
-	    dialog.setTitle(GuiUtils.getApplicationTitle() +"Layout Model Editor - Properties Dialog - Serlected");
-
-	}
+        StringBuilder title =
+            new StringBuilder(GuiUtils.getApplicationTitle())
+                .append("Layout Model Editor - Properties Dialog - ");
+        if (!doMultiple()) {
+            title.append(symbol.getLabel());
+        } else {
+            title.append("Selected");
+        }
+        dialog.setTitle(title.toString());
     }
 
     /**
