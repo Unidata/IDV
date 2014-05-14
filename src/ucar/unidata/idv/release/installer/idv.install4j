@@ -621,6 +621,34 @@ if (!context.isUpdateInstallation()) {
                 </serializedBean>
                 <condition />
               </action>
+              <action name="Mac OS X JRE" id="1022" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>jre.bundle</string>
+                        </object>
+                      </void>
+                      <void property="dirMode">
+                        <string>777</string>
+                      </void>
+                      <void property="mode">
+                        <string>777</string>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>osxjre.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
               <action name="Windows Java 3D" id="704" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -671,7 +699,7 @@ if (!context.isUpdateInstallation()) {
                     <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
                       <void property="destinationDirectory">
                         <object class="java.io.File">
-                          <string>${installer:sys.userHome}/Library/Java/Extensions</string>
+                          <string>jre.bundle/Contents/Home/lib/ext</string>
                         </object>
                       </void>
                       <void property="overwriteMode">
@@ -702,34 +730,6 @@ if (!context.isUpdateInstallation()) {
                       <void property="zipFile">
                         <object class="java.io.File">
                           <string>j3d-solaris.zip</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
-              <action name="Mac OS X JRE" id="1022" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
-                      <void property="destinationDirectory">
-                        <object class="java.io.File">
-                          <string>jre.bundle</string>
-                        </object>
-                      </void>
-                      <void property="dirMode">
-                        <string>777</string>
-                      </void>
-                      <void property="mode">
-                        <string>777</string>
-                      </void>
-                      <void property="overwriteMode">
-                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
-                      </void>
-                      <void property="zipFile">
-                        <object class="java.io.File">
-                          <string>osxjre.zip</string>
                         </object>
                       </void>
                     </object>
@@ -824,6 +824,51 @@ if (!context.isUpdateInstallation()) {
                       </void>
                       <void property="searchValue">
                         <string>XDOCK_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure runIDV with OS X libext option" id="1281" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>runIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Djava.ext.dirs="jre.bundle/Contents/Home/lib/ext/"</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>LIBEXT_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure runIDV with no libext option" id="1282" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>runIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="searchValue">
+                        <string>LIBEXT_INSTALL4J_VAR</string>
                       </void>
                     </object>
                   </java>
@@ -1038,10 +1083,11 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
-        <bean refId="707" />
         <bean refId="1022" />
+        <bean refId="707" />
         <bean refId="1019" />
         <bean refId="1035" />
+        <bean refId="1281" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1073,10 +1119,11 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
-        <bean refId="707" />
         <bean refId="1022" />
+        <bean refId="707" />
         <bean refId="1019" />
         <bean refId="1035" />
+        <bean refId="1281" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1164,6 +1211,7 @@ if (!context.isUpdateInstallation()) {
         <bean refId="709" />
         <bean refId="1020" />
         <bean refId="1036" />
+        <bean refId="1282" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1189,17 +1237,17 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
+        <bean refId="1022" />
         <bean refId="704" />
         <bean refId="706" />
         <bean refId="707" />
-        <bean refId="1022" />
         <bean refId="1019" />
         <bean refId="1035" />
+        <bean refId="1281" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="runIDV.bat" fileType="regular" />
-        <entry location="simpleIDV.bat" fileType="regular" />
         <entry location=".i4j_external_696/j3d-linux.zip" fileType="regular" />
         <entry location=".i4j_external_696/j3d-windows.zip" fileType="regular" />
         <entry location=".i4j_external_696/j3d-macosx.zip" fileType="regular" />
@@ -1226,10 +1274,11 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
-        <bean refId="707" />
         <bean refId="1022" />
+        <bean refId="707" />
         <bean refId="1019" />
         <bean refId="1035" />
+        <bean refId="1281" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
