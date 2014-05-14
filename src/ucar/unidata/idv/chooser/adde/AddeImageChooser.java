@@ -834,8 +834,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     protected JComponent doMakeContents() {
         List allComps = processServerComponents();
         getComponents(allComps);
-        processPropertyComponents();
-        // allComps.addAll(processPropertyComponents());
+        //processPropertyComponents();
+        allComps.addAll(processPropertyComponents());
         GuiUtils.tmpInsets = GRID_INSETS;
         JPanel imagePanel = GuiUtils.doLayout(allComps, 2, GuiUtils.WT_NY,
                                 GuiUtils.WT_N);
@@ -1164,9 +1164,10 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 addPropComp(PROP_SIZE, propComp = sizePanel);
             }
 
-            if (propComp != null) {
-                bottomComps.add(GuiUtils.rLabel(labelArray[propIdx]));
-                bottomComps.add(GuiUtils.left(propComp));
+            if (propComp != null && propIdx == 5) {
+                navComboBox.setToolTipText("choose LALO if you are using Level 1B or POES ADDE servers");
+                bottomComps.add(GuiUtils.rLabel(labelArray[propIdx+1]));
+                bottomComps.add(GuiUtils.left(navComboBox));
             }
 
         }
@@ -1498,7 +1499,21 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         return 4;
     }
 
+    /**
+     * chcek the polar dataset
+     *
+     * @return boolean
+     */
+    protected boolean isPolar(AddeImageDescriptor aid){
+        String sourceType = aid.getDirectory().getSourceType();
 
+        if(sourceType.startsWith("MOD") || sourceType.equals("AMSU") ||
+                sourceType.equals("AVHR") || sourceType.equals("AVH3") ||
+                sourceType.equals("TIRO") || sourceType.equals("HIR3"))
+            return true;
+        else
+            return false;
+    }
 
     /**
      * Enable or disable the GUI widgets based on what has been
@@ -1511,9 +1526,13 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             drivercbx.setSelected(false);
             enableTimeWidgets();
         }
+        boolean isPolar = false;
+        if(imageDescriptors != null)
+            isPolar = isPolar((AddeImageDescriptor)imageDescriptors.get(0));
+
         for (int i = 0; i < compsThatNeedDescriptor.size(); i++) {
             JComponent comp = (JComponent) compsThatNeedDescriptor.get(i);
-            GuiUtils.enableTree(comp, descriptorState);
+            GuiUtils.enableTree(comp, isPolar);
         }
 
         boolean timesOk = timesOk();
@@ -1756,9 +1775,12 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 bandDirs = new Hashtable(len);
                 for (int i = 0; i < len; i++) {
                     AreaDirectory dir    = dirs[0][i];
-                    int           bindex = dirs[0][i].getBands()[0];
+                    int   ilen = dirs[0][i].getBands().length;
 
-                    bandDirs.put(bindex, dir);
+                    for(int j = 0; j < ilen; j++){
+                        int bindex = dirs[0][i].getBands()[j];
+                        bandDirs.put(bindex, dir);
+                    }
                 }
                 lastAD = null;
                 for (int i = 0; i < numImages; i++) {

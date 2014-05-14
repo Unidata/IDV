@@ -318,7 +318,7 @@ public class AddeImageDataSource extends ImageDataSource {
                         IdvPersistenceManager.PROP_ZIDVPATH);
                 AreaDirectory thisDir;
                 if ((zpath1 != null) && (zpath1.length() > 0)) {
-                    thisDir = desc1.getDirectory();
+                    // thisDir = desc1.getDirectory();
                     return descriptors;
                 } else {
                     thisDir = (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
@@ -944,8 +944,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 (AddeImageDescriptor) despList.get(i);
             AddeImageInfo info = imageDescriptor.getImageInfo();
 
-            info.setElementMag(eleMag);
-            info.setLineMag(lineMag);
+            info.setElementMag(-1*eleMag);
+            info.setLineMag(-1*lineMag);
 
             if (locateKey != null) {
                 info.setLocateKey(locateKey);
@@ -955,7 +955,11 @@ public class AddeImageDataSource extends ImageDataSource {
                 //set center
                 info.setLocateValue(locateValue);
             }
-
+       /*     if(lines == 0 && elems == 0){
+                AreaDirectory ad = imageDescriptor.getDirectory();
+                lines = ad.getLines()/lineMag;
+                elems = ad.getElements()/lineMag;
+            }  */
             info.setLines(lines);
             info.setElements(elems);
             String sizeValue = Integer.toString(lines) + " "
@@ -964,18 +968,20 @@ public class AddeImageDataSource extends ImageDataSource {
                               + Integer.toString(eleMag);
             String source = imageDescriptor.getSource();
 
-            if ( !locateKey.equals(AddeImageURL.KEY_LINEELE)) {
+            if(getKey(source, locateKey) != null && getKey(source, locateKey).length() > 0){
+                source = replaceKey(source, locateKey, locateValue);
+            } else if (locateKey.equals(AddeImageURL.KEY_LATLON)){
                 source = replaceKey(source, AddeImageURL.KEY_LINEELE,
-                                    AddeImageURL.KEY_LATLON, locateValue);
-                source = replaceKey(source, AddeImageURL.KEY_PLACE,
-                                    PlaceValue);
+                        AddeImageURL.KEY_LATLON, locateValue);
             } else {
-                source = replaceKey(source, AddeImageURL.KEY_LINEELE,
-                                    locateValue);
+                source = replaceKey(source, AddeImageURL.KEY_LATLON,
+                        AddeImageURL.KEY_LINEELE, locateValue);
             }
+
+            source = replaceKey(source, AddeImageURL.KEY_PLACE, PlaceValue);
             source = replaceKey(source, AddeImageURL.KEY_SIZE, sizeValue);
             source = replaceKey(source, AddeImageURL.KEY_MAG, magValue);
-            source = replaceKey(source, AddeImageURL.KEY_SPAC, 1);
+            //source = replaceKey(source, AddeImageURL.KEY_SPAC, 1);
             if (unit != null) {
                 source = replaceKey(source, AddeImageURL.KEY_UNIT, unit);
             }
@@ -1258,11 +1264,11 @@ public class AddeImageDataSource extends ImageDataSource {
                 && ("BRIT".equals(val))) {
             returnString = replaceKey(returnString, AddeImageURL.KEY_SPAC,
                                       AddeImageURL.KEY_SPAC, SPACING_BRIT);
-        } else {
+        } /*else {
             returnString = replaceKey(returnString, AddeImageURL.KEY_SPAC,
                                       AddeImageURL.KEY_SPAC,
                                       SPACING_NON_BRIT);
-        }
+        }   */
         return returnString;
     }
 
