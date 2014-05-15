@@ -1718,7 +1718,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         String       descriptor  = getDescriptor();
         String       pos = (getDoAbsoluteTimes() || (archiveDay != null))
                            ? "all"
-                           : "1";
+                           : "0";
 
 
         StringBuffer addeCmdBuff = getGroupUrl(REQ_IMAGEDIR, getGroup());
