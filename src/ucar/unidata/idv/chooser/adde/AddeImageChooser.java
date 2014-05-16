@@ -1533,6 +1533,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
         for (int i = 0; i < compsThatNeedDescriptor.size(); i++) {
             JComponent comp = (JComponent) compsThatNeedDescriptor.get(i);
             GuiUtils.enableTree(comp, isPolar);
+            navComboBox.setSelectedIndex(1);
         }
 
         boolean timesOk = timesOk();
