@@ -247,8 +247,8 @@ public class AddeImageDataSource extends ImageDataSource {
             return "PROD";
         } else if (description.contains("Radiance")) {
             return "RAD";
-        } else if (description.contains("Reflectivity")) {
-            return "ECHO";
+        //} else if (description.contains("Reflectivity")) {
+        //    return "ECHO";
         } else if (description.contains("Vip level")) {
             return "VIP";
         } else if (description.contains("Vertical h2o")) {
@@ -262,7 +262,7 @@ public class AddeImageDataSource extends ImageDataSource {
         } else if (description.contains("Precipitation")) {
             return "RAIN";
         } else {
-            return "X";
+            return null;
         }
     }
 
@@ -764,6 +764,8 @@ public class AddeImageDataSource extends ImageDataSource {
         }
         inElemMag *= elemFactor;
         inLineMag = inElemMag / elFactor;
+        if(inLineMag == 0)
+            inLineMag = 1;
 
         outLine   = inLine / inLineMag;
         // alway in the center of the image and this is why it is divided by 2
