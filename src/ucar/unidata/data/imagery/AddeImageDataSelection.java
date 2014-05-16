@@ -2510,11 +2510,30 @@ public class AddeImageDataSelection {
                 latlon[0][0] = (float) gInfo.getMinLat();
                 float[][] lrLinEle   = baseAnav.toLinEle(latlon);
                 //int       displayNum = (int) rect.getWidth();
-                int lines  = (int) (lrLinEle[1][0] - ulLinEle[1][0])
-                             * Math.abs(lMag0)/Math.abs(lMag);
-                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
-                             * Math.abs(eMag0)/Math.abs(eMag);
+                int lines;
+                int elems;
+                if(ulLinEle[0][0] == ulLinEle[0][0] && lrLinEle[0][0] == lrLinEle[0][0]) {
+                    lines  = (int) (lrLinEle[1][0] - ulLinEle[1][0])
+                            * Math.abs(lMag0)/Math.abs(lMag);
+                    elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
+                            * Math.abs(eMag0)/Math.abs(eMag);
+                } else if(ulLinEle[0][0] == ulLinEle[0][0]) {
+                    lines  = (advancedPanel.maxLines - (int) (ulLinEle[1][0])
+                            * Math.abs(lMag0))/Math.abs(lMag);
+                    elems = (advancedPanel.maxEles - (int) (ulLinEle[0][0])
+                            * Math.abs(eMag0))/Math.abs(eMag);
+                } else if(lrLinEle[0][0] == lrLinEle[0][0]) {
+                    lines  = (int) (lrLinEle[1][0])
+                            * Math.abs(lMag0)/Math.abs(lMag);
+                    elems = (int) (lrLinEle[0][0])
+                            * Math.abs(eMag0)/Math.abs(eMag);
+                } else {
+                    lines = advancedPanel.maxLines;
+                    elems = advancedPanel.maxEles;
+                }
 
+                lines = Math.abs(lines);
+                elems = Math.abs(elems);
                 advancedPanel.setIsFromRegionUpdate(true);
 
                 // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
@@ -2536,7 +2555,11 @@ public class AddeImageDataSelection {
                     advancedPanel.setPlace("CENTER");
                 }
                 // set latlon coord
-                advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
+                if(baseAnav.toString().equals("LALO")) {
+                    advancedPanel.coordinateTypeComboBox.setSelectedIndex(1);
+                } else {
+                    advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
+                }
                 // update the size
                 if ( !isFull) {
                     advancedPanel.setNumLines(lines);
