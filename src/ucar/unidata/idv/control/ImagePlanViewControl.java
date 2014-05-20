@@ -59,9 +59,6 @@ import javax.swing.*;
  */
 public class ImagePlanViewControl extends PlanViewControl {
 
-    /** The label to show the readout in the side legend */
-    private JLabel sideLegendReadout;
-
     /** _more_ */
     public List descripters;
 
@@ -76,15 +73,6 @@ public class ImagePlanViewControl extends PlanViewControl {
     public ImagePlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
-    }
-
-    /**
-     * @override
-     *
-     * @return _more_
-     */
-    protected boolean canDoProgressiveResolution() {
-        return true;
     }
 
     /**
@@ -154,11 +142,8 @@ public class ImagePlanViewControl extends PlanViewControl {
                 userMessage("Selected image(s) not available");
             }
             String magStr = (String) dataChoice.getProperty("MAG");
-            if (magStr != null) {
-                if (sideLegendReadout == null) {
-                    sideLegendReadout = new JLabel("<html><br></html>");
-                }
-                sideLegendReadout.setText("<html>" + magStr + "</html>");
+            if (magStr != null && !magStr.isEmpty()) {
+                resolutionReadout = magStr;
             }
             return result;
         }
@@ -174,23 +159,8 @@ public class ImagePlanViewControl extends PlanViewControl {
                 userMessage("Selected image(s) not available");
             }
         }
-        //sideLegendReadout
-        DataChoice dc0 = null;
-        if (dataChoice instanceof DerivedDataChoice) {
-            dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
-        } else {
-            dc0 = dataChoice;
-        }
         //save imagelist
         descripters = getImageDescriptors(dataChoice);
-        String magStr = (String) dc0.getProperty("MAG");
-        if (magStr != null) {
-            if (sideLegendReadout == null) {
-                sideLegendReadout = new JLabel("<html><br></html>");
-            }
-            sideLegendReadout.setText("<html>" + magStr + "</html>");
-        }
-
         return result;
 
     }

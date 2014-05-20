@@ -86,7 +86,7 @@ import javax.swing.event.MenuListener;
  */
 public abstract class PlanViewControl extends GridDisplayControl {
 
-    /** Macro for the short parameter name for the label */
+    /** Macro for the level for the label */
     public static final String MACRO_LEVEL = "%level%";
 
     /** property for sharing levels */
@@ -191,9 +191,6 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
     /** flag for ensembles */
     protected boolean haveEnsemble = false;
-
-    /** The label to show the readout in the side legend */
-    private String resolutionReadout;
 
     /**
      * Cstr; does nothing. See init() for creation actions.
@@ -1441,9 +1438,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (currentLevel != null) {
             labels.add("Level: " + formatLevel(currentLevel));
         }
+        /*
         if (resolutionReadout != null && !resolutionReadout.isEmpty()) {
         	labels.add(resolutionReadout);
         }
+        */
     }
 
     /**
