@@ -170,6 +170,8 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** Macro for station */
     public static final String MACRO_STATION = "%station%";
 
+    /** Macro for the resolution for the label */
+    public static final String MACRO_RESOLUTION = "%resolution%";
 
     /** Macro for the long parameter name for the label */
     public static final String MACRO_LONGNAME = "%longname%";
