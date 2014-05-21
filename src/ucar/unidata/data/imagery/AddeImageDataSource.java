@@ -200,6 +200,52 @@ public class AddeImageDataSource extends ImageDataSource {
 
     /**
      * _more_
+     */
+    public void initAfterUnpersistence() {
+        super.initAfterUnpersistence();
+        if (getTmpPaths() != null) {  // zidv bundle
+            return;
+        }
+        String ver = IdvPersistenceManager.getBundleIdvVersion();
+        if ((ver == null) || (Character.getNumericValue(ver.charAt(0)) < 5)) {
+            return;              //old bundle
+        }
+
+        if ((this.source == null) && (imageList != null)
+                && (imageList.size() > 0)) {
+            //List                imageList1 = getImageList();
+            AddeImageDescriptor desc1 =
+                (AddeImageDescriptor) imageList.get(0);
+            this.source = desc1.getSource();
+            allBandDirs = (Hashtable) getProperties().get("allBands");
+            ArrayList oj = (ArrayList) getProperties().get("bandinfo");
+            if (oj != null) {
+                this.bandId = (BandInfo) oj.get(0);
+            }
+            String zpath = (String) getIdv().getStateManager().getProperty(
+                               IdvPersistenceManager.PROP_ZIDVPATH);
+            AreaDirectory thisDir;
+            if ((zpath != null) && (zpath.length() > 0)) {
+                thisDir = desc1.getDirectory();
+            } else {
+                thisDir = (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
+            }
+            // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
+            this.source = getPreviewSource(this.source, thisDir);
+            if (oj != null) {
+                this.source =
+                    replaceKey(this.source, "BAND",
+                               Integer.toString(this.bandId.getBandNumber()));
+            }
+            this.descriptor = new AddeImageDescriptor(thisDir, null);
+            List<DataSelectionComponent> dataSelectionComponents =
+                    new ArrayList<DataSelectionComponent>();
+            initDataSelectionComponents(dataSelectionComponents, super.findDataChoice(this.choiceName) );
+        }
+    }
+
+    /**
+     * _more_
      *
      * @param dataChoice _more_
      * @param category _more_
@@ -305,32 +351,6 @@ public class AddeImageDataSource extends ImageDataSource {
                 //isOldBundle = true;
                 initOldBundle(dataChoice, descriptors, this.source);
 
-            } else {
-                AddeImageDescriptor desc1 =
-                        (AddeImageDescriptor) descriptors.get(0);
-                this.source = desc1.getSource();
-                allBandDirs = (Hashtable) getProperties().get("allBands");
-                ArrayList oj = (ArrayList) getProperties().get("bandinfo");
-                if (oj != null) {
-                    this.bandId = (BandInfo) oj.get(0);
-                }
-                String zpath1 = (String) getIdv().getStateManager().getProperty(
-                        IdvPersistenceManager.PROP_ZIDVPATH);
-                AreaDirectory thisDir;
-                if ((zpath1 != null) && (zpath1.length() > 0)) {
-                    // thisDir = desc1.getDirectory();
-                    return descriptors;
-                } else {
-                    thisDir = (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
-                }
-                // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
-                this.source = getPreviewSource(this.source, thisDir);
-                if (oj != null) {
-                    this.source =
-                            replaceKey(this.source, "BAND",
-                                    Integer.toString(this.bandId.getBandNumber()));
-                }
-                this.descriptor = new AddeImageDescriptor(thisDir, null);
             }
 
             if (baseAnav == null) {
