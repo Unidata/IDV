@@ -436,10 +436,13 @@ public class AddeImageDataSource extends ImageDataSource {
                 String locationKey   = adSource.getLocateKey();
                 String locationValue = adSource.getLocateValue();
                 String place         = adSource.getPlaceValue();
+
                 if (isProgressiveResolution) {
                     // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                     lineMag = calculateMagFactor(lines,
                             (int) rect.getHeight());
+                    if (isProgressiveResolution && navType.equals("LALO"))
+                        lineMag = (lineMag >= 2) ? lineMag/2 : 1;
                     // lineMag = calculateMagFactor(lines,
                     //         (int) rect.getHeight()) - 1;
                     //lineMag = eleMag / elFactor;
@@ -449,9 +452,9 @@ public class AddeImageDataSource extends ImageDataSource {
                     lineMag = Math.abs(dlMag);
                 }
 
-                System.out.println(
-                    "Magnification factor of line X element : " + lineMag
-                    + " " + eleMag);
+                //System.out.println(
+                //    "Magnification factor of line X element : " + lineMag
+                 //   + " " + eleMag);
                 int newLines;
                 int newelems;
 
@@ -466,8 +469,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 } else {
                     newelems = (int) Math.floor(elems / eleMag + 0.5);
                 }
-                System.out.println("newLine X newElement : " + newLines + " "
-                                   + newelems);
+                //System.out.println("newLine X newElement : " + newLines + " "
+                //                   + newelems);
                 try {
                     descriptors = reSetImageDataDescriptor(descriptors,
                             locationKey, locationValue, place, newLines,
@@ -526,7 +529,13 @@ public class AddeImageDataSource extends ImageDataSource {
                         String locateValue = cline + " " + celem;
 
 
-                        if (isProgressiveResolution) {
+                        if (isProgressiveResolution && navType.equals("LALO")) {
+                            //eleMag = calculateMagFactor(elems, (int) rect.getWidth());
+                            lineMag = calculateMagFactor(lines,
+                                    (int) rect.getHeight());
+                            lineMag = (lineMag >= 2) ? lineMag/2 : 1;
+                            eleMag = lineMag * elFactor;
+                        } else if (isProgressiveResolution) {
                             eleMag = calculateMagFactor(elems,
                                     (int) rect.getWidth());
                             // lineMag = calculateMagFactor(lines,
@@ -537,9 +546,9 @@ public class AddeImageDataSource extends ImageDataSource {
                             lineMag = Math.abs(dlMag);
                         }
 
-                        System.out.println(
-                            "Magnification factor of line X element : "
-                            + lineMag + " " + eleMag);
+                        //System.out.println(
+                        //    "Magnification factor of line X element : "
+                        //    + lineMag + " " + eleMag);
                         int newLines;
                         int newelems;
 
@@ -555,8 +564,8 @@ public class AddeImageDataSource extends ImageDataSource {
                         } else {
                             newelems = (int) Math.floor(elems / eleMag + 0.5);
                         }
-                        System.out.println("newLine X newElement : "
-                                           + newLines + " " + newelems);
+                        //System.out.println("newLine X newElement : "
+                        //                   + newLines + " " + newelems);
                         try {
                             descriptors =
                                 reSetImageDataDescriptor(descriptors,
@@ -789,24 +798,35 @@ public class AddeImageDataSource extends ImageDataSource {
                 (int) Math.ceil(aDir.getCenterLatitudeResolution()
                                 / aDir.getCenterLongitudeResolution() - 0.5);
         }
-
-        System.out.println("Line and element ratio = " + elFactor);
+        String navType = getKey(inSource, AddeImageURL.KEY_NAV);
+        // System.out.println("Line and element ratio = " + elFactor);
         int lineFactor = 1;
         int elemFactor = 1;
 
         int outElem    = inElem;
         int outLine    = inLine;
 
-        while (outElem > 450) {
-            elemFactor += 1;
-            outElem    = inElem / elemFactor;
+        if(navType.equals("LALO")){
+            while (outLine > 450) {
+                lineFactor += 1;
+                outLine    = inLine / lineFactor;
+            }
+            inLineMag *= lineFactor;
+            inElemMag = inLineMag / elFactor;
+            if(inElemMag == 0)
+                inElemMag = 1;
+            outElem   = inElem / inElemMag;
+        } else {
+            while (outElem > 450) {
+                elemFactor += 1;
+                outElem    = inElem / elemFactor;
+            }
+            inElemMag *= elemFactor;
+            inLineMag = inElemMag / elFactor;
+            if(inLineMag == 0)
+                inLineMag = 1;
+            outLine   = inLine / inLineMag;
         }
-        inElemMag *= elemFactor;
-        inLineMag = inElemMag / elFactor;
-        if(inLineMag == 0)
-            inLineMag = 1;
-
-        outLine   = inLine / inLineMag;
         // alway in the center of the image and this is why it is divided by 2
         int cline = inLine / 2;
         int celem = inElem / 2;
@@ -1132,10 +1152,10 @@ public class AddeImageDataSource extends ImageDataSource {
             lrLinEle     = baseAnav.toLinEle(latlon);
             if ((lrLinEle[1][0] < 0) || (lrLinEle[1][0] != lrLinEle[1][0])) {
                 int ln = dsep.getDirectory().getDirectoryBlock()[8];
-                lrLinEle[1][0] = ln / Math.abs(eMag);
+                lrLinEle[1][0] = ln / Math.abs(lMag);
             }
 
-            lines = (int) (lrLinEle[1][0] - ulLinEle[1][0]) * Math.abs(eMag);;
+            lines = (int) (lrLinEle[1][0] - ulLinEle[1][0]) * Math.abs(lMag);
 
             //elems
             latlon[1][0] = (float) minLon;
@@ -1164,7 +1184,13 @@ public class AddeImageDataSource extends ImageDataSource {
             if (elems > dsep.getDirectory().getDirectoryBlock()[9]) {
                 elems = dsep.getDirectory().getDirectoryBlock()[9];
             }
-            if (isProgressiveResolution) {
+            if (isProgressiveResolution && nav.equals("LALO")) {
+                //eleMag = calculateMagFactor(elems, (int) rect.getWidth());
+                lineMag = calculateMagFactor(lines,
+                        (int) rect.getHeight());
+                lineMag = (lineMag >= 2) ? lineMag/2 : 1;
+                eleMag = lineMag * factor;
+            } else if (isProgressiveResolution) {
                 eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                 // int lineMag = calculateMagFactor(lines, (int) rect.getHeight());
                 lineMag = eleMag / factor;
@@ -1175,8 +1201,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 eleMag  = Math.abs(deMag);
                 lineMag = Math.abs(dlMag);
             }
-            System.out.println("Magnification factor of line X element : "
-                               + lineMag + " " + eleMag);
+            //System.out.println("Magnification factor of line X element : "
+            //                   + lineMag + " " + eleMag);
             int newLines;
             int newelems;
 
@@ -1192,9 +1218,9 @@ public class AddeImageDataSource extends ImageDataSource {
                 newelems = (int) (Math.floor(elems / eleMag + 0.5) * 1.);
             }
 
-            System.out.println("Line: lines " + lines + " lineMag " + lineMag
-                               + " newLines " + newLines + " displayH "
-                               + (int) rect.getHeight());
+            //System.out.println("Line: lines " + lines + " lineMag " + lineMag
+            //                   + " newLines " + newLines + " displayH "
+             //                  + (int) rect.getHeight());
 
 
             String locateValue = null;
