@@ -207,30 +207,22 @@ public class AddeImageDataSource extends ImageDataSource {
             return;
         }
         String ver = IdvPersistenceManager.getBundleIdvVersion();
-        if ((ver == null) || (Character.getNumericValue(ver.charAt(0)) < 5)) {
-            return;              //old bundle
-        }
+        // ver == null is quicklinks history
 
-        if ((this.source == null) && (imageList != null)
+        if (ver == null && (this.source == null) && (imageList != null)
                 && (imageList.size() > 0)) {
-            //List                imageList1 = getImageList();
+            List    descriptors = super.getDescriptors(super.findDataChoice(this.choiceName), null);
             AddeImageDescriptor desc1 =
-                (AddeImageDescriptor) imageList.get(0);
+                (AddeImageDescriptor) descriptors.get(0);
             this.source = desc1.getSource();
             allBandDirs = (Hashtable) getProperties().get("allBands");
             ArrayList oj = (ArrayList) getProperties().get("bandinfo");
             if (oj != null) {
                 this.bandId = (BandInfo) oj.get(0);
             }
-            String zpath = (String) getIdv().getStateManager().getProperty(
-                               IdvPersistenceManager.PROP_ZIDVPATH);
-            AreaDirectory thisDir;
-            if ((zpath != null) && (zpath.length() > 0)) {
-                thisDir = desc1.getDirectory();
-            } else {
-                thisDir = (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
-            }
-            // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
+
+            AreaDirectory thisDir = desc1.getDirectory();
+
             this.source = getPreviewSource(this.source, thisDir);
             if (oj != null) {
                 this.source =
@@ -351,6 +343,33 @@ public class AddeImageDataSource extends ImageDataSource {
                 //isOldBundle = true;
                 initOldBundle(dataChoice, descriptors, this.source);
 
+            } else {
+                AddeImageDescriptor desc1 =
+                        (AddeImageDescriptor) descriptors.get(0);
+                this.source = desc1.getSource();
+                allBandDirs = (Hashtable) getProperties().get("allBands");
+                ArrayList oj = (ArrayList) getProperties().get("bandinfo");
+                if (oj != null) {
+                    this.bandId = (BandInfo) oj.get(0);
+                }
+                String zpath1 = (String) getIdv().getStateManager().getProperty(
+                        IdvPersistenceManager.PROP_ZIDVPATH);
+                AreaDirectory thisDir;
+                if ((zpath1 != null) && (zpath1.length() > 0)) {
+                    // thisDir = desc1.getDirectory();
+                    return descriptors;
+                } else {
+                    //thisDir = (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
+                    thisDir = desc1.getDirectory();
+                }
+                // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
+                this.source = getPreviewSource(this.source, thisDir);
+                if (oj != null) {
+                    this.source =
+                            replaceKey(this.source, "BAND",
+                                    Integer.toString(this.bandId.getBandNumber()));
+                }
+                this.descriptor = new AddeImageDescriptor(thisDir, null);
             }
 
             if (baseAnav == null) {
@@ -1389,6 +1408,8 @@ public class AddeImageDataSource extends ImageDataSource {
 
         allBandDirs.put(bindex, dir0);
         String   magVal  = getKey(sourceStr, AddeImageURL.KEY_MAG);
+        if(magVal.length() == 0)
+            return;
         String[] magVals = magVal.split(" ");
         eMag = new Integer(magVals[1]).intValue();
         lMag = new Integer(magVals[0]).intValue();
@@ -1480,12 +1501,13 @@ public class AddeImageDataSource extends ImageDataSource {
                 }
 
                 this.bandId = id;
+            }
 
-                addeImageDataSelection = new AddeImageDataSelection(this,
+            addeImageDataSelection = new AddeImageDataSelection(this,
                         dataChoice, source, baseAnav, this.descriptor, acs,
                         areaAdapter);
 
-            }
+
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
