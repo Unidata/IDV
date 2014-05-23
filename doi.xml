@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:resource xmlns:p="http://datacite.org/schema/kernel-3"
+	xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+	<p:identifier identifierType="DOI">10.9999/9999</p:identifier>
+	<p:creators>
+		<p:creator>
+			<p:creatorName>Don Murray</p:creatorName>
+		</p:creator>
+		<p:creator>
+			<p:creatorName>Jeff McWhirter</p:creatorName>
+		</p:creator>
+		<p:creator>
+			<p:creatorName>Stuart Weir</p:creatorName>
+		</p:creator>
+		<p:creator>
+			<p:creatorName>Yuan Ho</p:creatorName>
+		</p:creator>
+		<p:creator>
+			<p:creatorName>Julien Chastang</p:creatorName>
+		</p:creator>		
+	</p:creators>
+	<p:titles>
+		<p:title>Unidata Integrated Data Viewer</p:title>
+		<p:title titleType="AlternativeTitle">IDV</p:title>
+	</p:titles>
+	<p:publisher>University Corporation for Atmospheric Research, Unidata</p:publisher>
+	<p:publicationYear>1997</p:publicationYear>
+	<p:subjects>
+		<p:subject subjectScheme="LC"
+			schemeURI="http://id.loc.gov/authorities/subjects/sh85084334.html">Meteorology</p:subject>
+		<p:subject subjectScheme="LC"
+			schemeURI="http://id.loc.gov/authorities/subjects/sh85040468.html">Earth sciences</p:subject>
+		<p:subject subjectScheme="LC"
+			schemeURI="http://id.loc.gov/authorities/subjects/sh2006009089.html">Software visualization</p:subject>
+		<p:subject subjectScheme="LC"
+			schemeURI="http://id.loc.gov/authorities/subjects/sh2002000243.html">Information visualization</p:subject>
+		<p:subject subjectScheme="LC"
+			schemeURI="http://id.loc.gov/authorities/subjects/sh85145843.html">Weather</p:subject>
+	</p:subjects>
+	<p:resourceType resourceTypeGeneral="Software">An application for analysis and visualization geoscience data</p:resourceType>
+	<p:contributors>
+		<p:contributor contributorType="ContactPerson">
+			<p:contributorName>support-idv@unidata.ucar.edu</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="ProjectLeader">
+			<p:contributorName>Yuan Ho</p:contributorName>
+		</p:contributor>		
+		<p:contributor contributorType="Distributor">
+			<p:contributorName>University Corporation for Atmospheric Research, Unidata</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="Funder">
+			<p:contributorName>National Science Foundation</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="HostingInstitution">
+			<p:contributorName>University Corporation for Atmospheric Research, Unidata</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="ResearchGroup">
+			<p:contributorName>Space Science and Engineering Center, University of Wisconsin-Madison</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="ResearchGroup">
+			<p:contributorName>National Oceanic and Atmospheric Administration, Earth System Research Laboratory</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="ResearchGroup">
+			<p:contributorName>UNAVCO</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="ResearchGroup">
+			<p:contributorName>Australian Bureau of Meteorology</p:contributorName>
+		</p:contributor>
+		<p:contributor contributorType="ResearchGroup">
+			<p:contributorName>China Meteorological Administration</p:contributorName>
+		</p:contributor>
+	</p:contributors>
+	<!-- Please see here for an explanation of date ranges http://www.ukoln.ac.uk/metadata/dcmi/collection-RKMS-ISO8601/ -->
+	<p:dates>
+		<p:date dateType="Created">1997</p:date>
+		<p:date dateType="Copyrighted">1997/</p:date>
+		<p:date dateType="Updated">1997/</p:date>
+	</p:dates>
+	<p:language>en</p:language>
+	<p:formats>
+		<p:format>application/java-archive</p:format>
+	</p:formats>
+	<p:rightsList>
+		<p:rights rightsURI="https://www.gnu.org/licenses/lgpl.html">GNU Lesser General Public License</p:rights>
+	</p:rightsList>
+	<p:descriptions>
+		<p:description descriptionType="Abstract">The Unidata Integrated
+			Data
+			Viewer (IDV) is a software application for analyzing and
+			displaying geoscience data. The IDV emphasizes interactive
+			three-dimensional visualization and integration of diverse data
+			types. The IDV software is available for Windows, Mac OS X, and
+			various flavors
+			of Unix including Linux, and Solaris.
+		</p:description>
+	</p:descriptions>
+	<p:relatedIdentifiers>
+		<p:relatedIdentifier relatedIdentifierType="URL"
+			relationType="HasPart">http://www.ssec.wisc.edu/~billh/visad.html</p:relatedIdentifier>
+		<p:relatedIdentifier relatedIdentifierType="URL"
+			relationType="HasPart">http://www.unidata.ucar.edu/software/thredds/current/netcdf-java/</p:relatedIdentifier>
+		<p:relatedIdentifier relatedIdentifierType="URL"
+			relationType="IsPartOf">http://www.ssec.wisc.edu/mcidas/software/v/</p:relatedIdentifier>
+	</p:relatedIdentifiers>
+</p:resource>
