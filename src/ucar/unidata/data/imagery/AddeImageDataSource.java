@@ -92,12 +92,6 @@ public class AddeImageDataSource extends ImageDataSource {
     int lMag;
 
     /** _more_ */
-    int eleMag = 0;
-
-    /** _more_ */
-    int lineMag = 0;
-
-    /** _more_ */
     int elFactor = 1;
 
     /** _more_ */
@@ -206,10 +200,10 @@ public class AddeImageDataSource extends ImageDataSource {
         if (getTmpPaths() != null) {  // zidv bundle
             return;
         }
-        String ver = IdvPersistenceManager.getBundleIdvVersion();
+        //String ver = IdvPersistenceManager.getBundleIdvVersion();
         // ver == null is quicklinks history
 
-        if (ver == null && (this.source == null) && (imageList != null)
+        if ((this.source == null) && (imageList != null)
                 && (imageList.size() > 0)) {
             List    descriptors = super.getDescriptors(super.findDataChoice(this.choiceName), null);
             AddeImageDescriptor desc1 =
@@ -315,14 +309,16 @@ public class AddeImageDataSource extends ImageDataSource {
     protected List getDescriptors(DataChoice dataChoice,
                                   DataSelection subset) {
 
+        int eleMag = 0;
+        int lineMag = 0;
+
         List<AddeImageDescriptor> descriptors =
             super.getDescriptors(dataChoice, subset);
         GeoSelection geoSelection            = subset.getGeoSelection();
         boolean      isProgressiveResolution = true;
         boolean fromBundle = getIdv().getStateManager().getProperty(
                                  IdvConstants.PROP_LOADINGXML, false);
-        boolean matchRegion = getIdv().getStateManager().getProperty(
-                IdvConstants.PROP_USE_DISPLAYAREA, false);
+
         String t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION,
                 DataSelection.PROP_USEDEFAULTAREA);
         String navType = subset.getProperty("navType", "X");
@@ -742,36 +738,36 @@ public class AddeImageDataSource extends ImageDataSource {
      *
      * @return _more_
      */
-    public int getEleMag() {
-        return eleMag;
-    }
+    //public int getEleMag() {
+    //    return eleMag;
+    //}
 
     /**
      * _more_
      *
      * @return _more_
      */
-    public int getLineMag() {
-        return lineMag;
-    }
+    //public int getLineMag() {
+     //   return lineMag;
+    //}
 
     /**
      * _more_
      *
      * @param mag _more_
      */
-    public void setEleMag(int mag) {
-        eleMag = mag;
-    }
+    //public void setEleMag(int mag) {
+     //   eleMag = mag;
+    //}
 
     /**
      * _more_
      *
      * @param mag _more_
      */
-    public void setLineMag(int mag) {
-        lineMag = mag;
-    }
+    //public void setLineMag(int mag) {
+     //   lineMag = mag;
+    //}
 
 
 
@@ -1131,6 +1127,9 @@ public class AddeImageDataSource extends ImageDataSource {
 
         //now the rubberband is changed and the IDV is going to do sth.
         try {
+
+            int eleMag = 0;
+            int lineMag = 0;
             AddeImageDescriptor dsep   =
                 (AddeImageDescriptor) despList.get(0);
             int                 lines  = 0;
