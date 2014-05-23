@@ -1588,7 +1588,7 @@ public class GeoGridDataSource extends GridDataSource {
             }
             */
             /** if we are doing PR, then we adjust the stride */
-            if (isProgressiveResolution) {
+            if (isProgressiveResolution && geoSelection != null && !geoSelection.hasStride()) {
                 int xLength = geoGrid.getXDimension().getLength();
                 int yLength = geoGrid.getYDimension().getLength();
 
@@ -1641,8 +1641,8 @@ public class GeoGridDataSource extends GridDataSource {
                 geoSelection.setYStride(ystride);
 
             }
-            System.out.println("new x y strides: " + geoSelection.getXStride() + " "
-                    + geoSelection.getYStride());
+            //System.out.println("new x y strides: " + geoSelection.getXStride() + " "
+            //        + geoSelection.getYStride());
             int xStride = geoSelection.getXStride();
             int yStride = geoSelection.getYStride();
             // Set 0 or -1 to be 1
@@ -1652,14 +1652,8 @@ public class GeoGridDataSource extends GridDataSource {
             if (yStride < 1) {
             	yStride = 1;
             }
-          //  if ( xStride != 1 || yStride != 1) {
-            	/*
-                String magValue = "Resolution: " + xStride + " "
-                    + yStride;
-                    */
             String magValue = DataUtil.makeSamplingLabel(xStride, yStride, "grid point");
-            dataChoice.setProperty("MAG", magValue);
-          //  }
+            dataChoice.setProperty("MAG", magValue); 
             if ((geoSelection != null)
                     && (geoSelection.hasSpatialSubset()
                         || geoSelection.getHasNonOneStride())) {
