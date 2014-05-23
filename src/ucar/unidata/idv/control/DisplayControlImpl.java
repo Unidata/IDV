@@ -463,6 +463,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** Keep around the bottom legend button panel */
     private JPanel bottomLegendButtonPanel;
 
+    /** The label to show the resolution readout in the side legend */
+    protected String resolutionReadout = null;
+
 
 
     /**
@@ -645,7 +648,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private String legendLabelTemplate;
 
     /** extra label template */
-    private String extraLabelTemplate = "";
+    private String extraLabelTemplate = null;
 
     /** property widget */
     private JTextField legendLabelTemplateFld;
@@ -4154,6 +4157,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             patterns.add(MACRO_DISPLAYUNIT);
             values.add("" + displayUnit);
         }
+        patterns.add(MACRO_RESOLUTION);
+        if (resolutionReadout == null || resolutionReadout.isEmpty()) {
+            values.add("");
+        } else {
+            values.add(resolutionReadout);
+        }
 
     }
 
@@ -6294,6 +6303,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             labels.add("Forecast Hour");
             names.add(MACRO_FHOUR2);
             labels.add("Forecast Hour (value only)");
+        }
+        if (canDoProgressiveResolution()) {
+            names.addAll(Misc.newList(MACRO_RESOLUTION));
+            labels.addAll(Misc.newList("Resolution"));
         }
     }
 
@@ -11958,7 +11971,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The ExtraLabelTemplate
      */
     public String getExtraLabelTemplate() {
-        if ((extraLabelTemplate == null) || extraLabelTemplate.equals("")) {
+        // If it's null, it's never been set
+        //if ((extraLabelTemplate == null) || extraLabelTemplate.isEmpty()) {
+        if (extraLabelTemplate == null) {
             boolean haveData = (getShortParamName() != null);
             extraLabelTemplate = getStore().get(PREF_EXTRALABEL_TEMPLATE
                     + "." + displayId, (String) null);
@@ -11967,6 +11982,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         ? ".data"
                         : ".nodata");
                 extraLabelTemplate = getStore().get(pref, (String) null);
+            }
+            if (extraLabelTemplate == null && canDoProgressiveResolution()) {
+                extraLabelTemplate = MACRO_RESOLUTION;
             }
         }
         if (extraLabelTemplate == null) {

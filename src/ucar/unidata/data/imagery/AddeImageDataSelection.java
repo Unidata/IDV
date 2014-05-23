@@ -475,8 +475,19 @@ public class AddeImageDataSelection {
             //this.place = urlInfo.getPlaceValue();
             this.coordinateType = urlInfo.getLocateKey();
             this.navType = urlInfo.getNavType();
-
-            if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
+            if(navType.equals("LALO")){
+                this.coordinateType = AddeImageURL.KEY_LINEELE;
+                centerLineFld.setText(Integer.toString(0));
+                centerElementFld.setText(Integer.toString(0));
+                setLine(0);
+                setElement(0);
+                urlInfo.setPlaceValue("ULEFT");
+                urlInfo.setLocationLine(0);
+                urlInfo.setLocationElem(0);
+                convertToLatLon();
+                urlInfo.setLocationLat(getLatitude());
+                urlInfo.setLocationLon(getLongitude());
+            } else if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
                 //this.latitude = urlInfo.getLocationLat();
                 //this.longitude = urlInfo.getLocationLon();
                 latLonWidget.setLat(urlInfo.getLocationLat());
@@ -1034,7 +1045,7 @@ public class AddeImageDataSelection {
             java.util.List allComps1       = new ArrayList();
             java.util.List allComps2       = new ArrayList();
             java.util.List allComps3       = new ArrayList();
-            java.util.List allComps4       = new ArrayList();
+            //java.util.List allComps4       = new ArrayList();
             Insets         dfltGridSpacing = new Insets(4, 0, 4, 0);
             String         dfltLblSpacing  = " ";
             JComponent     propComp        = null;
@@ -1356,7 +1367,7 @@ public class AddeImageDataSelection {
             allComps3.add(GuiUtils.left(propComp));
 
             //Navigator Type
-            allComps4.add(new JLabel(" "));
+       /*     allComps4.add(new JLabel(" "));
             allComps4.add(new JLabel(" "));
             navComboBox = new JComboBox();
             GuiUtils.setListData(
@@ -1377,7 +1388,7 @@ public class AddeImageDataSelection {
                 }
             });
             allComps4.add(GuiUtils.rLabel("Navigation Type:"));
-            allComps4.add(GuiUtils.left(navComboBox));
+            allComps4.add(GuiUtils.left(navComboBox));    */
 
             //all
             JPanel imagePanel =
@@ -1385,8 +1396,8 @@ public class AddeImageDataSelection {
                         {GuiUtils.doLayout(allComps0, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
                          GuiUtils.doLayout(allComps1, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
                          GuiUtils.doLayout(allComps2, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
-                         GuiUtils.doLayout(allComps3, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
-                         GuiUtils.doLayout(allComps4, 2, GuiUtils.WT_NY, GuiUtils.WT_N)});
+                         GuiUtils.doLayout(allComps3, 2, GuiUtils.WT_NY, GuiUtils.WT_N)});
+                       //  GuiUtils.doLayout(allComps4, 2, GuiUtils.WT_NY, GuiUtils.WT_N)});
 
             advance = GuiUtils.top(imagePanel);
             boolean showMagSection = !getIsProgressiveResolution(); //prograssiveCbx1.isSelected();
@@ -2499,11 +2510,30 @@ public class AddeImageDataSelection {
                 latlon[0][0] = (float) gInfo.getMinLat();
                 float[][] lrLinEle   = baseAnav.toLinEle(latlon);
                 //int       displayNum = (int) rect.getWidth();
-                int lines  = (int) (lrLinEle[1][0] - ulLinEle[1][0])
-                             * Math.abs(lMag0)/Math.abs(lMag);
-                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
-                             * Math.abs(eMag0)/Math.abs(eMag);
+                int lines;
+                int elems;
+                if(ulLinEle[0][0] == ulLinEle[0][0] && lrLinEle[0][0] == lrLinEle[0][0]) {
+                    lines  = (int) (lrLinEle[1][0] - ulLinEle[1][0])
+                            * Math.abs(lMag0)/Math.abs(lMag);
+                    elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
+                            * Math.abs(eMag0)/Math.abs(eMag);
+                } else if(ulLinEle[0][0] == ulLinEle[0][0]) {
+                    lines  = (advancedPanel.maxLines - (int) (ulLinEle[1][0])
+                            * Math.abs(lMag0))/Math.abs(lMag);
+                    elems = (advancedPanel.maxEles - (int) (ulLinEle[0][0])
+                            * Math.abs(eMag0))/Math.abs(eMag);
+                } else if(lrLinEle[0][0] == lrLinEle[0][0]) {
+                    lines  = (int) (lrLinEle[1][0])
+                            * Math.abs(lMag0)/Math.abs(lMag);
+                    elems = (int) (lrLinEle[0][0])
+                            * Math.abs(eMag0)/Math.abs(eMag);
+                } else {
+                    lines = advancedPanel.maxLines;
+                    elems = advancedPanel.maxEles;
+                }
 
+                lines = Math.abs(lines);
+                elems = Math.abs(elems);
                 advancedPanel.setIsFromRegionUpdate(true);
 
                 // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
@@ -2525,7 +2555,11 @@ public class AddeImageDataSelection {
                     advancedPanel.setPlace("CENTER");
                 }
                 // set latlon coord
-                advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
+                if(baseAnav.toString().equals("LALO")) {
+                    advancedPanel.coordinateTypeComboBox.setSelectedIndex(1);
+                } else {
+                    advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
+                }
                 // update the size
                 if ( !isFull) {
                     advancedPanel.setNumLines(lines);
