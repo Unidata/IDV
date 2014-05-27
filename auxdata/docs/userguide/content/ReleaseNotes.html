@@ -29,6 +29,12 @@ netCDF-Java and TDS update</a> item for more details on these changes.
 
 <faqitem cat="Display Changes"></faqitem>
 
+<faqitem q="New Image Chooser" id="newimagechooser">
+Added an image preview panel in the <a href="./data/DataSourceProperties.html#spatialsubset"> data subset</a> panel,
+and moved the image property widgets from the original chooser to the Advanced panel in the subset window.
+The result is a more intuitive and efficient user experience when selecting the area of interest before
+creating the final display.
+</faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
 
@@ -46,9 +52,11 @@ If the data source type is grid file, the IDV user can set "Match Display Region
 
 <faqitem q="Adaptive Resolution" id="adaptiveresolution">
 This is a new advanced feature in the IDV. When loading large datasets with PR enabled, the IDV calculates the
-resolution of the map view window, dynamically sets the magnification, and loads sufficient data to generate
+resolution of the map view window, dynamically sets the data sampling, and loads sufficient data to generate
 the image. The quality of the image is not compromised. The result of this improvement is more efficient use
-of both client and server system resources thereby reducing network traffic significantly.
+of both client and server system resources thereby reducing network traffic significantly. The Adaptive Resolution
+is a property in the <a href="./tools/Preferences.html">User Preference</a>. It can also be set in the
+<a href="./ui/Menus.html#projectionmenu">Projections</a> drop down menu of main view window.
 </faqitem>
 
 
