@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 4.0u1 release.
+The items below reflect changes since the 4.1 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -26,50 +26,29 @@ netCDF-Java and TDS update</a> item for more details on these changes.
 </p>
 </faqitem>
 
-<faqitem q="New version update message" id="update">
-The IDV now has a mechanism to alert users of a new available version of the
-IDV. As the IDV starts up, the user's version is compared against the latest
-stable version of the IDV. If the user's version is old, they are presented with
-an alert message and link indicating where to obtain the newer version. They
-can also choose to check "Don't show again" in which case they will no longer
-receive alerts for that newer version. However, if a new subsequent version of
-the IDV is released, they will again be alerted for that newer version.
-</faqitem>
-
-<faqitem q="ZIDV bundles" id="zidv">
-There is now a quicker way to save zidv bundles with the "Save All Displayed
-Data" option.  This selection allows the user to avoid having to go through many
-dialogs asking what data they would like saved.
-</faqitem>
-
-<faqitem q="Performance" id="performance">
-Various memory usage and performance enhancements were done to speed up the
-loading of bundles, display of radar data and contour labelling.
-</faqitem>
-
 
 <faqitem cat="Display Changes"></faqitem>
-
-<faqitem q="Transect Display" id="gridTransect">
-A new transect control will be created when a user creates a cross section display on a transect view. Two end points
-    lables are added in the transect display.
-</faqitem>
-
-<faqitem q="Contour labelling frequency" id="contourlabelfq">
-Improving the logic in the visad library can do better validation of the numeric ranges.
-</faqitem>
-
-<faqitem q="Units on color scale" id="colorscaleunit">
-It is now possible to label the color scale with a unit.  You can access this
-option through a display control's [ug::menu Edit Properties] menu under the
-[ug::tab Color Scale] tab.
-</faqitem>
 
 
 <faqitem cat="Data Changes"></faqitem>
 
-<faqitem q="Adde server list" id="addeList">
- Non active server has been removed and a few new servers added to the list..
+<faqitem q="Match Display Region" id="matchdisplayregion">
+The IDV can now match display regions. When the user selects this option in the data source property
+or subset panel, the IDV will automatically spatially subset to match the display area in the view window.
+This is done by first setting a region of interested in the main
+view window, and selecting "Match Display Region" in the Region tab of the subset panel. If the
+"Match Display Region" option is not selected before creating the display, you can re-set this option
+under View menu of the <a href="./controls/index.html#DisplayControlViewMenu">Display Control</a>.
+If the data source type is grid file, the IDV user can set "Match Display Region" as a default property in the
+<a href="./data/DataSourceProperties.html#spatialsubset">Data Source Properties</a> window.
+</faqitem>
+
+
+<faqitem q="Adaptive Resolution" id="adaptiveresolution">
+This is a new advanced feature in the IDV. When loading large datasets with PR enabled, the IDV calculates the
+resolution of the map view window, dynamically sets the magnification, and loads sufficient data to generate
+the image. The quality of the image is not compromised. The result of this improvement is more efficient use
+of both client and server system resources thereby reducing network traffic significantly.
 </faqitem>
 
 
@@ -81,124 +60,6 @@ option through a display control's [ug::menu Edit Properties] menu under the
 <faqitem q="Known Problems" id="problems">
 For a list of outstanding known problems, see the
 <a href="Bugs.html">Known Problems</a> page.
-</faqitem>
-
-
-<faqitem cat="Reminders"></faqitem>
-<faqitem q="Reminder on changes to netCDF-Java and TDS" id="netcdfJavaTdsChanges">
-<p>
-Version 4.3 and greater of netCDF-Java includes major changes to the way GRIB 1
-and 2 files are handled. See
-the <a href="http://www.unidata.ucar.edu/software/netcdf-java/formats/GribFiles.html">
-netCDF-Java GRIB documentation</a> for a more details on these changes.
-</p>
-
-<p>
-One major outcome of this change is that GRIB variable names will now be
-generated in a very general way. This means that bundles that were generated
-with a previous version of the IDV might break. In order to aid users in the
-transition between netCDF-Java 4.2 and 4.3, the netCDF-Java library has provided
-a mapping of old variable names and new variable names for the datasets served
-on the Unidata THREDDS Data Server (TDS), and this mapping is being used 'under
-the hood' in the IDV to minimize the impact of these changes on users.
-</p>
-
-<p>
-For users reading GRIB files from other locations (local files or other remote
-servers), the IDV now allows users to make custom variable name mappings. New
-variable mappings should be placed in the following file (found under the users
-home directory):
-</p>
-
-<p>
-&nbsp;&nbsp;.unidata/idv/DefaultIdv/varrenamer.xml
-</p>
-
-<p>
-The structure of this file is quite simple:
-</p>
-
-<p><code>
-&lt;varrenamers&gt;<br>
-<br>
-&nbsp;&nbsp;&lt;varrenamer<br>
-&nbsp;&nbsp;&nbsp;&nbsp;old="oldNameHere"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;new="newNameHere" /&gt;<br>
-<br>
-&nbsp;&nbsp;&lt;varrenamer<br>
-&nbsp;&nbsp;&nbsp;&nbsp;old="anotherOldNameHere"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;new="anotherNewNameHere" /&gt;<br>
-<br>
-&lt;/varrenamers&gt;
-</code></p>
-
-<p>
-Changes to the way GRIB files are served via the Unidata TDS server have also
-been made. The impact of this change on IDV users is that the dataset URLs that
-point to GRIB resources will change, which will break bundles that point to the
-old Unidata TDS (motherlode.ucar.edu).
-</p>
-
-<p>
-Again, in order to aid users in this transition, the netCDF-Java library has
-provided a mapping between the old and new dataset URL paths for all datasets
-served through the Unidata TDS. As with the variable name changes, the URL
-mapping for datasets on the Unidata TDS is being used 'under the hood' in the
-IDV to minimize the impact on users.
-</p>
-
-<p>
-The latest version of TDS (4.3), where URL related impacts will be
-seen, is <b>now running</b> on the main Unidata TDS (thredds.ucar.edu).
-Starting with this release (4.0u1), the IDV will redirect all requests to the old
-Unidata TDS (motherlode.ucar.edu) to the new Unidata TDS (thredds.ucar.edu)
-automatically and update the appropriate data URLs. Unlike the previous
-release (4.0), users do not need to install any plugins related to the
-TDS upgrade. <b><i>If you previously installed plugins related to the TDS
-upgrade, please remove them once you've upgraded to IDV 4.0u1 (or later).</i></b> 
-</p>
-
-<p>
-As TDS servers in the community begin to upgrade to TDS 4.3, IDV users will
-likely need to use custom URL mappings. New URL mappings should be placed in the
-following file (found under the users home directory):
-</p>
-
-<p>
-&nbsp;&nbsp;.unidata/idv/DefaultIdv/urlmaps.xml
-</p>
-
-<p>
-Again, the format of this file is quite simple:
-</p>
-
-<p><code>
-&lt;urlmaps&gt;<br>
-<br>
-&nbsp;&nbsp;&lt;urlmap<br>
-&nbsp;&nbsp;&nbsp;&nbsp;type="opendap"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;old="oldthreddsserver1.edu/"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;new="newthreddsserver1.edu/" /&gt;<br>
-<br>
-&nbsp;&nbsp;&lt;urlmap<br>
-&nbsp;&nbsp;&nbsp;&nbsp;type="opendap"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;old="threddsserver2.edu/thredds/dodsC/old/path/"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;new="threddsserver2.edu/thredds/dodcC/new/path/" /&gt;<br>
-<br>
-&lt;/urlmaps&gt;
-</code></p>
-
-<p>
-In the first example, a new THREDDS server has replaced an old server - all
-requests going to oldthreddsserver1.edu will be directed to
-newthreddsserver1.edu. The second example is where the URL path to a particular
-dataset has changed, either because the product has been replaced (for example,
-the RUC to the RAP transition) or the maintainer of the TDS server has changed
-the way data are cataloged. Note in both cases the type of URL is an opendap
-URL. In the future, this mechanism will be used to redirect other types of data
-requests, such as ADDE requests.
-</p>
-
 </faqitem>
 
 
