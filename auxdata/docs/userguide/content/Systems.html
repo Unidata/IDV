@@ -4,16 +4,14 @@
 </head>
 <body>
 
+The IDV should run on any platform that fully supports <b>Java 7</b> and <b>Java
+3D</b> and has been tested by Unidata on <b>Windows, Linux, Solaris x86, Mac
+OS X</b>.
 
-
-The IDV should run on any platform that fully supports <b>Java
-6</b> and <b>Java 3D</b> and has been tested by Unidata on <b>Windows, Linux,
-Solaris (SPARC and x86), Mac OS-X</b>.
-
-<p> For reasonable performance, it is recommended that an Intel system
-running IDV have at least a <b>1.2 GHz processor and 1 GB memory
-(RAM)</b>. Performance will be even better with faster processors and
-more memory. Detailed requirements are listed below.</p>
+<p> For reasonable performance, it is recommended that an Intel system running
+IDV have at least a <b>1.2 GHz processor and 1 GB memory (RAM)</b>. Performance
+will be even better with faster processors and more memory. Detailed
+requirements are listed below.</p>
 
 <%childlist%>
 
@@ -21,8 +19,8 @@ more memory. Detailed requirements are listed below.</p>
 
 The IDV runs on any platform that supports:
 <ul>
-<li><b>Java</b> version 1.6 or higher<b>AND</b>
-<li><b>Java 3D</b> version 1.3.1 or later (1.5.2 recommended for performance).
+<li><b>Java</b> version 1.7 or higher
+<li><b>Java 3D</b> version 1.6 (including pre-release versions).
 </ul>
 <p>
 
@@ -30,82 +28,18 @@ The IDV is known to run on the following operating systems:<p>
 
 <table border="1">
 <tr><th>OS</th><th>Version</th></tr>
-<tr><td><b>Windows</b></td><td>XP, Vista, 7 (32 or 64 bit)<sup><b>(1)</b></sup></td></tr>
-<tr><td><b>Linux</b></td><td> Fedora Core 9, 10, 11<sup><b>(2)</b></sup></td></tr>
-<tr><td><b>Mac OS-X</b></td><td>10.5 or later<sup><b>(3)</b></sup></td></tr>
-<tr><td><b>Solaris/SPARC</b></td><td>Solaris 9+<sup><b>(4)</b></sup></td></tr>
-<tr><td><b>Solaris/x86</b></td><td>Solaris 10 (Intel)<sup><b><b>(5)</b></sup></td></tr>
+<tr><td><b>Windows</b></td><td>XP, Vista, 7, 8</td></tr>
+<tr><td><b>Linux</b></td><td>Most modern flavors of Linux</td></tr>
+<tr><td><b>Mac OS-X</b></td><td>10.7 or later</td></tr>
+<tr><td><b>Solaris/x86</b></td><td>Solaris 10, 11 (Intel)</td></tr>
 </table>
-<p>
-  
-If other platforms fully support Java (version 1.6+) and 
-Java 3D (version 1.3.1 or higher) (e.g. AIX, IRIX) , they should 
-also work.
 
-<p>
-
-Your graphics system must support 3D; make sure you have the latest
-video driver for your graphics card. On Linux, the driver must support 
-GLX, an X windows system extension to OpenGL programs.
-
-<p>
-<b>NOTES:</b>
-<p>
-
-<b><sup>(1)</sup></b>You must have 
-Direct-X version 9.0 or higher installed on your Windows system if 
-you use the Direct-X version of Java 3D.
-<br>
-
-<b><sup>(2)</sup></b>The version of the OpenGL library must support
-GLX 1.3.</a>.
-
-<br>
-
-<b><sup>(3)</sup></b>Java 6 must be installed for the IDV to run on Mac OS-X.
-For those IDV users running on Mac OS-X 10.5, you can upgrade your Java version either by installing Snow Leopard, or by installing the Java update avaiable 
-<a href="http://www.apple.com/downloads/macosx/apple/application_updates/javaformacosx105update6.html">here</a>.
-<p>
-Please note that Java 6 is only available for Intel based Macs and 
-that the update above only works on 64 bit systems. If you have a 32-bit 
-Intel based Mac, you can get Java 6 by upgrading to Snow Leopard.
-<p>
-If you install Java from the update, you'll need to make it your default Java:
-<p>
-To find and/or update your default Java version, follow these steps:
-<ol>
-
-<li> Open the "Java Preferences" application located in /Applications/Utilities
-
-<li> Look for "Java SE 6" in the "Java Applications" section
-
-<li> The version at the top of the "Java Applications" list is the version being used by IDV. If "Java SE 6" is not at the top of the list, click and drag it to the top of the list (using the 64-bit option, if available), and you are ready to run IDV. If "Java SE 6" is not in the "Java Applications" list, you may need to manually run the Software Update feature in the Apple Menu to add it to the list. 
-</ol>
-
-<br>
-
-<b><sup>(4)</sup></b>OpenGL must be installed for Java 3D to run on Solaris/SPARC.
-<br>
-
-<b><sup>(5)</sup></b>For Solaris/x86 you must have Java 1.6 and Java 3D 1.4.0 
-(or later) installed (comes with the IDV installer, or you can install yourself)
-and a compatible video card.  For more information, see:<p>
-
-https://java3d.dev.java.net/binary-builds.html
-<br>
+Your graphics system must support Open GL, and for X Window Systems, GLX.
 
 <subhead id="disk" intoc="false">Disk Space</subhead>
 
-Using Web Start, you will need about 50 megabytes of disk space for
-the IDV-related JAR files downloaded. Additional space will be needed
-for the installation of Java, Java 3D, and Web Start, which must be
-installed on your system to run the IDV with Web Start.
-
-<p>
-
-Using installer files, you will need about 80-90 MB disk space for the
-installer file, which will uncompress into about twice that size. These
-include Java and Java3D.
+You will need about 150 MB disk space for the installer file, which will
+uncompress into about twice that size. These include Java and Java3D.
 
 
 <subhead id="memory" intoc="false">System Memory and Processor Speed</subhead>
@@ -117,33 +51,27 @@ Performance is significantly better with 1 GB RAM or more.
 
 <p>
 
-Recommended processor speed will vary by platform, but an Intel Pentium
-CPU with 1.2 GHz is about the minimum you would need for reasonable
-performance. In general, the faster the processor, and the more memory 
-your system has, the better IDV performance will be.
+Recommended processor speed will vary by platform, but in general, the faster
+the processor, and the more memory your system has, the better IDV performance
+will be.
 
 <subhead id="video" intoc="false">Graphics Cards</subhead>
-The IDV works on systems with graphics cards that support OpenGL (all
-systems) and Direct-X (version 9.0+, Windows only).  In most cases,
-you should make sure you have the latest video driver for your system.
-Even if the system is brand new, the video driver may be old.
+The IDV works on systems with graphics cards that support OpenGL (all systems).
+In most cases, you should make sure you have the latest video driver for your
+system.  Even if the system is brand new, the video driver may be old.
 <p>
-The IDV also works on systems with stereo video cards.  See the
-<a href="Faq.html">FAQ</a> on video card for more information.
 
 <subhead id="network" intoc="false">Internet Connection for Downloading 
 the IDV, and for Data Sources</subhead>
 
-You will have to download some 60 MB of IDV software initially if you
-use the Web Start installation, or some 80-90 MB if you use installer
-files which provide Java and Java3D.
+You will have to download some 100-150 MB of IDV software which provide Java and
+Java3D.
 
 <p>
 
-The IDV is designed to access data on remote servers on the
-Internet, as well as from local files. Downloading data from remote
-servers benefits from a fast connection to the Internet, since many data
-fields are large. 
+The IDV is designed to access data on remote servers on the Internet, as well as
+from local files. Downloading data from remote servers benefits from a fast
+connection to the Internet, since many data fields are large.
 
 </body>
 </html>
