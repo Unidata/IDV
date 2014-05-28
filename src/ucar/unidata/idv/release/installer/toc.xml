@@ -45,7 +45,7 @@
         <description>
         Installer for Mac OS-X.  
         <![CDATA[<font color="red"><b>]]>     
-         Requires Java 6. See the
+         Requires Mac OS X 10.7 or later. See the
         <![CDATA[<a href="%doc_path%/docs/userguide/Systems.html"
         target="_newwindow">
         System Requirements</a>]]> section of the User's Guide for
@@ -54,12 +54,12 @@
         <![CDATA[<a href="ftp/idv_%_version%_macos_installer.dmg.MD5">MD5</a>]]>
         </description>
    </file>
-   <file url="ftp/idv_%_version%_solaris-sparc_installer.sh" name="IDV %version% Installer for Solaris/SPARC">
+   <!--file url="ftp/idv_%_version%_solaris-sparc_installer.sh" name="IDV %version% Installer for Solaris/SPARC">
         <description>
         Installer for IDV under Solaris/SPARC
         <![CDATA[<a href="ftp/idv_%_version%_solaris-sparc_installer.sh.MD5">MD5</a>]]>
         </description>
-   </file>
+   </file-->
    <file url="ftp/idv_%_version%_solaris-x86_intel_installer.sh" name="IDV %version% Installer for Solaris/x86 (Intel)">
         <description>
         Installer for IDV under Solaris/x86
