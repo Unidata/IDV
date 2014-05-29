@@ -595,6 +595,8 @@ public class AddeImageDataSource extends ImageDataSource {
                                             maxLon, minLon, elFactor, dlMag,
                                             deMag, "CENTER",
                                             isProgressiveResolution, llp, navType);
+                        eleMag = Math.abs(descriptors.get(0).getImageInfo().getElementMag());
+                        lineMag = Math.abs(descriptors.get(0).getImageInfo().getLineMag());
                     }
 
 
@@ -605,6 +607,7 @@ public class AddeImageDataSource extends ImageDataSource {
        // if (isProgressiveResolution) {
         if (eleMag >= 1 || lineMag >= 1) {
             magValue = DataUtil.makeSamplingLabel(eleMag, lineMag, "pixel");
+            //System.out.println("newLine X newElement : " + lineMag + " "+ eleMag);
             //magValue = "Resolution: " + "-" + Integer.toString(lineMag)
             //           + " " + "-" + Integer.toString(eleMag);
          }
