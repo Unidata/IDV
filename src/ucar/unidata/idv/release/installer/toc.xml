@@ -41,9 +41,9 @@
         <![CDATA[<a href="ftp/idv_%_version%_linux64.sh.MD5">MD5</a>]]>
         </description>
    </file>
-   <file url="ftp/idv_%_version%_macos_installer.dmg" name="IDV %version% Installer for Mac OS-X">
+   <file url="ftp/idv_%_version%_macos_installer.dmg" name="IDV %version% Installer for Mac OS X">
         <description>
-        Installer for Mac OS-X.  
+        Installer for Mac OS X.  
         <![CDATA[<font color="red"><b>]]>     
          Requires Mac OS X 10.7 or later. See the
         <![CDATA[<a href="%doc_path%/docs/userguide/Systems.html"
