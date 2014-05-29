@@ -1600,7 +1600,12 @@ public class GeoGridDataSource extends GridDataSource {
                     LatLonRect bbox;
                     //if(regionOption.equals(DataSelection.PROP_USESELECTEDAREA))
                     if (!matchDisplayRegion) {
-                        bbox = gsbox;
+                        if(grbox.containedIn(gsbox))
+                            bbox = gsbox;
+                        else if(grbox.intersect(gsbox) != null)
+                            bbox = grbox.intersect(gsbox);
+                        else
+                            bbox = grbox;
                     } else {
                         bbox = grbox.intersect(gsbox);
                         if (bbox == null) {
@@ -1673,7 +1678,12 @@ public class GeoGridDataSource extends GridDataSource {
                     LatLonRect grbox = geoGrid.getCoordinateSystem().getLatLonBoundingBox();
                     LatLonRect bbox;
                     if (!matchDisplayRegion) {
-                        bbox = gsbox;
+                        if(grbox.containedIn(gsbox))
+                            bbox = gsbox;
+                        else if(grbox.intersect(gsbox) != null)
+                            bbox = grbox.intersect(gsbox);
+                        else
+                            bbox = grbox;
                     } else {
                         bbox = grbox.intersect(gsbox);
                         if (bbox == null) {
