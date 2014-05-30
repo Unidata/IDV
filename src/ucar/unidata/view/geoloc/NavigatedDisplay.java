@@ -1634,13 +1634,25 @@ public abstract class NavigatedDisplay extends DisplayMaster {
             findMinMaxFromScreen((int) (b.width * percent), b.height / 2,
                                  rangeXE, rangeXW, rangeY, normalizeLon);
         }
+        // check the ul corner
+        double[] rangeXE0 = { Double.NaN, Double.NaN };
+        double[] rangeXW0 = { Double.NaN, Double.NaN };
+        double[] rangeY0 = { Double.NaN, Double.NaN };
+        findMinMaxFromScreen((int) xs[1], (int) ys[1], rangeXE0, rangeXW0,
+                rangeY0, normalizeLon);
 
         double left;
         double right;
         if(rangeXE[0] == rangeXE[0] && rangeXW[0] == rangeXW[0]) {
-            //cross dateline
-            left   = rangeXW[0];
-            right  = rangeXE[1];
+            //if upper left corner is on the west
+            if(rangeXW0[0] == rangeXW0[0]){
+                left   = rangeXW0[0];
+                right  = rangeXE[1];
+            } else {  //cross dateline
+                left   = rangeXE0[0];
+                right  = rangeXW[1];
+            }
+
         } else if(rangeXE[0] == rangeXE[0]) {
             // 0 - 180
             left   = rangeXE[0];
