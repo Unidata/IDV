@@ -1638,17 +1638,26 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double[] rangeXE0 = { Double.NaN, Double.NaN };
         double[] rangeXW0 = { Double.NaN, Double.NaN };
         double[] rangeY0 = { Double.NaN, Double.NaN };
-        findMinMaxFromScreen((int) xs[1], (int) ys[1], rangeXE0, rangeXW0,
-                rangeY0, normalizeLon);
-
+        int jj = 1;
+        int ii = 1;
+        while((rangeXE0[0] != rangeXE0[0] && rangeXW0[0] != rangeXW0[0]) || rangeY0[1] > 90) {
+            findMinMaxFromScreen((int) xs[ii], (int) ys[jj], rangeXE0, rangeXW0,
+                    rangeY0, normalizeLon);
+            jj++;
+            if(jj == ys.length && ii < xs.length){
+                jj = 0;
+                ii = ii + 1;
+            }
+            if(ii == xs.length) break;
+        }
         double left;
         double right;
         if(rangeXE[0] == rangeXE[0] && rangeXW[0] == rangeXW[0]) {
             //if upper left corner is on the west
             if(rangeXW0[0] == rangeXW0[0]){
-                left   = rangeXW0[0];
+                left   = rangeXW[0];
                 right  = rangeXE[1];
-            } else {  //cross dateline
+            } else {  //cross dateline from east
                 left   = rangeXE0[0];
                 right  = rangeXW[1];
             }
@@ -1690,7 +1699,12 @@ public abstract class NavigatedDisplay extends DisplayMaster {
 
         // System.err.println ("left:" + left);
         // System.err.println ("right:" + right);
-        return new Rectangle2D.Double(left, top, right - left,
+        if(left <= -180)
+            left = -179.9;
+        double wwidth = right - left;
+        if(wwidth >= 360)
+            wwidth = 359.9;
+        return new Rectangle2D.Double(left, top, wwidth,
                                       top - bottom);
     }
 
