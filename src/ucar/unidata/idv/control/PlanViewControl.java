@@ -722,11 +722,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         processRequestProperties();
 
-        DataChoice dc0 = null;
-        if (dataChoice instanceof DerivedDataChoice) {
-            dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
-        } else {
-            dc0 = dataChoice;
+        DataChoice dc0 = dataChoice;
+
+        while (dc0 instanceof DerivedDataChoice) {
+            dc0 = (DataChoice) ((DerivedDataChoice) dc0).getChoices().get(0);
         }
 
         String magStr = (String) dc0.getProperty("MAG");
