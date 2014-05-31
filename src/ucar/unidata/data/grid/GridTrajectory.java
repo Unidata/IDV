@@ -1428,7 +1428,7 @@ public class GridTrajectory {
                     float lon = trajInfo.lons[timeStepIdx + 1];
                     float alt = trajInfo.alts[timeStepIdx + 1];
 
-                    float lat1 = (float) (lat
+                 /*   float lat1 = (float) (lat
                                           + f * ((v[timeStepIdx + 1]
                                               + v[timeStepIdx]) * 0.5
                                                   * delt) / (radius + alt));
@@ -1439,7 +1439,16 @@ public class GridTrajectory {
                     float alt1 = (float) (alt
                                           + ((w[timeStepIdx + 1]
                                               + w[timeStepIdx]) * 0.5
-                                                  * delt));
+                                                  * delt));   */
+                    float lat1 = (float) (lat
+                            + f * (v[timeStepIdx + 1]
+                            * delt) / (radius + alt));
+                    float lon1 = (float) (lon
+                            + f * (u[timeStepIdx + 1]
+                            * delt) / (radius + alt));
+                    float alt1 = (float) (alt
+                            + (w[timeStepIdx + 1]
+                            * delt));
                     if (alt1 < 0) {
                         alt1 = 0;
                     }
