@@ -1385,7 +1385,7 @@ public class GridTrajectory {
                     EarthLocation el = new EarthLocationLite(lat0, lon0,
                                            alt0);
                     FieldImpl ssample = GridUtil.sample(sFI, el);
-                    Data      srt     = ssample.getSample(0);
+                    Data      srt     = ssample.getSample(timeStepIdx);
                     Real      sreal   = (srt instanceof RealTuple)
                                         ? (Real) ((RealTuple) srt)
                                             .getComponent(0)
@@ -1394,7 +1394,7 @@ public class GridTrajectory {
 
 
                     FieldImpl usample = GridUtil.sample(uFI, el);
-                    Data      urt     = usample.getSample(0);
+                    Data      urt     = usample.getSample(timeStepIdx);
                     Real      ureal   = (urt instanceof RealTuple)
                                         ? (Real) ((RealTuple) urt)
                                             .getComponent(0)
@@ -1402,7 +1402,7 @@ public class GridTrajectory {
                     u[timeStepIdx] = (float) ureal.getValue();
 
                     FieldImpl vsample = GridUtil.sample(vFI, el);
-                    Data      vrt     = vsample.getSample(0);
+                    Data      vrt     = vsample.getSample(timeStepIdx);
                     Real      vreal   = (vrt instanceof RealTuple)
                                         ? (Real) ((RealTuple) vrt)
                                             .getComponent(0)
@@ -1410,7 +1410,7 @@ public class GridTrajectory {
                     v[timeStepIdx] = (float) vreal.getValue();
 
                     FieldImpl wsample = GridUtil.sample(wFI, el);
-                    Data      wrt     = wsample.getSample(0);
+                    Data      wrt     = wsample.getSample(timeStepIdx);
                     Real      wreal   = (wrt instanceof RealTuple)
                                         ? (Real) ((RealTuple) wrt)
                                             .getComponent(0)
