@@ -92,6 +92,12 @@ public class AddeImageDataSource extends ImageDataSource {
     int lMag;
 
     /** _more_ */
+    int eleMag = 0;
+
+    /** _more_ */
+    int lineMag = 0;
+
+    /** _more_ */
     int elFactor = 1;
 
     /** _more_ */
@@ -309,9 +315,6 @@ public class AddeImageDataSource extends ImageDataSource {
     protected List getDescriptors(DataChoice dataChoice,
                                   DataSelection subset) {
 
-        int eleMag = 0;
-        int lineMag = 0;
-
         List<AddeImageDescriptor> descriptors =
             super.getDescriptors(dataChoice, subset);
         GeoSelection geoSelection            = subset.getGeoSelection();
@@ -405,12 +408,12 @@ public class AddeImageDataSource extends ImageDataSource {
             subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION,
                                true);
 
-        if ( !isProgressiveResolution) {
-            dlMag =
-                addeImageDataSelection.getAdvancedPanel().getLineMagValue();
-            deMag =
-                addeImageDataSelection.getAdvancedPanel()
-                    .getElementMagValue();
+        if( fromBundle){
+            dlMag = getLineMag();
+            deMag = getEleMag();
+        } else if ( !isProgressiveResolution) {
+            dlMag = addeImageDataSelection.getAdvancedPanel().getLineMagValue();
+            deMag = addeImageDataSelection.getAdvancedPanel().getElementMagValue();
         }
 
 
@@ -595,8 +598,6 @@ public class AddeImageDataSource extends ImageDataSource {
                                             maxLon, minLon, elFactor, dlMag,
                                             deMag, "CENTER",
                                             isProgressiveResolution, llp, navType);
-                        eleMag = Math.abs(descriptors.get(0).getImageInfo().getElementMag());
-                        lineMag = Math.abs(descriptors.get(0).getImageInfo().getLineMag());
                     }
 
 
@@ -741,36 +742,36 @@ public class AddeImageDataSource extends ImageDataSource {
      *
      * @return _more_
      */
-    //public int getEleMag() {
-    //    return eleMag;
-    //}
+    public int getEleMag() {
+        return eleMag;
+    }
 
     /**
      * _more_
      *
      * @return _more_
      */
-    //public int getLineMag() {
-     //   return lineMag;
-    //}
+    public int getLineMag() {
+        return lineMag;
+    }
 
     /**
      * _more_
      *
      * @param mag _more_
      */
-    //public void setEleMag(int mag) {
-     //   eleMag = mag;
-    //}
+    public void setEleMag(int mag) {
+        eleMag = mag;
+    }
 
     /**
      * _more_
      *
      * @param mag _more_
      */
-    //public void setLineMag(int mag) {
-     //   lineMag = mag;
-    //}
+    public void setLineMag(int mag) {
+        lineMag = mag;
+    }
 
 
 
@@ -1130,9 +1131,6 @@ public class AddeImageDataSource extends ImageDataSource {
 
         //now the rubberband is changed and the IDV is going to do sth.
         try {
-
-            int eleMag = 0;
-            int lineMag = 0;
             AddeImageDescriptor dsep   =
                 (AddeImageDescriptor) despList.get(0);
             int                 lines  = 0;
