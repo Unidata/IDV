@@ -1065,7 +1065,7 @@ public class GridTrajectory {
 
                     FieldImpl ssample = GridUtil.sample(sFI, llp,
                                             Data.NEAREST_NEIGHBOR);
-                    Data srt   = ssample.getSample(0);
+                    Data srt   = ssample.getSample(timeStepIdx);
                     Real sreal = (srt instanceof RealTuple)
                                  ? (Real) ((RealTuple) srt).getComponent(0)
                                  : (Real) srt;
@@ -1074,7 +1074,7 @@ public class GridTrajectory {
 
                     FieldImpl usample = GridUtil.sample(uFI, llp,
                                             Data.NEAREST_NEIGHBOR);
-                    Data urt   = usample.getSample(0);
+                    Data urt   = usample.getSample(timeStepIdx);
                     Real ureal = (urt instanceof RealTuple)
                                  ? (Real) ((RealTuple) urt).getComponent(0)
                                  : (Real) urt;
@@ -1082,7 +1082,7 @@ public class GridTrajectory {
 
                     FieldImpl vsample = GridUtil.sample(vFI, llp,
                                             Data.NEAREST_NEIGHBOR);
-                    Data vrt   = vsample.getSample(0);
+                    Data vrt   = vsample.getSample(timeStepIdx);
                     Real vreal = (vrt instanceof RealTuple)
                                  ? (Real) ((RealTuple) vrt).getComponent(0)
                                  : (Real) vrt;
