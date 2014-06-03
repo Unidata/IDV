@@ -1521,15 +1521,15 @@ public class AddeImageDataSource extends ImageDataSource {
 
             if ((baseAnav == null) || !id.equals(this.bandId)) {
 
-            /*    try {
+                try {
                     areaAdapter = new AreaAdapter(this.source, false);
                     AreaFile areaFile = areaAdapter.getAreaFile();
                     baseAnav = areaFile.getNavigation();
                     acs      = new AREACoordinateSystem(areaFile);
                 } catch (Exception e) {
-                    LogUtil.userErrorMessage(
-                        "Error in initDataSelectionComponents  e=" + e);
-                }     */
+                   // LogUtil.userErrorMessage(
+                   //     "Error in initDataSelectionComponents  e=" + e);
+                }
 
                 this.bandId = id;
             }
