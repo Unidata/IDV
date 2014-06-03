@@ -139,6 +139,9 @@ public class AddeImageDataSelection {
         //prograssiveCbx  = new JCheckBox("", usePR);
 
         try {
+            if(this.aAdapter == null && this.source != null){
+                this.aAdapter = new AreaAdapter(this.source, false);
+            }
             this.regionPanel = new AddeImagePreviewPanel(this);
         } catch (Exception e) {}
 
@@ -1634,6 +1637,8 @@ public class AddeImageDataSelection {
                                  + 0.5);
             el[1][0] = (double) (el1[1][0] / Math.abs(getLineMagValue())
                                  + 0.5);
+            if(baseAnav == null)
+                return;
             try {
                 //AREACoordinateSystem macs = (AREACoordinateSystem)sampleProjection;
                 ll = baseAnav.toLatLon(el);
@@ -2128,7 +2133,7 @@ public class AddeImageDataSelection {
             display.getNavigatedPanel().addFocusListener(new FocusListener() {
                 @Override
                 public void focusGained(FocusEvent focusEvent) {
-                    System.err.println("Gain");
+                    // System.err.println("Gain");
                 }
 
                 @Override

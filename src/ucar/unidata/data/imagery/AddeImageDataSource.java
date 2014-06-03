@@ -369,6 +369,9 @@ public class AddeImageDataSource extends ImageDataSource {
                                     Integer.toString(this.bandId.getBandNumber()));
                 }
                 this.descriptor = new AddeImageDescriptor(thisDir, null);
+                List<DataSelectionComponent> dataSelectionComponents =
+                        new ArrayList<DataSelectionComponent>();
+                initDataSelectionComponents(dataSelectionComponents, super.findDataChoice(this.choiceName) );
             }
 
             if (baseAnav == null) {
@@ -1518,7 +1521,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
             if ((baseAnav == null) || !id.equals(this.bandId)) {
 
-                try {
+            /*    try {
                     areaAdapter = new AreaAdapter(this.source, false);
                     AreaFile areaFile = areaAdapter.getAreaFile();
                     baseAnav = areaFile.getNavigation();
@@ -1526,7 +1529,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 } catch (Exception e) {
                     LogUtil.userErrorMessage(
                         "Error in initDataSelectionComponents  e=" + e);
-                }
+                }     */
 
                 this.bandId = id;
             }
