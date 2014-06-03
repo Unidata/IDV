@@ -956,6 +956,10 @@ public class AddeImageDataSelection {
          * @param value _more_
          */
         public void setElementMagSlider(int value) {
+            if(this.elementMagSlider == null && urlInfo != null){
+                urlInfo.setElementMag(value);
+                return;
+            }
             this.elementMagSlider.setValue(value);
             this.elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
             urlInfo.setElementMag(getElementMagValue());
@@ -967,6 +971,10 @@ public class AddeImageDataSelection {
          * @param value _more_
          */
         public void setLineMagSlider(int value) {
+            if(this.lineMagSlider == null && urlInfo != null){
+                urlInfo.setLineMag(value);
+                return;
+            }
             this.lineMagSlider.setValue(value);
             this.lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
             urlInfo.setLineMag(getLineMagValue());

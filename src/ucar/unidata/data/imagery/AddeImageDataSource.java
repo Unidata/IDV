@@ -408,9 +408,11 @@ public class AddeImageDataSource extends ImageDataSource {
             subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION,
                                true);
 
-        if( fromBundle){
+        if( fromBundle && !isProgressiveResolution){
             dlMag = getLineMag();
             deMag = getEleMag();
+            addeImageDataSelection.getAdvancedPanel().setLineMagSlider(dlMag);
+            addeImageDataSelection.getAdvancedPanel().setElementMagSlider(deMag);
         } else if ( !isProgressiveResolution) {
             dlMag = addeImageDataSelection.getAdvancedPanel().getLineMagValue();
             deMag = addeImageDataSelection.getAdvancedPanel().getElementMagValue();
@@ -971,7 +973,7 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     public void reloadData() {
         super.reloadData();
-        if( addeImageDataSelection != null )
+        if( addeImageDataSelection != null && addeImageDataSelection.leMagPanel != null)
             addeImageDataSelection.advancedPanel.updateMagPanel();
     }
 
