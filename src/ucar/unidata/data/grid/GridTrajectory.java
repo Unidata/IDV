@@ -1099,12 +1099,10 @@ public class GridTrajectory {
 
 
                     float lat1 = (float) (lat
-                                          + f * ((v[timeStepIdx + 1]
-                                              + v[timeStepIdx]) * 0.5
+                                          + f * (v[timeStepIdx + 1]
                                                   * delt) / (radius + alt));
                     float lon1 = (float) (lon
-                                          + f * ((u[timeStepIdx + 1]
-                                              + u[timeStepIdx]) * 0.5
+                                          + f * (u[timeStepIdx + 1]
                                                   * delt) / (radius + alt));
                     float         alt1 = alt;
 
