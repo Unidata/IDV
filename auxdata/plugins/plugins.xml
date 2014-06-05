@@ -35,6 +35,8 @@
 
 <plugin name="McIDAS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/mcidas.jar" description="Color tables from McIDAS" category="Color Tables"/>
 
+<plugin name="WSR Radar Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/radarTable.jar" description="Color tables from WSR radar" category="Color Tables"/>
+
 <plugin name="Panoply Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/panoply.jar" description="Color tables from the Panoply application" category="Color Tables"/>
 
 <plugin name="Geovista Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/geovista.jar" description="Color tables from the Geovista application" category="Color Tables"/>
@@ -108,9 +110,13 @@
 
 <plugin  name="MMOUT NetCDF Files" url="http://www.unidata.ucar.edu/software/idv/plugins/mmout.jar" category="Data Sources"/>
 
-<plugin version="4.1"  category="Data Sources" name="Test Unidata TDS Upgrade" description="Forces all opendap links in bundles to load from thredds-test.unidata.ucar.edu in order to test your bundles before the thredds.ucar.edu is upgraded"  url="http://www.unidata.ucar.edu/software/idv/plugins/testThreddsUpgrade.jar"/>
+<!--plugin version="4.1"  category="Data Sources" name="Test Unidata TDS Upgrade" description="Forces all opendap links in bundles to load from thredds-test.unidata.ucar.edu in order to test your bundles before the thredds.ucar.edu is upgraded"  url="http://www.unidata.ucar.edu/software/idv/plugins/testThreddsUpgrade.jar"/-->
 
 <!--plugin version="4.0"  category="Data Sources" name="Motherlode TDS 4.2 persistence (IDV 4.0 only!)" description="This plugin is required for IDV 4.0 if users have bundles that were created with previous versions of the IDV. The plugin should be removed after June 1st 2013."  url="http://www.unidata.ucar.edu/software/idv/plugins/mlode42Persistence.jar"/-->
+
+<plugin version="5.0"  category="Data Sources" name="Unidata TDS Release Candidate Bundle Tester" description="Make all the Unidata TDS OPeNDAP links found in a bundle use the Unidata Release Candidate TDS. Use this plugin to test your bundles before the main Unidata TDS is upgraded. Please remove this plugin when not needed."  url="http://www.unidata.ucar.edu/software/idv/plugins/testUnidataTdsUpgrade.jar" />
+
+<plugin version="5.0"  category="Data Sources" name="Unidata TDS Fallback Server" description="Use this plugin if you are having issues with your bundles due to an upgrade of main Unidata TDS. Report any issues found with the new server before using this plugin. Note: only active during transition periods. Please remove this plugin when not needed."  url="http://www.unidata.ucar.edu/software/idv/plugins/unidataTdsFallback.jar" />
 
 <!-- Bug Fixes -->
 <plugin  version="2.8" name="Spurious Map Lines Fix" url="http://www.unidata.ucar.edu/software/idv/plugins/graphicsfix.jar" description="Provides a fix for the problem of random map lines on some systems" category="Bug Fixes"/>
