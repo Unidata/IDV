@@ -289,7 +289,7 @@ public class GeoSelectionPanel extends JPanel {
                     : PT_STRIDE_LABELS));
 
             strideComps.add(GuiUtils.rLabel((fullVersion
-                                             ? "X Stride:"
+                                             ? "X Sampling:"
                                              : "X:")));
             strideComps.add(GuiUtils.left(GuiUtils.hbox(xStrideBox,
                     new JLabel("      "), lockBtn)));
@@ -298,7 +298,7 @@ public class GeoSelectionPanel extends JPanel {
                     ? PT_STRIDE_LABELS
                     : PT_STRIDE_LABELS));
             strideComps.add(GuiUtils.rLabel((fullVersion
-                                             ? "Y Stride:"
+                                             ? "Y Sampling:"
                                              : "Y:")));
             strideComps.add(GuiUtils.left(yStrideBox));
 
@@ -306,13 +306,13 @@ public class GeoSelectionPanel extends JPanel {
                     ? LEVEL_STRIDE_LABELS
                     : PT_STRIDE_LABELS));
             strideComps.add(GuiUtils.rLabel((fullVersion
-                                             ? "Level Stride:"
+                                             ? "Level Sampling:"
                                              : "Level:")));
             strideComps.add(GuiUtils.left(zStrideBox));
         }
 
         {
-            useDisplayAreaCbx = new JCheckBox("", false);
+            useDisplayAreaCbx = new JCheckBox("", geoSelection.getUseViewBounds());
             useDisplayAreaCbx.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -323,7 +323,7 @@ public class GeoSelectionPanel extends JPanel {
                 }
             });
             useDisplayAreaComps.add(
-                GuiUtils.rLabel(DataSelection.PROP_USEDISPLAYAREA + ":"));
+                GuiUtils.rLabel("Match Display Region:"));
             useDisplayAreaComps.add(GuiUtils.left(useDisplayAreaCbx));
         }
         if (doBoundingBox) {
@@ -404,7 +404,7 @@ public class GeoSelectionPanel extends JPanel {
                 //                strideComps.add(0, new JLabel(" "));
                 GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
                 tab.addTab(
-                    "Stride",
+                    "Data Sampling",
                     strideComponent = GuiUtils.topLeft(
                         GuiUtils.doLayout(
                             strideComps, 2, GuiUtils.WT_N, GuiUtils.WT_N)));
@@ -587,7 +587,9 @@ public class GeoSelectionPanel extends JPanel {
                 //                geoSelection.setZStride(GeoSelection.STRIDE_NONE);
             }
         }
-
+        if (useDisplayAreaCbx != null) {
+        	geoSelection.setUseViewBounds(useDisplayAreaCbx.isSelected());
+        }
 
         if (mapPanel != null) {
             //xxxx

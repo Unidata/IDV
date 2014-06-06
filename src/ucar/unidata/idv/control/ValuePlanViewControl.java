@@ -308,6 +308,13 @@ public class ValuePlanViewControl extends PlanViewControl {
     protected FieldImpl getSliceForDisplay(FieldImpl slice)
             throws VisADException {
         FieldImpl subset      = super.getSliceForDisplay(slice);
+        if (getHaveInitialized() && (pointDisplay != null)) {
+            try {
+                pointDisplay.setShouldUseAltitude(GridUtil.is3D(subset));
+            } catch (Exception excp) {
+                logException("setting should use altitude", excp);
+            }
+        }
         FieldImpl stationData = GridUtil.getGridAsPointObs(subset);
         if (declutter) {
             try {

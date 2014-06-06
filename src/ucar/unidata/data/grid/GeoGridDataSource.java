@@ -1554,9 +1554,11 @@ public class GeoGridDataSource extends GridDataSource {
 
         String       regionOption            = null;
 
-        regionOption = givenDataSelection.getProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULTAREA);
+        regionOption = givenDataSelection.getProperty(
+        		DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULTAREA);
         boolean      isProgressiveResolution = givenDataSelection.getProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION, false);
+        boolean matchDisplayRegion = geoSelection.getUseViewBounds();
 
         if(!isProgressiveResolution && dataChoice.getDataSelection() != null){
             isProgressiveResolution =
@@ -1585,7 +1587,8 @@ public class GeoGridDataSource extends GridDataSource {
                 }
             }
             */
-            if (isProgressiveResolution) {
+            /** if we are doing PR, then we adjust the stride */
+            if (isProgressiveResolution && geoSelection != null && !geoSelection.hasStride()) {
                 int xLength = geoGrid.getXDimension().getLength();
                 int yLength = geoGrid.getYDimension().getLength();
 
@@ -1595,9 +1598,10 @@ public class GeoGridDataSource extends GridDataSource {
                     LatLonRect gsbox = geoSelection.getLatLonRect();
                     LatLonRect grbox = geoGrid.getCoordinateSystem().getLatLonBoundingBox();
                     LatLonRect bbox;
-                    if(regionOption.equals(DataSelection.PROP_USESELECTEDAREA))
+                    //if(regionOption.equals(DataSelection.PROP_USESELECTEDAREA))
+                    if (!matchDisplayRegion) {
                         bbox = gsbox;
-                    else {
+                    } else {
                         bbox = grbox.intersect(gsbox);
                         if (bbox == null) {
                             bbox = grbox;
@@ -1637,8 +1641,19 @@ public class GeoGridDataSource extends GridDataSource {
                 geoSelection.setYStride(ystride);
 
             }
-            System.out.println("new x y strides: " + geoSelection.getXStride() + " "
-                    + geoSelection.getYStride());
+            //System.out.println("new x y strides: " + geoSelection.getXStride() + " "
+            //        + geoSelection.getYStride());
+            int xStride = geoSelection.getXStride();
+            int yStride = geoSelection.getYStride();
+            // Set 0 or -1 to be 1
+            if (xStride < 1) {
+            	xStride = 1;
+            }
+            if (yStride < 1) {
+            	yStride = 1;
+            }
+            String magValue = DataUtil.makeSamplingLabel(xStride, yStride, "grid point");
+            dataChoice.setProperty("MAG", magValue); 
             if ((geoSelection != null)
                     && (geoSelection.hasSpatialSubset()
                         || geoSelection.getHasNonOneStride())) {
@@ -1656,9 +1671,14 @@ public class GeoGridDataSource extends GridDataSource {
                 if (geoSelection.getLatLonRect() != null) {
                     LatLonRect gsbox = geoSelection.getLatLonRect();
                     LatLonRect grbox = geoGrid.getCoordinateSystem().getLatLonBoundingBox();
-                    LatLonRect bbox = grbox.intersect(gsbox);
-                    if (bbox == null) {
-                    	bbox = grbox;
+                    LatLonRect bbox;
+                    if (!matchDisplayRegion) {
+                        bbox = gsbox;
+                    } else {
+                        bbox = grbox.intersect(gsbox);
+                        if (bbox == null) {
+                            bbox = grbox;
+                        }
                     }
                     filename.append("_rect_" + cleanBBoxName(bbox));
                     List yx_ranges =
@@ -1685,13 +1705,6 @@ public class GeoGridDataSource extends GridDataSource {
                 //                System.out.println("level range(1):  " + levelRange);
                 geoGrid = (GeoGrid) geoGrid.makeSubset(null, ensRange, null,
                         levelRange, yRange, xRange);
-                /*
-                geoGrid = geoGrid.subset(null, levelRange,
-                                         geoSelection.getLatLonRect(),
-                                         geoSelection.getZStrideToUse(),
-                                         geoSelection.getYStrideToUse(),
-                                         geoSelection.getXStrideToUse());
-                */
             } else if (levelRange != null) {
                 extraCacheKey = levelRange;
                 //                System.out.println("level range(2):  " + levelRange);

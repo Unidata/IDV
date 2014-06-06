@@ -22,11 +22,9 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -74,16 +72,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -97,7 +86,7 @@ import javax.swing.event.MenuListener;
  */
 public abstract class PlanViewControl extends GridDisplayControl {
 
-    /** Macro for the short parameter name for the label */
+    /** Macro for the level for the label */
     public static final String MACRO_LEVEL = "%level%";
 
     /** property for sharing levels */
@@ -733,11 +722,24 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         processRequestProperties();
 
+        DataChoice dc0 = dataChoice;
+
+        while (dc0 instanceof DerivedDataChoice) {
+            dc0 = (DataChoice) ((DerivedDataChoice) dc0).getChoices().get(0);
+        }
+
+        String magStr = (String) dc0.getProperty("MAG");
+        if (magStr != null && !magStr.isEmpty()) {
+        	resolutionReadout = magStr;
+        } else {
+        	resolutionReadout = null;
+        }
+        
         Trace.call2("PlanView.setData");
         return true;
     }
 
-
+    
     /**
      * Wrapper around {@link #addTopographyMap(int)} to allow subclasses
      * to set their own index.
@@ -1431,9 +1433,15 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     public void getLegendLabels(List labels, int legendType) {
         super.getLegendLabels(labels, legendType);
+        // TODO: - should this only be for side legends?
         if (currentLevel != null) {
             labels.add("Level: " + formatLevel(currentLevel));
         }
+        /*
+        if (resolutionReadout != null && !resolutionReadout.isEmpty()) {
+        	labels.add(resolutionReadout);
+        }
+        */
     }
 
     /**

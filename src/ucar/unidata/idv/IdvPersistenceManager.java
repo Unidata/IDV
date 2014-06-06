@@ -3363,7 +3363,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         dialog.getContentPane().add(comp);
         dialog.pack();
-        dialog.show();
+        dialog.setVisible(true);
         if (result[0] == null) {
             return false;
         }
@@ -3821,6 +3821,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
         } finally {
             getVMManager().setDisplayMastersActive();
+            // HACK! - unset this property after bundle loads
+            getStateManager().putProperty(PROP_USE_DISPLAYAREA, false);
         }
 
         loadDialog.setMessage("Activating displays");

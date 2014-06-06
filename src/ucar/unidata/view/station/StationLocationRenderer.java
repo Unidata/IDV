@@ -672,7 +672,7 @@ public class StationLocationRenderer implements ucar.unidata.view.Renderer {
             info.setText("Station: " + s.name + "\n");
             info.append("  pos: " + posLatLon + "\n");
 
-            super.show();
+            super.setVisible(true);
         }
     }
 

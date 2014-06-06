@@ -650,12 +650,16 @@ line using: and -Dbasedir=/some/other/dir
 
     <target name="copyandsign2" unless="${file}_uptodate">
         <copy overwrite="true"  file="${from}" tofile="${to}"/>
+        <jar update="true" file="${to}">
+            <manifest>
+                <attribute name="Codebase" value=" http://www.unidata.ucar.edu/software/idv"/>
+                <attribute name="Permissions" value="all-permissions"/>
+                <attribute name="Trusted-Only" value="true"/>
+            </manifest>
+        </jar>
         <signjar alias="idv" jar="${to}"
             keystore="${sign_keystore}" storepass="${sign_password}"/>
     </target>
-
-
-
 
     <target name="zipjars" depends="init">
         <zip

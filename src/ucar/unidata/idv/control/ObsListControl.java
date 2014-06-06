@@ -179,9 +179,12 @@ public class ObsListControl extends ObsDisplayControl {
         Hashtable  seenObs         = new Hashtable();
 
         for (int dataIdx = 0; dataIdx < dataList.size(); dataIdx++) {
-            FieldImpl data       = (FieldImpl) dataList.get(dataIdx);
-            Set       set        = data.getDomainSet();
-            int       shapeIndex = 0;
+            FieldImpl data = (FieldImpl) dataList.get(dataIdx);
+            if (data == null) {  //Avoiding NPEs in Point Data List, "Show Raw Data" option
+                continue;
+            }
+            Set set        = data.getDomainSet();
+            int shapeIndex = 0;
             for (int i = 0; i < set.getLength(); i++) {
                 PointOb ob = (PointOb) data.getSample(i, false);
                 if (doDeclutterTime) {
@@ -539,8 +542,8 @@ public class ObsListControl extends ObsDisplayControl {
         sorter.setTableHeader(obsTable.getTableHeader());
 
 
-        int         width    = 300;
-        int         height   = 400;
+        int width  = 300;
+        int height = 400;
         JScrollPane scroller = GuiUtils.makeScrollPane(obsTable, width,
                                    height);
         scroller.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -553,7 +556,7 @@ public class ObsListControl extends ObsDisplayControl {
         tablePanel.add(scroller);
 
         JComponent[] timeDeclutterComps = getTimeDeclutterComps();
-        JPanel       timeDeclutterPanel =
+        JPanel timeDeclutterPanel =
             GuiUtils.hbox(Misc.newList(timeDeclutterComps[0],
                                        GuiUtils.rLabel("Only show every: "),
                                        timeDeclutterComps[1],

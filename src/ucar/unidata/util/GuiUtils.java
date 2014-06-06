@@ -689,7 +689,7 @@ public class GuiUtils extends LayoutUtil {
             }
             return new Color(Integer.decode(s).intValue());
         } catch (Exception e) {
-            s = s.toLowerCase();
+            s = value.toLowerCase();
             for (int i = 0; i < COLORNAMES.length; i++) {
                 if (s.equals(COLORNAMES[i])) {
                     return COLORS[i];
@@ -6807,7 +6807,7 @@ public class GuiUtils extends LayoutUtil {
             this.getContentPane().add(contents);
             this.pack();
             this.setLocation(200, 200);
-            this.show();
+            this.setVisible(true);
         }
 
         /**

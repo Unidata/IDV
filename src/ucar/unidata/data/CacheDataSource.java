@@ -171,7 +171,7 @@ public class CacheDataSource extends DataSourceImpl {
                     progressBar), 5));
             dialog.pack();
             dialog.setLocation(200, 200);
-            dialog.show();
+            dialog.setVisible(true);
 
 
             List holders = writeToCache(progressBar);

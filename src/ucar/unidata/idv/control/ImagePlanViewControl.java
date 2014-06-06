@@ -59,9 +59,6 @@ import javax.swing.*;
  */
 public class ImagePlanViewControl extends PlanViewControl {
 
-    /** The label to show the readout in the side legend */
-    private JLabel sideLegendReadout;
-
     /** _more_ */
     public List descripters;
 
@@ -78,35 +75,6 @@ public class ImagePlanViewControl extends PlanViewControl {
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
     }
 
-    /**
-     * @override
-     *
-     * @return _more_
-     */
-    protected boolean canDoProgressiveResolution() {
-        return true;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param legendType _more_
-     *
-     * @return _more_
-     */
-    protected JComponent getExtraLegendComponent(int legendType) {
-        JComponent parentComp = super.getExtraLegendComponent(legendType);
-        if (legendType == BOTTOM_LEGEND) {
-            return parentComp;
-        }
-
-        if (sideLegendReadout == null) {
-            sideLegendReadout = new JLabel("<html><br></html>");
-        }
-
-        return GuiUtils.vbox(sideLegendReadout, parentComp);
-    }
     /**
      * Method to create the particular <code>DisplayableData</code> that
      * this this instance uses for data depictions.
@@ -167,16 +135,15 @@ public class ImagePlanViewControl extends PlanViewControl {
             if (descripters != null) {
                 dataChoice.setObjectProperty("descriptors", descripters);
             }
+            boolean mdr = getMatchDisplayRegion();
+            dataChoice.setProperty("MatchDisplayRegion", mdr);
             boolean result = super.setData(dataChoice);
             if ( !result) {
                 userMessage("Selected image(s) not available");
             }
             String magStr = (String) dataChoice.getProperty("MAG");
-            if (magStr != null) {
-                if (sideLegendReadout == null) {
-                    sideLegendReadout = new JLabel("<html><br></html>");
-                }
-                sideLegendReadout.setText("<html>" + magStr + "</html>");
+            if (magStr != null && !magStr.isEmpty()) {
+                resolutionReadout = magStr;
             }
             return result;
         }
@@ -192,22 +159,8 @@ public class ImagePlanViewControl extends PlanViewControl {
                 userMessage("Selected image(s) not available");
             }
         }
-        //sideLegendReadout
-        DataChoice dc0 = null;
-        if (dataChoice instanceof DerivedDataChoice) {
-            dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
-        } else {
-            dc0 = dataChoice;
-        }
         //save imagelist
         descripters = getImageDescriptors(dataChoice);
-        String magStr = (String) dc0.getProperty("MAG");
-        if (magStr != null) {
-            if (sideLegendReadout == null) {
-                sideLegendReadout = new JLabel("<html><br></html>");
-            }
-            sideLegendReadout.setText("<html>" + magStr + "</html>");
-        }
         return result;
 
     }

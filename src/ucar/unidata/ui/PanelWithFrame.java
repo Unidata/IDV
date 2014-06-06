@@ -157,7 +157,7 @@ public class PanelWithFrame extends JPanel {
      */
     public void showFrame() {
         if (frame != null) {
-            frame.show();
+            frame.setVisible(true);
         }
     }
 

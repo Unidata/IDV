@@ -638,7 +638,7 @@ public class TextGlyph extends DrawingGlyph {
                 JDialog dialog = (JDialog) comps[1];
                 if ( !dialog.isVisible()) {
                     dialog.setLocation(new Point(x, y));
-                    dialog.show();
+                    dialog.setVisible(true);
                 } else {
                     dialog.toFront();
                 }

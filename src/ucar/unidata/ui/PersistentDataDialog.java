@@ -265,7 +265,7 @@ public class PersistentDataDialog implements ActionListener {
      */
     public void show() {
         if (dialog != null) {
-            dialog.show();
+            dialog.setVisible(true);
         }
     }
 

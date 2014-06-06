@@ -463,6 +463,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** Keep around the bottom legend button panel */
     private JPanel bottomLegendButtonPanel;
 
+    /** The label to show the resolution readout in the side legend */
+    protected String resolutionReadout = null;
+
 
 
     /**
@@ -645,7 +648,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private String legendLabelTemplate;
 
     /** extra label template */
-    private String extraLabelTemplate = "";
+    private String extraLabelTemplate = null;
 
     /** property widget */
     private JTextField legendLabelTemplateFld;
@@ -903,14 +906,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean isProgressiveResolution = false;
 
     /**
-     * _more_
-     */
-    protected Gridded2DSet last2DSet = null;
-
-    /**
-     * _more_
+     * Flag for reloading from bounds
      */
     public boolean reloadFromBounds = false;
+
+    /**
+     * Flag for matching the display region
+     */
+    public boolean matchDisplayRegion = false;
 
     /**
      * Default constructor. This is called when the control is
@@ -1016,6 +1019,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (this.dataSelection == null) {
             this.dataSelection = new DataSelection();
         }
+        setMatchDisplayRegion(
+        	this.dataSelection.getGeoSelection(true).getUseViewBounds());
 
         //Initialize the adjust flags if we have not been unpersisted
         if ( !wasUnPersisted) {
@@ -1098,6 +1103,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         this.usesTimeDriver =
                             ds.getProperty(DataSelection.PROP_USESTIMEDRIVER,
                                            false);
+                        setMatchDisplayRegion(
+                                ds.getGeoSelection(true).getUseViewBounds());
                     }
                 }
             }
@@ -2722,7 +2729,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public void viewpointChanged() {
     	//System.out.println("viewpointChanged");
-        if (getShoulDoProgressiveResolution()) {
+        if (getMatchDisplayRegion()) {
             if (reloadFromBounds) {
             	loadDataFromViewBounds();
                 reloadFromBounds = false;
@@ -2745,9 +2752,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         	    Rectangle2D sbox = nd.getScreenBounds();
                 geoSelection.setScreenBound(sbox);
                 geoSelection.setLatLonRect(bbox);
+                geoSelection.setUseViewBounds(true);
                 getDataSelection().setGeoSelection(geoSelection);
 
-                getDataSelection().putProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDISPLAYAREA);
+                //getDataSelection().putProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDISPLAYAREA);
                 EarthLocation el = nd.screenToEarthLocation(
             		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
                 LatLonPointImpl llpi =
@@ -3649,11 +3657,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
       	Rectangle2D sbox = navDisplay.getScreenBounds();
         geoSelection.setScreenBound(sbox);
         boolean levelChanged = dataSelection.getProperty("levelChanged", false);
-        if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
-        		DataSelection.PROP_USEDISPLAYAREA) && !levelChanged) {
+        //if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
+        //		DataSelection.PROP_USEDISPLAYAREA) && !levelChanged) {
+        if (getMatchDisplayRegion() && !levelChanged) {
             getViewManager().setProjectionFromData(false);
       	    Rectangle2D bbox = navDisplay.getLatLonBox();
             geoSelection.setLatLonRect(bbox);
+            geoSelection.setUseViewBounds(true);
             dataSelection.setGeoSelection(geoSelection);
             EarthLocation el = navDisplay.screenToEarthLocation(
         		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
@@ -4148,6 +4158,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (displayUnit != null) {
             patterns.add(MACRO_DISPLAYUNIT);
             values.add("" + displayUnit);
+        }
+        patterns.add(MACRO_RESOLUTION);
+        if (resolutionReadout == null || resolutionReadout.isEmpty()) {
+            values.add("");
+        } else {
+            values.add(resolutionReadout);
         }
 
     }
@@ -5694,7 +5710,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (f != null) {
             GuiUtils.showDialogNearSrc(f, propertiesDialog);
         } else {
-            propertiesDialog.show();
+            propertiesDialog.setVisible(true);
         }
     }
 
@@ -6147,6 +6163,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     getDataSelection().getGeoSelection(true);
                 if ( !Misc.equals(newGeoSelection, oldGeoSelection)) {
                     getDataSelection().setGeoSelection(newGeoSelection);
+                    setMatchDisplayRegion(newGeoSelection.getUseViewBounds());
                     needToReloadData = true;
                 }
             }
@@ -6289,6 +6306,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             names.add(MACRO_FHOUR2);
             labels.add("Forecast Hour (value only)");
         }
+        if (canDoProgressiveResolution()) {
+            names.addAll(Misc.newList(MACRO_RESOLUTION));
+            labels.addAll(Misc.newList("Resolution"));
+        }
     }
 
 
@@ -6389,14 +6410,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         }
         
-        // DRM: Move Pr checkbox here
-        if (canDoProgressiveResolution()) {
-           items.add(GuiUtils.makeCheckboxMenuItem(MapViewManager.PR_LABEL, this,
-                "isProgressiveResolution", null));
-        }
-
-
-
 
 
         if (haveDataTimes()) {
@@ -6447,6 +6460,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
             });
             items.add(mi);
+            if (canDoProgressiveResolution()) {
+               items.add(GuiUtils.makeCheckboxMenuItem(MapViewManager.PR_LABEL, this,
+                    "isProgressiveResolution", null));
+               items.add(GuiUtils.makeCheckboxMenuItem("Match Display Region", this,
+                    "matchDisplayRegion", null));
+            }
         }
 
     }
@@ -6662,7 +6681,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             logException("Applying z position", exc);
         }
         //System.out.println("projection changed");
-        if (getShoulDoProgressiveResolution()) {
+        if (getMatchDisplayRegion()) {
         	reloadFromBounds = true;
         	lastBounds = null;
         	checkBoundsChange();
@@ -7800,24 +7819,6 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     GuiUtils.rLabel("Smoothing:"), doMakeSmoothingWidget()));
         }
 
-        /* DRM: Move Pr checkbox to view menu
-        if (canDoProgressiveResolution()) {
-            JCheckBox toggle = new JCheckBox("", isProgressiveResolution);
-            toggle.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    // setDeclutter(((JCheckBox) e.getSource()).isSelected());
-                    // loadDataInThread();
-                    isProgressiveResolution =
-                        ((JCheckBox) e.getSource()).isSelected();
-                    dataSelection.putProperty(
-                        DataSelection.PROP_PROGRESSIVERESOLUTION,
-                        isProgressiveResolution);
-                }
-            });
-            controlWidgets.add(new WrapperWidget(this,
-                    GuiUtils.rLabel("Progressive Resolution:"), toggle));
-        }
-        */
     }
 
     /**
@@ -11972,7 +11973,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return The ExtraLabelTemplate
      */
     public String getExtraLabelTemplate() {
-        if ((extraLabelTemplate == null) || extraLabelTemplate.equals("")) {
+        // If it's null, it's never been set
+        //if ((extraLabelTemplate == null) || extraLabelTemplate.isEmpty()) {
+        if (extraLabelTemplate == null) {
             boolean haveData = (getShortParamName() != null);
             extraLabelTemplate = getStore().get(PREF_EXTRALABEL_TEMPLATE
                     + "." + displayId, (String) null);
@@ -11981,6 +11984,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         ? ".data"
                         : ".nodata");
                 extraLabelTemplate = getStore().get(pref, (String) null);
+            }
+            if (extraLabelTemplate == null && canDoProgressiveResolution()) {
+                extraLabelTemplate = MACRO_RESOLUTION;
             }
         }
         if (extraLabelTemplate == null) {
@@ -12533,6 +12539,25 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             dataSelection.putProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION,
                 this.isProgressiveResolution);
+        }
+    }
+    
+    /**
+     * Should we match the display region for spatial bounds
+     * @return true if match display region
+     */
+    public boolean getMatchDisplayRegion() {
+    	return matchDisplayRegion;
+    }
+    
+    /**
+     * Set whether we should match the display region for spatial bounds
+     * @param useDR  true if match display region
+     */
+    public void setMatchDisplayRegion(boolean useDR) {
+    	this.matchDisplayRegion = useDR;
+        if (dataSelection != null) {
+            dataSelection.getGeoSelection(true).setUseViewBounds(useDR);
         }
     }
 

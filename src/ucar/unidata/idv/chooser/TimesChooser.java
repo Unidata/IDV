@@ -1656,7 +1656,7 @@ public class TimesChooser extends IdvChooser {
             //            loc.y += timelineBtn.getSize().height;
             dialog.setLocation(loc);
             GuiUtils.positionAndFitToScreen(dialog, dialog.getBounds());
-            dialog.show();
+            dialog.setVisible(true);
             if (ok[0]) {
                 selected = new ArrayList();
                 for (Date dttm :

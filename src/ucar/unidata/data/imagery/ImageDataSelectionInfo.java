@@ -56,53 +56,81 @@ public class ImageDataSelectionInfo {
     /** _more_ */
     public int locationElem;
 
+    /** _more_ */
     public String host;
 
+    /** _more_ */
     public String requestType;
 
+    /** _more_ */
     public String band;
 
+    /** _more_ */
+    public String navType;
+
+    /** _more_ */
     public String unit;
 
+    /** _more_ */
     public String group;
 
+    /** _more_ */
     public String descriptor;
 
+    /** _more_ */
     public int spacing;
 
+    /** _more_ */
     public String placeValue;
 
+    /** _more_ */
     public String locateValue;
 
+    /** _more_ */
     public String locateKey;
 
+    /** _more_ */
     public int line;
 
+    /** _more_ */
     public int elem;
 
+    /** _more_ */
     public int lines;
 
+    /** _more_ */
     public int elememts;
 
+    /** _more_ */
     public int lineMag;
 
+    /** _more_ */
     public int elementMag;
 
+    /** _more_ */
     public int trace;
 
+    /** _more_ */
     public boolean debug;
 
+    /** _more_ */
     public String compress;
 
+    /** _more_ */
     public String user;
 
+    /** _more_ */
     public int port;
 
+    /** _more_ */
     public int project;
 
+    /** _more_ */
     public String version;
 
+    /** _more_ */
     List<String> leftovers = new ArrayList<String>();
+
     /**
      * Construct a ImageDataSelectionInfo
      */
@@ -117,14 +145,14 @@ public class ImageDataSelectionInfo {
 
         URL url = null;
         try {
-          url = new URL(sourceURL);
+            url = new URL(sourceURL);
         } catch (MalformedURLException mue) {}
 
         setHost(url.getHost());
         setRequestType(url.getPath().substring(1).toLowerCase());
-        String query = url.getQuery();
+        String       query  = url.getQuery();
 
-        List<String> tokens    = StringUtil.split(query, "&", true, true);
+        List<String> tokens = StringUtil.split(query, "&", true, true);
         for (String token : tokens) {
             String[] keyValue = StringUtil.split(token, "=", 2);
             if (keyValue == null) {
@@ -136,52 +164,54 @@ public class ImageDataSelectionInfo {
                 continue;
             }
 
-            if (key.startsWith("port")) {  // port
+            if (key.startsWith("port")) {           // port
                 setPort(Integer.parseInt(value));
-            } else if (key.startsWith("comp")) {   // compress type
+            } else if (key.startsWith("comp")) {    // compress type
                 setCompression(value);
-            } else if (key.startsWith("user")) {   // user
+            } else if (key.startsWith("user")) {    // user
                 setUser(value);
-            } else if (key.startsWith("proj")) {  // projection
+            } else if (key.startsWith("proj")) {    // projection
                 setProject(Integer.parseInt(value));
-            } else if (key.startsWith("vers")) {  // version
+            } else if (key.startsWith("vers")) {    // version
                 setVersion(value);
-            } else if (key.startsWith("debug")) {  // version
+            } else if (key.startsWith("debug")) {   // version
                 setDebug(Boolean.parseBoolean(value));
             } else if (key.startsWith("trace")) {   // trace
                 setTrace(Integer.parseInt(value));
-            } else if (key.startsWith("band")) {  // band
+            } else if (key.startsWith("band")) {    // band
                 setBand(value);
-            } else if (key.startsWith("unit")) {   // unit
+            } else if (key.startsWith("unit")) {    // unit
                 setUnit(value);
             } else if (key.startsWith("group")) {   // group
                 setGroup(value);
-            } else if (key.startsWith("desc")) {  // descriptor
+            } else if (key.startsWith("desc")) {    // descriptor
                 setDescriptor(value);
-            } else if (key.startsWith("spac")) {  // spacing
+            } else if (key.startsWith("spac")) {    // spacing
                 setSpacing(Integer.parseInt(value));
             } else if (key.startsWith("linele")) {  // location  "700 864"
                 setLocateKey("LINELE");
-                setLocateValue(value);
+                setLocate(value);
                 List<String> lList = StringUtil.split(value, " ");
                 setLocationLine(Integer.parseInt(lList.get(0)));
                 setLocationElem(Integer.parseInt(lList.get(1)));
             } else if (key.startsWith("latlon")) {  // location  "700 864"
-                setLocateKey("LATLON") ;
-                setLocateValue(value);
+                setLocateKey("LATLON");
+                setLocate(value);
                 List<String> lList = StringUtil.split(value, " ");
                 setLocationLat(Double.parseDouble(lList.get(0)));
                 setLocationLon(Double.parseDouble(lList.get(1)));
             } else if (key.startsWith("place")) {   // place
                 setPlaceValue(value);
-            } else if (key.startsWith("size")) {   // 700 800
+            } else if (key.startsWith("size")) {    // 700 800
                 List<String> lList = StringUtil.split(value, " ");
                 setLines(Integer.parseInt(lList.get(0)));
                 setElements(Integer.parseInt(lList.get(1)));
-            } else if (key.startsWith("mag")) {  // =-2 -2
+            } else if (key.startsWith("mag")) {     // =-2 -2
                 List<String> lList = StringUtil.split(value, " ");
                 setLineMag(Integer.parseInt(lList.get(0)));
                 setElementMag(Integer.parseInt(lList.get(1)));
+            } else if (key.startsWith("nav")) {    // navigator type
+                setNavType(value);
             } else {
                 leftovers.add(token);
             }
@@ -190,146 +220,340 @@ public class ImageDataSelectionInfo {
 
     }
 
-    public ImageDataSelectionInfo cloneMe(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public ImageDataSelectionInfo cloneMe() {
         return new ImageDataSelectionInfo(this.getURLString());
     }
 
+    /**
+     * _more_
+     *
+     * @param port _more_
+     */
     public void setPort(int port) {
         this.port = port;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getCompression() {
         return compress;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param compress _more_
+     */
     public void setCompression(String compress) {
         this.compress = compress;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getProject() {
         return project;
     }
 
+    /**
+     * _more_
+     *
+     * @param project _more_
+     */
     public void setProject(int project) {
         this.project = project;
     }
 
-    public void setHost(String host){
+    /**
+     * _more_
+     *
+     * @param host _more_
+     */
+    public void setHost(String host) {
         this.host = host;
     }
 
-    public String getHost(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getHost() {
         return this.host;
     }
 
-    public void setBand(String band){
+    /**
+     * _more_
+     *
+     * @param band _more_
+     */
+    public void setBand(String band) {
         this.band = band;
     }
 
-    public String getBand(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getBand() {
         return this.band;
     }
 
-    public void setUnit(String unit){
+    /**
+     * _more_
+     *
+     * @param navType _more_
+     */
+    public void setNavType(String navType) {
+        this.navType = navType;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getNavType() {
+        return this.navType;
+    }
+
+    /**
+     * _more_
+     *
+     * @param unit _more_
+     */
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 
-    public String getUnit(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getUnit() {
         return this.unit;
     }
 
-    public void setGroup(String group){
+    /**
+     * _more_
+     *
+     * @param group _more_
+     */
+    public void setGroup(String group) {
         this.group = group;
     }
 
-    public String getGroup(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getGroup() {
         return this.group;
     }
 
-    public void setRequestType(String requestType){
+    /**
+     * _more_
+     *
+     * @param requestType _more_
+     */
+    public void setRequestType(String requestType) {
         this.requestType = requestType;
     }
 
-    public String getRequestType(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getRequestType() {
         return this.requestType;
     }
 
-    public void setDescriptor(String descriptor){
+    /**
+     * _more_
+     *
+     * @param descriptor _more_
+     */
+    public void setDescriptor(String descriptor) {
         this.descriptor = descriptor;
     }
 
-    public String getDescriptor(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getDescriptor() {
         return this.descriptor;
     }
 
-    public void setSpacing(int spacing){
+    /**
+     * _more_
+     *
+     * @param spacing _more_
+     */
+    public void setSpacing(int spacing) {
         this.spacing = spacing;
     }
 
-    public int getSpacing(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getSpacing() {
         return this.spacing;
     }
 
-    public void setPlaceValue(String placeValue){
+    /**
+     * _more_
+     *
+     * @param placeValue _more_
+     */
+    public void setPlaceValue(String placeValue) {
         this.placeValue = placeValue;
     }
 
-    public String getPlaceValue(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getPlaceValue() {
         return this.placeValue;
     }
 
-    public void setLine(int line){
+    /**
+     * _more_
+     *
+     * @param line _more_
+     */
+    public void setLine(int line) {
         this.line = line;
     }
 
-    public int getLine(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getLine() {
         return this.line;
     }
 
-    public void setLines(int lines){
+    /**
+     * _more_
+     *
+     * @param lines _more_
+     */
+    public void setLines(int lines) {
         this.lines = lines;
     }
 
-    public int getLines(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getLines() {
         return this.lines;
     }
 
-    public void setElement(int elem){
+    /**
+     * _more_
+     *
+     * @param elem _more_
+     */
+    public void setElement(int elem) {
         this.elem = elem;
     }
 
-    public int getElement(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getElement() {
         return this.elem;
     }
 
-    public void setElements(int elems){
+    /**
+     * _more_
+     *
+     * @param elems _more_
+     */
+    public void setElements(int elems) {
         this.elememts = elems;
     }
 
-    public int getElements(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getElements() {
         return this.elememts;
     }
 
-    public void setLineMag(int lineMag){
+    /**
+     * _more_
+     *
+     * @param lineMag _more_
+     */
+    public void setLineMag(int lineMag) {
         this.lineMag = lineMag;
     }
 
-    public int getLineMag(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getLineMag() {
         return this.lineMag;
     }
 
-    public void setElementMag(int elementMag){
+    /**
+     * _more_
+     *
+     * @param elementMag _more_
+     */
+    public void setElementMag(int elementMag) {
         this.elementMag = elementMag;
     }
 
-    public int getElementMag(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getElementMag() {
         return this.elementMag;
     }
+
     /**
      * _more_
      *
@@ -375,34 +599,60 @@ public class ImageDataSelectionInfo {
      *
      * @param value the locate value
      */
-    public void setLocateValue(String value) {
+    public void setLocate(String value) {
         //super.setLocateValue(value);
-        String locKey = getLocateKey();
+        String       locKey  = getLocateKey();
         List<String> locList = StringUtil.split(value, " ");
-        if (locKey.equals(AddeImageURL.KEY_LINEELE)) {
+        if ((locKey != null) && locKey.equals(AddeImageURL.KEY_LINEELE)) {
             this.locationLine = Integer.parseInt(locList.get(0));
             this.locationElem = Integer.parseInt(locList.get(1));
-            this.locateValue = this.locationLine + " " +  this.locationElem;
+            this.locateValue  = this.locationLine + " " + this.locationElem;
         } else {
             this.locationLat = Double.parseDouble(locList.get(0));
             this.locationLon = Double.parseDouble(locList.get(1));
-            this.locateValue = Misc.format(this.locationLat) + " " + Misc.format(this.locationLon);
+            this.locateValue = Misc.format(this.locationLat) + " "
+                               + Misc.format(this.locationLon);
         }
 
     }
 
-    public String getLocateValue() {
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setLocateValue(String value) {
+        this.locateValue = value;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getLocate() {
         String locKey = getLocateKey();
 
-        if (locKey.equals(AddeImageURL.KEY_LINEELE)) {
+        if ((locKey != null) && locKey.equals(AddeImageURL.KEY_LINEELE)) {
 
-            this.locateValue = this.locationLine + " " +  this.locationElem;
+            this.locateValue = this.locationLine + " " + this.locationElem;
         } else {
 
-            this.locateValue = Misc.format(this.locationLat) + " " + Misc.format(this.locationLon);
+            this.locateValue = Misc.format(this.locationLat) + " "
+                               + Misc.format(this.locationLon);
         }
         return this.locateValue;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getLocateValue() {
+        return this.locateValue;
+    }
+
     /**
      * _more_
      *
@@ -439,46 +689,97 @@ public class ImageDataSelectionInfo {
         return locationElem;
     }
 
-    public void setTrace(int value){
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setTrace(int value) {
         this.trace = value;
     }
 
-    public int getTrace(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getTrace() {
         return this.trace;
     }
 
+    /**
+     * _more_
+     *
+     * @param debug _more_
+     */
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getDebug() {
         return this.debug;
     }
 
-    public void setUser(String value){
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setUser(String value) {
         this.user = value;
     }
 
-    public String getUser(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getUser() {
         return this.user;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getVersion() {
         return version;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param version _more_
+     */
     public void setVersion(String version) {
         this.version = version;
     }
 
-    public String getSizeValue(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getSizeValue() {
         return getLines() + " " + getElements();
     }
 
-    public String getMagValue(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getMagValue() {
         return getLineMag() + " " + getElementMag();
     }
+
     /**
      * Set the locate key
      *
@@ -486,21 +787,31 @@ public class ImageDataSelectionInfo {
      */
     public void setLocateKey(String value) {
         this.locateKey = value;
-     /*   if(value.equals(AddeImageURL.KEY_LATLON)){
-            String locateValue = Misc.format(getLocationLat()) + " "
-                    + Misc.format(getLocationLon());
-            setLocateValue(locateValue);
-        } else {
-            String locateValue = getLocationLine() + " " + getLocationElem();
-            setLocateValue(locateValue);
-        }   */
+        /*   if(value.equals(AddeImageURL.KEY_LATLON)){
+               String locateValue = Misc.format(getLocationLat()) + " "
+                       + Misc.format(getLocationLon());
+               setLocateValue(locateValue);
+           } else {
+               String locateValue = getLocationLine() + " " + getLocationElem();
+               setLocateValue(locateValue);
+           }   */
     }
 
-    public String getLocateKey(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getLocateKey() {
         return this.locateKey;
     }
 
-    public String getURLString(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getURLString() {
         StringBuffer buf = new StringBuffer(AddeImageURL.ADDE_PROTOCOL);
         buf.append("://");
         buf.append(host);
@@ -512,21 +823,27 @@ public class ImageDataSelectionInfo {
         appendKeyValue(buf, AddeImageURL.KEY_USER, getUser());
         appendKeyValue(buf, AddeImageURL.KEY_PROJ, "" + getProject());
         appendKeyValue(buf, AddeImageURL.KEY_VERSION, getVersion());
-        appendKeyValue(buf, AddeImageURL.KEY_DEBUG, Boolean.toString(getDebug()));
+        appendKeyValue(buf, AddeImageURL.KEY_DEBUG,
+                       Boolean.toString(getDebug()));
         appendKeyValue(buf, AddeImageURL.KEY_TRACE, "" + getTrace());
         appendKeyValue(buf, AddeImageURL.KEY_GROUP, "" + getGroup());
-        appendKeyValue(buf, AddeImageURL.KEY_DESCRIPTOR, "" + getDescriptor());
+        appendKeyValue(buf, AddeImageURL.KEY_DESCRIPTOR,
+                       "" + getDescriptor());
         appendKeyValue(buf, AddeImageURL.KEY_BAND, "" + getBand());
-        if(getLocateKey().equals(AddeImageURL.KEY_LINEELE))
-            appendKeyValue(buf, AddeImageURL.KEY_LINEELE, "" + getLocateValue());
-        else
-            appendKeyValue(buf, AddeImageURL.KEY_LATLON, "" + getLocateValue());
+        if (getLocateKey().equals(AddeImageURL.KEY_LINEELE)) {
+            appendKeyValue(buf, AddeImageURL.KEY_LINEELE,
+                           "" + getLocate());
+        } else {
+            appendKeyValue(buf, AddeImageURL.KEY_LATLON,
+                           "" + getLocate());
+        }
 
         appendKeyValue(buf, AddeImageURL.KEY_PLACE, "" + getPlaceValue());
         appendKeyValue(buf, AddeImageURL.KEY_SIZE, "" + getSizeValue());
         appendKeyValue(buf, AddeImageURL.KEY_UNIT, "" + getUnit());
         appendKeyValue(buf, AddeImageURL.KEY_MAG, "" + getMagValue());
         appendKeyValue(buf, AddeImageURL.KEY_SPAC, "" + getSpacing());
+        appendKeyValue(buf, AddeImageURL.KEY_NAV, "" + getNavType());
 
         if ( !leftovers.isEmpty()) {
             for (String leftover : leftovers) {
@@ -537,7 +854,15 @@ public class ImageDataSelectionInfo {
         return buf.toString();
     }
 
-    protected void appendKeyValue(StringBuffer buf, String name, String value) {
+    /**
+     * _more_
+     *
+     * @param buf _more_
+     * @param name _more_
+     * @param value _more_
+     */
+    protected void appendKeyValue(StringBuffer buf, String name,
+                                  String value) {
         if ((buf.length() == 0) || (buf.charAt(buf.length() - 1) != '?')) {
             buf.append("&");
         }

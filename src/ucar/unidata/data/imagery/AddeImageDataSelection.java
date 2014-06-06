@@ -139,6 +139,9 @@ public class AddeImageDataSelection {
         //prograssiveCbx  = new JCheckBox("", usePR);
 
         try {
+            if(this.aAdapter == null && this.source != null){
+                this.aAdapter = new AreaAdapter(this.source, false);
+            }
             this.regionPanel = new AddeImagePreviewPanel(this);
         } catch (Exception e) {}
 
@@ -430,9 +433,17 @@ public class AddeImageDataSelection {
         /** _more_ */
         String previousPlace;
 
+        /** _more_ */
         ImageDataSelectionInfo urlInfo;
 
+        /** _more_ */
         String coordinateType;
+
+        /** _more_ */
+        String navType;
+
+        /** Widget for selecting image nav type */
+        protected JComboBox navComboBox;
 
         /**
          * Construct a AddeImageAdvancedPanel
@@ -466,8 +477,20 @@ public class AddeImageDataSelection {
             this.isLineEle = true;
             //this.place = urlInfo.getPlaceValue();
             this.coordinateType = urlInfo.getLocateKey();
-
-            if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
+            this.navType = urlInfo.getNavType();
+            if(navType.equals("LALO")){
+                this.coordinateType = AddeImageURL.KEY_LINEELE;
+                centerLineFld.setText(Integer.toString(0));
+                centerElementFld.setText(Integer.toString(0));
+                setLine(0);
+                setElement(0);
+                urlInfo.setPlaceValue("ULEFT");
+                urlInfo.setLocationLine(0);
+                urlInfo.setLocationElem(0);
+                convertToLatLon();
+                urlInfo.setLocationLat(getLatitude());
+                urlInfo.setLocationLon(getLongitude());
+            } else if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
                 //this.latitude = urlInfo.getLocationLat();
                 //this.longitude = urlInfo.getLocationLon();
                 latLonWidget.setLat(urlInfo.getLocationLat());
@@ -517,6 +540,7 @@ public class AddeImageDataSelection {
             // init information for the location and the default is LATLON
             AreaDirectory aDir = descriptor.getDirectory();
             this.coordinateType = urlInfo.getLocateKey();
+            this.navType = urlInfo.getNavType();
 
             if(coordinateType.equals(AddeImageURL.KEY_LATLON)){
                 //this.latitude = urlInfo.getLocationLat();
@@ -935,6 +959,10 @@ public class AddeImageDataSelection {
          * @param value _more_
          */
         public void setElementMagSlider(int value) {
+            if(this.elementMagSlider == null && urlInfo != null){
+                urlInfo.setElementMag(value);
+                return;
+            }
             this.elementMagSlider.setValue(value);
             this.elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
             urlInfo.setElementMag(getElementMagValue());
@@ -946,6 +974,10 @@ public class AddeImageDataSelection {
          * @param value _more_
          */
         public void setLineMagSlider(int value) {
+            if(this.lineMagSlider == null && urlInfo != null){
+                urlInfo.setLineMag(value);
+                return;
+            }
             this.lineMagSlider.setValue(value);
             this.lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
             urlInfo.setLineMag(getLineMagValue());
@@ -992,7 +1024,15 @@ public class AddeImageDataSelection {
             return value -1;
         }
 
-
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public void updateMagPanel(){
+            GuiUtils.enablePanel(leMagPanel,
+                    !getIsProgressiveResolution());
+        }
 
 
         /**
@@ -1016,6 +1056,7 @@ public class AddeImageDataSelection {
             java.util.List allComps1       = new ArrayList();
             java.util.List allComps2       = new ArrayList();
             java.util.List allComps3       = new ArrayList();
+            //java.util.List allComps4       = new ArrayList();
             Insets         dfltGridSpacing = new Insets(4, 0, 4, 0);
             String         dfltLblSpacing  = " ";
             JComponent     propComp        = null;
@@ -1336,17 +1377,38 @@ public class AddeImageDataSelection {
             allComps3.add(GuiUtils.rLabel("Magnification:"));
             allComps3.add(GuiUtils.left(propComp));
 
+            //Navigator Type
+       /*     allComps4.add(new JLabel(" "));
+            allComps4.add(new JLabel(" "));
+            navComboBox = new JComboBox();
+            GuiUtils.setListData(
+                    navComboBox,
+                    Misc.newList(
+                            new TwoFacedObject("Default", "X"),
+                            new TwoFacedObject("Lat/Lon", "LALO")));
+            navComboBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    int selectedIndex =
+                            navComboBox.getSelectedIndex();
 
+                    if(selectedIndex == 0){
+                        urlInfo.setNavType("X");
+                    } else {
+                        urlInfo.setNavType("LALO");
+                    }
+                }
+            });
+            allComps4.add(GuiUtils.rLabel("Navigation Type:"));
+            allComps4.add(GuiUtils.left(navComboBox));    */
 
             //all
             JPanel imagePanel =
-                GuiUtils.vbox(GuiUtils.doLayout(allComps0, 2, GuiUtils.WT_NY,
-                    GuiUtils.WT_N), GuiUtils.doLayout(allComps1, 2,
-                        GuiUtils.WT_NY,
-                        GuiUtils.WT_N), GuiUtils.doLayout(allComps2, 2,
-                            GuiUtils.WT_NY,
-                            GuiUtils.WT_N), GuiUtils.doLayout(allComps3, 2,
-                                GuiUtils.WT_NY, GuiUtils.WT_N));
+                GuiUtils.vbox(new Component []
+                        {GuiUtils.doLayout(allComps0, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                         GuiUtils.doLayout(allComps1, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                         GuiUtils.doLayout(allComps2, 2, GuiUtils.WT_NY, GuiUtils.WT_N),
+                         GuiUtils.doLayout(allComps3, 2, GuiUtils.WT_NY, GuiUtils.WT_N)});
+                       //  GuiUtils.doLayout(allComps4, 2, GuiUtils.WT_NY, GuiUtils.WT_N)});
 
             advance = GuiUtils.top(imagePanel);
             boolean showMagSection = !getIsProgressiveResolution(); //prograssiveCbx1.isSelected();
@@ -1575,6 +1637,8 @@ public class AddeImageDataSelection {
                                  + 0.5);
             el[1][0] = (double) (el1[1][0] / Math.abs(getLineMagValue())
                                  + 0.5);
+            if(baseAnav == null)
+                return;
             try {
                 //AREACoordinateSystem macs = (AREACoordinateSystem)sampleProjection;
                 ll = baseAnav.toLatLon(el);
@@ -1757,6 +1821,7 @@ public class AddeImageDataSelection {
                 }
             }
 
+            dataSelection.putProperty("navType", urlInfo.getNavType());
 
         }
 
@@ -2068,7 +2133,7 @@ public class AddeImageDataSelection {
             display.getNavigatedPanel().addFocusListener(new FocusListener() {
                 @Override
                 public void focusGained(FocusEvent focusEvent) {
-                    System.err.println("Gain");
+                    // System.err.println("Gain");
                 }
 
                 @Override
@@ -2458,11 +2523,30 @@ public class AddeImageDataSelection {
                 latlon[0][0] = (float) gInfo.getMinLat();
                 float[][] lrLinEle   = baseAnav.toLinEle(latlon);
                 //int       displayNum = (int) rect.getWidth();
-                int lines  = (int) (lrLinEle[1][0] - ulLinEle[1][0])
-                             * Math.abs(lMag0)/Math.abs(lMag);
-                int elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
-                             * Math.abs(eMag0)/Math.abs(eMag);
+                int lines;
+                int elems;
+                if(ulLinEle[0][0] == ulLinEle[0][0] && lrLinEle[0][0] == lrLinEle[0][0]) {
+                    lines  = (int) (lrLinEle[1][0] - ulLinEle[1][0])
+                            * Math.abs(lMag0)/Math.abs(lMag);
+                    elems = (int) (lrLinEle[0][0] - ulLinEle[0][0])
+                            * Math.abs(eMag0)/Math.abs(eMag);
+                } else if(ulLinEle[0][0] == ulLinEle[0][0]) {
+                    lines  = (advancedPanel.maxLines - (int) (ulLinEle[1][0])
+                            * Math.abs(lMag0))/Math.abs(lMag);
+                    elems = (advancedPanel.maxEles - (int) (ulLinEle[0][0])
+                            * Math.abs(eMag0))/Math.abs(eMag);
+                } else if(lrLinEle[0][0] == lrLinEle[0][0]) {
+                    lines  = (int) (lrLinEle[1][0])
+                            * Math.abs(lMag0)/Math.abs(lMag);
+                    elems = (int) (lrLinEle[0][0])
+                            * Math.abs(eMag0)/Math.abs(eMag);
+                } else {
+                    lines = advancedPanel.maxLines;
+                    elems = advancedPanel.maxEles;
+                }
 
+                lines = Math.abs(lines);
+                elems = Math.abs(elems);
                 advancedPanel.setIsFromRegionUpdate(true);
 
                 // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
@@ -2484,7 +2568,11 @@ public class AddeImageDataSelection {
                     advancedPanel.setPlace("CENTER");
                 }
                 // set latlon coord
-                advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
+                if(baseAnav.toString().equals("LALO")) {
+                    advancedPanel.coordinateTypeComboBox.setSelectedIndex(1);
+                } else {
+                    advancedPanel.coordinateTypeComboBox.setSelectedIndex(0);
+                }
                 // update the size
                 if ( !isFull) {
                     advancedPanel.setNumLines(lines);

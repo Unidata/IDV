@@ -734,7 +734,7 @@ public class DataSelectionWidget {
                             GuiUtils.inset(
                                 GuiUtils.right(strideCbx),
                                 new Insets(0, 0, 5, 0)), strideComponent)));
-                selectionTab.add("Stride", strideTab);
+                selectionTab.add("Data Sampling", strideTab);
             }
         }
 
@@ -799,24 +799,6 @@ public class DataSelectionWidget {
                                   || chooserDoTimeMatching);
 
 
-        // check progressive resolution  for derived
-        ViewManager vm = idv.getViewManager();
-        boolean usePR = ((MapViewManager)vm).getUseProgressiveResolution();
-        dataSelection.putProperty(DataSelection.PROP_PROGRESSIVERESOLUTION, usePR);
-
-        /*
-        if (chooserDoTimeMatching) {
-            dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
-                                      true);
-        } else {
-            dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER,
-                                      timeOption.equals(USE_DRIVERTIMES));
-        }
-
-        dataSelection.putProperty(DataSelection.PROP_ASTIMEDRIVER,
-                timeOption.equals(AS_DRIVERTIMES));
-                */
-
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
             if (strideCbx.isSelected()) {
@@ -829,10 +811,9 @@ public class DataSelectionWidget {
             if (regionOption.equals(DataSelection.PROP_USEDEFAULTAREA)) {
                 geoSelection.setBoundingBox(null);
                 geoSelection.setUseFullBounds(false);
+                geoSelection.setUseViewBounds(false);
             }
         }
-
-        // dataSelection.setGeoSelection(geoSelection);
 
         Object[] levelRange = getSelectedLevelRange();
         if ((levelRange != null) && (levelRange.length > 0)) {
@@ -844,17 +825,18 @@ public class DataSelectionWidget {
                 }
             }
         }
+        
+        ViewManager vm = idv.getViewManager();
+        NavigatedDisplay navDisplay = null;
+        if (vm instanceof NavigatedViewManager) {
+            navDisplay = (NavigatedDisplay) vm.getMaster();
+        }
 
         if (dataSelectionComponents != null) {
             for (DataSelectionComponent comp : dataSelectionComponents) {
                 comp.applyToDataSelection(dataSelection);
             }
         }
-        // add PR logic here
-        NavigatedDisplay navDisplay =
-            (NavigatedDisplay) idv.getViewManager().getMaster();
-        Object isPR = dataSelection.getProperty(
-                          DataSelection.PROP_PROGRESSIVERESOLUTION);
 
         if (dataSelectionComponents != null && dataSelectionComponents.size() == 2 )
         {
@@ -862,12 +844,13 @@ public class DataSelectionWidget {
             regionOption =
                     dataSelection.getProperty(DataSelection.PROP_REGIONOPTION,
                             USE_DEFAULTREGION);
+            if (regionOption.equals(DataSelection.PROP_USEDISPLAYAREA) &&
+                    navDisplay != null){
+                geoSelection.setUseViewBounds(true);
+            } else {
+                geoSelection.setUseViewBounds(false);
+            }
         } else {
-            // anything other than adde image
-            //if(prograssiveCbx1 == null)
-            //    prograssiveCbx1 = geoSelectionPanel.getPrograssiveCbx();
-            isProgressiveResolution = getIsProgressiveResolution();
-            dataSelection.setGeoSelection(geoSelection);
             if (geoSelection != null) {
                 if (strideCbx.isSelected() ){
                     geoSelection.clearStride();
@@ -875,12 +858,15 @@ public class DataSelectionWidget {
                 if ( regionOption.equals(DataSelection.PROP_USEDEFAULTAREA)) {
                     geoSelection.setBoundingBox(null);
                     geoSelection.setUseFullBounds(false);
-                } else if(regionOption.equals(DataSelection.PROP_USEDISPLAYAREA)){
-                    Rectangle2D sbox = navDisplay.getScreenBounds();
-                    vm.setProjectionFromData(false);
+                    geoSelection.setUseViewBounds(false);
+                } else if (regionOption.equals(DataSelection.PROP_USEDISPLAYAREA) &&
+                		navDisplay != null){
                     try{
+                        vm.setProjectionFromData(false);
+                        Rectangle2D sbox = navDisplay.getScreenBounds();
                         Rectangle2D bbox = navDisplay.getLatLonBox();
                         geoSelection.setLatLonRect(bbox);
+                        geoSelection.setUseViewBounds(true);
                         dataSelection.setGeoSelection(geoSelection);
                         visad.georef.EarthLocation el = navDisplay.screenToEarthLocation(
                                 (int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
@@ -894,9 +880,10 @@ public class DataSelectionWidget {
                     }
                 }
             }
+            dataSelection.setGeoSelection(geoSelection);
             dataSelection.putProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION,
-                isProgressiveResolution);
+                getIsProgressiveResolution());
             dataSelection.putProperty(
                     DataSelection.PROP_REGIONOPTION,
                     regionOption);
@@ -908,15 +895,10 @@ public class DataSelectionWidget {
 
 
 
-        if (geoSelection != null) {
+        if (geoSelection != null && navDisplay != null) {
 
             Rectangle screenBoundRect = navDisplay.getScreenBounds();
             geoSelection.setScreenBound(screenBoundRect);
-            //geoSelection.setRubberBandBoxPoints(null);
-            //try {
-            //    geoSelection.setScreenLatLonRect(navDisplay.getLatLonRect());
-           // } catch (Exception e) {}
-
         }
 
 
@@ -940,7 +922,6 @@ public class DataSelectionWidget {
             usePR = mvm.getUseProgressiveResolution();
         }
         return usePR;
-        //return prograssiveCbx1.isSelected();
     }
 
 

@@ -200,12 +200,12 @@ You can specify  the type of algorithm you want to use for converting from press
 
 
 
-[ug::prefGroup View]
+[ug::prefGroup View id="viewP"]
 
 The <b>View</b> tab allows you to set preferences related to the
 main 3D map view window.
 
-[ht::cimg images/preferences/MainDisplay.gif {View Preferences}]
+[ht::cimg images/preferences/MainDisplay.gif {View Preferences} ]
 
 
 [ug::prefSubGroup Legends]
@@ -223,7 +223,7 @@ A 3D display can have a small overview map shown under the legend.
 Note: This is kind of flaky.
 
 
-[ug::prefSubGroup Display]
+[ug::prefSubGroup View]
 
 [ug::preference {Show Wireframe Box}]
 Toggles the  visibility of a 3D wireframe box around the data. This box 
@@ -268,6 +268,10 @@ display made in the IDV to snap the whole view window to the native projection o
 data. This can be undesirable if you are overlaying several kinds of
 some of which have differing projections.
 
+[ug::preference {Enable Adaptive Resolution}]
+When loading large datasets with this option enabled, the IDV calculates the
+resolution of the map view window, dynamically sets the data sampling, and loads sufficient data to generate
+the image.
 
 [ug::preference {Use 3D View}]
 Allows you to override the default 3D behavior of the IDV and use

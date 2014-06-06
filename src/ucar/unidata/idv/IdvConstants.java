@@ -595,6 +595,9 @@ public interface IdvConstants {
     /** IDV use time driver preference */
     public static final String PROP_USE_TIMEDRIVER = "idv.usetimedriver";
 
+    /** IDV use time driver preference */
+    public static final String PROP_USE_DISPLAYAREA = "idv.usedisplayarea";
+
     /** Preference to store what choosers to show */
     public static final String PROP_CHOOSERS = "idv.choosers";
 
