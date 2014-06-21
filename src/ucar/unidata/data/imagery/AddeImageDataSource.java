@@ -206,10 +206,10 @@ public class AddeImageDataSource extends ImageDataSource {
         if (getTmpPaths() != null) {  // zidv bundle
             return;
         }
-        String ver = IdvPersistenceManager.getBundleIdvVersion();
+        //String ver = IdvPersistenceManager.getBundleIdvVersion();
         // ver == null is quicklinks history
 
-        if (ver == null && (this.source == null) && (imageList != null)
+        if ((this.source == null) && (imageList != null)
                 && (imageList.size() > 0)) {
             List    descriptors = super.getDescriptors(super.findDataChoice(this.choiceName), null);
             AddeImageDescriptor desc1 =
@@ -321,8 +321,7 @@ public class AddeImageDataSource extends ImageDataSource {
         boolean      isProgressiveResolution = true;
         boolean fromBundle = getIdv().getStateManager().getProperty(
                                  IdvConstants.PROP_LOADINGXML, false);
-        boolean matchRegion = getIdv().getStateManager().getProperty(
-                IdvConstants.PROP_USE_DISPLAYAREA, false);
+
         String t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION,
                 DataSelection.PROP_USEDEFAULTAREA);
         String navType = subset.getProperty("navType", "X");
@@ -370,6 +369,9 @@ public class AddeImageDataSource extends ImageDataSource {
                                     Integer.toString(this.bandId.getBandNumber()));
                 }
                 this.descriptor = new AddeImageDescriptor(thisDir, null);
+                List<DataSelectionComponent> dataSelectionComponents =
+                        new ArrayList<DataSelectionComponent>();
+                initDataSelectionComponents(dataSelectionComponents, super.findDataChoice(this.choiceName) );
             }
 
             if (baseAnav == null) {
@@ -409,12 +411,14 @@ public class AddeImageDataSource extends ImageDataSource {
             subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION,
                                true);
 
-        if ( !isProgressiveResolution) {
-            dlMag =
-                addeImageDataSelection.getAdvancedPanel().getLineMagValue();
-            deMag =
-                addeImageDataSelection.getAdvancedPanel()
-                    .getElementMagValue();
+        if( fromBundle && !isProgressiveResolution){
+            dlMag = getLineMag();
+            deMag = getEleMag();
+            addeImageDataSelection.getAdvancedPanel().setLineMagSlider(dlMag);
+            addeImageDataSelection.getAdvancedPanel().setElementMagSlider(deMag);
+        } else if ( !isProgressiveResolution) {
+            dlMag = addeImageDataSelection.getAdvancedPanel().getLineMagValue();
+            deMag = addeImageDataSelection.getAdvancedPanel().getElementMagValue();
         }
 
 
@@ -609,6 +613,7 @@ public class AddeImageDataSource extends ImageDataSource {
        // if (isProgressiveResolution) {
         if (eleMag >= 1 || lineMag >= 1) {
             magValue = DataUtil.makeSamplingLabel(eleMag, lineMag, "pixel");
+            //System.out.println("newLine X newElement : " + lineMag + " "+ eleMag);
             //magValue = "Resolution: " + "-" + Integer.toString(lineMag)
             //           + " " + "-" + Integer.toString(eleMag);
          }
@@ -971,7 +976,7 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     public void reloadData() {
         super.reloadData();
-        if( addeImageDataSelection != null )
+        if( addeImageDataSelection != null && addeImageDataSelection.leMagPanel != null)
             addeImageDataSelection.advancedPanel.updateMagPanel();
     }
 
@@ -1522,8 +1527,8 @@ public class AddeImageDataSource extends ImageDataSource {
                     baseAnav = areaFile.getNavigation();
                     acs      = new AREACoordinateSystem(areaFile);
                 } catch (Exception e) {
-                    LogUtil.userErrorMessage(
-                        "Error in initDataSelectionComponents  e=" + e);
+                   // LogUtil.userErrorMessage(
+                   //     "Error in initDataSelectionComponents  e=" + e);
                 }
 
                 this.bandId = id;

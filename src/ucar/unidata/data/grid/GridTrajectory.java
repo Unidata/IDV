@@ -1065,7 +1065,7 @@ public class GridTrajectory {
 
                     FieldImpl ssample = GridUtil.sample(sFI, llp,
                                             Data.NEAREST_NEIGHBOR);
-                    Data srt   = ssample.getSample(0);
+                    Data srt   = ssample.getSample(timeStepIdx);
                     Real sreal = (srt instanceof RealTuple)
                                  ? (Real) ((RealTuple) srt).getComponent(0)
                                  : (Real) srt;
@@ -1074,7 +1074,7 @@ public class GridTrajectory {
 
                     FieldImpl usample = GridUtil.sample(uFI, llp,
                                             Data.NEAREST_NEIGHBOR);
-                    Data urt   = usample.getSample(0);
+                    Data urt   = usample.getSample(timeStepIdx);
                     Real ureal = (urt instanceof RealTuple)
                                  ? (Real) ((RealTuple) urt).getComponent(0)
                                  : (Real) urt;
@@ -1082,7 +1082,7 @@ public class GridTrajectory {
 
                     FieldImpl vsample = GridUtil.sample(vFI, llp,
                                             Data.NEAREST_NEIGHBOR);
-                    Data vrt   = vsample.getSample(0);
+                    Data vrt   = vsample.getSample(timeStepIdx);
                     Real vreal = (vrt instanceof RealTuple)
                                  ? (Real) ((RealTuple) vrt).getComponent(0)
                                  : (Real) vrt;
@@ -1099,12 +1099,10 @@ public class GridTrajectory {
 
 
                     float lat1 = (float) (lat
-                                          + f * ((v[timeStepIdx + 1]
-                                              + v[timeStepIdx]) * 0.5
+                                          + f * (v[timeStepIdx + 1]
                                                   * delt) / (radius + alt));
                     float lon1 = (float) (lon
-                                          + f * ((u[timeStepIdx + 1]
-                                              + u[timeStepIdx]) * 0.5
+                                          + f * (u[timeStepIdx + 1]
                                                   * delt) / (radius + alt));
                     float         alt1 = alt;
 
@@ -1385,7 +1383,7 @@ public class GridTrajectory {
                     EarthLocation el = new EarthLocationLite(lat0, lon0,
                                            alt0);
                     FieldImpl ssample = GridUtil.sample(sFI, el);
-                    Data      srt     = ssample.getSample(0);
+                    Data      srt     = ssample.getSample(timeStepIdx);
                     Real      sreal   = (srt instanceof RealTuple)
                                         ? (Real) ((RealTuple) srt)
                                             .getComponent(0)
@@ -1394,7 +1392,7 @@ public class GridTrajectory {
 
 
                     FieldImpl usample = GridUtil.sample(uFI, el);
-                    Data      urt     = usample.getSample(0);
+                    Data      urt     = usample.getSample(timeStepIdx);
                     Real      ureal   = (urt instanceof RealTuple)
                                         ? (Real) ((RealTuple) urt)
                                             .getComponent(0)
@@ -1402,7 +1400,7 @@ public class GridTrajectory {
                     u[timeStepIdx] = (float) ureal.getValue();
 
                     FieldImpl vsample = GridUtil.sample(vFI, el);
-                    Data      vrt     = vsample.getSample(0);
+                    Data      vrt     = vsample.getSample(timeStepIdx);
                     Real      vreal   = (vrt instanceof RealTuple)
                                         ? (Real) ((RealTuple) vrt)
                                             .getComponent(0)
@@ -1410,7 +1408,7 @@ public class GridTrajectory {
                     v[timeStepIdx] = (float) vreal.getValue();
 
                     FieldImpl wsample = GridUtil.sample(wFI, el);
-                    Data      wrt     = wsample.getSample(0);
+                    Data      wrt     = wsample.getSample(timeStepIdx);
                     Real      wreal   = (wrt instanceof RealTuple)
                                         ? (Real) ((RealTuple) wrt)
                                             .getComponent(0)
@@ -1428,7 +1426,7 @@ public class GridTrajectory {
                     float lon = trajInfo.lons[timeStepIdx + 1];
                     float alt = trajInfo.alts[timeStepIdx + 1];
 
-                    float lat1 = (float) (lat
+                 /*   float lat1 = (float) (lat
                                           + f * ((v[timeStepIdx + 1]
                                               + v[timeStepIdx]) * 0.5
                                                   * delt) / (radius + alt));
@@ -1439,7 +1437,16 @@ public class GridTrajectory {
                     float alt1 = (float) (alt
                                           + ((w[timeStepIdx + 1]
                                               + w[timeStepIdx]) * 0.5
-                                                  * delt));
+                                                  * delt));   */
+                    float lat1 = (float) (lat
+                            + f * (v[timeStepIdx + 1]
+                            * delt) / (radius + alt));
+                    float lon1 = (float) (lon
+                            + f * (u[timeStepIdx + 1]
+                            * delt) / (radius + alt));
+                    float alt1 = (float) (alt
+                            + (w[timeStepIdx + 1]
+                            * delt));
                     if (alt1 < 0) {
                         alt1 = 0;
                     }

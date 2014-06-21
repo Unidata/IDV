@@ -162,10 +162,14 @@ public class TimeLengthField {
         GuiUtils.setListData(signCbx, Misc.newList("+", "-"));
         if (showYearsFld) {
             yearsFld = new JTextField("", 4);
+            yearsFld.setHorizontalAlignment(JTextField.RIGHT);
         }
         daysFld    = new JTextField("", 3);
+        daysFld.setHorizontalAlignment(JTextField.RIGHT);
         hoursFld   = new JTextField("", 3);
+        hoursFld.setHorizontalAlignment(JTextField.RIGHT);
         minutesFld = new JTextField("", 3);
+        minutesFld.setHorizontalAlignment(JTextField.RIGHT);
         Font monoFont = Font.decode("monospaced");
         label = new JLabel(" ");
         label.setFont(monoFont);

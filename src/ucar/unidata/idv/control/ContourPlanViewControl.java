@@ -139,6 +139,7 @@ public class ContourPlanViewControl extends PlanViewControl {
                                           Double.NaN, Double.NaN);
             contourInfo.setIsFilled(true);
             contourInfo.setIsLabeled(false);
+            colorByMember = false;
             return contourInfo;
         }
         return null;
@@ -203,7 +204,7 @@ public class ContourPlanViewControl extends PlanViewControl {
      * @return  true if there are multiple fields
      */
     protected boolean haveMultipleFields() {
-        return super.haveMultipleFields() || (haveEnsemble && colorByMember);
+        return super.haveMultipleFields() || (haveEnsemble && colorByMember && !isColorFill);
     }
 
     /**
@@ -217,7 +218,7 @@ public class ContourPlanViewControl extends PlanViewControl {
             throws VisADException, RemoteException {
         super.getControlWidgets(controlWidgets);
 
-        if (haveEnsemble) {
+        if (haveEnsemble && !isColorFill) {
             JCheckBox toggle = new JCheckBox("Color by Member",
                                              colorByMember);
             toggle.addActionListener(new ActionListener() {
@@ -226,7 +227,7 @@ public class ContourPlanViewControl extends PlanViewControl {
                         colorByMember =
                             ((JCheckBox) e.getSource()).isSelected();
                         getContourDisplay().setColoredByAnother(
-                            haveMultipleFields());
+                                haveMultipleFields());
                         getContourDisplay().loadData(
                             getSliceForDisplay(getCurrentSlice()));
                     } catch (Exception ve) {

@@ -139,6 +139,9 @@ public class AddeImageDataSelection {
         //prograssiveCbx  = new JCheckBox("", usePR);
 
         try {
+            if(this.aAdapter == null && this.source != null){
+                this.aAdapter = new AreaAdapter(this.source, false);
+            }
             this.regionPanel = new AddeImagePreviewPanel(this);
         } catch (Exception e) {}
 
@@ -956,6 +959,10 @@ public class AddeImageDataSelection {
          * @param value _more_
          */
         public void setElementMagSlider(int value) {
+            if(this.elementMagSlider == null && urlInfo != null){
+                urlInfo.setElementMag(value);
+                return;
+            }
             this.elementMagSlider.setValue(value);
             this.elementMagLbl.setText(StringUtil.padLeft("" + value, 3));
             urlInfo.setElementMag(getElementMagValue());
@@ -967,6 +974,10 @@ public class AddeImageDataSelection {
          * @param value _more_
          */
         public void setLineMagSlider(int value) {
+            if(this.lineMagSlider == null && urlInfo != null){
+                urlInfo.setLineMag(value);
+                return;
+            }
             this.lineMagSlider.setValue(value);
             this.lineMagLbl.setText(StringUtil.padLeft("" + value, 3));
             urlInfo.setLineMag(getLineMagValue());
@@ -1626,6 +1637,8 @@ public class AddeImageDataSelection {
                                  + 0.5);
             el[1][0] = (double) (el1[1][0] / Math.abs(getLineMagValue())
                                  + 0.5);
+            if(baseAnav == null)
+                return;
             try {
                 //AREACoordinateSystem macs = (AREACoordinateSystem)sampleProjection;
                 ll = baseAnav.toLatLon(el);
@@ -2120,7 +2133,7 @@ public class AddeImageDataSelection {
             display.getNavigatedPanel().addFocusListener(new FocusListener() {
                 @Override
                 public void focusGained(FocusEvent focusEvent) {
-                    System.err.println("Gain");
+                    // System.err.println("Gain");
                 }
 
                 @Override

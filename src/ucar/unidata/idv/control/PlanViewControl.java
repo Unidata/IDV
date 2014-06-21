@@ -498,6 +498,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (haveMultipleFields()) {
             //If we have multiple fields then we want both the 
             //color unit and the display unit
+            if (shouldUseZPosition()) {
+                // for the ensemble and colorByMember but is 2D variable, we do need
+                // to add vertical position slider
+                addDisplayable(planDisplay, FLAG_ZPOSITION);
+            }
             addDisplayable(planDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
         } else {
             if (shouldShowLevelWidget()) {
@@ -722,11 +727,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         processRequestProperties();
 
-        DataChoice dc0 = null;
-        if (dataChoice instanceof DerivedDataChoice) {
-            dc0 = (DataChoice) ((DerivedDataChoice) dataChoice).getChoices().get(0);
-        } else {
-            dc0 = dataChoice;
+        DataChoice dc0 = dataChoice;
+
+        while (dc0 instanceof DerivedDataChoice) {
+            dc0 = (DataChoice) ((DerivedDataChoice) dc0).getChoices().get(0);
         }
 
         String magStr = (String) dc0.getProperty("MAG");
