@@ -21,19 +21,32 @@
 package ucar.unidata.idv;
 
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LayoutUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.xml.XmlEncoder;
+import ucar.unidata.xml.XmlUtil;
+
+
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,15 +61,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LayoutUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.xml.XmlEncoder;
-import ucar.unidata.xml.XmlUtil;
 
 
 /**
@@ -105,14 +109,14 @@ public class IdvCommandLinePrefs {
         final StringBuilder sb = new StringBuilder();
 
         try {
-            final Map<Object, Object> userPrefMap   = getPrefMap(args);
-            String                    oldVersionKey = "idv_old_version_"
+            final Map<Object, Object> userPrefMap = getPrefMap(args);
+            String oldVersionKey = "idv_old_version_"
                                    + getIDVVersion().stringForShell() + "_"
                                    + currentIDVVersion.stringForShell()
                                    + "_dontwarn";
 
-            Object  oldVersionDontWarn = userPrefMap.get(oldVersionKey);
-            boolean dontShowOldWarn    =
+            Object oldVersionDontWarn = userPrefMap.get(oldVersionKey);
+            boolean dontShowOldWarn =
                 Boolean.parseBoolean((oldVersionDontWarn == null)
                                      ? false + ""
                                      : oldVersionDontWarn.toString());
@@ -134,33 +138,37 @@ public class IdvCommandLinePrefs {
             if (dontShowOldWarnRsp) {
                 final File f = new File(getPreferences(args));
                 if (f.exists()) {
-					Element root = XmlUtil.getRoot(f.getPath(), XmlUtil.class);
-					Document document = root.getOwnerDocument();
+                    Element root = XmlUtil.getRoot(f.getPath(),
+                                       XmlUtil.class);
+                    Document document = root.getOwnerDocument();
 
-					///Define the method element from the ground up.
-					XmlEncoder xmlEncoder = new XmlEncoder();
-					final Element warn = xmlEncoder.createElement(new Boolean(
-							dontShowOldWarn));
-					final Element oldVersion = xmlEncoder.createPrimitiveElement(
-							XmlEncoder.NAME_STRING, oldVersionKey);
+                    ///Define the method element from the ground up.
+                    XmlEncoder xmlEncoder = new XmlEncoder();
+                    final Element warn = xmlEncoder.createElement(
+                                             new Boolean(dontShowOldWarn));
+                    final Element oldVersion =
+                        xmlEncoder.createPrimitiveElement(
+                            XmlEncoder.NAME_STRING, oldVersionKey);
 
-					Element methodElement = xmlEncoder.createMethodElement(
-							XmlEncoder.METHOD_PUT, new ArrayList<Element>() {
-								{
-									add(oldVersion);
-									add(warn);
-								}
-							});
-					
-					//Totally preserve existing XML except appending "methodElement"
-					root.appendChild(document.importNode(methodElement, true));
+                    Element methodElement =
+                        xmlEncoder.createMethodElement(XmlEncoder.METHOD_PUT,
+                            new ArrayList<Element>() {
+                        {
+                            add(oldVersion);
+                            add(warn);
+                        }
+                    });
 
-					BufferedWriter writer = new BufferedWriter(
-							new FileWriter(f));
+                    //Totally preserve existing XML except appending "methodElement"
+                    root.appendChild(document.importNode(methodElement,
+                            true));
 
-					writer.write(XmlUtil.toString(root, true));
+                    BufferedWriter writer =
+                        new BufferedWriter(new FileWriter(f));
 
-					writer.close();
+                    writer.write(XmlUtil.toString(root, true));
+
+                    writer.close();
                 }
             }
         } catch (Exception ignore) {
@@ -245,7 +253,8 @@ public class IdvCommandLinePrefs {
     private static Map<Object, Object> getPrefMap(String... args)
             throws IOException, Exception {
         final Map<Object, Object> userPrefMap = new HashMap<Object, Object>();
-        final File                f           = new File(getPreferences(args));
+        final File                f           =
+            new File(getPreferences(args));
 
         if (f.exists()) {
             userPrefMap.putAll(
@@ -354,9 +363,9 @@ public class IdvCommandLinePrefs {
         StringBuilder response = new StringBuilder();
 
         try {
-            URL            website    = new URL(IDV_VERSION_URL);
-            URLConnection  connection = website.openConnection();
-            BufferedReader in         = new BufferedReader(
+            URL           website    = new URL(IDV_VERSION_URL);
+            URLConnection connection = website.openConnection();
+            BufferedReader in = new BufferedReader(
                                     new InputStreamReader(
                                         connection.getInputStream()));
 
