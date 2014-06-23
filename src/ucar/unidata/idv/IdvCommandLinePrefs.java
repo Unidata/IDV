@@ -116,8 +116,9 @@ public class IdvCommandLinePrefs {
                 Boolean.parseBoolean((oldVersionDontWarn == null)
                                      ? false + ""
                                      : oldVersionDontWarn.toString());
+            boolean dontShowOldWarnRsp = false;
             if (isIDVold() && !dontShowOldWarn) {
-                dontShowOldWarn = showOldVersionMessage();
+                dontShowOldWarnRsp = showOldVersionMessage();
             }
 
             for (Map.Entry<Object, Object> e : userPrefMap.entrySet()) {
@@ -130,7 +131,7 @@ public class IdvCommandLinePrefs {
                 sb.append(s);
             }
             //User said not to warn so must persist this information.
-            if (dontShowOldWarn) {
+            if (dontShowOldWarnRsp) {
                 final File f = new File(getPreferences(args));
                 if (f.exists()) {
 					Element root = XmlUtil.getRoot(f.getPath(), XmlUtil.class);
