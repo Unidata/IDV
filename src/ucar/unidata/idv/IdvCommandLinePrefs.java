@@ -21,31 +21,21 @@
 package ucar.unidata.idv;
 
 
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LayoutUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.xml.XmlEncoder;
-import ucar.unidata.xml.XmlUtil;
-
-
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -58,6 +48,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LayoutUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.xml.XmlEncoder;
+import ucar.unidata.xml.XmlUtil;
 
 
 /**
@@ -134,20 +133,33 @@ public class IdvCommandLinePrefs {
             if (dontShowOldWarn) {
                 final File f = new File(getPreferences(args));
                 if (f.exists()) {
-                    XmlEncoder                xmlEncoder = new XmlEncoder();
-                    Hashtable<Object, Object> ht         =
-                        (Hashtable<Object,
-                                   Object>) (new XmlEncoder().createObject(
-                                       XmlUtil.getRoot(
-                                           f.getPath(), XmlUtil.class)));
-                    ht.put(oldVersionKey, dontShowOldWarn);
-                    BufferedWriter writer =
-                        new BufferedWriter(new FileWriter(f));
+					Element root = XmlUtil.getRoot(f.getPath(), XmlUtil.class);
+					Document document = root.getOwnerDocument();
 
-                    writer.write(XmlUtil.toString(xmlEncoder.toElement(ht),
-                            true));
+					///Define the method element from the ground up.
+					XmlEncoder xmlEncoder = new XmlEncoder();
+					final Element warn = xmlEncoder.createElement(new Boolean(
+							dontShowOldWarn));
+					final Element oldVersion = xmlEncoder.createPrimitiveElement(
+							XmlEncoder.NAME_STRING, oldVersionKey);
 
-                    writer.close();
+					Element methodElement = xmlEncoder.createMethodElement(
+							XmlEncoder.METHOD_PUT, new ArrayList<Element>() {
+								{
+									add(oldVersion);
+									add(warn);
+								}
+							});
+					
+					//Totally preserve existing XML except appending "methodElement"
+					root.appendChild(document.importNode(methodElement, true));
+
+					BufferedWriter writer = new BufferedWriter(
+							new FileWriter(f));
+
+					writer.write(XmlUtil.toString(root, true));
+
+					writer.close();
                 }
             }
         } catch (Exception ignore) {
