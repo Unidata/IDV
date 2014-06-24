@@ -1184,8 +1184,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     grabImageAndBlock();
                 }
             } else {
-                if(animationResetCbx.isSelected())
-                    getAnimationWidget().gotoBeginning();
+                ///if(animationResetCbx.isSelected())
+                // getAnimationWidget().gotoBeginning();
 
                 int start = getAnimation().getCurrent();
 
