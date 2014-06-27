@@ -20,25 +20,34 @@
 
 package ucar.unidata.util;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
-import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 
-import java.math.*;
-
-import java.net.*;
-
-import java.security.*;
+import java.security.MessageDigest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
-import java.util.zip.*;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * A set of io related utilities
@@ -552,7 +561,7 @@ public class IOUtil {
      * @return How may bytes were written
      * @throws IOException On badness
      */
-    public static int writeTo(InputStream from, OutputStream to)
+    public static long writeTo(InputStream from, OutputStream to)
             throws IOException {
         return writeTo(from, to, null, 0);
     }
@@ -598,15 +607,15 @@ public class IOUtil {
      *
      * @throws IOException  problem writing to file.
      */
-    public static int writeTo(URL from, File file, Object loadId)
+    public static long writeTo(URL from, File file, Object loadId)
             throws IOException {
         URLConnection    connection = from.openConnection();
         InputStream      is         = connection.getInputStream();
         int              length     = connection.getContentLength();
-        int              numBytes   = -1;
+        long             numBytes   = -1;
         FileOutputStream fos        = new FileOutputStream(file);
         try {
-            int result = writeTo(is, fos, loadId, length);
+            long result = writeTo(is, fos, loadId, length);
             numBytes = result;
         } finally {
             close(fos);
@@ -636,12 +645,12 @@ public class IOUtil {
      *
      * @throws IOException On badness
      */
-    public static int writeTo(InputStream from, OutputStream to,
-                              Object loadId, int length)
+    public static long writeTo(InputStream from, OutputStream to,
+                              Object loadId, long length)
             throws IOException {
         from = new BufferedInputStream(from, 100000);
         byte[] content = new byte[100000];
-        int    total   = 0;
+        long    total   = 0;
         while (true) {
             int howMany = from.read(content);
             if (howMany <= 0) {
@@ -804,7 +813,7 @@ public class IOUtil {
 
             files.add(path);
             OutputStream to    = new FileOutputStream(path);
-            int          bytes = writeTo(from, to, loadId, length);
+            long          bytes = writeTo(from, to, loadId, length);
             try {
                 from.close();
             } catch (Exception exc) {}
