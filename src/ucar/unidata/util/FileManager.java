@@ -1,26 +1,22 @@
 /*
- * $Id: FileManager.java,v 1.22 2007/08/13 18:38:39 jeffmc Exp $
- *
- * Copyright  1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.util;
 
@@ -196,7 +192,7 @@ public class FileManager {
             System.out.println("OS ==  " + osName + " def =" + defDir);
         }
         boolean isWindose = (0 <= osName.indexOf("Windows"));
-        boolean isMac = (System.getProperty("mrj.version") != null);
+        boolean isMac     = (System.getProperty("mrj.version") != null);
 
         if (isWindose) {
             defaultDirs.add("C:/");
@@ -952,6 +948,8 @@ public class FileManager {
     /** Suffix for JAR files */
     public static final String SUFFIX_JAR = ".jar";
 
+    /** Suffix for JAR files */
+    public static final String SUFFIX_ZIP = ".zip";
 
     /** null accessory */
     private static final JComponent NULL_ACCESSORY = null;
@@ -1030,7 +1028,10 @@ public class FileManager {
     public static final PatternFileFilter FILTER_ANIMATEDGIF =
         new PatternFileFilter(".+\\.gif", "Animated GIF (*.gif)", SUFFIX_GIF);
 
-
+    /** Filter for ZIP files */
+    public static final PatternFileFilter FILTER_ZIP =
+        new PatternFileFilter(".+\\.zip", "Compressed ZIP (*.zip)",
+                              SUFFIX_ZIP);
 
 
     /** Filter for log files */
@@ -1504,8 +1505,8 @@ public class FileManager {
                                   (buttonText != null)
                                   ? buttonText
                                   : (forWrite
-                                     ?"Save"
-                                     :"Open"),includeUrl);
+                                     ? "Save"
+                                     : "Open"), includeUrl);
 
 
             if (filename == null) {
@@ -1581,10 +1582,10 @@ public class FileManager {
      */
     public static JComponent makeDirectoryHistoryComponent(
             final JFileChooser fileChooser, boolean includeLabel) {
-        final JButton goToBtn =
-            new JButton(
-                "",
-                GuiUtils.getImageIcon("/auxdata/ui/icons/folder_go.png"));
+        final JButton goToBtn = new JButton(
+                                    "",
+                                    GuiUtils.getImageIcon(
+                                        "/auxdata/ui/icons/folder_go.png"));
         goToBtn.setContentAreaFilled(false);
         goToBtn.setMargin(new Insets(1, 1, 1, 1));
         //        goToBtn.setBorder(BorderFactory.createEtchedBorder());
@@ -1604,4 +1605,3 @@ public class FileManager {
     }
 
 }
-
