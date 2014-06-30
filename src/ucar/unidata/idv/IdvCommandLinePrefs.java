@@ -166,8 +166,9 @@ public class IdvCommandLinePrefs {
                     BufferedWriter writer =
                         new BufferedWriter(new FileWriter(f));
 
-                    writer.write(XmlUtil.toString(root, true));
-
+                    //simply, regex to get rid of empty lines
+                    //http://stackoverflow.com/a/4123485/32174
+                    writer.write(XmlUtil.toString(root, true).replaceAll("(?m)^[ \\t]*\\r?\\n", ""));
                     writer.close();
                 }
             }
