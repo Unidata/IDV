@@ -204,7 +204,8 @@ public class ContourPlanViewControl extends PlanViewControl {
      * @return  true if there are multiple fields
      */
     protected boolean haveMultipleFields() {
-        return super.haveMultipleFields() || (haveEnsemble && colorByMember && !isColorFill);
+        return super.haveMultipleFields()
+               || (haveEnsemble && colorByMember && !isColorFill);
     }
 
     /**
@@ -227,7 +228,7 @@ public class ContourPlanViewControl extends PlanViewControl {
                         colorByMember =
                             ((JCheckBox) e.getSource()).isSelected();
                         getContourDisplay().setColoredByAnother(
-                                haveMultipleFields());
+                            haveMultipleFields());
                         getContourDisplay().loadData(
                             getSliceForDisplay(getCurrentSlice()));
                     } catch (Exception ve) {
@@ -264,7 +265,11 @@ public class ContourPlanViewControl extends PlanViewControl {
      */
     protected String getColorParamName() {
         if (haveEnsemble) {
-            return GridUtil.ENSEMBLE_TYPE.getName();
+            if (isColorFill) {
+                return paramName;
+            } else {
+                return GridUtil.ENSEMBLE_TYPE.getName();
+            }
         } else if (haveMultipleFields() && (getGridDataInstance() != null)) {
             return getGridDataInstance().getDataChoice().getIndexedName(
                 getColorRangeIndex());
