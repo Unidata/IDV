@@ -5,7 +5,7 @@ def ens_savg(grid):
    return GridMath.averageOverMembers(grid)
 
 def ens_ssprd(grid):
-   """ basic ensemble average """
+   """ standard deviation of all members """
    return GridMath.ensembleStandardDeviation(grid)
 
 def ens_smax(grid):
