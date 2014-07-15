@@ -2823,12 +2823,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         getInitialBooleanProperties(props);
 
-        StateManager   stateManager = getStateManager();
-        XmlObjectStore store        = getStore();
-
         if (booleanPropertiesForPersistence != null) {
+
             booleanPropertiesForPersistence =
-                stateManager.processPropertyTable(
+                StateManager.processPropertyTable(
                     booleanPropertiesForPersistence);
         }
 
