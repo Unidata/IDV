@@ -844,11 +844,18 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @return true if successful
      */
     public boolean doApplyProperties() {
+    	
         if ( !super.doApplyProperties()) {
             return false;
         }
         if (crossSectionView != null) {
-            return crossSectionView.applyProperties();
+        	// TJJ May 2014
+        	// This method can be called before the props dialog has been instantiated
+        	// e.g. when changing display units
+        	// If so, skip applyProperties on the view, or will get NPEs on components
+        	if (crossSectionView.isPropsComponentInstantiated()) {
+        		return crossSectionView.applyProperties();
+        	}
         }
         return true;
     }
