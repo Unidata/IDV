@@ -418,7 +418,7 @@ def zsum(S):
   """ Sum across the levels of a grid at all points
   <div class=jython>
       ZSUM (S) = ( S (Z1) + S (Z2) + ... + S (KZD) )
-                 KYD = number of levels
+                 KZD = number of levels
                  ZSUM for a vertical column is stored at every point
   </div>
   """
@@ -609,7 +609,7 @@ def vadd(V1,V2):
   return add(V1,V2)
 
 def vecn(S1,S2):
-  """ Make a true nort vector from two components 
+  """ Make a true north vector from two components 
   <div class=jython>
       VECN ( S1, S2 ) = [ S1, S2 ]
   </div>
