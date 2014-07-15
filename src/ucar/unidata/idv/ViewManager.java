@@ -2924,9 +2924,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     protected BooleanProperty getBooleanProperty(String propertyId,
             boolean dflt) {
-        if (booleanPropertyMap.size() == 0) {
-            initBooleanProperties();
-        }
+    	
+    	// avoid unpersistence order inconsistency bug, we have seen NPEs 
+    	// here because the Map is sometimes instantiated before the IDV ref!
+    	if (getIdv() != null) {
+    		if (booleanPropertyMap.size() == 0) {
+    			initBooleanProperties();
+    		}
+    	}
 
         BooleanProperty bp =
             (BooleanProperty) booleanPropertyMap.get(propertyId);
