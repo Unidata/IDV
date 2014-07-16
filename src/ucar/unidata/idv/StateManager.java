@@ -214,7 +214,7 @@ public class StateManager extends IdvManager {
      *
      * @return The converted table
      */
-    protected Hashtable processPropertyTable(Hashtable newTable) {
+    protected static Hashtable processPropertyTable(Hashtable newTable) {
         Hashtable processed = new Hashtable();
         for (Enumeration keys = newTable.keys(); keys.hasMoreElements(); ) {
             String key   = (String) keys.nextElement();
