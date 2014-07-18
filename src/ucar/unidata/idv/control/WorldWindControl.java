@@ -30,7 +30,6 @@ import ucar.unidata.data.DataInstance;
 
 import ucar.unidata.geoloc.Bearing;
 
-import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.gis.SpatialGrid;
 import ucar.unidata.gis.WorldWindReader;
 
@@ -265,7 +264,6 @@ public class WorldWindControl extends StationLocationControl {
         try {
             WorldWindReader    reader      = new WorldWindReader();
             Rectangle2D.Double rect = getNavigatedDisplay().getLatLonBox();
-            LatLonRect llrect = getNavigatedDisplay().getLatLonRect();
             List               layersToUse = new ArrayList();
             for (int i = 0; i < layers.size(); i++) {
                 Layer layer = (Layer) layers.get(i);
@@ -298,8 +296,8 @@ public class WorldWindControl extends StationLocationControl {
                 }
                 for (int featureIdx = 0; featureIdx < features.names.length;
                         featureIdx++) {
-                    if (llrect.contains(features.lats[featureIdx],
-                                      features.lons[featureIdx])) {
+                    if (rect.contains(features.lons[featureIdx],
+                                      features.lats[featureIdx])) {
                         String name = new String(features.names[featureIdx]);
                         if ( !onlyShowVisible
                                 && (seenLocations.get(name) != null)) {
