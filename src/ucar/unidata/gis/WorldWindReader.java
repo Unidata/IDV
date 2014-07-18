@@ -66,7 +66,7 @@ public class WorldWindReader {
      */
     public List findWwps(List wwps, Rectangle2D.Double rect) {
         List   names  = new ArrayList();
-        double height = Math.min(180.0, rect.getHeight());
+        double height = Math.min(180.0, Math.abs(rect.getHeight()));
         for (int i = 0; i < wwps.size(); i++) {
             Object[] a     = (Object[]) wwps.get(i);
             double[] range = (double[]) a[1];
@@ -144,7 +144,7 @@ public class WorldWindReader {
             //            System.err.println ("name=" + name);
             entries.add(new Object[]{ name,
                                       new double[]{ minRange, maxRange },
-                                      new Rectangle2D.Double(lon1, lat2,
+                                      new Rectangle2D.Double(lon1, lat1,
                                       lon2 - lon1, lat2 - lat1) });
         }
         return entries;

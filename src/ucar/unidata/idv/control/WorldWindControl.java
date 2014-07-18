@@ -21,77 +21,30 @@
 package ucar.unidata.idv.control;
 
 
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import org.w3c.dom.Element;
 
-import ucar.unidata.collab.Sharable;
-
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-
-import ucar.unidata.geoloc.Bearing;
-
-import ucar.unidata.gis.SpatialGrid;
 import ucar.unidata.gis.WorldWindReader;
-
-
-import ucar.unidata.idv.DisplayConventions;
-
-
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
-import ucar.unidata.ui.symbol.*;
-
 import ucar.unidata.util.FileManager;
-
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
-
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
-
-import ucar.visad.display.*;
-
-import ucar.visad.display.CompositeDisplayable;
-import ucar.visad.display.StationLocationDisplayable;
-import ucar.visad.display.StationModelDisplayable;
-
-
-import visad.*;
-
-
-import visad.georef.*;
-
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocation;
-import visad.georef.LatLonPoint;
-import visad.georef.NamedLocation;
-import visad.georef.NamedLocationTuple;
-
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
-
-
-import java.io.File;
-
-import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.border.*;
+import ucar.visad.display.PointProbe;
+import visad.CommonUnit;
+import visad.VisADException;
 
 
 

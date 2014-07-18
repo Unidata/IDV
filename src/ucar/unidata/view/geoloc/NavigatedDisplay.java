@@ -1704,7 +1704,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
         double wwidth = right - left;
         if(wwidth >= 360)
             wwidth = 359.9;
-        return new Rectangle2D.Double(left, top, wwidth,
+        return new Rectangle2D.Double(left, bottom, wwidth,
                                       top - bottom);
     }
 

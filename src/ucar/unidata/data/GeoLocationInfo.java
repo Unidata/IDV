@@ -79,7 +79,7 @@ public class GeoLocationInfo {
 
 
     public GeoLocationInfo(Rectangle2D rect) { 
-	this(rect.getY(), rect.getX(), rect.getY()-rect.getHeight(),
+	this(rect.getY()+rect.getHeight(), rect.getX(), rect.getY(),
 	     rect.getX()+rect.getWidth());
     }
 

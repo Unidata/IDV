@@ -3451,7 +3451,7 @@ public class StationModelControl extends ObsDisplayControl {
 
             bounds =
                 new LinearLatLonSet(RealTupleType.LatitudeLongitudeTuple,
-                                    rect.y, rect.y - rect.height, 11, rect.x,
+                                    rect.y, rect.y + rect.height, 11, rect.x,
                                     rect.x + rect.width, 11);
 
         } catch (Exception e) {
