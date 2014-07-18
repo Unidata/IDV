@@ -81,7 +81,7 @@
       <description>Zip file of all Java Archive (JAR) files necessary to 
                    run the IDV applications. See README.idv_jars included 
                    in the ZIP file for more information.
-       <![CDATA[<a href="ftp/idv_jars_%version%.zip.MD5">MD5</a>]]>
+       <!--[CDATA[<a href="ftp/idv_jars_%version%.zip.MD5">MD5</a>]]-->
        </description>
    </file>
 
@@ -91,7 +91,7 @@
        <![CDATA[<a href="%doc_path%/docs/userguide/misc/SourceBuild.html" target="_newwindow">
         Building the IDV from Source</a>]]> section of the User's 
         Guide for more information.
-        <![CDATA[<a href="ftp/idv_src_%version%.jar.MD5">MD5</a>]]>
+        <!--[CDATA[<a href="ftp/idv_src_%version%.jar.MD5">MD5</a>]]-->
        </description>
    </file>
 
@@ -100,7 +100,7 @@
     Zip file of the IDV User's Guide.  Available on-line
     <![CDATA[<a href="%doc_path%/docs/userguide/" target="_newwindow">
     here</a>]]>.
-    <![CDATA[<a href="ftp/idv_userguide_%version%.zip.MD5">MD5</a>]]>
+    <!--[CDATA[<a href="ftp/idv_userguide_%version%.zip.MD5">MD5</a>]]-->
     </description>
    </file>
 
@@ -109,7 +109,7 @@
       Available on-line 
       <![CDATA[<a href="%doc_path%/docs/javadoc" target="_newwindow">
       here.</a>]]>
-      <![CDATA[<a href="ftp/idv_javadoc_%version%.jar.MD5">MD5</a>]]>
+      <!--[CDATA[<a href="ftp/idv_javadoc_%version%.jar.MD5">MD5</a>]]-->
       </description>
    </file>
 
