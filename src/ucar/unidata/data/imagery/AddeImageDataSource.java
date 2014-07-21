@@ -975,9 +975,13 @@ public class AddeImageDataSource extends ImageDataSource {
      * _more_
      */
     public void reloadData() {
-        super.reloadData();
-        if( addeImageDataSelection != null && addeImageDataSelection.leMagPanel != null)
+        //super.reloadData();
+        if( addeImageDataSelection != null && addeImageDataSelection.leMagPanel != null) {
             addeImageDataSelection.advancedPanel.updateMagPanel();
+            addeImageDataSelection.advancedPanel.setLineMagSlider(lineMag);
+            addeImageDataSelection.advancedPanel.setElementMagSlider(eleMag);
+        }
+        super.reloadData();
     }
 
     /**
