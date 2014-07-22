@@ -579,7 +579,10 @@ public class AddeImageDataSource extends ImageDataSource {
                         } catch (Exception e) {}
                     } else {
                         LatLonRect bbox = mapInfo.getLatLonRect().intersect(
-                                              ginfo.getLatLonRect());
+                                ginfo.getLatLonRect());
+                        if(mapInfo.getLatLonRect().containedIn(ginfo.getLatLonRect()))
+                            bbox = mapInfo.getLatLonRect();
+
                         if (bbox == null) {
                             bbox = mapInfo.getLatLonRect();
                         } else {
