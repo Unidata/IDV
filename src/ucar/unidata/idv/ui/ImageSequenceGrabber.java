@@ -2469,7 +2469,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             sb.append("<entry fromdate=\"" + time.toString() + "\" id=\"imageloopParent\" name=\"" + pName + "\"  type=\"media_imageloop\">\n");
             sb.append("</entry>\n");
 
-
+            int idx = 0;
             for (ImageWrapper imageWrapper : images) {
 
                 zos.putNextEntry(
@@ -2486,9 +2486,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
                 DateTime        dttm   = imageWrapper.getDttm();
                 GeoLocationInfo bounds = imageWrapper.getBounds();
+                String         nameStr = "image_" + idx;
 
-                sb.append("<entry fromdate=\"" + dttm.toString() + "\" file=\""+ tail + "\" parent=\"imageloopParent\" type=\"file\">\n");
+                sb.append("<entry fromdate=\"" + dttm.toString() + "\" file=\""+ tail + "\" name=\"" + nameStr +
+                                               "\" parent=\"imageloopParent\" type=\"file\">\n");
                 sb.append("</entry>\n");
+                idx++;
             }
 
             sb.append("</entries>\n");
