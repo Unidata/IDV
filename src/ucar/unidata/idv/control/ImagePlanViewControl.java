@@ -132,9 +132,9 @@ public class ImagePlanViewControl extends PlanViewControl {
         boolean fromBundle = getIdv().getStateManager().getProperty(
                                  IdvConstants.PROP_LOADINGXML, false);
         if (fromBundle) {
-            if (descripters != null) {
-                dataChoice.setObjectProperty("descriptors", descripters);
-            }
+            //if (descripters != null) {
+             //   dataChoice.setObjectProperty("descriptors", descripters);
+            //}
             boolean mdr = getMatchDisplayRegion();
             dataChoice.setProperty("MatchDisplayRegion", mdr);
             boolean result = super.setData(dataChoice);
@@ -160,7 +160,7 @@ public class ImagePlanViewControl extends PlanViewControl {
             }
         }
         //save imagelist
-        descripters = getImageDescriptors(dataChoice);
+        //descripters = getImageDescriptors(dataChoice);
         return result;
 
     }
@@ -173,7 +173,7 @@ public class ImagePlanViewControl extends PlanViewControl {
      *
      * @return _more_
      */
-    protected List getImageDescriptors(DataChoice dc) {
+    /* protected List getImageDescriptors(DataChoice dc) {
         List dataSources = new ArrayList();
 
         dc.getDataSources(dataSources);
@@ -183,7 +183,7 @@ public class ImagePlanViewControl extends PlanViewControl {
         AddeImageDataSource aids = (AddeImageDataSource) dataSources.get(0);
 
         return aids.getDescriptorsToUse();
-    }
+    } */
 
     /**
      * Get the initial color table for the data
