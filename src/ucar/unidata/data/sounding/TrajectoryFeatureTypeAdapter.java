@@ -17,61 +17,54 @@
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 package ucar.unidata.data.sounding;
 
 
 import ucar.nc2.constants.FeatureType;
-
 import ucar.nc2.dods.DODSNetcdfFile;
-import ucar.nc2.ft.*;
+import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
+import ucar.nc2.ft.FeatureDatasetPoint;
+import ucar.nc2.ft.ProfileFeatureCollection;
+import ucar.nc2.ft.TrajectoryFeatureCollection;
 
 import ucar.unidata.data.BadDataException;
 
 import visad.Data;
 
-import java.util.Formatter;
 
+import java.util.Formatter;
 import java.util.Hashtable;
 import java.util.List;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: yuanho
- * Date: Oct 5, 2009
- * Time: 2:44:32 PM
- * To change this template use File | Settings | File Templates.
+ * The Class TrajectoryFeatureTypeAdapter.
  */
 public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
 
 
     /**
-     * Construct a new track from the filename
+     * Construct a new track from the filename.
      *
-     *
-     * @param dataSource _more_
-     * @param filename  location of file
-     * @param pointDataFilter _more_
-     * @param stride _more_
-     * @param lastNMinutes _more_
-     *
-     * @throws Exception    On badness
      */
     //    public CdmTrackAdapter(String filename) throws Exception {
     //        super(filename);
     //    }
     private boolean isCosmic = false;
+
+    /** The is profile. */
     private boolean isProfile = false;
+
     /**
-     * Construct a new track from the filename
-     *
+     * Construct a new track from the filename.
      *
      * @param dataSource _more_
      * @param filename  location of file
      * @param pointDataFilter Filters the variables to use
      * @param stride The stride
      * @param lastNMinutes use the last N minutes
-     *
      * @throws Exception    On badness
      */
     public TrajectoryFeatureTypeAdapter(TrackDataSource dataSource,
@@ -85,13 +78,14 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
         Formatter log = new Formatter();
         FeatureDatasetPoint dataset =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
-                FeatureType.TRAJECTORY, DODSNetcdfFile.canonicalURL(filename), null, log);
-        if(dataset == null){
-            dataset =
-                    (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
-                            FeatureType.PROFILE, filename, null, log);
-            if(dataset != null)
+                FeatureType.TRAJECTORY,
+                DODSNetcdfFile.canonicalURL(filename), null, log);
+        if (dataset == null) {
+            dataset = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+                FeatureType.PROFILE, filename, null, log);
+            if (dataset != null) {
                 isProfile = true;
+            }
         }
         String imp = dataset.getImplementationName();
         if (dataset == null) {
@@ -102,9 +96,9 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
             dataset.getPointFeatureCollectionList();
         FeatureCollection           fc  = fcList.get(0);
         TrajectoryFeatureCollection tfc = null;
-        ProfileFeatureCollection pfc = null;
+        ProfileFeatureCollection    pfc = null;
 
-        if(!isProfile) {
+        if ( !isProfile) {
             tfc = (TrajectoryFeatureCollection) fc;
             tfc.resetIteration();
         } else {
@@ -118,10 +112,11 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
             isCosmic = true;
             addTrackInfo(new CosmicTrajectoryFeatureTypeInfo(this, dataset,
                     tfc));
-        } /*else if (isProfile){
-            addTrackInfo(new CDMProfileFeatureTypeInfo(this, dataset,
-                    pfc));
-        } */ else {
+        }  /*else if (isProfile){
+             addTrackInfo(new CDMProfileFeatureTypeInfo(this, dataset,
+                     pfc));
+         } */
+        else {
             addTrackInfo(new CDMTrajectoryFeatureTypeInfo(this, dataset,
                     tfc));
         }
@@ -130,27 +125,27 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
     }
 
     /**
-     * _more_
+     * Sets the checks if is cosmic.
      *
-     * @param isC _more_
+     * @param isC the new checks if is cosmic
      */
     public void setIsCosmic(boolean isC) {
         this.isCosmic = isC;
     }
 
     /**
-     * _more_
+     * Gets the checks if is cosmic.
      *
-     * @return _more_
+     * @return the checks if is cosmic
      */
     public boolean getIsCosmic() {
         return isCosmic;
     }
 
     /**
-     * _more_
+     * Checks if is cosmic.
      *
-     * @return _more_
+     * @return true, if is cosmic
      */
     public boolean isCosmic() {
         return isCosmic;
