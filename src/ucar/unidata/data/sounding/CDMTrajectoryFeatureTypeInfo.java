@@ -28,6 +28,7 @@ import ucar.ma2.Range;
 import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
 
+import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
@@ -82,11 +83,8 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     /** The data set. */
     private FeatureDatasetPoint fdp;
 
-    /** The data type. */
-    TrajectoryFeatureCollection tfc;
-
     /** The obs list. */
-    List<PointFeature> obsList;
+    List<PointFeature> obsList = new ArrayList<PointFeature>();
 
     /** The times. */
     double[] times;
@@ -94,23 +92,26 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     /** The positive. */
     int positive = 1;
 
+    /** The feature collection. */
+    private FeatureCollection fc;
+
     /**
      * Instantiates a new CDM trajectory feature type info.
      *
      * @param adapter the adapter
-     * @param fdp the fdp
-     * @param tfc the tfc
+     * @param dataset the dataset
+     * @param pob the pob
+     * @param fc _more_
      * @throws Exception the exception
      */
-    public CDMTrajectoryFeatureTypeInfo(TrackAdapter adapter,
-                                        FeatureDatasetPoint fdp,
-                                        TrajectoryFeatureCollection tfc)
+    public CDMTrajectoryFeatureTypeInfo(TrajectoryFeatureTypeAdapter adapter,
+                                        FeatureDatasetPoint dataset,
+                                        FeatureCollection fc)
             throws Exception {
-        super(adapter, tfc.getName());
+        super(adapter, fc.getName());
         this.fdp = fdp;
-        this.tfc = tfc;
+        this.fc  = fc;
         init();
-        //            ucar.unidata.util.Misc.run(new Runnable(){public void run(){testit();}});
     }
 
 
@@ -145,39 +146,39 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     }
 
     /**
+     * Helps init method get observations
+     *
+     * @param fc the fc
+     * @return the trajectory feature bean
+     */
+    private TrajectoryFeatureBean initHelper(FeatureCollection fc) {
+        TrajectoryFeatureBean trajBean =
+            new TrajectoryFeatureBean((TrajectoryFeature) fc);
+        List pfs   = trajBean.pfs;
+        int  psize = pfs.size();
+        for (int i = 0; i < psize; i++) {
+            obsList.add((PointFeature) pfs.get(i));
+        }
+        return trajBean;
+    }
+
+    /**
      * Init method.
      *
      * @throws Exception the exception
      */
     private void init() throws Exception {
-
-
-        PointFeatureCollectionIterator iter =
-            tfc.getPointFeatureCollectionIterator(-1);
-        obsList = new ArrayList<PointFeature>();
         TrajectoryFeatureBean trajBean = null;
-        int                   iii      = 0;
-        while (iter.hasNext()) {
-            PointFeatureCollection pob = iter.next();
-            trajBean = new TrajectoryFeatureBean((TrajectoryFeature) pob);
-            List pfs   = trajBean.pfs;
-            int  psize = pfs.size();
-            for (int i = 0; i < psize; i++) {
-                obsList.add((PointFeature) pfs.get(i));
-                iii++;
+        if (fc instanceof PointFeatureCollection) {
+            trajBean = initHelper(fc);
+        } else {
+            TrajectoryFeatureCollection tfc =
+                (TrajectoryFeatureCollection) fc;
+            PointFeatureCollectionIterator iter =
+                tfc.getPointFeatureCollectionIterator(-1);
+            while (iter.hasNext()) {
+                trajBean = initHelper(iter.next());
             }
-            //if (trajBean.pf != null) {  // may have missing values
-
-
-            //}
-            /*    pob.resetIteration();
-                try {
-                    while (pob.hasNext()) {
-                        obsList.add(pob.next());
-                    }
-                } finally {
-                    pob.finish();
-                }        */
         }
 
         // TrajectoryFeatureBean         pf      = obsList.get(0);
@@ -258,17 +259,14 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * {@inheritDoc}
      */
     protected Unit getTimeUnit() throws Exception {
-        return DataUtil.parseUnit("days since 1950-01-01T00:00:00Z");
+    	 if (fc instanceof PointFeatureCollection) {
+        return DataUtil.parseUnit(
+            "days since " + obsList.get(0).getNominalTimeAsCalendarDate());
+        } else {
+        	return DataUtil.parseUnit("days since 1950-01-01T00:00:00Z");
+        }        	
     }
 
-    /**
-     * Get TrajectoryFeatureCollection.
-     *
-     * @return the TrajectoryFeatureCollection
-     */
-    public TrajectoryFeatureCollection getFt() {
-        return tfc;
-    }
 
     /**
      * Get the full range. Include the stride
@@ -290,7 +288,7 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @return number of points
      */
     public int getNumberPoints() {
-        return tfc.size();
+        return obsList.size();
     }
 
     /**
@@ -354,7 +352,7 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     private void testit() {
         try {
             Trace.call1("TrackInfo.rowRead-new");
-            test2();
+            //test2();
             Trace.call2("TrackInfo.rowRead-new");
         } catch (Exception exc) {}
     }
@@ -381,31 +379,35 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     /**
      * test.
      *
+     *
+     * @param v _more_
+     *
+     * @return _more_
      * @throws Exception On badness
      */
-    private void test2() throws Exception {
-        int   numObs      = getNumberPoints();
-        Index scalarIndex = new Index0D(new int[0]);
-        tfc.resetIteration();
-        StructureData structure = null;
-        while (tfc.hasNext() && (structure == null)) {
-            PointFeature pf = (PointFeature) tfc.next();
-            structure = pf.getData();
-        }
-
-        while (tfc.hasNext()) {
-            PointFeature  pf         = (PointFeature) tfc.next();
-            StructureData std        = pf.getData();
-            List          members    = std.getMembers();
-            int           numMembers = members.size();
-
-            for (int varIdx = 0; varIdx < numMembers; varIdx++) {
-                StructureMembers.Member member =
-                    (StructureMembers.Member) members.get(varIdx);
-                Array a = structure.getArray(member);
-            }
-        }
-    }
+    //    private void test2() throws Exception {
+    //        int   numObs      = getNumberPoints();
+    //        Index scalarIndex = new Index0D(new int[0]);
+    //        tfc.resetIteration();
+    //        StructureData structure = null;
+    //        while (tfc.hasNext() && (structure == null)) {
+    //            PointFeature pf = (PointFeature) tfc.next();
+    //            structure = pf.getData();
+    //        }
+    //
+    //        while (tfc.hasNext()) {
+    //            PointFeature  pf         = (PointFeature) tfc.next();
+    //            StructureData std        = pf.getData();
+    //            List          members    = std.getMembers();
+    //            int           numMembers = members.size();
+    //
+    //            for (int varIdx = 0; varIdx < numMembers; varIdx++) {
+    //                StructureMembers.Member member =
+    //                    (StructureMembers.Member) members.get(varIdx);
+    //                Array a = structure.getArray(member);
+    //            }
+    //        }
+    //    }
 
     /**
      * Get the full range. Include the stride

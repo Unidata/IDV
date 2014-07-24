@@ -160,9 +160,10 @@ public abstract class TrackAdapter {
     public TrackInfo getTrackInfo(String name) {
         for (int trackIdx = 0; trackIdx < trackInfos.size(); trackIdx++) {
             TrackInfo trackInfo = (TrackInfo) trackInfos.get(trackIdx);
+            int       i = Math.min(trackInfo.getTrackName().length(), 20);
             if ((name == null) || name.equals(trackInfo.getTrackName())
                     || name.startsWith(trackInfo.getTrackName().substring(0,
-                        20))) {
+                        i))) {
                 return trackInfo;
             }
         }
