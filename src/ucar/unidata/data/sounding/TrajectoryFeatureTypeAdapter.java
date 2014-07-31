@@ -26,7 +26,6 @@ import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureCollectionIterator;
 import ucar.nc2.ft.ProfileFeatureCollection;
 import ucar.nc2.ft.TrajectoryFeatureCollection;
@@ -126,12 +125,14 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
             PointFeatureCollectionIterator iter =
                 tfc.getPointFeatureCollectionIterator(-1);
             while (iter.hasNext()) {
-                addTrackInfo(new CDMTrajectoryFeatureTypeInfo(this, dataset,
-                		iter.next()));
+                addTrackInfo(
+                    new CDMTrajectoryFeatureTypeInfo.PointFeatureTypeInfo(
+                        this, dataset, iter.next()));
             }
         } else {
-            addTrackInfo(new CDMTrajectoryFeatureTypeInfo(this, dataset,
-                    tfc));
+            addTrackInfo(
+                new CDMTrajectoryFeatureTypeInfo.TrajectoryFeatureTypeInfo(
+                    this, dataset, tfc));
         }
         dataset.close();
 

@@ -78,7 +78,7 @@ import java.util.List;
 /**
  * The Class CDMTrajectoryFeatureTypeInfo.
  */
-public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
+public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     /** The data set. */
     private FeatureDatasetPoint fdp;
@@ -111,7 +111,6 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         super(adapter, fc.getName());
         this.fdp = fdp;
         this.fc  = fc;
-        init();
     }
 
 
@@ -151,7 +150,7 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @param fc the fc
      * @return the trajectory feature bean
      */
-    private TrajectoryFeatureBean initHelper(FeatureCollection fc) {
+    protected final TrajectoryFeatureBean initHelper(FeatureCollection fc) {
         TrajectoryFeatureBean trajBean =
             new TrajectoryFeatureBean((TrajectoryFeature) fc);
         List pfs   = trajBean.pfs;
@@ -165,22 +164,12 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     /**
      * Init method.
      *
+     *
+     * @param trajBean trajectory bean
+     *
      * @throws Exception the exception
      */
-    private void init() throws Exception {
-        TrajectoryFeatureBean trajBean = null;
-        if (fc instanceof PointFeatureCollection) {
-            trajBean = initHelper(fc);
-        } else {
-            TrajectoryFeatureCollection tfc =
-                (TrajectoryFeatureCollection) fc;
-            PointFeatureCollectionIterator iter =
-                tfc.getPointFeatureCollectionIterator(-1);
-            while (iter.hasNext()) {
-                trajBean = initHelper(iter.next());
-            }
-        }
-
+    protected void init(TrajectoryFeatureBean trajBean) throws Exception {
         // TrajectoryFeatureBean         pf      = obsList.get(0);
         StructureData                 pfsd    = trajBean.pf.getData();
         List<StructureMembers.Member> members = pfsd.getMembers();
@@ -254,19 +243,6 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         endTime = getEndTime();  //new DateTime(df.parse(etimeStr.toString()));
 
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected Unit getTimeUnit() throws Exception {
-    	 if (fc instanceof PointFeatureCollection) {
-        return DataUtil.parseUnit(
-            "days since " + obsList.get(0).getNominalTimeAsCalendarDate());
-        } else {
-        	return DataUtil.parseUnit("days since 1950-01-01T00:00:00Z");
-        }        	
-    }
-
 
     /**
      * Get the full range. Include the stride
@@ -1250,6 +1226,82 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             }
 
             return fdata;
+        }
+    }
+
+    /**
+     * The Class PointFeatureTypeInfo.
+     */
+    public static class PointFeatureTypeInfo extends CDMTrajectoryFeatureTypeInfo {
+
+        /** The pfc. */
+        private PointFeatureCollection pfc;
+
+        /**
+         * Instantiates a new point feature type info.
+         *
+         * @param adapter the adapter
+         * @param dataset the dataset
+         * @param pfc the pfc
+         * @throws Exception the exception
+         */
+        public PointFeatureTypeInfo(TrajectoryFeatureTypeAdapter adapter,
+                                    FeatureDatasetPoint dataset,
+                                    PointFeatureCollection pfc)
+                throws Exception {
+            super(adapter, dataset, pfc);
+            this.pfc = pfc;
+            init(initHelper(pfc));
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        protected Unit getTimeUnit() throws Exception {
+            return DataUtil.parseUnit(
+                "days since "
+                + obsList.get(0).getNominalTimeAsCalendarDate());
+        }
+    }
+
+    /**
+     * The Class TrajectoryFeatureTypeInfo.
+     */
+    public static class TrajectoryFeatureTypeInfo extends CDMTrajectoryFeatureTypeInfo {
+
+        /** The tfc. */
+        private TrajectoryFeatureCollection tfc;
+
+        /**
+         * Instantiates a new trajectory feature type info.
+         *
+         * @param adapter the adapter
+         * @param dataset the dataset
+         * @param tfc the tfc
+         * @throws Exception the exception
+         */
+        public TrajectoryFeatureTypeInfo(
+                TrajectoryFeatureTypeAdapter adapter,
+                FeatureDatasetPoint dataset, TrajectoryFeatureCollection tfc)
+                throws Exception {
+            super(adapter, dataset, tfc);
+            this.tfc = tfc;
+
+            TrajectoryFeatureBean trajBean = null;
+            PointFeatureCollectionIterator iter =
+                tfc.getPointFeatureCollectionIterator(-1);
+            while (iter.hasNext()) {
+                trajBean = initHelper(iter.next());
+            }
+            init(trajBean);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        protected Unit getTimeUnit() throws Exception {
+            return DataUtil.parseUnit("days since 1950-01-01T00:00:00Z");
         }
     }
 }
