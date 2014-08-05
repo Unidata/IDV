@@ -710,28 +710,6 @@ if (!context.isUpdateInstallation()) {
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Mac OS X JCE" id="1502" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
-                      <void property="destinationDirectory">
-                        <object class="java.io.File">
-                          <string>jre.bundle/Contents/Home/lib/ext</string>
-                        </object>
-                      </void>
-                      <void property="overwriteMode">
-                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
-                      </void>
-                      <void property="zipFile">
-                        <object class="java.io.File">
-                          <string>sunjce_provider.jar</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
               <action name="Sun Java 3D" id="709" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -748,6 +726,29 @@ if (!context.isUpdateInstallation()) {
                         <object class="java.io.File">
                           <string>j3d-solaris.zip</string>
                         </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Mac OS X JCE" id="1512" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                      <void property="destinationFile">
+                        <object class="java.io.File">
+                          <string>jre.bundle/Contents/Home/lib/ext</string>
+                        </object>
+                      </void>
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>sunjce_provider.jar</string>
+                            </object>
+                          </void>
+                        </array>
                       </void>
                     </object>
                   </java>
@@ -1126,6 +1127,7 @@ if (!context.isUpdateInstallation()) {
       <excludedBeans>
         <bean refId="1451" />
         <bean refId="707" />
+        <bean refId="1502" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
@@ -1163,6 +1165,7 @@ if (!context.isUpdateInstallation()) {
       <excludedBeans>
         <bean refId="1451" />
         <bean refId="707" />
+        <bean refId="1502" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
@@ -1284,6 +1287,7 @@ if (!context.isUpdateInstallation()) {
         <bean refId="704" />
         <bean refId="706" />
         <bean refId="707" />
+        <bean refId="1502" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
@@ -1320,6 +1324,7 @@ if (!context.isUpdateInstallation()) {
       <excludedBeans>
         <bean refId="1451" />
         <bean refId="707" />
+        <bean refId="1502" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
