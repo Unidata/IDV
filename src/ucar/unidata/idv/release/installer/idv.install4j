@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.7" transformSequenceNumber="4">
-  <directoryPresets config="foobar" />
+  <directoryPresets config="${compiler:SRCDIR}/libsrc/j3d-macosx.zip" />
   <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="4.1" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -61,6 +61,7 @@
       <dirEntry mountPoint="837" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/mac" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude />
       </dirEntry>
+      <fileEntry mountPoint="837" file="${compiler:SRCDIR}/libsrc/sunjce_provider.jar" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
     </entries>
     <components>
       <component name="IDV Components" id="67" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
@@ -702,6 +703,28 @@ if (!context.isUpdateInstallation()) {
                       <void property="zipFile">
                         <object class="java.io.File">
                           <string>j3d-macosx.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Mac OS X JCE" id="1502" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
+                      <void property="destinationDirectory">
+                        <object class="java.io.File">
+                          <string>jre.bundle/Contents/Home/lib/ext</string>
+                        </object>
+                      </void>
+                      <void property="overwriteMode">
+                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>sunjce_provider.jar</string>
                         </object>
                       </void>
                     </object>
