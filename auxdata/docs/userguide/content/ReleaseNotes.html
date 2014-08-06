@@ -110,10 +110,29 @@ in the
 view window.
 </faqitem>
 
+<faqitem q="CF Trajectories" id="cftrajectories">
+IDV can now handle multiple trajectories in one CF-compliant file. When wanting
+to view these data, select a Data Source Type of "Trajectory Sounding Files".
+You will have to build the trajectory file in a CF compliant manner as described
+<a href="http://www.unidata.ucar.edu/blogs/developer/en/entry/ipynb_cookbooks_to_create_cf">here</a>.
+</faqitem>
+
+
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
+We have discovered in a few circumstances the IDV OS X installers (always on
+NOAA OS X machines for some reason) are not working as expected. In particular,
+the IDV installers (not the IDV itself) try to use the Apple JRE 6. If the
+installer does not find it, it tries to download a JRE 6 for OS X. This workflow
+occasionally resulted in unreliable behavior crashing the installer. Moreover,
+Java 6 was end-of-lifed quite a while ago so this solution is not sustainable
+anyway. We now have a new installer strategy for OS X that relies on the JRE 7
+that is distributed with the IDV application itself. This should hopefully
+result in a more stable, long-term solution.
 </faqitem>
+
+
 
 <faqitem q="Known Problems" id="problems">
 For a list of outstanding known problems, see the
