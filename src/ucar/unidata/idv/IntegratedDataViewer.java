@@ -340,6 +340,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getJythonManager();
         getDataManager();
         getPublishManager().initPublisher();
+
     }
 
     /**
@@ -712,7 +713,10 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         argsManager.initParams   = new ArrayList();
         argsManager.initDisplays = new ArrayList();
 
-
+        // set java.net client ID
+        String version = getStateManager().getVersion();
+        version = (version != null ? "IDV " + version : "xxx");
+        System.setProperty("http.agent", version);
         if ( !getArgsManager().getIsOffScreen()) {
             Misc.run(new Runnable() {
                 public void run() {
