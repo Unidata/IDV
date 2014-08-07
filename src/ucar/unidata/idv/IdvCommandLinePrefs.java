@@ -361,7 +361,7 @@ public class IdvCommandLinePrefs {
      *
      * @return the current IDV version
      */
-    private static IDVVersion getCurrentIDVVersion() {
+    static IDVVersion getCurrentIDVVersion() {
         StringBuilder response = new StringBuilder();
 
         try {
