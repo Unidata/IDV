@@ -146,7 +146,7 @@ public class IdvCommandLinePrefs {
                     ///Define the method element from the ground up.
                     XmlEncoder xmlEncoder = new XmlEncoder();
                     final Element warn = xmlEncoder.createElement(
-                                             new Boolean(dontShowOldWarn));
+                                             new Boolean(dontShowOldWarnRsp));
                     final Element oldVersion =
                         xmlEncoder.createPrimitiveElement(
                             XmlEncoder.NAME_STRING, oldVersionKey);
