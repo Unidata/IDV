@@ -439,7 +439,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
             ProjectionImpl projectionImpl =
                     getNavigatedMapPanel().getProjectionImpl();
             LatLonRect latLonRect =
-                    projectionImpl.getLatLonBoundingBox(rect);
+                    projectionImpl.projToLatLonBB(rect);
 
             if (latLonRect.getHeight() != latLonRect.getHeight()) {
                 //corner point outside the earth
@@ -548,7 +548,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
             // no region subset, full image
         } else {
             ProjectionImpl  projectionImpl = display.getProjectionImpl();
-            LatLonRect latLonRect = projectionImpl.getLatLonBoundingBox(rect);
+            LatLonRect latLonRect = projectionImpl.projToLatLonBB(rect);
             GeoLocationInfo gInfo;
             if (latLonRect.getHeight() != latLonRect.getHeight()) {
                 //corner point outside the earth

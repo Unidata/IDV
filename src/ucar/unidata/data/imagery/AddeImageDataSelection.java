@@ -634,7 +634,7 @@ public class AddeImageDataSelection {
             newRect.setHeight(rect.getHeight());
             newRect.setWidth(rect.getWidth());
             LatLonRect latLonRectOld =
-                projectionImpl.getLatLonBoundingBox(rect);
+                projectionImpl.projToLatLonBB(rect);
 
             if (newPlace.equals("CENTER")) {
                 //move llr from ULEFT to CENTER
@@ -2428,7 +2428,7 @@ public class AddeImageDataSelection {
                 // no region subset, full image
                 ProjectionImpl projectionImpl = display.getProjectionImpl();
                 LatLonRect latLonRect =
-                    projectionImpl.getLatLonBoundingBox(rect);
+                    projectionImpl.projToLatLonBB(rect);
                 GeoLocationInfo gInfo;
                 if (latLonRect.getHeight() != latLonRect.getHeight()) {
                     //corner point outside the earth

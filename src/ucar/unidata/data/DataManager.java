@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.nc2.util.DiskCache2;
-import ucar.httpclient.HTTPSession;
+import ucar.httpservices.HTTPSession;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
@@ -510,22 +510,6 @@ public class DataManager {
      * @param resourceManager The resource manager
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
-
-        ucar.nc2.grib.GribResourceReader.setGribResourceReader(
-            new ucar.nc2.grib.GribResourceReader() {
-            public InputStream openInputStream(String resourceName)
-                    throws IOException {
-                try {
-                    InputStream inputStream =
-                        IOUtil.getInputStream(resourceName);
-                    return inputStream;
-                } catch (IOException ioe) {
-                    //System.err.println ("IDV failed to read:" + resourceName);
-                    return null;
-                }
-            }
-
-        });
 
         ResourceCollection grib1Resources =
             resourceManager.getResources(
