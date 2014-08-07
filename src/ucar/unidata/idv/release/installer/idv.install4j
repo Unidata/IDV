@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.7" transformSequenceNumber="4">
-  <directoryPresets config="foobar" />
+  <directoryPresets config="${compiler:SRCDIR}/libsrc/j3d-macosx.zip" />
   <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="4.1" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -61,7 +61,7 @@
       <dirEntry mountPoint="837" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/mac" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude />
       </dirEntry>
-      <fileEntry mountPoint="837" file="${compiler:SRCDIR}/libsrc/osxjre.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="837" file="${compiler:SRCDIR}/libsrc/sunjce_provider.jar" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
     </entries>
     <components>
       <component name="IDV Components" id="67" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
@@ -621,28 +621,23 @@ if (!context.isUpdateInstallation()) {
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Mac OS X JRE" id="1022" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Mac OS X JRE" id="1451" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
-                      <void property="destinationDirectory">
+                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                      <void property="destinationFile">
                         <object class="java.io.File">
-                          <string>jre.bundle</string>
+                          <string>${installer:sys.installationDir}/jre.bundle</string>
                         </object>
                       </void>
-                      <void property="dirMode">
-                        <string>777</string>
-                      </void>
-                      <void property="mode">
-                        <string>777</string>
-                      </void>
-                      <void property="overwriteMode">
-                        <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
-                      </void>
-                      <void property="zipFile">
-                        <object class="java.io.File">
-                          <string>osxjre.zip</string>
-                        </object>
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>${installer:sys.installationDir}/.install4j/jre.bundle</string>
+                            </object>
+                          </void>
+                        </array>
                       </void>
                     </object>
                   </java>
@@ -731,6 +726,29 @@ if (!context.isUpdateInstallation()) {
                         <object class="java.io.File">
                           <string>j3d-solaris.zip</string>
                         </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Mac OS X JCE" id="1512" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                      <void property="destinationFile">
+                        <object class="java.io.File">
+                          <string>jre.bundle/Contents/Home/lib/ext</string>
+                        </object>
+                      </void>
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>sunjce_provider.jar</string>
+                            </object>
+                          </void>
+                        </array>
                       </void>
                     </object>
                   </java>
@@ -916,6 +934,30 @@ if (!context.isUpdateInstallation()) {
                 </serializedBean>
                 <condition />
               </action>
+              <action name="Remove Mac OS X JRE" id="1412" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="backupForRollback">
+                        <boolean>false</boolean>
+                      </void>
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>${installer:sys.installationDir}/.install4j/jre.bundle</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="recursive">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
             </actions>
             <formComponents />
           </screen>
@@ -1083,11 +1125,13 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
-        <bean refId="1022" />
+        <bean refId="1451" />
         <bean refId="707" />
+        <bean refId="1512" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
+        <bean refId="1412" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1119,11 +1163,13 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
-        <bean refId="1022" />
+        <bean refId="1451" />
         <bean refId="707" />
+        <bean refId="1512" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
+        <bean refId="1412" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1197,7 +1243,7 @@ if (!context.isUpdateInstallation()) {
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <macosFolder name="Mac OS X" id="12" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="true" customInstallBaseDir="" contentFilesType="1" downloadURL="" signLaunchers="false">
+    <macosFolder name="Mac OS X" id="12" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_45" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="2" />
         <launcher id="7" />
@@ -1237,13 +1283,15 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
-        <bean refId="1022" />
+        <bean refId="1451" />
         <bean refId="704" />
         <bean refId="706" />
         <bean refId="707" />
+        <bean refId="1512" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
+        <bean refId="1412" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1274,11 +1322,13 @@ if (!context.isUpdateInstallation()) {
         <launcher id="49" />
       </excludedLaunchers>
       <excludedBeans>
-        <bean refId="1022" />
+        <bean refId="1451" />
         <bean refId="707" />
+        <bean refId="1512" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
+        <bean refId="1412" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>

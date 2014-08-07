@@ -21,13 +21,20 @@
 package ucar.unidata.data.sounding;
 
 
-import ucar.ma2.*;
+import ucar.ma2.Array;
+import ucar.ma2.Index;
+import ucar.ma2.Index0D;
+import ucar.ma2.Range;
+import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers;
 
-import ucar.nc2.Attribute;
-import ucar.nc2.constants.FeatureType;
-
-import ucar.nc2.ft.*;
-import ucar.nc2.units.DateRange;
+import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.FeatureDatasetPoint;
+import ucar.nc2.ft.PointFeature;
+import ucar.nc2.ft.PointFeatureCollection;
+import ucar.nc2.ft.PointFeatureCollectionIterator;
+import ucar.nc2.ft.TrajectoryFeature;
+import ucar.nc2.ft.TrajectoryFeatureCollection;
 
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
@@ -42,76 +49,80 @@ import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Direction;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.FunctionType;
+import visad.Integer1DSet;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.SetType;
+import visad.Text;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 
+
 import java.io.IOException;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
-
 import java.util.List;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: yuanho
- * Date: Sep 17, 2010
- * Time: 1:37:50 PM
- * To change this template use File | Settings | File Templates.
+ * The Class CDMTrajectoryFeatureTypeInfo.
  */
-public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
+public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
-
-    /** The data set */
+    /** The data set. */
     private FeatureDatasetPoint fdp;
 
-    /** The data type */
-    TrajectoryFeatureCollection tfc;
+    /** The obs list. */
+    List<PointFeature> obsList = new ArrayList<PointFeature>();
 
-    /** _more_ */
-    List<PointFeature> obsList;
-
-    /** _more_ */
+    /** The times. */
     double[] times;
 
+    /** The positive. */
     int positive = 1;
+
+    /** The feature collection. */
+    private FeatureCollection fc;
+
     /**
-     * ctor
+     * Instantiates a new CDM trajectory feature type info.
      *
-     *
-     * @param adapter The adapter
-     * @param fdp
-     * @param tfc
-     *
-     * @throws Exception On badness
+     * @param adapter the adapter
+     * @param dataset the dataset
+     * @param pob the pob
+     * @param fc _more_
+     * @throws Exception the exception
      */
-    public CDMTrajectoryFeatureTypeInfo(TrackAdapter adapter,
-                                        FeatureDatasetPoint fdp,
-                                        TrajectoryFeatureCollection tfc)
+    public CDMTrajectoryFeatureTypeInfo(TrajectoryFeatureTypeAdapter adapter,
+                                        FeatureDatasetPoint dataset,
+                                        FeatureCollection fc)
             throws Exception {
-        super(adapter, tfc.getName());
+        super(adapter, fc.getName());
         this.fdp = fdp;
-        this.tfc = tfc;
-        init();
-        //            ucar.unidata.util.Misc.run(new Runnable(){public void run(){testit();}});
+        this.fc  = fc;
     }
 
-    /** _more_ */
+
+    /** The category attributes. */
     private static String[] categoryAttributes = { "category", "group" };
 
     /**
-     * _more_
+     * Gets the trajectory collection beans.
      *
-     * @param trajCollection _more_
-     *
-     * @return _more_
-     *
-     * @throws IOException _more_
+     * @param trajCollection the traj collection
+     * @return the trajectory collection beans
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private List<TrajectoryFeatureBean> getTrajectoryCollectionBeans(
             TrajectoryFeatureCollection trajCollection)
@@ -134,43 +145,32 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     }
 
     /**
-     * init
+     * Helps init method get observations
      *
-     * @throws Exception On badness
+     * @param fc the fc
+     * @return the trajectory feature bean
      */
-    private void init() throws Exception {
-
-
-        PointFeatureCollectionIterator iter =
-            tfc.getPointFeatureCollectionIterator(-1);
-        obsList = new ArrayList<PointFeature>();
-        TrajectoryFeatureBean trajBean = null;
-        int iii = 0;
-        while (iter.hasNext()) {
-            PointFeatureCollection pob = iter.next();
-            trajBean =
-                new TrajectoryFeatureBean((TrajectoryFeature) pob);
-            List pfs = trajBean.pfs;
-            int psize = pfs.size();
-            for(int i=0; i<psize; i++) {
-                 obsList.add((PointFeature)pfs.get(i));
-                 iii++;
-            }
-            //if (trajBean.pf != null) {  // may have missing values
-
-
-            //}
-            /*    pob.resetIteration();
-                try {
-                    while (pob.hasNext()) {
-                        obsList.add(pob.next());
-                    }
-                } finally {
-                    pob.finish();
-                }        */
+    protected final TrajectoryFeatureBean initHelper(FeatureCollection fc) {
+        TrajectoryFeatureBean trajBean =
+            new TrajectoryFeatureBean((TrajectoryFeature) fc);
+        List pfs   = trajBean.pfs;
+        int  psize = pfs.size();
+        for (int i = 0; i < psize; i++) {
+            obsList.add((PointFeature) pfs.get(i));
         }
+        return trajBean;
+    }
 
-       // TrajectoryFeatureBean         pf      = obsList.get(0);
+    /**
+     * Init method.
+     *
+     *
+     * @param trajBean trajectory bean
+     *
+     * @throws Exception the exception
+     */
+    protected void init(TrajectoryFeatureBean trajBean) throws Exception {
+        // TrajectoryFeatureBean         pf      = obsList.get(0);
         StructureData                 pfsd    = trajBean.pf.getData();
         List<StructureMembers.Member> members = pfsd.getMembers();
         for (int i = 0; i < members.size(); i++) {
@@ -199,7 +199,7 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                                             mb.getDescription(), "Basic",
                                             unit));
                     varAltitude = mb.getName();
-                } else if ( mb.getName().equalsIgnoreCase("DEPTH")) {
+                } else if (mb.getName().equalsIgnoreCase("DEPTH")) {
                     positive = -1;
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), "Basic",
@@ -244,20 +244,6 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     }
 
-
-    protected Unit getTimeUnit() throws Exception {
-        return DataUtil.parseUnit("days since 1950-01-01T00:00:00Z");
-    }
-
-    /**
-     * Get TrajectoryObsDatatype
-     *
-     * @return the TrajectoryObsDatatype
-     */
-    public TrajectoryFeatureCollection getFt() {
-        return tfc;
-    }
-
     /**
      * Get the full range. Include the stride
      *
@@ -266,19 +252,19 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception On badness
      */
     protected Range getDataRange() throws Exception {
-       // TrajectoryFeatureBean tfb   = obsList.get(0);
-       // List                  ls    = tfb.pfs;
-        Range                 range = new Range(0, obsList.size() - 1);
+        // TrajectoryFeatureBean tfb   = obsList.get(0);
+        // List                  ls    = tfb.pfs;
+        Range range = new Range(0, obsList.size() - 1);
         return range;
     }
 
     /**
-     * Get number of points in track
+     * Get number of points in track.
      *
      * @return number of points
      */
     public int getNumberPoints() {
-        return tfc.size();
+        return obsList.size();
     }
 
     /**
@@ -298,6 +284,9 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public double[] getTimeVals(Range range) throws Exception {
         /*double[] timeVals = (double[]) cachedTimeVals.get(range);
         if (timeVals == null) {
@@ -305,51 +294,48 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             cachedTimeVals.put(range, timeVals);
         }    */
 
-        return getTime(range); //timeVals;
+        return getTime(range);  //timeVals;
     }
+
     /**
-     * _more_
-     *
-     * @return _more_
+     * {@inheritDoc}
      */
     public DateTime getStartTime() {
         if (startTime == null) {
             try {
-                startTime = new DateTime(times[1],
-                                 getTimeUnit());
+                startTime = new DateTime(times[1], getTimeUnit());
             } catch (Exception e) {}
         }
         return startTime;
     }
 
     /**
-     * _more_
-     *
-     * @return _more_
+     * {@inheritDoc}
      */
     public DateTime getEndTime() {
         if (endTime == null) {
             try {
-                endTime = new DateTime(times[times.length - 1],getTimeUnit());
+                endTime = new DateTime(times[times.length - 1],
+                                       getTimeUnit());
             } catch (Exception e) {}
         }
         return endTime;
     }
 
     /**
-     * test
+     * test.
      */
     private void testit() {
         try {
             Trace.call1("TrackInfo.rowRead-new");
-            test2();
+            //test2();
             Trace.call2("TrackInfo.rowRead-new");
         } catch (Exception exc) {}
     }
 
 
     /**
-     * test
+     * test.
      *
      * @throws Exception On badness
      */
@@ -367,43 +353,43 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
 
     /**
-     * test
+     * test.
      *
+     *
+     * @param v _more_
+     *
+     * @return _more_
      * @throws Exception On badness
      */
-    private void test2() throws Exception {
-        int   numObs      = getNumberPoints();
-        Index scalarIndex = new Index0D(new int[0]);
-        tfc.resetIteration();
-        StructureData structure = null;
-        while (tfc.hasNext() && (structure == null)) {
-            PointFeature pf = (PointFeature) tfc.next();
-            structure = pf.getData();
-        }
-
-        while (tfc.hasNext()) {
-            PointFeature  pf         = (PointFeature) tfc.next();
-            StructureData std        = pf.getData();
-            List          members    = std.getMembers();
-            int           numMembers = members.size();
-
-            for (int varIdx = 0; varIdx < numMembers; varIdx++) {
-                StructureMembers.Member member =
-                    (StructureMembers.Member) members.get(varIdx);
-                Array a = structure.getArray(member);
-            }
-        }
-    }
-
+    //    private void test2() throws Exception {
+    //        int   numObs      = getNumberPoints();
+    //        Index scalarIndex = new Index0D(new int[0]);
+    //        tfc.resetIteration();
+    //        StructureData structure = null;
+    //        while (tfc.hasNext() && (structure == null)) {
+    //            PointFeature pf = (PointFeature) tfc.next();
+    //            structure = pf.getData();
+    //        }
+    //
+    //        while (tfc.hasNext()) {
+    //            PointFeature  pf         = (PointFeature) tfc.next();
+    //            StructureData std        = pf.getData();
+    //            List          members    = std.getMembers();
+    //            int           numMembers = members.size();
+    //
+    //            for (int varIdx = 0; varIdx < numMembers; varIdx++) {
+    //                StructureMembers.Member member =
+    //                    (StructureMembers.Member) members.get(varIdx);
+    //                Array a = structure.getArray(member);
+    //            }
+    //        }
+    //    }
 
     /**
      * Get the full range. Include the stride
      *
-     *
      * @param v _more_
      * @return The range
-     *
-     * @throws Exception On badness
      */
     //  protected Range getDataRange() throws Exception {
 
@@ -436,11 +422,10 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
 
     /**
-     * _more_
+     * QC the lat lon.
      *
-     * @param v _more_
-     *
-     * @return _more_
+     * @param v the v
+     * @return the float[]
      */
     public static float[] qcLatLon(float[] v) {
         if ((v == null) || (v.length == 0)) {
@@ -471,29 +456,23 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     }
 
     /**
-     * _more_
-     *
-     * @param range _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * {@inheritDoc}
      */
     protected float[] getAltitude(Range range) throws Exception {
-        float[]   fdata = new float[range.length()];
+        float[] fdata = new float[range.length()];
 
-     //  TrajectoryFeatureBean tfb = obsList.get(0);
-     //   fdata = tfb.getAltitudes(range);
-        int      first  = range.first();
-        int      stride = range.stride();
-        int      last   = range.last();
+        //  TrajectoryFeatureBean tfb = obsList.get(0);
+        //   fdata = tfb.getAltitudes(range);
+        int first  = range.first();
+        int stride = range.stride();
+        int last   = range.last();
 
-        int      i      = first;
-        int      j      = 0;
+        int i      = first;
+        int j      = 0;
         while (i <= last) {
-            PointFeature  pf   = obsList.get(i);
+            PointFeature pf = obsList.get(i);
 
-            fdata[j++] = (float)pf.getLocation().getAltitude() * positive;
+            fdata[j++] = (float) pf.getLocation().getAltitude() * positive;
             i          = i + stride;
         }
 
@@ -501,30 +480,24 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     }
 
     /**
-     * _more_
-     *
-     * @param range _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * {@inheritDoc}
      */
     protected float[] getLatitude(Range range) throws Exception {
-        float[]   fdata = new float[range.length()];
+        float[] fdata = new float[range.length()];
 
         //TrajectoryFeatureBean tfb = obsList.get(0);
         //fdata = tfb.getLatitudes(range);
 
-        int      first  = range.first();
-        int      stride = range.stride();
-        int      last   = range.last();
+        int first  = range.first();
+        int stride = range.stride();
+        int last   = range.last();
 
-        int      i      = first;
-        int      j      = 0;
+        int i      = first;
+        int j      = 0;
         while (i <= last) {
-            PointFeature  pf   = obsList.get(i);
+            PointFeature pf = obsList.get(i);
 
-            fdata[j++] = (float)pf.getLocation().getLatitude();
+            fdata[j++] = (float) pf.getLocation().getLatitude();
             i          = i + stride;
         }
 
@@ -532,30 +505,24 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     }
 
     /**
-     * _more_
-     *
-     * @param range _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * {@inheritDoc}
      */
     protected float[] getLongitude(Range range) throws Exception {
-        float[]   fdata = new float[range.length()];
+        float[] fdata = new float[range.length()];
 
         //TrajectoryFeatureBean tfb = obsList.get(0);
         //fdata = tfb.getLongitudes(range);
 
-        int      first  = range.first();
-        int      stride = range.stride();
-        int      last   = range.last();
+        int first  = range.first();
+        int stride = range.stride();
+        int last   = range.last();
 
-        int      i      = first;
-        int      j      = 0;
+        int i      = first;
+        int j      = 0;
         while (i <= last) {
-            PointFeature  pf   = obsList.get(i);
+            PointFeature pf = obsList.get(i);
 
-            fdata[j++] = (float)pf.getLocation().getLongitude();
+            fdata[j++] = (float) pf.getLocation().getLongitude();
             i          = i + stride;
         }
 
@@ -574,19 +541,19 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception On badness
      */
     public float[] getFloatData(Range range, String var) throws Exception {
-        float[]               fdata = new float[range.length()];
+        float[] fdata = new float[range.length()];
         //TrajectoryFeatureBean tfb   = obsList.get(0);
         //fdata = tfb.getFloatData(range, var);
-        int      first  = range.first();
-        int      stride = range.stride();
-        int      last   = range.last();
+        int first  = range.first();
+        int stride = range.stride();
+        int last   = range.last();
 
-        int      i      = first;
-        int      j      = 0;
+        int i      = first;
+        int j      = 0;
         while (i <= last) {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
-                      
+
             fdata[j++] = pfsd.convertScalarFloat(var);
             i          = i + stride;
         }
@@ -595,26 +562,18 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     }
 
     /**
-     * _more_
-     *
-     * @param range _more_
-     * @param var _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * {@inheritDoc}
      */
-
     public double[] getDoubleData(Range range, String var) throws Exception {
-        double[]              fdata = new double[range.length()];
+        double[] fdata = new double[range.length()];
         //TrajectoryFeatureBean tfb   = obsList.get(0);
         //fdata = tfb.getDoubleData(range, var);
-        int      first  = range.first();
-        int      stride = range.stride();
-        int      last   = range.last();
+        int first  = range.first();
+        int stride = range.stride();
+        int last   = range.last();
 
-        int      i      = first;
-        int      j      = 0;
+        int i      = first;
+        int j      = 0;
         while (i <= last) {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
@@ -628,13 +587,11 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
 
     /**
-     * Get the string values for the var
+     * Get the string values for the var.
      *
      * @param range subset. May be null.
      * @param var The var
-     *
      * @return string values
-     *
      * @throws Exception On badness
      */
     public String[] getStringData(Range range, String var) throws Exception {
@@ -894,31 +851,26 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     }
 
-
     /**
-     * Class description
-     *
-     *
-     * @version        Enter version here..., Wed, Dec 22, '10
-     * @author         Enter your name here...
+     * The Class StationBean.
      */
     public static class StationBean implements ucar.unidata.geoloc.Station {
 
-        /** _more_ */
+        /** The s. */
         private Station s;
 
-        /** _more_ */
+        /** The npts. */
         private int npts = -1;
 
         /**
-         * _more_
+         * Instantiates a new station bean.
          */
         public StationBean() {}
 
         /**
-         * _more_
+         * Instantiates a new station bean.
          *
-         * @param s _more_
+         * @param s the s
          */
         public StationBean(Station s) {
             this.s = s;
@@ -928,36 +880,34 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         // for BeanTable
 
         /**
-         * _more_
+         * Hidden properties.
          *
-         * @return _more_
+         * @return the string
          */
         static public String hiddenProperties() {
             return "latLon";
         }
 
         /**
-         * _more_
+         * Gets the nobs.
          *
-         * @return _more_
+         * @return the nobs
          */
         public int getNobs() {
             return npts;
         }
 
         /**
-         * _more_
+         * Sets the nobs.
          *
-         * @param npts _more_
+         * @param npts the new nobs
          */
         public void setNobs(int npts) {
             this.npts = npts;
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public String getWmoId() {
             return s.getWmoId();
@@ -966,74 +916,56 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         // all the station dependent methods need to be overridden
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public String getName() {
             return s.getName();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public String getDescription() {
             return s.getDescription();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public double getLatitude() {
             return s.getLatitude();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public double getLongitude() {
             return s.getLongitude();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public double getAltitude() {
             return s.getAltitude();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public LatLonPoint getLatLon() {
             return s.getLatLon();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public boolean isMissing() {
             return s.isMissing();
         }
 
         /**
-         * _more_
-         *
-         * @param so _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public int compareTo(Station so) {
             return getName().compareTo(so.getName());
@@ -1042,30 +974,26 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
 
     /**
-     * Class description
-     *
-     *
-     * @version        Enter version here..., Wed, Dec 22, '10
-     * @author         Enter your name here...
+     * The Class TrajectoryFeatureBean.
      */
     public static class TrajectoryFeatureBean extends StationBean {
 
-        /** _more_ */
+        /** The npts. */
         int npts;
 
-        /** _more_ */
+        /** The pfc. */
         TrajectoryFeature pfc;
 
-        /** _more_ */
+        /** The pf. */
         PointFeature pf;
 
-        /** _more_ */
+        /** The pfs. */
         List<PointFeature> pfs;
 
         /**
-         * _more_
+         * Instantiates a new trajectory feature bean.
          *
-         * @param pfc _more_
+         * @param pfc the pfc
          */
         public TrajectoryFeatureBean(TrajectoryFeature pfc) {
             this.pfc = pfc;
@@ -1083,122 +1011,99 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         // for BeanTable
 
         /**
-         * _more_
+         * Hidden properties.
          *
-         * @return _more_
+         * @return the string
          */
         static public String hiddenProperties() {
             return "latLon";
         }
 
         /**
-         * _more_
-         *
-         * @param npts _more_
+         * {@inheritDoc}
          */
         public void setNobs(int npts) {
             this.npts = npts;
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public int getNobs() {
             return npts;
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public String getName() {
             return pfc.getName();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public String getDescription() {
             return null;
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public String getWmoId() {
             return null;
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public double getLatitude() {
             return pf.getLocation().getLatitude();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public double getLongitude() {
             return pf.getLocation().getLongitude();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public double getAltitude() {
             return pf.getLocation().getAltitude();
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public ucar.unidata.geoloc.LatLonPoint getLatLon() {
             return pf.getLocation().getLatLon();
         }
 
         /**
-         * _more_
-         *
-         * @param so _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public int compareTo(Station so) {
             return getName().compareTo(so.getName());
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public boolean isMissing() {
             return Double.isNaN(getLatitude());
         }
 
         /**
-         * _more_
+         * Gets the latitudes.
          *
-         * @return _more_
+         * @param range the range
+         * @return the latitudes
          */
         public float[] getLatitudes(Range range) {
-            float[] fdata = new float[npts];
+            float[] fdata  = new float[npts];
             int     first  = range.first();
             int     stride = range.stride();
             int     last   = range.last();
@@ -1210,12 +1115,13 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         }
 
         /**
-         * _more_
+         * Gets the longitudes.
          *
-         * @return _more_
+         * @param range the range
+         * @return the longitudes
          */
         public float[] getLongitudes(Range range) {
-            float[] fdata = new float[npts];
+            float[] fdata  = new float[npts];
             int     first  = range.first();
             int     stride = range.stride();
             int     last   = range.last();
@@ -1227,12 +1133,13 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         }
 
         /**
-         * _more_
+         * Gets the altitudes.
          *
-         * @return _more_
+         * @param range the range
+         * @return the altitudes
          */
         public float[] getAltitudes(Range range) {
-            float[] fdata = new float[npts];
+            float[] fdata  = new float[npts];
             int     first  = range.first();
             int     stride = range.stride();
             int     last   = range.last();
@@ -1244,14 +1151,12 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         }
 
         /**
-         * _more_
+         * Gets the float data.
          *
-         * @param range _more_
-         * @param varStr _more_
-         *
-         * @return _more_
-         *
-         * @throws Exception _more_
+         * @param range the range
+         * @param varStr the var str
+         * @return the float data
+         * @throws Exception the exception
          */
         public float[] getFloatData(Range range, String varStr)
                 throws Exception {
@@ -1285,14 +1190,12 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         }
 
         /**
-         * _more_
+         * Gets the double data.
          *
-         * @param range _more_
-         * @param varStr _more_
-         *
-         * @return _more_
-         *
-         * @throws Exception _more_
+         * @param range the range
+         * @param varStr the var str
+         * @return the double data
+         * @throws Exception the exception
          */
         public double[] getDoubleData(Range range, String varStr)
                 throws Exception {
@@ -1326,6 +1229,79 @@ public class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         }
     }
 
+    /**
+     * The Class PointFeatureTypeInfo.
+     */
+    public static class PointFeatureTypeInfo extends CDMTrajectoryFeatureTypeInfo {
+
+        /** The pfc. */
+        private PointFeatureCollection pfc;
+
+        /**
+         * Instantiates a new point feature type info.
+         *
+         * @param adapter the adapter
+         * @param dataset the dataset
+         * @param pfc the pfc
+         * @throws Exception the exception
+         */
+        public PointFeatureTypeInfo(TrajectoryFeatureTypeAdapter adapter,
+                                    FeatureDatasetPoint dataset,
+                                    PointFeatureCollection pfc)
+                throws Exception {
+            super(adapter, dataset, pfc);
+            this.pfc = pfc;
+            init(initHelper(pfc));
+        }
 
 
+        /**
+         * {@inheritDoc}
+         */
+        protected Unit getTimeUnit() throws Exception {
+            return DataUtil.parseUnit(
+                "days since "
+                + obsList.get(0).getNominalTimeAsCalendarDate());
+        }
+    }
+
+    /**
+     * The Class TrajectoryFeatureTypeInfo.
+     */
+    public static class TrajectoryFeatureTypeInfo extends CDMTrajectoryFeatureTypeInfo {
+
+        /** The tfc. */
+        private TrajectoryFeatureCollection tfc;
+
+        /**
+         * Instantiates a new trajectory feature type info.
+         *
+         * @param adapter the adapter
+         * @param dataset the dataset
+         * @param tfc the tfc
+         * @throws Exception the exception
+         */
+        public TrajectoryFeatureTypeInfo(
+                TrajectoryFeatureTypeAdapter adapter,
+                FeatureDatasetPoint dataset, TrajectoryFeatureCollection tfc)
+                throws Exception {
+            super(adapter, dataset, tfc);
+            this.tfc = tfc;
+
+            TrajectoryFeatureBean trajBean = null;
+            PointFeatureCollectionIterator iter =
+                tfc.getPointFeatureCollectionIterator(-1);
+            while (iter.hasNext()) {
+                trajBean = initHelper(iter.next());
+            }
+            init(trajBean);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        protected Unit getTimeUnit() throws Exception {
+            return DataUtil.parseUnit("days since 1950-01-01T00:00:00Z");
+        }
+    }
 }

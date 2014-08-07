@@ -439,7 +439,7 @@
 <!-- Python libraries    -->
   <resources name="idv.resource.jython">
     <resource
-       label="User's library"
+       label="User's Library"
        location="%USERPATH%/python/default.py"/>
 
     <resource
@@ -449,41 +449,41 @@
          value="Local Library"/>
     </resource>
     <resource
-       label="Site library"
+       label="Site Library"
        location="%SITEPATH%/default.py"/>
     <resource
-       label="Application library"
+       label="Application Library"
        location="%APPPATH%/default.py"/>
     <resource
-       label="Grid routines"
+       label="Grid Routines"
        location="%IDVPATH%/python/grid.py">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
-       label="Ensemble grid routines"
+       label="Ensemble Grid Routines"
        location="%IDVPATH%/python/ensemble.py">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
-       label="Image routines"
+       label="Image Routines"
        location="%IDVPATH%/python/image.py">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
-       label="Shell utilities"
+       label="Shell Utilities"
        location="%IDVPATH%/python/shell.py">
       <property
          name="category"
          value="System"/>
     </resource>
     <resource
-       label="Miscellaneous routines"
+       label="Miscellaneous Routines"
        location="%IDVPATH%/python/misc.py">
       <property
          name="category"
@@ -511,7 +511,7 @@
          value="System"/>
     </resource>
     <resource
-       label="Map routines"
+       label="Map Routines"
        location="%IDVPATH%/python/maps.py">
       <property
          name="category"
@@ -535,7 +535,7 @@
          value="true"/>
      </resource>
     <resource
-       label="Test routines"
+       label="Test Routines"
        location="%IDVPATH%/python/test.py">
       <property
          name="category"

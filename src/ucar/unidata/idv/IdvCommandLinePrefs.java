@@ -21,6 +21,9 @@
 package ucar.unidata.idv;
 
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LayoutUtil;
 import ucar.unidata.util.Misc;
@@ -44,8 +47,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -106,19 +109,20 @@ public class IdvCommandLinePrefs {
         final StringBuilder sb = new StringBuilder();
 
         try {
-            final Map<Object, Object> userPrefMap   = getPrefMap(args);
-            String                    oldVersionKey = "idv_old_version_"
+            final Map<Object, Object> userPrefMap = getPrefMap(args);
+            String oldVersionKey = "idv_old_version_"
                                    + getIDVVersion().stringForShell() + "_"
                                    + currentIDVVersion.stringForShell()
                                    + "_dontwarn";
 
-            Object  oldVersionDontWarn = userPrefMap.get(oldVersionKey);
-            boolean dontShowOldWarn    =
+            Object oldVersionDontWarn = userPrefMap.get(oldVersionKey);
+            boolean dontShowOldWarn =
                 Boolean.parseBoolean((oldVersionDontWarn == null)
                                      ? false + ""
                                      : oldVersionDontWarn.toString());
+            boolean dontShowOldWarnRsp = false;
             if (isIDVold() && !dontShowOldWarn) {
-                dontShowOldWarn = showOldVersionMessage();
+                dontShowOldWarnRsp = showOldVersionMessage();
             }
 
             for (Map.Entry<Object, Object> e : userPrefMap.entrySet()) {
@@ -131,22 +135,40 @@ public class IdvCommandLinePrefs {
                 sb.append(s);
             }
             //User said not to warn so must persist this information.
-            if (dontShowOldWarn) {
+            if (dontShowOldWarnRsp) {
                 final File f = new File(getPreferences(args));
                 if (f.exists()) {
-                    XmlEncoder                xmlEncoder = new XmlEncoder();
-                    Hashtable<Object, Object> ht         =
-                        (Hashtable<Object,
-                                   Object>) (new XmlEncoder().createObject(
-                                       XmlUtil.getRoot(
-                                           f.getPath(), XmlUtil.class)));
-                    ht.put(oldVersionKey, dontShowOldWarn);
+                    Element root = XmlUtil.getRoot(f.getPath(),
+                                       XmlUtil.class);
+                    Document document = root.getOwnerDocument();
+
+                    ///Define the method element from the ground up.
+                    XmlEncoder xmlEncoder = new XmlEncoder();
+                    final Element warn = xmlEncoder.createElement(
+                                             new Boolean(dontShowOldWarn));
+                    final Element oldVersion =
+                        xmlEncoder.createPrimitiveElement(
+                            XmlEncoder.NAME_STRING, oldVersionKey);
+
+                    Element methodElement =
+                        xmlEncoder.createMethodElement(XmlEncoder.METHOD_PUT,
+                            new ArrayList<Element>() {
+                        {
+                            add(oldVersion);
+                            add(warn);
+                        }
+                    });
+
+                    //Totally preserve existing XML except appending "methodElement"
+                    root.appendChild(document.importNode(methodElement,
+                            true));
+
                     BufferedWriter writer =
                         new BufferedWriter(new FileWriter(f));
 
-                    writer.write(XmlUtil.toString(xmlEncoder.toElement(ht),
-                            true));
-
+                    //simply, regex to get rid of empty lines
+                    //http://stackoverflow.com/a/4123485/32174
+                    writer.write(XmlUtil.toString(root, true).replaceAll("(?m)^[ \\t]*\\r?\\n", ""));
                     writer.close();
                 }
             }
@@ -232,7 +254,8 @@ public class IdvCommandLinePrefs {
     private static Map<Object, Object> getPrefMap(String... args)
             throws IOException, Exception {
         final Map<Object, Object> userPrefMap = new HashMap<Object, Object>();
-        final File                f           = new File(getPreferences(args));
+        final File                f           =
+            new File(getPreferences(args));
 
         if (f.exists()) {
             userPrefMap.putAll(
@@ -341,9 +364,9 @@ public class IdvCommandLinePrefs {
         StringBuilder response = new StringBuilder();
 
         try {
-            URL            website    = new URL(IDV_VERSION_URL);
-            URLConnection  connection = website.openConnection();
-            BufferedReader in         = new BufferedReader(
+            URL           website    = new URL(IDV_VERSION_URL);
+            URLConnection connection = website.openConnection();
+            BufferedReader in = new BufferedReader(
                                     new InputStreamReader(
                                         connection.getInputStream()));
 

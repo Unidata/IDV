@@ -74,12 +74,7 @@ import java.io.IOException;
 
 import java.text.DecimalFormat;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.Vector;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -1184,7 +1179,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     grabImageAndBlock();
                 }
             } else {
-                getAnimationWidget().gotoBeginning();
+                ///if(animationResetCbx.isSelected())
+                // getAnimationWidget().gotoBeginning();
 
                 int start = getAnimation().getCurrent();
 
@@ -1470,7 +1466,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             filename =
                 FileManager.getWriteFile(Misc.newList(FileManager.FILTER_MOV,
                     FileManager.FILTER_AVI, FileManager.FILTER_ANIMATEDGIF,
-                    FileManager.FILTER_KMZ,
+                    FileManager.FILTER_ZIP, FileManager.FILTER_KMZ,
                     FILTER_ANIS), FileManager.SUFFIX_MOV, extra);
             writePositions = writePositionsCbx.isSelected();
         } else {
@@ -1591,6 +1587,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
             if (suffix != null) {
                 if (suffix.equalsIgnoreCase(FileManager.SUFFIX_KMZ)
+                        || suffix.equalsIgnoreCase(FileManager.SUFFIX_ZIP)
                         || suffix.equalsIgnoreCase(FileManager.SUFFIX_KML)) {
                     defSuffix = FileManager.SUFFIX_PNG;
                 } else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
@@ -2216,11 +2213,12 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 } else if (movieFile.toLowerCase().endsWith(".htm")
                            || movieFile.toLowerCase().endsWith(".html")) {
                     createAnisHtml(movieFile, images, size, displayRate,
-                                   scriptingNode);
+                            scriptingNode);
                 } else if (movieFile.toLowerCase()
-                        .endsWith(FileManager.SUFFIX_KMZ) || movieFile
-                        .toLowerCase().endsWith(FileManager.SUFFIX_KMZ)) {
+                        .endsWith(FileManager.SUFFIX_KMZ)) {
                     createKmz(movieFile, images, scriptingNode);
+                } else if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_ZIP)) {
+                    createZip(movieFile, images, scriptingNode);
                 } else if (movieFile.toLowerCase().endsWith(
                         FileManager.SUFFIX_AVI)) {
                     ImageUtils.writeAvi(ImageWrapper.makeFileList(images),
@@ -2440,6 +2438,80 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
     }
 
+    /**
+     * create the kmz
+     *
+     * @param movieFile file name
+     * @param images list of images
+     * @param scriptingNode isl node
+     */
+    public void createZip(String movieFile, List<ImageWrapper> images,
+                          Element scriptingNode) {
+
+        try {
+            ZipOutputStream zos = null;
+
+            if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_ZIP)) {
+                zos = new ZipOutputStream(new FileOutputStream(movieFile));
+            }
+
+            StringBuffer sb =
+                    new StringBuffer(
+                            "<entries>\n");
+            DateTime time = null;
+
+            time = (((getAnimation() != null)
+                    && (getAnimation().getAniValue() != null))
+                    ? new DateTime(getAnimation().getAniValue())
+                    : null);
+
+            String pName = IOUtil.stripExtension(IOUtil.getFileTail(movieFile));
+            sb.append("<entry fromdate=\"" + time.toString() + "\" id=\"imageloopParent\" name=\"" + pName + "\"  type=\"media_imageloop\">\n");
+            sb.append("</entry>\n");
+
+            int idx = 0;
+            for (ImageWrapper imageWrapper : images) {
+
+                zos.putNextEntry(
+                        new ZipEntry(IOUtil.getFileTail(imageWrapper.getPath())));
+                byte[] imageBytes = IOUtil.readBytes(
+                        new FileInputStream(
+                                imageWrapper.getPath()));
+
+                zos.write(imageBytes, 0, imageBytes.length);
+
+                String image    = imageWrapper.getPath();
+                String tail     = IOUtil.getFileTail(image);
+
+
+                DateTime        dttm   = imageWrapper.getDttm();
+                GeoLocationInfo bounds = imageWrapper.getBounds();
+                String         nameStr = "image_" + idx;
+
+                sb.append("<entry fromdate=\"" + dttm.toString() + "\" file=\""+ tail + "\" name=\"" + nameStr +
+                                               "\" parent=\"imageloopParent\" type=\"file\">\n");
+                sb.append("</entry>\n");
+                idx++;
+            }
+
+            sb.append("</entries>\n");
+            if (zos != null) {
+                zos.putNextEntry(
+                        new ZipEntry("entries" + FileManager.SUFFIX_XML));
+
+                byte[] kmlBytes = sb.toString().getBytes();
+
+                // System.out.println("sb:" + sb);
+                zos.write(kmlBytes, 0, kmlBytes.length);
+                zos.close();
+            } else {
+                IOUtil.writeFile(movieFile, sb.toString());
+            }
+        } catch (Exception exc) {
+            LogUtil.logException("Saving zip file", exc);
+        }
+
+    }
     /**
      * create the anis html
      *

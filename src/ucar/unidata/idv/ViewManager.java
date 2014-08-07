@@ -1547,10 +1547,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
             logoP = "ll";
             logoO = "0,0";
         } else {
-            int firstComma = position.indexOf(",");
+            int firstComma = position.indexOf(',');
 
             if (firstComma > 0) {
-                logoP = position.substring(0, firstComma - 1);
+                logoP = position.substring(0, firstComma);
                 logoO = position.substring(firstComma + 1);
             } else {
                 logoP = position;
@@ -2823,12 +2823,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         getInitialBooleanProperties(props);
 
-        StateManager   stateManager = getStateManager();
-        XmlObjectStore store        = getStore();
-
         if (booleanPropertiesForPersistence != null) {
+
             booleanPropertiesForPersistence =
-                stateManager.processPropertyTable(
+                StateManager.processPropertyTable(
                     booleanPropertiesForPersistence);
         }
 

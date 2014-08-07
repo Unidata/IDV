@@ -579,7 +579,10 @@ public class AddeImageDataSource extends ImageDataSource {
                         } catch (Exception e) {}
                     } else {
                         LatLonRect bbox = mapInfo.getLatLonRect().intersect(
-                                              ginfo.getLatLonRect());
+                                ginfo.getLatLonRect());
+                        if(mapInfo.getLatLonRect().containedIn(ginfo.getLatLonRect()))
+                            bbox = mapInfo.getLatLonRect();
+
                         if (bbox == null) {
                             bbox = mapInfo.getLatLonRect();
                         } else {
@@ -975,9 +978,13 @@ public class AddeImageDataSource extends ImageDataSource {
      * _more_
      */
     public void reloadData() {
-        super.reloadData();
-        if( addeImageDataSelection != null && addeImageDataSelection.leMagPanel != null)
+        //super.reloadData();
+        if( addeImageDataSelection != null && addeImageDataSelection.leMagPanel != null) {
             addeImageDataSelection.advancedPanel.updateMagPanel();
+            addeImageDataSelection.advancedPanel.setLineMagSlider(lineMag);
+            addeImageDataSelection.advancedPanel.setElementMagSlider(eleMag);
+        }
+        super.reloadData();
     }
 
     /**

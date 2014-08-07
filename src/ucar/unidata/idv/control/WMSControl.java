@@ -521,8 +521,8 @@ public class WMSControl extends ImageControl implements ImageObserver {
             } else {
                 double minLon = rect.x;
                 double maxLon = rect.x + rect.width;
-                double minLat = rect.y - rect.height;
-                double maxLat = rect.y;
+                double minLat = rect.y;
+                double maxLat = rect.y + rect.height;
                 return new GeoLocationInfo(minLat, minLon, maxLat, maxLon);
             }
         }

@@ -22,45 +22,40 @@
 
 package ucar.unidata.data;
 
-
-import org.w3c.dom.*;
-
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-
-
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringUtil;
-
-import ucar.unidata.xml.XmlUtil;
-
-import visad.Data;
-import visad.DataReference;
-
-import visad.VisADException;
-
-import java.awt.event.*;
-
-import java.io.*;
-
+import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.Serializable;
-
 import java.rmi.RemoteException;
-
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-import java.util.zip.*;
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 
-import javax.swing.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import ucar.unidata.util.FileManager;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.PatternFileFilter;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlUtil;
+
+import visad.Data;
+import visad.VisADException;
 
 /**
  * Used to cache  a data choice and its data
@@ -222,7 +217,7 @@ public class CacheDataSource extends DataSourceImpl {
             Element root  = doc.getDocumentElement();
 
 
-            int     total = 0;
+            long     total = 0;
             ZipOutputStream zos =
                 new ZipOutputStream(new FileOutputStream(filename));
             for (int i = 0; i < holders.size(); i++) {
