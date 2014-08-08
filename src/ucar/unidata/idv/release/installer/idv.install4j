@@ -694,7 +694,7 @@ if (!context.isUpdateInstallation()) {
                     <object class="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction">
                       <void property="destinationDirectory">
                         <object class="java.io.File">
-                          <string>jre.bundle/Contents/Home/lib/ext</string>
+                          <string>jre.bundle/Contents/Home/jre/lib/ext</string>
                         </object>
                       </void>
                       <void property="overwriteMode">
@@ -738,7 +738,7 @@ if (!context.isUpdateInstallation()) {
                     <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
                       <void property="destinationFile">
                         <object class="java.io.File">
-                          <string>jre.bundle/Contents/Home/lib/ext</string>
+                          <string>jre.bundle/Contents/Home/jre/lib/ext</string>
                         </object>
                       </void>
                       <void property="files">
@@ -769,7 +769,7 @@ if (!context.isUpdateInstallation()) {
                         </array>
                       </void>
                       <void property="replaceValue">
-                        <string>jre="jre.bundle/Contents/Home"</string>
+                        <string>jre="jre.bundle/Contents/Home/jre"</string>
                       </void>
                       <void property="searchValue">
                         <string>JRE_INSTALL4J_VAR</string>
@@ -862,7 +862,7 @@ if (!context.isUpdateInstallation()) {
                         </array>
                       </void>
                       <void property="replaceValue">
-                        <string>-Djava.ext.dirs="jre.bundle/Contents/Home/lib/ext/"</string>
+                        <string>-Djava.ext.dirs="jre.bundle/Contents/Home/jre/lib/ext/"</string>
                       </void>
                       <void property="searchValue">
                         <string>LIBEXT_INSTALL4J_VAR</string>
