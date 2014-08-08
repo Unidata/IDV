@@ -630,6 +630,9 @@ if (!context.isUpdateInstallation()) {
                           <string>${installer:sys.installationDir}/jre.bundle</string>
                         </object>
                       </void>
+                      <void property="directoryMode">
+                        <string>777</string>
+                      </void>
                       <void property="files">
                         <array class="java.io.File" length="1">
                           <void index="0">
@@ -638,6 +641,9 @@ if (!context.isUpdateInstallation()) {
                             </object>
                           </void>
                         </array>
+                      </void>
+                      <void property="mode">
+                        <string>777</string>
                       </void>
                     </object>
                   </java>
