@@ -38,6 +38,17 @@ import java.util.List;
  * The Class IdvCommandLinePrefsTest.
  */
 public class IdvCommandLinePrefsTest {
+	
+	
+	/**
+	 * Test to see of the IDV current version from Unidata is being obtained
+	 * properly.
+	 */
+    @Test
+    public void testGetCurrentVersion() {
+    	assertTrue(IdvCommandLinePrefs.getCurrentIDVVersion() != null);
+    }
+
 
     /**
      * Test IDV Version equality

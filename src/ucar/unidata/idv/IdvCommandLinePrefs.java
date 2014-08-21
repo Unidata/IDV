@@ -107,6 +107,7 @@ public class IdvCommandLinePrefs {
     @SuppressWarnings("unchecked")
     public static void main(String... args) {
         final StringBuilder sb = new StringBuilder();
+        final File prefFile = new File(getPreferences(args));
 
         try {
             final Map<Object, Object> userPrefMap = getPrefMap(args);
@@ -121,7 +122,8 @@ public class IdvCommandLinePrefs {
                                      ? false + ""
                                      : oldVersionDontWarn.toString());
             boolean dontShowOldWarnRsp = false;
-            if (isIDVold() && !dontShowOldWarn) {
+            
+            if (prefFile.exists() && isIDVold() && !dontShowOldWarn) {
                 dontShowOldWarnRsp = showOldVersionMessage();
             }
 
@@ -136,16 +138,15 @@ public class IdvCommandLinePrefs {
             }
             //User said not to warn so must persist this information.
             if (dontShowOldWarnRsp) {
-                final File f = new File(getPreferences(args));
-                if (f.exists()) {
-                    Element root = XmlUtil.getRoot(f.getPath(),
+                if (prefFile.exists()) {
+                    Element root = XmlUtil.getRoot(prefFile.getPath(),
                                        XmlUtil.class);
                     Document document = root.getOwnerDocument();
 
                     ///Define the method element from the ground up.
                     XmlEncoder xmlEncoder = new XmlEncoder();
                     final Element warn = xmlEncoder.createElement(
-                                             new Boolean(dontShowOldWarn));
+                                             new Boolean(dontShowOldWarnRsp));
                     final Element oldVersion =
                         xmlEncoder.createPrimitiveElement(
                             XmlEncoder.NAME_STRING, oldVersionKey);
@@ -164,7 +165,7 @@ public class IdvCommandLinePrefs {
                             true));
 
                     BufferedWriter writer =
-                        new BufferedWriter(new FileWriter(f));
+                        new BufferedWriter(new FileWriter(prefFile));
 
                     //simply, regex to get rid of empty lines
                     //http://stackoverflow.com/a/4123485/32174
@@ -360,7 +361,7 @@ public class IdvCommandLinePrefs {
      *
      * @return the current IDV version
      */
-    private static IDVVersion getCurrentIDVVersion() {
+    static IDVVersion getCurrentIDVVersion() {
         StringBuilder response = new StringBuilder();
 
         try {
