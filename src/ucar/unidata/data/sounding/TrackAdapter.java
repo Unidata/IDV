@@ -58,7 +58,7 @@ public abstract class TrackAdapter {
     TrackDataSource dataSource;
 
     /** List of TrackInfo, one for each trajectory in the data. */
-    private List trackInfos = new ArrayList();
+    private List<TrackInfo> trackInfos = new ArrayList<>();
 
     /** Access the data. */
     //    private 
@@ -146,7 +146,7 @@ public abstract class TrackAdapter {
      *
      * @return list of TrackInfo-s
      */
-    public List getTrackInfos() {
+    public List<TrackInfo> getTrackInfos() {
         return trackInfos;
     }
 
@@ -158,15 +158,22 @@ public abstract class TrackAdapter {
      * @return the track info or null if not found
      */
     public TrackInfo getTrackInfo(String name) {
-        for (int trackIdx = 0; trackIdx < trackInfos.size(); trackIdx++) {
-            TrackInfo trackInfo = (TrackInfo) trackInfos.get(trackIdx);
-            int       i = Math.min(trackInfo.getTrackName().length(), 20);
-            if ((name == null) || name.equals(trackInfo.getTrackName())
-                    || name.startsWith(trackInfo.getTrackName().substring(0,
-                        i))) {
-                return trackInfo;
+    	
+        for (TrackInfo trackInfo : trackInfos) {
+            if ((name == null) || name.equals(trackInfo.getTrackName())) {
+                return trackInfo; 
             }
-        }
+		}
+        
+        //Try fuzzy match if we have not found anything yet.
+        for (TrackInfo trackInfo : trackInfos) {
+            int       i = Math.min(trackInfo.getTrackName().length(), 20);
+            if (name.startsWith(trackInfo.getTrackName().substring(0,
+                        i))) {
+                return trackInfo; 
+            }
+		}
+        
         throw new IllegalArgumentException("Unknown track:" + name);
     }
 

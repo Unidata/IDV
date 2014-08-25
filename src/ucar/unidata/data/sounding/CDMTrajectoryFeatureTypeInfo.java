@@ -303,7 +303,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     public DateTime getStartTime() {
         if (startTime == null) {
             try {
-                startTime = new DateTime(times[1], getTimeUnit());
+                startTime = new DateTime(times[0], getTimeUnit());
             } catch (Exception e) {}
         }
         return startTime;
@@ -578,7 +578,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
 
-            fdata[j++] = pfsd.getScalarDouble(var);
+            fdata[j++] = pfsd.convertScalarDouble(var);
             i          = i + stride;
         }
 
@@ -1259,9 +1259,10 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
          * {@inheritDoc}
          */
         protected Unit getTimeUnit() throws Exception {
-            return DataUtil.parseUnit(
-                "days since "
-                + obsList.get(0).getNominalTimeAsCalendarDate());
+        	//There has got to be a better way to do this.
+        	String tu = obsList.get(0).getTimeUnit() + "";
+        	int spaceIdx = tu.indexOf(" ");
+            return DataUtil.parseUnit(tu.substring(spaceIdx).trim());
         }
     }
 

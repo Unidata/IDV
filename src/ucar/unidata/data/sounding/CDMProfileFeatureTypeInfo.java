@@ -323,7 +323,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
     public DateTime getStartTime() {
         if (startTime == null) {
             try {
-                startTime = new DateTime(times[1], getTimeUnit());
+                startTime = new DateTime(times[0], getTimeUnit());
             } catch (Exception e) {}
         }
         return startTime;
