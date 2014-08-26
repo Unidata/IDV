@@ -190,7 +190,7 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
         times.addAll(timeSet);
     }
 
-    /**
+	/**
      * Mandatory levels.
      *
      * @param data the structured data
@@ -198,8 +198,8 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
      */
     private SoundingLevelData mandatoryLevels(final StructureData data) {
         SoundingLevelData sl = new SoundingLevelData();
-        sl.pressure    = data.getScalarInt(data.findMember(PRES));
-        sl.temperature = data.getScalarInt(data.findMember(TEMP));
+        sl.pressure    = data.getScalarFloat(data.findMember(PRES));
+        sl.temperature = data.getScalarFloat(data.findMember(TEMP));
         sl.dewpoint    = data.getScalarFloat(data.findMember(DWPT));
         sl.speed       = data.getScalarFloat(data.findMember(SPED));
         sl.direction   = data.getScalarFloat(data.findMember(DRCT));
