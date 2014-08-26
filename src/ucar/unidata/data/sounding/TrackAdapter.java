@@ -21,18 +21,16 @@
 package ucar.unidata.data.sounding;
 
 
-import ucar.ma2.Range;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
+import ucar.ma2.Range;
 import visad.CommonUnit;
 import visad.Data;
 import visad.DateTime;
 import visad.FieldImpl;
 import visad.FlatField;
-
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
 
 
 /**
@@ -158,22 +156,21 @@ public abstract class TrackAdapter {
      * @return the track info or null if not found
      */
     public TrackInfo getTrackInfo(String name) {
-    	
+
         for (TrackInfo trackInfo : trackInfos) {
             if ((name == null) || name.equals(trackInfo.getTrackName())) {
-                return trackInfo; 
+                return trackInfo;
             }
-		}
-        
+        }
+
         //Try fuzzy match if we have not found anything yet.
         for (TrackInfo trackInfo : trackInfos) {
-            int       i = Math.min(trackInfo.getTrackName().length(), 20);
-            if (name.startsWith(trackInfo.getTrackName().substring(0,
-                        i))) {
-                return trackInfo; 
+            int i = Math.min(trackInfo.getTrackName().length(), 20);
+            if (name.startsWith(trackInfo.getTrackName().substring(0, i))) {
+                return trackInfo;
             }
-		}
-        
+        }
+
         throw new IllegalArgumentException("Unknown track:" + name);
     }
 

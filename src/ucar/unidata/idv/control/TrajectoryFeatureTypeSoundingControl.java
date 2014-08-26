@@ -21,6 +21,17 @@
 package ucar.unidata.idv.control;
 
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JComboBox;
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.sounding.CosmicTrajectoryFeatureTypeInfo;
@@ -34,18 +45,15 @@ import ucar.visad.display.DisplayableData;
 import ucar.visad.display.IndicatorPoint;
 import ucar.visad.display.LineDrawing;
 import ucar.visad.display.PickableLineDrawing;
-import visad.*;
+import visad.ActionImpl;
+import visad.Data;
+import visad.DateTime;
+import visad.Field;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.VisADException;
 import visad.georef.LatLonPoint;
 import visad.georef.NamedLocationTuple;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 
 /**
@@ -249,9 +257,10 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
         timeList   = new ArrayList();
 
         for (int i = 0; i < len; i++) {
-            TrajectoryFeatureTypeAdapter          cta   = adapters.get(i);
-            List<TrackInfo> infos = cta.getTrackInfos();
-            CosmicTrajectoryFeatureTypeInfo       cfti  = (CosmicTrajectoryFeatureTypeInfo) infos.get(0);
+            TrajectoryFeatureTypeAdapter cta   = adapters.get(i);
+            List<TrackInfo>              infos = cta.getTrackInfos();
+            CosmicTrajectoryFeatureTypeInfo cfti =
+                (CosmicTrajectoryFeatureTypeInfo) infos.get(0);
             Data[] sddata = cfti.getAerologicalDiagramDataArray();
             dataList.add(sddata);
             NamedLocationTuple s = cfti.getLatLonPoint();
