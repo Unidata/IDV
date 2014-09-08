@@ -255,8 +255,8 @@ public class AddePointDataSource extends PointDataSource {
                     double latMax = Math.max(ll.getLatitude(),
                                              ur.getLatitude());
                     if(ll.getLongitude() > 0 && ur.getLongitude() < 0) {
-                        lonMin = ll.getLongitude();
-                        lonMax = ur.getLongitude();
+                        lonMax = -1 * ll.getLongitude();
+                        lonMin = -1 * ur.getLongitude();
                     } else {
                         lonMin = Math.min(-1 * ll.getLongitude(),
                                 -1 * ur.getLongitude());
