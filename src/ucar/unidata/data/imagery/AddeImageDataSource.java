@@ -401,7 +401,6 @@ public class AddeImageDataSource extends ImageDataSource {
             //if(!matchRegion || !mdr)
             //    return descriptors;
         }
-        Rectangle2D rect  = geoSelection.getScreenBound();
 
 
         int         dlMag = 0;
@@ -423,6 +422,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
 
         if (geoSelection != null) {
+            Rectangle2D rect  = geoSelection.getScreenBound();
             ImageDataSelectionInfo adSource =
                     (ImageDataSelectionInfo) subset.getProperty(
                             "advancedURL");
