@@ -3273,15 +3273,23 @@ public final class Util {
             List<String> toks =
                 ucar.unidata.util.StringUtil.split(value.toString(), ",",
                     true, true);
-            if (toks.size() != 2) {
+            if (toks.size() == 2) {
+                // cross section start and end point
+                double lat = Double.parseDouble(toks.get(0));
+                double lon = Double.parseDouble(toks.get(1));
+                argument = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                        new double[] { lon,
+                                lat, 0.0 });
+            } else if (toks.size() == 1) {
+                //radar rhi azimuth
+                double laz = Double.parseDouble(toks.get(0));
+                Real lar = new Real(laz);
+                argument = new RealTuple(new Real[]{lar});
+            }else {
                 throw new IllegalArgumentException("Bad EarthLocation value:"
                         + value);
             }
-            double lat = Double.parseDouble(toks.get(0));
-            double lon = Double.parseDouble(toks.get(1));
-            argument = new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                                     new double[] { lon,
-                    lat, 0.0 });
+
         }
 
         if (argument != null) {

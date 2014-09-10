@@ -723,6 +723,19 @@ public class ColorRhiControl extends ColorCrossSectionControl {
     }
 
     /**
+     * _more_
+     *
+     * @param p _more_
+     */
+    public void setEndPoint(RealTuple p) {
+        if (p.getLength() != 1) {
+            return;
+        }
+        float az = (float) p.getValues()[0];
+        resetBeamAz(az);
+    }
+
+    /**
      * Set the value of the
      * azimuth of the RHI from radar location, 360 degrees, cw from N.
      * Does NOT move the beam; this is only for persistence. Use resetBeamAz.
