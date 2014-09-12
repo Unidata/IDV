@@ -37,6 +37,7 @@ import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.grid.GridDataSource;
+import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
@@ -65,6 +66,7 @@ import ucar.unidata.view.geoloc.ViewpointInfo;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.GeoUtils;
+import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationWidget;
 
@@ -335,6 +337,9 @@ public class ImageGenerator extends IdvManager {
 
     /** isl tag */
     public static final String TAG_TRANSPARENT = "transparent";
+
+    /** isl tag */
+    public static final String TAG_PROJECTION = "projection";
 
     /** background transparent tag */
     public static final String TAG_BGTRANSPARENT = "backgroundtransparent";
@@ -2260,7 +2265,33 @@ public class ImageGenerator extends IdvManager {
         return true;
     }
 
+    /**
+     * process the given node
+     *
+     * @param node Node to process
+     *
+     * @return keep going
+     *
+     * @throws Throwable On badness
+     */
+    protected boolean processTagProjection(Element node) throws Throwable {
+        if (XmlUtil.hasAttribute(node, ATTR_NAME)) {
+            String projName = applyMacros(node, ATTR_NAME);
+            ProjectionImpl projection = getIdv().getIdvProjectionManager().findProjectionByName(projName);
 
+            if(projection == null) {
+                throw new IllegalArgumentException("Could not find projection: "
+                        + projName);
+            } else {
+                MapProjection mp =
+                        new ProjectionCoordinateSystem(projection);
+                getVMManager().center(mp);
+            }
+
+            return true;
+        }
+        return true;
+    }
     /**
      * Find the data source that is identified by the given xml node
      *
