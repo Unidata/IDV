@@ -464,8 +464,10 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int j      = 0;
         while (i <= last) {
             PointFeature pf = obsList.get(i);
-
-            fdata[j++] = (float) pf.getLocation().getAltitude() * positive;
+            if(!Double.isNaN(pf.getLocation().getAltitude()))
+                fdata[j++] = (float) pf.getLocation().getAltitude() * positive;
+            else
+                fdata[j++] = 0.0f;
             i          = i + stride;
         }
 
