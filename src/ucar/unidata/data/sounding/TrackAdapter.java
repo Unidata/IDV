@@ -21,16 +21,18 @@
 package ucar.unidata.data.sounding;
 
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-
 import ucar.ma2.Range;
+
 import visad.CommonUnit;
 import visad.Data;
 import visad.DateTime;
 import visad.FieldImpl;
 import visad.FlatField;
+
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 
 /**
@@ -56,7 +58,7 @@ public abstract class TrackAdapter {
     TrackDataSource dataSource;
 
     /** List of TrackInfo, one for each trajectory in the data. */
-    private List<TrackInfo> trackInfos = new ArrayList<TrackInfo>();
+    private List<TrackInfo> trackInfos = new ArrayList<>();
 
     /** Access the data. */
     //    private 

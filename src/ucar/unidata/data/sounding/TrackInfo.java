@@ -21,37 +21,62 @@
 package ucar.unidata.data.sounding;
 
 
-import ucar.ma2.ArrayFloat;
 import ucar.ma2.Range;
 
-import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
-import ucar.unidata.data.point.*;
-
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.Bearing;
-
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 
-import ucar.visad.UtcDate;
 import ucar.visad.Util;
-import ucar.visad.quantities.*;
-
+import ucar.visad.quantities.AirPressure;
+import ucar.visad.quantities.AirTemperature;
 import ucar.visad.quantities.CommonUnits;
+import ucar.visad.quantities.DewPoint;
+import ucar.visad.quantities.Direction;
+import ucar.visad.quantities.PolarHorizontalWind;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.DateTime;
+import visad.DoubleSet;
+import visad.ErrorEstimate;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Gridded1DDoubleSet;
+import visad.GriddedSet;
+import visad.Integer1DSet;
+import visad.MathType;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Set;
+import visad.SetType;
+import visad.Text;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
-import visad.georef.*;
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
 
 import visad.util.DataUtility;
 
+
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -59,20 +84,19 @@ import java.util.List;
  *
  *
  * @author IDV Development Team
- * @version $Revision: 1.4 $
  */
 public abstract class TrackInfo {
 
-    /** _more_ */
+    /** The var time. */
     protected String varTime;
 
-    /** _more_ */
+    /** The var latitude. */
     protected String varLatitude;
 
-    /** _more_ */
+    /** The var longitude. */
     protected String varLongitude;
 
-    /** _more_ */
+    /** The var altitude. */
     protected String varAltitude;
 
 
@@ -116,8 +140,9 @@ public abstract class TrackInfo {
     /** Name of track */
     protected String trackName;
 
-    /** _more_ */
-    Hashtable dataTable = new Hashtable();
+
+    /** The data table. */
+    Map<String, Object> dataTable = new HashMap<>();
 
     /**
      * ctor
@@ -145,21 +170,20 @@ public abstract class TrackInfo {
     }
 
     /**
-     * _more_
+     * Adds the variable data.
      *
-     * @param vname _more_
-     * @param dataArray _more_
+     * @param vname the vname
+     * @param dataArray the data array
      */
     protected void addVariableData(String vname, Object dataArray) {
         dataTable.put(vname, dataArray);
     }
 
     /**
-     * _more_
+     * Gets the variable data.
      *
-     * @param vname _more_
-     *
-     * @return _more_
+     * @param vname the vname
+     * @return the variable data
      */
     protected Object getVariableData(String vname) {
         return dataTable.get(vname);

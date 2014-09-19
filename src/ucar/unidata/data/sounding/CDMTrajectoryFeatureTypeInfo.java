@@ -95,7 +95,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      *
      * @param adapter the adapter
      * @param dataset the dataset
-     * @param fc _more_
+     * @param fc the fc
      * @throws Exception the exception
      */
     public CDMTrajectoryFeatureTypeInfo(TrajectoryFeatureTypeAdapter adapter,
