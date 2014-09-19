@@ -56,7 +56,7 @@ public abstract class TrackAdapter {
     TrackDataSource dataSource;
 
     /** List of TrackInfo, one for each trajectory in the data. */
-    private List<TrackInfo> trackInfos = new ArrayList<>();
+    private List<TrackInfo> trackInfos = new ArrayList<TrackInfo>();
 
     /** Access the data. */
     //    private 

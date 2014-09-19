@@ -25,12 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ucar.ma2.Array;
-import ucar.ma2.Index;
-import ucar.ma2.Index0D;
-import ucar.ma2.Range;
-import ucar.ma2.StructureData;
-import ucar.ma2.StructureMembers;
+
+import ucar.ma2.*;
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
@@ -93,7 +89,6 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      *
      * @param adapter the adapter
      * @param dataset the dataset
-     * @param pob the pob
      * @param fc _more_
      * @throws Exception the exception
      */
@@ -201,6 +196,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 } else {
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), unit));
+                    addVariableData(mb.getName(), mb.getDataArray().copy());
                 }
             } else if ((unit != null)
                        && unit.isConvertible(CommonUnits.DEGREE)) {
@@ -221,11 +217,13 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 } else {
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), unit));
+                    addVariableData(mb.getName(), mb.getDataArray().copy());
                 }
 
             } else {
                 addVariable(new VarInfo(mb.getName(), mb.getDescription(),
                                         unit));
+                addVariableData(mb.getName(), mb.getDataArray().copy());
             }
 
         }
@@ -542,14 +540,12 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int first  = range.first();
         int stride = range.stride();
         int last   = range.last();
-
+       // List obsList = (List)obsTable.get(fc.getName());
+        Array dataArray = (Array)getVariableData(var);
         int i      = first;
         int j      = 0;
         while (i <= last) {
-            PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getData();
-
-            fdata[j++] = pfsd.convertScalarFloat(var);
+            fdata[j++] = dataArray.getFloat(i);
             i          = i + stride;
         }
 
