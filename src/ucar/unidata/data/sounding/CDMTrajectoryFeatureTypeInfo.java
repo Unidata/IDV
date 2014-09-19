@@ -21,12 +21,8 @@
 package ucar.unidata.data.sounding;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-
 import ucar.ma2.*;
+
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
@@ -34,6 +30,7 @@ import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureCollectionIterator;
 import ucar.nc2.ft.TrajectoryFeature;
 import ucar.nc2.ft.TrajectoryFeatureCollection;
+
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
 import ucar.unidata.data.point.PointOb;
@@ -42,9 +39,11 @@ import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.Station;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Trace;
+
 import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Direction;
+
 import visad.CommonUnit;
 import visad.Data;
 import visad.DateTime;
@@ -60,8 +59,15 @@ import visad.Text;
 import visad.Tuple;
 import visad.TupleType;
 import visad.Unit;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
+
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -462,11 +468,13 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int j      = 0;
         while (i <= last) {
             PointFeature pf = obsList.get(i);
-            if(!Double.isNaN(pf.getLocation().getAltitude()))
-                fdata[j++] = (float) pf.getLocation().getAltitude() * positive;
-            else
+            if ( !Double.isNaN(pf.getLocation().getAltitude())) {
+                fdata[j++] = (float) pf.getLocation().getAltitude()
+                             * positive;
+            } else {
                 fdata[j++] = 0.0f;
-            i          = i + stride;
+            }
+            i = i + stride;
         }
 
         return fdata;
@@ -540,10 +548,10 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int first  = range.first();
         int stride = range.stride();
         int last   = range.last();
-       // List obsList = (List)obsTable.get(fc.getName());
-        Array dataArray = (Array)getVariableData(var);
-        int i      = first;
-        int j      = 0;
+        // List obsList = (List)obsTable.get(fc.getName());
+        Array dataArray = (Array) getVariableData(var);
+        int   i         = first;
+        int   j         = 0;
         while (i <= last) {
             fdata[j++] = dataArray.getFloat(i);
             i          = i + stride;
