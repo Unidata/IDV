@@ -24,6 +24,7 @@ package ucar.unidata.data.sounding;
 import ucar.ma2.Array;
 import ucar.ma2.ArraySequence;
 import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers.Member;
 
 import ucar.nc2.constants.FeatureType;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
@@ -190,7 +191,7 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
         times.addAll(timeSet);
     }
 
-	/**
+    /**
      * Mandatory levels.
      *
      * @param data the structured data
@@ -218,19 +219,22 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
             final StructureData data)
             throws IOException {
         List<SoundingLevelData> sld = new LinkedList<>();
-        ArraySequence ttbb = data.getArraySequence(data.findMember(TTBB));
-        Array pres = ttbb.extractMemberArray(ttbb.findMember(PRES));
-        Array temp = ttbb.extractMemberArray(ttbb.findMember(TEMP));
-        Array dwpt = ttbb.extractMemberArray(ttbb.findMember(DWPT));
-        for (int i = 0; i < pres.getSize(); i++) {
-            SoundingLevelData sl = new SoundingLevelData();
-            sl.pressure    = pres.getFloat(i);
-            sl.temperature = temp.getFloat(i);
-            sl.dewpoint    = dwpt.getFloat(i);
-            sl.speed       = Float.NaN;
-            sl.direction   = Float.NaN;
-            sl.height      = Float.NaN;
-            sld.add(sl);
+        Member                  d   = data.findMember(TTBB);
+        if (d != null) {
+            ArraySequence ttbb = data.getArraySequence(d);
+            Array pres = ttbb.extractMemberArray(ttbb.findMember(PRES));
+            Array temp = ttbb.extractMemberArray(ttbb.findMember(TEMP));
+            Array dwpt = ttbb.extractMemberArray(ttbb.findMember(DWPT));
+            for (int i = 0; i < pres.getSize(); i++) {
+                SoundingLevelData sl = new SoundingLevelData();
+                sl.pressure    = pres.getFloat(i);
+                sl.temperature = temp.getFloat(i);
+                sl.dewpoint    = dwpt.getFloat(i);
+                sl.speed       = Float.NaN;
+                sl.direction   = Float.NaN;
+                sl.height      = Float.NaN;
+                sld.add(sl);
+            }
         }
         return sld;
     }
@@ -245,19 +249,22 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
     private Collection<? extends SoundingLevelData> ppbb(StructureData data)
             throws IOException {
         List<SoundingLevelData> sld = new LinkedList<>();
-        ArraySequence ppbb = data.getArraySequence(data.findMember(PPBB));
-        Array sped = ppbb.extractMemberArray(ppbb.findMember(SPED));
-        Array drct = ppbb.extractMemberArray(ppbb.findMember(DRCT));
-        Array hght = ppbb.extractMemberArray(ppbb.findMember(HGHT));
-        for (int i = 0; i < hght.getSize(); i++) {
-            SoundingLevelData sl = new SoundingLevelData();
-            sl.pressure    = hght.getFloat(i);
-            sl.temperature = Float.NaN;
-            sl.dewpoint    = Float.NaN;
-            sl.speed       = sped.getFloat(i);
-            sl.direction   = drct.getFloat(i);
-            sl.height      = Float.NaN;
-            sld.add(sl);
+        Member                  d   = data.findMember(PPBB);
+        if (d != null) {
+            ArraySequence ppbb = data.getArraySequence(d);
+            Array sped = ppbb.extractMemberArray(ppbb.findMember(SPED));
+            Array drct = ppbb.extractMemberArray(ppbb.findMember(DRCT));
+            Array hght = ppbb.extractMemberArray(ppbb.findMember(HGHT));
+            for (int i = 0; i < hght.getSize(); i++) {
+                SoundingLevelData sl = new SoundingLevelData();
+                sl.pressure    = hght.getFloat(i);
+                sl.temperature = Float.NaN;
+                sl.dewpoint    = Float.NaN;
+                sl.speed       = sped.getFloat(i);
+                sl.direction   = drct.getFloat(i);
+                sl.height      = Float.NaN;
+                sld.add(sl);
+            }
         }
         return sld;
     }
@@ -272,22 +279,25 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
     private Collection<? extends SoundingLevelData> ttcc(StructureData data)
             throws IOException {
         List<SoundingLevelData> sld = new LinkedList<>();
-        ArraySequence ttcc = data.getArraySequence(data.findMember(TTCC));
-        Array pres = ttcc.extractMemberArray(ttcc.findMember(PRES));
-        Array temp = ttcc.extractMemberArray(ttcc.findMember(TEMP));
-        Array dwpt = ttcc.extractMemberArray(ttcc.findMember(DWPT));
-        Array sped = ttcc.extractMemberArray(ttcc.findMember(SPED));
-        Array drct = ttcc.extractMemberArray(ttcc.findMember(DRCT));
-        Array hght = ttcc.extractMemberArray(ttcc.findMember(HGHT));
-        for (int i = 0; i < hght.getSize(); i++) {
-            SoundingLevelData sl = new SoundingLevelData();
-            sl.pressure    = pres.getFloat(i);
-            sl.temperature = temp.getFloat(i);
-            sl.dewpoint    = dwpt.getFloat(i);
-            sl.speed       = sped.getFloat(i);
-            sl.direction   = drct.getFloat(i);
-            sl.height      = hght.getFloat(i);
-            sld.add(sl);
+        Member                  d   = data.findMember(TTCC);
+        if (d != null) {
+            ArraySequence ttcc = data.getArraySequence(d);
+            Array pres = ttcc.extractMemberArray(ttcc.findMember(PRES));
+            Array temp = ttcc.extractMemberArray(ttcc.findMember(TEMP));
+            Array dwpt = ttcc.extractMemberArray(ttcc.findMember(DWPT));
+            Array sped = ttcc.extractMemberArray(ttcc.findMember(SPED));
+            Array drct = ttcc.extractMemberArray(ttcc.findMember(DRCT));
+            Array hght = ttcc.extractMemberArray(ttcc.findMember(HGHT));
+            for (int i = 0; i < hght.getSize(); i++) {
+                SoundingLevelData sl = new SoundingLevelData();
+                sl.pressure    = pres.getFloat(i);
+                sl.temperature = temp.getFloat(i);
+                sl.dewpoint    = dwpt.getFloat(i);
+                sl.speed       = sped.getFloat(i);
+                sl.direction   = drct.getFloat(i);
+                sl.height      = hght.getFloat(i);
+                sld.add(sl);
+            }
         }
         return sld;
     }
@@ -302,19 +312,22 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
     private Collection<? extends SoundingLevelData> mxwc(StructureData data)
             throws IOException {
         List<SoundingLevelData> sld = new LinkedList<>();
-        ArraySequence ppbb = data.getArraySequence(data.findMember(MXWC));
-        Array sped = ppbb.extractMemberArray(ppbb.findMember(SPED));
-        Array drct = ppbb.extractMemberArray(ppbb.findMember(DRCT));
-        Array pres = ppbb.extractMemberArray(ppbb.findMember(PRES));
-        for (int i = 0; i < pres.getSize(); i++) {
-            SoundingLevelData sl = new SoundingLevelData();
-            sl.pressure    = pres.getFloat(i);
-            sl.temperature = Float.NaN;
-            sl.dewpoint    = Float.NaN;
-            sl.speed       = sped.getFloat(i);
-            sl.direction   = drct.getFloat(i);
-            sl.height      = Float.NaN;
-            sld.add(sl);
+        Member                  d   = data.findMember(MXWC);
+        if (d != null) {
+            ArraySequence mxwc = data.getArraySequence(d);
+            Array sped = mxwc.extractMemberArray(mxwc.findMember(SPED));
+            Array drct = mxwc.extractMemberArray(mxwc.findMember(DRCT));
+            Array pres = mxwc.extractMemberArray(mxwc.findMember(PRES));
+            for (int i = 0; i < pres.getSize(); i++) {
+                SoundingLevelData sl = new SoundingLevelData();
+                sl.pressure    = pres.getFloat(i);
+                sl.temperature = Float.NaN;
+                sl.dewpoint    = Float.NaN;
+                sl.speed       = sped.getFloat(i);
+                sl.direction   = drct.getFloat(i);
+                sl.height      = Float.NaN;
+                sld.add(sl);
+            }
         }
         return sld;
     }
