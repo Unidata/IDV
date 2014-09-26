@@ -1696,6 +1696,18 @@ public class StationModelControl extends ObsDisplayControl {
                     Set timeSet = theData.getDomainSet();
                     if ( !getAskedUserToDeclutterTime()
                             && (timeSet.getLength() > 1000)) {
+                        if(!isInitDone()){
+                            int       numTimes   = timeSet.getLength();
+                            PointOb ob00;
+                            FieldImpl ob0 = (FieldImpl) theData.getSample(0);
+                            ob00 = (PointOb)ob0.getSample(0);
+                            double time0 = ob00.getDateTime().getValue();
+                            FieldImpl obE = (FieldImpl) theData.getSample(numTimes-1);
+                            ob00 = (PointOb)obE.getSample(0);
+                            double timeE = ob00.getDateTime().getValue();
+                            int seconds0 = (int)(timeE - time0)/1000;
+                            super.updateTimeDeclutterMinutes(seconds0/60);
+                        }
                         setAskedUserToDeclutterTime(true);
                         if ( !GuiUtils.askYesNo("Time Declutter", new JLabel("<html>There are "
                                 + timeSet.getLength()
@@ -3199,7 +3211,7 @@ public class StationModelControl extends ObsDisplayControl {
 
     /**
      * Declutters the observations.  This is just a wrapper around
-     * the real decluttering in {@link #doTheActualDecluttering(FieldImpl)}
+     * the real decluttering in {link #doTheActualDecluttering(FieldImpl)}
      * to handle the case where there is a time sequence of observations.
      *
      * @param  obs initial field of observations.

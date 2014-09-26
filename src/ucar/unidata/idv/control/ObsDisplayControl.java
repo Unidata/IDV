@@ -358,24 +358,6 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         List      timeFields = new ArrayList();
         List      timeValues = new ArrayList();
         Hashtable seenTime   = new Hashtable();
-
-        // cal seconds
-        PointOb ob00;
-        FieldImpl ob0 = (FieldImpl) obs.getSample(0);
-        ob00 = (PointOb)ob0.getSample(0);
-        double time0 = ob00.getDateTime().getValue();
-        FieldImpl obE = (FieldImpl) obs.getSample(numTimes-1);
-        ob00 = (PointOb)obE.getSample(0);
-        double timeE = ob00.getDateTime().getValue();
-        int seconds0 = (int)(timeE - time0)/100;
-        timeDeclutterMinutes = seconds0/60;
-        if(timeDeclutterMinutes < 1)
-            timeDeclutterMinutes = 1;
-        else {
-            setTimeDeclutterMinutes(timeDeclutterMinutes);
-            timeDeclutterFld.setText(getDisplayConventions().format(getTimeDeclutterMinutes()));
-        }
-
         int       seconds    = (int) (timeDeclutterMinutes * 60);
         if (seconds == 0) {
             seconds = 1;
@@ -872,6 +854,15 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         timeDeclutterMinutes = value;
     }
 
+    /**
+     * Update the TimeDeclutterMinutes property.
+     *
+     * @param value The new value for TimeDeclutterMinutes
+     */
+    public void updateTimeDeclutterMinutes(double value) {
+        timeDeclutterMinutes = value;
+        timeDeclutterFld.setText(getDisplayConventions().format(getTimeDeclutterMinutes()));
+    }
     /**
      * Get the TimeDeclutterMinutes property.
      *
