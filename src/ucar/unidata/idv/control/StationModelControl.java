@@ -1713,6 +1713,7 @@ public class StationModelControl extends ObsDisplayControl {
                 LogUtil.message("Observation display: subsetting times");
                 Trace.call1("doDeclutterTime");
                 theData = doDeclutterTime(theData);
+                GuiUtils.enableComponents(timeDeclutterComps, getTimeDeclutterEnabled());
                 Trace.call2("doDeclutterTime");
             }
 
