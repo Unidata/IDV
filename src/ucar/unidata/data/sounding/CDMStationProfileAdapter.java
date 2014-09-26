@@ -366,9 +366,7 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
                     sl.direction   = (drct == null)
                                      ? Float.NaN
                                      : drct.getFloat(i);
-                    sl.height      = (hght == null)
-                                     ? Float.NaN
-                                     : hght.getFloat(i);
+                    sl.height      = hght.getFloat(i);
                     sld.add(sl);
                 }
             }
