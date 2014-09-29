@@ -142,7 +142,7 @@ public abstract class TrackInfo {
 
 
     /** The data table. */
-    Map<String, Object> dataTable = new HashMap<>();
+    Map<String, Object> dataTable = new HashMap<String, Object>();
 
     /**
      * ctor
