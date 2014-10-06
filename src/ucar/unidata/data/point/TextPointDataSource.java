@@ -2429,38 +2429,27 @@ public class TextPointDataSource extends PointDataSource {
 
 
             if(dTimes != null){
-                HashSet seenTimes = new HashSet();
                 int jj = 0;
-                PointOb[]      obs0          = new PointObTuple[dTimes.size()];
-                for (DateTime dTime : dTimes) {
-                    Date dttm        = ucar.visad.Util.makeDate(dTime);
-                    long minTimeDiff = -1;
-                    DateTime minDate     = null;
-                    int ii = -1;
-                    for (int i = 0; i < numObs; i++) {
-                        DateTime sDate = (DateTime)times.get(i);
-                        Date stm        = ucar.visad.Util.makeDate(sDate);
-                        long timeDiff = Math.abs(stm.getTime()
-                                - dttm.getTime());
-                        if ((minTimeDiff < 0) || (timeDiff < minTimeDiff)) {
-                            minTimeDiff = timeDiff;
-                            minDate     = sDate;
-                            ii = i;
-                        }
-                    }
-                    if ((minDate != null) && !seenTimes.contains(minDate)) {
+                PointOb[]      obs0          = new PointObTuple[numObs];
+                List<DateTime> matches = null;
+                try {
+                    matches = DataUtil.selectTimesFromList(times, dTimes);
+                } catch (Exception e){}
 
-                        seenTimes.add(minDate);
-                        Data rest = (Data) tuples.get(ii);
+                for (int i = 0; i < numObs; i++) {
+                    DateTime sDate = (DateTime)times.get(i);
+
+                    if (matches.contains(sDate)) {
+                        Data rest = (Data) tuples.get(i);
                         EarthLocationLite location =
-                                (EarthLocationLite) locations.get(ii);
+                                (EarthLocationLite) locations.get(i);
                         if (finalTT == null) {
-                            PointObTuple pot = new PointObTuple(location, minDate,
+                            PointObTuple pot = new PointObTuple(location, sDate,
                                     rest);
                             obs0[jj] = pot;
                             finalTT = Tuple.buildTupleType(pot.getComponents());
                         } else {
-                            obs0[jj] = new PointObTuple(location, minDate, rest,
+                            obs0[jj] = new PointObTuple(location, sDate, rest,
                                     finalTT, false);
                         }
                         jj++;
