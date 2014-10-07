@@ -2436,6 +2436,11 @@ public class TextPointDataSource extends PointDataSource {
                     matches = DataUtil.selectTimesFromList(times, dTimes);
                 } catch (Exception e){}
 
+                if(matches == null || matches.size() == 0) {
+                    throw new IllegalStateException(
+                            "Could not match the driver times");
+                }
+
                 for (int i = 0; i < numObs; i++) {
                     DateTime sDate = (DateTime)times.get(i);
 
