@@ -67,6 +67,31 @@
     <operands/>
   </derived>
   <derived
+        description="Make flow vectors from direction data"
+        formula="flowVector(windDir)"
+        id="flowVectors"
+        isdefault="false"
+        isenduser="true">
+    <categories>
+        <category
+                display="true"
+                value="Grids"/>
+        <category
+                display="false"
+                value="*-flowvector-*;display:planviewflow"/>
+        <category
+                display="false"
+                value="*-flowvector-*;display:streamlines"/>
+        <category
+                display="false"
+                value="*-flowvector-*;display:windbarbplan"/>
+        <category
+                display="false"
+                value="*-flowvector-*;display:probe"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
      description="Make flow vectors from u, v, and w data"
      formula="makeFlowField(u, v, w)"
      id="flowVectors3D"
