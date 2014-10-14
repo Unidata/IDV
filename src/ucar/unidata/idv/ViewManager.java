@@ -183,6 +183,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
@@ -6989,7 +6990,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         };
 
         // GuiUtils.invokeInSwingThread(runnable);
-        Misc.run(runnable);
+        SwingUtilities.invokeLater(runnable);
     }
 
     /**
