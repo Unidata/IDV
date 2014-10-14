@@ -39,15 +39,7 @@ import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.grid.GridDataSource;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.ProjectionRect;
-import ucar.unidata.idv.ControlDescriptor;
-import ucar.unidata.idv.DisplayControl;
-import ucar.unidata.idv.IdvManager;
-import ucar.unidata.idv.IdvPersistenceManager;
-import ucar.unidata.idv.IntegratedDataViewer;
-import ucar.unidata.idv.MapViewManager;
-import ucar.unidata.idv.VectorGraphicsRenderer;
-import ucar.unidata.idv.ViewDescriptor;
-import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.colortable.ColorTableCanvas;
@@ -4281,8 +4273,12 @@ public class ImageGenerator extends IdvManager {
                         new VectorGraphicsRenderer(viewManager);
                     vectorRenderer.renderTo(loopFilename);
                 } else {
-                    getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
-                        getIdv().getIdvUIManager(), 0);
+                    if(viewManager instanceof CrossSectionViewManager)
+                        getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
+                            getIdv().getIdvUIManager(), 1000);
+                    else
+                        getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
+                                getIdv().getIdvUIManager(), 0);
                     lastImage       = viewManager.getMaster().getImage(false);
                     imageProperties = new Hashtable();
                     lastImage = processImage((BufferedImage) lastImage,

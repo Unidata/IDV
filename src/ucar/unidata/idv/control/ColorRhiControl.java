@@ -890,7 +890,9 @@ public class ColorRhiControl extends ColorCrossSectionControl {
         if (grid == null) {
             return;
         }
+        showWaitCursor();
         loadData(grid);
+        showNormalCursor();
         lastLoadedAz = beamAz;
     }
 
