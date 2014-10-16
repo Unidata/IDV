@@ -1558,7 +1558,7 @@ public class GeoGridDataSource extends GridDataSource {
         		DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDEFAULTAREA);
         boolean      isProgressiveResolution = givenDataSelection.getProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION, false);
-        boolean matchDisplayRegion = geoSelection.getUseViewBounds();
+        boolean matchDisplayRegion = ((geoSelection != null) ? geoSelection.getUseViewBounds(): false);
 
         if(!isProgressiveResolution && dataChoice.getDataSelection() != null){
             isProgressiveResolution =
@@ -1643,8 +1643,8 @@ public class GeoGridDataSource extends GridDataSource {
             }
             //System.out.println("new x y strides: " + geoSelection.getXStride() + " "
             //        + geoSelection.getYStride());
-            int xStride = geoSelection.getXStride();
-            int yStride = geoSelection.getYStride();
+            int xStride = (geoSelection != null) ? geoSelection.getXStride() : 1;
+            int yStride = (geoSelection != null) ? geoSelection.getYStride() : 1;
             // Set 0 or -1 to be 1
             if (xStride < 1) {
             	xStride = 1;
