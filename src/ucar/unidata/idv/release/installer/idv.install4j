@@ -845,7 +845,7 @@ if (!context.isUpdateInstallation()) {
                         </array>
                       </void>
                       <void property="replaceValue">
-                        <string>-Djava.ext.dirs="jre.bundle/Contents/Home/jre/lib/ext/"</string>
+                        <string>-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/jre/lib/ext/"</string>
                       </void>
                       <void property="searchValue">
                         <string>LIBEXT_INSTALL4J_VAR</string>
