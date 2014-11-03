@@ -1088,11 +1088,11 @@ public class LogUtil {
         }
         if (showGui()) {
             consoleMessage(msg);
-            JLabel label = new JLabel(msg);
-            GuiUtils.addModalDialogComponent(label);
+            JComponent msgComponent = getMessageComponent(msg);
+            GuiUtils.addModalDialogComponent(msgComponent);
             javax.swing.JOptionPane.showMessageDialog(getCurrentWindow(),
-                    label);
-            GuiUtils.removeModalDialogComponent(label);
+                msgComponent);
+            GuiUtils.removeModalDialogComponent(msgComponent);
         } else {
             if ( !(andLog && (log_ != null))) {
                 System.err.println(msg);
@@ -1119,12 +1119,11 @@ public class LogUtil {
         if (msg.length() < 50) {
             return new JLabel(msg);
         }
-        List         lines = StringUtil.split(msg, "\n");
-        StringBuffer sb    = new StringBuffer();
-        for (int i = 0; i < lines.size(); i++) {
-            String line = (String) lines.get(i);
+        List<String>  lines = StringUtil.split(msg, "\n");
+        StringBuilder sb    = new StringBuilder(msg.length() * 2);
+        for (String line : lines) {
             line = StringUtil.breakText(line, "\n", 50);
-            sb.append(line + "\n");
+            sb.append(line).append('\n');
         }
 
         JTextArea textArea = new JTextArea(sb.toString());

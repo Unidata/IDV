@@ -1,20 +1,18 @@
 /*
- * $Id: TrackInfo.java,v 1.4 2007/08/06 17:02:27 jeffmc Exp $
- *
- * Copyright  1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -25,34 +23,60 @@ package ucar.unidata.data.sounding;
 
 import ucar.ma2.Range;
 
-import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
-import ucar.unidata.data.point.*;
-
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.Bearing;
-
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 
-import ucar.visad.UtcDate;
 import ucar.visad.Util;
-import ucar.visad.quantities.*;
-
+import ucar.visad.quantities.AirPressure;
+import ucar.visad.quantities.AirTemperature;
 import ucar.visad.quantities.CommonUnits;
+import ucar.visad.quantities.DewPoint;
+import ucar.visad.quantities.Direction;
+import ucar.visad.quantities.PolarHorizontalWind;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.DateTime;
+import visad.DoubleSet;
+import visad.ErrorEstimate;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.Gridded1DDoubleSet;
+import visad.GriddedSet;
+import visad.Integer1DSet;
+import visad.MathType;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.Set;
+import visad.SetType;
+import visad.Text;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
-import visad.georef.*;
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
 
 import visad.util.DataUtility;
 
+
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -60,20 +84,19 @@ import java.util.List;
  *
  *
  * @author IDV Development Team
- * @version $Revision: 1.4 $
  */
 public abstract class TrackInfo {
 
-    /** _more_          */
+    /** The var time. */
     protected String varTime;
 
-    /** _more_          */
+    /** The var latitude. */
     protected String varLatitude;
 
-    /** _more_          */
+    /** The var longitude. */
     protected String varLongitude;
 
-    /** _more_          */
+    /** The var altitude. */
     protected String varAltitude;
 
 
@@ -118,6 +141,9 @@ public abstract class TrackInfo {
     protected String trackName;
 
 
+    /** The data table. */
+    Map<String, Object> dataTable = new HashMap<String, Object>();
+
     /**
      * ctor
      *
@@ -143,6 +169,25 @@ public abstract class TrackInfo {
         variables.add(variable);
     }
 
+    /**
+     * Adds the variable data.
+     *
+     * @param vname the vname
+     * @param dataArray the data array
+     */
+    protected void addVariableData(String vname, Object dataArray) {
+        dataTable.put(vname, dataArray);
+    }
+
+    /**
+     * Gets the variable data.
+     *
+     * @param vname the vname
+     * @return the variable data
+     */
+    protected Object getVariableData(String vname) {
+        return dataTable.get(vname);
+    }
 
     /**
      * _more_
@@ -460,15 +505,15 @@ public abstract class TrackInfo {
 
         timeVals = CommonUnit.secondsSinceTheEpoch.toThis(timeVals,
                 getTimeUnit());
-        List<VarInfo>    varsToUse  = getVarsToUse();
-        int     numReals   = countReals(varsToUse);
-        int     numStrings = varsToUse.size() - numReals;
-        boolean allReals   = numStrings == 0;
-        int     numVars    = varsToUse.size();
-        Unit[]  units      = new Unit[numVars];
+        List<VarInfo> varsToUse  = getVarsToUse();
+        int           numReals   = countReals(varsToUse);
+        int           numStrings = varsToUse.size() - numReals;
+        boolean       allReals   = numStrings == 0;
+        int           numVars    = varsToUse.size();
+        Unit[]        units      = new Unit[numVars];
 
         for (int varIdx = 0; varIdx < numVars; varIdx++) {
-            VarInfo var =  varsToUse.get(varIdx);
+            VarInfo var = varsToUse.get(varIdx);
             units[varIdx] = var.getUnit();
         }
 
@@ -528,7 +573,7 @@ public abstract class TrackInfo {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
                 }
-                VarInfo var =  varsToUse.get(varIdx);
+                VarInfo var = varsToUse.get(varIdx);
                 if (var.getIsNumeric()) {
                     float[] fvalues = getFloatData(range, var.getShortName());
                     if (var.getRealType() == null) {
@@ -1061,7 +1106,8 @@ public abstract class TrackInfo {
                 PolarHorizontalWind.getSpeedRealType().getDefaultUnit(),
                 samples[wspdIndex],
                 PolarHorizontalWind.getDirectionRealType().getDefaultUnit(),
-                samples[wdirIndex], DataUtil.parseUnit("gpm"), samples[altIndex]);
+                samples[wdirIndex], DataUtil.parseUnit("gpm"),
+                samples[altIndex]);
 
         raob.setMandatoryPressureProfile(mpp);
 
@@ -1072,4 +1118,3 @@ public abstract class TrackInfo {
 
 
 }
-

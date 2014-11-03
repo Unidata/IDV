@@ -21,14 +21,22 @@
 package ucar.unidata.data.sounding;
 
 
-import ucar.ma2.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import ucar.nc2.Attribute;
-import ucar.nc2.constants.FeatureType;
-
-import ucar.nc2.ft.*;
-import ucar.nc2.units.DateRange;
-
+import ucar.ma2.Index;
+import ucar.ma2.Index0D;
+import ucar.ma2.Range;
+import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers;
+import ucar.nc2.ft.FeatureDatasetPoint;
+import ucar.nc2.ft.PointFeature;
+import ucar.nc2.ft.PointFeatureCollection;
+import ucar.nc2.ft.PointFeatureCollectionIterator;
+import ucar.nc2.ft.PointFeatureIterator;
+import ucar.nc2.ft.ProfileFeature;
+import ucar.nc2.ft.ProfileFeatureCollection;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
 import ucar.unidata.data.point.PointOb;
@@ -37,24 +45,26 @@ import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.Station;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Trace;
-
 import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Direction;
-
-import visad.*;
-
+import visad.CommonUnit;
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.FunctionType;
+import visad.Integer1DSet;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.SetType;
+import visad.Text;
+import visad.Tuple;
+import visad.TupleType;
+import visad.Unit;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
-
-import java.io.IOException;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-
-import java.util.List;
 
 
 /**
@@ -323,7 +333,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
     public DateTime getStartTime() {
         if (startTime == null) {
             try {
-                startTime = new DateTime(times[1], getTimeUnit());
+                startTime = new DateTime(times[0], getTimeUnit());
             } catch (Exception e) {}
         }
         return startTime;
@@ -772,10 +782,9 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
                         float value = structure.convertScalarFloat(member);
                         realArray[realCnt++] = value;
                         tupleArray[varCnt]   = (var.getUnit() == null)
-                                ? new Real(var.getRealType(),
-                                value)
-                                : new Real(var.getRealType(),
-                                value, var.getUnit());
+                                ? new Real(var.getRealType(), value)
+                                : new Real(var.getRealType(), value,
+                                           var.getUnit());
                     }
                     varCnt++;
                 }

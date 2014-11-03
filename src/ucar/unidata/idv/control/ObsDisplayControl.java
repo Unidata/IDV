@@ -855,6 +855,15 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
     }
 
     /**
+     * Update the TimeDeclutterMinutes property.
+     *
+     * @param value The new value for TimeDeclutterMinutes
+     */
+    public void updateTimeDeclutterMinutes(double value) {
+        timeDeclutterMinutes = value;
+        timeDeclutterFld.setText(getDisplayConventions().format(getTimeDeclutterMinutes()));
+    }
+    /**
      * Get the TimeDeclutterMinutes property.
      *
      * @return The TimeDeclutterMinutes

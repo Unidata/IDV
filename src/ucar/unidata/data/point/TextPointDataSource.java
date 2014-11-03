@@ -41,6 +41,7 @@ import ucar.unidata.util.StringUtil;
 
 import visad.*;
 
+import visad.Set;
 import visad.data.text.TextAdapter;
 
 import visad.georef.EarthLocation;
@@ -58,11 +59,8 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -241,6 +239,8 @@ public class TextPointDataSource extends PointDataSource {
     private String delimiter;
 
 
+    /** _more_          */
+    public boolean useDriverTime = false;
     /**
      * Default constructor
      *
@@ -387,6 +387,15 @@ public class TextPointDataSource extends PointDataSource {
                              LatLonRect bbox)
             throws Exception {
         //        System.err.println("MAKE OBS");
+        Object t       = subset.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+        if ((t instanceof Boolean) && (useDriverTime == false)) {
+            useDriverTime = ((Boolean) t).booleanValue();
+        }
+
+        if (useDriverTime) {
+            List dt = subset.getTimeDriverTimes();
+            subset.setTimes(dt);
+        }
         return makeObs(dataChoice, subset, bbox, null, false, true);
     }
 
@@ -652,8 +661,11 @@ public class TextPointDataSource extends PointDataSource {
                 }
 
                 long t1 = System.currentTimeMillis();
+                List tlist = null;
+                if(subset != null )
+                    tlist = subset.getTimeDriverTimes();
                 if (streamProcessorToUse != null) {
-                    obs = makePointObs(pointValues, trackParam);
+                    obs = makePointObs(pointValues, trackParam, tlist);
                 } else {
                     obs = makePointObs(d, trackParam);
                 }
@@ -2093,7 +2105,7 @@ public class TextPointDataSource extends PointDataSource {
      *
      * @throws VisADException  problem making VisAD Data
      */
-    private FieldImpl makePointObs(List<Data[]> pointData, String trackParam)
+    private FieldImpl makePointObs(List<Data[]> pointData, String trackParam, List<DateTime> dTimes)
             throws VisADException {
 
         if (pointData.size() == 0) {
@@ -2416,31 +2428,74 @@ public class TextPointDataSource extends PointDataSource {
                                             getBinWidth());
 
 
+            if(dTimes != null){
+                int jj = 0;
+                PointOb[]      obs0          = new PointObTuple[numObs];
+                List<DateTime> matches = null;
+                try {
+                    matches = DataUtil.selectTimesFromList(times, dTimes);
+                } catch (Exception e){}
 
-
-            for (int i = 0; i < numObs; i++) {
-                DateTime dateTime = (DateTime) times.get(i);
-                Data     rest     = (Data) tuples.get(i);
-                EarthLocationLite location =
-                    (EarthLocationLite) locations.get(i);
-                if (finalTT == null) {
-                    PointObTuple pot = new PointObTuple(location, dateTime,
-                                           rest);
-                    obs[i]  = pot;
-                    finalTT = Tuple.buildTupleType(pot.getComponents());
-                } else {
-                    obs[i] = new PointObTuple(location, dateTime, rest,
-                            finalTT, false);
-
+                if(matches == null || matches.size() == 0) {
+                    throw new IllegalStateException(
+                            "Could not match the driver times");
                 }
+
+                for (int i = 0; i < numObs; i++) {
+                    DateTime sDate = (DateTime)times.get(i);
+
+                    if (matches.contains(sDate)) {
+                        Data rest = (Data) tuples.get(i);
+                        EarthLocationLite location =
+                                (EarthLocationLite) locations.get(i);
+                        if (finalTT == null) {
+                            PointObTuple pot = new PointObTuple(location, sDate,
+                                    rest);
+                            obs0[jj] = pot;
+                            finalTT = Tuple.buildTupleType(pot.getComponents());
+                        } else {
+                            obs0[jj] = new PointObTuple(location, sDate, rest,
+                                    finalTT, false);
+                        }
+                        jj++;
+                    }
+                }
+                PointOb[]      obs1          = new PointObTuple[jj];
+                System.arraycopy(obs0, 0, obs1, 0, jj);
+                Integer1DSet indexSet =
+                        new Integer1DSet(RealType.getRealType("index"), jj);
+                retField = new FieldImpl(
+                        new FunctionType(
+                                ((SetType) indexSet.getType()).getDomain(),
+                                obs1[0].getType()), indexSet);
+                retField.setSamples(obs1, false, false);
+
+            } else {
+                for (int i = 0; i < numObs; i++) {
+                    DateTime dateTime = (DateTime) times.get(i);
+                    Data rest = (Data) tuples.get(i);
+                    EarthLocationLite location =
+                            (EarthLocationLite) locations.get(i);
+                    if (finalTT == null) {
+                        PointObTuple pot = new PointObTuple(location, dateTime,
+                                rest);
+                        obs[i] = pot;
+                        finalTT = Tuple.buildTupleType(pot.getComponents());
+                    } else {
+                        obs[i] = new PointObTuple(location, dateTime, rest,
+                                finalTT, false);
+
+                    }
+                }
+                Integer1DSet indexSet =
+                        new Integer1DSet(RealType.getRealType("index"), obs.length);
+                retField = new FieldImpl(
+                        new FunctionType(
+                                ((SetType) indexSet.getType()).getDomain(),
+                                obs[0].getType()), indexSet);
+                retField.setSamples(obs, false, false);
             }
-            Integer1DSet indexSet =
-                new Integer1DSet(RealType.getRealType("index"), obs.length);
-            retField = new FieldImpl(
-                new FunctionType(
-                    ((SetType) indexSet.getType()).getDomain(),
-                    obs[0].getType()), indexSet);
-            retField.setSamples(obs, false, false);
+
         } catch (RemoteException re) {
             throw new VisADException("got RemoteException " + re);
         }

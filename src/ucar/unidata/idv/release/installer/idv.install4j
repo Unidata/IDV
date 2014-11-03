@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.12" transformSequenceNumber="4">
+<install4j version="5.1.7" transformSequenceNumber="4">
   <directoryPresets config="${compiler:SRCDIR}/libsrc/j3d-macosx.zip" />
   <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="4.1" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
@@ -845,7 +845,7 @@ if (!context.isUpdateInstallation()) {
                         </array>
                       </void>
                       <void property="replaceValue">
-                        <string>-Djava.ext.dirs="jre.bundle/Contents/Home/jre/lib/ext/"</string>
+                        <string>-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/jre/lib/ext/"</string>
                       </void>
                       <void property="searchValue">
                         <string>LIBEXT_INSTALL4J_VAR</string>
@@ -911,30 +911,6 @@ if (!context.isUpdateInstallation()) {
                             </object>
                           </void>
                         </array>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
-              <action name="Remove Mac OS X JRE" id="1412" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
-                      <void property="backupForRollback">
-                        <boolean>false</boolean>
-                      </void>
-                      <void property="files">
-                        <array class="java.io.File" length="1">
-                          <void index="0">
-                            <object class="java.io.File">
-                              <string>${installer:sys.installationDir}/.install4j/jre.bundle</string>
-                            </object>
-                          </void>
-                        </array>
-                      </void>
-                      <void property="recursive">
-                        <boolean>true</boolean>
                       </void>
                     </object>
                   </java>
@@ -1226,7 +1202,7 @@ if (!context.isUpdateInstallation()) {
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <macosFolder name="Mac OS X" id="12" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_67" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="" signLaunchers="false">
+    <macosFolder name="Mac OS X" id="12" customizedId="" mediaFileName="" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_67" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="2" />
         <launcher id="7" />

@@ -446,7 +446,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
 
-
+        getIdv().getVMManager().addViewManager(crossSectionView);
         addViewManager(crossSectionView);
         setYAxisRange(csvxsDisplay, verticalAxisRange);
         csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
@@ -1659,7 +1659,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         if (getSkipValue() > 0) {
             slice = GridUtil.subset(slice, getSkipValue() + 1, 1);
         }
+        showWaitCursor();
         loadData(slice);
+        showNormalCursor();
     }
 
 

@@ -16,6 +16,11 @@ def makeFlowField(a,b,c):
   """
   return DerivedGridFactory.createFlowVectors(a,b,c)
 
+def flowVector(field):
+  """ Make a vector from flow direction"""
+  a=newName(sin(field),"a")
+  b=newName(cos(field),"b")
+  return DerivedGridFactory.createFlowVectors(a,b)
 
 def extractPressureFromNWPGrid(fieldimpl):
   """Get the pressure coordinate from a time series grid and

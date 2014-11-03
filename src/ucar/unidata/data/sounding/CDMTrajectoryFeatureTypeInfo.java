@@ -21,12 +21,7 @@
 package ucar.unidata.data.sounding;
 
 
-import ucar.ma2.Array;
-import ucar.ma2.Index;
-import ucar.ma2.Index0D;
-import ucar.ma2.Range;
-import ucar.ma2.StructureData;
-import ucar.ma2.StructureMembers;
+import ucar.ma2.*;
 
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
@@ -100,8 +95,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      *
      * @param adapter the adapter
      * @param dataset the dataset
-     * @param pob the pob
-     * @param fc _more_
+     * @param fc the fc
      * @throws Exception the exception
      */
     public CDMTrajectoryFeatureTypeInfo(TrajectoryFeatureTypeAdapter adapter,
@@ -208,6 +202,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 } else {
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), unit));
+                    addVariableData(mb.getName(), mb.getDataArray().copy());
                 }
             } else if ((unit != null)
                        && unit.isConvertible(CommonUnits.DEGREE)) {
@@ -228,11 +223,13 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 } else {
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), unit));
+                    addVariableData(mb.getName(), mb.getDataArray().copy());
                 }
 
             } else {
                 addVariable(new VarInfo(mb.getName(), mb.getDescription(),
                                         unit));
+                addVariableData(mb.getName(), mb.getDataArray().copy());
             }
 
         }
@@ -303,7 +300,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     public DateTime getStartTime() {
         if (startTime == null) {
             try {
-                startTime = new DateTime(times[1], getTimeUnit());
+                startTime = new DateTime(times[0], getTimeUnit());
             } catch (Exception e) {}
         }
         return startTime;
@@ -471,9 +468,13 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int j      = 0;
         while (i <= last) {
             PointFeature pf = obsList.get(i);
-
-            fdata[j++] = (float) pf.getLocation().getAltitude() * positive;
-            i          = i + stride;
+            if ( !Double.isNaN(pf.getLocation().getAltitude())) {
+                fdata[j++] = (float) pf.getLocation().getAltitude()
+                             * positive;
+            } else {
+                fdata[j++] = 0.0f;
+            }
+            i = i + stride;
         }
 
         return fdata;
@@ -547,14 +548,12 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int first  = range.first();
         int stride = range.stride();
         int last   = range.last();
-
-        int i      = first;
-        int j      = 0;
+        // List obsList = (List)obsTable.get(fc.getName());
+        Array dataArray = (Array) getVariableData(var);
+        int   i         = first;
+        int   j         = 0;
         while (i <= last) {
-            PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getData();
-
-            fdata[j++] = pfsd.convertScalarFloat(var);
+            fdata[j++] = dataArray.getFloat(i);
             i          = i + stride;
         }
 
@@ -578,7 +577,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
 
-            fdata[j++] = pfsd.getScalarDouble(var);
+            fdata[j++] = pfsd.convertScalarDouble(var);
             i          = i + stride;
         }
 
@@ -1259,9 +1258,10 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
          * {@inheritDoc}
          */
         protected Unit getTimeUnit() throws Exception {
-            return DataUtil.parseUnit(
-                "days since "
-                + obsList.get(0).getNominalTimeAsCalendarDate());
+            //There has got to be a better way to do this.
+            String tu       = obsList.get(0).getTimeUnit() + "";
+            int    spaceIdx = tu.indexOf(" ");
+            return DataUtil.parseUnit(tu.substring(spaceIdx).trim());
         }
     }
 
