@@ -28,6 +28,7 @@ import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.NavigatedViewManager;
 import ucar.unidata.idv.ViewManager;
@@ -2433,20 +2434,19 @@ public class AddeImageDataSelection {
                 if (latLonRect.getHeight() != latLonRect.getHeight()) {
                     //corner point outside the earth
 
-                    LatLonPointImpl cImpl =
-                        projectionImpl.projToLatLon(rect.getX()
+                    LatLonPoint cImpl = projectionImpl.projToLatLon(rect.getX()
                             + rect.getWidth() / 2, rect.getY()
-                                + rect.getHeight() / 2);
-                    LatLonPointImpl urImpl =
+                            + rect.getHeight() / 2);
+                    LatLonPoint urImpl =
                         projectionImpl.projToLatLon(rect.getX() + rect.getWidth(),
                             rect.getY() + rect.getHeight());
-                    LatLonPointImpl ulImpl =
+                    LatLonPoint ulImpl =
                         projectionImpl.projToLatLon(rect.getX(),
                             rect.getY() + rect.getHeight());
-                    LatLonPointImpl lrImpl =
+                    LatLonPoint lrImpl =
                         projectionImpl.projToLatLon(rect.getX() + rect.getWidth(),
                             rect.getY());
-                    LatLonPointImpl llImpl =
+                    LatLonPoint llImpl =
                         projectionImpl.projToLatLon(rect.getX(), rect.getY());
 
                     double maxLat = Double.NaN;
