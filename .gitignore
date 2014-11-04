@@ -30,6 +30,7 @@ ide/intellij/.idea/vcs.xml
 ide/intellij/.idea/compiler.xml
 ide/intellij/.idea/libraries/ncIdv.xml
 ide/intellij/.idea/libraries/java3d.xml
+ide/intellij/IDV.iml
 #
 # Eclipse files
 #
