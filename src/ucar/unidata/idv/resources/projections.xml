@@ -24,18 +24,18 @@
           <property name="Rect" >
             <object idref="id11" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-3718.9811314976646</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-1318.7048434428925</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>6278.23417910328</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>6278.23417910328</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-3718.9811314976646</double>
+          </property>
+          <property name="Y" >
+            <double>-1318.7048434428925</double>
+          </property>
+          <property name="Width" >
+            <double>6278.23417910328</double>
+          </property>
+          <property name="Height" >
+            <double>6278.23417910328</double>
+          </property>
         </object>
       </property>
     </object>
@@ -63,18 +63,18 @@
           <property name="Rect" >
             <object idref="id13" />
           </property>
-          <field name="x" >
-            <java.lang.Double>2209.3855386593705</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>2061.162079838977</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>859.872633795836</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>859.872633795836</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>2209.3855386593705</double>
+          </property>
+          <property name="Y" >
+            <double>2061.162079838977</double>
+          </property>
+          <property name="Width" >
+            <double>859.872633795836</double>
+          </property>
+          <property name="Height" >
+            <double>859.872633795836</double>
+          </property>
         </object>
       </property>
     </object>
@@ -102,18 +102,18 @@
           <property name="Rect" >
             <object idref="id15" />
           </property>
-          <field name="x" >
-            <java.lang.Double>413.8369539997084</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>33.307746053816345</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>1353.9825719568362</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>1353.9825719568362</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>413.8369539997084</double>
+          </property>
+          <property name="Y" >
+            <double>33.307746053816345</double>
+          </property>
+          <property name="Width" >
+            <double>1353.9825719568362</double>
+          </property>
+          <property name="Height" >
+            <double>1353.9825719568362</double>
+          </property>
         </object>
       </property>
     </object>
@@ -141,18 +141,18 @@
           <property name="Rect" >
             <object idref="id17" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-367.86401209338374</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>163.4766129765212</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>2563.6432563866597</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>2563.6432563866592</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-367.86401209338374</double>
+          </property>
+          <property name="Y" >
+            <double>163.4766129765212</double>
+          </property>
+          <property name="Width" >
+            <double>2563.6432563866597</double>
+          </property>
+          <property name="Height" >
+            <double>2563.6432563866592</double>
+          </property>
         </object>
       </property>
     </object>
@@ -180,18 +180,18 @@
           <property name="Rect" >
             <object idref="id19" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-1840.748844898699</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>95.9399950302709</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>2116.4208175965196</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>2116.4208175965196</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-1840.748844898699</double>
+          </property>
+          <property name="Y" >
+            <double>95.9399950302709</double>
+          </property>
+          <property name="Width" >
+            <double>2116.4208175965196</double>
+          </property>
+          <property name="Height" >
+            <double>2116.4208175965196</double>
+          </property>
         </object>
       </property>
     </object>
@@ -219,18 +219,18 @@
           <property name="Rect" >
             <object idref="id21" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-1947.348728639401</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>1348.2854525850246</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>1664.0147036270876</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>1664.0147036270878</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-1947.348728639401</double>
+          </property>
+          <property name="Y" >
+            <double>1348.2854525850246</double>
+          </property>
+          <property name="Width" >
+            <double>1664.0147036270876</double>
+          </property>
+          <property name="Height" >
+            <double>1664.0147036270878</double>
+          </property>
         </object>
       </property>
     </object>
@@ -258,18 +258,18 @@
           <property name="Rect" >
             <object idref="id23" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-4935.84</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-4127.759999999998</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>10002.72</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>10002.72</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-4935.84</double>
+          </property>
+          <property name="Y" >
+            <double>-4127.759999999998</double>
+          </property>
+          <property name="Width" >
+            <double>10002.72</double>
+          </property>
+          <property name="Height" >
+            <double>10002.72</double>
+          </property>
         </object>
       </property>
     </object>
@@ -288,18 +288,18 @@
           <property name="Rect" >
             <object idref="id25" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-97.701230592</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-59.32354867199999</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>76.09912934400002</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>76.09912934400002</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-97.701230592</double>
+          </property>
+          <property name="Y" >
+            <double>-59.32354867199999</double>
+          </property>
+          <property name="Width" >
+            <double>76.09912934400002</double>
+          </property>
+          <property name="Height" >
+            <double>76.09912934400002</double>
+          </property>
         </object>
       </property>
     </object>
@@ -318,18 +318,18 @@
           <property name="Rect" >
             <object idref="id3" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-21.599999999999994</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-42.47999999999998</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>86.39999999999999</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>86.39999999999999</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-21.599999999999994</double>
+          </property>
+          <property name="Y" >
+            <double>-42.47999999999998</double>
+          </property>
+          <property name="Width" >
+            <double>86.39999999999999</double>
+          </property>
+          <property name="Height" >
+            <double>86.39999999999999</double>
+          </property>
         </object>
       </property>
     </object>
@@ -348,18 +348,18 @@
           <property name="Rect" >
             <object idref="id31" />
           </property>
-          <field name="x" >
-            <java.lang.Double>36.23799694257326</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-38.386531145543046</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>156.51091917912555</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>156.51091917912555</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>36.23799694257326</double>
+          </property>
+          <property name="Y" >
+            <double>-38.386531145543046</double>
+          </property>
+          <property name="Width" >
+            <double>156.51091917912555</double>
+          </property>
+          <property name="Height" >
+            <double>156.51091917912555</double>
+          </property>
         </object>
       </property>
     </object>
@@ -378,18 +378,18 @@
           <property name="Rect" >
             <object idref="id5" />
           </property>
-          <field name="x" >
-            <java.lang.Double>108.76032000000001</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-49.94496000000001</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>48.222719999999995</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>48.22272</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>108.76032000000001</double>
+          </property>
+          <property name="Y" >
+            <double>-49.94496000000001</double>
+          </property>
+          <property name="Width" >
+            <double>48.222719999999995</double>
+          </property>
+          <property name="Height" >
+            <double>48.22272</double>
+          </property>
         </object>
       </property>
     </object>
@@ -417,18 +417,18 @@
           <property name="Rect" >
             <object idref="id27" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-2662.9019289599996</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-785.7312153599987</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>4529.87179008</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>4529.87179008</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-2662.9019289599996</double>
+          </property>
+          <property name="Y" >
+            <double>-785.7312153599987</double>
+          </property>
+          <property name="Width" >
+            <double>4529.87179008</double>
+          </property>
+          <property name="Height" >
+            <double>4529.87179008</double>
+          </property>
         </object>
       </property>
     </object>
@@ -447,18 +447,18 @@
           <property name="Rect" >
             <object idref="id29" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-180.0</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-180.0</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>360.0</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>360.0</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-180.0</double>
+          </property>
+          <property name="Y" >
+            <double>-180.0</double>
+          </property>
+          <property name="Width" >
+            <double>360.0</double>
+          </property>
+          <property name="Height" >
+            <double>360.0</double>
+          </property>
         </object>
       </property>
     </object>
@@ -483,18 +483,18 @@
           <property name="Rect" >
             <object idref="id7" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-7080.0</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-6560.0</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>13040.0</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>13040.0</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-7080.0</double>
+          </property>
+          <property name="Y" >
+            <double>-6560.0</double>
+          </property>
+          <property name="Width" >
+            <double>13040.0</double>
+          </property>
+          <property name="Height" >
+            <double>13040.0</double>
+          </property>
         </object>
       </property>
     </object>
@@ -519,18 +519,18 @@
           <property name="Rect" >
             <object idref="id9" />
           </property>
-          <field name="x" >
-            <java.lang.Double>-5693.032959999998</java.lang.Double>
-          </field>
-          <field name="y" >
-            <java.lang.Double>-5350.4396799999995</java.lang.Double>
-          </field>
-          <field name="width" >
-            <java.lang.Double>10811.673599999996</java.lang.Double>
-          </field>
-          <field name="height" >
-            <java.lang.Double>10811.673599999996</java.lang.Double>
-          </field>
+          <property name="X" >
+            <double>-5693.032959999998</double>
+          </property>
+          <property name="Y" >
+            <double>-5350.4396799999995</double>
+          </property>
+          <property name="Width" >
+            <double>10811.673599999996</double>
+          </property>
+          <property name="Height" >
+            <double>10811.673599999996</double>
+          </property>
         </object>
       </property>
     </object>
