@@ -849,6 +849,7 @@ public class AddeImageDataSource extends ImageDataSource {
         outSource = replaceKey(outSource, AddeImageURL.KEY_UNIT, "BRIT");
         outSource = replaceKey(outSource, AddeImageURL.KEY_MAG, magStr1);
         outSource = replaceKey(outSource, AddeImageURL.KEY_SIZE, sizeStr1);
+        outSource = replaceKey(outSource, AddeImageURL.KEY_PLACE, "CENTER");
         String key0 = getKey(outSource, AddeImageURL.KEY_LATLON);
         if ((key0 != null) && (key0.length() > 2)) {
             outSource = replaceKey(outSource, AddeImageURL.KEY_LATLON,
