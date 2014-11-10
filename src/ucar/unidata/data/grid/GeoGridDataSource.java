@@ -902,6 +902,10 @@ public class GeoGridDataSource extends GridDataSource {
                 zStride = geoSubset.getZStride();
             }
         }
+        // if geoSubset is null or no bbx
+        if(llr ==  null){
+            llr = dataset.getBoundingBox();
+        }
 
         String         path   = prefix;
         NetcdfCFWriter writer = new NetcdfCFWriter();
