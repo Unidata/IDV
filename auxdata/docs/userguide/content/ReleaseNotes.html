@@ -11,49 +11,33 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 4.1 release.
+The items below reflect changes since the 5.0 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem q="Java 7 / Java3D 1.6 migration" id="j3d">
-<p>
-Migrated the IDV to Java 7 and Java3D 1.6. On Mac OS X, no longer using the
-Apple JVM (which is now defunct), and instead using an Oracle Java 1.7 JVM which
-is packaged with the IDV similar to the IDV deployment on other platforms.
-</p>
-</faqitem>
-
 <faqitem q="Latest netCDF-Java Version" id="nj43">
-<p>
-A new version of the netCDF-Java library (4.3.22) is included in this release.
+  <p>
+    The version of the netCDF-Java library currently distributed with the IDV is
+    4.3.22-20140527112500.
 </p>
 </faqitem>
 
-<faqitem q="Latest VisAD Version" id="visad">
-<p>
-A new version of the VisAD library is included in this release.
-</p>
-</faqitem>
-
-<faqitem q="Performance" id="performance">
-Optimized Java Garbage Collection in the IDV. Optimized memory settings to avoid
-performance problems.
-</faqitem>
-
-<faqitem q="Install4J Deployment Workflow" id="install4j">
-Improved the deployment workflow of the IDV via Install4J. Users are now
-presented with a current installation warning after they have selected a
-directory where the IDV may be already installed. When a current installation
-directory is detected and the user does not want to overwrite, they are
-presented with a new directory.
+<faqitem q="Install4J and IDV Start Script" id="install4j">
+  Repaired Install4J unistaller which had been broken for some time. Also fixed
+  a path problem in the IDV start script where the IDV would not start properly
+  if the IDV was started from a remote path.
 </faqitem>
 
 <faqitem q="RAMADDA plugin" id="ramaddaPlugin">
 The new RAMADDA plugin along with changes to the image generator allows
 users to generate a movie and save it as a zip file of images. Users can then publish the zip file
 to the RAMADDA server to be displayed by the image player.
+</faqitem>
+
+<faqitem q="UNAVCO plugin" id="unavcoPlugin">
+  Fixed the remote location of the UNAVCO plugin.
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
@@ -76,7 +60,10 @@ and how contours are defined in the IDV contour labeling UI.
 <faqitem cat="Data Changes"></faqitem>
 
 <faqitem q="GEMPAK Upper Air format Support" id="gempakua">
-The IDV now has the capability of viewing GEMPAK format upper air data files.
+  The IDV now has the capability of viewing GEMPAK format upper air data files.
+  We continue to make changes, improvements, and bug fixes in this area. We
+  added documentation specifying that, for now, the GEMPAK format upper air data
+  files must be supplied with the .gem suffix.
 </faqitem>
 
 <faqitem q="Match Display Region" id="matchdisplayregion">
@@ -159,7 +146,6 @@ Starting the IDV with Java Web Start is currently broken on all platforms. We
 are hoping to revive it soon with the help of the JOGL and Java3D open source
 community.
 </faqitem>
-
 
 </faq>
 
