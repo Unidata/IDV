@@ -498,12 +498,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
         if (haveMultipleFields()) {
             //If we have multiple fields then we want both the 
             //color unit and the display unit
-            if (shouldUseZPosition() && haveEnsemble) {
+            if (shouldUseZPosition()) {
                 // for the ensemble and colorByMember but is 2D variable, we do need
                 // to add vertical position slider
-                addDisplayable(planDisplay, FLAG_ZPOSITION);
-            }
-            addDisplayable(planDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
+                addDisplayable(planDisplay, FLAG_ZPOSITION | FLAG_COLORTABLE | FLAG_COLORUNIT);
+            } else
+                addDisplayable(planDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
         } else {
             if (shouldShowLevelWidget()) {
                 addDisplayable(planDisplay);
