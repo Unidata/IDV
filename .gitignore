@@ -23,14 +23,7 @@ docs/javadoc
 #
 # IntelliJ files
 #
-ide/intellij/.idea/workspace.xml
-ide/intellij/.idea/tasks.xml
-ide/intellij/.idea/misc.xml
-ide/intellij/.idea/vcs.xml
-ide/intellij/.idea/compiler.xml
-ide/intellij/.idea/libraries/ncIdv.xml
-ide/intellij/.idea/libraries/java3d.xml
-ide/intellij/IDV.iml
+ide/intellij/
 #
 # Eclipse files
 #
