@@ -399,7 +399,7 @@ public class WmsUtil {
             if (wmsSelection == null) {
                 wmsSelection = new WmsSelection(url, layer, title, srsString,
                         format, version,
-                        new GeoLocationInfo(miny, maxx, maxy, minx));
+                        new GeoLocationInfo(maxy, minx, miny, maxx));
 
                 Element abstractNode = XmlUtil.getElement(layerNode,
                                            WmsUtil.TAG_ABSTRACT);
