@@ -71,7 +71,8 @@ public class CDMRadarDataSource extends RadarDataSource {
     /** This holds the RadarQuery in the properties */
     public static final String PROP_RADARQUERY = "prop.radarquery";
 
-
+    /* level 2  */
+    public static final String LevelII = "Level II";
     /** logging category */
     static LogUtil.LogCategory log_ =
         LogUtil.getLogInstance(DoradeDataSource.class.getName());
@@ -701,7 +702,7 @@ public class CDMRadarDataSource extends RadarDataSource {
             return;
         }
         if (((CDMRadarAdapter) adapters.get(0)).getDataFormatName().equals(
-                ucar.nc2.dt.RadialDatasetSweep.LevelII)) {
+                LevelII)) {
             Vector<NamedStation> items = new Vector<NamedStation>();
             items.addAll(getStations().values());
             Collections.sort(items);
