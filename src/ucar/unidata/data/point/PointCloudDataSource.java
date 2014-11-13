@@ -2,21 +2,20 @@
  * Copyright 1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.data.point;
@@ -252,10 +251,9 @@ public class PointCloudDataSource extends FilesDataSource {
                     double south = Double.parseDouble(toks.get(1));
                     double east  = Double.parseDouble(toks.get(2));
                     double north = Double.parseDouble(toks.get(3));
-                    Rectangle2D.Double rect = new Rectangle2D.Double(west,
-                                                  north, east - west,
-                                                  north - south);
-                    return new LatLonProjection("", new ProjectionRect(rect));
+                    ProjectionRect rect = new ProjectionRect(west, south,
+                                              east, north);
+                    return new LatLonProjection("", rect);
                 }
             }
             return null;
@@ -406,30 +404,33 @@ public class PointCloudDataSource extends FilesDataSource {
             }
 
             MathType type;
-            if(pts.length == 3) {
+            if (pts.length == 3) {
                 type = new RealTupleType(RealType.Altitude,
-                                         RealType.Longitude, RealType.Latitude);
-            } else if(pts.length == 6) {
-                type = new RealTupleType(new RealType[]{RealType.Altitude,
-                                         RealType.Longitude, RealType.Latitude, 
-                                         Util.makeRealType("rgb red",null),
-                                         Util.makeRealType("rgb green",null),
-                                                        Util.makeRealType("rgb blue",null)});
+                                         RealType.Longitude,
+                                         RealType.Latitude);
+            } else if (pts.length == 6) {
+                type = new RealTupleType(new RealType[] {
+                    RealType.Altitude, RealType.Longitude, RealType.Latitude,
+                    Util.makeRealType("rgb red", null),
+                    Util.makeRealType("rgb green", null),
+                    Util.makeRealType("rgb blue", null)
+                });
             } else {
                 type = new RealTupleType(RealType.Altitude,
-                                         RealType.Longitude, RealType.Latitude, rt);
+                                         RealType.Longitude,
+                                         RealType.Latitude, rt);
             }
 
             if (dataChoice.getId().equals("altitudegrid")) {
-                return makeGrid(pts, rt, false,false);
+                return makeGrid(pts, rt, false, false);
             }
 
             if (dataChoice.getId().equals("hillshadegrid")) {
-                return makeGrid(pts, rt, true,false);
+                return makeGrid(pts, rt, true, false);
             }
 
             if (dataChoice.getId().equals("pointcount")) {
-                return makeGrid(pts, rt, false,true);
+                return makeGrid(pts, rt, false, true);
             }
             return makeField(type, pts);
         } catch (Exception exc) {
@@ -712,14 +713,14 @@ public class PointCloudDataSource extends FilesDataSource {
      * @param pts _more_
      * @param type _more_
      * @param hillshade _more_
+     * @param pointCount _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     private FieldImpl makeGrid(float[][] pts, RealType type,
-                               boolean hillshade,
-                               boolean pointCount)
+                               boolean hillshade, boolean pointCount)
             throws Exception {
 
         boolean   fillMissing = true;
@@ -770,8 +771,8 @@ public class PointCloudDataSource extends FilesDataSource {
         if (pointCount) {
             for (int x = 0; x < numCols; x++) {
                 for (int y = 0; y < numRows; y++) {
-                    if(cntGrid[y][x]>0) {
-                        latLonGrid[y][x] =  cntGrid[y][x];
+                    if (cntGrid[y][x] > 0) {
+                        latLonGrid[y][x] = cntGrid[y][x];
                     }
                 }
             }
@@ -793,13 +794,14 @@ public class PointCloudDataSource extends FilesDataSource {
             type = Util.makeRealType("hillshade" + (typeCnt++), null);
             latLonGrid = doHillShade(latLonGrid, hillShadeAzimuth,
                                      hillShadeAngle);
-        } else  if (pointCount) {
+        } else if (pointCount) {
             type = Util.makeRealType("pointcount" + (typeCnt++), null);
         } else {
             type = RealType.Altitude;
         }
 
-        float[][] gridValues = GridUtil.makeGrid(latLonGrid, numCols, numRows, GRID_MISSING);
+        float[][] gridValues = GridUtil.makeGrid(latLonGrid, numCols,
+                                   numRows, GRID_MISSING);
 
         Linear1DSet xSet = new Linear1DSet(RealType.Longitude, west, east,
                                            numCols);

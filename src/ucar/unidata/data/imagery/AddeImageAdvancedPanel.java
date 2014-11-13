@@ -431,7 +431,7 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         ProjectionRect newRect = new ProjectionRect();
         newRect.setHeight(rect.getHeight());
         newRect.setWidth(rect.getWidth());
-        LatLonRect latLonRectOld = projectionImpl.getLatLonBoundingBox(rect);
+        LatLonRect latLonRectOld = projectionImpl.projToLatLonBB(rect);
 
         if (newPlace.equals("CENTER")) {
             //move llr from ULEFT to CENTER

@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.nc2.util.DiskCache2;
-import ucar.nc2.util.net.HTTPSession;
+import ucar.httpservices.HTTPSession;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
@@ -347,7 +347,7 @@ public class DataManager {
             boolean doCache = dataContext.getIdv().getStateManager()
                     .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true);
             dc.setAlwaysUseCache(doCache);
-            ucar.nc2.grib.GribCollection.setDiskCache2(dc);
+            ucar.nc2.grib.collection.GribCollection.setDiskCache2(dc);
 
             // Doesn't seem to work in nc 4.3
             ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(doCache);
@@ -511,22 +511,6 @@ public class DataManager {
      */
     protected void loadIospResources(IdvResourceManager resourceManager) {
 
-        ucar.nc2.grib.GribResourceReader.setGribResourceReader(
-            new ucar.nc2.grib.GribResourceReader() {
-            public InputStream openInputStream(String resourceName)
-                    throws IOException {
-                try {
-                    InputStream inputStream =
-                        IOUtil.getInputStream(resourceName);
-                    return inputStream;
-                } catch (IOException ioe) {
-                    //System.err.println ("IDV failed to read:" + resourceName);
-                    return null;
-                }
-            }
-
-        });
-
         ResourceCollection grib1Resources =
             resourceManager.getResources(
                 IdvResourceManager.RSC_GRIB1LOOKUPTABLES);
@@ -544,21 +528,7 @@ public class DataManager {
                 //                System.err.println ("bad:"+ exc);
             }
         }
-        ResourceCollection grib2Resources =
-            resourceManager.getResources(
-                IdvResourceManager.RSC_GRIB2LOOKUPTABLES);
-        for (int i = 0; i < grib2Resources.size(); i++) {
-            try {
-                String grib2TableName = grib2Resources.get(i).toString();
-                File   grib2TableFile = new File(grib2TableName);
-                if (grib2TableFile.exists()) {
-                    ucar.grib.grib2.ParameterTable.addParametersUser(
-                        grib2TableName);
-                }
-            } catch (Exception exc) {
-                //                System.err.println ("bad:"+ exc);
-            }
-        }
+
         ResourceCollection njResources =
             resourceManager.getResources(IdvResourceManager.RSC_NJCONFIG);
         StringBuilder errlog = new StringBuilder();

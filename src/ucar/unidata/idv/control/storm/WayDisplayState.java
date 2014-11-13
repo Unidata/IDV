@@ -2568,7 +2568,7 @@ public class WayDisplayState {
 
         StormTrackPoint[] track = new StormTrackPoint[size];
         FlatEarth         e     = new FlatEarth();
-        ProjectionPointImpl p0 = e.latLonToProj(c.getLatitude().getValue(),
+        ProjectionPoint p0 = e.latLonToProj(c.getLatitude().getValue(),
                                      c.getLongitude().getValue());
 
         for (int i = 0; i < size; i++) {

@@ -38,11 +38,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScheme;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.auth.CredentialsProvider;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.auth.AuthScope;
 
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlUtil;
@@ -142,12 +141,21 @@ public class AccountManager implements CredentialsProvider,
      * _more_
      *
      * @param scope _more_
-     * @param host
-     * @param port
-     * @param isproxy
+     * @param creds
      *
      */
-    public void setCredentials(AuthScheme scope, String host,int port, boolean isproxy)
+    public void setCredentials(AuthScope scope, Credentials creds)
+    {
+    }
+
+    /**
+     * Do the authentication
+     * @param scope authscope
+     *
+     * @return Null if the user presses cancel. Else return the credentials
+     *
+     */
+    public Credentials getCredentials(AuthScope scope)
     {
         //TODO: What should this do?
         if (scope == null) {
@@ -155,43 +163,30 @@ public class AccountManager implements CredentialsProvider,
                 "Authentication scope may not be null");
         }
 
-        String key = host + ":" + port + ":"
-                     + scope.getRealm();
-        //        System.err.println ("got auth call " + key);
+        if(currentCredentials == null) {
+            String host = scope.getHost();
+            int port = scope.getPort();
 
-        UserInfo userInfo = getUserNamePassword(key,
-                                "The server " + host + ":"
-                                + port
-                                + " requires a username/password");
-        if (userInfo == null) {
-            return;
+            String key = host + ":" + port + ":"
+                         + scope.getRealm();
+            //        System.err.println ("got auth call " + key);
+
+            UserInfo userInfo = getUserNamePassword(key,
+                                    "The server " + host + ":"
+                                    + port
+                                    + " requires a username/password");
+            if (userInfo == null) {
+                return null;
+            }
+
+            currentCredentials =
+                    new UsernamePasswordCredentials(userInfo.getUserId(),
+                        userInfo.getPassword());
         }
-
-        currentCredentials =
-                new UsernamePasswordCredentials(userInfo.getUserId(),
-                    userInfo.getPassword());
-    }
-
-    /**
-     * Do the authentication
-     * @param authscope authscope
-     *
-     * @return Null if the user presses cancel. Else return the credentials
-     *
-     */
-    public Credentials getCredentials(AuthScheme authscope, String host,int port, boolean isproxy)
-    {
-        if (authscope == null) {
-            throw new IllegalArgumentException(
-                "Authentication scope may not be null");
-        }
-
-        if (currentCredentials == null) {
-            setCredentials(authscope, host, port, isproxy);
-        }
-
         return currentCredentials;
     }
+
+
 
     /**
      * _more_

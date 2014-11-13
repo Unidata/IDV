@@ -1259,7 +1259,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
          */
         protected Unit getTimeUnit() throws Exception {
             //There has got to be a better way to do this.
-            String tu       = obsList.get(0).getTimeUnit() + "";
+            String tu       = obsList.get(0).getObservationTimeAsCalendarDate().getTimeUnits() + "";
             int    spaceIdx = tu.indexOf(" ");
             return DataUtil.parseUnit(tu.substring(spaceIdx).trim());
         }

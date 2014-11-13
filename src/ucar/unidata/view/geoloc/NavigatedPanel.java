@@ -1,25 +1,22 @@
-/**
- * $Id: NavigatedPanel.java,v 1.60 2007/07/25 21:56:52 jeffmc Exp $
- *
- * Copyright  1997-2014 Unidata Program Center/University Corporation for
+/*
+ * Copyright 1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 package ucar.unidata.view.geoloc;
 
@@ -98,7 +95,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         MouseMotionListener, KeyListener {
 
 
-    /** _more_          */
+    /** _more_ */
     private static Color disabledColor = new Color(230, 230, 230);
 
 
@@ -320,6 +317,35 @@ public class NavigatedPanel extends JPanel implements MouseListener,
 
 
     /**
+     * Convert from a ProjectionRect object to a Rectangle2D object
+     *
+     * @param projRect ProjectionRect object
+     *
+     * @return Rectangle2D
+     */
+    public static Rectangle2D ProjRectToRectangle2D(ProjectionRect projRect) {
+        double llx    = projRect.getMinX();
+        double lly    = projRect.getMinY();
+        double width  = projRect.getWidth();
+        double height = projRect.getHeight();
+        return new Rectangle2D.Double(llx, lly, width, height);
+    }
+
+    /**
+     * Convert from a ProjectionPointImpl object to a Point2D object
+     *
+     * @param ppi ProjectionPointImpl object
+     *
+     * @return Point2D object
+     */
+    public static Point2D ProjPointToPoint2D(ProjectionPointImpl ppi) {
+        double x = ppi.getX();
+        double y = ppi.getY();
+
+        return new Point2D.Double(x, y);
+    }
+
+    /**
      * Utility to create a lmpick
      *
      * @return lmpick
@@ -489,26 +515,25 @@ public class NavigatedPanel extends JPanel implements MouseListener,
     public ProjectionRect normalizeRectangle(ProjectionRect bb) {
 
 
-        if ((bb == null) || (project == null)
-            || !project.isLatLon()) {
+        if ((bb == null) || (project == null) || !project.isLatLon()) {
             return bb;
         }
         ProjectionRect newRect          = new ProjectionRect(bb);
-        double         maxLon           = newRect.x + newRect.width;
+        double         maxLon           = newRect.getX() + newRect.getWidth();
         double         normalizedMaxLon = LatLonPointImpl.lonNormal(maxLon);
 
 
-        newRect.x += (normalizedMaxLon - maxLon);
+        newRect.setX(newRect.getX() + (normalizedMaxLon - maxLon));
 
-        double         minLon           = newRect.x;
-        double         normalizedMinLon = LatLonPointImpl.lonNormal(minLon);
+        double minLon           = newRect.getX();
+        double normalizedMinLon = LatLonPointImpl.lonNormal(minLon);
 
-        newRect.x += (normalizedMinLon - minLon);
+        newRect.setX(newRect.getX() + (normalizedMinLon - minLon));
 
 
         //Try to normalize the rectangle
-        while(newRect.x+newRect.width>360) {
-            newRect.x-= 360;
+        while (newRect.getX() + newRect.getWidth() > 360) {
+            newRect.setX(newRect.getX() - 360);
         }
 
         return newRect;
@@ -690,7 +715,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         g2.setStroke(new BasicStroke(0.0f));  // default stroke size is one pixel
         g2.setRenderingHint(RenderingHints.KEY_RENDERING,
                             RenderingHints.VALUE_RENDER_SPEED);
-        g2.setClip(boundingBox);  // normalized coord system, because transform is applied
+        g2.setClip(ProjRectToRectangle2D(boundingBox));  // normalized coord system, because transform is applied
 
         Color foo = Color.red;
         //        g2.setBackground(backColor);
@@ -1030,7 +1055,8 @@ public class NavigatedPanel extends JPanel implements MouseListener,
         navigate.screenToWorld(new Point2D.Double(mousex, mousey), workW);
         workL.set(project.projToLatLon(workW));
         if (lmMove.hasListeners()) {
-            lmMove.sendEvent(new CursorMoveEvent(this, workW));
+            lmMove.sendEvent(new CursorMoveEvent(this,
+                    ProjPointToPoint2D(workW)));
         }
 
         if (statusLabel == null) {
@@ -1093,8 +1119,8 @@ public class NavigatedPanel extends JPanel implements MouseListener,
             navigate.screenToWorld(new Point2D.Double(e.getX(), e.getY()),
                                    workW);
             if (lmPick != null) {
-                lmPick.sendEvent(new PickEvent(NavigatedPanel.this, workW,
-                        e));
+                lmPick.sendEvent(new PickEvent(NavigatedPanel.this,
+                        ProjPointToPoint2D(workW), e));
             }
         }
     }
@@ -1856,4 +1882,3 @@ public class NavigatedPanel extends JPanel implements MouseListener,
 
 
 }
-

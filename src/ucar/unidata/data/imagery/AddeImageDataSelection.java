@@ -28,6 +28,7 @@ import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.NavigatedViewManager;
 import ucar.unidata.idv.ViewManager;
@@ -634,7 +635,7 @@ public class AddeImageDataSelection {
             newRect.setHeight(rect.getHeight());
             newRect.setWidth(rect.getWidth());
             LatLonRect latLonRectOld =
-                projectionImpl.getLatLonBoundingBox(rect);
+                projectionImpl.projToLatLonBB(rect);
 
             if (newPlace.equals("CENTER")) {
                 //move llr from ULEFT to CENTER
@@ -2428,26 +2429,25 @@ public class AddeImageDataSelection {
                 // no region subset, full image
                 ProjectionImpl projectionImpl = display.getProjectionImpl();
                 LatLonRect latLonRect =
-                    projectionImpl.getLatLonBoundingBox(rect);
+                    projectionImpl.projToLatLonBB(rect);
                 GeoLocationInfo gInfo;
                 if (latLonRect.getHeight() != latLonRect.getHeight()) {
                     //corner point outside the earth
 
-                    LatLonPointImpl cImpl =
-                        projectionImpl.projToLatLon(rect.x
-                            + rect.getWidth() / 2, rect.y
-                                + rect.getHeight() / 2);
-                    LatLonPointImpl urImpl =
-                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                            rect.y + rect.getHeight());
-                    LatLonPointImpl ulImpl =
-                        projectionImpl.projToLatLon(rect.x,
-                            rect.y + rect.getHeight());
-                    LatLonPointImpl lrImpl =
-                        projectionImpl.projToLatLon(rect.x + rect.getWidth(),
-                            rect.y);
-                    LatLonPointImpl llImpl =
-                        projectionImpl.projToLatLon(rect.x, rect.y);
+                    LatLonPoint cImpl = projectionImpl.projToLatLon(rect.getX()
+                            + rect.getWidth() / 2, rect.getY()
+                            + rect.getHeight() / 2);
+                    LatLonPoint urImpl =
+                        projectionImpl.projToLatLon(rect.getX() + rect.getWidth(),
+                            rect.getY() + rect.getHeight());
+                    LatLonPoint ulImpl =
+                        projectionImpl.projToLatLon(rect.getX(),
+                            rect.getY() + rect.getHeight());
+                    LatLonPoint lrImpl =
+                        projectionImpl.projToLatLon(rect.getX() + rect.getWidth(),
+                            rect.getY());
+                    LatLonPoint llImpl =
+                        projectionImpl.projToLatLon(rect.getX(), rect.getY());
 
                     double maxLat = Double.NaN;
                     double minLat = Double.NaN;

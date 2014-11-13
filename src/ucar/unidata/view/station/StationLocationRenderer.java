@@ -1,7 +1,7 @@
 /*
  * $Id: StationLocationRenderer.java,v 1.30 2006/12/27 17:43:08 jeffmc Exp $
  *
- * Copyright  1997-2014 Unidata Program Center/University Corporation for
+ * Copyright  1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -330,7 +330,11 @@ public class StationLocationRenderer implements ucar.unidata.view.Renderer {
 
         for (int i = 0; i < stations.size(); i++) {
             SLStation s = (SLStation) stations.get(i);
-            world2Normal.transform(s.worldPos, s.screenPos);  // work in normalized coordinate space
+            Point2D worldPosP2D = new Point2D.Double(s.worldPos.getX(),
+                                      s.worldPos.getY());
+            Point2D screenPosP2D = new Point2D.Double(s.screenPos.getX(),
+                                       s.screenPos.getY());
+            world2Normal.transform(worldPosP2D, screenPosP2D);  // work in normalized coordinate space
 
             s.resetBounds();
             //Skip over the stations for which the current projection gives us infinity

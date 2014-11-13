@@ -1,7 +1,7 @@
 /*
  * $Id: Navigation.java,v 1.29 2006/04/04 21:41:19 jeffmc Exp $
  *
- * Copyright  1997-2014 Unidata Program Center/University Corporation for
+ * Copyright  1997-2013 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -23,15 +23,16 @@
 package ucar.unidata.view.geoloc;
 
 
-
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Point2D;
-
 import ucar.unidata.geoloc.ProjectionPointImpl;
 import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.util.ListenerManager;
+
+
+
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -283,12 +284,11 @@ public class Navigation {
      *
      * @param ma  new map area
      */
-    public void setMapArea(Rectangle2D ma) {
+    public void setMapArea(ProjectionRect ma) {
         if (debugMapArea) {
             System.out.println("Navigation setMapArea " + ma);
         }
-
-        bb.setRect(ma);
+        bb.setRect(ma.getX(), ma.getY(), ma.getWidth(), ma.getHeight());
         zoom.push();
 
         mapAreaIsSet = true;
@@ -362,10 +362,30 @@ public class Navigation {
     /**
      * Convert a display region to a world coordinate
      *
+     * @param rect2D    display region
+     * @return corresponding world coordinates
+     */
+    public ProjectionRect screenToWorld(Rectangle2D rect2D) {
+        double minx = rect2D.getMinX();
+        double miny = rect2D.getMinY();
+        double maxx = rect2D.getMaxX();
+        double maxy = rect2D.getMaxY();
+
+        Rectangle2D rect2Dstw = screenToWorld(new ProjectionRect(minx, miny,
+                                    maxx, maxy));
+
+        return new ProjectionRect(rect2Dstw.getMinX(), rect2Dstw.getMinY(),
+                                  rect2Dstw.getMaxX(), rect2Dstw.getMaxY());
+    }
+
+
+    /**
+     * Convert a display region to a world coordinate
+     *
      * @param screenRect    display region
      * @return corresponding world coordinates
      */
-    public Rectangle2D screenToWorld(Rectangle2D screenRect) {
+    public Rectangle2D screenToWorld(ProjectionRect screenRect) {
         ProjectionPointImpl origin =
             screenToWorld(new Point2D.Double(screenRect.getX(),
                                              screenRect.getY()));
@@ -386,7 +406,7 @@ public class Navigation {
      * @param screenRect    world region
      * @return corresponding screen coordinates
      */
-    public Rectangle2D worldToScreen(Rectangle2D screenRect) {
+    public Rectangle2D worldToScreen(ProjectionRect screenRect) {
         Point2D ul = worldToScreen(new ProjectionPointImpl(screenRect.getX(),
                          screenRect.getY()));
         Point2D lr = worldToScreen(new ProjectionPointImpl(screenRect.getX()
@@ -714,4 +734,3 @@ public class Navigation {
     }
 
 }
-

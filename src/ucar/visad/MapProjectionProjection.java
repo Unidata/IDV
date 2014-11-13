@@ -319,7 +319,7 @@ public class MapProjectionProjection extends ProjectionImpl {
      */
     public static void main(String[] args) {
         MapProjectionProjection a = new MapProjectionProjection();
-        ProjectionPointImpl     p = a.latLonToProj(89, -101);
+        ProjectionPoint     p = a.latLonToProj(89, -101);
         System.out.println("proj point = " + p);
         LatLonPoint ll = a.projToLatLon(p);
         System.out.println("ll = " + ll);

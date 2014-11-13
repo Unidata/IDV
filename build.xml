@@ -125,7 +125,13 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/render.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
+        <!-- keep for reflection related issues -->
         <unjar src="${libsrc}/commons-httpclient-3.1.jar" dest="${tmpjardir}"/>
+        <!-- new httpclient for netCDF Java 4.4.X -->
+        <unjar src="${libsrc}/httpclient-4.2.6.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/httpcore-4.2.5.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/httpmime-4.2.6.jar" dest="${tmpjardir}"/>
+
         <unjar src="${libsrc}/commons-fileupload-1.2.2.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/mysql.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/derby.jar" dest="${tmpjardir}"/>
