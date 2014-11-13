@@ -209,7 +209,7 @@ public class IdvCommandLinePrefs {
      */
     private static boolean noCheckArg(String[] args) {
         for (String string : args) {
-            if (string.equals("-nocheck")) {
+            if (string.equals("-noversioncheck")) {
                 return true;
             }
         }
