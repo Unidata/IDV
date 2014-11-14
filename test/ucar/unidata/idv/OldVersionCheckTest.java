@@ -23,7 +23,7 @@ package ucar.unidata.idv;
 
 import org.junit.Test;
 
-import ucar.unidata.idv.IdvCommandLinePrefs.IDVVersion;
+import ucar.unidata.idv.OldVersionCheck.IDVVersion;
 
 
 import static org.junit.Assert.assertEquals;
@@ -35,18 +35,18 @@ import java.util.List;
 
 
 /**
- * The Class IdvCommandLinePrefsTest.
+ * The Class OldVersionCheckTest.
  */
-public class IdvCommandLinePrefsTest {
-	
-	
-	/**
-	 * Test to see of the IDV current version from Unidata is being obtained
-	 * properly.
-	 */
+public class OldVersionCheckTest {
+
+
+    /**
+     * Test to see of the IDV current version from Unidata is being obtained
+     * properly.
+     */
     @Test
     public void testGetCurrentVersion() {
-    	assertTrue(IdvCommandLinePrefs.getCurrentIDVVersion() != null);
+        assertTrue(OldVersionCheck.getCurrentIDVVersion() != null);
     }
 
 
@@ -165,30 +165,30 @@ public class IdvCommandLinePrefsTest {
     @Test
     public void parseOutVersion() {
         final String msg = "IDV Version not parsing correctly";
-        assertEquals(msg, IdvCommandLinePrefs.getIDVVersion().toString(),
-                     IdvCommandLinePrefs.parseOutVersion("").toString());
+        assertEquals(msg, OldVersionCheck.getIDVVersion().toString(),
+                     OldVersionCheck.parseOutVersion("").toString());
         assertEquals(
-            msg, IdvCommandLinePrefs.getIDVVersion().toString(),
-            IdvCommandLinePrefs.parseOutVersion("fjhkfjhfdkjh").toString());
+            msg, OldVersionCheck.getIDVVersion().toString(),
+            OldVersionCheck.parseOutVersion("fjhkfjhfdkjh").toString());
         assertEquals(
             msg, "2.6",
-            IdvCommandLinePrefs.parseOutVersion(
+            OldVersionCheck.parseOutVersion(
                 "xxxxxxxxxx Unidata IDV API v2.6 xxxxxxxxxxx").toString());
         assertEquals(
             msg, "2.6uX",
-            IdvCommandLinePrefs.parseOutVersion(
+            OldVersionCheck.parseOutVersion(
                 "xxxxxxxxxx Unidata IDV API v2.6uX xxxxxxxxxxx").toString());
         assertEquals(
             msg, "2.7u2",
-            IdvCommandLinePrefs.parseOutVersion(
+            OldVersionCheck.parseOutVersion(
                 "xxxxxxxxxx Unidata IDV API v2.7u2 xxxxxxxxxxx").toString());
         assertEquals(
             msg, "3.0b1",
-            IdvCommandLinePrefs.parseOutVersion(
+            OldVersionCheck.parseOutVersion(
                 "xxxxxxxxxx Unidata IDV API v3.0b1 xxxxxxxxxxx").toString());
         assertEquals(
             msg, "4.0u1",
-            IdvCommandLinePrefs.parseOutVersion(
+            OldVersionCheck.parseOutVersion(
                 "xxxxxxxxxx Unidata IDV API v4.0u1 xxxxxxxxxxx").toString());
 
     }

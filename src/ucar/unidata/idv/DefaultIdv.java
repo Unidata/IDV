@@ -21,33 +21,19 @@
 package ucar.unidata.idv;
 
 
-
-import ucar.unidata.idv.ui.*;
-
-
-import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-
 
 import visad.VisADException;
 
 
-import java.awt.*;
-import java.awt.event.*;
 
 import java.lang.reflect.Constructor;
 
 import java.rmi.RemoteException;
 
-import java.util.Date;
-import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.event.*;
 
 
 
@@ -116,21 +102,21 @@ public class DefaultIdv extends IntegratedDataViewer {
 
     /*
 
-      String javaBin = System.getProperty("java.home") + "/bin/java";        File jarFile;  
-      try {  
-      jarFile = new File  
-      (classInJarFile.getClass().getProtectionDomain()  
-      .getCodeSource().getLocation().toURI());  
-      } catch(Exception e) {  
-      return false;  
-      }  
-   
-      if ( !jarFile.getName().endsWith(".jar") )  
-      return false;   //no, it's a .class probably  
-   
-      String  toExec[] = new String[] { javaBin, "-jar", jarFile.getPath() };  
-      try {  
-      Process p = Runtime.getRuntime().exec( toExec );  
+      String javaBin = System.getProperty("java.home") + "/bin/java";        File jarFile;
+      try {
+      jarFile = new File
+      (classInJarFile.getClass().getProtectionDomain()
+      .getCodeSource().getLocation().toURI());
+      } catch(Exception e) {
+      return false;
+      }
+
+      if ( !jarFile.getName().endsWith(".jar") )
+      return false;   //no, it's a .class probably
+
+      String  toExec[] = new String[] { javaBin, "-jar", jarFile.getPath() };
+      try {
+      Process p = Runtime.getRuntime().exec( toExec );
       }catch(Exception exc) {
       }
     */
