@@ -332,10 +332,10 @@ public class StationLocationRenderer implements ucar.unidata.view.Renderer {
             SLStation s = (SLStation) stations.get(i);
             Point2D worldPosP2D = new Point2D.Double(s.worldPos.getX(),
                                       s.worldPos.getY());
-            Point2D screenPosP2D = new Point2D.Double(s.screenPos.getX(),
-                                       s.screenPos.getY());
-            world2Normal.transform(worldPosP2D, screenPosP2D);  // work in normalized coordinate space
-
+          //  Point2D screenPosP2D = new Point2D.Double(s.screenPos.getX(),
+          //                             s.screenPos.getY());
+          //  world2Normal.transform(worldPosP2D, screenPosP2D);  // work in normalized coordinate space
+            world2Normal.transform(worldPosP2D, s.screenPos);
             s.resetBounds();
             //Skip over the stations for which the current projection gives us infinity
             if ((s.screenPos.getX() == Double.POSITIVE_INFINITY)
