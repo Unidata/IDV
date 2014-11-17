@@ -61,7 +61,6 @@ import visad.Data;
 import visad.VisADException;
 
 
-
 import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -628,13 +627,13 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getIdvUIManager().initDone();
         getArgsManager().initDone();
 
-
-
-
-        if ( !getArgsManager().getIsOffScreen()) {
-            //checkVersion();
+        if (!getStateManager().getRunningIsl()) {
+            try {
+                OldVersionCheck.check(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
 
         for (int i = 0; i < argsManager.displayTemplates.size(); i += 3) {
             String datasourcePath =
@@ -2038,7 +2037,7 @@ Misc.run(new Runnable() {
     public String selectDataType(Object definingObject, String message) {
         JComboBox dataSourcesCbx = IdvChooser.getDataSourcesComponent(false,
                                        getDataManager(), false);
-        JLabel label    = new JLabel(message);
+        JLabel label = new JLabel(message);
         JPanel contents = GuiUtils.vbox(
                               GuiUtils.inset(label, 5),
                               GuiUtils.inset(
@@ -2082,11 +2081,11 @@ Misc.run(new Runnable() {
             if ( !getProperty(PROP_LOADINGXML, false)) {
                 if (getStore().get(PREF_AUTODISPLAYS_ENABLE, true)) {
                     JDialog notifyWindow = null;
-                    List    pairs        =
+                    List pairs =
                         getAutoDisplayEditor().getDisplaysForDataSource(
                             dataSource);
                     for (int i = 0; i < pairs.size(); i += 2) {
-                        DataChoice        dc = (DataChoice) pairs.get(i);
+                        DataChoice dc = (DataChoice) pairs.get(i);
                         ControlDescriptor cd =
                             (ControlDescriptor) pairs.get(i + 1);
                         doMakeControl(dc, cd, NULL_STRING);
@@ -2629,13 +2628,15 @@ Misc.run(new Runnable() {
      * @param withHeader  should we add the XML header
      * @return Xml representation of the given object
      */
-    public String encodeObject(Object object, boolean prettyPrint, boolean withHeader) {
-        return withHeader 
-                //TODO: consolidate the with header stuff in XmlUtil
-                ? XmlUtil.toStringWithHeader(getEncoderForWrite().toElement(object),
-                        "  ", "\n", prettyPrint)
-                : XmlUtil.toString(getEncoderForWrite().toElement(object),
-                                prettyPrint);
+    public String encodeObject(Object object, boolean prettyPrint,
+                               boolean withHeader) {
+        return withHeader
+        //TODO: consolidate the with header stuff in XmlUtil
+               ? XmlUtil.toStringWithHeader(
+                   getEncoderForWrite().toElement(object), "  ", "\n",
+                   prettyPrint)
+               : XmlUtil.toString(getEncoderForWrite().toElement(object),
+                                  prettyPrint);
     }
 
     /**
@@ -3006,7 +3007,7 @@ Misc.run(new Runnable() {
      */
     public boolean quit() {
         if (getStore().get(PREF_SHOWQUITCONFIRM, true)) {
-            JCheckBox  cbx  = new JCheckBox("Always ask", true);
+            JCheckBox cbx = new JCheckBox("Always ask", true);
             JComponent comp =
                 GuiUtils
                     .vbox(new JLabel(
