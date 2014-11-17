@@ -2189,7 +2189,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
 
             if ( !useSubset) {
-                times = DataSourceImpl.getDateTimes(times, dataChoice.getAllDateTimes());
+                times = DataSourceImpl.getDateTimes(times, getAllDateTimes());
             }
 
 
