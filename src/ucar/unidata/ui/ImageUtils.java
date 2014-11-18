@@ -443,25 +443,30 @@ public class ImageUtils {
      * Where u=upper,m=middle,l=lower
      * r=right,l=left
      *
-     *
-     *
-     * @param s Stirng spec
-     * @param r Reference rect
+     * @param s String specification
+     * @param r Reference rectangle
      *
      * @return The point
      */
+    
     public static Point parsePoint(String s, Rectangle r) {
         s = s.toLowerCase();
 
+        // TJJ Nov 2014
+        // NOTE: even if String s is empty, StringUtil.split returns a list
+        // of size 1 with a single empty string, so need to check for that below.
+        // Previous code would assume list size zero, causing exception in 
+        // Glyph.getPointOnRect() when parameter is empty string.
+        // This bug was exposed by a McV bundle incompatibility.
+        
         List places = StringUtil.split(s, ",");
         int  dx     = 0;
         int  dy     = 0;
 
-        if (places.size() == 0) {
-            places.add("ll");
-        }
-
         String place = (String) places.get(0);
+        if (place.isEmpty()) {
+        	place = "ll";
+        }
 
         if (places.size() > 1) {
             dx = new Integer(places.get(1).toString()).intValue();
