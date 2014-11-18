@@ -798,6 +798,10 @@ public class DataSelectionWidget {
                                   timeOption.equals(USE_DRIVERTIMES)
                                   || chooserDoTimeMatching);
 
+        String idx = (String) timeOptionLabelBox.getSelectedItem();
+        if (idx.equals(USE_SELECTEDTIMES) &&
+                lastDataChoice.getProperty(DataSelection.PROP_TIMESUBSET) == null)
+            lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET, true);
 
         GeoSelection geoSelection = getGeoSelection();
         if (geoSelection != null) {
