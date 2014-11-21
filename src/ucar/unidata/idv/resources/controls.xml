@@ -412,7 +412,7 @@ Since this is confusing and needs more work lets remove this for now
      label="Vector Plan View"
      doeslevels="true"
      displaycategory="Flow Displays"
-     properties="vectors=true;">
+     properties="streamlines=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -433,11 +433,11 @@ Since this is confusing and needs more work lets remove this for now
     categories="*-flowvector-*"
     class="ucar.unidata.idv.control.FlowPlanViewControl"
     label="Trajectory Colored by Parameter"
-    code="DerivedGridFactory.combineGrids( D1, parameter )"
+    code="GridTrajectory.combineGridsArray( D1, parameter )"
     doeslevels="true"
     displaycategory="Flow Displays"
-    properties="trajectories=true;">
-    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    properties="streamlines=false;">
+<property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
   <control
@@ -447,7 +447,7 @@ Since this is confusing and needs more work lets remove this for now
      description="Plan view of 3D flow vectors"
      label="3D Vector Plan View"
      displaycategory="Flow Displays"
-     properties="vectors=true;isThreeComponents=false;coloredByAnother=false">
+     properties="streamlines=false;isThreeComponents=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -1231,27 +1231,7 @@ Example of how to make an image movie control with a fixed table of contents
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
-    <control
-            id="vectorvolumerender"
-            categories="*-flowvector3d-*"
-            class="ucar.unidata.idv.control.VolumeVectorControl"
-            description="3-D vector Volume"
-            label="3D Volume Vector"
-            icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="Flow Displays">
-        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-    </control>
-    <control
-            id="volumeTrajectoryrender"
-            categories="*-flowvector3d-*"
-            class="ucar.unidata.idv.control.VolumeVectorControl"
-            description="3-D Volume Trajectory"
-            label="3D Volume Trajectory"
-            icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="Flow Displays"
-            properties="trajectories=true;">
-        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-    </control>
+
   <control
      id="gridtablecontrol"
      categories="trace;GRID-2D-*;IMAGE-*-*;GRID-3D-*;RADAR-3D-*"
