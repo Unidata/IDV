@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -39,6 +40,8 @@ import javax.swing.SwingConstants;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -94,8 +97,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** vector/barb button */
     private JRadioButton vectorBtn;
 
+    private JRadioButton trajectoryBtn;
+
     /** flag for streamlines */
     boolean isStreamlines = false;
+    boolean isVectors = true;
+    boolean isTrajectories = false;
 
     /** flag for wind barbs */
     boolean isWindBarbs = false;
@@ -186,6 +193,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
         planDisplay.setAutoScale(autoSize);
+        planDisplay.setTrojectoriesEnabled(isTrajectories);
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
         return planDisplay;
@@ -208,6 +216,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         FlowDisplayable fd = getGridDisplay();
         fd.setActive(false);
         boolean result = super.setData(dataChoice);
+
         if ( !result) {
             Trace.call2("FlowPlanView.setData");
             return false;
@@ -265,20 +274,31 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             streamlinesBtn = new JRadioButton("Streamlines:", isStreamlines);
             vectorBtn      = new JRadioButton((isWindBarbs
                     ? "Wind Barbs:"
-                    : "Vectors:"), !isStreamlines);
+                    : "Vectors:"), isVectors);
+            trajectoryBtn = new JRadioButton("Trajectories:", isTrajectories);
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
                     if (source == streamlinesBtn) {
-                        setStreamlines(source.isSelected());
+                        isStreamlines = true;
+                        isVectors = false;
+                        isTrajectories = false;
+                    } else if(source == trajectoryBtn) {
+                        isTrajectories = true;
+                        isStreamlines = false;
+                        isVectors = false;
                     } else {
-                        setStreamlines( !source.isSelected());
+                        isVectors = true;
+                        isStreamlines = false;
+                        isTrajectories = false;
                     }
+                    setStreamlines();
                 }
             };
             streamlinesBtn.addActionListener(listener);
             vectorBtn.addActionListener(listener);
-            GuiUtils.buttonGroup(streamlinesBtn, vectorBtn);
+            trajectoryBtn.addActionListener(listener);
+            GuiUtils.buttonGroup(streamlinesBtn, vectorBtn, trajectoryBtn);
             densityLabel     = GuiUtils.rLabel("Density: ");
             densityComponent = doMakeDensityComponent();
             enableDensityComponents();
@@ -295,7 +315,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                                         GuiUtils.inset(
                                             GuiUtils.hbox(
                                                 densityLabel,
-                                                densityComponent), spacer))));
+                                                densityComponent), spacer))),
+                        GuiUtils.left(
+                                trajectoryBtn));
             JLabel showLabel = GuiUtils.rLabel("Show:");
             showLabel.setVerticalTextPosition(JLabel.TOP);
             controlWidgets.add(
@@ -465,7 +487,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     private void enableBarbSizeBox() {
         if (sizeComponent != null) {
-            GuiUtils.enableTree(sizeComponent, !isStreamlines);
+            GuiUtils.enableTree(sizeComponent, isVectors);
         }
     }
 
@@ -496,18 +518,28 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * Set the streamline property.
      * Used by XML persistence
      *
-     * @param v  true to use streamlines
+     * @param
      */
-    public void setStreamlines(boolean v) {
-        isStreamlines = v;
+    public void setStreamlines() {
+        //isStreamlines = v;
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlinesEnabled(isStreamlines);
+            getGridDisplay().setTrojectoriesEnabled(isTrajectories);
             enableBarbSizeBox();
             enableDensityComponents();
         }
         if (streamlinesBtn != null) {
-            streamlinesBtn.setSelected(v);
-            vectorBtn.setSelected( !v);
+            streamlinesBtn.setSelected(isStreamlines);
+            vectorBtn.setSelected(isVectors);
+            trajectoryBtn.setSelected(isTrajectories);
+        }
+
+        if(isTrajectories){
+            DerivedDataChoice ddc        = (DerivedDataChoice) this.datachoice;
+            Hashtable choices = ddc.getUserSelectedChoices();
+            DirectDataChoice udc =
+                    (DirectDataChoice) choices.get(new String("D1"));
+            getDataInstance();
         }
     }
 

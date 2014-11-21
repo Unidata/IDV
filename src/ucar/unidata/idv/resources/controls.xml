@@ -427,6 +427,19 @@ Since this is confusing and needs more work lets remove this for now
      properties="streamlines=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
+
+    <control
+    id="trajectories"
+    categories="*-flowvector-*"
+    class="ucar.unidata.idv.control.FlowPlanViewControl"
+    label="Trajectory Colored by Parameter"
+    code="GridTrajectory.combineGridsArray( D1, parameter )"
+    doeslevels="true"
+    displaycategory="Flow Displays"
+    properties="streamlines=false;">
+<property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
   <control
      id="planviewflow3d"
      categories="*-flowvector3d-*"
