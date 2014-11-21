@@ -99,6 +99,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** flag for streamlines */
     private boolean isStreamlines = false;
 
+    private boolean isTrajectories = false;
+
     /** flag for whether wind is cartesian (u,v) or polar (spd,dir) */
     private boolean isCartesian = true;
 
@@ -262,6 +264,20 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         isStreamlines = enable;
     }
 
+    public void setTrojectoriesEnabled(boolean enable) {
+
+        if ((flowControl != null) && (enable != isTrajectories)) {
+            try {
+                flowControl.enableTrajectory(enable);
+            } catch (VisADException ve) {
+                ve.printStackTrace();
+            } catch (RemoteException re) {
+                re.printStackTrace();
+            }
+        }
+
+        isTrajectories = enable;
+    }
     /**
      * Returns indicator whether wind barb style is that used in
      * the northern hemisphere or the southern hemisphere.
