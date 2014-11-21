@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2014 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,7 +24,25 @@ package ucar.visad.display;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.Range;
 
-import visad.*;
+import visad.BadMappingException;
+import visad.CommonUnit;
+import visad.ConstantMap;
+import visad.Display;
+import visad.EarthVectorType;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FlowControl;
+import visad.MathType;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.RealVectorType;
+import visad.ScalarMap;
+import visad.ScalarMapControlEvent;
+import visad.ScalarMapEvent;
+import visad.ScalarMapListener;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 
 
 import java.awt.Color;
@@ -72,18 +90,6 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** scale factor for size of vectors/barbs */
     private float flowscale = 0.02f;
 
-    /** _more_ */
-    private float trajOffset = 4.0f;
-
-    /** _more_ */
-    private float vectorLength = 2.0f;
-
-    /** _more_ */
-    private boolean arrowHead = false;
-
-    /** _more_ */ 
-    private float arrowHeadSize = 1.0f;
-
     /** streamline density factor */
     private float streamlineDensity = 1.f;
 
@@ -93,11 +99,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** flag for streamlines */
     private boolean isStreamlines = false;
 
-    /** _more_ */
     private boolean isTrajectories = false;
-
-    /** _more_ */
-    private boolean isRefresh = false;
 
     /** flag for whether wind is cartesian (u,v) or polar (spd,dir) */
     private boolean isCartesian = true;
@@ -262,55 +264,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         isStreamlines = enable;
     }
 
-    /**
-     * sets trajectory parms if the enable is true.
-     * @param enable boolean whether trajectories are enabled.
-     * @param markerOn boolean whether markers are enabled.
-     * @param mSize _more_
-     * @param refresh _more_
-     */
-    public void setTrojectoriesEnabled(boolean enable, float mSize, boolean refresh) { 
-       setTrojectoriesEnabled(enable, false, mSize, refresh);
-    }
+    public void setTrojectoriesEnabled(boolean enable) {
 
-    /**
-     * sets trajectory parms if the enable is true.
-     * @param enable boolean whether streamlines are enabled.
-     * @param mSize _more_
-     * @param refresh _more_
-     */
-    public void setTrojectoriesEnabled(boolean enable, boolean markerOn, float mSize,
-                                       boolean refresh) {
-
-        if ((flowControl != null)
-                && ((enable != isTrajectories) || (refresh != isRefresh))) {
+        if ((flowControl != null) && (enable != isTrajectories)) {
             try {
                 flowControl.enableTrajectory(enable);
-                if (enable) {
-                    Set timeSet =
-                        GridUtil.getTimeSet((FieldImpl) (getData()));
-                    int        numTimes = timeSet.getLength();
-                    double[][] td       = timeSet.getDoubles();
-                    double     tlen;
-                    double     rlen;
-
-                    if (refresh) {
-                        rlen = (td[0][1] - td[0][0]);
-                        tlen = (td[0][1] - td[0][0]) * vectorLength;
-                    } else {
-                        rlen = (td[0][1] - td[0][0]) * numTimes;
-                        tlen = (td[0][1] - td[0][0]) * trajOffset;
-                    }
-                    arrowHead = markerOn;
-                    arrowHeadSize = mSize;
-                    TrajectoryParams tparm =
-                        flowControl.getTrajectoryParams();
-                    tparm.setMarkerSize(mSize);
-                    tparm.setTrajRefreshInterval(rlen);
-                    tparm.setTrajVisibilityTimeWindow(tlen);
-                    tparm.setMarkerEnabled(markerOn);
-                    flowControl.setTrajectoryParams(tparm);
-                }
             } catch (VisADException ve) {
                 ve.printStackTrace();
             } catch (RemoteException re) {
@@ -319,48 +277,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
 
         isTrajectories = enable;
-        isRefresh      = refresh;
     }
-
-    /**
-     * resets trajectory parms
-     *
-     */
-
-    public void resetTrojectories() {
-
-        if ((flowControl != null)) {
-            try {
-                Set timeSet = GridUtil.getTimeSet((FieldImpl) (getData()));
-                int        numTimes = timeSet.getLength();
-                double[][] td       = timeSet.getDoubles();
-                double     tlen;
-                double     rlen;
-
-                if (isRefresh) {
-                    rlen = (td[0][1] - td[0][0]);
-                    tlen = (td[0][1] - td[0][0]) * vectorLength;
-                } else {
-                    rlen = (td[0][1] - td[0][0]) * numTimes;
-                    tlen = (td[0][1] - td[0][0]) * trajOffset;
-                }
-
-                TrajectoryParams tparm = flowControl.getTrajectoryParams();
-                tparm.setMarkerSize(arrowHeadSize);
-                tparm.setTrajRefreshInterval(rlen);
-                tparm.setTrajVisibilityTimeWindow(tlen);
-                tparm.setMarkerEnabled(arrowHead);
-                flowControl.setTrajectoryParams(tparm);
-
-            } catch (VisADException ve) {
-                ve.printStackTrace();
-            } catch (RemoteException re) {
-                re.printStackTrace();
-            }
-        }
-    }
-
-
     /**
      * Returns indicator whether wind barb style is that used in
      * the northern hemisphere or the southern hemisphere.
@@ -465,39 +382,6 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         flowscale = scale;
     }
 
-    public void setArrowHead(boolean onoff) {
-        arrowHead = onoff;
-    }
-
-    /**
-     * _more_
-     *
-     * @param size _more_
-     */
-    public void setArrowHeadSize(float size) {
-        arrowHeadSize = size;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param len _more_
-     */
-    public void setVectorLength(float len) {
-        vectorLength = len;
-
-    }
-
-    /**
-     * _more_
-     *
-     * @param offset _more_
-     */
-    public void setTrajOffset(float offset) {
-        trajOffset = offset;
-    }
-
     /**
      * Set the autoscale property
      *
@@ -600,7 +484,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         RealType[] realTypes = flowRealTupleType.getRealComponents();
         Unit[]     units     = flowRealTupleType.getDefaultUnits();
 
-        spdIndex = 1;
+        spdIndex  = 1;
 
         // if data is u,v (so far as you can tell by units)
         if ((Unit.canConvert(units[0], CommonUnit.meterPerSecond)
@@ -682,14 +566,10 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                         || (id == event.CONTROL_REPLACED)) {
                     flowControl = (FlowControl) flowYMap.getControl();
                     flowControl.enableStreamlines(isStreamlines);
-                    flowControl.enableTrajectory(isTrajectories);
                     flowControl.setAutoScale(autoScale);
                     flowControl.setStreamlineDensity(streamlineDensity);
                     flowControl.setAdjustFlowToEarth(adjustFlow);
                     flowControl.setBarbOrientation(barborientation);
-                    if (isTrajectories) {
-                        resetTrojectories();
-                    }
                     adjustScale(flowscale);
                 }
             }
@@ -785,13 +665,10 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         // get the RealTupleType of the range data in the  FlatField
         RealTupleType rtt       = new RealTupleType(tt.getRealComponents());
 
-        int           threeDDim = (coloredByAnother || ignoreExtraParameters )
+        int           threeDDim = (coloredByAnother || ignoreExtraParameters)
                                   ? 3
                                   : 2;
-        if(is3D && rtt.getDimension()==3){
-            set3DFlow(true);
-        } else
-            set3DFlow(rtt.getDimension() > threeDDim);
+        set3DFlow(rtt.getDimension() > threeDDim);
         // uncomment to determine ad-hoc rather than programatically
         //coloredByAnother = coloredByAnother && (rtt.getDimension() > 2);
         if (coloredByAnother) {
@@ -905,19 +782,6 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     }
 
     /**
-     * _more_
-     *
-     * @param scale _more_
-     *
-     * @throws RemoteException _more_
-     * @throws VisADException _more_
-     */
-    private void adjustTrajOffsetLength(float scale)
-            throws VisADException, RemoteException {
-        flowControl.setFlowScale(scale);
-    }
-
-    /**
      * Check to see if the wind data is cartesian (u,v) or
      * if it's polar (spd, dir).
      * @return  true if the wind is cartesian
@@ -973,10 +837,10 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         // set RealType to color by speed
         if (useSpeedForColor && !isCartesian) {
             //if ( !coloredByAnother) {
-            try {
+        	try {
                 setRGBRealType(
                     (RealType) flowRealTupleType.getComponent(spdIndex));
-            } catch (Exception e) {}
+        	} catch (Exception e) {}
         }
     }
 
@@ -988,5 +852,5 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     public void setIgnoreExtraParameters(boolean yesno) {
         ignoreExtraParameters = yesno;
     }
-
+    
 }
