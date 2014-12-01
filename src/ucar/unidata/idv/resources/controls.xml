@@ -412,7 +412,7 @@ Since this is confusing and needs more work lets remove this for now
      label="Vector Plan View"
      doeslevels="true"
      displaycategory="Flow Displays"
-     properties="streamlines=false;">
+     properties="vectors=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -433,11 +433,11 @@ Since this is confusing and needs more work lets remove this for now
     categories="*-flowvector-*"
     class="ucar.unidata.idv.control.FlowPlanViewControl"
     label="Trajectory Colored by Parameter"
-    code="GridTrajectory.combineGridsArray( D1, parameter )"
+    code="DerivedGridFactory.combineGrids( D1, parameter )"
     doeslevels="true"
     displaycategory="Flow Displays"
-    properties="streamlines=false;">
-<property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    properties="trajectories=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
   <control
