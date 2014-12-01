@@ -566,6 +566,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                         || (id == event.CONTROL_REPLACED)) {
                     flowControl = (FlowControl) flowYMap.getControl();
                     flowControl.enableStreamlines(isStreamlines);
+                    flowControl.enableTrajectory(isTrajectories);
                     flowControl.setAutoScale(autoScale);
                     flowControl.setStreamlineDensity(streamlineDensity);
                     flowControl.setAdjustFlowToEarth(adjustFlow);

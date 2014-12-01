@@ -40,8 +40,10 @@ import javax.swing.SwingConstants;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.grid.GridTrajectory;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -556,15 +558,29 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             trajectoryBtn.setSelected(isTrajectories);
         }
 
-        if(isTrajectories){
-            DerivedDataChoice ddc        = (DerivedDataChoice) this.datachoice;
-            Hashtable choices = ddc.getUserSelectedChoices();
-            DirectDataChoice udc =
-                    (DirectDataChoice) choices.get(new String("D1"));
-            getDataInstance();
-        }
     }
 
+
+    public void setStreamlines(boolean v) {
+        isStreamlines = v;
+        isTrajectories = !v;
+        isVectors = !v;
+        setStreamlines();
+    }
+
+    public void setTrajectories(boolean v) {
+        isStreamlines = !v;
+        isTrajectories = v;
+        isVectors = !v;
+        setStreamlines();
+    }
+
+    public void setVectors(boolean v) {
+        isStreamlines = !v;
+        isTrajectories = !v;
+        isVectors = v;
+        setStreamlines();
+    }
     /**
      * Get the streamline property.
      * Used by XML persistence
