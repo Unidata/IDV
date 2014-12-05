@@ -446,7 +446,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
 
-        getIdv().getVMManager().addViewManager(crossSectionView);
+       //getIdv().getVMManager().addViewManager(crossSectionView);
         addViewManager(crossSectionView);
         setYAxisRange(csvxsDisplay, verticalAxisRange);
         csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
@@ -813,6 +813,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * @throws VisADException On badness
      */
     public void doRemove() throws RemoteException, VisADException {
+        super.doRemove();
         if (viewContents != null) {
             Container parent = viewContents.getParent();
             if (parent != null) {
@@ -820,7 +821,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             }
             viewContents = null;
         }
-        super.doRemove();
     }
 
 
