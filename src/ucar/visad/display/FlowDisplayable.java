@@ -24,25 +24,7 @@ package ucar.visad.display;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.Range;
 
-import visad.BadMappingException;
-import visad.CommonUnit;
-import visad.ConstantMap;
-import visad.Display;
-import visad.EarthVectorType;
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.FlowControl;
-import visad.MathType;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.RealVectorType;
-import visad.ScalarMap;
-import visad.ScalarMapControlEvent;
-import visad.ScalarMapEvent;
-import visad.ScalarMapListener;
-import visad.TupleType;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 
 import java.awt.Color;
@@ -269,6 +251,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         if ((flowControl != null) && (enable != isTrajectories)) {
             try {
                 flowControl.enableTrajectory(enable);
+                if(enable){
+                    TrajectoryParams tparm = flowControl.getTrajectoryParams();
+                    double tt = tparm.getTrajRefreshInterval();
+                    tparm.setTrajRefreshInterval(tt*10);
+                    flowControl.changeControl(true);
+                }
             } catch (VisADException ve) {
                 ve.printStackTrace();
             } catch (RemoteException re) {
