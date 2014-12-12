@@ -252,10 +252,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             try {
                 flowControl.enableTrajectory(enable);
                 if(enable){
+                    Set          timeSet    = GridUtil.getTimeSet((FieldImpl)(getData()));
+                    int          numTimes   = timeSet.getLength();
+                    double[][] td = timeSet.getDoubles();
+                    double tlen  = (td[0][1] - td[0][0])*numTimes;
                     TrajectoryParams tparm = flowControl.getTrajectoryParams();
-                    double tt = tparm.getTrajRefreshInterval();
-                    tparm.setTrajRefreshInterval(tt*10);
-                    flowControl.changeControl(true);
+                    tparm.setTrajRefreshInterval(tlen);
+                    tparm.setTrajVisibilityTimeWindow(tlen);
+                    flowControl.setTrajectoryParams(tparm);
                 }
             } catch (VisADException ve) {
                 ve.printStackTrace();
@@ -559,6 +563,16 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     flowControl.setStreamlineDensity(streamlineDensity);
                     flowControl.setAdjustFlowToEarth(adjustFlow);
                     flowControl.setBarbOrientation(barborientation);
+                    if(isTrajectories){
+                        Set          timeSet    = GridUtil.getTimeSet((FieldImpl)(getData()));
+                        int          numTimes   = timeSet.getLength();
+                        double[][] td = timeSet.getDoubles();
+                        double tlen  = (td[0][1] - td[0][0]);
+                        TrajectoryParams tparm = flowControl.getTrajectoryParams();
+                        tparm.setTrajRefreshInterval(tlen*numTimes);
+                        tparm.setTrajVisibilityTimeWindow(tlen*4);
+                        flowControl.setTrajectoryParams(tparm);
+                    }
                     adjustScale(flowscale);
                 }
             }
