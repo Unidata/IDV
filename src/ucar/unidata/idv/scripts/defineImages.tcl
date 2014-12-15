@@ -98,7 +98,7 @@ defineImage http://www.gbuapcd.org/dustcam/keelerv1.jpg {Owens Lake} -ll {36.501
 
 defineImage http://www.fs.fed.us/gpnf/volcanocams/msh/images/mshvolcanocam.jpg {Mount St. Helens, WA} -ll {46.272,-122.152} -dz -8
 defineImage http://fin.bimedia.net/KVAL/kvaltower.jpg {Eugene, OR} -ll {44.001778 -123.115917} -dz -8
-defineImage http://belo.bimedia.net/KGW/weather/stills/wellsfargo.jpg {Portland, OR} -ll {45.516905,-122.659244} -dz -8
+defineImage http://archive.kgw.com/weather/images/core/webcams/rosecity.jpg {Portland, OR} -ll {45.516905,-122.659244} -dz -8
 defineImage http://belo.bimedia.net/KGW/weather/stills/pdx.jpg {PDX International Airport, OR} -ll {45.588267,-122.594398} -dz -8
 defineImage http://archive.king5.com/weather/images/core/webcam/queenanne.jpg {Seattle,WA} -ll {47.444,-122.317} -dz -8
 defineImage http://134.121.11.63/images/bryan/bryan_00001.jpg {Pullman,WA} -ll {46.73193,-117.165365} -dz -8
