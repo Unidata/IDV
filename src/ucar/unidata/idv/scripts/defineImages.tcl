@@ -76,8 +76,8 @@ defineImage {http://hvo.wr.usgs.gov/cams/KIcam/images/M.jpg} {Hawaii Volcanoes N
 
 
 defineGroup {West Coast}
-defineImage http://cdn.abclocal.go.com/three/kgo/webcam/baybridge.jpg {San Francisco,CA} -ll {37.8181, 122.3467} -dz -8
-defineImage http://livecams.ocscsailing.com/camera1.php?1418665898.158 {Berkeley,CA} -ll {37.8677, 122.3125} -dz -8
+defineImage http://cdn.abclocal.go.com/three/kgo/webcam/baybridge.jpg {San Francisco,CA} -ll {37.8181, -122.3467} -dz -8
+defineImage http://livecams.ocscsailing.com/camera1.php?1418665898.158 {Berkeley,CA} -ll {37.8677, -122.3125} -dz -8
 
 defineImage http://www.met.sjsu.edu/cam_directory/latest.jpg {San Jose State} -ll {37.3044,-121.85} -dz -8
 defineImage http://obs.astro.ucla.edu/images/towercam.jpg {Mt. Wilson, CA} -ll {34.22583,-118.05639} -dz -8
@@ -149,7 +149,7 @@ defineImage http://165.134.236.34/-wvhttp-01-/GetStillImage?p=-15&t=-5&z=3&b=off
 defineImage http://agwx.soils.wisc.edu/soils-agwx-assets/uwex_agwx/images/webcam/fullsize.jpg {Madison,WI} -ll {43.07980,-89.38751} -dz -6
 
 
-defineImage http://www.cbc.ca/windsor/webcam/windsor_webcam.jpg {Windsor, Canada} -dz -5 -ll {38.547133,-122.81638}
+defineImage http://www.cbc.ca/windsor/webcam/windsor_webcam.jpg {Windsor, Canada} -dz -5 -ll {42.2833, -83.0}
 defineImage http://www.myfoxwfld.com/webcam/sears/sears.jpg {Chicago, IL} -dz -6 -ll {41.8,-87.7}
 
 # These are valid, but mysteriously this script cannot grab them. Are they blocking our web request, somehow?
