@@ -27,13 +27,13 @@ defineImage http://www.unco.edu/liveview/images/UNC2.jpg {University of Northern
 
 defineImage http://www.9news.com/9live/images/cams/pic1.jpg {Denver, CO} -dz -7 -ll {39.75,-105}
 defineImage http://www.cotrip.org/images/camera?imageURL=60002.jpg {Eisenhower Tunnel, CO} -ll {39.68,-105.9} -dz -7
-defineImage http://utepasscams.com/cams/216.jpg {Pikes Peak, CO} -ll {38.84056,-105.04389} -dz -7
+defineImage http://www.cograilway.com/Summit/summitcam.jpg {Pikes Peak, CO} -ll {38.84056,-105.04389} -dz -7
 
 defineImage http://ouraynet.com/blowout.jpg  {Ouray, CO} -dz -7 -ll {38.04,-107.76} -heading {225}
 
 defineImage {http://www-das.uwyo.edu/weathercam/weathercam.jpg} {Laramie, WY} -ll {41.316,-105.578} -dz -7
 defineImage http://www2.tetoncam.com/tetonl.jpg {Grand Tetons, WY} -ll {43.74111,-110.80167} -dz -7
-defineImage {http://bridgerbowl.com/bridgerCams/cam3.jpg} {Bridger Bowl, MT} -ll {45.819727,-110.917782} -dz -7
+defineImage {http://bridgerbowl.com/assets/webcams/cam4.jpg} {Bridger Bowl, MT} -ll {45.819727,-110.917782} -dz -7
 
 
 
@@ -76,13 +76,14 @@ defineImage {http://hvo.wr.usgs.gov/cams/KIcam/images/M.jpg} {Hawaii Volcanoes N
 
 
 defineGroup {West Coast}
-defineImage http://castrocam.net/castrocam.jpg {San Francisco,CA} -ll {37.76298,-122.440395} -dz -8
-defineImage http://sv.berkeley.edu/view/images/current_view.jpg {Berkeley,CA} -ll {37.86972,-122.25778} -dz -8
+defineImage http://cdn.abclocal.go.com/three/kgo/webcam/baybridge.jpg {San Francisco,CA} -ll {37.8181, 122.3467} -dz -8
+defineImage http://livecams.ocscsailing.com/camera1.php?1418665898.158 {Berkeley,CA} -ll {37.8677, 122.3125} -dz -8
+
 defineImage http://www.met.sjsu.edu/cam_directory/latest.jpg {San Jose State} -ll {37.3044,-121.85} -dz -8
 defineImage http://obs.astro.ucla.edu/images/towercam.jpg {Mt. Wilson, CA} -ll {34.22583,-118.05639} -dz -8
 defineImage http://abclocal.go.com/three/kabc/webcam/web1-2.jpg?1144856196725 {Los Angeles, CA} -ll {34,-118.24} -dz -8
-defineImage {http://hpwren.ucsd.edu/gphoto2-a2/CNMVCSD2/LAST.jpg} {San Diego,CA}  -ll {32.715685,-117.161724}
-defineImage {http://208.74.106.27/netcam.jpg} {Whiskey Town,CA}  -ll {44.30315,-118.324272}
+defineImage {http://hpwren.ucsd.edu/gphoto2-a2/CNMVCSD2/LAST.jpg} {San Diego, CA}  -ll {32.715685,-117.161724}
+defineImage {http://images.webcams.travel/webcam/1393001576-Weather-Bass-Mtn-McColl.jpg} {McColl, CA}  -ll {40.7329276 -122.3672311}
 
 
 ###defineImage http://www.lesjackson.com/capture1.jpg {Monterey, CA} -ll {36.59,-121.882} -dz -8
@@ -96,10 +97,10 @@ defineImage http://www.gbuapcd.org/dustcam/keelerv1.jpg {Owens Lake} -ll {36.501
 
 
 defineImage http://www.fs.fed.us/gpnf/volcanocams/msh/images/mshvolcanocam.jpg {Mount St. Helens, WA} -ll {46.272,-122.152} -dz -8
-defineImage http://webcam.uoregon.edu/jpg/image.jpg {Eugene, OR} -ll {44.04,-123.07} -dz -8
+defineImage http://fin.bimedia.net/KVAL/kvaltower.jpg {Eugene, OR} -ll {44.001778 -123.115917} -dz -8
 defineImage http://belo.bimedia.net/KGW/weather/stills/wellsfargo.jpg {Portland, OR} -ll {45.516905,-122.659244} -dz -8
 defineImage http://belo.bimedia.net/KGW/weather/stills/pdx.jpg {PDX International Airport, OR} -ll {45.588267,-122.594398} -dz -8
-defineImage http://images.ibsys.com/sea/images/weather/auto/queenannecam_640x480.jpg {Seattle,WA} -ll {47.444,-122.317} -dz -8
+defineImage http://archive.king5.com/weather/images/core/webcam/queenanne.jpg {Seattle,WA} -ll {47.444,-122.317} -dz -8
 defineImage http://134.121.11.63/images/bryan/bryan_00001.jpg {Pullman,WA} -ll {46.73193,-117.165365} -dz -8
 
 
@@ -122,7 +123,7 @@ defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ
 
 defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359}
 
-defineImage http://wwc.instacam.com/instacamimg/LTCRC/LTCRC_l.jpg {Las Cruces, NM} -ll {32.3,-106.7}
+defineImage http://www.eastmesaweather.com/cams/secam.jpg {Las Cruces, NM} -ll {32.3,-106.7}
 defineImage http://www.cloudcroftwebcam.com/camera2.jpg {Cloudcroft, NM} -ll {32.957313,-105.742485}
 
 defineImage http://wwc.instacam.com/instacamimg/KOBTV/KOBTV_l.jpg {Albuquerque,NM}  -ll {35.1029697, -106.6703963}
@@ -131,7 +132,7 @@ defineImage http://www.wxnation.com/livecam/ccam.jpg {Fort Worth, TX} -ll {32.72
 defineImage http://www.atmo.ttu.edu/includes/Photo_N.jpg {Lubbock,TX} -ll {33.5777778, -101.8547222} -dz -6
 
 defineImage http://www.nps.gov/webcams-glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
-defineImage http://www.nps.gov/webcams-glca/ww1.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
+defineImage http://www.nps.gov/webcams-glca/ww2.jpg {Wahweap, Lake Powell, UT} -ll {37.01278,-111.48944} -dz -7
 defineImage http://www.neng.usu.edu/webcam/latest/latest_bldcam2.jpg {Logan, UT} -ll {41.73444,-111.85361} -dz -7
 defineImage http://155.98.55.200/image.jpg {University of Utah at Salt Lake City, UT} -dz -7 -ll {40.76623,-111.84755}
 defineImage http://instacam.com/instacamimg/ZPRNG/ZPRNG_S.jpg {Zion National Park, UT} -dz -7 -ll {37,-113}
@@ -145,7 +146,7 @@ defineImage {http://www.wrh.noaa.gov/boi/images/BOI2-CAM.jpg} {Boise,ID}  -ll {4
 defineGroup "Midwest"
 
 defineImage http://165.134.236.34/-wvhttp-01-/GetStillImage?p=-15&t=-5&z=3&b=off&camer_id=1  {Saint Louis Univertiy,MO} -ll {38.637,-90.234} -dz -6
-defineImage http://www.soils.wisc.edu/asig/webcam/halfsize.jpg  {Madison,WI} -ll {43.07980,-89.38751} -dz -6
+defineImage http://agwx.soils.wisc.edu/soils-agwx-assets/uwex_agwx/images/webcam/fullsize.jpg {Madison,WI} -ll {43.07980,-89.38751} -dz -6
 
 
 defineImage http://www.cbc.ca/windsor/webcam/windsor_webcam.jpg {Windsor, Canada} -dz -5 -ll {38.547133,-122.81638}
@@ -162,7 +163,7 @@ defineImage http://www.myfoxwfld.com/webcam/sears/sears.jpg {Chicago, IL} -dz -6
 
 
 defineImage http://www.starcitywebcam.com/images/cam1l.jpg {Lincoln,NE} -dz -6 -ll {40.7,-96.66}
-defineImage http://66.231.15.194/Weather/Files_Forecast/cam4.jpg {Watertown,SD}  -ll {44.900588,-97.105744}
+defineImage http://www.keloland.com/weather/files_forecast/cam4.jpg {Watertown,SD}  -ll {44.900588,-97.105744}
 
 
 
@@ -209,13 +210,13 @@ defineImage http://www.spadre.com/southpadrebeachcam.jpg {South Padre Island,TX}
 defineImage http://webcams.galveston.com/docs/casadelmar2006/casadelmarmp.jpg {Galveston,TX} -dz -5 -ll {29.29,-94.79}
 
 defineImage http://wwc.instacam.com/instacamimg/NORLS/NORLS_l.jpg {La Nouvelle-Orleans, LA} -dz -6 -ll {29.951066,-90.071532}
-defineImage http://209.209.196.98/ {Monroe, LA} -dz -6 -ll {32.509311,-92.119301}
+defineImage http://www.kxul.com/cgi-bin/campuscam.cgi?large {Monroe, LA} -dz -6 -ll {32.509311,-92.119301}
 
 defineImage http://www.dnr.mo.gov/env/esp/aqm/photos/kccam/lat001.jpg {Kansas City,MO}  -ll {39.10296,-94.583062}
 
 
 
-defineImage {http://www.rwic.und.edu/webcam/webcam32.jpg} {Grand Forks,ND}  -ll {47.924085,-97.032034}
+defineImage {http://images.webcams.travel/original/1349806811-Weather-North-Dakota-Grand-Forks-City-Hall-Grand-Forks.jpg} {Grand Forks,ND}  -ll {47.924085,-97.032034}
 
 
 defineImage http://www.scottcountyiowa.com/webcams/images/live/112/cam112_00051.jpg {Scott County, IA}  -ll {41.61293,-90.606277}
@@ -228,7 +229,7 @@ defineImage http://webcam.icorp.net/ar1.jpg {Metairie,LA} -dz -5 -ll {29.98,-90.
 defineGroup {Antarctica}
 defineImage http://www.esrl.noaa.gov/gmd/webdata/spo/webcam/cmdlfullsize.jpg {South Pole}   -ll {-90, -105}
 defineGroup {Europe}
-defineImage http://www.cardada.ch/webcam/Cardada_mittel.jpg {Locarno, Switzerland}  -dz +1 -ll {46.2, 8.8}
+defineImage http://www.ticino.ch/docroot/site-ticino/img/element/webcams/data/LC.jpg {Locarno, Switzerland}  -dz +1 -ll {46.2, 8.8}
 defineImage http://www.knmi.nl/webcam/images/ispy.jpg {KNMI, Netherlands}  -dz +1 -ll {52,5}
 
 
