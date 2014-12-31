@@ -22,6 +22,7 @@ package ucar.unidata.idv;
 
 
 import ucar.nc2.grib.GribVariableRenamer;
+import ucar.nc2.time.CalendarDate;
 
 import java.io.IOException;
 
@@ -72,23 +73,13 @@ public class LibVersionUtil {
                     if ((implTitle != null)
                             && (implTitle.contains("ncIdv"))) {
                         buildInfo.put(
-                            "version",
-                            attrs.getValue("Implementation-Version"));
-                        SimpleDateFormat oldFormat =
-                            new SimpleDateFormat(
-                                    "yyyyMMdd.HHmm");
-                        //Fri Dec 07 10:51:57 MST 2012
-                        SimpleDateFormat newFormat =
-                            new SimpleDateFormat("yyyyMMddHHmmss");
-
+                                "version",
+                                attrs.getValue("Implementation-Version"));
                         String strDate = attrs.getValue("Built-On");
-                        try {
-                            Date date = oldFormat.parse(strDate);
-                            buildInfo.put("buildDate",
-                                          newFormat.format(date));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+
+                        CalendarDate cd = CalendarDate.parseISOformat(null, strDate);
+                        buildInfo.put("buildDate", cd.toString());
+
                         break;
                     }
                 }

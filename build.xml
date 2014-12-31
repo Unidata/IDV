@@ -146,6 +146,7 @@ argument -Dfoo=bar) -->
         <unjar src="${libsrc}/abom.jar" dest="${tmpjardir}"/>
 
         <unjar src="${libsrc}/AppleJavaExtensions.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/ehcache-core-2.6.2.jar" dest="${tmpjardir}"/>
         <jar
             basedir="${tmpjardir}"
             compress="true"
