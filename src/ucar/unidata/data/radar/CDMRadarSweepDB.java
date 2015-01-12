@@ -90,8 +90,7 @@ public class CDMRadarSweepDB {
 
         res = 360.0f / numberOfRay;
         /* Check that this makes sense with beam width. */
-        if ((res > 2 * beamWidth) && (beamWidth != 0)) {
-
+        if (beamWidth != 0) {
             res = beamWidth;
         }
         float[] _azimuths = s;
@@ -100,7 +99,7 @@ public class CDMRadarSweepDB {
             // try {
             azi = _azimuths[i];
             if ( !Float.isNaN(azi)) {
-                iazim = (int) (azi / res + res / 2.0);  /* Centered on bin. */
+                iazim = Math.round (azi + res / 2.0f);  /* Centered on bin. */
                 // } catch (IOException e) {
                 // e.printStackTrace();
                 // iazim = 0;
@@ -113,7 +112,7 @@ public class CDMRadarSweepDB {
                 r.index    = iazim;
                 r.rayIndex = sIdx[i];
                 r.azimuth  = azi;
-
+                //System.out.println("I " + i + " INDEX " + iazim + " AZI " + azi + "\n");
                 /*
                  * fprintf(stderr,"ray# %d, azim %f, iazim %d\n", ray->h.ray_num,
                  * ray->h.azimuth, iazim);
