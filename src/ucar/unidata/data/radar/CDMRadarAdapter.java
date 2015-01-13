@@ -969,10 +969,10 @@ public class CDMRadarAdapter implements RadarAdapter {
         float                    gateSize   = sw0.getGateSize();
         float                    range_step = sw0.getGateSize();
         float range_to_first_gate           = sw0.getRangeToFirstGate();
-        float[]  rayFactor  = new float[numSweep];
+
         // now get the hash map for each sweep contain azi as index and ray information.
         Trace.call1("   sweep list");
-     //   if (RSL_sweep_list == null) {
+        if (RSL_sweep_list == null) {
             RSL_sweep_list = new CDMRadarSweepDB[numSweep];
 
             float[][] myAziArray  = new float[numSweep][];
@@ -981,7 +981,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 int sb = Integer.parseInt(cut[b].toString());
                 RadialDatasetSweep.Sweep s1    = sweepVar.getSweep(sb);
                 float[]                  tmpAz;
-                if ((s1.getRadialNumber() /numberOfRay) == 2)
+                if (format != null && format.toString().contains("AR2V"))
                     tmpAz =  getAzimuth(s1);
                 else
                     tmpAz =  s1.getAzimuth();
@@ -996,7 +996,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                 RSL_sweep_list[b] = constructSweepHashTable(myAziArray[b],
                         aziArrayIdx[b], beamWidth);
             }
-     //   }
+        }
         Trace.call2("   sweep list");
 
         // setting cappi azi value for each ray.
@@ -1172,11 +1172,11 @@ public class CDMRadarAdapter implements RadarAdapter {
             float[][]                _data2 = data2[sweepIdx];
             int sb = Integer.parseInt(cut[sweepIdx].toString());
             RadialDatasetSweep.Sweep s1     = sweepVar.getSweep(sb);
-            rNum[sweepIdx] = s1.getRadialNumber();
+            int rnumber = s1.getRadialNumber();
             for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
                 //int si = rayIndex[sweepIdx][rayIdx];
                 float[] __data2 = _data2[rayIdx];
-                int     rnumber = rNum[sweepIdx];
+                //int     rnumber = rNum[sweepIdx];
                 if (rayIdx < rnumber) {
                     for (int gateIdx = 0; gateIdx < numBin; gateIdx++) {
                         __data2[gateIdx] =
