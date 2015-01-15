@@ -117,7 +117,8 @@ public class CDMRadarSweepDB {
                  * fprintf(stderr,"ray# %d, azim %f, iazim %d\n", ray->h.ray_num,
                  * ray->h.azimuth, iazim);
                  */
-                sweepTableHash.put(r.index, r);
+                if(r.index < 360)
+                    sweepTableHash.put(r.index, r);
             }
         }
 

@@ -2302,7 +2302,10 @@ public class CDMRadarAdapter implements RadarAdapter {
             bincounter = (int) Math.round(deltaAzi);
             if (bincounter > 180) {
                 bincounter = 360 - bincounter;
-                cs         = true;
+                cs = true;
+            }
+            if(numberOfRay > 361) {
+                bincounter = (int)(bincounter * (numberOfRay/360.f));
             }
         }
 
@@ -2335,6 +2338,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             ray0Idx[b] = r1.rayIndex;
             ray1Idx[b] = r2.rayIndex;
             */
+            //System.out.println("Id 0: " + ray0Idx[b] + " Id 1: " + ray1Idx[b]);
         }
 
 
@@ -2472,8 +2476,8 @@ public class CDMRadarAdapter implements RadarAdapter {
                         }
                     } else if (cs) {
                         rr = ray0 + ri;
-                        if (rr >= 360) {
-                            rr = rr - 360;
+                        if (rr >= numberOfRay) {
+                            rr = rr - numberOfRay;
                         }
                     } else if ( !incsign) {
                         rr = ray0 - ri;
@@ -2482,8 +2486,8 @@ public class CDMRadarAdapter implements RadarAdapter {
                         }
                     } else {
                         rr = ray0 + ri;
-                        if (rr >= 360) {
-                            rr = rr - 360;
+                        if (rr >= numberOfRay) {
+                            rr = rr - numberOfRay;
                         }
                     }
                     float azi = myAziArray[ti][rr];
@@ -3013,7 +3017,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             for (int i = 0; i < numSweep; i++) {
                 int num = sweepVar.getSweep(i).getRadialNumber();
 
-                if (num > numRay) {
+                if (num < numRay) {
                     numRay = num;
                 }
             }
@@ -4005,7 +4009,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             for (int rayIdx = 0; rayIdx < rayNumber; rayIdx++) {
                 int     si      = rayIndex[sweepIdx][rayIdx];
                 float[] __data2 = _data2[rayIdx];
-                if (si < rnumber) {
+                if (si < rnumber && si < numberOfRay) {
                     for (int gateIdx = 0; gateIdx < gates; gateIdx++) {
                         __data2[gateIdx] =
                             allData[gates * numberOfRay * sb + gates * si + gateIdx];
