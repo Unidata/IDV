@@ -31,16 +31,47 @@ The items below reflect changes since the 5.0 release.
 </faqitem>
 
 <faqitem q="RAMADDA plugin" id="ramaddaPlugin">
-The new RAMADDA plugin along with changes to the image generator allows
-users to generate a movie and save it as a zip file of images. Users can then publish the zip file
-to the RAMADDA server to be displayed by the image player.
+The new RAMADDA plugin along with changes to the image generator allows users to
+generate a movie and save it as a zip file of images. Users can then publish the
+zip file to the RAMADDA server to be displayed by the image player.
 </faqitem>
 
 <faqitem q="UNAVCO plugin" id="unavcoPlugin">
   Fixed the remote location of the UNAVCO plugin.
 </faqitem>
 
+<faqitem q="Windows Unknown Publisher" id="windowscert">
+  The IDV installation application on Windows is now properly signed with a
+  security certificate. There result of this change is during IDV installation,
+  users will now see the publisher as "The University Corporation for
+  Atmospheric Research".
+</faqitem>
+
+<faqitem q="Mac OS X Gatekeeper" id="gatekeeper">
+ IDV nightly build is finally properly signed vis a vis OS X gatekeeper. The
+result is IDV users on OS X can now install the IDV in a straightforward manner
+(instead of having to jump through awkward Finder hoops).
+</faqitem>
+
+<faqitem q="Multiple IDVs on OS X (Yosemite)" id="gatekeeper">
+  Multiple instances of the IDV can now run on OS X by starting the IDV with the
+  (dock) icon. Moreover, fixed a problem on OS X Yosemite where attempting to
+  start the IDV multiple times from the dock or icon would fail, and "ghost" IDV
+  instances could not be killed.
+</faqitem>
+
+<faqitem q="IDV Old Version Warning" id="versioncheck">
+  Fixed a bug where the IDV old version warning mechanism was interefering with
+  ISL scripts. Also refactored, and improved the code that handles this old
+  version check.
+</faqitem>
+
+
 <faqitem cat="Display Changes"></faqitem>
+
+<faqitem q="Webcams" id="webcam">
+Fixed broken webcam links available in the IDV.
+</faqitem>
 
 <faqitem q="New Image Chooser" id="newimagechooser">
 Added an image preview panel in
