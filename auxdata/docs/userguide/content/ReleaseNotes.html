@@ -17,11 +17,15 @@ The items below reflect changes since the 5.0 release.
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem q="Latest netCDF-Java Version" id="nj43">
+<faqitem q="Latest netCDF-Java Version" id="nj45">
   <p>
-    The version of the netCDF-Java library currently distributed with the IDV is the 4.5.4 release.
+    The version of the netCDF-Java library currently distributed with the IDV is the 4.5.4 release. This version
+    of netCDF-Java includes changes to new I/O NIO.2 of Java 7, HttpClient 4, improved projections, and updated grib
+    tables. See the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf_java_library_and_tds8">
+    netCDF-Java Library</a> for a more details on these changes.
 </p>
 </faqitem>
+
 
 <faqitem q="Install4J and IDV Start Script" id="install4j">
   Repaired Install4J uninstaller which had been broken for some time. Also fixed
@@ -72,72 +76,18 @@ result is IDV users on OS X can now install the IDV in a straightforward manner
 Fixed broken webcam links available in the IDV.
 </faqitem>
 
-<faqitem q="New Image Chooser" id="newimagechooser">
-Added an image preview panel in
-the <a href="./data/DataSourceProperties.html#spatialsubset"> data subset</a>
-panel, and moved the image property widgets from the original chooser to the
-Advanced panel in the subset window. The result is a more intuitive and
-efficient user experience when selecting the area of interest before creating
-the final display.
-</faqitem>
-
-<faqitem q="Contour Labeling" id="contours">
-Made improvements in VisAD and the IDV to improve the labeling of contours
-and how contours are defined in the IDV contour labeling UI.
-</faqitem>
-
 
 <faqitem cat="Data Changes"></faqitem>
 
-<faqitem q="GEMPAK Upper Air format Support" id="gempakua">
-  The IDV now has the capability of viewing GEMPAK format upper air data files.
-  We continue to make changes, improvements, and bug fixes in this area. We
-  added documentation specifying that, for now, the GEMPAK format upper air data
-  files must be supplied with the .gem suffix.
+<faqitem q="CFRadial netcdf format Support" id="cfradial">
+  The IDV now has the capability of viewing CFRadial netcdf format radar data files.
+  We works with engineers from NCAR/EOL groups and continue to make changes, improvements,
+  and bug fixes in this area.
 </faqitem>
 
-<faqitem q="Match Display Region" id="matchdisplayregion">
-The IDV can now match display regions. When the user selects this option in the
-data source property or subset panel, the IDV will automatically spatially
-subset to match the display area in the view window.  This is done by first
-setting a region of interest in the main view window, and selecting "Match
-Display Region" in the Region tab of the subset panel. If the "Match Display
-Region" option is not selected before creating the display, you can reset this
-option under View menu of
-the <a href="./controls/index.html#DisplayControlViewMenu">Display Control</a>.
-If the data source type is grid file, the IDV user can set "Match Display
-Region" as a default property in the
-<a href="./data/DataSourceProperties.html#spatialsubset">Data Source
-Properties</a> window.
 
-<p>
-Another important use of the Match Display Region feature is when opening a bundle to a new
-area of interest. This is done by first selecting an area of interest in the main view
-window and opening a newly created bundle. You will be prompted whether you want
-to use the Match Display Region. If this option is checked, the region of coverage
-of the bundle will be replaced by the display region of the view window.
-
-</p>
-</faqitem>
-
-<faqitem q="Adaptive Resolution" id="adaptiveresolution">
-This is a new advanced feature in the IDV. When loading large datasets with PR
-enabled, the IDV calculates the resolution of the map view window, dynamically
-sets the data sampling, and loads sufficient data to generate the image. The
-quality of the image is not compromised. The result of this improvement is more
-efficient use of both client and server system resources thereby reducing
-network traffic significantly. The Adaptive Resolution is a property in
-the <a href="./tools/Preferences.html">User Preference</a>. It can also be set
-in the
-<a href="./ui/Menus.html#projectionmenu">Projections</a> drop down menu of main
-view window.
-</faqitem>
-
-<faqitem q="CF Trajectories" id="cftrajectories">
-IDV can now handle multiple trajectories in one CF-compliant file. When wanting
-to view these data, select a Data Source Type of "Trajectory Sounding Files".
-You will have to build the trajectory file in a CF compliant manner as described
-<a href="http://www.unidata.ucar.edu/blogs/developer/en/entry/ipynb_cookbooks_to_create_cf">here</a>.
+<faqitem q="AMRC Text Point" id="amrctextpoint">
+IDV can now handle text point data from the Antarctic Meteorological Research Center(AMRC).
 </faqitem>
 
 <faqitem q="CSV Time Matching" id="csvtimematching">
