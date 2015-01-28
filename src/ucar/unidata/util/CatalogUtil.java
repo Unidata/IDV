@@ -25,17 +25,14 @@
 package ucar.unidata.util;
 
 
+import org.apache.xerces.dom.DeferredElementImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.ui.XmlTree;
-
-
 import ucar.unidata.xml.XmlUtil;
-
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -855,9 +852,19 @@ public class CatalogUtil {
             return null;
         }
         if (datasetNodes.size() > 1) {
-            errorMessage("Too many dataset nodes found in the  catalog:"
-                         + resolverUrl);
-            return null;
+            Object dn = datasetNodes.get(0);
+            if(dn instanceof DeferredElementImpl) {
+                DeferredElementImpl dei = (DeferredElementImpl) dn;
+                if (!dei.hasAttribute("urlPath")) {
+                    errorMessage("Too many dataset nodes found in the  catalog:"
+                                 + resolverUrl);
+                    return null;
+                }
+            } else {
+                errorMessage("Too many dataset nodes found in the  catalog:"
+                             + resolverUrl);
+                return null;
+            }
         }
         Element datasetNode = (Element) datasetNodes.get(0);
         Element serviceNode = findServiceNodeForDataset(datasetNode, false,
