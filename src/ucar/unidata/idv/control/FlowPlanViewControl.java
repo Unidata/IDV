@@ -191,7 +191,29 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         return planDisplay;
     }
 
-    /**
+    	/* (non-Javadoc)
+	 * @see ucar.unidata.idv.control.DisplayControlImpl#changeColorUnit()
+	 */
+	@Override
+	// TJJ Feb 2015 - This local override is so wind barb colors get 
+	// updated appropriately when the user changes units (e.g. knots to m/s)
+    	// (see inquiry 1911)
+	public void changeColorUnit() {
+		super.changeColorUnit();
+		try {
+			getPlanDisplay().setDisplayUnit(getColorUnit());
+            		// MJH the colorScaleInfo stuff makes sure the display's color
+            		// table unit label gets updated properly also, for inq 1925.
+            		getColorScaleInfo().setUnit(getColorUnit());
+            		applyColorScaleInfo();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (VisADException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
      * Called to initialize this control from the given dataChoice;
      * override super class instance to set skip factor before displaying data.
      *
