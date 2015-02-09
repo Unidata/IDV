@@ -95,9 +95,7 @@ public class WindBarbDisplayable extends FlowDisplayable {
     }
 
     /**
-     * Sets the RealType of the RGB parameter.  Override so that
-     * we set the units to be KNOTS since wind barbs are always
-     * in knots
+     * Sets the RealType of the RGB parameter.
      * @param realType          The RealType of the RGB parameter.  May
      *                          not be <code>null</code>.
      * @throws VisADException   VisAD failure.
@@ -106,7 +104,12 @@ public class WindBarbDisplayable extends FlowDisplayable {
     public void setRGBRealType(RealType realType)
             throws RemoteException, VisADException {
         super.setRGBRealType(realType);
-        setDisplayUnit(CommonUnits.KNOT);
+        // mjh inq 1911: we actually don't want to force units to KNOT here;
+        // the barb icon will always be in knots but not necessarily the color
+        // and color scale.
+        // TODO: this method probably doesn't need to be overridden if we
+        // aren't forcing unit to knots...
+        //setDisplayUnit(CommonUnits.KNOT);
     }
 
 
