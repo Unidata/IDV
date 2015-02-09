@@ -25,6 +25,7 @@ import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.idv.ControlContext;
 
@@ -260,6 +261,21 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         }
 
         setLevelWithRawValue(initialValue);
+
+        String magStr = (String) choice.getProperty("MAG");
+        if(choice instanceof DerivedDataChoice){
+            DerivedDataChoice dchoice = (DerivedDataChoice)choice;
+            List<DataChoice> dlist = dchoice.getChoices();
+            DataChoice dc = dlist.get(0);
+            magStr = (String) dc.getProperty("MAG");
+        }
+
+        if (magStr != null && !magStr.isEmpty()) {
+            System.out.println(" MAG " + resolutionReadout);
+            resolutionReadout = magStr;
+        } else {
+            resolutionReadout = null;
+        }
         return true;
     }
 
@@ -880,6 +896,6 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
      * @return _more_
      */
     protected boolean canDoProgressiveResolution() {
-        return false;
+        return true;
     }
 }
