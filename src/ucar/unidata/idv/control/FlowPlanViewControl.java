@@ -528,8 +528,13 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void setSkipValue(int value) {
         super.setSkipValue(value);
+        FlowDisplayable fd = getGridDisplay();
         if (skipFactorWidget != null) {
             skipFactorWidget.setValue(value);
+        }
+        fd.setUseSpeedForColor(useSpeedForColor);
+        if (useSpeedForColor) {
+            colorIndex = fd.getSpeedTypeIndex();
         }
     }
 
