@@ -450,6 +450,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         addViewManager(crossSectionView);
         setYAxisRange(csvxsDisplay, verticalAxisRange);
         csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
+        csvxsDisplay.setYDisplayUnit(csvxsDisplay.getYDisplayUnit());
         //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
         if (haveMultipleFields()) {
             addDisplayable(vcsDisplay, crossSectionView,
