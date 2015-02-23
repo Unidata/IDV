@@ -25,7 +25,7 @@ defineImage http://www.unco.edu/liveview/images/UNC2.jpg {University of Northern
 
 
 
-defineImage http://www.9news.com/9live/images/cams/pic1.jpg {Denver, CO} -dz -7 -ll {39.75,-105}
+defineImage http://archive.9news.com/9live/images/cams/pic1.jpg {Denver, CO} -dz -7 -ll {39.75,-105}
 defineImage http://www.cotrip.org/images/camera?imageURL=60002.jpg {Eisenhower Tunnel, CO} -ll {39.68,-105.9} -dz -7
 defineImage http://www.cograilway.com/Summit/summitcam.jpg {Pikes Peak, CO} -ll {38.84056,-105.04389} -dz -7
 
@@ -176,13 +176,13 @@ defineImage http://www.hazecam.net/images/photos-main/BLUEHILL.JPG {Boston,MA} -
 defineImage http://www.dotdata.ct.gov/trafficcameras/images/image87.jpg {Hartford,CT} -dz -5 -ll {41.74,-72.65}
 defineImage http://hazecam.net/images/main/mtwash.jpg {Mount Washington, NH} -dz -5 -ll {44,-71}
 defineImage http://hazecam.net/images/main/burlington_right.jpg {Burlington, VT} -dz -5 -ll {44,-73}
-defineImage http://apollo.lsc.vsc.edu/webcam/LSCimage.jpg {Lyndon State College, VT} -ll {44.53528,-72.02611} -dz -5
+defineImage http://meteorology.lyndonstate.edu/webcam/LSCimage2.jpg {Lyndon State College, VT} -ll {44.53528,-72.02611} -dz -5
 
 defineImage http://wwc.instacam.com/instacamimg/MLLRU/MLLRU_l.jpg {Millersville University of Pennsylvania} -ll {40,-76.35} -dz -5
 defineImage http://www.instacam.com/instacamimg/CALIF/CALIF_s.jpg {California University of Pennylvania} -ll {40.066,-79.892} -dz -5
 
 
-defineImage  http://www.wchstv.com/newsroom/wvtcam3.jpg {Charleston,WV}  -ll {38.350195,-81.638989}
+defineImage  http://ftpcontent2.worldnow.com/wciv/news/stationcameras/downtown/downtown.jpg {Charleston,WV}  -ll {38.350195,-81.638989}
 
 
 defineImage http://www.gettysburgaddress.com/GIFS/battle.jpg {Gettysburg,PA} -ll {39.82111,-77.22361} -dz -5
@@ -197,7 +197,7 @@ defineImage http://wwc.instacam.com/instacamimg/ATLGM/ATLGM_l.jpg {Atlanta,GA} -
 defineImage http://images.webcams.travel/webcam/1170512061.jpg {Savannah,GA} -ll {32,-81.1} -dz -5
 
 
-defineImage http://www.mymiamiview.com/images/webcam.jpg {Miami,FL} -ll {25.7,-80.1} -dz -5
+defineImage http://images.webcams.travel/original/1232600976-Weather-Wannman-Cam,-Miami's-Biscayne-Bay-North-Bay-Village.jpg  {Miami,FL} -ll {25.5658, -80.2164} -dz -5
 defineImage http://doppler.tbo.com/webcam/towercam.jpg {Tampa,FL} -ll {27.84806,-82.26333} -dz -5
 ###defineImage http://www.news-journalonline.com/webcam/dbcam.jpg {Daytona Beach,FL} -ll {29.2,-81.0} -dz -5
 
