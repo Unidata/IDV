@@ -854,6 +854,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             try {
                 getGridDisplay().setTrajOffset(trajOffsetValue);
                 getGridDisplay().resetTrojectories();
+                if (arrowHead) {
+                    getGridDisplay().resetTrojectoryArrowHead(1.0f);
+                } else {
+                    getGridDisplay().resetTrojectoryArrowHead(0.0f);
+                }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
