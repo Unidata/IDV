@@ -118,7 +118,7 @@ defineImage http://www.avo.alaska.edu/webcam/augtst.jpg {Augustine Volcano, AK} 
 
 defineGroup Southwest
 defineImage http://www.cs.arizona.edu/camera/view.jpg {Tuscon, AZ} -ll {32.22694,-110.96083}
-defineImage http://icons.wunderground.com/webcamramdisk/p/o/pocomas/1/current.jpg {Mount Lemmon, AZ} -ll {32.4456,-110.7447}
+defineImage http://icons.wunderground.com/webcamramdisk/p/o/pocomas/2/current.jpg {Mount Lemmon, AZ} -ll {32.4456,-110.7447}
 defineImage http://www.wrh.noaa.gov/images/fgz/webcam/camera1.jpg {Bellemont, AZ} -ll {35.24,-111.84}
 
 defineImage http://www.noao.edu/kpno/kpcam/lastim.jpg {Kitt Peak, AZ} -ll {31.9639671, -111.5998359}
