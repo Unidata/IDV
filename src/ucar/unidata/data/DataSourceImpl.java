@@ -2193,7 +2193,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
 
 
-            if ((times == null) || (times.size() == 0)) {
+            if ((times == null) || (times.size() == 0) ||
+                    times.size()== allTimesFromDataChoice.size()) {
                 times = allTimesFromDataChoice;
             }
             times = getDateTimes(times, allTimesFromDataChoice);
