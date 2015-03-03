@@ -262,25 +262,28 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /**
      * sets trajectory parms if the enable is true.
      * @param enable boolean whether streamlines are enabled.
+     * @param mSize _more_
+     * @param refresh _more_
      */
-    public void setTrojectoriesEnabled(boolean enable, float mSize, boolean refresh) {
+    public void setTrojectoriesEnabled(boolean enable, float mSize,
+                                       boolean refresh) {
 
-        if ((flowControl != null) && (enable != isTrajectories || refresh != isRefresh) ) {
+        if ((flowControl != null)
+                && ((enable != isTrajectories) || (refresh != isRefresh))) {
             try {
                 flowControl.enableTrajectory(enable);
                 if (enable) {
                     Set timeSet =
                         GridUtil.getTimeSet((FieldImpl) (getData()));
-                    int              numTimes = timeSet.getLength();
-                    double[][]       td       = timeSet.getDoubles();
-                    double           tlen;
-                    double           rlen;
+                    int        numTimes = timeSet.getLength();
+                    double[][] td       = timeSet.getDoubles();
+                    double     tlen;
+                    double     rlen;
 
-                    if(refresh) {
+                    if (refresh) {
                         rlen = (td[0][1] - td[0][0]);
                         tlen = (td[0][1] - td[0][0]) * vectorLength;
-                    }
-                    else {
+                    } else {
                         rlen = (td[0][1] - td[0][0]) * numTimes;
                         tlen = (td[0][1] - td[0][0]) * trajOffset;
                     }
@@ -300,12 +303,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
 
         isTrajectories = enable;
-        isRefresh = refresh;
+        isRefresh      = refresh;
     }
 
     /**
-     * resets trajectory parms.
-     * @param
+     * resets trajectory parms
+     *
      */
 
     public void resetTrojectories() {
@@ -313,21 +316,20 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         if ((flowControl != null)) {
             try {
                 Set timeSet = GridUtil.getTimeSet((FieldImpl) (getData()));
-                int              numTimes = timeSet.getLength();
-                double[][]       td       = timeSet.getDoubles();
-                double           tlen;
-                double           rlen;
+                int        numTimes = timeSet.getLength();
+                double[][] td       = timeSet.getDoubles();
+                double     tlen;
+                double     rlen;
 
-                if(isRefresh) {
+                if (isRefresh) {
                     rlen = (td[0][1] - td[0][0]);
                     tlen = (td[0][1] - td[0][0]) * vectorLength;
-                }
-                else {
+                } else {
                     rlen = (td[0][1] - td[0][0]) * numTimes;
                     tlen = (td[0][1] - td[0][0]) * trajOffset;
                 }
 
-                TrajectoryParams tparm    = flowControl.getTrajectoryParams();
+                TrajectoryParams tparm = flowControl.getTrajectoryParams();
                 tparm.setMarkerSize(arrowHead);
                 tparm.setTrajRefreshInterval(rlen);
                 tparm.setTrajVisibilityTimeWindow(tlen);
@@ -454,6 +456,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     public void setArrowHead(float size) {
         arrowHead = size;
     }
+
     /**
      * _more_
      *
