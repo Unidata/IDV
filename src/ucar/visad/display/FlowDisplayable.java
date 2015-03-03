@@ -75,6 +75,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** _more_ */
     private float trajOffset = 4.0f;
 
+    /** _more_ */
+    private float vectorLength = 2.0f;
+
+    /** _more_ */
+    private float arrowHead = 0.5f;
+
     /** streamline density factor */
     private float streamlineDensity = 1.f;
 
@@ -86,6 +92,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
     /** _more_ */
     private boolean isTrajectories = false;
+
+    /** _more_ */
+    private boolean isRefresh = false;
 
     /** flag for whether wind is cartesian (u,v) or polar (spd,dir) */
     private boolean isCartesian = true;
@@ -254,9 +263,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      * sets trajectory parms if the enable is true.
      * @param enable boolean whether streamlines are enabled.
      */
-    public void setTrojectoriesEnabled(boolean enable) {
+    public void setTrojectoriesEnabled(boolean enable, float mSize, boolean refresh) {
 
-        if ((flowControl != null) && (enable != isTrajectories)) {
+        if ((flowControl != null) && (enable != isTrajectories || refresh != isRefresh) ) {
             try {
                 flowControl.enableTrajectory(enable);
                 if (enable) {
@@ -264,12 +273,21 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                         GridUtil.getTimeSet((FieldImpl) (getData()));
                     int              numTimes = timeSet.getLength();
                     double[][]       td       = timeSet.getDoubles();
-                    double           tlen = (td[0][1] - td[0][0])
-                                            * trajOffset;
-                    double           rlen = (td[0][1] - td[0][0]) * numTimes;
+                    double           tlen;
+                    double           rlen;
+
+                    if(refresh) {
+                        rlen = (td[0][1] - td[0][0]);
+                        tlen = (td[0][1] - td[0][0]) * vectorLength;
+                    }
+                    else {
+                        rlen = (td[0][1] - td[0][0]) * numTimes;
+                        tlen = (td[0][1] - td[0][0]) * trajOffset;
+                    }
+                    arrowHead = mSize;
                     TrajectoryParams tparm =
                         flowControl.getTrajectoryParams();
-                    tparm.setMarkerSize(0.f);
+                    tparm.setMarkerSize(mSize);
                     tparm.setTrajRefreshInterval(rlen);
                     tparm.setTrajVisibilityTimeWindow(tlen);
                     flowControl.setTrajectoryParams(tparm);
@@ -282,6 +300,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
 
         isTrajectories = enable;
+        isRefresh = refresh;
     }
 
     /**
@@ -296,11 +315,20 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 Set timeSet = GridUtil.getTimeSet((FieldImpl) (getData()));
                 int              numTimes = timeSet.getLength();
                 double[][]       td       = timeSet.getDoubles();
-                double           tlen     = (td[0][1] - td[0][0])
-                                            * trajOffset;
-                double           rlen     = (td[0][1] - td[0][0]) * numTimes;
+                double           tlen;
+                double           rlen;
+
+                if(isRefresh) {
+                    rlen = (td[0][1] - td[0][0]);
+                    tlen = (td[0][1] - td[0][0]) * vectorLength;
+                }
+                else {
+                    rlen = (td[0][1] - td[0][0]) * numTimes;
+                    tlen = (td[0][1] - td[0][0]) * trajOffset;
+                }
+
                 TrajectoryParams tparm    = flowControl.getTrajectoryParams();
-                tparm.setMarkerSize(0.f);
+                tparm.setMarkerSize(arrowHead);
                 tparm.setTrajRefreshInterval(rlen);
                 tparm.setTrajVisibilityTimeWindow(tlen);
                 flowControl.setTrajectoryParams(tparm);
@@ -313,25 +341,6 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
     }
 
-    /**
-     * _more_
-     *
-     * @param arrow _more_
-     */
-    public void resetTrojectoryArrowHead(float arrow) {
-
-        if ((flowControl != null)) {
-            try {
-                TrajectoryParams tparm = flowControl.getTrajectoryParams();
-                tparm.setMarkerSize(arrow);
-                flowControl.setTrajectoryParams(tparm);
-            } catch (VisADException ve) {
-                ve.printStackTrace();
-            } catch (RemoteException re) {
-                re.printStackTrace();
-            }
-        }
-    }
 
     /**
      * Returns indicator whether wind barb style is that used in
@@ -440,29 +449,28 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /**
      * _more_
      *
+     * @param size _more_
+     */
+    public void setArrowHead(float size) {
+        arrowHead = size;
+    }
+    /**
+     * _more_
+     *
+     * @param len _more_
+     */
+    public void setVectorLength(float len) {
+        vectorLength = len;
+
+    }
+
+    /**
+     * _more_
+     *
      * @param offset _more_
      */
     public void setTrajOffset(float offset) {
         trajOffset = offset;
-        if ((flowControl != null) && (offset != trajOffset)) {
-            try {
-                Set timeSet = GridUtil.getTimeSet((FieldImpl) (getData()));
-                //int          numTimes   = timeSet.getLength();
-                double[][]       td    = timeSet.getDoubles();
-                double           tlen  = (td[0][1] - td[0][0]) * trajOffset;
-                TrajectoryParams tparm = flowControl.getTrajectoryParams();
-                tparm.setMarkerSize(0.f);
-                tparm.setTrajRefreshInterval(tlen);
-                tparm.setTrajVisibilityTimeWindow(tlen);
-                flowControl.setTrajectoryParams(tparm);
-            } catch (VisADException e) {
-                ;
-            } catch (RemoteException e) {
-                ;
-            }
-        }
-
-
     }
 
     /**
