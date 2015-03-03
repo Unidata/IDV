@@ -33,16 +33,19 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
+
 import ucar.visad.Util;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.FlowDisplayable;
 import ucar.visad.display.WindBarbDisplayable;
+
 import visad.Data;
 import visad.FieldImpl;
 import visad.Real;
 import visad.RealTuple;
 import visad.Unit;
 import visad.VisADException;
+
 import visad.georef.EarthLocation;
 
 
@@ -237,10 +240,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
         planDisplay.setAutoScale(autoSize);
-        if(isCVectors)
-            planDisplay.setTrojectoriesEnabled(isCVectors, arrowHeadSizeValue, true);
-        else
+        if (isCVectors) {
+            planDisplay.setTrojectoriesEnabled(isCVectors,
+                    arrowHeadSizeValue, true);
+        } else {
             planDisplay.setTrojectoriesEnabled(isTrajectories, 0.0f, false);
+        }
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
         return planDisplay;
@@ -350,13 +355,13 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             cvectorAHLengthWidget = new ValueSliderWidget(this, 0, 1,
                     "ArrowHeadSize", "Arrow Head Length", 10.0f);
             cvectorLengthComponent =
-                    GuiUtils.hbox(GuiUtils.rLabel("Vector Length: "),
-                            cvectorLengthWidget.getContents(false),
-                            GuiUtils.rLabel("ArrowHead Size: "),
-                            cvectorAHLengthWidget.getContents(false));
+                GuiUtils.hbox(GuiUtils.rLabel("Vector Length: "),
+                              cvectorLengthWidget.getContents(false),
+                              GuiUtils.rLabel("ArrowHead Size: "),
+                              cvectorAHLengthWidget.getContents(false));
 
             trajectoryBtn = new JRadioButton("Trajectories:", isTrajectories);
-            cvectorBtn = new JRadioButton("Curly Vectors:", isCVectors);
+            cvectorBtn    = new JRadioButton("Curly Vectors:", isCVectors);
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
@@ -388,7 +393,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             vectorBtn.addActionListener(listener);
             trajectoryBtn.addActionListener(listener);
             cvectorBtn.addActionListener(listener);
-            GuiUtils.buttonGroup(streamlinesBtn, vectorBtn, trajectoryBtn, cvectorBtn);
+            GuiUtils.buttonGroup(streamlinesBtn, vectorBtn, trajectoryBtn,
+                                 cvectorBtn);
             densityLabel     = GuiUtils.rLabel("Density: ");
             densityComponent = doMakeDensityComponent();
             enableDensityComponents();
@@ -411,11 +417,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                                                         GuiUtils.inset(
                                                             trajLengthComponent,
                                                             spacer))), GuiUtils.left(
-                                                    GuiUtils.vbox(
-                                                        cvectorBtn,
-                                                        GuiUtils.inset(
-                                                            cvectorLengthComponent,
-                                                            spacer))));
+                                                                GuiUtils.vbox(
+                                                                    cvectorBtn,
+                                                                    GuiUtils.inset(
+                                                                        cvectorLengthComponent,
+                                                                        spacer))));
             JLabel showLabel = GuiUtils.rLabel("Show:");
             showLabel.setVerticalTextPosition(JLabel.TOP);
             controlWidgets.add(
@@ -601,11 +607,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     }
 
 
+    /**
+     * _more_
+     */
     private void enableCVectorLengthBox() {
         if (cvectorLengthComponent != null) {
             GuiUtils.enableTree(cvectorLengthComponent, isCVectors);
         }
     }
+
     /**
      * Get the appropriate size label for this instance.
      * @return the label
@@ -633,16 +643,18 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * Set the streamline property.
      * Used by XML persistence
      *
-     * @param
      */
     public void setStreamlines() {
         //isStreamlines = v;
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlinesEnabled(isStreamlines);
-            if(isCVectors)
-                getGridDisplay().setTrojectoriesEnabled(isCVectors, arrowHeadSizeValue, true);
-            else
-                getGridDisplay().setTrojectoriesEnabled(isTrajectories, 0.0f, false);
+            if (isCVectors) {
+                getGridDisplay().setTrojectoriesEnabled(isCVectors,
+                        arrowHeadSizeValue, true);
+            } else {
+                getGridDisplay().setTrojectoriesEnabled(isTrajectories, 0.0f,
+                        false);
+            }
             enableBarbSizeBox();
             enableDensityComponents();
             enableTrajLengthBox();
@@ -664,7 +676,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setStreamlines(boolean v) {
-        isCVectors = !v;
+        isCVectors     = !v;
         isStreamlines  = v;
         isTrajectories = !v;
         isVectors      = !v;
@@ -677,7 +689,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setTrajectories(boolean v) {
-        isCVectors = !v;
+        isCVectors     = !v;
         isStreamlines  = !v;
         isTrajectories = v;
         isVectors      = !v;
@@ -690,7 +702,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setVectors(boolean v) {
-        isCVectors = !v;
+        isCVectors     = !v;
         isStreamlines  = !v;
         isTrajectories = !v;
         isVectors      = v;
@@ -703,7 +715,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setCVectors(boolean v) {
-        isCVectors = v;
+        isCVectors     = v;
         isStreamlines  = !v;
         isTrajectories = !v;
         isVectors      = !v;
@@ -858,10 +870,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     public void setArrowHead(boolean arrow) {
         arrowHead = arrow;
         if (getGridDisplay() != null) {
-            if(arrowHead)
+            if (arrowHead) {
                 getGridDisplay().setArrowHead(1.0f);
-            else
+            } else {
                 getGridDisplay().setArrowHead(0.0f);
+            }
         }
     }
 
@@ -927,6 +940,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
     public void setVectorLength(float f) {
         vectorLengthValue = f;
         if (getGridDisplay() != null) {
@@ -945,6 +963,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
     public void setArrowHeadSize(float f) {
         arrowHeadSizeValue = f;
         if (getGridDisplay() != null) {
@@ -964,10 +987,20 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public float getVectorLength() {
         return vectorLengthValue;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public float getArrowHeadSize() {
         return arrowHeadSizeValue;
     }
