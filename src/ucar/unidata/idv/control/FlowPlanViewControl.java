@@ -79,11 +79,20 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** vector/barb size component */
     JComponent sizeComponent;
 
-    /** a component to change the barb size */
+    /** a component to change the traj size */
     ValueSliderWidget trajLengthWidget;
 
     /** vector/traj length component */
     JComponent trajLengthComponent;
+
+    /** a component to change the cvector size */
+    ValueSliderWidget cvectorLengthWidget;
+
+    /** cvector length component */
+    JComponent cvectorLengthComponent;
+
+    /** a component to change the cvector arrow head size */
+    ValueSliderWidget cvectorAHLengthWidget;
 
     /** a component to change the skip */
     ValueSliderWidget skipFactorWidget;
@@ -109,6 +118,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** trajectory button */
     private JRadioButton trajectoryBtn;
 
+    /** cvector button */
+    private JRadioButton cvectorBtn;
+
     /** flag for streamlines */
     boolean isStreamlines = false;
 
@@ -117,6 +129,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
     /** _more_ */
     boolean isTrajectories = false;
+
+    /** _more_ */
+    boolean isCVectors = false;
 
     /** flag for wind barbs */
     boolean isWindBarbs = false;
@@ -135,6 +150,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
     /** a scale value */
     float flowScaleValue = 4.0f;
+
+    /** a traj offset value */
+    float vectorLengthValue = 2.0f;
+
+    /** a traj offset value */
+    float arrowHeadSizeValue = 0.5f;
 
     /** a traj offset value */
     float trajOffsetValue = 4.0f;
@@ -216,7 +237,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
         planDisplay.setAutoScale(autoSize);
-        planDisplay.setTrojectoriesEnabled(isTrajectories);
+        if(isCVectors)
+            planDisplay.setTrojectoriesEnabled(isCVectors, arrowHeadSizeValue, true);
+        else
+            planDisplay.setTrojectoriesEnabled(isTrajectories, 0.0f, false);
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
         return planDisplay;
@@ -257,7 +281,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
         // end color by speed.
         setFlowScale(flowScaleValue);
-        setTrajOffset(trajOffsetValue);
+        if (getGridDisplay() != null) {
+            getGridDisplay().setTrajOffset(trajOffsetValue);
+            getGridDisplay().setVectorLength(vectorLengthValue);
+            // getGridDisplay().setArrowHead(arrowHeadSizeValue);
+        }
         //        setSkipValue(skipValue);
         fd.setActive(true);
         Trace.call2("FlowPlanView.setData");
@@ -296,10 +324,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             public void actionPerformed(ActionEvent e) {
                 arrowHead = ((JCheckBox) e.getSource()).isSelected();
                 if (arrowHead) {
-                    getGridDisplay().resetTrojectoryArrowHead(1.0f);
+                    getGridDisplay().setArrowHead(1.0f);
                 } else {
-                    getGridDisplay().resetTrojectoryArrowHead(0.0f);
+                    getGridDisplay().setArrowHead(0.0f);
                 }
+                getGridDisplay().resetTrojectories();
             }
         });
 
@@ -316,8 +345,18 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             trajLengthComponent =
                 GuiUtils.hbox(GuiUtils.rLabel("Length Offset: "),
                               trajLengthWidget.getContents(false), arrowCbx);
+            cvectorLengthWidget = new ValueSliderWidget(this, 1, 21,
+                    "VectorLength", "Curly Vector Length");
+            cvectorAHLengthWidget = new ValueSliderWidget(this, 0, 1,
+                    "ArrowHeadSize", "Arrow Head Length", 10.0f);
+            cvectorLengthComponent =
+                    GuiUtils.hbox(GuiUtils.rLabel("Vector Length: "),
+                            cvectorLengthWidget.getContents(false),
+                            GuiUtils.rLabel("ArrowHead Size: "),
+                            cvectorAHLengthWidget.getContents(false));
 
             trajectoryBtn = new JRadioButton("Trajectories:", isTrajectories);
+            cvectorBtn = new JRadioButton("Curly Vectors:", isCVectors);
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
@@ -325,14 +364,22 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                         isStreamlines  = true;
                         isVectors      = false;
                         isTrajectories = false;
+                        isCVectors     = false;
                     } else if (source == trajectoryBtn) {
                         isTrajectories = true;
+                        isStreamlines  = false;
+                        isVectors      = false;
+                        isCVectors     = false;
+                    } else if (source == cvectorBtn) {
+                        isCVectors     = true;
+                        isTrajectories = false;
                         isStreamlines  = false;
                         isVectors      = false;
                     } else {
                         isVectors      = true;
                         isStreamlines  = false;
                         isTrajectories = false;
+                        isCVectors     = false;
                     }
                     setStreamlines();
                 }
@@ -340,7 +387,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             streamlinesBtn.addActionListener(listener);
             vectorBtn.addActionListener(listener);
             trajectoryBtn.addActionListener(listener);
-            GuiUtils.buttonGroup(streamlinesBtn, vectorBtn, trajectoryBtn);
+            cvectorBtn.addActionListener(listener);
+            GuiUtils.buttonGroup(streamlinesBtn, vectorBtn, trajectoryBtn, cvectorBtn);
             densityLabel     = GuiUtils.rLabel("Density: ");
             densityComponent = doMakeDensityComponent();
             enableDensityComponents();
@@ -362,6 +410,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                                                         trajectoryBtn,
                                                         GuiUtils.inset(
                                                             trajLengthComponent,
+                                                            spacer))), GuiUtils.left(
+                                                    GuiUtils.vbox(
+                                                        cvectorBtn,
+                                                        GuiUtils.inset(
+                                                            cvectorLengthComponent,
                                                             spacer))));
             JLabel showLabel = GuiUtils.rLabel("Show:");
             showLabel.setVerticalTextPosition(JLabel.TOP);
@@ -410,6 +463,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
         enableBarbSizeBox();
         enableTrajLengthBox();
+        enableCVectorLengthBox();
         super.getControlWidgets(controlWidgets);
     }
 
@@ -546,6 +600,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
+
+    private void enableCVectorLengthBox() {
+        if (cvectorLengthComponent != null) {
+            GuiUtils.enableTree(cvectorLengthComponent, isCVectors);
+        }
+    }
     /**
      * Get the appropriate size label for this instance.
      * @return the label
@@ -579,15 +639,20 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         //isStreamlines = v;
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlinesEnabled(isStreamlines);
-            getGridDisplay().setTrojectoriesEnabled(isTrajectories);
+            if(isCVectors)
+                getGridDisplay().setTrojectoriesEnabled(isCVectors, arrowHeadSizeValue, true);
+            else
+                getGridDisplay().setTrojectoriesEnabled(isTrajectories, 0.0f, false);
             enableBarbSizeBox();
             enableDensityComponents();
             enableTrajLengthBox();
+            enableCVectorLengthBox();
         }
         if (streamlinesBtn != null) {
             streamlinesBtn.setSelected(isStreamlines);
             vectorBtn.setSelected(isVectors);
             trajectoryBtn.setSelected(isTrajectories);
+            cvectorBtn.setSelected(isCVectors);
         }
 
     }
@@ -599,6 +664,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setStreamlines(boolean v) {
+        isCVectors = !v;
         isStreamlines  = v;
         isTrajectories = !v;
         isVectors      = !v;
@@ -611,6 +677,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setTrajectories(boolean v) {
+        isCVectors = !v;
         isStreamlines  = !v;
         isTrajectories = v;
         isVectors      = !v;
@@ -623,9 +690,23 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setVectors(boolean v) {
+        isCVectors = !v;
         isStreamlines  = !v;
         isTrajectories = !v;
         isVectors      = v;
+        setStreamlines();
+    }
+
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
+    public void setCVectors(boolean v) {
+        isCVectors = v;
+        isStreamlines  = !v;
+        isTrajectories = !v;
+        isVectors      = !v;
         setStreamlines();
     }
 
@@ -773,9 +854,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         arrowHead = arrow;
         if (getGridDisplay() != null) {
             if(arrowHead)
-                getGridDisplay().resetTrojectoryArrowHead(1.0f);
+                getGridDisplay().setArrowHead(1.0f);
             else
-                getGridDisplay().resetTrojectoryArrowHead(0.0f);
+                getGridDisplay().setArrowHead(0.0f);
         }
     }
 
@@ -826,9 +907,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                 getGridDisplay().setTrajOffset(trajOffsetValue);
                 getGridDisplay().resetTrojectories();
                 if (arrowHead) {
-                    getGridDisplay().resetTrojectoryArrowHead(1.0f);
+                    getGridDisplay().setArrowHead(1.0f);
                 } else {
-                    getGridDisplay().resetTrojectoryArrowHead(0.0f);
+                    getGridDisplay().setArrowHead(0.0f);
                 }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
@@ -839,6 +920,51 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if (trajLengthWidget != null) {
             trajLengthWidget.setValue(f);
         }
+    }
+
+    public void setVectorLength(float f) {
+        vectorLengthValue = f;
+        if (getGridDisplay() != null) {
+            try {
+                getGridDisplay().setVectorLength(vectorLengthValue);
+                getGridDisplay().setArrowHead(arrowHeadSizeValue);
+                getGridDisplay().resetTrojectories();
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
+
+        }
+
+        if (cvectorLengthWidget != null) {
+            cvectorLengthWidget.setValue(f);
+        }
+    }
+
+    public void setArrowHeadSize(float f) {
+        arrowHeadSizeValue = f;
+        if (getGridDisplay() != null) {
+            try {
+                getGridDisplay().setTrajOffset(vectorLengthValue);
+                getGridDisplay().setArrowHead(arrowHeadSizeValue);
+                getGridDisplay().resetTrojectories();
+
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
+
+        }
+
+        if (cvectorAHLengthWidget != null) {
+            cvectorAHLengthWidget.setValue(f);
+        }
+    }
+
+    public float getVectorLength() {
+        return vectorLengthValue;
+    }
+
+    public float getArrowHeadSize() {
+        return arrowHeadSizeValue;
     }
 
     /**
