@@ -532,9 +532,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if (skipFactorWidget != null) {
             skipFactorWidget.setValue(value);
         }
-        fd.setUseSpeedForColor(useSpeedForColor);
-        if (useSpeedForColor) {
-            colorIndex = fd.getSpeedTypeIndex();
+        if(fd != null) {
+            fd.setUseSpeedForColor(useSpeedForColor);
+            if (useSpeedForColor) {
+                colorIndex = fd.getSpeedTypeIndex();
+            }
         }
     }
 
