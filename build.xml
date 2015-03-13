@@ -498,6 +498,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
     <target name="docs_workshop" depends="init">
         <antcall target="docs_gen">
             <param name="docgen_dir" value="workshop/content"/>
+            <param name="docgen_target" value="../processed"/>
         </antcall>
     </target>
 
