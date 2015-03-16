@@ -2,7 +2,7 @@
 // $Id: UnitOfMeasure.java,v 1.8 2005/03/10 18:38:36 jeffmc Exp $
 
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
