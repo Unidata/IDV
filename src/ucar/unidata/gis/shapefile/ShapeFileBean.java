@@ -1,7 +1,7 @@
 /*
  * $Id: ShapeFileBean.java,v 1.15 2005/10/20 20:46:29 jeffmc Exp $
  *
- * Copyright  1997-2014 Unidata Program Center/University Corporation for
+ * Copyright  1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
