@@ -447,7 +447,7 @@ Since this is confusing and needs more work lets remove this for now
      description="Plan view of 3D flow vectors"
      label="3D Vector Plan View"
      displaycategory="Flow Displays"
-     properties="streamlines=false;isThreeComponents=true">
+     properties="vectors=true;isThreeComponents=false;coloredByAnother=false">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 

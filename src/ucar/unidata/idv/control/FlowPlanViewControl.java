@@ -236,6 +236,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             if (getMultipleIsTopography()) {
                 planDisplay.setIgnoreExtraParameters(true);
             }
+            planDisplay.set3DFlow(true);
         }
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
@@ -268,6 +269,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         FlowDisplayable fd = getGridDisplay();
         fd.setActive(false);
         boolean result = super.setData(dataChoice);
+        fd.setUseSpeedForColor(useSpeedForColor);
 
         if ( !result) {
             Trace.call2("FlowPlanView.setData");
@@ -280,7 +282,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if ( !useSpeedForColor) {
             useSpeedForColor = !fd.isCartesianWind();
         }
-        fd.setUseSpeedForColor(useSpeedForColor);
+        //fd.setUseSpeedForColor(useSpeedForColor);
         if (useSpeedForColor) {
             colorIndex = fd.getSpeedTypeIndex();
         }
@@ -297,6 +299,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         return true;
     }
 
+    public void setColoredByAnother(boolean yesno){
+        useSpeedForColor = yesno;
+    }
     /**
      * Get control widgets special to this control.
      *
