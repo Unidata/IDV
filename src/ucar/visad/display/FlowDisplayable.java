@@ -763,10 +763,13 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         // get the RealTupleType of the range data in the  FlatField
         RealTupleType rtt       = new RealTupleType(tt.getRealComponents());
 
-        int           threeDDim = (coloredByAnother || ignoreExtraParameters)
+        int           threeDDim = (coloredByAnother || ignoreExtraParameters )
                                   ? 3
                                   : 2;
-        set3DFlow(rtt.getDimension() > threeDDim);
+        if(is3D && rtt.getDimension()==3){
+            set3DFlow(true);
+        } else
+            set3DFlow(rtt.getDimension() > threeDDim);
         // uncomment to determine ad-hoc rather than programatically
         //coloredByAnother = coloredByAnother && (rtt.getDimension() > 2);
         if (coloredByAnother) {
