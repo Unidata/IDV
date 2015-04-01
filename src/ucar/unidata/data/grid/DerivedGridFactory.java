@@ -1833,6 +1833,27 @@ public class DerivedGridFactory {
     }
 
     /**
+     * Make a FieldImpl of horizontal scalar advection from flow vector,
+     *  defined as u*(dp/dx) + v*(dp/dy)
+     *
+     * @param paramGrid grid of scalar parameter
+     * @param flowVector  grid of wind vector
+     *
+     * @return grid of horizontal advection of scalar
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createHorizontalAdvection(FieldImpl paramGrid,
+                                                      FieldImpl flowVector)
+            throws VisADException, RemoteException {
+        FieldImpl uGrid = getUComponent(flowVector);
+        FieldImpl vGrid = getVComponent(flowVector);
+
+        return createHorizontalAdvection(paramGrid,uGrid,vGrid);
+
+    }
+    /**
      * Make a FieldImpl of horizontal scalar advection from u and v components,
      *  defined as u*(dp/dx) + v*(dp/dy)
      *
