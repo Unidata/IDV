@@ -87,8 +87,7 @@
         <include all="false">
           <entry location="runIDV" fileType="regular" />
           <entry location="runIDV.bat" fileType="regular" />
-          <entry location="simpleIDV" fileType="regular" />
-          <entry location="simpleIDV.bat" fileType="regular" />
+          <entry location="testIDV" fileType="regular" />
           <entry location="runIDV.ico" fileType="regular" />
           <entry location="IDV" fileType="launcher" />
         </include>
