@@ -1180,11 +1180,11 @@ if (!context.isUpdateInstallation()) {
       <excludedBeans>
         <bean refId="1451" />
         <bean refId="707" />
-        <bean refId="1512" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
-        <bean refId="1412" />
+        <bean refId="1503" />
+        <bean refId="1505" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1218,16 +1218,15 @@ if (!context.isUpdateInstallation()) {
       <excludedBeans>
         <bean refId="1451" />
         <bean refId="707" />
-        <bean refId="1512" />
         <bean refId="1019" />
         <bean refId="1035" />
         <bean refId="1281" />
-        <bean refId="1412" />
+        <bean refId="1503" />
+        <bean refId="1505" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="runIDV.bat" fileType="regular" />
-        <entry location="simpleIDV.bat" fileType="regular" />
         <entry location=".i4j_external_696/j3d-solaris.zip" fileType="regular" />
         <entry location=".i4j_external_696/j3d-windows.zip" fileType="regular" />
         <entry location=".i4j_external_696/j3d-macosx.zip" fileType="regular" />
@@ -1311,11 +1310,12 @@ if (!context.isUpdateInstallation()) {
         <bean refId="1020" />
         <bean refId="1036" />
         <bean refId="1282" />
+        <bean refId="1504" />
+        <bean refId="1506" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="runIDV.bat" fileType="regular" />
-        <entry location="simpleIDV.bat" fileType="regular" />
         <entry location=".i4j_external_696/j3d-linux.zip" fileType="regular" />
         <entry location=".i4j_external_696/j3d-solaris.zip" fileType="regular" />
         <entry location=".i4j_external_696/j3d-windows.zip" fileType="regular" />
