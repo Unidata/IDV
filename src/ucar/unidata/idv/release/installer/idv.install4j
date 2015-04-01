@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.15" transformSequenceNumber="4">
-  <directoryPresets config="${compiler:SRCDIR}/libsrc/j3d-macosx.zip" />
+  <directoryPresets config="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV" />
   <application name="Integrated Data Viewer" distributionSourceDir="" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="idv" publisher="Unidata Program Center" publisherWeb="http://www.unidata.ucar.edu/software/idv" version="4.1" allPathsRelative="false" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.7" allowBetaVM="true" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -53,6 +53,7 @@
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/idv.gif" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV" overwriteMode="5" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.bat" overwriteMode="5" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/testIDV" overwriteMode="5" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-linux.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-solaris.zip" overwriteMode="2" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
@@ -86,8 +87,7 @@
         <include all="false">
           <entry location="runIDV" fileType="regular" />
           <entry location="runIDV.bat" fileType="regular" />
-          <entry location="simpleIDV" fileType="regular" />
-          <entry location="simpleIDV.bat" fileType="regular" />
+          <entry location="testIDV" fileType="regular" />
           <entry location="runIDV.ico" fileType="regular" />
           <entry location="IDV" fileType="launcher" />
         </include>
@@ -148,6 +148,7 @@
         <file path="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/idv_32x32.png" />
       </iconImageFiles>
     </launcher>
+    <launcher name="testIDV" id="1501" customizedId="" external="true" excludeFromMenu="false" unixMode="755" menuName="" externalFile="testIDV" />
   </launchers>
   <installerGui installerType="1" addOnAppId="" suggestPreviousLocations="false" autoUpdateDescriptorUrl="" useAutoUpdateBaseUrl="false" autoUpdateBaseUrl="">
     <customCode />
@@ -911,6 +912,99 @@ if (!context.isUpdateInstallation()) {
                             </object>
                           </void>
                         </array>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure testIDV with OS X JRE" id="1503" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>testIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="replaceValue">
+                        <string>jre="jre.bundle/Contents/Home/jre"</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>JRE_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure testIDV with default JRE" id="1504" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>testIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="replaceValue">
+                        <string>jre="jre"</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>JRE_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure testIDV with OS X libext option" id="1505" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>testIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/jre/lib/ext/"</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>LIBEXT_INSTALL4J_VAR</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Configure testIDV with no libext option" id="1506" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>testIDV</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="searchValue">
+                        <string>LIBEXT_INSTALL4J_VAR</string>
                       </void>
                     </object>
                   </java>
