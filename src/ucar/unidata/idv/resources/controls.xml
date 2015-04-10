@@ -1231,6 +1231,17 @@ Example of how to make an image movie control with a fixed table of contents
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
+    <control
+            id="vectorvolumerender"
+            categories="*-flowvector3d-*"
+            class="ucar.unidata.idv.control.VolumeVectorControl"
+            description="3-D vector Volume"
+            label="Vector Volume"
+            icon="/ucar/unidata/idv/images/volume.png"
+            displaycategory="Flow Displays"
+            properties="usePoints=true">
+        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
 
   <control
      id="gridtablecontrol"
