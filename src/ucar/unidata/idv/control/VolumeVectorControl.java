@@ -81,6 +81,9 @@ public class VolumeVectorControl extends GridDisplayControl {
     /** trajectory button */
     private JRadioButton trajectoryBtn;
 
+    /** cvector button */
+    private JRadioButton cvectorBtn;
+
     /** flag for streamlines */
     boolean isStreamlines = false;
 
@@ -89,6 +92,9 @@ public class VolumeVectorControl extends GridDisplayControl {
 
     /** _more_ */
     boolean isTrajectories = false;
+
+    /** _more_ */
+    boolean isCVectors = false;
 
     /** flag for wind barbs */
     boolean isWindBarbs = false;
@@ -112,7 +118,7 @@ public class VolumeVectorControl extends GridDisplayControl {
     float vectorLengthValue = 2.0f;
 
     /** a traj offset value */
-    float arrowHeadSizeValue = 1.0f;
+    float arrowHeadSizeValue = 0.5f;
 
     /** a traj offset value */
     float trajOffsetValue = 4.0f;
@@ -200,9 +206,12 @@ public class VolumeVectorControl extends GridDisplayControl {
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
         planDisplay.setAutoScale(autoSize);
-
-        planDisplay.setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue, false);
-
+        if (isCVectors) {
+            planDisplay.setTrojectoriesEnabled(isCVectors,
+                    arrowHeadSizeValue, true);
+        } else {
+            planDisplay.setTrojectoriesEnabled(isTrajectories, 0.0f, false);
+        }
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
         return planDisplay;
@@ -244,9 +253,9 @@ public class VolumeVectorControl extends GridDisplayControl {
             public void actionPerformed(ActionEvent e) {
                 arrowHead = ((JCheckBox) e.getSource()).isSelected();
                 if (arrowHead) {
-                    getGridDisplay().setArrowHead(arrowHead);
+                    getGridDisplay().setArrowHead(1.0f);
                 } else {
-                    getGridDisplay().setArrowHead(arrowHead);
+                    getGridDisplay().setArrowHead(0.0f);
                 }
                 getGridDisplay().resetTrojectories();
             }
@@ -337,16 +346,17 @@ public class VolumeVectorControl extends GridDisplayControl {
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlinesEnabled(isStreamlines);
 
-            getGridDisplay().setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue,
+            getGridDisplay().setTrojectoriesEnabled(isTrajectories, 0.0f,
                         false);
 
             enableDensityComponents();
-            enableTrajLengthBox();
+
         }
         if (streamlinesBtn != null) {
             streamlinesBtn.setSelected(isStreamlines);
             vectorBtn.setSelected(isVectors);
             trajectoryBtn.setSelected(isTrajectories);
+            cvectorBtn.setSelected(isCVectors);
         }
 
     }
@@ -420,11 +430,6 @@ public class VolumeVectorControl extends GridDisplayControl {
             throws VisADException, RemoteException {
         if ( !super.setData(choice) || (getNavigatedDisplay() == null)) {
             return false;
-        }
-        myDisplay.setUseSpeedForColor(useSpeedForColor);
-
-        if (useSpeedForColor) {
-            colorIndex = myDisplay.getSpeedTypeIndex();
         }
         loadVolumeData();
         return true;
@@ -613,9 +618,9 @@ public class VolumeVectorControl extends GridDisplayControl {
                 getGridDisplay().setTrajOffset(trajOffsetValue);
                 getGridDisplay().resetTrojectories();
                 if (arrowHead) {
-                    getGridDisplay().setArrowHead(arrowHead);
+                    getGridDisplay().setArrowHead(1.0f);
                 } else {
-                    getGridDisplay().setArrowHead(arrowHead);
+                    getGridDisplay().setArrowHead(0.0f);
                 }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
@@ -627,26 +632,6 @@ public class VolumeVectorControl extends GridDisplayControl {
             trajLengthWidget.setValue(f);
         }
     }
-    /**
-     * _more_
-     *
-     * @param v _more_
-     */
-    public void setTrajectories(boolean v) {
-        isTrajectories = v;
-        isVectors      = !v;
-        setStreamlines();
-    }
 
-    /**
-     * _more_
-     *
-     * @param v _more_
-     */
-    public void setVectors(boolean v) {
-        isTrajectories = !v;
-        isVectors      = v;
-        setStreamlines();
-    }
 
 }
