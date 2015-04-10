@@ -1440,7 +1440,10 @@ public class TextPointDataSource extends PointDataSource {
             String attrs = "";
             if (name.equals("Time")) {
                 if (unit.trim().length() > 0) {
-                    attrs = attrs + "fmt=\"" + unit + "\" ";
+                    if(unit.contains("since"))
+                        attrs = attrs + "unit=\"" + unit + "\" ";
+                    else
+                        attrs = attrs + "fmt=\"" + unit + "\" ";
                 }
 
             } else {
