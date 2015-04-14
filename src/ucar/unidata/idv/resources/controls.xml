@@ -1238,8 +1238,7 @@ Example of how to make an image movie control with a fixed table of contents
             description="3-D vector Volume"
             label="Vector Volume"
             icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="Flow Displays"
-            properties="usePoints=true">
+            displaycategory="Flow Displays">
         <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
