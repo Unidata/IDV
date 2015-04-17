@@ -1161,6 +1161,37 @@ public class DerivedGridFactory {
                                      false /* copy */);
     }
 
+
+    public static FieldImpl createFlowVectorsN(FieldImpl uGrid,
+                                              FieldImpl vGrid, FieldImpl wGrid)
+            throws VisADException, RemoteException {
+        FieldImpl w;
+        final Unit rgUnit =
+                ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
+        if (Unit.canConvert(rgUnit, CommonUnits.METERS_PER_SECOND)) {
+            w = wGrid;
+        } else {
+            FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                    (FlatField) wGrid.getSample(0));
+            FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+            w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
+                    wGrid, hPI, null);
+
+            // choices.remove(new String("D3"));
+            //choices.put(new String("D3"), w);
+        }
+
+        FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid,
+                w }, true);
+        TupleType paramType = GridUtil.getParamType(uvwGrid);
+        RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
+                CommonUnit.meterPerSecond);
+        RealTupleType earthVectorType = new EarthVectorType(reals[0],
+                reals[1], reals[2]);
+
+        return GridUtil.setParamType(uvwGrid, earthVectorType,
+                false /* copy */);
+    }
     /**
      * Combine an array of grids into one.  If the grids are on different
      * time domains, they are resampled to the domain of the first.
