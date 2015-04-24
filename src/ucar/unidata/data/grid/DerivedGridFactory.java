@@ -1064,18 +1064,30 @@ public class DerivedGridFactory {
         }
         // setParamType will create a new FieldImpl of the same structure as the original using Util.clone()
 
-        FieldImpl dhdp = GridMath.partial(hField, 2);
-        FieldImpl dhdt = GridMath.multiply(pressureVelField, dhdp);
+        FieldImpl dhdp  = GridMath.partial(hField, 2);
+        Unit      dunit = dhdp.getDefaultRangeUnits()[0];
+        if (dunit instanceof ScaledUnit) {
+            ScaledUnit scaledUnit = (ScaledUnit) dunit;
+            Unit rUnit = scaledUnit.getUnit();
+            dhdp = GridUtil.setParamType(dhdp,
+                    RealType.getRealType("ddp", rUnit));
+        }
+        FieldImpl dhdt  = GridMath.multiply(pressureVelField, dhdp);
+
+
+        Unit zUnit = CommonUnits.METERS_PER_SECOND;
+
         FieldImpl heightGrid = GridUtil.setParamType(dhdt,
-                                   RealType.getRealType("zVel",
-                                       CommonUnits.METERS_PER_SECOND));
+                                   RealType.getRealType("zVel", zUnit));
 
         if (GridUtil.isSequence(heightGrid)) {
             Set seqSet = heightGrid.getDomainSet();
             for (int i = 0; i < seqSet.getLength(); i++) {
                 FlatField ff = (FlatField) heightGrid.getSample(i, false);
-                float[][] pressVals = ff.getFloats();
-                ff.setSamples(pressVals, false);
+                FlatField fd = (FlatField)GridUtil.setParamType(ff,
+                        RealType.getRealType("zVel", zUnit));
+                float[][] pressVals = fd.getFloats();
+                fd.setSamples(pressVals, false);
             }
         } else {
             float[][] pressVals = heightGrid.getFloats();
@@ -1162,36 +1174,82 @@ public class DerivedGridFactory {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param uGrid _more_
+     * @param vGrid _more_
+     * @param wGrid _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public static FieldImpl createFlowVectorsN(FieldImpl uGrid,
-                                              FieldImpl vGrid, FieldImpl wGrid)
+            FieldImpl vGrid, FieldImpl wGrid)
             throws VisADException, RemoteException {
         FieldImpl w;
         final Unit rgUnit =
-                ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
+            ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
         if (Unit.canConvert(rgUnit, CommonUnits.METERS_PER_SECOND)) {
             w = wGrid;
         } else {
             FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
-                    (FlatField) wGrid.getSample(0));
+                                (FlatField) wGrid.getSample(0));
             FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
             w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
-                    wGrid, hPI, null);
+                wGrid, hPI, null);
 
             // choices.remove(new String("D3"));
             //choices.put(new String("D3"), w);
         }
 
-        FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid,
-                w }, true);
+        FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid, w },
+                                         true);
         TupleType paramType = GridUtil.getParamType(uvwGrid);
         RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
-                CommonUnit.meterPerSecond);
+                                           CommonUnit.meterPerSecond);
         RealTupleType earthVectorType = new EarthVectorType(reals[0],
-                reals[1], reals[2]);
+                                            reals[1], reals[2]);
 
         return GridUtil.setParamType(uvwGrid, earthVectorType,
-                false /* copy */);
+                                     false /* copy */);
     }
+
+    /**
+     * _more_
+     *
+     * @param wGrid _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl createFlowVectorsN1(FieldImpl wGrid)
+            throws VisADException, RemoteException {
+        FieldImpl w;
+        final Unit rgUnit =
+            ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
+        if (Unit.canConvert(rgUnit, CommonUnits.METERS_PER_SECOND)) {
+            w = wGrid;
+        } else {
+            FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                                (FlatField) wGrid.getSample(0));
+            FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+            w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
+                wGrid, hPI, null);
+
+            // choices.remove(new String("D3"));
+            //choices.put(new String("D3"), w);
+        }
+
+
+
+        return w;
+    }
+
     /**
      * Combine an array of grids into one.  If the grids are on different
      * time domains, they are resampled to the domain of the first.
