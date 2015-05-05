@@ -564,7 +564,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * {@inheritDoc}
      */
     public double[] getDoubleData(Range range, String var) throws Exception {
-        double[] fdata = new double[range.length()];
+        double[] ddata = new double[range.length()];
         //TrajectoryFeatureBean tfb   = obsList.get(0);
         //fdata = tfb.getDoubleData(range, var);
         int first  = range.first();
@@ -577,11 +577,11 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getData();
 
-            fdata[j++] = pfsd.convertScalarDouble(var);
+            ddata[j++] = pfsd.convertScalarDouble(var);
             i          = i + stride;
         }
 
-        return fdata;
+        return ddata;
     }
 
 
@@ -712,7 +712,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 }
                 VarInfo var = varsToUse.get(varIdx);
                 if (var.getIsNumeric()) {
-                    float[] fvalues = getFloatData(range, var.getShortName());
+                    double[] dvalues = getDoubleData(range, var.getShortName());
                     if (var.getRealType() == null) {
                         //???
                     }
@@ -721,18 +721,18 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                     for (int obIdx = 0; obIdx < numObs; obIdx++) {
                         Data[] tupleArray = (Data[]) tuples.get(obIdx);
                         ((double[]) reals.get(obIdx))[realCnt] =
-                            fvalues[obIdx];
+                            dvalues[obIdx];
                         if (firstTuple != null) {
                             tupleArray[varIdx] =
                                 ((Real) firstTuple[varIdx]).cloneButValue(
-                                    fvalues[obIdx]);
+                                    dvalues[obIdx]);
                         } else {
                             firstTuple         = tupleArray;
                             tupleArray[varIdx] = (var.getUnit() == null)
                                     ? new Real(var.getRealType(),
-                                    fvalues[obIdx])
+                                    dvalues[obIdx])
                                     : new Real(var.getRealType(),
-                                    fvalues[obIdx], var.getUnit());
+                                    dvalues[obIdx], var.getUnit());
                         }
                     }
                     realCnt++;
