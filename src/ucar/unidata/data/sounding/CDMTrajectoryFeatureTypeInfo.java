@@ -712,7 +712,8 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 }
                 VarInfo var = varsToUse.get(varIdx);
                 if (var.getIsNumeric()) {
-                    double[] dvalues = getDoubleData(range, var.getShortName());
+                    double[] dvalues = getDoubleData(range,
+                                           var.getShortName());
                     if (var.getRealType() == null) {
                         //???
                     }
@@ -1259,9 +1260,10 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
          */
         protected Unit getTimeUnit() throws Exception {
             //There has got to be a better way to do this.
-            StructureData sdata = obsList.get(0).getFeatureData();
-            StructureMembers.Member tMember = sdata.findMember(varTime);
-            String timeUnitString = tMember.getUnitsString();
+            StructureData           sdata = obsList.get(0).getFeatureData();
+            StructureMembers.Member tMember        =
+                sdata.findMember(varTime);
+            String                  timeUnitString = tMember.getUnitsString();
 
             return DataUtil.parseUnit(timeUnitString);
         }
