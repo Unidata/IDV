@@ -21,16 +21,13 @@
 package ucar.unidata.data.sounding;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 import ucar.ma2.Index0D;
 import ucar.ma2.Range;
 import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
+
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
@@ -38,6 +35,7 @@ import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureCollectionIterator;
 import ucar.nc2.ft.TrajectoryFeature;
 import ucar.nc2.ft.TrajectoryFeatureCollection;
+
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
 import ucar.unidata.data.point.PointOb;
@@ -46,9 +44,11 @@ import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.Station;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Trace;
+
 import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Direction;
+
 import visad.CommonUnit;
 import visad.Data;
 import visad.DateTime;
@@ -64,8 +64,17 @@ import visad.Text;
 import visad.Tuple;
 import visad.TupleType;
 import visad.Unit;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
+
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -77,7 +86,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     private FeatureDatasetPoint fdp;
 
     /** The obs list. */
-    List<PointFeature> obsList = new ArrayList<PointFeature>();
+    List<PointFeature> obsList = new ArrayList<>();
 
     /** The times. */
     double[] times;
@@ -87,6 +96,13 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     /** The feature collection. */
     private FeatureCollection fc;
+
+    /** The category attributes. */
+    private static String[] categoryAttributes = { "category", "group" };
+
+    /** The units cache. */
+    private Map<String, Unit> unitsCache = new ConcurrentHashMap<>();
+
 
     /**
      * Instantiates a new CDM trajectory feature type info.
@@ -105,9 +121,6 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         this.fc  = fc;
     }
 
-
-    /** The category attributes. */
-    private static String[] categoryAttributes = { "category", "group" };
 
     /**
      * Gets the trajectory collection beans.
@@ -162,18 +175,30 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception the exception
      */
     protected void init(TrajectoryFeatureBean trajBean) throws Exception {
-        // TrajectoryFeatureBean         pf      = obsList.get(0);
         StructureData                 pfsd    = trajBean.pf.getFeatureData();
+
         List<StructureMembers.Member> members = pfsd.getMembers();
+
         for (int i = 0; i < members.size(); i++) {
+
             StructureMembers.Member mb   = members.get(i);
             String                  ustr = mb.getUnitsString();
             Unit                    unit = null;
+
+            /**
+             * Introducing a units cache here makes this method spend from 70%
+             * to 50% of the total time in this 'if' block.
+             */
             if ((ustr != null) && !ustr.equalsIgnoreCase("none")) {
-                try {
-                    unit = Util.parseUnit(ustr);
-                } catch (visad.VisADException e) {
-                    unit = null;
+                if (unitsCache.get(ustr) != null) {
+                    unit = unitsCache.get(ustr);
+                } else {
+                    try {
+                        unit = Util.parseUnit(ustr);
+                    } catch (visad.VisADException e) {
+                        unit = null;
+                    }
+                    unitsCache.put(ustr, unit);
                 }
             }
 
@@ -229,14 +254,16 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                                         unit));
                 addVariableData(mb.getName(), mb.getDataArray().copy());
             }
-
         }
+
         Range rg = getDataRange();
-        times = getTime(rg);
 
-        startTime = getStartTime();  //new DateTime(df.parse(stimeStr.toString()));
-        endTime = getEndTime();  //new DateTime(df.parse(etimeStr.toString()));
+        times     = getTime(rg);
 
+
+        startTime = getStartTime();
+
+        endTime   = getEndTime();
     }
 
     /**
