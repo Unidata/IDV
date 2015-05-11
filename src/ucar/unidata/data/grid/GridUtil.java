@@ -5739,9 +5739,12 @@ public class GridUtil {
                 double[][] timeValues = timeSet.getDoubles(false);
                 Unit       timeUnit   = timeSet.getSetUnits()[0];
                 int        numTimes   = timeSet.getLength();
+                CalendarDateTimeSet cdt = (CalendarDateTimeSet)timeSet;
                 for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
+
                     DateTime dt = new DateTime(timeValues[0][timeIdx],
                                       timeUnit);
+                    CalendarDateTime cdti = new CalendarDateTime(timeValues[0][timeIdx] ,cdt.getCalendar());
                     JobManager.getManager().setDialogLabel1(loadId,
                             "Writing grid time:" + (timeIdx + 1) + "/"
                             + numTimes);
@@ -5749,7 +5752,7 @@ public class GridUtil {
                     if (ff == null) {
                         continue;
                     }
-                    times.add(dt);
+                    times.add(cdti);
                     fields.add(ff);
                 }
             } else if (grid instanceof FlatField) {
