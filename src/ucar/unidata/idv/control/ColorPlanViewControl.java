@@ -92,7 +92,7 @@ public class ColorPlanViewControl extends PlanViewControl {
                                   + ((datachoice != null)
                                      ? datachoice.toString()
                                      : ""), true);
-        gridDisplay.setPointSize(2f);
+        gridDisplay.setPointSize(getPointSize());
         gridDisplay.setPolygonMode(polygonMode);
         gridDisplay.setTextureEnable( !isSmoothed);
         addAttributedDisplayable(gridDisplay);
