@@ -118,7 +118,7 @@ public class VolumeVectorControl extends GridDisplayControl {
     float vectorLengthValue = 2.0f;
 
     /** a traj offset value */
-    float arrowHeadSizeValue = 0.5f;
+    float arrowHeadSizeValue = 1.0f;
 
     /** a traj offset value */
     float trajOffsetValue = 4.0f;
@@ -210,7 +210,7 @@ public class VolumeVectorControl extends GridDisplayControl {
             planDisplay.setTrojectoriesEnabled(isCVectors,
                     arrowHeadSizeValue, true);
         } else {
-            planDisplay.setTrojectoriesEnabled(isTrajectories, 0.0f, false);
+            planDisplay.setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue, false);
         }
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
@@ -253,9 +253,9 @@ public class VolumeVectorControl extends GridDisplayControl {
             public void actionPerformed(ActionEvent e) {
                 arrowHead = ((JCheckBox) e.getSource()).isSelected();
                 if (arrowHead) {
-                    getGridDisplay().setArrowHead(1.0f);
+                    getGridDisplay().setArrowHead(arrowHead);
                 } else {
-                    getGridDisplay().setArrowHead(0.0f);
+                    getGridDisplay().setArrowHead(arrowHead);
                 }
                 getGridDisplay().resetTrojectories();
             }
@@ -346,7 +346,7 @@ public class VolumeVectorControl extends GridDisplayControl {
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlinesEnabled(isStreamlines);
 
-            getGridDisplay().setTrojectoriesEnabled(isTrajectories, 0.0f,
+            getGridDisplay().setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue,
                         false);
 
             enableDensityComponents();
@@ -618,9 +618,9 @@ public class VolumeVectorControl extends GridDisplayControl {
                 getGridDisplay().setTrajOffset(trajOffsetValue);
                 getGridDisplay().resetTrojectories();
                 if (arrowHead) {
-                    getGridDisplay().setArrowHead(1.0f);
+                    getGridDisplay().setArrowHead(arrowHead);
                 } else {
-                    getGridDisplay().setArrowHead(0.0f);
+                    getGridDisplay().setArrowHead(arrowHead);
                 }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
