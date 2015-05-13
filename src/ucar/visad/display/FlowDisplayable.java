@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -79,7 +79,10 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     private float vectorLength = 2.0f;
 
     /** _more_ */
-    private float arrowHead = 0.5f;
+    private boolean arrowHead = false;
+
+    /** _more_ */ 
+    private float arrowHeadSize = 1.0f;
 
     /** streamline density factor */
     private float streamlineDensity = 1.f;
@@ -261,11 +264,22 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
     /**
      * sets trajectory parms if the enable is true.
+     * @param enable boolean whether trajectories are enabled.
+     * @param markerOn boolean whether markers are enabled.
+     * @param mSize _more_
+     * @param refresh _more_
+     */
+    public void setTrojectoriesEnabled(boolean enable, float mSize, boolean refresh) { 
+       setTrojectoriesEnabled(enable, false, mSize, refresh);
+    }
+
+    /**
+     * sets trajectory parms if the enable is true.
      * @param enable boolean whether streamlines are enabled.
      * @param mSize _more_
      * @param refresh _more_
      */
-    public void setTrojectoriesEnabled(boolean enable, float mSize,
+    public void setTrojectoriesEnabled(boolean enable, boolean markerOn, float mSize,
                                        boolean refresh) {
 
         if ((flowControl != null)
@@ -287,12 +301,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                         rlen = (td[0][1] - td[0][0]) * numTimes;
                         tlen = (td[0][1] - td[0][0]) * trajOffset;
                     }
-                    arrowHead = mSize;
+                    arrowHead = markerOn;
+                    arrowHeadSize = mSize;
                     TrajectoryParams tparm =
                         flowControl.getTrajectoryParams();
                     tparm.setMarkerSize(mSize);
                     tparm.setTrajRefreshInterval(rlen);
                     tparm.setTrajVisibilityTimeWindow(tlen);
+                    tparm.setMarkerEnabled(markerOn);
                     flowControl.setTrajectoryParams(tparm);
                 }
             } catch (VisADException ve) {
@@ -330,9 +346,10 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 }
 
                 TrajectoryParams tparm = flowControl.getTrajectoryParams();
-                tparm.setMarkerSize(arrowHead);
+                tparm.setMarkerSize(arrowHeadSize);
                 tparm.setTrajRefreshInterval(rlen);
                 tparm.setTrajVisibilityTimeWindow(tlen);
+                tparm.setMarkerEnabled(arrowHead);
                 flowControl.setTrajectoryParams(tparm);
 
             } catch (VisADException ve) {
@@ -448,14 +465,19 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         flowscale = scale;
     }
 
+    public void setArrowHead(boolean onoff) {
+        arrowHead = onoff;
+    }
+
     /**
      * _more_
      *
      * @param size _more_
      */
-    public void setArrowHead(float size) {
-        arrowHead = size;
+    public void setArrowHeadSize(float size) {
+        arrowHeadSize = size;
     }
+
 
     /**
      * _more_
