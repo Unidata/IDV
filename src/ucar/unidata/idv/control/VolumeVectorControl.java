@@ -81,9 +81,6 @@ public class VolumeVectorControl extends GridDisplayControl {
     /** trajectory button */
     private JRadioButton trajectoryBtn;
 
-    /** cvector button */
-    private JRadioButton cvectorBtn;
-
     /** flag for streamlines */
     boolean isStreamlines = false;
 
@@ -92,9 +89,6 @@ public class VolumeVectorControl extends GridDisplayControl {
 
     /** _more_ */
     boolean isTrajectories = false;
-
-    /** _more_ */
-    boolean isCVectors = false;
 
     /** flag for wind barbs */
     boolean isWindBarbs = false;
@@ -206,12 +200,9 @@ public class VolumeVectorControl extends GridDisplayControl {
         planDisplay.setStreamlinesEnabled(isStreamlines);
         planDisplay.setStreamlineDensity(streamlineDensity);
         planDisplay.setAutoScale(autoSize);
-        if (isCVectors) {
-            planDisplay.setTrojectoriesEnabled(isCVectors,
-                    arrowHeadSizeValue, true);
-        } else {
-            planDisplay.setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue, false);
-        }
+
+        planDisplay.setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue, false);
+
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
         return planDisplay;
@@ -350,13 +341,12 @@ public class VolumeVectorControl extends GridDisplayControl {
                         false);
 
             enableDensityComponents();
-
+            enableTrajLengthBox();
         }
         if (streamlinesBtn != null) {
             streamlinesBtn.setSelected(isStreamlines);
             vectorBtn.setSelected(isVectors);
             trajectoryBtn.setSelected(isTrajectories);
-            cvectorBtn.setSelected(isCVectors);
         }
 
     }
