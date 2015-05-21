@@ -421,6 +421,11 @@ public class VolumeVectorControl extends GridDisplayControl {
         if ( !super.setData(choice) || (getNavigatedDisplay() == null)) {
             return false;
         }
+        myDisplay.setUseSpeedForColor(useSpeedForColor);
+
+        if (useSpeedForColor) {
+            colorIndex = myDisplay.getSpeedTypeIndex();
+        }
         loadVolumeData();
         return true;
     }
@@ -622,6 +627,26 @@ public class VolumeVectorControl extends GridDisplayControl {
             trajLengthWidget.setValue(f);
         }
     }
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
+    public void setTrajectories(boolean v) {
+        isTrajectories = v;
+        isVectors      = !v;
+        setStreamlines();
+    }
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
+    public void setVectors(boolean v) {
+        isTrajectories = !v;
+        isVectors      = v;
+        setStreamlines();
+    }
 
 }
