@@ -264,7 +264,9 @@ way the view works.  Each display control may have a different
 set of entries under this menu, depending on the type of data
 being displayed.
 
-[ht::cimg images/DCViewMenu.gif] 
+[ht::cimg images/DCViewMenu.gif]
+
+
 
 Some of the things you can do with this menu are:
 
@@ -305,6 +307,17 @@ when displays have transparent color tables.
 [menuDesc {Use Data Projection} { 
 This menu item sets the projection in the currently active
 view window to that of the data used by this control.
+}]
+
+[menuDesc {Enable Adaptive Resolution} {
+This menu item allows the IDV
+to calculate the resolution of the map view window, dynamically sets the
+data sampling, and loads sufficient data to generate the image.
+}]
+
+[menuDesc {Match Display Region} {
+This menu item allows the IDV to spatially subset the
+data based on the map view area of the active view window.
 }]
 
 [menuDesc {Dock in/Undock from Dashboard} { 

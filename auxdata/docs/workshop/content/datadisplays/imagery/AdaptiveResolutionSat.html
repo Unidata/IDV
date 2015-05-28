@@ -1,0 +1,72 @@
+<html>
+<head>
+    <title>Adaptive Resolution in Satellite Imagery</title>
+</head>
+
+<body>
+
+<div class="overview">
+    <p>In this exercise, we'll load in some high resolution visible imagery from the GINI East 1km dataset.</p>
+</div>
+
+<p>When loading a high resolution satellite imagery with the [ht::command {Adaptive Resolution}] turned on,
+    the IDV calculates the resolution of
+    the view window, sets the magnification factors dynamically, and loads a sufficient amount
+    of the data to generate an image at the correct resolution. With the [ht::command {Match Display Region}]
+    option turned on, a rubber band box (RBB) interface allows the user to zoom in/out or change the
+    projection, forcing the IDV to recalculate the magnification factors and get higher/lower
+    resolution data. This feature improves the IDV memory usage and performance significantly. </p>
+
+<p>The [ht::command {Adaptive Resolution}] is a property in the User Preference. It can also be set in
+    the Projections drop down menu of main view window. If a display has been created without
+    the [ht::command {Adaptive Resolution}] turned on, it can be changed by selecting the option
+    under [ht::menu View {Match Display Region}] drop down menu in the same display control.</p>
+<ol class="step">
+    <li>[ht::clearDisplaysAndData]</li>
+
+    <li>[ht::openDataSourceChooser]
+        Click on the [ht::command Images] node in the chooser tree.</li>
+
+    <li>In the [ht::command Server:] selector, choose
+        [ht::param adde.ucar.edu].
+        In the [ht::command Dataset:] selector, choose
+        [ht::param GINIEAST], click the [ht::button Connect]
+        button.</li>
+
+    <li>From the [ht::command Image Type:] selector, choose
+        the [ht::param GINI 1 km VIS East CONUS] type.</li>
+
+    <li>You can either load in the last &quot;<i>n</i>&quot; images, or
+        you can select by time.  For this exercise, we want to select
+        5 most recent of the relative times.    </li>
+
+    <li> Click the [ht::button Add Source] button.</li>
+
+
+    <li>Match display region:
+        <ul>
+            <li>In the [ht::dialog Map View] window, zoom into the region of interested.</li>
+
+            <li>In the [ht::dialog Data Subset] panel, click on the [ht::command Region] tab and
+                click on the drop down menu button and choose the [ht::command Match Display Region] option.</li>
+
+            <li>Click the [ht::command Create Display] button.</li>
+        </ul>
+
+
+    <li>Use the [ht::menu View {Match Display Region}] menu in the same display control to check and make sure
+    the [ht::command Match Display Region] option has been selected. If a different menu item under
+    the [ht::command Region] tab is selected, this property can be changed in this drop down menu.
+
+    <li>In the [ht::dialog Map View] window, use the combination of [ht::button Shift] and left mouse button
+    to create rubber band box [ht::command RBB].</li>
+
+    <li>Zoom in and out and draw [ht::command RBB] to different areas, and check the data sampling factor that
+    is shown in the side legend.</li>
+
+
+
+</ol>
+
+</body>
+</html>

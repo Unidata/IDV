@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -147,6 +147,16 @@ public class VerticalXSDisplay extends XSDisplay {
     }
 
     /**
+     * Set the units of displayed values on the Y axis
+     *
+     * @param  newUnit  units to use
+     */
+    public void setYDisplayUnit(Unit newUnit) {
+        super.setYDisplayUnit(newUnit);
+        setYAxisTitle();
+    }
+
+    /**
      * Set the title on the XAxis.
      */
     public void setXAxisTitle() {
@@ -154,6 +164,17 @@ public class VerticalXSDisplay extends XSDisplay {
         if (xscale != null) {
             xscale.setTitle("Distance along transect (" + getXDisplayUnit()
                             + ")");
+        }
+    }
+
+    /**
+     * Set the title on the YAxis.
+     */
+    public void setYAxisTitle() {
+        AxisScale yscale = getYAxisScale();
+        if (yscale != null) {
+            RealType yAxisType = getYAxisType();
+            yscale.setTitle(yAxisType.toString() + " (" + getYDisplayUnit() + ")");
         }
     }
 }

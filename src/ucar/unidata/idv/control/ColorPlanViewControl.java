@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -92,7 +92,7 @@ public class ColorPlanViewControl extends PlanViewControl {
                                   + ((datachoice != null)
                                      ? datachoice.toString()
                                      : ""), true);
-        gridDisplay.setPointSize(2f);
+        gridDisplay.setPointSize(getPointSize());
         gridDisplay.setPolygonMode(polygonMode);
         gridDisplay.setTextureEnable( !isSmoothed);
         addAttributedDisplayable(gridDisplay);

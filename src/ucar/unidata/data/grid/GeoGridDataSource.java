@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,15 +21,18 @@
 package ucar.unidata.data.grid;
 
 
+import org.jfree.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
-
 import ucar.nc2.Attribute;
 import ucar.nc2.Group;
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.NetcdfFileWriter;
+import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
@@ -45,7 +48,6 @@ import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
-
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
@@ -78,18 +80,19 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
-
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
-
 import visad.Data;
 import visad.DateTime;
 import visad.FieldImpl;
 import visad.Real;
 import visad.VisADException;
-
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
+
+
+
+
 
 
 import java.awt.Dimension;
@@ -98,13 +101,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -918,6 +918,12 @@ public class GeoGridDataSource extends GridDataSource {
 
         String        path   = prefix;
         CFGridWriter2 writer = new CFGridWriter2();
+        NetcdfFileWriter ncFileWriter = null;
+        try {
+            ncFileWriter = NetcdfFileWriter.createNew(Version.netcdf3, path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //Start the load, showing the dialog
         loadId = JobManager.getManager().startLoad("Copying data", true,
@@ -935,7 +941,7 @@ public class GeoGridDataSource extends GridDataSource {
             // NetcdfFileWriter writer
 
             writer.writeFile(dataset, varNames, llr, null, hStride, null,
-                             dateRange, timeStride, includeLatLon, null);
+                             dateRange, timeStride, includeLatLon, ncFileWriter);
         } catch (Exception exc) {
             logException("Error writing local netcdf file.\nData:"
                          + getFilePath() + "\nVariables:" + varNames, exc);

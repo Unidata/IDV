@@ -1,7 +1,7 @@
 /*
  * $Id: EsriShapefileRenderer.java,v 1.22 2005/12/30 15:38:55 jeffmc Exp $
  *
- * Copyright  1997-2014 Unidata Program Center/University Corporation for
+ * Copyright  1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

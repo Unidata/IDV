@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1030,10 +1030,10 @@ public class GeoGridAdapter {
                         for (int j = 0; j < dl[1]; j++) {
                             for (int i = 0; i < xl; i++) {
                                 ii        = i + j * xl + k * xl * yl;
-                                jj        = i + j * (xl + 1) + k * xl * yl;
+                                jj        = i + j * (xl + 1) + k * (xl + 1) * yl;
                                 valsT[jj] = vals[ii];
                             }
-                            valsT[jj + 1] = valsT[j * xl + k * xl * yl];
+                            valsT[jj + 1] = valsT[j * (xl + 1) + k * (xl + 1) * yl];
                         }
                     }
                 }

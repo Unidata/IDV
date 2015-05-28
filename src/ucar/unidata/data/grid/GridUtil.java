@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -2345,7 +2345,7 @@ public class GridUtil {
             LatLonPoint point, int samplingMode)
             throws VisADException {
         return getProfileAtLatLonPoint(grid, point, samplingMode,
-                                       DEFAULT_ERROR_MODE);
+                DEFAULT_ERROR_MODE);
     }
 
     /**
@@ -4179,7 +4179,7 @@ public class GridUtil {
                                          int samplingMode)
             throws VisADException {
         return resampleGrid(grid, subDomain, samplingMode,
-                            DEFAULT_ERROR_MODE);
+                DEFAULT_ERROR_MODE);
     }
 
     /**
@@ -4309,7 +4309,7 @@ public class GridUtil {
             throws VisADException {
         long t1 = System.currentTimeMillis();
         FieldImpl result = resampleGridInner(grid, subDomain, samplingMode,
-                                             errorMode);
+                errorMode);
         long t2 = System.currentTimeMillis();
         //System.err.println("Time:" + (t2 - t1));
         return result;
@@ -5694,7 +5694,7 @@ public class GridUtil {
      */
     public static void writeGridToXls(FieldImpl grid) throws Exception {
         String filename = FileManager.getWriteFile(FileManager.FILTER_XLS,
-                              null);
+                null);
         if (filename == null) {
             return;
         }
@@ -5739,18 +5739,34 @@ public class GridUtil {
                 double[][] timeValues = timeSet.getDoubles(false);
                 Unit       timeUnit   = timeSet.getSetUnits()[0];
                 int        numTimes   = timeSet.getLength();
-                for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
-                    DateTime dt = new DateTime(timeValues[0][timeIdx],
-                                      timeUnit);
-                    JobManager.getManager().setDialogLabel1(loadId,
-                            "Writing grid time:" + (timeIdx + 1) + "/"
-                            + numTimes);
-                    FlatField ff = (FlatField) grid.getSample(timeIdx);
-                    if (ff == null) {
-                        continue;
+                CalendarDateTimeSet cdt = null;
+                if(numTimes > 1) {
+                    cdt = (CalendarDateTimeSet) timeSet;
+                    for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
+                        CalendarDateTime cdti = new CalendarDateTime(timeValues[0][timeIdx], cdt.getCalendar());
+                        JobManager.getManager().setDialogLabel1(loadId,
+                                "Writing grid time:" + (timeIdx + 1) + "/"
+                                        + numTimes);
+                        FlatField ff = (FlatField) grid.getSample(timeIdx);
+                        if (ff == null) {
+                            continue;
+                        }
+                        times.add(cdti);
+                        fields.add(ff);
                     }
-                    times.add(dt);
-                    fields.add(ff);
+                } else {
+                    RealTuple ss = ((SingletonSet) timeSet).getData();
+                    if(ss != null ) {
+                        visad.Data[] vdata = ss.getComponents();
+                        JobManager.getManager().setDialogLabel1(loadId,
+                                "Writing grid time:" +  1 + "/"
+                                        + numTimes);
+                        FlatField ff = (FlatField) grid.getSample(0);
+                        if (ff != null) {
+                            times.add((CalendarDateTime)vdata[0]);
+                            fields.add(ff);
+                        }
+                    }
                 }
             } else if (grid instanceof FlatField) {
                 fields.add((FlatField) grid);

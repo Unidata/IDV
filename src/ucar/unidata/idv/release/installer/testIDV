@@ -1,0 +1,43 @@
+#!/bin/sh
+
+if [ $# -ne 2 ]
+then
+    echo "Syntax: $(basename $0) <bundle> <output dir>"
+    exit 1
+fi
+
+
+dirname=`dirname $0`
+
+java="java"
+
+JRE_INSTALL4J_VAR
+    
+if test -f ${jre}/bin/java; then
+# We are in the installer directory
+    java=${jre}/bin/${java}
+else
+# Try using the dirname of this script
+    if test -f ${dirname}/${jre}/bin/java; then
+       java=${dirname}/${jre}/bin/${java}
+    else
+       if test  ${JAVA_HOME}; then
+# Try using JAVA_HOME
+          java=${JAVA_HOME}/bin/${java}
+       else
+# Try just using java
+          java=${java}
+      fi
+    fi
+fi
+
+
+bundle=$1
+
+dir=$2
+
+bundlefile=$(basename $bundle)
+
+testname="${bundlefile%.*}"
+
+${java} LIBEXT_INSTALL4J_VAR -Xmx2g  -Didv.enableStereo=false -XX:+DisableExplicitGC -jar ${dirname}/idv.jar -nodefault -noplugins -test $testname $dir $bundle

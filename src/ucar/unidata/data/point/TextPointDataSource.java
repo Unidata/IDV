@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1440,7 +1440,10 @@ public class TextPointDataSource extends PointDataSource {
             String attrs = "";
             if (name.equals("Time")) {
                 if (unit.trim().length() > 0) {
-                    attrs = attrs + "fmt=\"" + unit + "\" ";
+                    if(unit.contains("since"))
+                        attrs = attrs + "unit=\"" + unit + "\" ";
+                    else
+                        attrs = attrs + "fmt=\"" + unit + "\" ";
                 }
 
             } else {

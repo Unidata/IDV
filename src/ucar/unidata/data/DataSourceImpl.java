@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -2193,7 +2193,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
 
 
-            if ((times == null) || (times.size() == 0)) {
+            if ((times == null) || (times.size() == 0) ||
+                    times.size()== allTimesFromDataChoice.size()) {
                 times = allTimesFromDataChoice;
             }
             times = getDateTimes(times, allTimesFromDataChoice);

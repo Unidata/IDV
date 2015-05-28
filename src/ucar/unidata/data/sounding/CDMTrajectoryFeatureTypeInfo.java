@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,7 +21,12 @@
 package ucar.unidata.data.sounding;
 
 
-import ucar.ma2.*;
+import ucar.ma2.Array;
+import ucar.ma2.Index;
+import ucar.ma2.Index0D;
+import ucar.ma2.Range;
+import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers;
 
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
@@ -68,6 +73,8 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -79,7 +86,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     private FeatureDatasetPoint fdp;
 
     /** The obs list. */
-    List<PointFeature> obsList = new ArrayList<PointFeature>();
+    List<PointFeature> obsList = new ArrayList<>();
 
     /** The times. */
     double[] times;
@@ -89,6 +96,13 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
     /** The feature collection. */
     private FeatureCollection fc;
+
+    /** The category attributes. */
+    private static String[] categoryAttributes = { "category", "group" };
+
+    /** The units cache. */
+    private Map<String, Unit> unitsCache = new ConcurrentHashMap<>();
+
 
     /**
      * Instantiates a new CDM trajectory feature type info.
@@ -107,9 +121,6 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         this.fc  = fc;
     }
 
-
-    /** The category attributes. */
-    private static String[] categoryAttributes = { "category", "group" };
 
     /**
      * Gets the trajectory collection beans.
@@ -164,18 +175,30 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception the exception
      */
     protected void init(TrajectoryFeatureBean trajBean) throws Exception {
-        // TrajectoryFeatureBean         pf      = obsList.get(0);
-        StructureData                 pfsd    = trajBean.pf.getData();
+        StructureData                 pfsd    = trajBean.pf.getFeatureData();
+
         List<StructureMembers.Member> members = pfsd.getMembers();
+
         for (int i = 0; i < members.size(); i++) {
+
             StructureMembers.Member mb   = members.get(i);
             String                  ustr = mb.getUnitsString();
             Unit                    unit = null;
+
+            /**
+             * Introducing a units cache here makes this method spend from 70%
+             * to 50% of the total time in this 'if' block.
+             */
             if ((ustr != null) && !ustr.equalsIgnoreCase("none")) {
-                try {
-                    unit = Util.parseUnit(ustr);
-                } catch (visad.VisADException e) {
-                    unit = null;
+                if (unitsCache.get(ustr) != null) {
+                    unit = unitsCache.get(ustr);
+                } else {
+                    try {
+                        unit = Util.parseUnit(ustr);
+                    } catch (visad.VisADException e) {
+                        unit = null;
+                    }
+                    unitsCache.put(ustr, unit);
                 }
             }
 
@@ -231,14 +254,16 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                                         unit));
                 addVariableData(mb.getName(), mb.getDataArray().copy());
             }
-
         }
+
         Range rg = getDataRange();
-        times = getTime(rg);
 
-        startTime = getStartTime();  //new DateTime(df.parse(stimeStr.toString()));
-        endTime = getEndTime();  //new DateTime(df.parse(etimeStr.toString()));
+        times     = getTime(rg);
 
+
+        startTime = getStartTime();
+
+        endTime   = getEndTime();
     }
 
     /**
@@ -564,7 +589,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * {@inheritDoc}
      */
     public double[] getDoubleData(Range range, String var) throws Exception {
-        double[] fdata = new double[range.length()];
+        double[] ddata = new double[range.length()];
         //TrajectoryFeatureBean tfb   = obsList.get(0);
         //fdata = tfb.getDoubleData(range, var);
         int first  = range.first();
@@ -575,13 +600,13 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int j      = 0;
         while (i <= last) {
             PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getData();
+            StructureData pfsd = pf.getFeatureData();
 
-            fdata[j++] = pfsd.convertScalarDouble(var);
+            ddata[j++] = pfsd.convertScalarDouble(var);
             i          = i + stride;
         }
 
-        return fdata;
+        return ddata;
     }
 
 
@@ -603,7 +628,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int      j      = 0;
         while (i <= last) {
             PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getData();
+            StructureData pfsd = pf.getFeatureData();
 
             sdata[j++] = pfsd.getScalarString(var);
             i          = i + stride;
@@ -712,7 +737,8 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                 }
                 VarInfo var = varsToUse.get(varIdx);
                 if (var.getIsNumeric()) {
-                    float[] fvalues = getFloatData(range, var.getShortName());
+                    double[] dvalues = getDoubleData(range,
+                                           var.getShortName());
                     if (var.getRealType() == null) {
                         //???
                     }
@@ -721,18 +747,18 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                     for (int obIdx = 0; obIdx < numObs; obIdx++) {
                         Data[] tupleArray = (Data[]) tuples.get(obIdx);
                         ((double[]) reals.get(obIdx))[realCnt] =
-                            fvalues[obIdx];
+                            dvalues[obIdx];
                         if (firstTuple != null) {
                             tupleArray[varIdx] =
                                 ((Real) firstTuple[varIdx]).cloneButValue(
-                                    fvalues[obIdx]);
+                                    dvalues[obIdx]);
                         } else {
                             firstTuple         = tupleArray;
                             tupleArray[varIdx] = (var.getUnit() == null)
                                     ? new Real(var.getRealType(),
-                                    fvalues[obIdx])
+                                    dvalues[obIdx])
                                     : new Real(var.getRealType(),
-                                    fvalues[obIdx], var.getUnit());
+                                    dvalues[obIdx], var.getUnit());
                         }
                     }
                     realCnt++;
@@ -1174,7 +1200,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
             while ((i <= pfs.size()) && (j < range.length())) {
                 PointFeature  pf0 = pfs.get(i);
-                StructureData std = pf0.getData();
+                StructureData std = pf0.getFeatureData();
                 Array         a   = std.getArray(varStr);
                 fdata[j++] = ((float[]) a.get1DJavaArray(Float.class))[0];
                 i          = i + stride;
@@ -1213,7 +1239,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
             while ((i <= pfs.size()) && (j < range.length())) {
                 PointFeature  pf0 = pfs.get(i);
-                StructureData std = pf0.getData();
+                StructureData std = pf0.getFeatureData();
                 Array         a   = std.getArray(varStr);
                 fdata[j++] = ((double[]) a.get1DJavaArray(Double.class))[0];
                 i          = i + stride;
@@ -1259,9 +1285,12 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
          */
         protected Unit getTimeUnit() throws Exception {
             //There has got to be a better way to do this.
-            String tu       = obsList.get(0).getObservationTimeAsCalendarDate().getTimeUnits() + "";
-            int    spaceIdx = tu.indexOf(" ");
-            return DataUtil.parseUnit(tu.substring(spaceIdx).trim());
+            StructureData           sdata = obsList.get(0).getFeatureData();
+            StructureMembers.Member tMember        =
+                sdata.findMember(varTime);
+            String                  timeUnitString = tMember.getUnitsString();
+
+            return DataUtil.parseUnit(timeUnitString);
         }
     }
 

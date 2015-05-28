@@ -49,22 +49,36 @@ the workshop.</p>
         <li>Select [ht::listSelect] the 7 images from [ht::param 1998-06-29 16:15:00Z]
             through [ht::param 1998-06-29 22:15:00Z].</li>
 
-        <li>Be sure that the [ht::command Create display] checkbox is selected
-            and click the [ht::button Add Source] button.</li>
+        <li> Click the [ht::button Add Source] button.</li>
     </ul>
-<!--
-  <li>In the [ht::dialog Field Selector] window, 
-      you should see [ht::dataset 1 km GOES-8 Visible]
-      dataset selected in the [ht::command Data Sources]
-      panel, the [ht::param 0.65 um Visible - Cloud Cover] field 
-      selected in the [ht::command Fields] panel,
-      and [ht::display Image Display] selected
-      in the [ht::command Displays] panel, and
-      [ht::command Use Default] checked
-      in the [ht::command Times] panel.  If not, 
-      select them, then click the 
-      [ht::command Create Display] button.</li>
--->
+
+  <li>Compare three spatial subset options:
+      <p>In the [ht::dialog Data Subset] panel, there are [ht::command Times], [ht::command Region], and [ht::command Advanced] tabs.</p>
+      <ul>
+          <li>In the [ht::command Region] tab, click on the drop down menu button and
+              by default the [ht::command Use Default Region] option is selected. </li>
+
+          <li>Click the [ht::command Create Display] button. The images created in the [ht::dialog Map View] window
+              cover the entire region of the dataset. Zoom in over the super cell in eastern Iowa</li>
+
+          <li>Remove the display and keep the data by click [ht::command Trash] icon in the legend panel</li>
+
+          <li>Back in the data subset panel, in the [ht::command Region] tab, click on the drop down menu button and
+              choose the [ht::command Select A Region] option. </li>
+
+          <li>Draw a bonding box in eastern Iowa with left mouse button and click the [ht::command Create Display] button.</li>
+
+          <li>In the [ht::dialog Map View] window, zoom into the region in eastern Iowa covered with the convective cloud. </li>
+
+          <li>Remove the display and keep the data by click [ht::command Trash] icon in the legend panel, do not
+               change the map view region in the [ht::dialog Map View] window.</li>
+
+          <li>Back in the data subset panel, in the [ht::command Region] tab,
+              click on the drop down menu button and choose the [ht::command Match Display Region] option, click
+              the [ht::command Create Display] button.</li>
+          <li>Keep images created in the last spatial subset option.</li>
+      </ul>
+
 
   <li>[ht::mapChange]  Turn on the 
       [ht::command North & Central America] and

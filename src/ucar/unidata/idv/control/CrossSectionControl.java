@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -450,6 +450,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         addViewManager(crossSectionView);
         setYAxisRange(csvxsDisplay, verticalAxisRange);
         csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
+        csvxsDisplay.setYDisplayUnit(csvxsDisplay.getYDisplayUnit());
         //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
         if (haveMultipleFields()) {
             addDisplayable(vcsDisplay, crossSectionView,
