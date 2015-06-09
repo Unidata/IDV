@@ -25,6 +25,7 @@ import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.gis.Transect;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
@@ -1134,6 +1135,19 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         setXAxisTitle();
 
+        String magStr = (String) dataChoice.getProperty("MAG");
+        if(dataChoice instanceof DerivedDataChoice){
+            DerivedDataChoice dchoice = (DerivedDataChoice)dataChoice;
+            List<DataChoice> dlist = dchoice.getChoices();
+            DataChoice dc = dlist.get(0);
+            magStr = (String) dc.getProperty("MAG");
+        }
+
+        if (magStr != null && !magStr.isEmpty()) {
+            resolutionReadout = magStr;
+        } else {
+            resolutionReadout = null;
+        }
         return true;
     }
 
