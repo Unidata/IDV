@@ -347,11 +347,10 @@ public class DataManager {
             boolean doCache = dataContext.getIdv().getStateManager()
                     .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true);
             dc.setAlwaysUseCache(doCache);
-            ucar.nc2.grib.collection.GribCollection.setDiskCache2(dc);
+            ucar.nc2.grib.GribIndexCache.setDiskCache2(dc);
 
             // Doesn't seem to work in nc 4.3
             ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(doCache);
-
 
             visad.data.DataCacheManager.getCacheManager().setCacheDir(
                 new File(getDataCacheDirectory()));
