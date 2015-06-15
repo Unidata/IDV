@@ -33,7 +33,7 @@ import visad.Unit;
  *
  * @author   IDV Development Team
  */
-public class VertScaleInfo {
+public class VertScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /** maximum range of the vertical scale */
     public double maxVertRange;
@@ -46,6 +46,15 @@ public class VertScaleInfo {
 
     /** Is visible */
     public boolean visible;
+    
+    /** The major increment. */
+    private double majorIncrement;
+    
+    /** Minor division. */
+    private int minorDivision;
+    
+    public static final int DEFAULT_MAJ_DIVISIONS = 4;
+    public static final String DEFAULT_AXIS_LABEL = "Altitude";
 
     /**
      * Construct a <code>VertScaleInfo</code> with the specified range.
@@ -69,9 +78,43 @@ public class VertScaleInfo {
         this.minVertRange = min;
         this.maxVertRange = max;
         this.unit         = unit;
+        this.minorDivision = 1;
+        this.visible = true;
+        this.setVisible(true);
+        this.majorIncrement = (max - min) / DEFAULT_MAJ_DIVISIONS;
+        // Include units in what is shown to user in the display
+        this.setLabel(DEFAULT_AXIS_LABEL + " (" + unit.getIdentifier() + ")");
     }
 
     /**
+	 * @return the majorIncrement
+	 */
+	public double getMajorIncrement() {
+		return majorIncrement;
+	}
+
+	/**
+	 * @param majorIncrement the majorIncrement to set
+	 */
+	public void setMajorIncrement(double majorIncrement) {
+		this.majorIncrement = majorIncrement;
+	}
+
+	/**
+	 * @return the minorDivision
+	 */
+	public int getMinorDivision() {
+		return minorDivision;
+	}
+
+	/**
+	 * @param minorDivision the minorDivision to set
+	 */
+	public void setMinorDivision(int minorDivision) {
+		this.minorDivision = minorDivision;
+	}
+
+	/**
      * _more_
      *
      * @return _more_
@@ -146,6 +189,14 @@ public class VertScaleInfo {
         }
 
         if (visible != other.visible) {
+            return false;
+        }
+        
+        if (majorIncrement != other.majorIncrement) {
+            return false;
+        }
+        
+        if (minorDivision != other.minorDivision) {
             return false;
         }
 

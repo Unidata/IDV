@@ -20,30 +20,32 @@
 
 package ucar.unidata.view.geoloc;
 
-
+import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.visad.Util;
-
 import visad.CommonUnit;
 import visad.Unit;
-
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
-
+import javax.swing.SpinnerNumberModel;
 
 /**
  * A widget to get vertical range or scaling info from the user.  NB: this should be
@@ -51,9 +53,12 @@ import javax.swing.JTextField;
  *
  * @author   IDV Development Team
  */
+
 public class VertScaleDialog extends JPanel implements ActionListener {
 
-    /** The control */
+	private static final long serialVersionUID = 1L;
+
+	/** The control */
     ViewpointControl control;
 
     /** The dialog when in dialog mode */
@@ -61,9 +66,9 @@ public class VertScaleDialog extends JPanel implements ActionListener {
 
     /** input fields for max/min values */
     private JTextField min, max;
-
-    /** flag for whether the user hit cancel or not */
-    private boolean ok;
+    
+    /** input field for Label values */
+    private JTextField jtfAxisLabel;
 
     /** The frame parent */
     JFrame parent;
@@ -75,17 +80,18 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     private JComboBox unitCombo;
 
     /** Is the vertical scale visible */
-    private JCheckBox visible;
-
+    private JCheckBox jcbVisible;
+    
+    /** Vertical increment */
+    private JTextField vertIncrement;
+    
+    /** Vertical scale minor increment */
+    private JSpinner vertMinorSpinner;
+    
     /**
-     * Create a new dialog for setting the vertical range of the display
-     *
-     * @param parent   parent for model dialog
-     * @param control The control
+     * Axis font selector
      */
-    public VertScaleDialog(JFrame parent, ViewpointControl control) {
-        this(parent, control, null);
-    }
+    private FontSelector fontSelector;
 
     /**
      * Create a new dialog for setting the vertical range of the display
@@ -94,6 +100,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      * @param control The control
      * @param vertScaleInfo The info to use
      */
+    
     public VertScaleDialog(JFrame parent, ViewpointControl control,
                            VertScaleInfo vertScaleInfo) {
         this.control       = control;
@@ -105,36 +112,74 @@ public class VertScaleDialog extends JPanel implements ActionListener {
     /**
      * Make the widget contents (UI)
      */
+    
     protected void doMakeContents() {
+    	
         setLayout(new BorderLayout());
         GuiUtils.tmpInsets = new Insets(5, 5, 0, 0);
 
-        JPanel p1 = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Min value: "), min = new JTextField(""),
-            GuiUtils.rLabel("Max value: "), max = new JTextField(""),
+        fontSelector = new FontSelector(FontSelector.COMBOBOX_UI, false, false);
+        
+        jtfAxisLabel = new JTextField(20);
+        
+        JPanel vertPanel = GuiUtils.doLayout(new Component[] {
+            GuiUtils.rLabel("Min Value: "), min = new JTextField(""),
+            GuiUtils.rLabel("Max Value: "), max = new JTextField(""),
+            GuiUtils.rLabel("Axis Label: "), jtfAxisLabel,
             GuiUtils.rLabel("Units: "),
             unitCombo = GuiUtils.getEditableBox(Misc.toList(new String[] {
-                "meters",
-                "km", "feet", "fathoms" }), null),
-            GuiUtils.rLabel("Visible: "), visible = new JCheckBox("", true),
+                "m", "km", "feet", "fathoms" }), null),
+            GuiUtils.rLabel("Major Increment: "),
+            vertIncrement = new JTextField(),
+            GuiUtils.rLabel("Minor Division: "),
+            vertMinorSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1)),
+            GuiUtils.rLabel("Visible: "), jcbVisible = new JCheckBox("", true),
         }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
+        
+        vertPanel.setBorder(BorderFactory.createTitledBorder("Vertical Scale Parameters"));
 
         min.setActionCommand(GuiUtils.CMD_OK);
         min.addActionListener(this);
         max.setActionCommand(GuiUtils.CMD_OK);
         max.addActionListener(this);
-        this.add("Center", GuiUtils.inset(p1, 5));
-
+        
+        JComponent fontPanel =
+                GuiUtils.doLayout(new Component[] {
+                    GuiUtils.left(fontSelector.getComponent()) }, 1,
+                        GuiUtils.WT_N, GuiUtils.WT_N);
+            fontPanel.setBorder(BorderFactory.createTitledBorder("Font"));
+            
+        List<?> pnls = Arrays.asList(new Component[] { GuiUtils.left(vertPanel),
+        		GuiUtils.left(fontPanel) });
+            
+        this.add("Center", GuiUtils.doLayout(pnls, 1, 5, 5));
+        
         if (vertScaleInfo != null) {
             min.setText(Misc.format(vertScaleInfo.minVertRange));
             max.setText(Misc.format(vertScaleInfo.maxVertRange));
+            vertIncrement.setText("" + vertScaleInfo.getMajorIncrement());
+            vertMinorSpinner.setValue(vertScaleInfo.getMinorDivision());
 
             if (vertScaleInfo.unit != null) {
                 unitCombo.setSelectedItem(vertScaleInfo.unit.toString());
             }
 
-            visible.setSelected(vertScaleInfo.visible);
+            // In the text field, don't show units
+            String tmpStr = vertScaleInfo.getLabel();
+            if ((tmpStr == null) || (tmpStr.isEmpty())) {
+            	tmpStr = VertScaleInfo.DEFAULT_AXIS_LABEL;
+            } else {
+            	// Actual Axis label will have units in parentheses, 
+            	// strip this off for UI text field
+            	if (tmpStr.indexOf(" (") > 0) {
+            		tmpStr = tmpStr.substring(0 , tmpStr.indexOf(" ("));
+            	}
+            }
+            jtfAxisLabel.setText(tmpStr);
+            jcbVisible.setSelected(vertScaleInfo.visible);
+            fontSelector.setFont(vertScaleInfo.getFont());
         }
+
     }
 
     /**
@@ -143,6 +188,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      *
      * @param evt  event to handle
      */
+    
     public void actionPerformed(ActionEvent evt) {
         String cmd = evt.getActionCommand();
 
@@ -164,6 +210,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      *
      * @param v Is visible
      */
+    
     public void setVisible(boolean v) {
         if (dialog != null) {
             dialog.setVisible(v);
@@ -175,15 +222,15 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      *
      * @param transfer   default values for the dialog
      */
+    
     public void showDialog(VertScaleInfo transfer) {
+
         if (dialog == null) {
             JPanel buttons = GuiUtils.makeApplyOkCancelButtons(this);
 
             this.add("South", buttons);
-            dialog = new JDialog(parent, "Vertical Range",
-                                 false /* non-modal */);
+            dialog = new JDialog(parent, "Vertical Scale", false);
             dialog.getContentPane().add("Center", this);
-            dialog.setSize(240, 100);  // size of dialog box is X byY pixels
             dialog.pack();
             dialog.setLocation(100, 100);
         }
@@ -192,8 +239,32 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         min.setText(Misc.format(transfer.minVertRange));
         max.setText(Misc.format(transfer.maxVertRange));
         unitCombo.setSelectedItem(transfer.unit.toString());
-        visible.setSelected(transfer.visible);
+        
+        // minor increment
+        vertMinorSpinner.setValue(transfer.getMinorDivision());
+        
+        // font
+        fontSelector.setFont(transfer.getFont());
+        
+        // In the text field, don't show units
+        String tmpStr = transfer.getLabel();
+        
+        if ((tmpStr == null) || (tmpStr.isEmpty())) {
+        	tmpStr = VertScaleInfo.DEFAULT_AXIS_LABEL;
+        } else {
+        	// Actual Axis label will have units in parentheses, 
+        	// strip this off for UI text field
+        	if (tmpStr.indexOf(" (") > 0) {
+        		tmpStr = tmpStr.substring(0 , tmpStr.indexOf(" ("));
+        	}
+        }
+        jtfAxisLabel.setText(tmpStr);
+        vertIncrement.setText(
+        		"" + transfer.getMajorIncrement()
+        );
+        jcbVisible.setSelected(transfer.isVisible());
         dialog.setVisible(true);
+
     }
 
     /**
@@ -201,7 +272,9 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      *
      * @return Was it successful
      */
+    
     public boolean doApply() {
+    	
         float minValue = Float.NaN;
         float maxValue = Float.NaN;
 
@@ -210,7 +283,6 @@ public class VertScaleDialog extends JPanel implements ActionListener {
             maxValue = (float) Misc.parseNumber(max.getText());
         } catch (NumberFormatException nfe) {
             LogUtil.userMessage("Invalid max or min value");
-
             return false;
         }
 
@@ -225,14 +297,22 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         } catch (Exception e) {
             LogUtil.userMessage("Unknown or incompatible unit "
                                 + unitCombo.getSelectedItem());
-
             return false;
         }
 
-        VertScaleInfo newTransfer = new VertScaleInfo(minValue, maxValue,
-                                        newUnit);
+        VertScaleInfo newTransfer = new VertScaleInfo(minValue, maxValue, newUnit);
 
-        newTransfer.visible = visible.isSelected();
+        newTransfer.setLabel(jtfAxisLabel.getText() + " (" + newUnit.getIdentifier() + ")");
+        
+        // TJJ 2014 - should not be accessing variable directly but that's what 
+        // classes using the Transfer were doing with "visible" and others.
+        // Should be addressed at some point.
+
+        newTransfer.setVisible(jcbVisible.isSelected());
+        newTransfer.visible = jcbVisible.isSelected();
+        newTransfer.setMajorIncrement(Misc.parseNumber(vertIncrement.getText()));
+        newTransfer.setMinorDivision(Integer.valueOf(vertMinorSpinner.getValue().toString()));
+        newTransfer.setFont(fontSelector.getFont());
 
         // Force redraw each time rather than checking equality between
         // newTransfer and vertScaleInfo. This is necessary to ensure the
@@ -246,8 +326,7 @@ public class VertScaleDialog extends JPanel implements ActionListener {
         try {
             control.applyVerticalRange(vertScaleInfo);
         } catch (Exception exc) {
-            LogUtil.userMessage("An error has occurred:" + exc);
-
+            LogUtil.userMessage("An error has occurred: " + exc);
             return false;
         }
         //        }
@@ -260,8 +339,9 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      *
      * @return true, if is axis visible
      */
+    
     public boolean isAxisVisible() {
-        return visible.isSelected();
+        return jcbVisible.isSelected();
     }
 
     /**
@@ -269,7 +349,9 @@ public class VertScaleDialog extends JPanel implements ActionListener {
      *
      * @return the vert scale info
      */
+    
     public VertScaleInfo getVertScaleInfo() {
         return this.vertScaleInfo;
     }
+
 }
