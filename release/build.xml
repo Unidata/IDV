@@ -219,14 +219,14 @@ line using: and -Dbasedir=/some/other/dir
     </target>
 
     <target name="install_plugins" depends="init">
-        <sshexec host="conan"
+        <sshexec host="www"
             username="${user.name}"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase=""
             command="${makedir} /content/software/idv/plugins"
         />
         <scp
-            todir="${user.name}@conan:/content/software/idv/plugins"
+            todir="${user.name}@www:/content/software/idv/plugins"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase=""
         >
@@ -409,36 +409,36 @@ line using: and -Dbasedir=/some/other/dir
     <target name="snapshot_release" depends="init">
 
         <property name="ftp_path" value="${snapshot_download_path}/ftp"/>
-        <echo message="Making conan directory: ${snapshot_path}"/>
+        <echo message="Making www directory: ${snapshot_path}"/>
         <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path};"/>
+            <arg line="www ${makedir} /content${snapshot_path};"/>
         </exec>
         <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/docs;"/>
+            <arg line="www ${makedir} /content${snapshot_path}/docs;"/>
         </exec>
         <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/docs/userguide;"/>
+            <arg line="www ${makedir} /content${snapshot_path}/docs/userguide;"/>
         </exec>
         <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/docs/workshop;"/>
+            <arg line="www ${makedir} /content${snapshot_path}/docs/workshop;"/>
         </exec>
 
         <echo message="Making download directory: /content${snapshot_download_path}"/>
         <exec executable="ssh">
-            <arg line="conan cd /home/ftp/pub/idv; ${makedir} ${snapshot_dir};"/>
+            <arg line="www cd /home/ftp/pub/idv; ${makedir} ${snapshot_dir};"/>
         </exec>
         <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_download_path};"/>
+            <arg line="www ${makedir} /content${snapshot_download_path};"/>
         </exec>
         <exec executable="ssh">
-            <arg line="conan cd /content${snapshot_download_path};if !(-e idv) ln -s /web/ftp/pub/idv idv;if (-e ftp) rm ftp;ln -s idv/${snapshot_dir} ftp"/>
+            <arg line="www cd /content${snapshot_download_path};if !(-e idv) ln -s /web/ftp/pub/idv idv;if (-e ftp) rm ftp;ln -s idv/${snapshot_dir} ftp"/>
         </exec>
 
 
         <echo message="Copying installers to downloads directory"/>
 
         <scp
-            todir="${user.name}@conan:/content/${ftp_path}"
+            todir="${user.name}@www:/content/${ftp_path}"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase="">
             <fileset  dir="installers" includes="**/idv_${idv.version.under}_**"/>
@@ -446,15 +446,15 @@ line using: and -Dbasedir=/some/other/dir
 
         <echo message="Making webstart directory: ${snapshot_path}/webstart"/>
         <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/webstart;"/>
+            <arg line="www ${makedir} /content${snapshot_path}/webstart;"/>
         </exec>
         <exec executable="ssh">
-            <arg line="conan ${makedir} /content${snapshot_path}/webstart/IDV;"/>
+            <arg line="www ${makedir} /content${snapshot_path}/webstart/IDV;"/>
         </exec>
 
 <!--  Not needed after 2.6a2
         <exec executable="ssh">
-            <arg line="conan cd /content${snapshot_path}/webstart;if !(-e java3D) ln -s /content/software/idv/webstart/java3D java3D"/>
+            <arg line="www cd /content${snapshot_path}/webstart;if !(-e java3D) ln -s /content/software/idv/webstart/java3D java3D"/>
         </exec>
 -->
 
@@ -466,7 +466,7 @@ line using: and -Dbasedir=/some/other/dir
         <echo message="Making docs, jars zip, etc."/>
         <antcall target="ftpdir"/>
         <scp
-            todir="${user.name}@conan:/content${ftp_path}"
+            todir="${user.name}@www:/content${ftp_path}"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase=""
         >
@@ -476,19 +476,19 @@ line using: and -Dbasedir=/some/other/dir
 
 
         <exec dir="docs" executable="scp">
-             <arg line = "-r userguide conan:/content${snapshot_path}/docs"/>
+             <arg line = "-r userguide www:/content${snapshot_path}/docs"/>
         </exec>
 
         <exec dir="docs" executable="scp">
-             <arg line = "-r workshop conan:/content${snapshot_path}/docs"/>
+             <arg line = "-r workshop www:/content${snapshot_path}/docs"/>
         </exec>
 
         <exec executable="ssh">
-            <arg line="conan cd /content${snapshot_path}; if !(-e plugins) ln -s /content/software/idv/plugins plugins"/>
+            <arg line="www cd /content${snapshot_path}; if !(-e plugins) ln -s /content/software/idv/plugins plugins"/>
         </exec>
 
         <exec executable="ssh">
-            <arg line="conan cd /content${snapshot_path}; if !(-e resources) ln -s /content/software/idv/resources resources"/>
+            <arg line="www cd /content${snapshot_path}; if !(-e resources) ln -s /content/software/idv/resources resources"/>
         </exec>
 
         <echo message="Copying index.html file: /content${snapshot_path}"/>
@@ -505,7 +505,7 @@ line using: and -Dbasedir=/some/other/dir
         </copy>
 
         <scp
-            todir="${user.name}@conan:/content${snapshot_path}"
+            todir="${user.name}@www:/content${snapshot_path}"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase=""
             file="webstart/index.html"/>
@@ -526,23 +526,23 @@ line using: and -Dbasedir=/some/other/dir
 
 
         <scp
-            todir="${user.name}@conan:/content${snapshot_download_path}"
+            todir="${user.name}@www:/content${snapshot_download_path}"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase=""
             file="${ftpdir}/toc.xml"/>
 
         <echo message="Flipping links: ln -s ${snapshot_dir} ${snapshot_name}"/>
         <exec executable="ssh">
-            <arg line="conan cd /content${idv_release_path}; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
+            <arg line="www cd /content${idv_release_path}; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
         </exec>
 
         <exec executable="ssh">
-            <arg line="conan cd /home/ftp/pub/idv; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
+            <arg line="www cd /home/ftp/pub/idv; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
         </exec>
 
         <echo message="Setting mode g+w"/>
         <exec executable="ssh">
-            <arg line="conan cd /content${idv_release_path} ; chmod -R g+w ${snapshot_dir}"/>
+            <arg line="www cd /content${idv_release_path} ; chmod -R g+w ${snapshot_dir}"/>
         </exec>
 
 
@@ -578,7 +578,7 @@ line using: and -Dbasedir=/some/other/dir
         <echo message="scp'ing jar files to: /content${webstart_target}/IDV"/>
 <!--
         <scp
-            todir="${user.name}@conan:/content${webstart_target}/IDV"
+            todir="${user.name}@www:/content${webstart_target}/IDV"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase=""
         >
@@ -586,7 +586,7 @@ line using: and -Dbasedir=/some/other/dir
         </scp>
 -->
         <exec dir="${webstart_root}" executable="scp" failonerror="true">
-             <arg line="-p -r IDV conan:/content${webstart_target}"/>
+             <arg line="-p -r IDV www:/content${webstart_target}"/>
         </exec>
 
 
