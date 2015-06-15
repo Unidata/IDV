@@ -20,8 +20,6 @@
 
 package ucar.unidata.view.geoloc;
 
-
-
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -31,7 +29,6 @@ import ucar.unidata.geoloc.projection.LatLonProjection;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.GeoUtils;
@@ -74,7 +71,6 @@ import visad.georef.EarthLocationTuple;
 import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -112,7 +108,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-
 /**
  * Provides a navigated VisAD DisplayImpl for displaying data.
  * The Projection or MapProjection provides the transformation from
@@ -125,6 +120,7 @@ import javax.swing.JToolBar;
  *
  * @author Don Murray
  */
+
 public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
     /**
@@ -262,6 +258,9 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
 
     /** The lon scale info */
     private LatLonAxisScaleInfo lonScaleInfo;
+    
+    /** The vertical scale info */
+    private VertScaleInfo vertScaleInfo;
 
     /** The MapProjection */
     private MapProjection mapProjection;
@@ -963,22 +962,86 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
      * @throws VisADException   problem creating some VisAD object
      * @throws RemoteException   problem creating remote object
      */
+    
     private void updateVertScale(AxisScale scale, String title,
                                  double[] maxmin, double bottom, double top)
             throws VisADException, RemoteException {
-        scale.setVisible(getVerticalRangeVisible());
+    	
+    	scale.setVisible(getVerticalRangeVisible());
         scale.setSnapToBox(true);
-        scale.setTitle(title);
-
-        Hashtable<Double, String> labelTable = new Hashtable<Double,
-                                                   String>();
+        
+        // TJJ 2014 - we are letting user choose their own title now if they want.
+        // Commented out line below was pulling from verticalParameter. May want
+        // to try letting displayed data drive the axis title at some point.
+        // scale.setTitle(title);
+        
+        scale.setTitle(getVertScaleInfo().getLabel());
+        
+        List<Double> majorTicks   = new ArrayList<Double>();
+        int          minorIncrement = getVertScaleInfo().getMinorDivision();
+        List<Double> minorTicks   = new ArrayList<Double>();
+        double majorIncrement = getVertScaleInfo().getMajorIncrement();
+        
+        Hashtable<Double, String> labelTable = new Hashtable<Double, String>();
 
         labelTable.put(new Double(maxmin[0]), labelFormat.format(bottom));
         labelTable.put(new Double(maxmin[1]), labelFormat.format(top));
         scale.setLabelTable(labelTable);
         scale.setTickBase(maxmin[0]);
-        scale.setMajorTickSpacing(Math.abs(maxmin[1] - maxmin[0]));
-        scale.setMinorTickSpacing(Math.abs(maxmin[1] - maxmin[0]));
+        
+        int majorCount = 0;
+        // scale mapping for previous pass through loop
+        double prevMap = maxmin[0];
+        // map increment from previous major to next minor tick
+        double tmpIncr = 0.0d;
+        double rangeMap = 0.0d;
+
+        for (double i = bottom; i < top; i += majorIncrement) {
+
+        	// Values that are not in this range are not visible.
+        	if (i < bottom) {
+        		continue;
+        	}
+
+        	rangeMap = maxmin[0] + (maxmin[1] - maxmin[0]) / (top - bottom) * (i - bottom);
+
+    		majorTicks.add(rangeMap);
+    		labelTable.put(rangeMap, labelFormat.format(bottom + (majorCount * majorIncrement)));
+    		majorCount++;
+
+    		// do minor increment labeling, if needed
+    		if (minorIncrement > 1) {
+				tmpIncr = (Math.abs(rangeMap - prevMap)) / minorIncrement;
+				// skip minor increments if major increment is the max
+				if ((top != majorIncrement)) {
+    				for (int j = 0; j < minorIncrement; j++) {
+    					minorTicks.add(prevMap + (tmpIncr * j));
+    				}
+				}
+    		}
+
+    		prevMap = rangeMap;
+
+        }
+        
+        // see if the top should be labeled too. will label if it's within a delta
+        // I have found elsewhere in this file
+        if ((top % majorIncrement) < 0.0001) {
+    		majorTicks.add(maxmin[1]);
+    		labelTable.put(maxmin[1], labelFormat.format(top));
+    		// do minor increment labeling, if needed
+    		if (minorIncrement > 1) {
+    			if (majorCount > 0) {
+    				tmpIncr = (Math.abs(maxmin[1] - prevMap)) / minorIncrement;
+    				for (int j = 1; j < minorIncrement; j++) {
+    					minorTicks.add(prevMap + (tmpIncr * j));
+    				}
+    			}
+    		}
+        }
+        
+        finalizeAxis(scale, getVertScaleInfo().getLabel(), labelTable,
+                majorTicks, minorTicks, getVertScaleInfo().getFont());
     }
 
     /**
@@ -1257,6 +1320,38 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         }
 
         return latScaleInfo;
+    }
+    
+    /**
+     * Gets the vertical scale info.
+     *
+     * @return the vertical scale info
+     */
+    
+    public VertScaleInfo getVertScaleInfo() {
+    	
+    	if (vertScaleInfo == null) {
+    		vertScaleInfo = new VertScaleInfo(minVerticalRange, maxVerticalRange);
+    		vertScaleInfo.setVisible(true);
+    		// we'll start the major increment at a reasonable number of ticks
+    		vertScaleInfo.setMajorIncrement((maxVerticalRange - minVerticalRange) / VertScaleInfo.DEFAULT_MAJ_DIVISIONS);
+    	}
+
+    	return vertScaleInfo;
+    }
+    
+    /**
+     * Sets the vertical scale info.
+     *
+     * @param vertScaleInfo the new vertical scale info
+     * @throws RemoteException the remote exception
+     * @throws VisADException the vis ad exception
+     */
+    
+    public void setVertScaleInfo(VertScaleInfo vertScaleInfo)
+            throws RemoteException, VisADException {
+        this.vertScaleInfo = vertScaleInfo;
+        makeVerticalScale();
     }
 
     /**

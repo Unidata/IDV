@@ -222,6 +222,9 @@ public class ViewpointControl implements ActionListener {
 
     /** Keep the dialog around for setting the state */
     private VertScaleDialog vsDialog;
+    
+    /** Keep the current state of the vertical axis */
+    private VertScaleInfo vsi;
 
     /**
      * Construct a new ViewpointControl for the NavigatedDisplay.
@@ -312,12 +315,8 @@ public class ViewpointControl implements ActionListener {
             setWestView();
         } else if (cmd.equals(CMD_ROTATEDIALOG)) {
             rotateViewpoint(new ViewpointInfo(vpAz, vpTilt));
-        } else if (cmd.equals(CMD_SETVERTICALRANGE)
-                   || cmd.equals(CMD_SETVERTICALSCALE)) {
-            double[] range = navDisplay.getVerticalRange();
-            Unit     u     = navDisplay.getVerticalRangeUnit();
-
-            changeVerticalRange(new VertScaleInfo(range[0], range[1], u));
+        } else if (cmd.equals(CMD_SETVERTICALRANGE) || cmd.equals(CMD_SETVERTICALSCALE)) {
+            changeVerticalRange(getVsi());
         } else if (cmd.equals(CMD_SETEYEPOSITION)) {
             changeEyePosition();
         }
@@ -605,7 +604,7 @@ public class ViewpointControl implements ActionListener {
      * @param viewMenu Menu to add item to
      */
     public void makeVerticalRangeMenuItem(JMenu viewMenu) {
-        JMenuItem mi = new JMenuItem("Vertical Range...");
+        JMenuItem mi = new JMenuItem("Vertical Scale...");
 
         viewMenu.add(mi);
         mi.setMnemonic('V');
@@ -883,6 +882,18 @@ public class ViewpointControl implements ActionListener {
     }
 
     /**
+	 * @return the vsi
+	 */
+	protected VertScaleInfo getVsi() {
+		if (vsi == null) {
+			double[] range = navDisplay.getVerticalRange();
+			Unit u = navDisplay.getVerticalRangeUnit();
+			vsi = new VertScaleInfo(range[0], range[1], u);
+		}
+		return vsi;
+	}
+
+	/**
      * Make the vertical scale widget
      *
      * @param visible  true to be visible
@@ -900,12 +911,10 @@ public class ViewpointControl implements ActionListener {
      * @return vertical range widget
      */
     public VertScaleDialog makeVerticalRangeWidget(boolean visible) {
-        double[]      range = navDisplay.getVerticalRange();
-        Unit          u     = navDisplay.getVerticalRangeUnit();
-        VertScaleInfo temp  = new VertScaleInfo(range[0], range[1], u);
-        temp.visible = visible;
+        VertScaleInfo tmpVsi = getVsi();
+        tmpVsi.visible = visible;
         return new VertScaleDialog(
-            GuiUtils.getFrame(navDisplay.getComponent()), this, temp);
+            GuiUtils.getFrame(navDisplay.getComponent()), this, tmpVsi);
     }
 
     /**
@@ -924,13 +933,14 @@ public class ViewpointControl implements ActionListener {
      * @param transfer  vertical range information
      */
     public void changeVerticalRange(VertScaleInfo transfer) {
+    	vsi = transfer;
         if (vsDialog == null) {
             if (navDisplay instanceof GlobeDisplay) {
                 vsDialog = new GlobeScaleDialog(
-                    GuiUtils.getFrame(navDisplay.getComponent()), this);
+                    GuiUtils.getFrame(navDisplay.getComponent()), this, vsi);
             } else {
                 vsDialog = new VertScaleDialog(
-                    GuiUtils.getFrame(navDisplay.getComponent()), this);
+                    GuiUtils.getFrame(navDisplay.getComponent()), this, vsi);
             }
         }
 
@@ -947,6 +957,7 @@ public class ViewpointControl implements ActionListener {
      */
     protected void applyVerticalScale(VertScaleInfo transfer)
             throws Exception {
+    	vsi = transfer;
     	applyVerticalRange(transfer);
     }
     
@@ -959,7 +970,13 @@ public class ViewpointControl implements ActionListener {
      */
     protected void applyVerticalRange(VertScaleInfo transfer)
             throws Exception {
+    	vsi = transfer;
         navDisplay.setDisplayInactive();
+        // TJJ 2014 - Inq #1408
+        // User made updates to vertical scale, notify MapProjectionDisplay to redraw
+        if (navDisplay instanceof MapProjectionDisplay) {
+        	((MapProjectionDisplay) navDisplay).setVertScaleInfo(transfer);
+        }
         navDisplay.setVerticalRangeVisible(transfer.visible);
         navDisplay.setVerticalRangeUnit(transfer.unit);
         navDisplay.setVerticalRange(transfer.minVertRange,

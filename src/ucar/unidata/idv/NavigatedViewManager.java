@@ -402,7 +402,9 @@ public abstract class NavigatedViewManager extends ViewManager {
 
         boolean b = vertRangeWidget.isAxisVisible();
 
-        setBp(PREF_SHOWSCALES, b);
+        // don't set PREF_SHOWSCALES here!  we don't want the
+        // 'master' switch set by the individual axis visibility
+        //setBp(PREF_SHOWSCALES, b);
 
         return vertRangeWidget.doApply();
     }
@@ -414,10 +416,12 @@ public abstract class NavigatedViewManager extends ViewManager {
      */
     protected void addPropertiesComponents(JTabbedPane tabbedPane) {
         super.addPropertiesComponents(tabbedPane);
+        // set vertical range "visible" checkbox to current status of
+        // individual vert axis visibility, independent of global
+        // 'show display scales' switch
         vertRangeWidget = getViewpointControl().makeVerticalRangeWidget(
-            getBp(PREF_SHOWSCALES));
-        tabbedPane.add("Vertical Range", GuiUtils.topLeft(vertRangeWidget));
-        vertRangeWidget.getVertScaleInfo().visible = getBp(PREF_SHOWSCALES);
+            getNavigatedDisplay().getVerticalRangeVisible());
+        tabbedPane.add("Vertical Scale", GuiUtils.topLeft(vertRangeWidget));
 
     }
 
