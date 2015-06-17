@@ -1218,7 +1218,26 @@ public class StringUtil {
     return items;
   }
 
-
+  /**
+   * Parse the given string and return a list of flost values.
+   * <p/>
+   * So s can be:
+   * <pre>
+   * 1.0,2.0,3.0   - the numbers 1.0 2.0 and 3.0
+   * </pre>
+   *
+   * @param s The string to parse
+   * @return List of Integers
+   */
+  public static List parseFloatListString(String s) {
+    List items = new ArrayList();
+    List tokens = split(s, ",");
+    for (int tokIdx = 0; tokIdx < tokens.size(); tokIdx++) {
+      String token = (String) tokens.get(tokIdx);
+        items.add(new Float(token));
+    }
+    return items;
+  }
   /**
    * This splits the given content String into a set of lines
    * (delimited by the given lineDelimiter).

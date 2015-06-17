@@ -37,14 +37,8 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
-import visad.Data;
-import visad.DisplayRealType;
-import visad.FieldImpl;
-import visad.Real;
-import visad.RealType;
-import visad.ScalarMap;
-import visad.Unit;
-import visad.VisADException;
+import ucar.visad.data.CalendarDateTime;
+import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.MapProjection;
@@ -742,5 +736,33 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
      */
     protected boolean shouldAddControlListener() {
         return true;
+    }
+
+    /**
+     * Apply the forecast hour macro
+     *
+     * @param t label string
+     * @param currentTime first time
+     *
+     * @return modified string
+     */
+    protected String applyForecastHourMacro(String t, DateTime currentTime) {
+        if (hasForecastHourMacro(t)) {
+            String v = "";
+            CalendarDateTime fTime = (CalendarDateTime)getDataChoice().getAllDateTimes().get(0);
+            if ((currentTime != null) && (fTime != null)) {
+                try {
+                    double diff =
+                            currentTime.getValue(CommonUnit.secondsSinceTheEpoch)
+                                    - fTime.getValue(CommonUnit.secondsSinceTheEpoch);
+                    v = ((int) (diff / 60 / 60)) + "";
+                } catch (Exception exc) {
+                    System.err.println("Error:" + exc);
+                    exc.printStackTrace();
+                }
+            }
+            return t.replace(MACRO_FHOUR2, v).replace(MACRO_FHOUR, v + "H");
+        }
+        return t;
     }
 }
