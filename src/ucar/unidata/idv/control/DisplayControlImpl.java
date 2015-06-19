@@ -3965,6 +3965,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                 .getDefaultTimeZone());
                     if(i == 0 && hasForecastHourMacro(label)){
                         String rtime = (String)this.getDataChoice().getProperty("RUNTIME");
+                        if(rtime == null && this.getDataChoice() instanceof DerivedDataChoice){
+                            DataChoice childChoice = (DataChoice)((DerivedDataChoice) this.getDataChoice()).getChoices().get(0);
+                            rtime = (String)childChoice.getProperty("RUNTIME");
+                        }
                         if(rtime != null && rtime.length() > 0)
                             fhour = StringUtil.parseFloatListString(rtime);
                     }
