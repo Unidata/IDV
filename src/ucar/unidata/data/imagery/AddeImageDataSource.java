@@ -35,6 +35,7 @@ import ucar.unidata.idv.IdvPersistenceManager;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.util.StringUtil;
 import visad.Data;
 import visad.VisADException;
 
@@ -416,8 +417,10 @@ public class AddeImageDataSource extends ImageDataSource {
             addeImageDataSelection.getAdvancedPanel().setLineMagSlider(dlMag);
             addeImageDataSelection.getAdvancedPanel().setElementMagSlider(deMag);
         } else if ( !isProgressiveResolution) {
-            dlMag = addeImageDataSelection.getAdvancedPanel().getLineMagValue();
-            deMag = addeImageDataSelection.getAdvancedPanel().getElementMagValue();
+            dlMag = Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
+                    .lineMagLbl.getText().trim());
+            deMag = Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
+                    .elementMagLbl.getText().trim());
         }
 
 
