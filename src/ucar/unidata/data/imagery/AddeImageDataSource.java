@@ -36,6 +36,7 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
+
 import visad.Data;
 import visad.VisADException;
 
@@ -212,7 +213,9 @@ public class AddeImageDataSource extends ImageDataSource {
 
         if ((this.source == null) && (imageList != null)
                 && (imageList.size() > 0)) {
-            List    descriptors = super.getDescriptors(super.findDataChoice(this.choiceName), null);
+            List descriptors =
+                super.getDescriptors(super.findDataChoice(this.choiceName),
+                                     null);
             AddeImageDescriptor desc1 =
                 (AddeImageDescriptor) descriptors.get(0);
             this.source = desc1.getSource();
@@ -232,8 +235,10 @@ public class AddeImageDataSource extends ImageDataSource {
             }
             this.descriptor = new AddeImageDescriptor(thisDir, null);
             List<DataSelectionComponent> dataSelectionComponents =
-                    new ArrayList<DataSelectionComponent>();
-            initDataSelectionComponents(dataSelectionComponents, super.findDataChoice(this.choiceName) );
+                new ArrayList<DataSelectionComponent>();
+            initDataSelectionComponents(
+                dataSelectionComponents,
+                super.findDataChoice(this.choiceName));
         }
     }
 
@@ -286,8 +291,8 @@ public class AddeImageDataSource extends ImageDataSource {
             return "PROD";
         } else if (description.contains("Radiance")) {
             return "RAD";
-        //} else if (description.contains("Reflectivity")) {
-        //    return "ECHO";
+            //} else if (description.contains("Reflectivity")) {
+            //    return "ECHO";
         } else if (description.contains("Vip level")) {
             return "VIP";
         } else if (description.contains("Vertical h2o")) {
@@ -324,7 +329,7 @@ public class AddeImageDataSource extends ImageDataSource {
                                  IdvConstants.PROP_LOADINGXML, false);
 
         String t1 = subset.getProperty(DataSelection.PROP_REGIONOPTION,
-                DataSelection.PROP_USEDEFAULTAREA);
+                                       DataSelection.PROP_USEDEFAULTAREA);
         String navType = subset.getProperty("navType", "X");
 
         String unitStr = getUnitString(dataChoice.getDescription());
@@ -345,14 +350,15 @@ public class AddeImageDataSource extends ImageDataSource {
 
             } else {
                 AddeImageDescriptor desc1 =
-                        (AddeImageDescriptor) descriptors.get(0);
+                    (AddeImageDescriptor) descriptors.get(0);
                 this.source = desc1.getSource();
                 allBandDirs = (Hashtable) getProperties().get("allBands");
                 ArrayList oj = (ArrayList) getProperties().get("bandinfo");
                 if (oj != null) {
                     this.bandId = (BandInfo) oj.get(0);
                 }
-                String zpath1 = (String) getIdv().getStateManager().getProperty(
+                String zpath1 =
+                    (String) getIdv().getStateManager().getProperty(
                         IdvPersistenceManager.PROP_ZIDVPATH);
                 AreaDirectory thisDir;
                 if ((zpath1 != null) && (zpath1.length() > 0)) {
@@ -365,14 +371,16 @@ public class AddeImageDataSource extends ImageDataSource {
                 // (AreaDirectory) allBandDirs.get(this.bandId.getBandNumber());
                 this.source = getPreviewSource(this.source, thisDir);
                 if (oj != null) {
-                    this.source =
-                            replaceKey(this.source, "BAND",
-                                    Integer.toString(this.bandId.getBandNumber()));
+                    this.source = replaceKey(
+                        this.source, "BAND",
+                        Integer.toString(this.bandId.getBandNumber()));
                 }
                 this.descriptor = new AddeImageDescriptor(thisDir, null);
                 List<DataSelectionComponent> dataSelectionComponents =
-                        new ArrayList<DataSelectionComponent>();
-                initDataSelectionComponents(dataSelectionComponents, super.findDataChoice(this.choiceName) );
+                    new ArrayList<DataSelectionComponent>();
+                initDataSelectionComponents(
+                    dataSelectionComponents,
+                    super.findDataChoice(this.choiceName));
             }
 
             if (baseAnav == null) {
@@ -382,14 +390,14 @@ public class AddeImageDataSource extends ImageDataSource {
                     baseAnav = areaFile.getNavigation();
                     acs      = new AREACoordinateSystem(areaFile);
                 } catch (Exception e) {
-                    LogUtil.userErrorMessage(
-                        "Error in getDescriptors  e=" + e);
+                    LogUtil.userErrorMessage("Error in getDescriptors  e="
+                                             + e);
                 }
             }
 
             if ((ver == null)
                     || (Character.getNumericValue(ver.charAt(0)) < 5)) {
-                return descriptors;    //old bundle
+                return descriptors;  //old bundle
             }
             //BandInfo id = (BandInfo) dataChoice.getId();
             //AreaDirectory thisDir =
@@ -404,36 +412,39 @@ public class AddeImageDataSource extends ImageDataSource {
         }
 
 
-        int         dlMag = 0;
-        int         deMag = 0;
+        int dlMag = 0;
+        int deMag = 0;
 
         isProgressiveResolution =
             subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION,
                                true);
 
-        if( fromBundle && !isProgressiveResolution){
+        if (fromBundle && !isProgressiveResolution) {
             dlMag = getLineMag();
             deMag = getEleMag();
             addeImageDataSelection.getAdvancedPanel().setLineMagSlider(dlMag);
-            addeImageDataSelection.getAdvancedPanel().setElementMagSlider(deMag);
+            addeImageDataSelection.getAdvancedPanel().setElementMagSlider(
+                deMag);
         } else if ( !isProgressiveResolution) {
-            dlMag = Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
+            dlMag =
+                Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
                     .lineMagLbl.getText().trim());
-            deMag = Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
+            deMag =
+                Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
                     .elementMagLbl.getText().trim());
         }
 
 
         if (geoSelection != null) {
-            Rectangle2D rect  = geoSelection.getScreenBound();
+            Rectangle2D rect = geoSelection.getScreenBound();
             ImageDataSelectionInfo adSource =
-                    (ImageDataSelectionInfo) subset.getProperty(
-                            "advancedURL");
-            if (geoSelection.getBoundingBox() == null && adSource != null) {
+                (ImageDataSelectionInfo) subset.getProperty("advancedURL");
+            if ((geoSelection.getBoundingBox() == null)
+                    && (adSource != null)) {
 
                 //ImageDataSelectionInfo adSource =
-                 //   (ImageDataSelectionInfo) subset.getProperty(
-                 //       "advancedURL");
+                //   (ImageDataSelectionInfo) subset.getProperty(
+                //       "advancedURL");
 
                 int lines = adSource.getLines()
                             * Math.abs(adSource.getLineMag());;
@@ -448,8 +459,11 @@ public class AddeImageDataSource extends ImageDataSource {
                     // eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                     lineMag = calculateMagFactor(lines,
                             (int) rect.getHeight());
-                    if (isProgressiveResolution && navType.equals("LALO"))
-                        lineMag = (lineMag >= 2) ? lineMag/2 : 1;
+                    if (isProgressiveResolution && navType.equals("LALO")) {
+                        lineMag = (lineMag >= 2)
+                                  ? lineMag / 2
+                                  : 1;
+                    }
                     // lineMag = calculateMagFactor(lines,
                     //         (int) rect.getHeight()) - 1;
                     //lineMag = eleMag / elFactor;
@@ -461,7 +475,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
                 //System.out.println(
                 //    "Magnification factor of line X element : " + lineMag
-                 //   + " " + eleMag);
+                //   + " " + eleMag);
                 int newLines;
                 int newelems;
 
@@ -536,12 +550,15 @@ public class AddeImageDataSource extends ImageDataSource {
                         String locateValue = cline + " " + celem;
 
 
-                        if (isProgressiveResolution && navType.equals("LALO")) {
+                        if (isProgressiveResolution
+                                && navType.equals("LALO")) {
                             //eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                             lineMag = calculateMagFactor(lines,
                                     (int) rect.getHeight());
-                            lineMag = (lineMag >= 2) ? lineMag/2 : 1;
-                            eleMag = lineMag * elFactor;
+                            lineMag = (lineMag >= 2)
+                                      ? lineMag / 2
+                                      : 1;
+                            eleMag  = lineMag * elFactor;
                         } else if (isProgressiveResolution) {
                             eleMag = calculateMagFactor(elems,
                                     (int) rect.getWidth());
@@ -582,9 +599,11 @@ public class AddeImageDataSource extends ImageDataSource {
                         } catch (Exception e) {}
                     } else {
                         LatLonRect bbox = mapInfo.getLatLonRect().intersect(
-                                ginfo.getLatLonRect());
-                        if(mapInfo.getLatLonRect().containedIn(ginfo.getLatLonRect()))
+                                              ginfo.getLatLonRect());
+                        if (mapInfo.getLatLonRect().containedIn(
+                                ginfo.getLatLonRect())) {
                             bbox = mapInfo.getLatLonRect();
+                        }
 
                         if (bbox == null) {
                             bbox = mapInfo.getLatLonRect();
@@ -608,7 +627,8 @@ public class AddeImageDataSource extends ImageDataSource {
                                             descriptors, maxLat, minLat,
                                             maxLon, minLon, elFactor, dlMag,
                                             deMag, "CENTER",
-                                            isProgressiveResolution, llp, navType);
+                                            isProgressiveResolution, llp,
+                                            navType);
                     }
 
 
@@ -616,23 +636,24 @@ public class AddeImageDataSource extends ImageDataSource {
             }
         }
         String magValue = "";
-       // if (isProgressiveResolution) {
-        if (eleMag >= 1 || lineMag >= 1) {
+        // if (isProgressiveResolution) {
+        if ((eleMag >= 1) || (lineMag >= 1)) {
             magValue = DataUtil.makeSamplingLabel(eleMag, lineMag, "pixel");
             //System.out.println("newLine X newElement : " + lineMag + " "+ eleMag);
             //magValue = "Resolution: " + "-" + Integer.toString(lineMag)
             //           + " " + "-" + Integer.toString(eleMag);
-         }
-       /* } else if (dlMag < -1 || deMag < -1) {
-            magValue = DataUtil.makeSamplingLabel(deMag, dlMag, "pixel");
-            //magValue = "Resolution: " + dlMag + " " + deMag;
-        } */
+        }
+        /* } else if (dlMag < -1 || deMag < -1) {
+             magValue = DataUtil.makeSamplingLabel(deMag, dlMag, "pixel");
+             //magValue = "Resolution: " + dlMag + " " + deMag;
+         } */
         //if ( magValue != null ) {
         dataChoice.setProperty("MAG", magValue);
         //}
 
-        if(fromBundle)
+        if (fromBundle) {
             return descriptors;
+        }
 
         Hashtable dp = new Hashtable();
         dp.put("descriptorsToSave", descriptors);
@@ -817,16 +838,17 @@ public class AddeImageDataSource extends ImageDataSource {
         int outElem    = inElem;
         int outLine    = inLine;
 
-        if(navType.equals("LALO")){
+        if (navType.equals("LALO")) {
             while (outLine > 450) {
                 lineFactor += 1;
                 outLine    = inLine / lineFactor;
             }
             inLineMag *= lineFactor;
             inElemMag = inLineMag / elFactor;
-            if(inElemMag == 0)
+            if (inElemMag == 0) {
                 inElemMag = 1;
-            outElem   = inElem / inElemMag;
+            }
+            outElem = inElem / inElemMag;
         } else {
             while (outElem > 450) {
                 elemFactor += 1;
@@ -834,9 +856,10 @@ public class AddeImageDataSource extends ImageDataSource {
             }
             inElemMag *= elemFactor;
             inLineMag = inElemMag / elFactor;
-            if(inLineMag == 0)
+            if (inLineMag == 0) {
                 inLineMag = 1;
-            outLine   = inLine / inLineMag;
+            }
+            outLine = inLine / inLineMag;
         }
         // alway in the center of the image and this is why it is divided by 2
         int cline = inLine / 2;
@@ -983,7 +1006,8 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     public void reloadData() {
         //super.reloadData();
-        if( addeImageDataSelection != null && addeImageDataSelection.leMagPanel != null) {
+        if ((addeImageDataSelection != null)
+                && (addeImageDataSelection.leMagPanel != null)) {
             addeImageDataSelection.advancedPanel.updateMagPanel();
             addeImageDataSelection.advancedPanel.setLineMagSlider(lineMag);
             addeImageDataSelection.advancedPanel.setElementMagSlider(eleMag);
@@ -1004,6 +1028,7 @@ public class AddeImageDataSource extends ImageDataSource {
      * @param lineMag _more_
      * @param eleMag _more_
      * @param unit _more_
+     * @param nav _more_
      *
      *
      * @return _more_
@@ -1012,7 +1037,8 @@ public class AddeImageDataSource extends ImageDataSource {
      */
     static public List reSetImageDataDescriptor(List despList,
             String locateKey, String locateValue, String PlaceValue,
-            int lines, int elems, int lineMag, int eleMag, String unit, String nav)
+            int lines, int elems, int lineMag, int eleMag, String unit,
+            String nav)
             throws RemoteException, VisADException {
 
         List descriptorList = new ArrayList();
@@ -1021,8 +1047,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 (AddeImageDescriptor) despList.get(i);
             AddeImageInfo info = imageDescriptor.getImageInfo();
 
-            info.setElementMag(-1*eleMag);
-            info.setLineMag(-1*lineMag);
+            info.setElementMag(-1 * eleMag);
+            info.setLineMag(-1 * lineMag);
 
             if (locateKey != null) {
                 info.setLocateKey(locateKey);
@@ -1032,11 +1058,11 @@ public class AddeImageDataSource extends ImageDataSource {
                 //set center
                 info.setLocateValue(locateValue);
             }
-       /*     if(lines == 0 && elems == 0){
-                AreaDirectory ad = imageDescriptor.getDirectory();
-                lines = ad.getLines()/lineMag;
-                elems = ad.getElements()/lineMag;
-            }  */
+            /*     if(lines == 0 && elems == 0){
+                     AreaDirectory ad = imageDescriptor.getDirectory();
+                     lines = ad.getLines()/lineMag;
+                     elems = ad.getElements()/lineMag;
+                 }  */
             info.setLines(lines);
             info.setElements(elems);
             String sizeValue = Integer.toString(lines) + " "
@@ -1045,14 +1071,15 @@ public class AddeImageDataSource extends ImageDataSource {
                               + Integer.toString(eleMag);
             String source = imageDescriptor.getSource();
 
-            if(getKey(source, locateKey) != null && getKey(source, locateKey).length() > 0){
+            if ((getKey(source, locateKey) != null)
+                    && (getKey(source, locateKey).length() > 0)) {
                 source = replaceKey(source, locateKey, locateValue);
-            } else if (locateKey.equals(AddeImageURL.KEY_LATLON)){
+            } else if (locateKey.equals(AddeImageURL.KEY_LATLON)) {
                 source = replaceKey(source, AddeImageURL.KEY_LINEELE,
-                        AddeImageURL.KEY_LATLON, locateValue);
+                                    AddeImageURL.KEY_LATLON, locateValue);
             } else {
                 source = replaceKey(source, AddeImageURL.KEY_LATLON,
-                        AddeImageURL.KEY_LINEELE, locateValue);
+                                    AddeImageURL.KEY_LINEELE, locateValue);
             }
 
             source = replaceKey(source, AddeImageURL.KEY_PLACE, PlaceValue);
@@ -1063,7 +1090,7 @@ public class AddeImageDataSource extends ImageDataSource {
                 source = replaceKey(source, AddeImageURL.KEY_UNIT, unit);
             }
 
-            if(nav != null) {
+            if (nav != null) {
                 source = replaceKey(source, AddeImageURL.KEY_NAV, nav);
             }
             imageDescriptor.setSource(source);
@@ -1130,6 +1157,7 @@ public class AddeImageDataSource extends ImageDataSource {
      * @param placeValue _more_
      * @param isProgressiveResolution _more_
      * @param centerLLP _more_
+     * @param nav _more_
      *
      * @return _more_
      */
@@ -1202,10 +1230,11 @@ public class AddeImageDataSource extends ImageDataSource {
             }
             if (isProgressiveResolution && nav.equals("LALO")) {
                 //eleMag = calculateMagFactor(elems, (int) rect.getWidth());
-                lineMag = calculateMagFactor(lines,
-                        (int) rect.getHeight());
-                lineMag = (lineMag >= 2) ? lineMag/2 : 1;
-                eleMag = lineMag * factor;
+                lineMag = calculateMagFactor(lines, (int) rect.getHeight());
+                lineMag = (lineMag >= 2)
+                          ? lineMag / 2
+                          : 1;
+                eleMag  = lineMag * factor;
             } else if (isProgressiveResolution) {
                 eleMag = calculateMagFactor(elems, (int) rect.getWidth());
                 // int lineMag = calculateMagFactor(lines, (int) rect.getHeight());
@@ -1236,7 +1265,7 @@ public class AddeImageDataSource extends ImageDataSource {
 
             //System.out.println("Line: lines " + lines + " lineMag " + lineMag
             //                   + " newLines " + newLines + " displayH "
-             //                  + (int) rect.getHeight());
+            //                  + (int) rect.getHeight());
 
 
             String locateValue = null;
@@ -1347,11 +1376,11 @@ public class AddeImageDataSource extends ImageDataSource {
                 && ("BRIT".equals(val))) {
             returnString = replaceKey(returnString, AddeImageURL.KEY_SPAC,
                                       AddeImageURL.KEY_SPAC, SPACING_BRIT);
-        } /*else {
-            returnString = replaceKey(returnString, AddeImageURL.KEY_SPAC,
-                                      AddeImageURL.KEY_SPAC,
-                                      SPACING_NON_BRIT);
-        }   */
+        }  /*else {
+             returnString = replaceKey(returnString, AddeImageURL.KEY_SPAC,
+                                       AddeImageURL.KEY_SPAC,
+                                       SPACING_NON_BRIT);
+         }   */
         return returnString;
     }
 
@@ -1449,9 +1478,10 @@ public class AddeImageDataSource extends ImageDataSource {
         int           bindex = binfo.getBandNumber();
 
         allBandDirs.put(bindex, dir0);
-        String   magVal  = getKey(sourceStr, AddeImageURL.KEY_MAG);
-        if(magVal.length() == 0)
+        String magVal = getKey(sourceStr, AddeImageURL.KEY_MAG);
+        if (magVal.length() == 0) {
             return;
+        }
         String[] magVals = magVal.split(" ");
         eMag = new Integer(magVals[1]).intValue();
         lMag = new Integer(magVals[0]).intValue();
@@ -1538,16 +1568,16 @@ public class AddeImageDataSource extends ImageDataSource {
                     baseAnav = areaFile.getNavigation();
                     acs      = new AREACoordinateSystem(areaFile);
                 } catch (Exception e) {
-                   // LogUtil.userErrorMessage(
-                   //     "Error in initDataSelectionComponents  e=" + e);
+                    // LogUtil.userErrorMessage(
+                    //     "Error in initDataSelectionComponents  e=" + e);
                 }
 
                 this.bandId = id;
             }
 
             addeImageDataSelection = new AddeImageDataSelection(this,
-                        dataChoice, source, baseAnav, this.descriptor, acs,
-                        areaAdapter);
+                    dataChoice, source, baseAnav, this.descriptor, acs,
+                    areaAdapter);
 
 
 
