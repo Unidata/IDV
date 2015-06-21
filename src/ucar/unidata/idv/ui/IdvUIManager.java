@@ -6102,7 +6102,7 @@ public class IdvUIManager extends IdvManager {
                                          String stackTrace, JDialog dialog) {
 
         StringBuffer extra    = getSystemInfo();
-        List         entries  = new ArrayList();
+        List<HttpFormEntry> entries  = new ArrayList<>();
         StringBuffer javaInfo = new StringBuffer();
         javaInfo.append("Java: home: " + System.getProperty("java.home"));
         javaInfo.append(" version: " + System.getProperty("java.version"));
@@ -6214,7 +6214,7 @@ public class IdvUIManager extends IdvManager {
             getStore().put(PROP_HELP_EMAIL, emailEntry.getValue());
             getStore().save();
 
-            List entriesToPost = new ArrayList(entries);
+            List<HttpFormEntry> entriesToPost = new ArrayList<>(entries);
 
             if ((stackTrace != null) && (stackTrace.length() > 0)) {
                 entriesToPost.remove(descriptionEntry);
