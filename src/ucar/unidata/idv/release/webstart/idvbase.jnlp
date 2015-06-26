@@ -5,13 +5,13 @@
       <vendor>Unidata</vendor> 
       <offline-allowed/>
    </information> 
-   <resources> 
+   <resources>
+        <jar href="IDV/ncIdv.jar"/>
         <jar href="IDV/auxdata.jar"/>
         <jar href="IDV/external.jar"/>
         <jar href="IDV/jython.jar"/>
         <jar href="IDV/local-visad.jar"/>
         <jar href="IDV/visad.jar"/>
-        <jar href="IDV/ncIdv.jar"/>
         <extension name="Java3D" href="http://www.unidata.ucar.edu/software/idv/java3d/java3d-latest.jnlp"/>
    </resources> 
    <component-desc>
