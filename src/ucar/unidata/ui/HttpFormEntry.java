@@ -22,7 +22,6 @@
 
 package ucar.unidata.ui;
 
-import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -44,7 +43,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +56,8 @@ import java.util.List;
  */
 public class HttpFormEntry
 {
-
+    static String TESTURL = "http://putsreq.com/tM3n0JBWRCcNEEE32rF";
+    static boolean TESTING=true;
     //////////////////////////////////////////////////
     // Constants
 
@@ -87,6 +87,9 @@ public class HttpFormEntry
      * File reference
      */
     public static final int TYPE_FILE = 4;
+
+    protected static final Charset UTF8 = Charset.forName("UTF-8");
+    protected static final Charset ASCII = Charset.forName("US-ASCII");
 
     //////////////////////////////////////////////////
     // Instance Fields
@@ -155,6 +158,7 @@ public class HttpFormEntry
         this.name = name;
         type = TYPE_FILE;
         this.filePartSource = new ByteArrayBody(bytes, fileName);
+        this.fileName = fileName;
     }
 
     public HttpFormEntry(String name, String label, String value)
@@ -601,6 +605,8 @@ public class HttpFormEntry
      */
     public static String[] doPost(List<HttpFormEntry> entries, String urlPath)
     {
+        if(TESTING)
+            urlPath = TESTURL;
         try {
             try (HTTPMethod postMethod = getMethod(entries, urlPath)) {
                 postMethod.getSession().setMaxRedirects(5);
@@ -638,8 +644,9 @@ public class HttpFormEntry
             MultipartEntity mpe = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
             for(int i = 0; i < goodEntries.size(); i++) {
                 HttpFormEntry formEntry = goodEntries.get(i);
+                ContentBody part = null;
                 if(formEntry.type == TYPE_FILE) {
-                    mpe.addPart(formEntry.getName(), formEntry.getFilePart());
+                    part = formEntry.getFilePart();
                 } else {
                     //Not sure why but we have seen a couple of times
                     //the byte value '0' gets into one of these strings
@@ -647,15 +654,24 @@ public class HttpFormEntry
                     String value = formEntry.getValue();
                     char with = new String(" ").charAt(0);
                     value = value.replace((char) 0, with);
-                    mpe.addPart(formEntry.getName(), StringBody.create(value));
+                    try {
+                        part = StringBody.create(value,"text/plain",ASCII);
+                    } catch (Exception e) {
+                        throw e;
+                    }
                 }
+                mpe.addPart(formEntry.getName(), part);
             }
             postentity = mpe;
         } else {
             List<NameValuePair> params = new ArrayList<>();
             for(int i = 0; i < goodEntries.size(); i++) {
                 HttpFormEntry formEntry = goodEntries.get(i);
-                params.add(new BasicNameValuePair(formEntry.getName(), formEntry.getValue()));
+                try {
+                    params.add(new BasicNameValuePair(formEntry.getName(), formEntry.getValue()));
+                } catch (Exception e) {
+                    throw e;
+                }
             }
             UrlEncodedFormEntity uefe = new UrlEncodedFormEntity(params);
             postentity = uefe;
