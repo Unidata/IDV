@@ -612,10 +612,11 @@ public class HttpFormEntry
                 postMethod.getSession().setMaxRedirects(5);
                 postMethod.execute();
                 String result = IOUtil.readContents(postMethod.getResponseBodyAsStream());
-                if(postMethod.getStatusCode() >= 300)
-                    return new String[]{result, null};
+		int code = postMethod.getStatusCode();
+                if(code >= 300)
+                    return new String[]{result, null, code};
                 else
-                    return new String[]{null, result};
+                    return new String[]{null, result, code};
             }
         } catch (Exception exc) {
             throw new WrapperException("doing post", exc);
