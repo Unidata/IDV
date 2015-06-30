@@ -125,8 +125,8 @@ ${libsrc}/j3d/j3dcore.jar:${libsrc}/j3d/j3dutils.jar:${libsrc}/j3d/vecmath.jar;$
         <unjar src="${libsrc}/postgres.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/render.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/jfreechart.jar" dest="${tmpjardir}"/>
-        <!-- new httpclient for netCDF Java 4.4.X -->
 <!--
+        <! new httpclient for netCDF Java 4.4.X >
         <! keep for reflection related issues >
         <unjar src="${libsrc}/commons-httpclient-3.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/httpclient-4.2.6.jar" dest="${tmpjardir}"/>
