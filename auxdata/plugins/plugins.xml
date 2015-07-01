@@ -9,7 +9,7 @@
 <plugin name="TC IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/tcidv.jar" description="Shanghai Typhoon Institute IDV" category="Customized IDVs"/>
 -->
 
-<plugin name="UNAVCO IDV" url=" http://www.unavco.org/software/visualization/idv/unavcoidv.jar" description="UNAVCO's IDV plugin for supporting Geophysicical data sets" category="Customized IDVs"/>
+<plugin name="UNAVCO IDV" url="http://www.unavco.org/software/visualization/idv/unavcoidv.jar" description="UNAVCO's IDV plugin for supporting Geophysicical data sets" category="Customized IDVs"/>
 
 <plugin name="T-Rex IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/trex.jar" description="Configuration for the Terrain Induced Rotor Experiment (T-Rex) Field Project" category="Customized IDVs"/>
 
