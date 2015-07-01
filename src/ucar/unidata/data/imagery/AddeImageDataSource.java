@@ -427,11 +427,11 @@ public class AddeImageDataSource extends ImageDataSource {
                 deMag);
         } else if ( !isProgressiveResolution) {
             dlMag =
-                Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
-                    .lineMagLbl.getText().trim());
+                addeImageDataSelection.getAdvancedPanel().getLineMagValue();
+                   // .lineMagLbl.getText().trim());
             deMag =
-                Integer.parseInt(addeImageDataSelection.getAdvancedPanel()
-                    .elementMagLbl.getText().trim());
+                addeImageDataSelection.getAdvancedPanel().getElementMagValue();
+                  //  .elementMagLbl.getText().trim());
         }
 
 

@@ -2513,6 +2513,7 @@ public class AddeImageDataSelection {
                 } else {
                     gInfo = new GeoLocationInfo(latLonRect);
                 }
+                this.geoSelection = new GeoSelection(gInfo);
                 // update the advanced
                 float[][] latlon = new float[2][1];
                 latlon[1][0] = (float) gInfo.getMinLon();

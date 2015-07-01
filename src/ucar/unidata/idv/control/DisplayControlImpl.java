@@ -847,7 +847,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private List initialSettings;
 
     /** Data selection components from the data source for the properties dialog */
-    private List<DataSelectionComponent> dataSelectionComponents;
+    //private List<DataSelectionComponent> dataSelectionComponents;
 
     /**
      * the texture quality  (1= best, 10= moderate)
@@ -5891,7 +5891,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
 
-        dataSelectionComponents = null;
+        //dataSelectionComponents = null;
 
         List dataSources = Misc.makeUnique(getDataSources());
         geoSelectionPanel = null;
@@ -5905,7 +5905,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
 
 
-            try {
+       /*    try {
                 if (getDataChoice() != null) {
                     dataSelectionComponents =
                         dataSource.getDataSelectionComponents(
@@ -5914,8 +5914,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         for (DataSelectionComponent dsc :
                                 dataSelectionComponents) {
                             if (dsc.getShowInControlProperties()) {
-                                jtp.add(dsc.getName(),
-                                        dsc.getContents(getDataSelection()));
+                               // dsc.getContents(getDataSelection());
+                              //  jtp.add(dsc.getName(),
+                              //          dsc.getContents(getDataSelection()));
                             }
                         }
                     }
@@ -5923,7 +5924,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             } catch (Exception exc) {
                 logException("Initializing  properties", exc);
             }
-
+*/
         }
 
 
@@ -6186,14 +6187,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     needToReloadData = true;
                 }
             }
-            if (dataSelectionComponents != null) {
+       /*     if (dataSelectionComponents != null) {
                 for (DataSelectionComponent dsc : dataSelectionComponents) {
                     if (dsc.getShowInControlProperties()) {
                         dsc.applyToDataSelection(getDataSelection());
                         needToReloadData = true;
                     }
                 }
-            }
+            }*/
             if (dataSelectionWidget != null) {
                 List oldSelectedTimes = getDataSelection().getTimes();
                 List selectedTimes =
