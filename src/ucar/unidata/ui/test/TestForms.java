@@ -22,19 +22,18 @@
 
 package ucar.unidata.ui.test;
 
-import junit.framework.TestCase;
 import org.junit.Test;
 import ucar.httpservices.HTTPException;
 import ucar.unidata.ui.HttpFormEntry;
-import ucar.unidata.util.Diff;
-import ucar.unidata.util.Json;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Test HttpFormEntry
@@ -43,13 +42,13 @@ import java.util.Map;
  */
 
 
-public class TestForms extends TestCase
+public class TestForms extends UnitTestCommon
 {
 
     //////////////////////////////////////////////////
     // Constants
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     // Pick a URL to test
 
@@ -57,8 +56,6 @@ public class TestForms extends TestCase
     //static protected final String TESTURL = "http://www.unidata.ucar.edu/support/requestSupport.jsp";
 
     static protected final String TESTURL = "http://echo.httpkit.com";
-
-    static protected final String FAKEBOUNDARY = "XXXXXXXXXXXXXXXXXXX";
 
     // Field values to use
 
@@ -69,10 +66,13 @@ public class TestForms extends TestCase
     static final String SUBJECTENTRY = "test httpformentry";
     static final String NAGENTRY = "I have no idea";
     static final String VERSIONENTRY = "1.0";
-    static final String HARDWAREENTRY = "1.0";
+    static final String HARDWAREENTRY = "x86";
     static final String SOFTWAREPACKAGEENTRY = "IDV";
     static final String BUNDLETEXT = "bundle";
     static final String EXTRATEXT = "whatever";
+    static final String OSTEXT = System.getProperty("os.name");
+
+    static final char QUOTE = '"';
 
     //////////////////////////////////////////////////
     // Instance fields
@@ -188,15 +188,14 @@ public class TestForms extends TestCase
             throws IOException
     {
         Object json = Json.parse(body);
-        cleanup(json, multipart);
+        json = cleanup(json, multipart);
         String text = Json.toString(json);
-        body = text;
-        if(DEBUG) {
-            System.err.println("********************");
-            System.err.println(body);
-            System.err.println("********************");
-        }
-        String diffs = compare("TestMultipart", expectedMultipart, text);
+        text = localize(text, OSTEXT);
+        if(DEBUG)
+            visual(multipart?"TestMultipart":"TestSimple",text);
+        String diffs = compare(multipart ? "TestMultipart" : "TestSimple",
+                multipart ? expectedMultipart : expectedSimple,
+                text);
         if(diffs != null) {
             System.err.println(diffs);
             return false;
@@ -204,15 +203,17 @@ public class TestForms extends TestCase
         return true;
     }
 
-    protected void cleanup(Object o, boolean multipart)
+    protected Map<String, Object> cleanup(Object o, boolean multipart)
             throws HTTPException
     {
         Map<String, Object> map = (Map<String, Object>) o;
+        map = (Map<String, Object>) sort(map);
         Object oh = map.get("headers");
         String boundary = null;
         if(oh != null) {
             Map<String, Object> headers = (Map<String, Object>) oh;
             String formdata = (String) headers.get("content-type");
+            if(oh == null) formdata = (String) headers.get("Content-Type");
             if(oh != null) {
                 String[] pieces = formdata.split("[ \t]*[;][ \t]*");
                 for(String p : pieces) {
@@ -225,19 +226,131 @@ public class TestForms extends TestCase
             // Remove headers
             map.remove("headers");
         }
-        if(multipart && boundary != null) {
-            // Now parse and change the body
-            String body = (String) map.get("body");
-            if(body != null) {
-                String[] lines = body.split("\\r\\n");
-                for(int i = 0; i < lines.length; i++) {
-                    String line = lines[i];
-                    if(line.startsWith("--" + boundary))
-                        lines[i] = "--" + FAKEBOUNDARY;
-                }
-                map.put("body", join(lines, "\n"));
+        String body = (String) map.get("body");
+        if(body != null) {
+            if(multipart && boundary != null) {
+                Map<String, String> bodymap = parsemultipartbody(body);
+                map.put("body", mapjoin(bodymap, "\n", ": "));
+            } else {
+                Map<String, String> bodymap = parsesimplebody(body);
+                map.put("body", mapjoin(bodymap, "&","="));
             }
         }
+        return map;
+    }
+
+    protected String localize(String text, String os)
+            throws HTTPException
+    {
+        text = text.replace(os, "<OS_NAME>");
+	if(os.indexOf(' ') >= 0) 
+	    os = os.replace(' ', '+');
+        text = text.replace(os, "<OS+NAME>");
+        return text;
+    }
+
+    protected Object sort(Object o)
+    {
+        if(o instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) o;
+            map = new TreeMap(map); // Convert the map to sorted order
+            for(Map.Entry<String, Object> entry : map.entrySet()) {
+                map.put(entry.getKey(), sort(entry.getValue()));
+            }
+            return map;
+        } else if(o instanceof List) {
+            List<Object> list = (List) o;
+            List<Object> out = new ArrayList<>();
+            for(int i = 0; i < list.size(); i++) {
+                out.add(sort(list.get(i)));
+            }
+            return out;
+        } else
+            return o;
+    }
+
+    protected Map<String, String> parsesimplebody(String body)
+            throws HTTPException
+    {
+        Map<String, String> map = new TreeMap<>();
+        String[] pieces = body.split("[&]");
+        for(String piece : pieces) {
+            String[] pair = piece.split("[=]");
+            if(pair.length == 1) {
+                pair = new String[]{pair[0], ""};
+            }
+            if(pair[0] == null || pair[0].length() == 0)
+                throw new HTTPException("Illegal body : " + body);
+            map.put(pair[0], pair[1]);
+        }
+        return map;
+    }
+
+
+    static final Pattern blockb = Pattern.compile(
+            "--[^\n]*+[\n]", Pattern.DOTALL);
+
+    static final Pattern blockc = Pattern.compile(
+            "Content-Disposition:\\s+form-data;\\s+name="
+                    + "[\"]([^\"]*)[\"]"
+            , Pattern.DOTALL);
+
+    static final Pattern blockf = Pattern.compile(
+            "[;]\\s+filename="
+                    + "[\"]([^\"]*)[\"]"
+                    + "[\n][Cc]ontent-[Tt]ype[:]\\s*([^\n]*)"
+            , Pattern.DOTALL);
+
+    static final Pattern blockx = Pattern.compile(
+            "([^\n]*)[\n]"
+            , Pattern.DOTALL);
+
+
+    protected Map<String, String> parsemultipartbody(String body)
+            throws HTTPException
+    {
+        Map<String, String> map = new TreeMap<>();
+        body = body.replace("\r\n", "\n");
+        while(body.length() > 0) {
+            Matcher mb = blockb.matcher(body);
+            if(!mb.lookingAt()) {
+                throw new HTTPException("Missing boundary marker : " + body);
+            }
+            int len = mb.group(0).length();
+            body = body.substring(len);
+            if(body.length() == 0) break; // trailing boundary marker
+            Matcher mc = blockc.matcher(body);
+            if(!mc.lookingAt())
+                throw new HTTPException("Missing Content-type marker : " + body);
+            len = mc.group(0).length();
+            String name = mc.group(1);
+            body = body.substring(len);
+            Matcher mf = blockf.matcher(body);
+            String filename = null;
+            String contenttype = null;
+            if(mf.lookingAt()) {
+                filename = mf.group(1);
+                contenttype = mf.group(2);
+                len = mf.group(0).length();
+                body = body.substring(len);
+            }
+            // Skip the two newlines
+            if(!body.startsWith("\n\n"))
+                throw new HTTPException("Missing newlines");
+            body = body.substring(2);
+            // Extract the pieces
+            String value = null;
+            Matcher mx = blockx.matcher(body);
+            if(mx.lookingAt()) {
+                value = mx.group(1);
+                len = mx.group(0).length();
+                body = body.substring(len);
+            } else {
+                throw new HTTPException("Match failure at : " + body);
+            }
+            map.put(name, value);
+        }
+        return map;
     }
 
     static protected String join(String[] pieces, String sep)
@@ -250,101 +363,61 @@ public class TestForms extends TestCase
         return buf.toString();
     }
 
-    protected String compare(String tag, String baseline, String s)
+    static protected String mapjoin(Map<String, String> map, String sep1, String sep2)
     {
-        try {
-            // Diff the two print results
-            Diff diff = new Diff(tag);
-            StringWriter sw = new StringWriter();
-            boolean pass = !diff.doDiff(baseline, s, sw);
-            return (pass ? null : sw.toString());
-        } catch (Exception e) {
-            System.err.println("UnitTest: Diff failure: " + e);
-            return null;
+        StringBuilder buf = new StringBuilder();
+        boolean first = true;
+        for(Map.Entry<String, String> entry : map.entrySet()) {
+            if(!first) buf.append(sep1);
+            first = false;
+            buf.append(entry.getKey());
+            buf.append(sep2);
+            buf.append(entry.getValue());
         }
+        return buf.toString();
     }
 
     //////////////////////////////////////////////////
 
-    static final String expectedSimple =
-            "{\n"
-            +"  \"method\" : \"POST\",\n"
-            +"  \"uri\" : \"/\",\n"
-            +"  \"path\" : {\n"
-            +"    \"name\" : \"/\",\n"
-            +"    \"query\" : \"\",\n"
-            +"    \"params\" : {}\n"
-            +"  },\n"
-            +"  \"body\" : \"os=Windows+7&organization=UCAR&hardware=1.0&packageVersion=1.0&softwarePackage=IDV&submit=Send+Email&description=hello+world&subject=test+httpformentry&emailAddress=jones%40gmail.com&fullName=Jim+Jones\",\n"
-            +"  \"ip\" : \"127.0.0.1\",\n"
-            +"  \"powered-by\" : \"http://httpkit.com\",\n"
-            +"  \"docs\" : \"http://httpkit.com/echo\"\n"
-            +"}\n";
-
     static final String expectedMultipart =
             "{\n"
+            +"  \"body\" : \"attachmentOne: whatever\n"
+            +"attachmentTwo: bundle\n"
+            +"description: hello world\n"
+            +"emailAddress: jones@gmail.com\n"
+            +"fullName: Jim Jones\n"
+            +"hardware: x86\n"
+            +"organization: UCAR\n"
+            +"os: <OS_NAME>\n"
+            +"packageVersion: 1.0\n"
+            +"softwarePackage: IDV\n"
+            +"subject: test httpformentry\n"
+            +"submit: Send Email\",\n"
+            +"  \"docs\" : \"http://httpkit.com/echo\",\n"
+            +"  \"ip\" : \"127.0.0.1\",\n"
             +"  \"method\" : \"POST\",\n"
-            +"  \"uri\" : \"/\",\n"
             +"  \"path\" : {\n"
             +"    \"name\" : \"/\",\n"
-            +"    \"query\" : \"\",\n"
-            +"    \"params\" : {}\n"
+            +"    \"params\" : {},\n"
+            +"    \"query\" : \"\"\n"
             +"  },\n"
-            +"  \"body\" : \"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"os\"\n"
-            +"\n"
-            +"Windows 7\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"organization\"\n"
-            +"\n"
-            +"UCAR\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"attachmentOne\"; filename=\"extra.html\"\n"
-            +"Content-Type: application/octet-stream\n"
-            +"\n"
-            +"whatever\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"hardware\"\n"
-            +"\n"
-            +"1.0\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"packageVersion\"\n"
-            +"\n"
-            +"1.0\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"softwarePackage\"\n"
-            +"\n"
-            +"IDV\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"submit\"\n"
-            +"\n"
-            +"Send Email\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"attachmentTwo\"; filename=\"bundle.xidv\"\n"
-            +"Content-Type: application/octet-stream\n"
-            +"\n"
-            +"bundle\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"description\"\n"
-            +"\n"
-            +"hello world\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"subject\"\n"
-            +"\n"
-            +"test httpformentry\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"emailAddress\"\n"
-            +"\n"
-            +"jones@gmail.com\n"
-            +"--XXXXXXXXXXXXXXXXXXX\n"
-            +"Content-Disposition: form-data; name=\"fullName\"\n"
-            +"\n"
-            +"Jim Jones\n"
-            +"--XXXXXXXXXXXXXXXXXXX\",\n"
-            +"  \"ip\" : \"127.0.0.1\",\n"
             +"  \"powered-by\" : \"http://httpkit.com\",\n"
-            +"  \"docs\" : \"http://httpkit.com/echo\"\n"
+            +"  \"uri\" : \"/\"\n"
             +"}\n";
 
+    static final String expectedSimple =
+            "{\n"
+            +"  \"body\" : \"description=hello+world&emailAddress=jones%40gmail.com&fullName=Jim+Jones&hardware=x86&organization=UCAR&os=<OS+NAME>&packageVersion=1.0&softwarePackage=IDV&subject=test+httpformentry&submit=Send+Email\",\n"
+            +"  \"docs\" : \"http://httpkit.com/echo\",\n"
+            +"  \"ip\" : \"127.0.0.1\",\n"
+            +"  \"method\" : \"POST\",\n"
+            +"  \"path\" : {\n"
+            +"    \"name\" : \"/\",\n"
+            +"    \"params\" : {},\n"
+            +"    \"query\" : \"\"\n"
+            +"  },\n"
+            +"  \"powered-by\" : \"http://httpkit.com\",\n"
+            +"  \"uri\" : \"/\"\n"
+            +"}\n"
+            +"\n";
 }
-

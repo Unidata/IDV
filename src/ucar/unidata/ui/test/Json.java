@@ -1,4 +1,5 @@
 /*
+ *
  * Copyright  1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
@@ -18,15 +19,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package ucar.unidata.util;
+package ucar.unidata.ui.test;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.io.StreamTokenizer.*;
 
@@ -81,6 +79,7 @@ abstract public class Json
             tokens.wordChars('0', '9');
             tokens.wordChars('_', '_');
             tokens.wordChars('-', '-');
+            tokens.wordChars('$', '$');
             Object result = parseR(tokens);
             return result;
         }
@@ -157,7 +156,7 @@ abstract public class Json
                 throws IOException
         {
             assert (tokens.ttype == LBRACE);
-            Map<String, Object> map = new LinkedHashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();  // Keep insertion order
             loop:
             for(; ; ) {
                 int token = tokens.nextToken();
