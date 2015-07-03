@@ -163,7 +163,7 @@ public class TestForms extends UnitTestCommon
                 "packageVersion", "",
                 VERSIONENTRY));
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN, "os", "",
-                System.getProperty("os.name")));
+                OSTEXT));
         entries.add(new HttpFormEntry(HttpFormEntry.TYPE_HIDDEN, "hardware",
                 "", HARDWAREENTRY));
 
@@ -243,8 +243,8 @@ public class TestForms extends UnitTestCommon
             throws HTTPException
     {
         text = text.replace(os, "<OS_NAME>");
-	if(os.indexOf(' ') >= 0) 
-	    os = os.replace(' ', '+');
+	    if(os.indexOf(' ') >= 0)
+	        os = os.replace(' ', '+');
         text = text.replace(os, "<OS+NAME>");
         return text;
     }
