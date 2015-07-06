@@ -21,21 +21,21 @@
  */
 
 /**
-In order to test the changes to HttpFormEntry, I created
-a unit test for it. Testing http connections is always a bit
-tricky, so what I did was to use an echo service: http://echo.httpkit.com.
-The echo services accepts requests from some client and returns
-what it received in text form, but encoded in Json format.
-So, This test creates a form and sends it to the echo service.
-It collects the returned Json, processes it and compares it
-to expected value (see end of this file). Processing involves
-removing irrelevant info and converting changeable info
-to a fixed form or to removing it altogether. 
-(see the procedures process and cleanup).
-If, eventually, the echo service I am using goes away,
-then this test will need to be rewritten for some other
-echo service.
-*/
+ * In order to test the changes to HttpFormEntry, I created
+ * a unit test for it. Testing http connections is always a bit
+ * tricky, so what I did was to use an echo service: http://echo.httpkit.com.
+ * The echo services accepts requests from some client and returns
+ * what it received in text form, but encoded in Json format.
+ * So, This test creates a form and sends it to the echo service.
+ * It collects the returned Json, processes it and compares it
+ * to expected value (see end of this file). Processing involves
+ * removing irrelevant info and converting changeable info
+ * to a fixed form or to removing it altogether.
+ * (see the procedures process and cleanup).
+ * If, eventually, the echo service I am using goes away,
+ * then this test will need to be rewritten for some other
+ * echo service.
+ */
 
 
 package ucar.unidata.ui.test;
@@ -206,14 +206,15 @@ public class TestForms extends UnitTestCommon
             throws IOException
     {
         Object json = Json.parse(body);
+        if(DEBUG)
+            visual("Raw text", Json.toString(json));
         json = cleanup(json, multipart);
         String text = Json.toString(json);
         text = localize(text, OSTEXT);
         if(DEBUG)
-            visual(multipart?"TestMultipart":"TestSimple",text);
+            visual(multipart ? "TestMultipart" : "TestSimple", text);
         String diffs = compare(multipart ? "TestMultipart" : "TestSimple",
-                multipart ? expectedMultipart : expectedSimple,
-                text);
+                multipart ? expectedMultipart : expectedSimple, text);
         if(diffs != null) {
             System.err.println(diffs);
             return false;
@@ -251,7 +252,7 @@ public class TestForms extends UnitTestCommon
                 map.put("body", mapjoin(bodymap, "\n", ": "));
             } else {
                 Map<String, String> bodymap = parsesimplebody(body);
-                map.put("body", mapjoin(bodymap, "&","="));
+                map.put("body", mapjoin(bodymap, "&", "="));
             }
         }
         return map;
@@ -261,8 +262,8 @@ public class TestForms extends UnitTestCommon
             throws HTTPException
     {
         text = text.replace(os, "<OS_NAME>");
-	    if(os.indexOf(' ') >= 0)
-	        os = os.replace(' ', '+');
+        if(os.indexOf(' ') >= 0)
+            os = os.replace(' ', '+');
         text = text.replace(os, "<OS+NAME>");
         return text;
     }
@@ -399,43 +400,43 @@ public class TestForms extends UnitTestCommon
 
     static final String expectedMultipart =
             "{\n"
-            +"  \"body\" : \"attachmentOne: whatever\n"
-            +"attachmentTwo: bundle\n"
-            +"description: hello world\n"
-            +"emailAddress: jones@gmail.com\n"
-            +"fullName: Jim Jones\n"
-            +"hardware: x86\n"
-            +"organization: UCAR\n"
-            +"os: <OS_NAME>\n"
-            +"packageVersion: 1.0\n"
-            +"softwarePackage: IDV\n"
-            +"subject: test httpformentry\n"
-            +"submit: Send Email\",\n"
-            +"  \"docs\" : \"http://httpkit.com/echo\",\n"
-            +"  \"ip\" : \"127.0.0.1\",\n"
-            +"  \"method\" : \"POST\",\n"
-            +"  \"path\" : {\n"
-            +"    \"name\" : \"/\",\n"
-            +"    \"params\" : {},\n"
-            +"    \"query\" : \"\"\n"
-            +"  },\n"
-            +"  \"powered-by\" : \"http://httpkit.com\",\n"
-            +"  \"uri\" : \"/\"\n"
-            +"}\n";
+                    + "  \"body\" : \"attachmentOne: whatever\n"
+                    + "attachmentTwo: bundle\n"
+                    + "description: hello world\n"
+                    + "emailAddress: jones@gmail.com\n"
+                    + "fullName: Jim Jones\n"
+                    + "hardware: x86\n"
+                    + "organization: UCAR\n"
+                    + "os: <OS_NAME>\n"
+                    + "packageVersion: 1.0\n"
+                    + "softwarePackage: IDV\n"
+                    + "subject: test httpformentry\n"
+                    + "submit: Send Email\",\n"
+                    + "  \"docs\" : \"http://httpkit.com/echo\",\n"
+                    + "  \"ip\" : \"127.0.0.1\",\n"
+                    + "  \"method\" : \"POST\",\n"
+                    + "  \"path\" : {\n"
+                    + "    \"name\" : \"/\",\n"
+                    + "    \"params\" : {},\n"
+                    + "    \"query\" : \"\"\n"
+                    + "  },\n"
+                    + "  \"powered-by\" : \"http://httpkit.com\",\n"
+                    + "  \"uri\" : \"/\"\n"
+                    + "}\n";
 
     static final String expectedSimple =
             "{\n"
-            +"  \"body\" : \"description=hello+world&emailAddress=jones%40gmail.com&fullName=Jim+Jones&hardware=x86&organization=UCAR&os=<OS+NAME>&packageVersion=1.0&softwarePackage=IDV&subject=test+httpformentry&submit=Send+Email\",\n"
-            +"  \"docs\" : \"http://httpkit.com/echo\",\n"
-            +"  \"ip\" : \"127.0.0.1\",\n"
-            +"  \"method\" : \"POST\",\n"
-            +"  \"path\" : {\n"
-            +"    \"name\" : \"/\",\n"
-            +"    \"params\" : {},\n"
-            +"    \"query\" : \"\"\n"
-            +"  },\n"
-            +"  \"powered-by\" : \"http://httpkit.com\",\n"
-            +"  \"uri\" : \"/\"\n"
-            +"}\n"
-            +"\n";
+                    + "  \"body\" : \"description=hello+world&emailAddress=jones%40gmail.com&fullName=Jim+Jones&hardware=x86&organization=UCAR&os=<OS+NAME>&packageVersion=1.0&softwarePackage=IDV&subject=test+httpformentry&submit=Send+Email\",\n"
+                    + "  \"docs\" : \"http://httpkit.com/echo\",\n"
+                    + "  \"ip\" : \"127.0.0.1\",\n"
+                    + "  \"method\" : \"POST\",\n"
+                    + "  \"path\" : {\n"
+                    + "    \"name\" : \"/\",\n"
+                    + "    \"params\" : {},\n"
+                    + "    \"query\" : \"\"\n"
+                    + "  },\n"
+                    + "  \"powered-by\" : \"http://httpkit.com\",\n"
+                    + "  \"uri\" : \"/\"\n"
+                    + "}\n"
+                    + "\n";
 }
