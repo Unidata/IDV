@@ -239,6 +239,11 @@ public class GridTrajectoryControl extends DrawingControl {
     /** _more_ */
     private boolean backwardTrajectory = false;
 
+    /** _more_ */
+    protected DataSelection dataSelection1;
+
+    /** _more_ */
+    protected GridDataInstance gridDataInstance;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -246,7 +251,7 @@ public class GridTrajectoryControl extends DrawingControl {
         //setCoordType(DrawingGlyph.COORD_LATLON);
         setLineWidth(2);
         reallySetAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
-                                | FLAG_GRIDTRAJECTORY);
+                | FLAG_GRIDTRAJECTORY);
     }
 
 
@@ -307,7 +312,7 @@ public class GridTrajectoryControl extends DrawingControl {
          * @return _more_
          */
         public boolean getHaveInitialized() {
-            return true;
+                return true;
         }
 
 
@@ -581,7 +586,7 @@ public class GridTrajectoryControl extends DrawingControl {
          */
         private boolean trackDataOk() throws VisADException, RemoteException {
 
-            DataInstance dataInstance = getDataInstance();
+            DataInstance dataInstance = gtc.getDataInstance();
             if ((dataInstance == null) || !dataInstance.dataOk()) {
                 return false;
             }
@@ -613,6 +618,17 @@ public class GridTrajectoryControl extends DrawingControl {
          */
         protected FieldImpl getTrjGridDataInstance() {
             return trackGrid;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public GridDataInstance getGridDataInstance() {
+
+            return gtc.getGridDataInstance();
+
         }
 
     }
@@ -774,7 +790,12 @@ public class GridTrajectoryControl extends DrawingControl {
         if (wdc != null) {
             addDataChoice(wdc);
         }
-        DataSelection dataSelection1 = getDataSelection();
+
+     //   if(!isBundle) {
+        dataSelection1 = getDataSelection();
+
+        updateDataSelection(dataSelection1);
+
         Object        fromLevel      = dataSelection1.getFromLevel();
         dataSelection1.setLevel(null);
         u = (FieldImpl) udc.getData(dataSelection1);
@@ -787,14 +808,14 @@ public class GridTrajectoryControl extends DrawingControl {
         }
         sdc.setDataSelection(dataSelection1);
         s = (FieldImpl) sdc.getData(null);
-        doMakeDataInstance(sdc);
+        GridDataInstance gdi = (GridDataInstance)doMakeDataInstance(sdc);
 
 
-        GridDataInstance gdi = new GridDataInstance(sdc, getDataSelection(),
-                                   getRequestProperties());
+        //GridDataInstance gdi = new GridDataInstance(sdc, dataSelection1,
+         //                          getRequestProperties());
         setDataInstance(gdi);
         gridTrackControl.controlContext = getControlContext();
-        gridTrackControl.updateGridDataInstance(gdi);
+        //gridTrackControl.updateGridDataInstance(gdi);
         if (getDisplayUnit().equals(getDefaultDistanceUnit())) {
             setDisplayUnit(gdi.getRawUnit(0));
         }
@@ -935,6 +956,82 @@ public class GridTrajectoryControl extends DrawingControl {
     }
 
     /**
+     * Call this to reset the data before the calculation of the traj.
+     *
+     * @return true if everything is okay
+     *
+     * @throws RemoteException When bad things happen
+     * @throws VisADException When bad things happen
+     */
+    public boolean initData( )
+            throws VisADException, RemoteException {
+
+        DerivedDataChoice ddc = (DerivedDataChoice) dataChoice;
+        List choices0 = ddc.getChoices();
+        DerivedDataChoice ddc0 = (DerivedDataChoice) choices0.get(0);
+        Hashtable choices = ddc0.getUserSelectedChoices();
+        DataInstance di = getDataInstance();
+
+        int numChoices = choices.size();
+        if (numChoices == 2) {
+            is2DTraj = true;
+        }
+        DirectDataChoice udc =
+                (DirectDataChoice) choices.get(new String("D1"));
+        DirectDataChoice vdc =
+                (DirectDataChoice) choices.get(new String("D2"));
+        DirectDataChoice wdc =
+                (DirectDataChoice) choices.get(new String("D3"));
+        if (choices0.size() == 1) {
+            return false;
+        }
+        DataChoice sdc;
+
+        sdc = (DataChoice) choices0.get(1);
+        addDataChoice(udc);
+        addDataChoice(vdc);
+        if (wdc != null) {
+            addDataChoice(wdc);
+        }
+
+        //   if(!isBundle) {
+        dataSelection1 = getDataSelection();
+        //   } else {
+        updateDataSelection(dataSelection1);
+        //  }
+        Object fromLevel = dataSelection1.getFromLevel();
+        dataSelection1.setLevel(null);
+        u = (FieldImpl) udc.getData(dataSelection1);
+        v = (FieldImpl) vdc.getData(dataSelection1);
+        if (wdc != null) {
+            pw = (FieldImpl) wdc.getData(dataSelection1);
+        }
+        if (sdc == null) {
+            return false;
+        }
+        sdc.setDataSelection(dataSelection1);
+        s = (FieldImpl) sdc.getData(null);
+        GridDataInstance gdi = (GridDataInstance) doMakeDataInstance(sdc);
+
+
+        //GridDataInstance gdi = new GridDataInstance(sdc, dataSelection1,
+        //                          getRequestProperties());
+        setDataInstance(gdi);
+
+        return true;
+    }
+
+
+    @Override
+    public synchronized void dataChanged() {
+        try {
+            removeAllGlyphs();
+            initData();
+        }catch (Exception e){}
+
+    }
+
+    /**
      * _more_
      *
      * @param oldUnit _more_
@@ -964,7 +1061,7 @@ public class GridTrajectoryControl extends DrawingControl {
                 try {
                     synchronized (MUTEX) {
                         showWaitCursor();
-                        if ( !is2DTraj) {
+                        if (!is2DTraj) {
                             createTrajectoryControl();
                         } else {
                             create2DTrajectoryControl();
@@ -2089,4 +2186,33 @@ public class GridTrajectoryControl extends DrawingControl {
     public void setCoordinateType(int type) {
         coordinateType = type;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     */
+    protected DataInstance doMakeDataInstance(DataChoice dataChoice)
+            throws RemoteException, VisADException {
+        gridDataInstance = new GridDataInstance(dataChoice, getDataSelection(),
+                getRequestProperties(), null);
+        return gridDataInstance;
+
+    }
+    /**
+     * _more_
+     *
+     * @param
+     */
+    public GridDataInstance getGridDataInstance() {
+        if(this.gridDataInstance == null) {
+            try {
+                doMakeDataInstance(this.dataChoice);
+            } catch (Exception exce){}
+        }
+        return gridDataInstance;
+
+    }
+
 }
