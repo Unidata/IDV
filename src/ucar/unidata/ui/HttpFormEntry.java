@@ -22,6 +22,8 @@
 
 package ucar.unidata.ui;
 
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.content.StringBody;
 import ucar.httpservices.HTTPFactory;
 import ucar.httpservices.HTTPFormBuilder;
 import ucar.httpservices.HTTPMethod;
@@ -35,6 +37,8 @@ import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,12 +124,6 @@ public class HttpFormEntry
     private byte[] filePartSource;
 
     /**
-     * filename
-     */
-    private String fileName;
-
-
-    /**
      * Create an entry that already holds the byte contents of a file.
      * Having an entry like this will result in a multi-part post
      *
@@ -139,7 +137,7 @@ public class HttpFormEntry
         this.name = name;
         type = TYPE_FILE;
         this.filePartSource = bytes;
-        this.fileName = fileName;
+        this.value = fileName;
     }
 
 
@@ -397,16 +395,6 @@ public class HttpFormEntry
     }
 
     /**
-     * Get the file name
-     *
-     * @return The file name
-     */
-    public String getFileName()
-    {
-        return fileName;
-    }
-
-    /**
      * Create the GUI from the list of entries
      *
      * @param entries List of entries
@@ -633,7 +621,10 @@ public class HttpFormEntry
         for(int i = 0; i < goodEntries.size(); i++) {
             HttpFormEntry formEntry = goodEntries.get(i);
             if(formEntry.type == TYPE_FILE) {
-                builder.add(formEntry.getName(), formEntry.getBytes(), formEntry.getFileName());
+                // Might be bytes or might be a file ref
+                InputStream stream = formEntry.getFilePart();
+                builder.add(formEntry.getName(), stream, formEntry.getValue());
+                System.err.printf("%s %s\n", formEntry.getName(), formEntry.getValue());
             } else
                 builder.add(formEntry.getName(), formEntry.getValue());
         }
