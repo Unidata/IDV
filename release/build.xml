@@ -240,7 +240,7 @@ line using: and -Dbasedir=/some/other/dir
 
     <target name="scpftp" depends="init">
         <scp
-            todir="${user.name}@ftp:/home/ftp/pub/idv/untested"
+            todir="${user.name}@ftp:/web/ftp/pub/idv/untested"
             keyfile="${user.home}/.ssh/id_dsa"
             passphrase=""
         >
@@ -425,7 +425,7 @@ line using: and -Dbasedir=/some/other/dir
 
         <echo message="Making download directory: /content${snapshot_download_path}"/>
         <exec executable="ssh">
-            <arg line="www cd /home/ftp/pub/idv; ${makedir} ${snapshot_dir};"/>
+            <arg line="www cd /web/ftp/pub/idv; ${makedir} ${snapshot_dir};"/>
         </exec>
         <exec executable="ssh">
             <arg line="www ${makedir} /content${snapshot_download_path};"/>
@@ -537,7 +537,7 @@ line using: and -Dbasedir=/some/other/dir
         </exec>
 
         <exec executable="ssh">
-            <arg line="www cd /home/ftp/pub/idv; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
+            <arg line="www cd /web/ftp/pub/idv; rm -f ${snapshot_name};  ln -s ${snapshot_dir} ${snapshot_name}"/>
         </exec>
 
         <echo message="Setting mode g+w"/>
