@@ -357,7 +357,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                               trajLengthWidget.getContents(false), arrowCbx);
             cvectorLengthWidget = new ValueSliderWidget(this, 1, 21,
                     "VectorLength", "Curly Vector Length");
-            cvectorAHLengthWidget = new ValueSliderWidget(this, 0, 1,
+            cvectorAHLengthWidget = new ValueSliderWidget(this, 0, 20,
                     "ArrowHeadSize", "Arrow Head Length", 10.0f);
             cvectorLengthComponent =
                 GuiUtils.hbox(GuiUtils.rLabel("Vector Length: "),
@@ -654,7 +654,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if (getGridDisplay() != null) {
             getGridDisplay().setStreamlinesEnabled(isStreamlines);
             if (isCVectors) {
-                getGridDisplay().setTrojectoriesEnabled(isCVectors,
+                getGridDisplay().setTrojectoriesEnabled(true, isCVectors,
                         arrowHeadSizeValue, true);
             } else {
                 getGridDisplay().setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue,
