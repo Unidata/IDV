@@ -417,6 +417,16 @@ Since this is confusing and needs more work lets remove this for now
     </control>
 
   <control
+     id="planviewflow1"
+     categories="*-flowvector-*"
+     class="ucar.unidata.idv.control.FlowPlanViewControl"
+     label="Vector Colored by Speed"
+     doeslevels="true"
+     displaycategory="Flow Displays"
+     properties="vectors=true;useSpeedForColor=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
      id="streamlines"
      categories="*-flowvector-*"
      class="ucar.unidata.idv.control.FlowPlanViewControl"
@@ -432,11 +442,10 @@ Since this is confusing and needs more work lets remove this for now
     id="trajectories"
     categories="*-flowvector-*"
     class="ucar.unidata.idv.control.FlowPlanViewControl"
-    label="Trajectory Colored by Parameter"
-    code="DerivedGridFactory.combineGrids( D1, parameter )"
+    label="Trajectory"
     doeslevels="true"
     displaycategory="Flow Displays"
-    properties="trajectories=true;">
+    properties="trajectories=true;useSpeedForColor=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
