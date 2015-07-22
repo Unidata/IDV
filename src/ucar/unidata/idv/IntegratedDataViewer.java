@@ -2164,15 +2164,6 @@ Misc.run(new Runnable() {
     }
 
     /**
-     * Get the max size of the perm gen space
-     *
-     * @return max size of perm gen space
-     */
-    public int getMaxPermGenSize() {
-        return getStore().get(PREF_MAX_PERMGENSIZE, DEFAULT_MAX_PERMGENSIZE);
-    }
-
-    /**
      * Get whether we are using the time driver facility
      *
      * @return true if using time matching

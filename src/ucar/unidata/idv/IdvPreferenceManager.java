@@ -645,24 +645,6 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                                            GuiUtils.filler()));
         systemComps.add(systemPref.getComponent(false));
 
-        Vector permGenSize = new Vector();
-
-        int[]  pgSizes     = { 64, 128, 256, 512 };
-        for (int i = 0; i < pgSizes.length; i++) {
-            permGenSize.add(new Integer(pgSizes[i]));
-        }
-
-        JComboBox maxPermGenCbx = new JComboBox(permGenSize);
-
-        maxPermGenCbx.setSelectedItem(
-            new Integer(getIdv().getMaxPermGenSize()));
-        systemWidgets.put(PREF_MAX_PERMGENSIZE, maxPermGenCbx);
-
-        systemComps.add(GuiUtils.rLabel("PermGen Size:"));
-
-        systemComps.add(GuiUtils.leftRight(GuiUtils.hbox(maxPermGenCbx,
-                new JLabel("megabytes")), GuiUtils.filler()));
-
         systemComps.add(GuiUtils.rLabel("Caching:"));
 
         JCheckBox cacheCbx = new JCheckBox("Cache Data in Memory",
