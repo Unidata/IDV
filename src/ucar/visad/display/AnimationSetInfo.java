@@ -132,6 +132,31 @@ public class AnimationSetInfo {
         this.isTimeDriver       = that.isTimeDriver;
     }
 
+    /**
+     * _more_
+     *
+     * @param that _more_
+     *
+     * @return _more_
+     */
+    public boolean equals(AnimationSetInfo that) {
+        if ((this.active == that.active)
+                && (this.startMode == that.startMode)
+                && (this.endMode == that.endMode)
+                && (this.intervalMinutes == that.intervalMinutes)
+                && (this.pollMinutes == that.pollMinutes)
+                && (this.startOffsetMinutes == that.startOffsetMinutes)
+                && (this.endOffsetMinutes == that.endOffsetMinutes)
+                && (this.roundTo == that.roundTo)
+                && (this.startFixedTime == that.startFixedTime)
+                && (this.endFixedTime == that.endFixedTime)
+                && (this.baseTimes == that.baseTimes)
+                && (this.isTimeDriver == that.isTimeDriver)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Utility to round the given seconds
