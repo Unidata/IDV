@@ -21,15 +21,17 @@
 package ucar.unidata.idv;
 
 
-
-import org.python.core.*;
-import org.python.util.*;
+import org.python.core.PyFunction;
+import org.python.core.PyList;
+import org.python.core.PyStringMap;
+import org.python.core.PySyntaxError;
+import org.python.core.PyTableCode;
+import org.python.core.PyTuple;
+import org.python.util.PythonInterpreter;
 
 import org.w3c.dom.Element;
 
-import ucar.unidata.data.CacheDataSource;
 import ucar.unidata.data.DataCancelException;
-
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
@@ -37,53 +39,47 @@ import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.DerivedDataDescriptor;
 import ucar.unidata.data.DescriptorDataSource;
-
-import ucar.unidata.idv.ui.*;
+import ucar.unidata.idv.ui.FormulaDialog;
+import ucar.unidata.idv.ui.JythonShell;
 import ucar.unidata.ui.Help;
 import ucar.unidata.ui.TextSearcher;
-
 import ucar.unidata.ui.TreePanel;
 import ucar.unidata.util.FileManager;
-
 import ucar.unidata.util.GuiUtils;
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.Msg;
-
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.ResourceCollection;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.xml.XmlEncoder;
-import ucar.unidata.xml.XmlObjectStore;
-import ucar.unidata.xml.XmlPersistable;
-
-import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
-import visad.Data;
 import visad.VisADException;
 
-import visad.python.*;
+import visad.python.JPythonEditor;
 
 
-import java.awt.*;
 
-import java.awt.datatransfer.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
 import java.io.InputStream;
-
-
-import java.net.*;
-
-import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -91,13 +87,25 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import java.util.zip.*;
-
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.text.JTextComponent;
 
 
 
@@ -1236,7 +1244,8 @@ public class JythonManager extends IdvManager implements ActionListener {
         interpreter.exec("import ucar.unidata.util.StringUtil as StringUtil");
         interpreter.exec(
             "import ucar.unidata.data.grid.DerivedGridFactory as DerivedGridFactory");
-        interpreter.exec("import ucar.unidata.data.grid.GridTrajectory as GridTrajectory");
+        interpreter.exec(
+            "import ucar.unidata.data.grid.GridTrajectory as GridTrajectory");
         //interpreter.exec("from visad import FlatField");
         //interpreter.exec("from visad import FieldImpl");
     }
