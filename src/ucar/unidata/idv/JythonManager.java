@@ -2276,7 +2276,7 @@ public class JythonManager extends IdvManager implements ActionListener {
     private String makeCallString(PyFunction func, Hashtable props) {
         StringBuffer sb = new StringBuffer();
         sb.append(func.__name__ + "(");
-        PyTableCode tc = (PyTableCode) func.func_code;
+        PyTableCode tc = (PyTableCode) func.__code__;
         for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
             if (argIdx > 0) {
                 sb.append(", ");
@@ -2388,7 +2388,7 @@ public class JythonManager extends IdvManager implements ActionListener {
                 sb.append("\n<p><a name=\"" + func.__name__
                           + "\"></a><code class=\"command\">" + func.__name__
                           + "(");
-                PyTableCode tc = (PyTableCode) func.func_code;
+                PyTableCode tc = (PyTableCode) func.__code__;
                 for (int argIdx = 0; argIdx < tc.co_argcount; argIdx++) {
                     if (argIdx > 0) {
                         sb.append(", ");
