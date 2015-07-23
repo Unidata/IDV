@@ -21,6 +21,7 @@
 package ucar.visad.display;
 
 
+
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.Range;
 
@@ -44,7 +45,6 @@ import visad.TupleType;
 import visad.Unit;
 import visad.VisADException;
 
-
 import java.awt.Color;
 
 import java.rmi.RemoteException;
@@ -58,9 +58,6 @@ import java.rmi.RemoteException;
  */
 public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     implements GridDisplayable {
-
-    /** use Flow1 ScalarMaps */
-    private static boolean useFlow1 = false;
 
     /**
      * The name of the "real-type" property.
@@ -80,6 +77,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
     /** ScalarMap for Z component of flow */
     volatile ScalarMap flowZMap;
+
+    /** flag for using flow1 or flow2 */
+    public boolean useFlow1;
 
     /** FlowControl for ScalarMap */
     private volatile FlowControl flowControl;
@@ -150,11 +150,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      * @param rTT        The VisAD RealTupleType of the parameter.  May be
      *                          <code>null</code>.
      * @param useSpeedForColor  set to true if you want to color by speed
+     * @param useFlow1          Sets the VisAD scalarmap for flow 1 or flow 2
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
     public FlowDisplayable(String name, RealTupleType rTT, float flowscale,
-                           boolean useSpeedForColor)
+                           boolean useSpeedForColor, Boolean useFlow1)
             throws VisADException, RemoteException {
 
         super(name, null, null, true);
@@ -162,10 +163,30 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         this.flowRealTupleType = rTT;  // immutable object
         this.flowscale         = flowscale;
         this.useSpeedForColor  = useSpeedForColor;
-
+        this.useFlow1          = useFlow1;
         if (flowRealTupleType != null) {
-            setFlowMaps();
+            setFlowMaps(useFlow1);
         }
+    }
+
+
+    /**
+     * Constructs from a name for the Displayable and the type of the
+     * parameter, and the desired size of "scale"
+     *
+     * @param name           The name for the displayable.
+     * @param flowscale      A float size for the "flow scale".
+     * @param rTT        The VisAD RealTupleType of the parameter.  May be
+     *                          <code>null</code>.
+     * @param useFlow1          Sets the VisAD scalarmap for flow 1 or flow 2
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public FlowDisplayable(String name, RealTupleType rTT, float flowscale,
+                           Boolean useFlow1)
+            throws VisADException, RemoteException {
+
+        this(name, rTT, flowscale, false, useFlow1);
     }
 
     /**
@@ -182,9 +203,26 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     public FlowDisplayable(String name, RealTupleType rTT, float flowscale)
             throws VisADException, RemoteException {
 
-        this(name, rTT, flowscale, false);
+        this(name, rTT, flowscale, false, true);
     }
 
+
+    /**
+     * Constructs from a name for the Displayable and the type of the
+     * parameter.
+     *
+     * @param name           The name for the displayable.
+     * @param rTT        The VisAD RealTupleType of the parameter.  May be
+     *                          <code>null</code>.
+     * @param useFlow1          Sets the VisAD scalarmap for flow 1 or flow 2
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public FlowDisplayable(String name, RealTupleType rTT, Boolean useFlow1)
+            throws VisADException, RemoteException {
+
+        this(name, rTT, 0.02f, useFlow1);
+    }
 
     /**
      * Constructs from a name for the Displayable and the type of the
@@ -215,9 +253,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
         flowRealTupleType = that.flowRealTupleType;  // immutable object
         flowscale         = that.flowscale;
-
+        useFlow1          = that.useFlow1;
         if (flowRealTupleType != null) {
-            setFlowMaps();
+            setFlowMaps(that.useFlow1);
         }
     }
 
@@ -458,17 +496,19 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      *
      * Note - makes bad plot if data is v,u form
      *
+     *
+     * @param useFlow1 indicates whether or not we should use flow1 or flow2
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    protected void setFlowMaps() throws RemoteException, VisADException {
+    protected void setFlowMaps(Boolean useFlow1)
+            throws RemoteException, VisADException {
 
-        useFlow1 = !useFlow1;
 
         RealType[] realTypes = flowRealTupleType.getRealComponents();
         Unit[]     units     = flowRealTupleType.getDefaultUnits();
 
-        spdIndex  = 1;
+        spdIndex = 1;
 
         // if data is u,v (so far as you can tell by units)
         if ((Unit.canConvert(units[0], CommonUnit.meterPerSecond)
@@ -734,7 +774,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
             flowRealTupleType = rTT;
 
-            setFlowMaps();
+            setFlowMaps(this.useFlow1);
             firePropertyChange(FLOW_TYPE, oldValue, flowRealTupleType);
         }
     }
@@ -821,10 +861,10 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         // set RealType to color by speed
         if (useSpeedForColor && !isCartesian) {
             //if ( !coloredByAnother) {
-        	try {
+            try {
                 setRGBRealType(
                     (RealType) flowRealTupleType.getComponent(spdIndex));
-        	} catch (Exception e) {}
+            } catch (Exception e) {}
         }
     }
 
@@ -836,5 +876,5 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     public void setIgnoreExtraParameters(boolean yesno) {
         ignoreExtraParameters = yesno;
     }
-    
+
 }
