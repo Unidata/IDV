@@ -99,7 +99,8 @@ public class GeoSelection {
         this();
         this.useFullBounds  = that.useFullBounds;
         if (that.boundingBox != null) {
-            this.boundingBox = new GeoLocationInfo(that.boundingBox);
+            this.boundingBox = that.boundingBox;
+            //this.boundingBox = new GeoLocationInfo(that.boundingBox);
         }
         this.xStride = that.xStride;
         this.yStride = that.yStride;
@@ -610,8 +611,10 @@ public class GeoSelection {
                && (this.yStride == that.yStride)
                && (this.zStride == that.zStride)
                && (this.useViewBounds == that.useViewBounds)
-               && Misc.equals(this.boundingBox, that.boundingBox)
-               && Misc.equals(this.level, that.level);
+                && (this.useFullBounds == that.useFullBounds)
+               && Misc.equals(this.boundingBox,that.boundingBox)
+               && Misc.equals(this.level, that.level)
+                && Misc.equals(this.screenBoundRect, that.screenBoundRect);
     }
 
 
