@@ -93,7 +93,7 @@ argument -Dfoo=bar) -->
         <property name="maxmemory" value="512m"/>
 
         <!-- Source verions -->
-        <property name="srcversion" value="1.7"/>
+        <property name="srcversion" value="1.8"/>
 
     </target>
 
