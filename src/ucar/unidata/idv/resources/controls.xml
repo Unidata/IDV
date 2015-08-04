@@ -426,7 +426,7 @@ Since this is confusing and needs more work lets remove this for now
      properties="vectors=true;useSpeedForColor=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-  <control
+  <!--control
      id="streamlines"
      categories="*-flowvector-*"
      class="ucar.unidata.idv.control.FlowPlanViewControl"
@@ -436,9 +436,9 @@ Since this is confusing and needs more work lets remove this for now
      displaycategory="Flow Displays"
      properties="streamlines=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-    </control>
+    </control-->
 
-    <control
+    <!--control
     id="trajectories"
     categories="*-flowvector-*"
     class="ucar.unidata.idv.control.FlowPlanViewControl"
@@ -447,7 +447,7 @@ Since this is confusing and needs more work lets remove this for now
     displaycategory="Flow Displays"
     properties="trajectories=true;useSpeedForColor=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-    </control>
+    </control-->
 
   <control
      id="planviewflow3d"
@@ -472,13 +472,25 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
+    <control
+     id="windbarbplan1"
+     categories="*-flowvector-*"
+     class="ucar.unidata.idv.control.FlowPlanViewControl"
+     description="Wind barb plan view of flow vectors"
+     label="Wind Barb Colored by Speed"
+     doeslevels="true"
+     displaycategory="Flow Displays"
+     properties="windbarbs=true; useSpeedForColor=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+
   <control
      id="flowxs"
      categories="*-flowvector-*"
      class="ucar.unidata.idv.control.FlowCrossSectionControl"
      description="Cross-section of flow vectors"
      label="Vector Cross Section"
-     displaycategory="Flow Displays"
+     displaycategory="Flow Cross Section"
      properties="windowVisible=true;"/>
 
   <control
@@ -496,7 +508,7 @@ Since this is confusing and needs more work lets remove this for now
      class="ucar.unidata.idv.control.FlowCrossSectionControl"
      description="Cross-section of wind barbs"
      label="Wind Barb Cross Section"
-     displaycategory="Flow Displays"
+     displaycategory="Flow Cross Section"
      properties="windowVisible=true;windbarbs=true"/>
 
   <control
