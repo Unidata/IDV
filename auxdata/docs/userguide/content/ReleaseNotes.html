@@ -17,6 +17,13 @@ The items below reflect changes since the 5.1 release.
 
 <faqitem cat="System Changes"></faqitem>
 
+<faqitem q="Java Version 1.8" id="jv18">
+  <p>
+    Migrated the IDV to Java 8 and Java3D 1.6. The IDV is using
+    Java 1.8 JVM on all platforms of this release.
+  </p>
+</faqitem>
+
 <faqitem q="Latest netCDF-Java Version" id="nj46">
   <p>
     The version of the netCDF-Java library currently distributed with the IDV is the 4.6.2. Its main
@@ -29,84 +36,29 @@ The items below reflect changes since the 5.1 release.
 </faqitem>
 
 
-<faqitem q="Install4J and IDV Start Script" id="install4j">
-  Repaired Install4J uninstaller which had been broken for some time. Also fixed
-  a path problem in the IDV start script where the IDV would not start properly
-  if the IDV was started from a remote path.
-</faqitem>
-
-<faqitem q="RAMADDA plugin" id="ramaddaPlugin">
-The new RAMADDA plugin along with changes to the image generator allows users to
-generate a movie and save it as a zip file of images. Users can then publish the
-zip file to the RAMADDA server to be displayed by the image player.
-</faqitem>
-
-<faqitem q="UNAVCO plugin" id="unavcoPlugin">
-  Fixed the remote location of the UNAVCO plugin.
-</faqitem>
-
-<faqitem q="Windows Unknown Publisher" id="windowscert">
-  The IDV installation application on Windows is now properly signed with a
-  security certificate. There result of this change is during IDV installation,
-  users will now see the publisher as "The University Corporation for
-  Atmospheric Research".
-</faqitem>
-
-<faqitem q="Mac OS X Gatekeeper" id="gatekeeper">
- IDV nightly build is finally properly signed vis a vis OS X gatekeeper. The
-result is IDV users on OS X can now install the IDV in a straightforward manner
-(instead of having to jump through awkward Finder hoops).
-</faqitem>
-
-<faqitem q="Multiple IDVs on OS X (Yosemite)" id="yosemite">
-  Multiple instances of the IDV can now run on OS X by starting the IDV with the
-  (dock) icon. Moreover, fixed a problem on OS X Yosemite where attempting to
-  start the IDV multiple times from the dock or icon would fail, and "ghost" IDV
-  instances could not be killed.
-</faqitem>
-
-<faqitem q="IDV Old Version Warning" id="versioncheck">
-  Fixed a bug where the IDV old version warning mechanism was interefering with
-  ISL scripts. Also refactored, and improved the code that handles this old
-  version check.
-</faqitem>
-
-<faqitem q="IDV Webstart Working Again" id="webstart">
-  After security and Java 3D problems, the IDV is working again via Java
-  WebStart.
-</faqitem>
-
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Webcams" id="webcam">
-Fixed broken webcam links available in the IDV.
+<faqitem q="Forecast hour added" id="fhour">
+The IDV can calculate the forecast hour based on the run time coordinate and its value
+  can be accessed through the forecast hour macro.
 </faqitem>
 
+<faqitem q="New Grid Trajectory and Curly Vector" id="ngtrajectory">
+The new 2D gridded trajectory and the curly vector display are based on the new api of the VisAD library.
+  Both displays are categorized as flow vector display. The vector plan view display will be created
+  first and there are radio buttons to switch to the trajectory or curly vector display. The trajectory
+  and the curly vector can be colored by the wind speed.
+</faqitem>
+
+<faqitem q="3D Adaptive Resolution" id="3dAR">
+  The Adaptisve Resolution (AR) feature in the IDV has been expanded to cover several 3 dimensional displays.
+  When creating a 3D display or cross section display, the IDV calculates the resolution of the map view window,
+  dynamically sets the data sampling in all 3 dimensions, and loads sufficient data to generate the image.
+</faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
 
-<faqitem q="CFRadial netcdf format Support" id="cfradial">
-  The IDV now has the capability of viewing CFRadial netcdf format radar data files.
-  We works with engineers from NCAR/EOL groups and continue to make changes, improvements,
-  and bug fixes in this area.
-</faqitem>
-
-
-<faqitem q="AMRC Text Point" id="amrctextpoint">
-IDV can now handle text point data from the Antarctic Meteorological Research Center(AMRC).
-</faqitem>
-
-<faqitem q="CSV Time Matching" id="csvtimematching">
-IDV can now apply time matching to the CSV point data files. When wanting
-to do the time matching, you need to create the display first, and then
-specify a driver time and select View > Times > Uses Time Driver Times in
-the display control of CSV display, reload the data will create the display
-with matching driver times.
-
-</faqitem>
-
-
-    <faqitem cat="Bug Fixes/Known Problems"></faqitem>
+<faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
 We have discovered in a few circumstances the IDV OS X installers (always on
