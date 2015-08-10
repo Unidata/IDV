@@ -245,7 +245,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             planDisplay.setTrojectoriesEnabled(isCVectors,
                     arrowHeadSizeValue, true);
         } else {
-            planDisplay.setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue, false);
+            planDisplay.setTrojectoriesEnabled(isTrajectories,
+                    arrowHeadSizeValue, false);
         }
         //addAttributedDisplayable(planDisplay, FLAG_SKIPFACTOR);
         addAttributedDisplayable(planDisplay);
@@ -299,12 +300,22 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         return true;
     }
 
-    public void setColoredByAnother(boolean yesno){
+    /**
+     * _more_
+     *
+     * @param yesno _more_
+     */
+    public void setColoredByAnother(boolean yesno) {
         useSpeedForColor = yesno;
     }
 
 
-    public void setUseSpeedForColor(boolean yesno){
+    /**
+     * _more_
+     *
+     * @param yesno _more_
+     */
+    public void setUseSpeedForColor(boolean yesno) {
         useSpeedForColor = yesno;
     }
 
@@ -663,8 +674,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                 getGridDisplay().setTrojectoriesEnabled(true, isCVectors,
                         arrowHeadSizeValue, true);
             } else {
-                getGridDisplay().setTrojectoriesEnabled(isTrajectories, arrowHeadSizeValue,
-                        false);
+                getGridDisplay().setTrojectoriesEnabled(isTrajectories,
+                        arrowHeadSizeValue, false);
             }
             enableBarbSizeBox();
             enableDensityComponents();
@@ -687,11 +698,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setStreamlines(boolean v) {
-        isCVectors     = !v;
-        isStreamlines  = v;
-        isTrajectories = !v;
-        isVectors      = !v;
-        setStreamlines();
+        isStreamlines = v;
     }
 
     /**
@@ -700,11 +707,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setTrajectories(boolean v) {
-        isCVectors     = !v;
-        isStreamlines  = !v;
         isTrajectories = v;
-        isVectors      = !v;
-        setStreamlines();
     }
 
     /**
@@ -713,11 +716,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setVectors(boolean v) {
-        isCVectors     = !v;
-        isStreamlines  = !v;
-        isTrajectories = !v;
-        isVectors      = v;
-        setStreamlines();
+        isVectors = v;
     }
 
     /**
@@ -726,11 +725,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @param v _more_
      */
     public void setCVectors(boolean v) {
-        isCVectors     = v;
-        isStreamlines  = !v;
-        isTrajectories = !v;
-        isVectors      = !v;
-        setStreamlines();
+        isCVectors = v;
+
     }
 
     /**
@@ -744,6 +740,33 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getTrajectories() {
+        return isTrajectories;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getCVectors() {
+        return isCVectors;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getVectors() {
+        return isVectors;
+    }
+
+    /**
      * Set the skip value
      *
      * @param value the value
@@ -754,7 +777,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if (skipFactorWidget != null) {
             skipFactorWidget.setValue(value);
         }
-        if(fd != null) {
+        if (fd != null) {
             fd.setUseSpeedForColor(useSpeedForColor);
             if (useSpeedForColor) {
                 colorIndex = fd.getSpeedTypeIndex();
@@ -834,6 +857,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                              SETTINGS_GROUP_DISPLAY);
         dsd.addPropertyValue(new Boolean(getStreamlines()), "streamlines",
                              "Show Streamlines", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Boolean(getTrajectories()), "trajectory",
+                             "Show Trajectory", SETTINGS_GROUP_DISPLAY);
+        dsd.addPropertyValue(new Boolean(getCVectors()), "curlyvector",
+                             "Show Curly Vector", SETTINGS_GROUP_DISPLAY);
         dsd.addPropertyValue(new Boolean(getAutoSize()), "autoSize",
                              "Autosize", SETTINGS_GROUP_DISPLAY);
 
