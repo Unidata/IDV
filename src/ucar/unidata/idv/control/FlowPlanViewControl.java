@@ -290,6 +290,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         // end color by speed.
         setFlowScale(flowScaleValue);
         if (getGridDisplay() != null) {
+            getGridDisplay().setArrowHead(arrowHead);
             getGridDisplay().setTrajOffset(trajOffsetValue);
             getGridDisplay().setVectorLength(vectorLengthValue);
             // getGridDisplay().setArrowHead(arrowHeadSizeValue);
@@ -673,6 +674,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             if (isCVectors) {
                 getGridDisplay().setTrojectoriesEnabled(true, isCVectors,
                         arrowHeadSizeValue, true);
+                arrowHead = true;
+                getGridDisplay().setArrowHead(arrowHead);
             } else {
                 getGridDisplay().setTrojectoriesEnabled(isTrajectories,
                         arrowHeadSizeValue, false);
@@ -989,6 +992,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         vectorLengthValue = f;
         if (getGridDisplay() != null) {
             try {
+                arrowHead = true;
+                getGridDisplay().setArrowHead(arrowHead);
                 getGridDisplay().setVectorLength(vectorLengthValue);
                 getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
                 getGridDisplay().resetTrojectories();
