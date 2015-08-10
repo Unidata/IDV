@@ -293,7 +293,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             getGridDisplay().setArrowHead(arrowHead);
             getGridDisplay().setTrajOffset(trajOffsetValue);
             getGridDisplay().setVectorLength(vectorLengthValue);
-            // getGridDisplay().setArrowHead(arrowHeadSizeValue);
+            getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
         }
         //        setSkipValue(skipValue);
         fd.setActive(true);
