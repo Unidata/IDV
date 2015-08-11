@@ -181,6 +181,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** _more_ */
     private int colorIndex = -1;
 
+    /** _more_ */
+    JCheckBox arrowCbx;
+
     /**
      * Create a new FlowPlanViewControl; set attribute flags
      */
@@ -350,7 +353,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         addRemovable(barbSizeWidget);
 
         JCheckBox autoSizeCbx = new JCheckBox("Autosize", autoSize);
-        JCheckBox arrowCbx    = new JCheckBox("Arrow", arrowHead);
+        arrowCbx    = new JCheckBox("Arrow", arrowHead);
         autoSizeCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 autoSize = ((JCheckBox) e.getSource()).isSelected();
@@ -361,11 +364,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         arrowCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 arrowHead = ((JCheckBox) e.getSource()).isSelected();
-                if (arrowHead) {
-                    getGridDisplay().setArrowHead(arrowHead);
-                } else {
-                    getGridDisplay().setArrowHead(arrowHead);
-                }
+                getGridDisplay().setArrowHead(arrowHead);
                 getGridDisplay().resetTrojectories();
             }
         });
@@ -685,11 +684,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                 getGridDisplay().setTrojectoriesEnabled(true, isCVectors,
                         arrowHeadSizeValue, true);
                 arrowHead = true;
-                getGridDisplay().setArrowHead(arrowHead);
+
             } else {
+                arrowHead = arrowCbx.isSelected();
                 getGridDisplay().setTrojectoriesEnabled(isTrajectories,
                         arrowHeadSizeValue, false);
             }
+
+            getGridDisplay().setArrowHead(arrowHead);
+            getGridDisplay().resetTrojectories();
             enableBarbSizeBox();
             enableDensityComponents();
             enableTrajLengthBox();
@@ -923,11 +926,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     public void setArrowHead(boolean arrow) {
         arrowHead = arrow;
         if (getGridDisplay() != null) {
-            if (arrowHead) {
-                getGridDisplay().setArrowHead(arrowHead);
-            } else {
-                getGridDisplay().setArrowHead(arrowHead);
-            }
+            getGridDisplay().setArrowHead(arrowHead);
         }
     }
 
@@ -977,11 +976,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             try {
                 getGridDisplay().setTrajOffset(trajOffsetValue);
                 getGridDisplay().resetTrojectories();
-                if (arrowHead) {
-                    getGridDisplay().setArrowHead(arrowHead);
-                } else {
-                    getGridDisplay().setArrowHead(arrowHead);
-                }
+                getGridDisplay().setArrowHead(arrowHead);
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
