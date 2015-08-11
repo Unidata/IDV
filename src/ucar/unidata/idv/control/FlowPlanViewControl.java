@@ -320,6 +320,16 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         useSpeedForColor = yesno;
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getUseSpeedForColor() {
+        return useSpeedForColor;
+    }
+
     /**
      * Get control widgets special to this control.
      *
