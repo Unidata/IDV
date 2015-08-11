@@ -394,6 +394,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
             trajectoryBtn = new JRadioButton("Trajectories:", isTrajectories);
             cvectorBtn    = new JRadioButton("Curly Vectors:", isCVectors);
+            trajectoryBtn.setToolTipText("Require mininmum four time steps for this display");
+            cvectorBtn.setToolTipText("Require mininmum four time steps for this display");
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
@@ -487,12 +489,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     GuiUtils.left(sizeComponent)));
         }
         controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Skip:"),
-                GuiUtils.left(
-                    GuiUtils.hbox(
-                        GuiUtils.rLabel("XY:  "),
-                        skipFactorWidget.getContents(false)))));
+                new WrapperWidget(
+                        this, GuiUtils.rLabel("Skip:"),
+                        GuiUtils.left(
+                                GuiUtils.hbox(
+                                        GuiUtils.rLabel("XY:  "),
+                                        skipFactorWidget.getContents(false)))));
 
         if ( !getWindbarbs()) {
             controlWidgets.add(new WrapperWidget(this,
@@ -502,6 +504,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         enableBarbSizeBox();
         enableTrajLengthBox();
         enableCVectorLengthBox();
+        List timeL = getDataSelection().getTimes();
+        if(timeL.size() < 4){
+            GuiUtils.enableTree(cvectorBtn, false);
+            GuiUtils.enableTree(trajectoryBtn, false);
+        }
         super.getControlWidgets(controlWidgets);
     }
 
