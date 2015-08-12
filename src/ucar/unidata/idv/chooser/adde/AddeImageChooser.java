@@ -3215,9 +3215,11 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      */
     protected void handleConnectionError(Exception excp) {
         String message = excp.getMessage().toLowerCase();
+        String cause = excp.getCause().getMessage().toLowerCase();
         if ((excp instanceof AreaFileException)
                 && (message.indexOf("must be used with archived datasets")
-                    >= 0)) {
+                    >= 0 || cause.indexOf("must be used with archived datasets")
+                    >= 0) ) {
             getArchiveDay();
         } else if ((excp instanceof AreaFileException)
                    && (archiveDay != null)
