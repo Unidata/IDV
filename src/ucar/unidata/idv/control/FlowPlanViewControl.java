@@ -505,7 +505,13 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         enableTrajLengthBox();
         enableCVectorLengthBox();
         List timeL = getDataSelection().getTimes();
-        if(timeL.size() < 4){
+        if(timeL == null && getHadDataChoices()){
+            List dchoices = getMyDataChoices();
+            timeL = ((DataChoice) dchoices.get(0)).getSelectedDateTimes();
+            if(timeL != null && timeL.size() == 0)
+                timeL = ((DataChoice) dchoices.get(0)).getAllDateTimes();
+        }
+        if(timeL != null && timeL.size() < 4){
             GuiUtils.enableTree(cvectorBtn, false);
             GuiUtils.enableTree(trajectoryBtn, false);
         }
