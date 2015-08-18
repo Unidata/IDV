@@ -175,7 +175,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @throws Exception the exception
      */
     protected void init(TrajectoryFeatureBean trajBean) throws Exception {
-        StructureData                 pfsd    = trajBean.pf.getFeatureData();
+        StructureData                 pfsd    = trajBean.pf.getDataAll();
 
         List<StructureMembers.Member> members = pfsd.getMembers();
 
@@ -600,7 +600,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int j      = 0;
         while (i <= last) {
             PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getFeatureData();
+            StructureData pfsd = pf.getDataAll();
 
             ddata[j++] = pfsd.convertScalarDouble(var);
             i          = i + stride;
@@ -628,7 +628,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int      j      = 0;
         while (i <= last) {
             PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getFeatureData();
+            StructureData pfsd = pf.getDataAll();
 
             sdata[j++] = pfsd.getScalarString(var);
             i          = i + stride;
@@ -1200,7 +1200,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
             while ((i <= pfs.size()) && (j < range.length())) {
                 PointFeature  pf0 = pfs.get(i);
-                StructureData std = pf0.getFeatureData();
+                StructureData std = pf0.getDataAll();
                 Array         a   = std.getArray(varStr);
                 fdata[j++] = ((float[]) a.get1DJavaArray(Float.class))[0];
                 i          = i + stride;
@@ -1239,7 +1239,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
             while ((i <= pfs.size()) && (j < range.length())) {
                 PointFeature  pf0 = pfs.get(i);
-                StructureData std = pf0.getFeatureData();
+                StructureData std = pf0.getDataAll();
                 Array         a   = std.getArray(varStr);
                 fdata[j++] = ((double[]) a.get1DJavaArray(Double.class))[0];
                 i          = i + stride;
