@@ -49,18 +49,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * See the package.html This class is in part responsible for (de)serializing
@@ -75,13 +73,13 @@ public class XmlEncoder extends XmlUtil {
      */
     private static class MethodKey {
 
-        /** Class          */
+        /** Class */
         private Class<?> clazz;
 
-        /** method          */
+        /** method */
         private String method;
 
-        /** param types          */
+        /** param types */
         private Class<?>[] paramTypes;
 
         /**
@@ -101,44 +99,55 @@ public class XmlEncoder extends XmlUtil {
         /**
          * {@inheritDoc}
          */
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
-			result = prime * result
-					+ ((method == null) ? 0 : method.hashCode());
-			result = prime * result + Arrays.hashCode(paramTypes);
-			return result;
-		}
+        @Override
+        public int hashCode() {
+            final int prime  = 31;
+            int       result = 1;
+            result = prime * result + ((clazz == null)
+                                       ? 0
+                                       : clazz.hashCode());
+            result = prime * result + ((method == null)
+                                       ? 0
+                                       : method.hashCode());
+            result = prime * result + Arrays.hashCode(paramTypes);
+            return result;
+        }
 
         /**
          * {@inheritDoc}
          */
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			MethodKey other = (MethodKey) obj;
-			if (clazz == null) {
-				if (other.clazz != null)
-					return false;
-			} else if (!clazz.equals(other.clazz))
-				return false;
-			if (method == null) {
-				if (other.method != null)
-					return false;
-			} else if (!method.equals(other.method))
-				return false;
-			if (!Arrays.equals(paramTypes, other.paramTypes))
-				return false;
-			return true;
-		}
-        
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            MethodKey other = (MethodKey) obj;
+            if (clazz == null) {
+                if (other.clazz != null) {
+                    return false;
+                }
+            } else if ( !clazz.equals(other.clazz)) {
+                return false;
+            }
+            if (method == null) {
+                if (other.method != null) {
+                    return false;
+                }
+            } else if ( !method.equals(other.method)) {
+                return false;
+            }
+            if ( !Arrays.equals(paramTypes, other.paramTypes)) {
+                return false;
+            }
+            return true;
+        }
+
     }
 
 
@@ -420,7 +429,8 @@ public class XmlEncoder extends XmlUtil {
     /**
      * The method cache
      */
-    private static Map<XmlEncoder.MethodKey, Method> methodCache = new ConcurrentHashMap<XmlEncoder.MethodKey, Method>();
+    private static Map<XmlEncoder.MethodKey, Method> methodCache =
+        new ConcurrentHashMap<XmlEncoder.MethodKey, Method>();
 
     /**
      *  Create a new XmlEncoder.
@@ -438,7 +448,7 @@ public class XmlEncoder extends XmlUtil {
         addDelegateForClass(Color.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 Color color = (Color) o;
-                List  args  = Misc.newList(new Integer(color.getRed()),
+                List args = Misc.newList(new Integer(color.getRed()),
                                          new Integer(color.getGreen()),
                                          new Integer(color.getBlue()));
                 List types = Misc.newList(Integer.TYPE, Integer.TYPE,
@@ -450,7 +460,7 @@ public class XmlEncoder extends XmlUtil {
         addDelegateForClass(Rectangle.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 Rectangle r = (Rectangle) o;
-                List args   = Misc.newList(new Integer(r.x), new Integer(r.y),
+                List args = Misc.newList(new Integer(r.x), new Integer(r.y),
                                          new Integer(r.width),
                                          new Integer(r.height));
                 List types = Misc.newList(Integer.TYPE, Integer.TYPE,
@@ -486,7 +496,8 @@ public class XmlEncoder extends XmlUtil {
         addDelegateForClass(Point.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 Point p     = (Point) o;
-                List  args  = Misc.newList(new Integer(p.x), new Integer(p.y));
+                List  args  = Misc.newList(new Integer(p.x),
+                                           new Integer(p.y));
                 List  types = Misc.newList(Integer.TYPE, Integer.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
             }
@@ -494,8 +505,8 @@ public class XmlEncoder extends XmlUtil {
 
         addDelegateForClass(Dimension.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
-                Dimension p    = (Dimension) o;
-                List      args = Misc.newList(new Integer(p.width),
+                Dimension p = (Dimension) o;
+                List args = Misc.newList(new Integer(p.width),
                                          new Integer(p.height));
                 List types = Misc.newList(Integer.TYPE, Integer.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
@@ -504,7 +515,7 @@ public class XmlEncoder extends XmlUtil {
 
         addDelegateForClass(Font.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
-                Font f    = (Font) o;
+                Font f = (Font) o;
                 List args = Misc.newList(f.getName(),
                                          new Integer(f.getStyle()),
                                          new Integer(f.getSize()));
@@ -1776,7 +1787,7 @@ public class XmlEncoder extends XmlUtil {
     public ObjectClass createArrayObject(Element element) {
         try {
             Class arrayType = getClass(element.getAttribute(ATTR_CLASS));
-            int   length    =
+            int length =
                 new Integer(element.getAttribute(ATTR_LENGTH)).intValue();
             Object   array    = Array.newInstance(arrayType, length);
             NodeList children = XmlUtil.getElements(element);
@@ -2179,8 +2190,8 @@ public class XmlEncoder extends XmlUtil {
                             types[i] = Object.class;
                         }
                     }
-                    Class       theClass = getClass(className);
-                    Constructor ctor     =
+                    Class theClass = getClass(className);
+                    Constructor ctor =
                         Misc.findConstructor(getClass(className), types);
                     if (ctor == null) {
                         System.err.println(
