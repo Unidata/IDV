@@ -573,12 +573,14 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int first  = range.first();
         int stride = range.stride();
         int last   = range.last();
-        // List obsList = (List)obsTable.get(fc.getName());
-        Array dataArray = (Array) getVariableData(var);
+
         int   i         = first;
         int   j         = 0;
         while (i <= last) {
-            fdata[j++] = dataArray.getFloat(i);
+            PointFeature  pf   = obsList.get(i);
+            StructureData pfsd = pf.getFeatureData();
+
+            fdata[j++] = pfsd.convertScalarFloat(var);
             i          = i + stride;
         }
 
