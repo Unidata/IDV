@@ -21,9 +21,6 @@
 package ucar.unidata.xml;
 
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -63,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * See the package.html This class is in part responsible for (de)serializing
@@ -422,14 +420,7 @@ public class XmlEncoder extends XmlUtil {
     /**
      * The method cache
      */
-    private static Cache methodCache;
-
-    static { //initializing method cache
-      URL resource = XmlEncoder.class.getResource("/ucar/unidata/xml/ehcache.xml");
-      CacheManager cacheManager = CacheManager.create(resource);
-      cacheManager.addCache(XmlEncoder.class.toString());
-        methodCache = CacheManager.getInstance().getCache(XmlEncoder.class.toString());
-    }
+    private static Map<XmlEncoder.MethodKey, Method> methodCache = new ConcurrentHashMap<XmlEncoder.MethodKey, Method>();
 
     /**
      *  Create a new XmlEncoder.
@@ -2335,9 +2326,8 @@ public class XmlEncoder extends XmlUtil {
         try {
             MethodKey mk = new MethodKey(object.getClass(), methodName,
                                          paramTypes);
-            net.sf.ehcache.Element e = methodCache.get(mk);
-            Method                 theMethod;
-            if (e == null) {
+            Method theMethod = methodCache.get(mk);
+            if (theMethod == null) {
                 theMethod = Misc.findMethod(object.getClass(), methodName,
                                             paramTypes);
                 if (theMethod == null) {
@@ -2360,10 +2350,9 @@ public class XmlEncoder extends XmlUtil {
                         + object.getClass().getName() + "." + methodName);
                 } else {
                     theMethod.invoke(object, params);
-                    methodCache.put(new net.sf.ehcache.Element(mk, theMethod));
+                    methodCache.put(mk, theMethod);
                 }
             } else {
-                theMethod = (Method) e.getObjectValue();
                 theMethod.invoke(object, params);
             }
 
