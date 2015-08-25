@@ -234,11 +234,11 @@ public class AddeImageDataSource extends ImageDataSource {
                                Integer.toString(this.bandId.getBandNumber()));
             }
             this.descriptor = new AddeImageDescriptor(thisDir, null);
-            List<DataSelectionComponent> dataSelectionComponents =
-                new ArrayList<DataSelectionComponent>();
-            initDataSelectionComponents(
-                dataSelectionComponents,
-                super.findDataChoice(this.choiceName));
+            //List<DataSelectionComponent> dataSelectionComponents =
+            //    new ArrayList<DataSelectionComponent>();
+            //initDataSelectionComponents(
+             //   dataSelectionComponents,//
+             //   super.findDataChoice(this.choiceName));
         }
     }
 
@@ -389,6 +389,12 @@ public class AddeImageDataSource extends ImageDataSource {
                     AreaFile areaFile = areaAdapter.getAreaFile();
                     baseAnav = areaFile.getNavigation();
                     acs      = new AREACoordinateSystem(areaFile);
+
+                    List<DataSelectionComponent> dataSelectionComponents =
+                            new ArrayList<DataSelectionComponent>();
+                    initDataSelectionComponents(
+                       dataSelectionComponents,
+                       super.findDataChoice(this.choiceName));
                 } catch (Exception e) {
                     LogUtil.userErrorMessage("Error in getDescriptors  e="
                                              + e);
@@ -1575,7 +1581,8 @@ public class AddeImageDataSource extends ImageDataSource {
                 this.bandId = id;
             }
 
-            addeImageDataSelection = new AddeImageDataSelection(this,
+            if(areaAdapter!= null)
+                addeImageDataSelection = new AddeImageDataSelection(this,
                     dataChoice, source, baseAnav, this.descriptor, acs,
                     areaAdapter);
 
@@ -1588,8 +1595,10 @@ public class AddeImageDataSource extends ImageDataSource {
             getDataContext().getIdv().showNormalCursor();
             return;
         }
-        components.add(addeImageDataSelection.getRegionPanel());
-        components.add(addeImageDataSelection.getAdvancedPanel());
+        if(areaAdapter != null) {
+            components.add(addeImageDataSelection.getRegionPanel());
+            components.add(addeImageDataSelection.getAdvancedPanel());
+        }
     }
 
 
