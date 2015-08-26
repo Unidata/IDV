@@ -19,8 +19,8 @@ The items below reflect changes since the 5.1 release.
 
 <faqitem q="Java Version 1.8" id="jv18">
   <p>
-    Migrated the IDV to Java 8 and Java3D 1.6. The IDV is now using
-    Java 1.8 JVM on all platforms of this release.
+    Migrated the IDV to Java 8 and Java3D 1.6. The IDV is now using Java 1.8 JVM
+    on all platforms of this release.
   </p>
 </faqitem>
 
@@ -32,47 +32,61 @@ The items below reflect changes since the 5.1 release.
 
 <faqitem q="DOI" id="doi">
   <p>
-    For improved citation purposes: The IDV now has a Digital Object Identifier
+    For improved citation purposes, the IDV now has a Digital Object Identifier
     (DOI): doi:10.5065/D6RN35XM.
   </p>
 </faqitem>
 
 <faqitem q="Latest netCDF-Java Version" id="nj46">
   <p>
-    The version of the netCDF-Java library currently distributed with the IDV is the 4.6.2. Its main
-    feature is a rewrite of GRIB handling. This version of netCDF-Java includes changes:
-      AWIPSsat projection, WRF lat/lon coordinates with time dependence, Updated grib1 table for NLDAS,
-      handling of scalar runtime coordinate for GRIB collections.
-      See the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf_java_library_and_tds10">
-    netCDF-Java Library</a> for a more details on these changes.
-</p>
+    The version of the netCDF-Java library currently distributed with the IDV is
+    the 4.6.2. Its main feature is a rewrite of GRIB handling. This version of
+    netCDF-Java includes changes: AWIPSsat projection, WRF lat/lon coordinates
+    with time dependence, Updated grib1 table for NLDAS, handling of scalar
+    runtime coordinate for GRIB collections.  See
+    the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf_java_library_and_tds10">
+      netCDF-Java Library</a> for a more details on these changes.
+  </p>
 </faqitem>
 
 
 <faqitem cat="Display Changes"></faqitem>
 
 <faqitem q="Forecast hour added" id="fhour">
-The IDV can now calculate the forecast hours based on the run time coordinate system and values
-  can be accessed through the forecast hour macro in the display properties window.
+  <p>
+    The IDV can now calculate the forecast hours based on the run time
+    coordinate system and values can be accessed through the forecast hour macro
+    in the display properties window.
+  </p>
 </faqitem>
 
 <faqitem q="New Grid Trajectory and Curly Vector" id="ngtrajectory">
-The new 2D grid trajectory and the curly vector display are based on the new APIs of the VisAD library.
-  Both displays are categorized as flow vector display. The vector plan view display will be created
-  first and there are radio buttons to switch to the trajectory or curly vector display. The trajectory
-  and the curly vector can also be colored by the wind speed.
+  <p>
+    The new 2D grid trajectory and the curly vector display are based on the new
+    APIs of the VisAD library.  Both displays are categorized as flow vector
+    display. The vector plan view display will be created first and there are
+    radio buttons to switch to the trajectory or curly vector display. The
+    trajectory and the curly vector can also be colored by the wind speed.
+  </p>
 </faqitem>
 
 <faqitem q="3D Adaptive Resolution" id="3dAR">
-  The Adaptisve Resolution (AR) feature in the IDV has been expanded to cover several 3 dimensional displays.
-  When creating a 3D display or cross section display, the IDV calculates the resolution of the map view window,
-  dynamically sets the data sampling in all 3 dimensions, and loads sufficient data to generate the image.
+  <p>
+    The Adaptive Resolution (AR) feature in the IDV has been expanded to cover
+    several 3 dimensional displays. When creating a 3D display or cross section
+    display, the IDV calculates the resolution of the map view window,
+    dynamically sets the data sampling in all 3 dimensions, and loads sufficient
+    data to generate the image.
+  </p>
 </faqitem>
 
 <faqitem q="Support for CF Trajectory Format" id="cftraj">
-  The IDV now supports the reading and display of trajectory data as described in
+  <p>
+    The IDV now supports the reading and display of trajectory data as described
+    in
   <a href="http://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/build/aphs04.html">H.4. Trajectory
-  Data</a> of the CF conventions.
+    Data</a> of the CF conventions.
+  </p>
 </faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
@@ -80,16 +94,18 @@ The new 2D grid trajectory and the curly vector display are based on the new API
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
-We fixed a few bugs associated with the time matching in this release. One of the bug is the excessive loading
-  of data in the bundle when there is a derived of derived parameters. The another bug fixed is in the 3D grid
-  trajectory display in which the time subset information not correctly saved in the bundle.
+  We fixed a few bugs associated with the time matching in this release. One of
+  the bug is the excessive loading of data in the bundle when there is a derived
+  of derived parameters. The another bug fixed is in the 3D grid trajectory
+  display in which the time subset information not correctly saved in the
+  bundle.
 </faqitem>
 
-
-
 <faqitem q="Known Problems" id="problems">
-For a list of outstanding known problems, see the
-<a href="Bugs.html">Known Problems</a> page.
+  <p>
+    For a list of outstanding known problems, see the
+    <a href="Bugs.html">Known Problems</a> page.
+  </p>
 </faqitem>
 
 </faq>
