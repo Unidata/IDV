@@ -25,6 +25,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ucar.httpservices.HTTPAuthSchemes;
+import ucar.httpservices.HTTPException;
 import ucar.nc2.util.DiskCache2;
 import ucar.httpservices.HTTPSession;
 
@@ -366,7 +368,11 @@ public class DataManager {
                 AccountManager.setGlobalAccountManager(accountManager);
             }
             AccountManager provider = accountManager;
-            HTTPSession.setGlobalCredentialsProvider(provider);
+            try {
+                HTTPSession.setGlobalCredentialsProvider(provider, HTTPAuthSchemes.BASIC);
+            } catch (HTTPException e) {
+                e.printStackTrace();
+            }
             // Get the current version
             String version =
                 dataContext.getIdv().getStateManager().getVersion();
