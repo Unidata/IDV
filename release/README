@@ -257,6 +257,27 @@ to place the archive in. Select /share/idv/test/archives.
 ***********************************************************************
 Building/configuring the installers
 
+build.xml:
+
+The entire build process is quite Baroque owing to the complexity of the IDV,
+and the long history of the project. Currently the nightly build runs from spock
+from Yuan's crontab:
+
+5 1 * * * /share/idv/release/newbuildIdv nightly > /share/idv/nightly.log 2>&1
+5 2 * * * mailx -s "IDV Build Status" chastang@unidata.ucar.edu yuanho@unidata.ucar.edu < /share/idv/nightly.log
+
+Naturally the IDV is built from what is in version control EXCEPT for the
+build.xml file in /share/idv/release/build.xml. This file must be manually
+maintained and copied over from release/build.xml in the git repository when
+there are changes. Make sure to tread lightly here and make any backups before
+overwriting anything. Note that /share/idv/release/build.xml contains passwords
+that the release/build.xml does not have. It is instructive to simply do a diff
+between these files. For the build make sure these two build.xmls stay in sync
+except for any passwords. Don't check passwords into version control! See the
+section about certificates below:
+
+Installers:
+
 The installers are built automatically by ant using install4j ant tasks which is
 located in /share/install4j.  We have a single, multi-platform license which
 means that only one copy can run at a time, but on any machine you want even VMs
@@ -362,13 +383,24 @@ https://gouessej.wordpress.com/2012/08/01/java-3d-est-de-retour-java-3d-is-back/
 Even though this blog entry is old, it is periodically updated.
 
 ***********************************************************************
-Java Web Start Certificate Signing
+Certificate Signing
 
-On a yearly basis IDV Java Web Start certificate must be updated. Instructions
-on updating that certificate can be found here
+Unfortunately, we live in a much more stringent security environment than in the
+past. This means the IDV distributions on OS X, Windows, and Java Webstart must
+have certificates otherwise the users will run into various problems including
+not being able to run the IDV. Obtaining these certificates can be a pain. You
+will have to work with the security group at UCAR-CISL whenever they expire.
 
-https://www.unidata.ucar.edu/unidata_only/admin/idv_software_license_info.html
+The certificates for Windows and OS X are kept in /share/idv/Certicates. Therein
+you will find .p12 files. Work with UCAR-CISL security to obtain these
+certificate files when they expire. See the General Settings, Code Signing Tab
+in install4j for more information of about the signing process. On OS X a
+"Developer ID" certificate (and no other kind of certificate) is mandatory.
 
+For Webstart, see the release/build.xml and search for "sign".
+
+For signing passwords, see /share/idv/release/build.xml. Don't store passwords
+in version control! 
 
 ***********************************************************************
 Java 3D Hosting.
