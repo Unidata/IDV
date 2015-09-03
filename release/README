@@ -257,98 +257,82 @@ to place the archive in. Select /share/idv/test/archives.
 ***********************************************************************
 Building/configuring the installers
 
-The installers are built automatically by ant using install4j which is
-located in /share/install4j.  We have a single, multi-platform license
-which means that only one copy can run at a time, but on any machine
-you want.  Website for install4j is
-http://www.ej-technologies.com/products/install4j/overview.html.  The
-Unidata Admin staff has the license information.  The license server
-runs on abbott as of October 2011.
+The installers are built automatically by ant using install4j ant tasks which is
+located in /share/install4j.  We have a single, multi-platform license which
+means that only one copy can run at a time, but on any machine you want even VMs
+as long as it is on the Unidata network.
+
+Website for install4j is
+http://www.ej-technologies.com/products/install4j/overview.html.  The Unidata
+Admin staff has the license information.  The license server runs on abbott as
+of October 2011.
+
+The install4j support staff is usually pretty responsive so contact them if you
+have trouble: ej-technologies Support <bugs@ej-technologies.com>
 
 The configuration file is in git:
-/src/ucar/unidata/idv/release/installer/idv.install4j.  This file is used
-as a template for the installer and copied to /share/idv/installers
-during the build process.  At that point, the version number is filled
-in.
+/src/ucar/unidata/idv/release/installer/idv.install4j.  This file is used as a
+template for the installer and copied to /share/idv/installers during the build
+process.  At that point, the version number is filled in.
 
-To make configuration changes, run /share/install4j/bin/install4j and
-open the template.  After making changes, test the build and if it
-works as you expect, save the changes back to the template.
+To make configuration changes, run /share/install4j/bin/install4j and open the
+template.  After making changes, test the build and if it works as you expect,
+save the changes back to the template.
 
 JRE bundles:
 
-The JREs that are included in the installers need to be updated
-periodically as new versions of Java come out. This is an involved
-process so set aside a day or two. Also have a spreadsheet ready to
-keep track of your steps. For an example spreadsheet, see jre.org (use
-emacs org mode to view it).
+The JREs that are included in the installers need to be updated periodically as
+new versions of Java come out. This process has been made much easier for a
+variety of reasons. We can generally use the JRE provided by install4j. 
+
+http://resources.ej-technologies.com/install4j/help/doc/index.html#install4j.helptopics.concepts.jreBundles
+
+For Linux, we use Vagrant VMs coupled with install4j for the creation of the
+JRE.  The Vagrantfiles are located in release/vagrant. Note you will have to run
+those Vagrant VMs on the Unidata network to have access to the install4j license
+sever.
 
 The platforms currently supported by the IDV are
 
 - linux
 - linux64
-- solarisx86
 - windows
 - windows64
 - mac os x
 
-On most platforms, it is a matter of:
+On Linux Vagrant VMs, it is a matter of:
 
 - downloading the JRE from oracle.com
-- logging onto a machine of the particular OS
-- unpacking the OS specific JRE to the appropriate subdirectory of /share/idv/jre
-- installing Java 3D on top of the unpacked JRE (just unzip the version in the directory,
-e.g., cd jre1.6.0_31; unzip ../j3d-1_5_2-windows-i586/j3d-jre.zip)
-- running install4j to create a new JRE bundles. (Using install4j
-creates smaller bundles than manually taring and gzipping the JRE
-directory.) Also, you must run the install4j bundle wizard on the
-specific OS for a given JRE bundle. You will have to obtain a login on
-each of these platforms. Try to obtain logins on machines that have a
-/share mount available to make your life easier.  For example, ssh -Y
-sparcMachine, and run /share/install4j/bin/install4j from that host.
+- logging into the Vagrant VM of the particular OS
+- unpacking the OS specific JRE to a known directory
+- running install4j to create a new JRE bundles.  Also, you must run the
+install4j bundle wizard on the specific OS (Vagrant machine)for a given JRE
+bundle.
 
-The only platform that is problematic is Windows because when you
-install the JRE, it makes the new JRE default on your system.  To be
-on the safe side, clear out any existing JREs so you have a fresh JRE
-install. (Sometimes, cruft can accumulate over time in the JRE
-directories.) Make sure you uninstall the JRE in a way that make
-Windows happy, otherwise you will be cleaning up the registry. You
-have to install it on your system, not to a temporary directory.  You
-also have to install a copy of install4j on your Windows system to run
-the bundle generator.  You can copy the c:/Program Files/Java/jre6 (or
-where ever the JRE was installed) over to /share/idv/windows, unzip
-the Java 3D on it and then pack it up using the Windows version of
-install4j.
-
-To create a JRE bundle in install4j, start it up and select the
-Project->Create a JRE Bundle menu (this menu item is not available on
-OS X for install4j version 4 so don't tear your hair out looking for
-it) and step through the process. The important page is the Select a
-JRE:
+Now that you have done the work of obtaining the JREs, for all platforms, to
+create a JRE bundle in install4j, start it up and select the Project->Create a
+JRE Bundle menu (this menu item is not available on OS X for install4j version 4
+so don't tear your hair out looking for it) and step through the process. The
+important page is the Select a JRE:
 
 - select the top level of the unpacked JRE
-- Input the version of the JRE (e.g. 1.6.0_20)
+- Input the version of the JRE (e.g. 1.8.0_45)
 - For the custom id, use the java 3d version  (e.g., j3d1.5.2)
-
-NB: You will have to do this for every platform by running install4j
-on each platform.
 
 The resulting JRE bundle will use this to create a name like:
 
 linux-i386-1.6.0_20.5.2.tar.gz
 
-The JRE bundles are automatically stored in /share/install4j/jres (if
-you are running install4j from /share/install4j/bin), except on
-Windows.  It will be stored in the jres directory of the Windows
-install4j installation and then has to be manually copied over to
-/share/install4j/jres.
+The JRE bundles are automatically stored in /share/install4j/jres (if you are
+running install4j from /share/install4j/bin), except on Windows.  It will be
+stored in the jres directory of the Windows install4j installation and then has
+to be manually copied over to /share/install4j/jres.
 
-Once you have created the JRE bundles, you need to update the
-install4j template to point to the new versions.  There are two ways
-to do this.  The most fool-proof way is to run install4j and update
-the Media instances to point to the new bundles.  The other is just to
-edit the template.  If you do the latter, just make sure you change
-all references.
+Once you have created the JRE bundles, you need to update the install4j template
+to point to the new versions.  There are two ways to do this.  The most
+fool-proof way is to run install4j and update the Media instances to point to
+the new bundles.  The other is just to edit the template.  If you do the latter,
+just make sure you change all references.
 
 SSEC uses install4j for McIDAS-V, so you can contact them for help
 with the program.  We also share the JRE bundles with them for
