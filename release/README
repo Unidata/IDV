@@ -341,6 +341,26 @@ platforms that we don't have.
 The Unidata admin staff has the information on licenses and passwords
 to get in to download new versions.
 
+Java 3D:
+
+Java 3D is being maintained by the open source community. The API is frozen, bug
+fixes only (and, yes, they really do fix bugs). The best place to obtain
+information on the status of Java 3D is the JogAmp Java 3D forum:
+http://forum.jogamp.org/java3d-f3728156.html
+
+Contrary to the past, the Java 3D files are contained in zip files in libsrc
+directory. The files are incorporated into the install4j build process so that
+they end in the correct place in the IDV distribution. These need to be
+periodically updated with a recent JOGL and Java 3D jars. But doing so requires
+careful and systematic testing of the IDV. If you find a bug, provide an
+isolated test case and report back to the forum.
+
+See here for more information:
+
+https://gouessej.wordpress.com/2012/08/01/java-3d-est-de-retour-java-3d-is-back/
+
+Even though this blog entry is old, it is periodically updated.
+
 ***********************************************************************
 Java Web Start Certificate Signing
 
