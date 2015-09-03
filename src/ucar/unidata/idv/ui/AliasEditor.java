@@ -20,57 +20,49 @@
 
 package ucar.unidata.idv.ui;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
-
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
-
 import ucar.unidata.data.DataAlias;
-
-
-
-import ucar.unidata.idv.*;
-
-
+import ucar.unidata.idv.IdvManager;
+import ucar.unidata.idv.IdvResourceManager;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.PluginManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
 import ucar.unidata.util.StringUtil;
-
-
 import ucar.unidata.xml.XmlResourceCollection;
-
 import ucar.unidata.xml.XmlUtil;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
-
-import java.io.File;
-import java.io.FileOutputStream;
-
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.table.*;
-
-
-
 
 /**
  * This class is used to edit the set of {@link ucar.unidata.data.DataAlias}-s
@@ -195,8 +187,6 @@ public class AliasEditor extends IdvManager {
     private void init() {
         tabbedPane = new JTabbedPane();
 
-
-        int count = 0;
         for (int resourceIdx = 0; resourceIdx < resources.size();
                 resourceIdx++) {
             Element root       = resources.getRoot(resourceIdx);
@@ -429,9 +419,9 @@ public class AliasEditor extends IdvManager {
         //Turn the "," into "\n"
         aliases = StringUtil.join("\n",
                                   StringUtil.split(aliases, ",", true, true));
-        JTextField      nameFld    = new JTextField(name, 15);
-        JTextField      labelFld   = new JTextField(label, 15);
-        final JTextArea aliasesFld = new JTextArea(aliases, 15, 10);
+        JTextField      nameFld    = new JTextField(name, 40);
+        JTextField      labelFld   = new JTextField(label, 40);
+        final JTextArea aliasesFld = new JTextArea(aliases, 30, 10);
         aliasesFld.setToolTipText(
             "<html>Enter parameter name, one per line<br>Right mouse to add current parameters</html>");
         aliasesFld.addMouseListener(new MouseAdapter() {
@@ -446,15 +436,27 @@ public class AliasEditor extends IdvManager {
                 aliasesFld, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-
-        sp.setPreferredSize(new Dimension(150, 100));
+        // TJJ Sep 2015: Minor layout mods so components resize better.
+        // Also, bump the initial size a bit, 150 x 150 was really small.
+        
+        sp.setPreferredSize(new Dimension(400, 300));
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
+        
+        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        namePanel.add(new JLabel("Name: "));
+        namePanel.add(nameFld);
+        
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        labelPanel.add(new JLabel("Label: "));
+        labelPanel.add(labelFld);
+        
+        double[] WT_YYYY = { 1, 1, 1, 1 };
         JPanel p = GuiUtils.doLayout(new Component[] {
-            GuiUtils.rLabel("Name: "), GuiUtils.left(nameFld),
-            GuiUtils.rLabel("Label: "), GuiUtils.left(labelFld),
-            GuiUtils.filler(), new JLabel("Enter aliases one per line:"),
-            GuiUtils.filler(), sp
-        }, 2, GuiUtils.WT_N, GuiUtils.WT_NNNY);
+        	namePanel, 
+        	labelPanel,
+            new JLabel("Enter aliases one per line:"),
+            sp
+        }, 1, GuiUtils.WT_Y, WT_YYYY);
 
         if ( !GuiUtils.showOkCancelDialog(null, "Data Alias", p, null)) {
             if (deleteOnCancel && !newEntry) {
