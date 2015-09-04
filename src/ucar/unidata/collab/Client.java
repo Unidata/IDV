@@ -1,20 +1,18 @@
 /*
- * $Id: Client.java,v 1.15 2005/09/21 17:13:21 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,20 +21,23 @@
 package ucar.unidata.collab;
 
 
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Writer;
+
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 import java.util.List;
-
-
-import java.io.*;
-
-import java.net.*;
 
 
 
@@ -44,7 +45,6 @@ import java.net.*;
  *
  * A generic client object.
  * @author Metapps development team
- * @version $Revision: 1.15 $Date: 2005/09/21 17:13:21 $
  */
 
 
@@ -183,9 +183,9 @@ public class Client {
 
 
     /**
-     * _more_
+     * Debug
      *
-     * @param msg
+     * @param msg debug message
      */
     public void debug(String msg) {
         System.err.println(msg);
@@ -245,7 +245,7 @@ public class Client {
     /**
      *  Handle the  message rcvd from the server.
      *
-     * @param message
+     * @param message message from server
      */
     protected void handleServerMessage(String message) {
         //        debug ("Got message from server:" + message);
@@ -485,16 +485,3 @@ public class Client {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

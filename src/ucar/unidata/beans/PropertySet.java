@@ -1,7 +1,5 @@
 /*
- * $Id: PropertySet.java,v 1.10 2005/05/13 18:28:22 jeffmc Exp $
- * 
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,10 +22,10 @@ package ucar.unidata.beans;
 
 
 
-import java.io.Serializable;
-
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
+
+import java.io.Serializable;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -38,7 +36,6 @@ import java.util.TreeMap;
  * Provides support for JavaBean properties.
  *
  * @author Steven R. Emmerson
- * @version $Id: PropertySet.java,v 1.10 2005/05/13 18:28:22 jeffmc Exp $
  */
 public class PropertySet implements Serializable {
 
@@ -52,7 +49,7 @@ public class PropertySet implements Serializable {
     /**
      * Adds a property to the collection of properties.
      *
-     * @param property
+     * @param property some property
      */
     public void addProperty(Property property) {
         propertyNameMap.put(property.getName(), property);
@@ -61,7 +58,7 @@ public class PropertySet implements Serializable {
     /**
      * Removes a property from the collection of properties.
      *
-     * @param property
+     * @param property some property
      */
     public void removeProperty(Property property) {
         propertyNameMap.remove(property.getName());
@@ -217,10 +214,3 @@ public class PropertySet implements Serializable {
         }
     }
 }
-
-
-
-
-
-
-

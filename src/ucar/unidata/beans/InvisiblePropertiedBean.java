@@ -1,7 +1,5 @@
 /*
- * $Id: InvisiblePropertiedBean.java,v 1.7 2005/05/13 18:28:22 jeffmc Exp $
- * 
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,14 +22,8 @@ package ucar.unidata.beans;
 
 
 
-import java.io.Serializable;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
 
 /**
@@ -40,7 +32,7 @@ import java.util.TreeMap;
  * which is named "title".
  *
  * @author Steven R. Emmerson
- * @version $Id: InvisiblePropertiedBean.java,v 1.7 2005/05/13 18:28:22 jeffmc Exp $
+ *
  */
 public abstract class InvisiblePropertiedBean implements PropertiedBean {
 
@@ -69,14 +61,14 @@ public abstract class InvisiblePropertiedBean implements PropertiedBean {
         if (title != null) {
             try {
                 titleProperty.setValue(title);
-            } catch (PropertyVetoException e) {}    // can't happen because Bean just created
+            } catch (PropertyVetoException e) {}  // can't happen because Bean just created
         }
     }
 
     /**
      * Adds a property to the collection of properties.
      *
-     * @param property
+     * @param property some property
      */
     public void addProperty(Property property) {
         propertySet.addProperty(property);
@@ -162,10 +154,3 @@ public abstract class InvisiblePropertiedBean implements PropertiedBean {
         propertySet.removePropertyChangeListener(name, listener);
     }
 }
-
-
-
-
-
-
-

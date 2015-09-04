@@ -1,7 +1,5 @@
 /*
- * $Id: PropertiedBean.java,v 1.9 2005/05/13 18:28:22 jeffmc Exp $
- * 
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,23 +22,22 @@ package ucar.unidata.beans;
 
 
 
-import java.io.Serializable;
-
 import java.beans.PropertyChangeListener;
+
+import java.io.Serializable;
 
 
 /**
  * Provides support for JavaBeans that have properties.
  *
  * @author Steven R. Emmerson
- * @version $Id: PropertiedBean.java,v 1.9 2005/05/13 18:28:22 jeffmc Exp $
  */
 public interface PropertiedBean extends Serializable {
 
     /**
      * Adds a property to the collection of properties.
      *
-     * @param property
+     * @param property some property
      */
     void addProperty(Property property);
 
@@ -90,10 +87,3 @@ public interface PropertiedBean extends Serializable {
     void removePropertyChangeListener(String name,
                                       PropertyChangeListener listener);
 }
-
-
-
-
-
-
-
