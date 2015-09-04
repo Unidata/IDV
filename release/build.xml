@@ -705,7 +705,8 @@ line using: and -Dbasedir=/some/other/dir
           projectfile="${installerdir}/idv.install4j.${idv.version}"
           release="${idv.version}"
           destination="${installerdir}"
-          macKeystorePassword="idv"
+          macKeystorePassword=""
+          winKeystorePassword=""
       >
           <variable name="SRCDIR" value="${basedir}"/>
       </install4j>
