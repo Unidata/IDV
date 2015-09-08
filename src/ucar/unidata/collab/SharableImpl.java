@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.collab;
@@ -25,20 +24,15 @@ package ucar.unidata.collab;
 import ucar.unidata.util.GuiUtils;
 
 
-
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 
-import javax.swing.*;
-
-
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 
 /**
  * @author Jeff McWhirter
- * @version $Revision: 1.12 $Date: 2005/10/06 15:19:37 $
  */
 
 public class SharableImpl implements Sharable {
@@ -61,7 +55,7 @@ public class SharableImpl implements Sharable {
     private JComboBox shareGroupBox;
 
 
-    /** Keeps track of the last time this object rcvd  shared data  */
+    /** Keeps track of the last time this object rcvd  shared data */
     private Hashtable<Object, Long> lastReceiveShareTime;
 
 
@@ -167,25 +161,23 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public boolean getSharing() {
         return sharing;
     }
 
     /**
-     * _more_
+     * Sets the sharing.
      *
-     * @param sharing
+     * @param sharing the new sharing
      */
     public void setSharing(boolean sharing) {
         this.sharing = sharing;
     }
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public Object getShareGroup() {
         return shareGroup;
@@ -193,16 +185,16 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
+     * Removes the sharable.
      */
     public void removeSharable() {
         SharableManager.removeSharable(this);
     }
 
     /**
-     * _more_
+     * Sets the share group.
      *
-     * @param shareGroup
+     * @param shareGroup the new share group
      */
     public void setShareGroup(Object shareGroup) {
         if (hasBeenInitialized) {
@@ -215,11 +207,7 @@ public class SharableImpl implements Sharable {
     }
 
     /**
-     * _more_
-     *
-     * @param from
-     * @param dataId
-     * @param data
+     * {@inheritDoc}
      */
     public void receiveShareData(Sharable from, Object dataId,
                                  Object[] data) {

@@ -26,7 +26,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,8 +109,7 @@ public class Client {
 
 
     /**
-     * _more_
-     *
+     * Instantiates a new client.
      */
     public Client() {}
 
@@ -121,7 +119,7 @@ public class Client {
      *  hostname[:optional port number]. If alsoCreateServer is true
      *  then also create a server.
      *
-     * @param host
+     * @param host the host
      */
     public Client(String host) {
         this(host, -1);
@@ -134,8 +132,8 @@ public class Client {
      *  hostname[:optional port number]. If alsoCreateServer is true
      *  then also create a server.
      *
-     * @param host
-     * @param thePort
+     * @param host the host
+     * @param thePort the the port
      */
     public Client(String host, int thePort) {
         //See if there is a port
@@ -255,10 +253,11 @@ public class Client {
 
 
     /**
-     * _more_
-     * @return _more_
+     * Read.
      *
-     * @throws IOException
+     * @return the string
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     protected String read() throws IOException {
         String errorMsg = null;
@@ -333,9 +332,9 @@ public class Client {
 
 
     /**
-     * _more_
+     * Write.
      *
-     * @param message
+     * @param message the message
      */
     public void write(String message) {
         try {
@@ -354,10 +353,10 @@ public class Client {
 
 
     /**
-     * _more_
+     * Log exception.
      *
-     * @param msg
-     * @param exc
+     * @param msg the msg
+     * @param exc the exc
      */
     protected void logException(String msg, Exception exc) {
         LogUtil.printException(log_, msg, exc);
@@ -365,8 +364,7 @@ public class Client {
 
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public String toString() {
         return hostname;
