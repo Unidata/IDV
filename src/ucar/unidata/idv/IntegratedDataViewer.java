@@ -627,7 +627,9 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getIdvUIManager().initDone();
         getArgsManager().initDone();
 
-        if (!getStateManager().getRunningIsl()) {
+        boolean doVersionCheck =
+            getStateManager().getProperty("idv.doversioncheck", true);
+        if (!getStateManager().getRunningIsl() && doVersionCheck) {
             try {
                 OldVersionCheck.check(this);
             } catch (Exception e) {
