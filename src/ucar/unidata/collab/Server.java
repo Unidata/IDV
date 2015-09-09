@@ -1,20 +1,18 @@
 /*
- * $Id: Server.java,v 1.13 2005/09/21 17:13:21 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,18 +21,17 @@
 package ucar.unidata.collab;
 
 
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 
+import java.io.IOException;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import java.util.ArrayList;
 import java.util.List;
-
-
-import java.io.*;
-
-import java.net.*;
 
 
 
@@ -88,14 +85,13 @@ public class Server {
         this.port = port;
     }
 
-
-
     /**
-     * _more_
+     * Start server.
      *
-     * @param newPort
+     * @param newPort the new port
+     * @throws IOException Signals that an I/O exception has occurred.
      *
-     * @throws java.io.IOException
+     * @throws java.io.IOException _more_
      */
     public void startServer(int newPort) throws java.io.IOException {
         port = newPort;
@@ -113,9 +109,11 @@ public class Server {
 
 
     /**
-     * _more_
+     * Start server.
      *
-     * @throws java.io.IOException
+     * @throws IOException Signals that an I/O exception has occurred.
+     *
+     * @throws java.io.IOException _more_
      */
     public void startServer() throws java.io.IOException {
         startServer(port);
@@ -123,7 +121,7 @@ public class Server {
 
 
     /**
-     * _more_
+     * Stop server.
      */
     public void stopServer() {
         if (isRunning) {
@@ -138,7 +136,7 @@ public class Server {
 
 
     /**
-     * _more_
+     * Run server.
      */
     private void runServer() {
         isRunning = true;
@@ -263,28 +261,23 @@ public class Server {
         }
     }
 
-
-
-
-
     /**
-     * _more_
-     * @return _more_
+     * Gets the clients.
+     *
+     * @return the clients
      */
     public List getClients() {
         return clients;
     }
 
-
-
     /**
      *  Does this server have any clients.
-     * @return _more_
+     *
+     * @return true, if successful
      */
     public boolean hasClients() {
         return clients.size() > 0;
     }
-
 
     /**
      *  Add the given client to the list of clients managed by this server
@@ -345,19 +338,19 @@ public class Server {
     }
 
     /**
-     * _more_
+     * Write.
      *
-     * @param message
+     * @param message the message
      */
     public void write(String message) {
         write(message, null);
     }
 
     /**
-     * _more_
+     * Write.
      *
-     * @param message
-     * @param exceptClient
+     * @param message the message
+     * @param exceptClient the except client
      */
     public void write(String message, Client exceptClient) {
         try {
@@ -379,12 +372,11 @@ public class Server {
         }
     }
 
-
     /**
-     * _more_
+     * Log exception.
      *
-     * @param msg
-     * @param exc
+     * @param msg the msg
+     * @param exc the exc
      */
     protected void logException(String msg, Exception exc) {
         LogUtil.printException(log_, msg, exc);
@@ -392,27 +384,11 @@ public class Server {
 
 
     /**
-     * _more_
+     * The main method.
      *
-     * @param args
+     * @param args the arguments
      */
     public static void main(String[] args) {
         new Server();
     }
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -60,39 +60,34 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
-     *
+     * Instantiates a new sharable impl.
      */
     public SharableImpl() {
         this(SharableManager.GROUP_ALL, false);
     }
 
     /**
-     * _more_
+     * Instantiates a new sharable impl.
      *
-     * @param sharing
-     *
+     * @param sharing the sharing
      */
     public SharableImpl(boolean sharing) {
         this(SharableManager.GROUP_ALL, sharing);
     }
 
     /**
-     * _more_
+     * Instantiates a new sharable impl.
      *
-     * @param group
-     * @param sharing
-     *
+     * @param group the group
+     * @param sharing the sharing
      */
     public SharableImpl(Object group, boolean sharing) {
         this.sharing    = sharing;
         this.shareGroup = group;
     }
 
-
-
     /**
-     * _more_
+     * Show sharable dialog.
      */
     public void showSharableDialog() {
         JComponent contents = getSharablePropertiesComponent();
@@ -105,7 +100,7 @@ public class SharableImpl implements Sharable {
     }
 
     /**
-     * _more_
+     * Inits the group box.
      */
     private void initGroupBox() {
         if (shareGroupBox == null) {
@@ -124,9 +119,9 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
+     * Gets the sharable properties component.
      *
-     * @return _more_
+     * @return the sharable properties component
      */
     public JComponent getSharablePropertiesComponent() {
         initGroupBox();
@@ -135,7 +130,7 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
+     * Apply sharable properties.
      */
     public void applySharableProperties() {
         if (shareGroupBox == null) {
@@ -302,8 +297,7 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public String getUniqueId() {
         if (uniqueId == null) {
@@ -313,13 +307,11 @@ public class SharableImpl implements Sharable {
     }
 
     /**
-     * _more_
+     * Sets the unique id.
      *
-     * @param id
+     * @param id the new unique id
      */
     public void setUniqueId(String id) {
         uniqueId = id;
     }
-
-
 }
