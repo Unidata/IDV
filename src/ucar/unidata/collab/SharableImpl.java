@@ -288,8 +288,8 @@ public class SharableImpl implements Sharable {
     /**
      *  Share the data identified by dataId with only internal (to the jvm) objects.
      *
-     * @param dataId
-     * @param data
+     * @param dataId the data id
+     * @param data the data
      */
     public void doShareInternal(Object dataId, Object data) {
         doShare(dataId, new Object[] { data }, true, false);

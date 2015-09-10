@@ -39,7 +39,6 @@ import java.util.List;
  * A generic server
  *
  * @author Metapps development team
- * @version $Revision: 1.13 $Date: 2005/09/21 17:13:21 $
  */
 
 
@@ -90,10 +89,8 @@ public class Server {
      *
      * @param newPort the new port
      * @throws IOException Signals that an I/O exception has occurred.
-     *
-     * @throws java.io.IOException _more_
      */
-    public void startServer(int newPort) throws java.io.IOException {
+    public void startServer(int newPort) throws IOException {
         port = newPort;
         if (isRunning) {
             return;
@@ -112,10 +109,8 @@ public class Server {
      * Start server.
      *
      * @throws IOException Signals that an I/O exception has occurred.
-     *
-     * @throws java.io.IOException _more_
      */
-    public void startServer() throws java.io.IOException {
+    public void startServer() throws IOException {
         startServer(port);
     }
 
@@ -182,7 +177,7 @@ public class Server {
     /**
      *  Gets called when we have added a new client.
      *
-     * @param client
+     * @param client the client
      */
     protected void notifyClientAdd(Client client) {}
 
@@ -190,7 +185,7 @@ public class Server {
     /**
      *  Gets called when we have removed a client.
      *
-     * @param client
+     * @param client the client
      */
     protected void notifyClientRemove(Client client) {}
 
@@ -209,10 +204,10 @@ public class Server {
 
     /**
      *  A factory method for creating a new client.
-     *  @param clientSocket The socket we are connected to the client with.
-     *  @return a new Client
      *
-     * @throws IOException
+     * @param clientSocket The socket we are connected to the client with.
+     * @return a new Client
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     protected Client createClient(Socket clientSocket) throws IOException {
         return new Client(clientSocket);

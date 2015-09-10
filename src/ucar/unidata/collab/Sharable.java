@@ -16,25 +16,21 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.collab;
 
 
-
-
-
 /**
  * @author Jeff McWhirter
- * @version $Revision: 1.6 $Date: 2005/09/21 17:13:21 $
  */
 
 public interface Sharable {
 
     /**
-     * _more_
-     * @return _more_
+     * Gets the sharing.
+     *
+     * @return the sharing
      */
     public boolean getSharing();
 
@@ -57,23 +53,25 @@ public interface Sharable {
 
 
     /**
-     * _more_
+     * Receive share data.
      *
-     * @param from
-     * @param dataId
-     * @param data
+     * @param from the from
+     * @param dataId the data id
+     * @param data the data
      */
     public void receiveShareData(Sharable from, Object dataId, Object[] data);
 
     /**
-     * _more_
-     * @return _more_
+     * Gets the share group.
+     *
+     * @return the share group
      */
     public Object getShareGroup();
 
     /**
-     * _more_
-     * @return _more_
+     * Gets the unique id.
+     *
+     * @return the unique id
      */
     public String getUniqueId();
 }
