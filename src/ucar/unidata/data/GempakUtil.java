@@ -24,7 +24,7 @@ package ucar.unidata.data;
 /**
  * Created by yuanho on 9/11/15.
  */
-public class GempackUtil {
+public class GempakUtil {
 
     /** _more_ */
     public static final String[] wcod = {
