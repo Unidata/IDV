@@ -212,7 +212,7 @@ public class WeatherSymbol extends MetSymbol implements ImageObserver {
         if ((image == null) && (symbolType < SYMBOLNAMES.length)
                 && (symbolType >= 0)) {
             image = GuiUtils.getImage("/ucar/unidata/ui/symbol/images/"
-                                      + SYMBOLNAMES[symbolType] + ".gif");
+                    + SYMBOLNAMES[symbolType] + ".gif");
         }
         return image;
     }
@@ -254,7 +254,7 @@ public class WeatherSymbol extends MetSymbol implements ImageObserver {
             switch (symbolType) {
 
             case SYMBOL_PRESENTWEATHER :
-                return (code > 3)
+                return (code > 3 && code < 100)
                     ? WeatherSymbols.getPresentWeatherSymbol(code)
                     : null;
 

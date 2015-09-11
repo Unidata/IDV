@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.GempackUtil;
 import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.idv.JythonManager;
@@ -1218,6 +1219,12 @@ public class StationModelDisplayable extends DisplayableData {
                         // ignore null data
                     } catch (Exception npe) {}
                     if ( !Double.isNaN(value)) {
+                        String idc[] = metSymbol.getParamIds();
+                        if(idc != null && idc[0].equals("WNUM")){
+                            int code = (int)value;
+                            String dd = GempackUtil.pt_wcod(code);
+                            value = GempackUtil.pt_wsym(dd);
+                        }
                         shape =
                             ((WeatherSymbol) metSymbol).getLines((int) value);
                     }
