@@ -1,4 +1,4 @@
-***********************************************************************
+********************************************************************************
 The release environment:
 
 Start releases in the morning. If there are problems, you have time to recover.
@@ -24,7 +24,7 @@ in auxdata/docs/userguide/content/ReleaseNotes.html
   Words like for, and, a, the don't need to be capitalized.
 - If there are other pages in the user guide with more information on the
   change (like a new control page, or something in the preferences), add a link to it from the description.
-- The format for menus and submenus is Menu->Submenu->Sub-submenu.
+- The format for menus and sub-menus is Menu->Submenu->Sub-submenu.
   You can use the [ug::menu] macro which will format and bold the menus for you.
   If there are multiple words in a menu, enclose them in braces {}.
   Examples:  [ug::menu Edit Preferences] will show up as Edit->Preferences.
@@ -79,7 +79,8 @@ Then (see below):
 
   change the /content/software/idv/current to point to the new release.
 
-***********************************************************************
+********************************************************************************
+
 Update the downloads toc.xml page
 
 On conan:
@@ -94,7 +95,8 @@ cd /content/downloads/idv
    rm current
    ln -s <current IDV version> current
 
-***********************************************************************
+********************************************************************************
+
 Expand the javadoc
 
 cd /content/software/idv/<release>/docs
@@ -104,7 +106,8 @@ mv javadoc ..
 cd ..
 rm -rf META-INF/ docs
 
-***********************************************************************
+********************************************************************************
+
 Generate the PDFs
 
 You  need to build the userguide.pdf and workshop.pdf files.
@@ -126,7 +129,8 @@ Once this is done, copy them to conan:
 /content/software/idv/<release>/docs/userguide/userguide.pdf
 /content/software/idv/<release>/docs/workshop/workshop.pdf
 
-***********************************************************************
+********************************************************************************
+
 Changing the index.html page
 
 cd /content/software/idv/<release_dir>
@@ -144,17 +148,21 @@ we make the edits in index.html.<version>)
 Open http://www.unidata.ucar.edu/software/idv/<release_dir> in a web browser.
 Test all the links to the docs.  Fix any broken links.
 
-***********************************************************************
-Branch the git repository:
+********************************************************************************
 
-After the release of a version, you should make a branch in the git repository
-in case changes are needed later.  To branch the git repository,
+Tag the git repository:
+
+After the release of a version, you should make a tag in the git repository
+in case changes are needed later.  To tag the git repository,
 run:
 
-git checkout -b IDV_<version>
-git push origin IDV_<version>
+git tag v<version>
+git push origin v<version>
 
-***********************************************************************
+See the git history for tag examples.
+
+********************************************************************************
+
 Update the current and stable links:
 
 cd /content/software/idv
@@ -170,7 +178,8 @@ ln -s ../<stable IDV version> stable    (or simply point stable to current)
 Go to the IDV homepage and make sure it is pointing to the updated directory.  Make
 sure all the links on the page work correctly.
 
-***********************************************************************
+********************************************************************************
+
 Send out email to community:
 
 idvusers@unidata.ucar.edu
@@ -190,71 +199,26 @@ Best Regards,
 
 The Unidata IDV Team
 
+********************************************************************************
 
-***********************************************************************
-Running the test suite
+The IDV Testing Suite
 
-Of course, running the tests should come first but  it comes last in the README
-due to its length.
+The code for IDV testing suite is contained within this git repo:
 
-The cliff notes version of this section, i.e., to run the full
-test suite on the results of the build simply:
-cd /share/idv/lib
-tclsh /share/idv/test/runtest.tcl
+https://github.com/Unidata/idv-test
 
-And look at:
-/share/idv/lib/results.html
+The IDV testing suite make use of Docker technology. See here for more
+information on running the test suite with Docker:
 
-It is probably best to do this on harpo since the original archive images
-are generated on harpo. This should minimize false differences.
+https://hub.docker.com/r/unidata/idv-test/
 
+Currently, the testing suite runs on a nightly basis on our Azure resources.
+Please see here for the results of these tests:
 
-The longer version:
+http://unidata-idvtest.cloudapp.net/compare.html
 
-The set of test archives are in:
-/share/idv/test/archives
-Each archive has a directory there, e.g., dem, elnino, eta1, etc.
-The script:
-/share/idv/test/runtest.tcl
-runs the set of tests. You can give it the full directory name of a
-test archive to run just one test:
-tclsh /share/idv/test/runtest.tcl /share/idv/test/archives/eta1
-or as a short hand:
-tclsh /share/idv/test/runtest.tcl eta1
+********************************************************************************
 
-If no archive directories  are given on the command line it will run through
-all of the archives in /share/idv/test/archives
-
-The version of the idv that is used depends on where you are when you
-run the test. If there is an idv.jar in the current working directory
-then the script will run:
-java -jar idv.jar
-else it will run from the classpath:
-java ucar.unidata.idv.DefaultIdv
-
-
-The script will iterate through the test archives. For each on it will run
-the idv in test mode and tell the idv to write to the <archive name>_results
-directory. The script will then compare the generated images in the
-original archive with the generated images in the _results directory.
-The script produces 3 output files in the working directory:
-
-        results.html  resultsLeft.html  resultsRight.html
-
-Results is a frame set that contains resultsLeft.html and resultsRight.html
-Any stderr output is shown in resultsRight.html in red.
-resultsLeft.html  highlights the images that differ.
-Note: We just do a "diff image1 image2" on the images. So
-it is always the case that we pick up differences between some of the
-images.
-
-
-To create a test archive enable the "Test" menu. There should be
-a "Write Test Archive" entry. Select that and you will be prompted
-for an archive name, an optional text description and the directory
-to place the archive in. Select /share/idv/test/archives.
-
-***********************************************************************
 Building/configuring the installers
 
 build.xml:
@@ -382,7 +346,8 @@ https://gouessej.wordpress.com/2012/08/01/java-3d-est-de-retour-java-3d-is-back/
 
 Even though this blog entry is old, it is periodically updated.
 
-***********************************************************************
+********************************************************************************
+
 Certificate Signing
 
 Unfortunately, we live in a much more stringent security environment than in the
@@ -402,7 +367,8 @@ For Webstart, see the release/build.xml and search for "sign".
 For signing passwords, see /share/idv/release/build.xml. Don't store passwords
 in version control! 
 
-***********************************************************************
+********************************************************************************
+
 Java 3D Hosting.
 
 As of September 2011, Oracle no longer hosts properly signed Java 3D jars necessary

@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.collab;
@@ -25,20 +24,15 @@ package ucar.unidata.collab;
 import ucar.unidata.util.GuiUtils;
 
 
-
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 
-import javax.swing.*;
-
-
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 
 /**
  * @author Jeff McWhirter
- * @version $Revision: 1.12 $Date: 2005/10/06 15:19:37 $
  */
 
 public class SharableImpl implements Sharable {
@@ -61,44 +55,39 @@ public class SharableImpl implements Sharable {
     private JComboBox shareGroupBox;
 
 
-    /** Keeps track of the last time this object rcvd  shared data  */
+    /** Keeps track of the last time this object rcvd  shared data */
     private Hashtable<Object, Long> lastReceiveShareTime;
 
 
     /**
-     * _more_
-     *
+     * Instantiates a new sharable impl.
      */
     public SharableImpl() {
         this(SharableManager.GROUP_ALL, false);
     }
 
     /**
-     * _more_
+     * Instantiates a new sharable impl.
      *
-     * @param sharing
-     *
+     * @param sharing the sharing
      */
     public SharableImpl(boolean sharing) {
         this(SharableManager.GROUP_ALL, sharing);
     }
 
     /**
-     * _more_
+     * Instantiates a new sharable impl.
      *
-     * @param group
-     * @param sharing
-     *
+     * @param group the group
+     * @param sharing the sharing
      */
     public SharableImpl(Object group, boolean sharing) {
         this.sharing    = sharing;
         this.shareGroup = group;
     }
 
-
-
     /**
-     * _more_
+     * Show sharable dialog.
      */
     public void showSharableDialog() {
         JComponent contents = getSharablePropertiesComponent();
@@ -111,7 +100,7 @@ public class SharableImpl implements Sharable {
     }
 
     /**
-     * _more_
+     * Inits the group box.
      */
     private void initGroupBox() {
         if (shareGroupBox == null) {
@@ -130,9 +119,9 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
+     * Gets the sharable properties component.
      *
-     * @return _more_
+     * @return the sharable properties component
      */
     public JComponent getSharablePropertiesComponent() {
         initGroupBox();
@@ -141,7 +130,7 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
+     * Apply sharable properties.
      */
     public void applySharableProperties() {
         if (shareGroupBox == null) {
@@ -167,25 +156,23 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public boolean getSharing() {
         return sharing;
     }
 
     /**
-     * _more_
+     * Sets the sharing.
      *
-     * @param sharing
+     * @param sharing the new sharing
      */
     public void setSharing(boolean sharing) {
         this.sharing = sharing;
     }
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public Object getShareGroup() {
         return shareGroup;
@@ -193,16 +180,16 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
+     * Removes the sharable.
      */
     public void removeSharable() {
         SharableManager.removeSharable(this);
     }
 
     /**
-     * _more_
+     * Sets the share group.
      *
-     * @param shareGroup
+     * @param shareGroup the new share group
      */
     public void setShareGroup(Object shareGroup) {
         if (hasBeenInitialized) {
@@ -215,11 +202,7 @@ public class SharableImpl implements Sharable {
     }
 
     /**
-     * _more_
-     *
-     * @param from
-     * @param dataId
-     * @param data
+     * {@inheritDoc}
      */
     public void receiveShareData(Sharable from, Object dataId,
                                  Object[] data) {
@@ -305,8 +288,8 @@ public class SharableImpl implements Sharable {
     /**
      *  Share the data identified by dataId with only internal (to the jvm) objects.
      *
-     * @param dataId
-     * @param data
+     * @param dataId the data id
+     * @param data the data
      */
     public void doShareInternal(Object dataId, Object data) {
         doShare(dataId, new Object[] { data }, true, false);
@@ -314,8 +297,7 @@ public class SharableImpl implements Sharable {
 
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public String getUniqueId() {
         if (uniqueId == null) {
@@ -325,13 +307,11 @@ public class SharableImpl implements Sharable {
     }
 
     /**
-     * _more_
+     * Sets the unique id.
      *
-     * @param id
+     * @param id the new unique id
      */
     public void setUniqueId(String id) {
         uniqueId = id;
     }
-
-
 }

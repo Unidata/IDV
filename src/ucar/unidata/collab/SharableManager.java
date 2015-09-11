@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.collab;
@@ -34,7 +33,6 @@ import java.util.List;
 
 /**
  * @author Jeff McWhirter
- * @version $Revision: 1.12 $Date: 2005/09/21 17:13:21 $
  */
 
 public class SharableManager {
@@ -43,12 +41,12 @@ public class SharableManager {
 
     private static final Object MUTEX = new Object();
 
-    /** 
-        When a sharable receives a share we set the time when. When a sharable
-        does a doShare we check the last time it rcvd the share event. If its
-        less than this threshold (milliseconds) then we don't propagate the 
-        doShare
-    */
+    /**
+     *   When a sharable receives a share we set the time when. When a sharable
+     *   does a doShare we check the last time it rcvd the share event. If its
+     *   less than this threshold (milliseconds) then we don't propagate the
+     *   doShare
+     */
     private static final long SHARE_TIME_THRESHOLD = 1000;
 
     /** _more_ */
@@ -79,8 +77,9 @@ public class SharableManager {
     private static List shareGroups = null;
 
     /**
-     * _more_
-     * @return _more_
+     * Gets the share group names.
+     *
+     * @return the share group names
      */
     public static List getShareGroupNames() {
         synchronized (MUTEX) {
@@ -92,9 +91,9 @@ public class SharableManager {
     }
 
     /**
-     * _more_
+     * Adds the share group name.
      *
-     * @param name _more_
+     * @param name the name
      */
     public static void addShareGroupName(String name) {
         getShareGroupNames();
@@ -105,7 +104,7 @@ public class SharableManager {
     }
 
     /**
-     * _more_
+     * Inits the share group names.
      */
     private static void initShareGroupNames() {
         shareGroupNames = new ArrayList();
@@ -118,10 +117,10 @@ public class SharableManager {
 
 
     /**
-     * _more_
+     * Gets the group list.
      *
-     * @param group
-     * @return _more_
+     * @param group the group
+     * @return the group list
      */
     private static List getGroupList(Object group) {
         synchronized (MUTEX) {
@@ -137,9 +136,9 @@ public class SharableManager {
     }
 
     /**
-     * _more_
+     * Adds the sharable.
      *
-     * @param s
+     * @param s the s
      */
     public static void addSharable(Sharable s) {
         synchronized (MUTEX) {
@@ -155,9 +154,9 @@ public class SharableManager {
     }
 
     /**
-     * _more_
+     * Removes the sharable.
      *
-     * @param s
+     * @param s the s
      */
     public static void removeSharable(Sharable s) {
         synchronized (MUTEX) {
@@ -176,7 +175,7 @@ public class SharableManager {
     /**
      *  Add a listener to the list of listeners.
      *
-     * @param listener
+     * @param listener the listener
      */
     public static void addSharableListener(SharableListener listener) {
         if (listeners == null) {
@@ -190,7 +189,7 @@ public class SharableManager {
     /**
      *  Remove a listener from the list of listeners.
      *
-     * @param listener
+     * @param listener the listener
      */
     public static void removeSharableListener(SharableListener listener) {
         if (listeners == null) {
@@ -201,13 +200,13 @@ public class SharableManager {
 
 
     /**
-     * _more_
+     * Check share data.
      *
-     * @param from
-     * @param dataId
-     * @param data
-     * @param internal
-     * @param external
+     * @param from the from
+     * @param dataId the data id
+     * @param data the data
+     * @param internal the internal
+     * @param external the external
      */
     protected static void checkShareData(Sharable from, Object dataId,
                                          Object[] data, boolean internal,
@@ -239,11 +238,11 @@ public class SharableManager {
 
 
     /**
-     * _more_
+     * Send share data.
      *
-     * @param from
-     * @param dataId
-     * @param data
+     * @param from the from
+     * @param dataId the data id
+     * @param data the data
      */
     private static void sendShareData(Sharable from, Object dataId,
                                       Object[] data) {
@@ -253,12 +252,12 @@ public class SharableManager {
 
 
     /**
-     * _more_
+     * Send share data.
      *
-     * @param from
-     * @param shareGroup
-     * @param dataId
-     * @param data
+     * @param from the from
+     * @param shareGroup the share group
+     * @param dataId the data id
+     * @param data the data
      */
     private static void sendShareData(Sharable from, Object shareGroup,
                                       Object dataId, Object[] data) {
@@ -292,11 +291,10 @@ public class SharableManager {
         activelySharing = false;
     }
 
-
-
     /**
-     * _more_
-     * @return _more_
+     * Gets the default share groups.
+     *
+     * @return the default share groups
      */
     public static List getDefaultShareGroups() {
         synchronized (MUTEX) {
@@ -309,9 +307,9 @@ public class SharableManager {
     }
 
     /**
-     * _more_
+     * Adds the share group.
      *
-     * @param group
+     * @param group the group
      */
     public static void addShareGroup(Object group) {
         synchronized (MUTEX) {

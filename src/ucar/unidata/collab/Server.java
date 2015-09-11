@@ -1,20 +1,18 @@
 /*
- * $Id: Server.java,v 1.13 2005/09/21 17:13:21 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,18 +21,17 @@
 package ucar.unidata.collab;
 
 
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 
+import java.io.IOException;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import java.util.ArrayList;
 import java.util.List;
-
-
-import java.io.*;
-
-import java.net.*;
 
 
 
@@ -42,7 +39,6 @@ import java.net.*;
  * A generic server
  *
  * @author Metapps development team
- * @version $Revision: 1.13 $Date: 2005/09/21 17:13:21 $
  */
 
 
@@ -88,16 +84,13 @@ public class Server {
         this.port = port;
     }
 
-
-
     /**
-     * _more_
+     * Start server.
      *
-     * @param newPort
-     *
-     * @throws java.io.IOException
+     * @param newPort the new port
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    public void startServer(int newPort) throws java.io.IOException {
+    public void startServer(int newPort) throws IOException {
         port = newPort;
         if (isRunning) {
             return;
@@ -113,17 +106,17 @@ public class Server {
 
 
     /**
-     * _more_
+     * Start server.
      *
-     * @throws java.io.IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    public void startServer() throws java.io.IOException {
+    public void startServer() throws IOException {
         startServer(port);
     }
 
 
     /**
-     * _more_
+     * Stop server.
      */
     public void stopServer() {
         if (isRunning) {
@@ -138,7 +131,7 @@ public class Server {
 
 
     /**
-     * _more_
+     * Run server.
      */
     private void runServer() {
         isRunning = true;
@@ -184,7 +177,7 @@ public class Server {
     /**
      *  Gets called when we have added a new client.
      *
-     * @param client
+     * @param client the client
      */
     protected void notifyClientAdd(Client client) {}
 
@@ -192,7 +185,7 @@ public class Server {
     /**
      *  Gets called when we have removed a client.
      *
-     * @param client
+     * @param client the client
      */
     protected void notifyClientRemove(Client client) {}
 
@@ -211,10 +204,10 @@ public class Server {
 
     /**
      *  A factory method for creating a new client.
-     *  @param clientSocket The socket we are connected to the client with.
-     *  @return a new Client
      *
-     * @throws IOException
+     * @param clientSocket The socket we are connected to the client with.
+     * @return a new Client
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     protected Client createClient(Socket clientSocket) throws IOException {
         return new Client(clientSocket);
@@ -224,7 +217,7 @@ public class Server {
     /**
      *  Create a new client object and listen for input.
      *
-     * @param clientSocket
+     * @param clientSocket the client socket
      */
     protected void initClient(Socket clientSocket) {
         Client client = null;
@@ -238,7 +231,7 @@ public class Server {
     /**
      *  Create a new client object and listen for input.
      *
-     * @param client
+     * @param client the client
      */
     private void runClient(Client client) {
         try {
@@ -263,33 +256,28 @@ public class Server {
         }
     }
 
-
-
-
-
     /**
-     * _more_
-     * @return _more_
+     * Gets the clients.
+     *
+     * @return the clients
      */
     public List getClients() {
         return clients;
     }
 
-
-
     /**
      *  Does this server have any clients.
-     * @return _more_
+     *
+     * @return true, if successful
      */
     public boolean hasClients() {
         return clients.size() > 0;
     }
 
-
     /**
-     *  Add the given client to the list of clients managed by this server
+     *  Add the given client to the list of clients managed by this server.
      *
-     * @param client
+     * @param client the client
      */
     public void addClient(Client client) {
         addClient(client, true);
@@ -297,10 +285,10 @@ public class Server {
     }
 
     /**
-     *  Add the given client to the list of clients managed by this server
+     *  Add the given client to the list of clients managed by this server.
      *
-     * @param client
-     * @param andStartListening
+     * @param client the client
+     * @param andStartListening the and start listening
      */
     public void addClient(final Client client, boolean andStartListening) {
         clients.add(client);
@@ -317,9 +305,9 @@ public class Server {
 
 
     /**
-     *  Remove the given client from the list of clients managed by this server
+     *  Remove the given client from the list of clients managed by this server.
      *
-     * @param client
+     * @param client the client
      */
     public void removeClient(Client client) {
         try {
@@ -335,8 +323,8 @@ public class Server {
      *  Handle the  message rcvd from the given client. The default is to just turn around
      *  and write it to each of the other clients.
      *
-     * @param fromClient
-     * @param message
+     * @param fromClient the from client
+     * @param message the message
      */
     protected void handleIncomingMessage(Client fromClient, String message) {
         if (fromClient.getValid()) {
@@ -345,19 +333,19 @@ public class Server {
     }
 
     /**
-     * _more_
+     * Write.
      *
-     * @param message
+     * @param message the message
      */
     public void write(String message) {
         write(message, null);
     }
 
     /**
-     * _more_
+     * Write.
      *
-     * @param message
-     * @param exceptClient
+     * @param message the message
+     * @param exceptClient the except client
      */
     public void write(String message, Client exceptClient) {
         try {
@@ -379,12 +367,11 @@ public class Server {
         }
     }
 
-
     /**
-     * _more_
+     * Log exception.
      *
-     * @param msg
-     * @param exc
+     * @param msg the msg
+     * @param exc the exc
      */
     protected void logException(String msg, Exception exc) {
         LogUtil.printException(log_, msg, exc);
@@ -392,27 +379,11 @@ public class Server {
 
 
     /**
-     * _more_
+     * The main method.
      *
-     * @param args
+     * @param args the arguments
      */
     public static void main(String[] args) {
         new Server();
     }
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-

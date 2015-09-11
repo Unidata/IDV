@@ -26,7 +26,6 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,35 +106,29 @@ public class Client {
     /** _more_ */
     int numCharsNeeded = 0;
 
-
-
     /**
-     * _more_
-     *
+     * Instantiates a new client.
      */
     public Client() {}
-
 
     /**
      *  Create a new Client connection, connection to the given hostname which is of the form:
      *  hostname[:optional port number]. If alsoCreateServer is true
      *  then also create a server.
      *
-     * @param host
+     * @param host the host
      */
     public Client(String host) {
         this(host, -1);
     }
 
-
-
     /**
      *  Create a new Client connection, connection to the given hostname which is of the form:
      *  hostname[:optional port number]. If alsoCreateServer is true
      *  then also create a server.
      *
-     * @param host
-     * @param thePort
+     * @param host the host
+     * @param thePort the the port
      */
     public Client(String host, int thePort) {
         //See if there is a port
@@ -165,14 +158,11 @@ public class Client {
         //        initListening ();
     }
 
-
     /**
-     * _more_
+     * Instantiates a new client.
      *
-     * @param socket
-     *
-     * @throws IOException
-     *
+     * @param socket the socket
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public Client(Socket socket) throws IOException {
         this.socket = socket;
@@ -192,7 +182,7 @@ public class Client {
     }
 
     /**
-     * _more_
+     * Inits the listening.
      */
     private void initListening() {
         if (isListening) {
@@ -206,7 +196,7 @@ public class Client {
     }
 
     /**
-     * _more_
+     * Run client.
      */
     private void runClient() {
         isListening = true;
@@ -255,10 +245,11 @@ public class Client {
 
 
     /**
-     * _more_
-     * @return _more_
+     * Read.
      *
-     * @throws IOException
+     * @return the string
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     protected String read() throws IOException {
         String errorMsg = null;
@@ -333,9 +324,9 @@ public class Client {
 
 
     /**
-     * _more_
+     * Write.
      *
-     * @param message
+     * @param message the message
      */
     public void write(String message) {
         try {
@@ -354,10 +345,10 @@ public class Client {
 
 
     /**
-     * _more_
+     * Log exception.
      *
-     * @param msg
-     * @param exc
+     * @param msg the msg
+     * @param exc the exc
      */
     protected void logException(String msg, Exception exc) {
         LogUtil.printException(log_, msg, exc);
@@ -365,8 +356,7 @@ public class Client {
 
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public String toString() {
         return hostname;
@@ -450,17 +440,10 @@ public class Client {
     }
 
 
-
-
-
-
-
-
-
     /**
-     * _more_
+     * The main method.
      *
-     * @param args
+     * @param args the arguments
      */
     public static void main(String[] args) {
         try {
@@ -479,9 +462,4 @@ public class Client {
             System.err.println("Error:" + exc);
         }
     }
-
-
-
-
-
 }
