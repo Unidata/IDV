@@ -217,7 +217,7 @@ public class Server {
     /**
      *  Create a new client object and listen for input.
      *
-     * @param clientSocket
+     * @param clientSocket the client socket
      */
     protected void initClient(Socket clientSocket) {
         Client client = null;
@@ -231,7 +231,7 @@ public class Server {
     /**
      *  Create a new client object and listen for input.
      *
-     * @param client
+     * @param client the client
      */
     private void runClient(Client client) {
         try {
@@ -275,9 +275,9 @@ public class Server {
     }
 
     /**
-     *  Add the given client to the list of clients managed by this server
+     *  Add the given client to the list of clients managed by this server.
      *
-     * @param client
+     * @param client the client
      */
     public void addClient(Client client) {
         addClient(client, true);
@@ -285,10 +285,10 @@ public class Server {
     }
 
     /**
-     *  Add the given client to the list of clients managed by this server
+     *  Add the given client to the list of clients managed by this server.
      *
-     * @param client
-     * @param andStartListening
+     * @param client the client
+     * @param andStartListening the and start listening
      */
     public void addClient(final Client client, boolean andStartListening) {
         clients.add(client);
@@ -305,9 +305,9 @@ public class Server {
 
 
     /**
-     *  Remove the given client from the list of clients managed by this server
+     *  Remove the given client from the list of clients managed by this server.
      *
-     * @param client
+     * @param client the client
      */
     public void removeClient(Client client) {
         try {
@@ -323,8 +323,8 @@ public class Server {
      *  Handle the  message rcvd from the given client. The default is to just turn around
      *  and write it to each of the other clients.
      *
-     * @param fromClient
-     * @param message
+     * @param fromClient the from client
+     * @param message the message
      */
     protected void handleIncomingMessage(Client fromClient, String message) {
         if (fromClient.getValid()) {
