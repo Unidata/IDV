@@ -1,20 +1,18 @@
 /*
- * $Id: DbaseFile.java,v 1.9 2005/05/13 18:29:48 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,18 +21,19 @@
 package ucar.unidata.gis.shapefile;
 
 
+import ucar.unidata.io.Swap;
 
-import java.net.URL;
 
-import java.io.InputStream;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import ucar.unidata.io.Swap;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 /**
@@ -42,7 +41,6 @@ import ucar.unidata.io.Swap;
  *
  * @author  Kirk Waters, NOAA Coastal Services Center, 1997.
  * @author  Russ Rew, modified to restrict access to read-only
- * @version $Id: DbaseFile.java,v 1.9 2005/05/13 18:29:48 jeffmc Exp $
  */
 public class DbaseFile extends Object {
 
@@ -107,23 +105,24 @@ public class DbaseFile extends Object {
     DataInputStream ds = null;
 
     /**
-     *  @param url URL to the *.dbf file
+     * Instantiates a new dbase file.
      *
-     * @throws java.io.IOException
-     * @throws java.net.MalformedURLException
+     * @param url URL to the *.dbf file
+     * @throws MalformedURLException the malformed url exception
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    public DbaseFile(URL url)
-            throws java.net.MalformedURLException, java.io.IOException {
+    public DbaseFile(URL url) throws MalformedURLException, IOException {
         this.url = url;
         stream   = url.openStream();
     }
 
     /**
-     *  @param spec Location of the *.dbf file, as either a URL or filename
+     * Instantiates a new dbase file.
      *
-     * @throws java.io.IOException
+     * @param spec Location of the *.dbf file, as either a URL or filename
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    public DbaseFile(String spec) throws java.io.IOException {
+    public DbaseFile(String spec) throws IOException {
         try {
             url    = new URL(spec);
             stream = url.openStream();
@@ -137,7 +136,9 @@ public class DbaseFile extends Object {
     }
 
     /**
-     *  @param file A file object of the *.dbf file.
+     * Instantiates a new dbase file.
+     *
+     * @param file A file object of the *.dbf file.
      */
     public DbaseFile(File file) {
         try {
@@ -149,10 +150,9 @@ public class DbaseFile extends Object {
     }
 
     /**
-     * _more_
+     * Instantiates a new dbase file.
      *
-     * @param s
-     *
+     * @param s the s
      */
     public DbaseFile(InputStream s) {
         stream = s;
@@ -247,7 +247,7 @@ public class DbaseFile extends Object {
                             data[j].readRowN(ds, i);
                         } catch (NumberFormatException nfe) {
                             System.err.println("nfe field=" + j + " row="
-                                               + i);
+                                    + i);
                             System.err.println("data:" + data[j].getType());
                             throw nfe;
                         }
@@ -277,9 +277,9 @@ public class DbaseFile extends Object {
     }
 
     /**
-     * _more_
+     * Close.
      *
-     * @param d
+     * @param d the d
      */
     private void close(InputStream d) {
         //TODO: don't close the stream for now
@@ -506,54 +506,3 @@ public class DbaseFile extends Object {
         }
     }
 }
-
-/* Change History:
-   $Log: DbaseFile.java,v $
-   Revision 1.9  2005/05/13 18:29:48  jeffmc
-   Clean up the odd copyright symbols
-
-   Revision 1.8  2005/03/10 18:38:53  jeffmc
-   jindent and javadoc
-
-   Revision 1.7  2005/01/20 20:46:24  jeffmc
-   More changes to the shape file control. Put in
-   some code to degrade a bit more gracefully when reading bad numeric data in the dbf files.,
-   Javadoc, jindent, etc.
-
-   Revision 1.6  2005/01/20 17:15:50  jeffmc
-   First (and fairly extensive) pass at reading
-   and handing dbf attribute databases in shape files.
-   The shapefilecontrol now can filter on the attributes and
-   display them in a tabular form. It doesn't effect
-   the display yet.
-
-   Revision 1.5  2004/01/29 17:36:06  jeffmc
-   A big sweeping checkin after a big sweeping reformatting
-   using the new jindent.
-
-   jindent adds in javadoc templates and reformats existing javadocs. In the new javadoc
-   templates there is a '_more_' to remind us to fill these in.
-
-   Revision 1.4  2000/08/18 04:15:27  russ
-   Licensed under GNU LGPL.
-
-   Revision 1.3  1999/06/03 01:43:56  caron
-   remove the damn controlMs
-
-   Revision 1.2  1999/06/03 01:26:23  caron
-   another reorg
-
-   Revision 1.1.1.1  1999/05/21 17:33:42  caron
-   startAgain
-
-# Revision 1.2  1998/12/14  17:11:05  russ
-# Add comment for accumulating change histories.
-#
-*/
-
-
-
-
-
-
-
