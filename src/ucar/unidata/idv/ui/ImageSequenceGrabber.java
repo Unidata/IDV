@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 
 import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
+import ucar.unidata.idv.IdvObjectStore;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.ViewManager;
@@ -95,6 +96,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+
 
 
 /**
@@ -195,6 +198,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     /** Property for the image file template */
     public static final String PROP_IMAGETEMPLATE =
         "imagesequencegrabber.template";
+
+    /** {@literal "Global"} GIF palette preference ID. */
+    public static final String PREF_USE_GLOBAL_PALETTE =
+        "idv.capture.gif.useGlobalTable";
+
+    /** Tooltip text for global palette checkbox. */
+    public static final String GLOBAL_PALETTE_TOOLTIP =
+        "<html>Turn off to correct colors for low-light animations.<br/>" +
+        "<br/></br/>This option controls whether or not a resulting GIF " +
+        "image will use a color palette<br/>taken from all the frames of the" +
+        " animation.<br/><br/>If the option is turned off, the animation's " +
+        "frames will use their own color palettes.<br/>This can result in " +
+        "the same color value looking different between different frames" +
+        "<br/>in the resulting animated GIF.</html>";
 
     /** How much we pause between animation captures */
     private static int SLEEP_TIME = 500;
@@ -882,6 +899,20 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
     /**
+     * Return the value of the {@literal "idv.capture.gif.useGlobalTable"}
+     * preference.
+     *
+     * <p>Note: if the preference is not set, the value will default to
+     * {@code true}.</p>
+     *
+     * @return Value of {@code idv.capture.gif.useGlobalTable}.
+     */
+    private boolean getGlobalPaletteValue() {
+        IdvObjectStore store = idv.getStore();
+        return store.get(PREF_USE_GLOBAL_PALETTE, true);
+    }
+
+    /**
      * Load in the current preview image into the gui
      */
     private void setPreviewImage() {
@@ -1441,7 +1472,17 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             writePositionsCbx.setToolTipText(
                 "Also save the viewpoint matrices as an 'xidv' file");
 
-            List accessoryComps = new ArrayList();
+            JCheckBox otherGlobalPaletteBox =
+                new JCheckBox("Use 'global' GIF color palette",
+                    getGlobalPaletteValue());
+            otherGlobalPaletteBox.setToolTipText(GLOBAL_PALETTE_TOOLTIP);
+            otherGlobalPaletteBox.addActionListener(e -> {
+                boolean value = otherGlobalPaletteBox.isSelected();
+                IdvObjectStore store = idv.getStore();
+                store.put(PREF_USE_GLOBAL_PALETTE, value);
+                store.save();
+            });
+            List<JComponent> accessoryComps = new ArrayList<>(10);
 
             accessoryComps.add(
                 GuiUtils.leftRight(
@@ -1450,6 +1491,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 GuiUtils.leftRight(
                     GuiUtils.rLabel(" End Frame Pause: "), endPauseFld));
             accessoryComps.add(writePositionsCbx);
+            accessoryComps.add(otherGlobalPaletteBox);
 
             if (publishCbx == null) {
                 publishCbx = idv.getPublishManager().makeSelector();
@@ -2200,10 +2242,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 if (movieFile.toLowerCase().endsWith(
                         FileManager.SUFFIX_GIF)) {
                     double  rate   = 1.0 / displayRate;
-                    boolean useGCT = idv.getStateManager().getProperty(
-                                         "idv.capture.gif.useGlobalTable",
-                                         false);
-
+                    boolean useGCT = getGlobalPaletteValue();
                     AnimatedGifEncoder.createGif(movieFile,
                             ImageWrapper.makeFileList(images),
                             AnimatedGifEncoder.REPEAT_FOREVER,
