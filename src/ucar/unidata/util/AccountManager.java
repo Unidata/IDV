@@ -218,7 +218,7 @@ public class AccountManager implements CredentialsProvider,
         }
         */
 
-        String key = host + ":" + port + ":" + realm;
+        String key = host + realm;
         //        System.err.println ("got auth call " + key);
         UserInfo userInfo = getUserNamePassword(key,
                                 "The server " + host + ":" + port

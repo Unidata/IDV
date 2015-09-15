@@ -149,6 +149,7 @@ argument -Dfoo=bar) -->
 
         <unjar src="${libsrc}/slf4j-api-1.7.12.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/slf4j-jdk14-1.7.12.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/ehcache-core-2.6.2.jar" dest="${tmpjardir}"/>
         <jar
             basedir="${tmpjardir}"
             compress="true"
