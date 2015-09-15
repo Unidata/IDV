@@ -205,7 +205,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
     /** Tooltip text for global palette checkbox. */
     public static final String GLOBAL_PALETTE_TOOLTIP =
-        "<html>Turn off to correct colors for low-light animations.<br/>" +
+        "<html>Turn off to correct colors for varying color animations.<br/>" +
         "<br/></br/>This option controls whether or not a resulting GIF " +
         "image will use a color palette<br/>taken from all the frames of the" +
         " animation.<br/><br/>If the option is turned off, the animation's " +
@@ -1473,7 +1473,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 "Also save the viewpoint matrices as an 'xidv' file");
 
             JCheckBox otherGlobalPaletteBox =
-                new JCheckBox("Use 'global' GIF color palette",
+                new JCheckBox("Use constant color palette for GIF",
                     getGlobalPaletteValue());
             otherGlobalPaletteBox.setToolTipText(GLOBAL_PALETTE_TOOLTIP);
             otherGlobalPaletteBox.addActionListener(e -> {
