@@ -436,7 +436,7 @@ public class DbaseFile extends Object {
     /**
      * Test program, dumps a Dbase file to stdout.
      *
-     * @param args
+     * @param args the arguments
      */
     public static void main(String[] args) {
         if (args.length < 1) {

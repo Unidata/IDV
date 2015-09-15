@@ -26,7 +26,6 @@ import ucar.unidata.ui.drawing.Glyph;
 import ucar.unidata.util.Misc;
 
 import ucar.visad.display.LatLonLabels;
-import ucar.visad.display.TextDisplayable;
 
 import visad.TextControl;
 import visad.TextType;
@@ -207,11 +206,11 @@ public class LatLonLabelData {
 
 
     /**
-     * Create, if needed, initialize and return the latlonlines object
-     * @return The {@link ucar.visad.display.LatLonLabels} object
+     * Create, if needed, initialize and return the latlonlines object.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @return The {@link ucar.visad.display.LatLonLabels} object
+     * @throws VisADException the visad exception
+     * @throws RemoteException the remote exception
      */
     public LatLonLabels getLatLonLabels()
             throws VisADException, RemoteException {
