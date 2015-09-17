@@ -179,11 +179,11 @@ public class LatLonData {
 
 
     /**
-     * Create, if needed, initialize and return the latlonlines object
-     * @return The {@link ucar.visad.display.LatLonLines} object
+     * Create, if needed, initialize and return the latlonlines object.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @return The {@link ucar.visad.display.LatLonLines} object
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public LatLonLines getLatLonLines()
             throws VisADException, RemoteException {

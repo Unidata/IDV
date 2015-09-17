@@ -163,27 +163,23 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract all features into
      * an in-memory structure.
      *
      * @param filename name of ESRI shapefile (typically has ".shp"
      *        extension)
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(String filename) throws IOException {
         this(filename, null);
     }
 
     /**
-     *
      *    Read an ESRI shapefile from a URL and extract all features into
      * an in-memory structure.
      *
      * @param url URL of ESRI shapefile
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(URL url) throws IOException {
         this(url, null);
@@ -191,15 +187,13 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract all features into
      * an in-memory structure, with control of time versus resolution.
      *
      * @param filename name of ESRI shapefile (typically has ".shp"
      *        extension)
      * @param coarseness to tradeoff plot quality versus speed.
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(String filename, double coarseness)
             throws IOException {
@@ -207,14 +201,12 @@ public class EsriShapefile {
     }
 
     /**
-     *
      * Read an ESRI shapefile from a URL and extract all features into
      * an in-memory structure, with control of time versus resolution.
      *
      * @param url URL of ESRI shapefile
      * @param coarseness to tradeoff plot quality versus speed.
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(URL url, double coarseness) throws IOException {
         this(url, null, coarseness);
@@ -222,17 +214,15 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract the subset of features that have
-     * bounding boxes that intersect a specified bounding box
+     * bounding boxes that intersect a specified bounding box.
      *
      * @param url URL of ESRI shapefile
      * @param bBox bounding box specifying which features to select,
      * namely those whose bounding boxes intersect this one. If null,
      * bounding box of whole shapefile is used
      * @param coarseness to tradeoff plot quality versus speed.
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(URL url, Rectangle2D bBox, double coarseness)
             throws IOException {
@@ -1033,10 +1023,9 @@ public class EsriShapefile {
     public class EsriMultipoint extends EsriFeature {
 
         /**
-         * Create a new EsriMultipoint
+         * Create a new EsriMultipoint.
          *
-         * @throws IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
         public EsriMultipoint() throws IOException {
             bounds = readBoundingBox();
