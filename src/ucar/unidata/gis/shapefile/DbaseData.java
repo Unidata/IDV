@@ -180,7 +180,9 @@ public class DbaseData {
               if (desc.FieldLength == 4) {
                   numeric[n] = (double) Swap.swapFloat(field, 0);
               } else {
-                  numeric[n] = Swap.swapDouble(field, 0);
+                  //numeric[n] = Swap.swapDouble(field, 0);
+                  String sf = new String(field);
+                  numeric[n] = Double.valueOf(sf).doubleValue();
               }
               break;
 
