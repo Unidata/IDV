@@ -78,7 +78,7 @@ public class Server {
     /**
      *  Create a new Server connection on the given port.
      *
-     * @param port
+     * @param port the port
      */
     public Server(int port) {
         this.port = port;

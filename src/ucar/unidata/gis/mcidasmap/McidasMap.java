@@ -1,20 +1,18 @@
 /*
- * $Id: McidasMap.java,v 1.6 2005/05/13 18:29:44 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,24 +21,26 @@
 package ucar.unidata.gis.mcidasmap;
 
 
-
-import java.awt.*;
-import java.awt.geom.*;
-
-import java.io.*;
-
-import java.util.*;
-
-import ucar.unidata.geoloc.*;
-import ucar.unidata.geoloc.projection.*;
-import ucar.unidata.gis.*;
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.projection.LatLonProjection;
+import ucar.unidata.gis.AbstractGisFeature;
+import ucar.unidata.gis.GisPart;
 import ucar.unidata.util.Resource;
+
+
+
+import java.io.BufferedInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+
+import java.util.ArrayList;
 
 
 /**
  * A renderer for McIDAS OUTL* map files
+ *
  * @author Don Murray
- * @version $Id: McidasMap.java,v 1.6 2005/05/13 18:29:44 jeffmc Exp $
  */
 
 public class McidasMap extends ucar.unidata.gis.GisFeatureRenderer {
@@ -77,10 +77,9 @@ public class McidasMap extends ucar.unidata.gis.GisFeatureRenderer {
     // constructor
 
     /**
-     * _more_
+     * Instantiates a new mcidas map.
      *
-     * @param mapName
-     *
+     * @param mapName the map name
      */
     public McidasMap(String mapName) {
 
@@ -92,8 +91,9 @@ public class McidasMap extends ucar.unidata.gis.GisFeatureRenderer {
     // read in lat/lon points one time for this class
 
     /**
-     * _more_
-     * @return _more_
+     * Read mcidas map.
+     *
+     * @return true, if successful
      */
     private boolean readMcidasMap() {
 
@@ -160,7 +160,7 @@ public class McidasMap extends ucar.unidata.gis.GisFeatureRenderer {
                 npts = npts / 2;
 
                 McidasMapPart run = new McidasMapPart(npts, minx, maxx, miny,
-                                                      maxy, start);
+                                        maxy, start);
                 partList.add(run);
                 total_pts += npts;
 
@@ -265,7 +265,7 @@ public class McidasMap extends ucar.unidata.gis.GisFeatureRenderer {
         int npts, start;
 
         /** _more_ */
-        double[] wx;                            // lat/lon coords
+        double[] wx;  // lat/lon coords
 
         /** _more_ */
         double[] wy;
@@ -369,10 +369,3 @@ public class McidasMap extends ucar.unidata.gis.GisFeatureRenderer {
     }
 
 }
-
-
-
-
-
-
-

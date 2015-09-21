@@ -1,6 +1,7 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for Atmospheric Research
- * Copyright 2010- Jeff McWhirter
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
+ * support@unidata.ucar.edu.
  * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
  */
 
 package ucar.unidata.gis.shapefile;
@@ -26,7 +26,6 @@ import ucar.unidata.gis.GisFeature;
 import ucar.unidata.gis.GisPart;
 import ucar.unidata.io.BeLeDataInputStream;
 import ucar.unidata.util.IOUtil;
-
 
 
 import java.awt.geom.Rectangle2D;
@@ -55,14 +54,13 @@ import java.util.zip.ZipInputStream;
  * http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
  *
  * @author Russ Rew
- * @version $Revision: 1.27 $  $Date: 2005/05/13 18:29:48 $
  */
 public class EsriShapefile {
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
-    /** count total number of points    */
+    /** count total number of points */
     private int NUMPOINTS = 0;
 
     /** shapefile magic number */
@@ -165,27 +163,23 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract all features into
      * an in-memory structure.
      *
      * @param filename name of ESRI shapefile (typically has ".shp"
      *        extension)
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(String filename) throws IOException {
         this(filename, null);
     }
 
     /**
-     *
      *    Read an ESRI shapefile from a URL and extract all features into
      * an in-memory structure.
      *
      * @param url URL of ESRI shapefile
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(URL url) throws IOException {
         this(url, null);
@@ -193,15 +187,13 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract all features into
      * an in-memory structure, with control of time versus resolution.
      *
      * @param filename name of ESRI shapefile (typically has ".shp"
      *        extension)
      * @param coarseness to tradeoff plot quality versus speed.
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(String filename, double coarseness)
             throws IOException {
@@ -209,14 +201,12 @@ public class EsriShapefile {
     }
 
     /**
-     *
      * Read an ESRI shapefile from a URL and extract all features into
      * an in-memory structure, with control of time versus resolution.
      *
      * @param url URL of ESRI shapefile
      * @param coarseness to tradeoff plot quality versus speed.
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(URL url, double coarseness) throws IOException {
         this(url, null, coarseness);
@@ -224,17 +214,15 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract the subset of features that have
-     * bounding boxes that intersect a specified bounding box
+     * bounding boxes that intersect a specified bounding box.
      *
      * @param url URL of ESRI shapefile
      * @param bBox bounding box specifying which features to select,
      * namely those whose bounding boxes intersect this one. If null,
      * bounding box of whole shapefile is used
      * @param coarseness to tradeoff plot quality versus speed.
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(URL url, Rectangle2D bBox, double coarseness)
             throws IOException {
@@ -243,7 +231,6 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract all features into an in-memory
      * structure, with control of time versus resolution.
      *
@@ -252,8 +239,7 @@ public class EsriShapefile {
      * namely those whose bounding boxes intersect this one. If null,
      * bounding box of whole shapefile is used
      * @param coarseness to tradeoff plot quality versus speed.
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(String filename, Rectangle2D bBox, double coarseness)
             throws IOException {
@@ -261,16 +247,14 @@ public class EsriShapefile {
     }
 
     /**
-     *
      * Read an ESRI shapefile and extract the subset of features that have
-     * bounding boxes that intersect a specified bounding box
+     * bounding boxes that intersect a specified bounding box.
      *
      * @param url URL of ESRI shapefile
      * @param bBox bounding box specifying which features to select,
      * namely those whose bounding boxes intersect this one. If null,
      * bounding box of whole shapefile is used
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(URL url, Rectangle2D bBox) throws IOException {
         this(new DataInputStream(url.openStream()), bBox, 0.0f);
@@ -278,7 +262,6 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract the subset of features that have
      * bounding boxes that intersect a specified bounding box.
      *
@@ -286,8 +269,7 @@ public class EsriShapefile {
      * @param bBox bounding box specifying which features to select,
      * namely those whose bounding boxes intersect this one. If null,
      * bounding box of whole shapefile is used
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(String filename, Rectangle2D bBox)
             throws IOException {
@@ -296,7 +278,6 @@ public class EsriShapefile {
 
 
     /**
-     *
      * Read an ESRI shapefile and extract the subset of features that
      * have bounding boxes that intersect a specified bounding box,
      * with control of time versus resolution.
@@ -305,9 +286,8 @@ public class EsriShapefile {
      * @param bBox bounding box specifying which features to select,
      * namely those whose bounding boxes intersect this one. If null,
      * bounding box of whole shapefile is used
-     * @param coarseness
-     *
-     * @throws IOException
+     * @param coarseness the coarseness
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public EsriShapefile(InputStream iStream, Rectangle2D bBox,
                          double coarseness)
@@ -394,12 +374,11 @@ public class EsriShapefile {
     }
 
     /**
-     * Is this a Zip stream?
+     * Is this a Zip stream?.
      *
-     * @param is
+     * @param is the is
      * @return  true if it is
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     static boolean isZipStream(InputStream is) throws IOException {
         is.mark(5);
@@ -571,10 +550,10 @@ public class EsriShapefile {
     }
 
     /**
-     * Read a little endian int
-     * @return the value
+     * Read a little endian int.
      *
-     * @throws IOException
+     * @return the value
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private int readLEInt() throws IOException {
         bytesSeen += 4;
@@ -582,10 +561,10 @@ public class EsriShapefile {
     }
 
     /**
-     * Read a 4 byte integer
-     * @return the value
+     * Read a 4 byte integer.
      *
-     * @throws IOException
+     * @return the value
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private int readInt() throws IOException {
         bytesSeen += 4;
@@ -593,10 +572,10 @@ public class EsriShapefile {
     }
 
     /**
-     * Read a little endian double
-     * @return the value
+     * Read a little endian double.
      *
-     * @throws IOException
+     * @return the value
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private double readLEDouble() throws IOException {
         bytesSeen += 8;
@@ -604,12 +583,11 @@ public class EsriShapefile {
     }
 
     /**
-     * Read an array of little endian doubles
+     * Read an array of little endian doubles.
      *
      * @param d  the output array
      * @param n  the number of elements
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private void readLEDoubles(double[] d, int n) throws IOException {
         bdis.readLEDoubles(d, n);
@@ -617,11 +595,10 @@ public class EsriShapefile {
     }
 
     /**
-     * Skip bytes
+     * Skip bytes.
      *
      * @param n the number of bytes to skip
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private void skipBytes(int n) throws IOException {
         bdis.skip(n);
@@ -653,7 +630,7 @@ public class EsriShapefile {
      *
      * @return a List of features
      */
-    public java.util.List getFeatures() {
+    public List getFeatures() {
         return features;
     }
 
@@ -671,7 +648,7 @@ public class EsriShapefile {
      * @return a new list of features in the shapefile whose bounding
      * boxes intersect the specified bounding box.
      */
-    public java.util.List getFeatures(Rectangle2D bBox) {
+    public List getFeatures(Rectangle2D bBox) {
         if (bBox == null) {
             return features;
         }
@@ -757,7 +734,7 @@ public class EsriShapefile {
          * @return the iterator over the parts of this feature.  Each part
          * is a GisPart.
          */
-        public java.util.Iterator getGisParts() {
+        public Iterator getGisParts() {
             return partsList.iterator();
         }
 
@@ -798,12 +775,11 @@ public class EsriShapefile {
     public class EsriPolygon extends EsriFeature {
 
         /**
-         * Create a new EsriPolygon
+         * Create a new EsriPolygon.
          *
-         * @throws java.io.IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
-        public EsriPolygon() throws java.io.IOException {
+        public EsriPolygon() throws IOException {
             bounds   = readBoundingBox();
             numParts = readLEInt();
             readNumPoints();
@@ -858,12 +834,11 @@ public class EsriShapefile {
     public class EsriPolygonZ extends EsriFeature {
 
         /**
-         * Create a new EsriPolygonZ
+         * Create a new EsriPolygonZ.
          *
-         * @throws java.io.IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
-        public EsriPolygonZ() throws java.io.IOException {
+        public EsriPolygonZ() throws IOException {
             bounds   = readBoundingBox();
             numParts = readLEInt();
             readNumPoints();
@@ -931,12 +906,11 @@ public class EsriShapefile {
     public class EsriPolyline extends EsriFeature {
 
         /**
-         * Create a new EsriPolyline
+         * Create a new EsriPolyline.
          *
-         * @throws java.io.IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
-        public EsriPolyline() throws java.io.IOException {
+        public EsriPolyline() throws IOException {
             bounds   = readBoundingBox();
             numParts = readLEInt();
             readNumPoints();
@@ -977,20 +951,15 @@ public class EsriShapefile {
 
     /**
      * Class description
-     *
-     *
-     * @version        $version$, Wed, Aug 3, '11
-     * @author         Enter your name here...    
      */
     public class EsriPolylineZ extends EsriFeature {
 
         /**
-         * Create a new EsriPolyline
+         * Create a new EsriPolyline.
          *
-         * @throws java.io.IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
-        public EsriPolylineZ() throws java.io.IOException {
+        public EsriPolylineZ() throws IOException {
             bounds   = readBoundingBox();
             numParts = readLEInt();
             readNumPoints();
@@ -1052,12 +1021,11 @@ public class EsriShapefile {
     public class EsriMultipoint extends EsriFeature {
 
         /**
-         * Create a new EsriMultipoint
+         * Create a new EsriMultipoint.
          *
-         * @throws java.io.IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
-        public EsriMultipoint() throws java.io.IOException {
+        public EsriMultipoint() throws IOException {
             bounds = readBoundingBox();
             readNumPoints();
             if (xyPoints.length < 2 * numPoints) {
@@ -1081,12 +1049,11 @@ public class EsriShapefile {
     public class EsriPoint extends EsriFeature {
 
         /**
-         * Create a new EsriPoint
+         * Create a new EsriPoint.
          *
-         * @throws java.io.IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
-        public EsriPoint() throws java.io.IOException {
+        public EsriPoint() throws IOException {
             numPoints = 1;
             NUMPOINTS++;
             readLEDoubles(xyPoints, 2 * numPoints);
@@ -1103,18 +1070,15 @@ public class EsriShapefile {
      * Class description
      *
      *
-     * @version        $version$, Wed, Aug 3, '11
-     * @author         Enter your name here...    
      */
     public class EsriPointZ extends EsriFeature {
 
         /**
-         * Create a new EsriPoint
+         * Create a new EsriPoint.
          *
-         * @throws java.io.IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
-        public EsriPointZ() throws java.io.IOException {
+        public EsriPointZ() throws IOException {
             numPoints = 1;
             NUMPOINTS++;
             readLEDoubles(xyPoints, 2 * numPoints);
@@ -1266,11 +1230,10 @@ public class EsriShapefile {
     }
 
     /**
-     * _more_
+     * The main method.
      *
-     * @param args _more_
-     *
-     * @throws IOException _more_
+     * @param args the arguments
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void main(String[] args) throws IOException {
         for (String arg : args) {
