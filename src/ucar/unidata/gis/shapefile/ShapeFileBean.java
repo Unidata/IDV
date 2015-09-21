@@ -55,9 +55,9 @@ public class ShapeFileBean implements ucar.unidata.gis.MapBean {
     private AbstractAction action;
 
     /**
-     * contructor for a specific shapefile
+     * contructor for a specific shapefile.
      *
-     * @param shapefileName
+     * @param shapefileName the shapefile name
      */
     public ShapeFileBean(String shapefileName) {
         this.shapefileName = shapefileName;

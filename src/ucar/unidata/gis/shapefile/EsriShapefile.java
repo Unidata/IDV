@@ -775,10 +775,9 @@ public class EsriShapefile {
     public class EsriPolygon extends EsriFeature {
 
         /**
-         * Create a new EsriPolygon
+         * Create a new EsriPolygon.
          *
-         * @throws IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
         public EsriPolygon() throws IOException {
             bounds   = readBoundingBox();
@@ -956,10 +955,9 @@ public class EsriShapefile {
     public class EsriPolylineZ extends EsriFeature {
 
         /**
-         * Create a new EsriPolyline
+         * Create a new EsriPolyline.
          *
-         * @throws IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
         public EsriPolylineZ() throws IOException {
             bounds   = readBoundingBox();
@@ -1051,10 +1049,9 @@ public class EsriShapefile {
     public class EsriPoint extends EsriFeature {
 
         /**
-         * Create a new EsriPoint
+         * Create a new EsriPoint.
          *
-         * @throws IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
         public EsriPoint() throws IOException {
             numPoints = 1;
@@ -1077,10 +1074,9 @@ public class EsriShapefile {
     public class EsriPointZ extends EsriFeature {
 
         /**
-         * Create a new EsriPoint
+         * Create a new EsriPoint.
          *
-         * @throws IOException
-         *
+         * @throws IOException Signals that an I/O exception has occurred.
          */
         public EsriPointZ() throws IOException {
             numPoints = 1;

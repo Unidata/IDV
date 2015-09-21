@@ -1,20 +1,18 @@
 /*
- * $Id: WorldMapBean.java,v 1.9 2005/05/13 18:29:53 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2015 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -24,7 +22,8 @@ package ucar.unidata.gis.worldmap;
 
 
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 
 /** Wraps the default WorldMap object into a MapBean */
@@ -38,8 +37,7 @@ public class WorldMapBean implements ucar.unidata.gis.MapBean {
     private ucar.unidata.util.ListenerManager lm;
 
     /**
-     * _more_
-     *
+     * Instantiates a new world map bean.
      */
     public WorldMapBean() {
         rend = new WorldMap();
@@ -50,8 +48,7 @@ public class WorldMapBean implements ucar.unidata.gis.MapBean {
     }
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public ucar.unidata.view.Renderer getRenderer() {
         return rend;
@@ -82,9 +79,7 @@ public class WorldMapBean implements ucar.unidata.gis.MapBean {
     }
 
     /**
-     * _more_
-     *
-     * @param l
+     * {@inheritDoc}
      */
     public void addNewRendererListener(
             ucar.unidata.view.NewRendererListener l) {
@@ -92,19 +87,10 @@ public class WorldMapBean implements ucar.unidata.gis.MapBean {
     }
 
     /**
-     * _more_
-     *
-     * @param l
+     * {@inheritDoc}
      */
     public void removeNewRendererListener(
             ucar.unidata.view.NewRendererListener l) {
         lm.removeListener(l);
     }
 }
-
-
-
-
-
-
-
