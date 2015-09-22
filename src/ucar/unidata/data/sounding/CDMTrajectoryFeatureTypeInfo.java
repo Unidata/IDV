@@ -52,6 +52,7 @@ import ucar.visad.quantities.Direction;
 import visad.CommonUnit;
 import visad.Data;
 import visad.DateTime;
+import visad.DerivedUnit;
 import visad.FieldImpl;
 import visad.FunctionType;
 import visad.Integer1DSet;
@@ -81,6 +82,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * The Class CDMTrajectoryFeatureTypeInfo.
  */
 public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
+
+    /** Basic tree node in the Data Choosers */
+    private static final String DATA_CHOOSER_TREE_NODE_BASIC = "Basic";
 
     /** The data set. */
     private FeatureDatasetPoint fdp;
@@ -203,9 +207,10 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             }
 
             if ((unit != null)
-                    && unit.isConvertible(CommonUnit.secondsSinceTheEpoch)) {
+                    && unit.isConvertible(CommonUnit.secondsSinceTheEpoch)
+                    && !(unit instanceof DerivedUnit)) {
                 addVariable(new VarInfo(mb.getName(), mb.getDescription(),
-                                        "Basic", unit));
+                                        DATA_CHOOSER_TREE_NODE_BASIC, unit));
                 varTime = mb.getName();
             } else if ((unit != null)
                        && unit.isConvertible(CommonUnits.KILOMETER)) {
@@ -213,13 +218,15 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                         || mb.getName().equalsIgnoreCase("ALT")) {
 
                     addVariable(new VarInfo(mb.getName(),
-                                            mb.getDescription(), "Basic",
+                                            mb.getDescription(),
+                                            DATA_CHOOSER_TREE_NODE_BASIC,
                                             unit));
                     varAltitude = mb.getName();
                 } else if (mb.getName().equalsIgnoreCase("DEPTH")) {
                     positive = -1;
                     addVariable(new VarInfo(mb.getName(),
-                                            mb.getDescription(), "Basic",
+                                            mb.getDescription(),
+                                            DATA_CHOOSER_TREE_NODE_BASIC,
                                             unit));
                     varAltitude = mb.getName();
                 } else {
@@ -235,13 +242,15 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
                         || mb.getName().equalsIgnoreCase("LAT")) {
                     varLatitude = mb.getName();
                     addVariable(new VarInfo(mb.getName(),
-                                            mb.getDescription(), "Basic",
+                                            mb.getDescription(),
+                                            DATA_CHOOSER_TREE_NODE_BASIC,
                                             unit));
                 } else if (mb.getName().equalsIgnoreCase("LONGITUDE")
                            || mb.getName().equalsIgnoreCase("LON")) {
                     varLongitude = mb.getName();
                     addVariable(new VarInfo(mb.getName(),
-                                            mb.getDescription(), "Basic",
+                                            mb.getDescription(),
+                                            DATA_CHOOSER_TREE_NODE_BASIC,
                                             unit));
                 } else {
                     addVariable(new VarInfo(mb.getName(),
@@ -574,8 +583,8 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         int stride = range.stride();
         int last   = range.last();
 
-        int   i         = first;
-        int   j         = 0;
+        int i      = first;
+        int j      = 0;
         while (i <= last) {
             PointFeature  pf   = obsList.get(i);
             StructureData pfsd = pf.getFeatureData();
