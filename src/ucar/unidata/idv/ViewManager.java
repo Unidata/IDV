@@ -901,8 +901,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /**
      * Initialize.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void init() throws VisADException, RemoteException {
         if (haveInitialized) {
@@ -2307,14 +2307,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * Set the different boolean flags from thise held by the
+     * Set the different boolean flags from those held by the
      * given  view manager.
      *
      * @param vm The ViewManager to get state from
-     *
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the vis ad exception
+     * @throws RemoteException the remote exception
      */
     protected void setBooleanProperties(ViewManager vm)
             throws VisADException, RemoteException {
@@ -2335,13 +2333,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * The BooleanProperty identified byt he given id has changed.
+     * The BooleanProperty identified by the given id has changed.
      * Apply the change to the display.
      *
      * @param id Id of the changed BooleanProperty
      * @param value Its new value
      *
-     * @throws Exception problem handeling the change
+     * @throws Exception problem handling the change
      */
     protected void handleBooleanPropertyChange(String id, boolean value)
             throws Exception {
@@ -4389,9 +4387,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * {@link DisplayControl}.
      *
      * @param displayInfo The display info to remove
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public void removeDisplayInfo(DisplayInfo displayInfo)
             throws RemoteException, VisADException {
