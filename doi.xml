@@ -24,7 +24,7 @@
 		<p:title>Unidata Integrated Data Viewer</p:title>
 		<p:title titleType="AlternativeTitle">IDV</p:title>
 	</p:titles>
-	<p:publisher>University Corporation for Atmospheric Research, Unidata</p:publisher>
+	<p:publisher>UCAR/NCAR - Unidata</p:publisher>
 	<p:publicationYear>1997</p:publicationYear>
 	<p:subjects>
 		<p:subject subjectScheme="LC"
@@ -47,13 +47,13 @@
 			<p:contributorName>Yuan Ho</p:contributorName>
 		</p:contributor>		
 		<p:contributor contributorType="Distributor">
-			<p:contributorName>University Corporation for Atmospheric Research, Unidata</p:contributorName>
+			<p:contributorName>University Corporation for Atmospheric Research (UCAR): UCAR Community Programs (UCP): Unidata</p:contributorName>
 		</p:contributor>
 		<p:contributor contributorType="Funder">
 			<p:contributorName>National Science Foundation</p:contributorName>
 		</p:contributor>
 		<p:contributor contributorType="HostingInstitution">
-			<p:contributorName>University Corporation for Atmospheric Research, Unidata</p:contributorName>
+			<p:contributorName>University Corporation for Atmospheric Research (UCAR): UCAR Community Programs (UCP): Unidata</p:contributorName>
 		</p:contributor>
 		<p:contributor contributorType="ResearchGroup">
 			<p:contributorName>Space Science and Engineering Center, University of Wisconsin-Madison</p:contributorName>
@@ -74,8 +74,8 @@
 	<!-- Please see here for an explanation of date ranges http://www.ukoln.ac.uk/metadata/dcmi/collection-RKMS-ISO8601/ -->
 	<p:dates>
 		<p:date dateType="Created">1997</p:date>
-		<p:date dateType="Copyrighted">1997/</p:date>
-		<p:date dateType="Updated">1997/</p:date>
+		<p:date dateType="Copyrighted">1997</p:date>
+		<p:date dateType="Updated">1997</p:date>
 	</p:dates>
 	<p:language>en</p:language>
 	<p:formats>
