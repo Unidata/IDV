@@ -2311,7 +2311,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * given  view manager.
      *
      * @param vm The ViewManager to get state from
-     * @throws VisADException the vis ad exception
+     * @throws VisADException the VisAD exception
      * @throws RemoteException the remote exception
      */
     protected void setBooleanProperties(ViewManager vm)
