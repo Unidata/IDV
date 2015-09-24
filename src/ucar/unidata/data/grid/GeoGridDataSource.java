@@ -937,7 +937,7 @@ public class GeoGridDataSource extends GridDataSource {
             // NetcdfFileWriter writer
 
             writer.writeFile(dataset, varNames, llr, null, hStride, null,
-                             dateRange, timeStride, includeLatLon, ncFileWriter);
+                    dateRange, timeStride, includeLatLon, ncFileWriter);
         } catch (Exception exc) {
             logException("Error writing local netcdf file.\nData:"
                          + getFilePath() + "\nVariables:" + varNames, exc);
@@ -2099,11 +2099,15 @@ public class GeoGridDataSource extends GridDataSource {
 
         } else if (dt != null) {
             CalendarDate ct0 = dt.getCalendarDate(0);
-            for(int i= 0; i < timeIndices.length; i++){
-                CalendarDate ct = dt.getCalendarDate(timeIndices[i]);
-                long diff = ct.getDifferenceInMsecs(ct0);
-                float fh = diff/(1000.0f*3600.0f);
-                buf.append(fh + ",");
+            if(allTimes.size() >= timeIndices.length) {
+                //for speed contour over topo, topo is likely has
+                //its time dimension lenght 1 or zero.
+                for (int i = 0; i < timeIndices.length; i++) {
+                    CalendarDate ct = dt.getCalendarDate(timeIndices[i]);
+                    long diff = ct.getDifferenceInMsecs(ct0);
+                    float fh = diff / (1000.0f * 3600.0f);
+                    buf.append(fh + ",");
+                }
             }
         }
         if(buf.length() > 1) {
