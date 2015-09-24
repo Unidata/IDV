@@ -21,10 +21,13 @@
 package ucar.visad.display;
 
 
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.Range;
 
+import ucar.visad.quantities.CommonUnits;
 import visad.*;
+import visad.data.units.UnitParser;
 
 
 import java.awt.Color;
@@ -789,7 +792,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                                   ? 3
                                   : 2;
         if(is3D && rtt.getDimension()==3){
-            set3DFlow(true);
+            RealType rt = (RealType)rtt.getComponents()[2];
+            if(rt.getDefaultUnit().isConvertible(CommonUnit.meterPerSecond))
+                set3DFlow(true);
+            else
+                set3DFlow(false);
         } else
             set3DFlow(rtt.getDimension() > threeDDim);
         // uncomment to determine ad-hoc rather than programatically
