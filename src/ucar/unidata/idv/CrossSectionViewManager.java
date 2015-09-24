@@ -79,12 +79,11 @@ public class CrossSectionViewManager extends ViewManager {
      *  Create a CrossSectionViewManager with the given context, descriptor, object store
      *  and properties string.
      *
-     *  @param viewContext Provides a context for the VM to be in.
-     *  @param desc The ViewDescriptor that identifies this VM
-     *  @param properties A set of ";" delimited name-value pairs.
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @param viewContext Provides a context for the VM to be in.
+     * @param desc The ViewDescriptor that identifies this VM
+     * @param properties A set of ";" delimited name-value pairs.
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public CrossSectionViewManager(ViewContext viewContext,
                                    ViewDescriptor desc, String properties)
@@ -96,16 +95,14 @@ public class CrossSectionViewManager extends ViewManager {
 
     /**
      *  Create a CrossSectionViewManager with the given context, descriptor, object store,
-     *  properties string and animation state
+     *  properties string and animation state.
      *
-     *  @param viewContext Provides a context for the VM to be in.
-     *  @param desc The ViewDescriptor that identifies this VM
-     *  @param properties A set of ";" delimited name-value pairs.
-     *  @param animationInfo Initial animation properties
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     *
+     * @param viewContext Provides a context for the VM to be in.
+     * @param desc The ViewDescriptor that identifies this VM
+     * @param properties A set of ";" delimited name-value pairs.
+     * @param animationInfo Initial animation properties
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public CrossSectionViewManager(ViewContext viewContext,
                                    ViewDescriptor desc, String properties,
