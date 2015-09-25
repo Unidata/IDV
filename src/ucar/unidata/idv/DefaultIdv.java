@@ -27,7 +27,6 @@ import ucar.unidata.util.Misc;
 import visad.VisADException;
 
 
-
 import java.lang.reflect.Constructor;
 
 import java.rmi.RemoteException;
@@ -51,8 +50,8 @@ public class DefaultIdv extends IntegratedDataViewer {
     /**
      * Parameterless ctor. Why? I'm not quite sure.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public DefaultIdv() throws VisADException, RemoteException {}
 

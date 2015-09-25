@@ -4470,9 +4470,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      *
      * @param displayInfo The display info to add.
      * @return Was the addition successful
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public boolean addDisplayInfo(DisplayInfo displayInfo)
             throws RemoteException, VisADException {
@@ -4500,10 +4499,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * Update display if needed
+     * Update display if needed.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public void updateDisplayIfNeeded()
             throws VisADException, RemoteException {
@@ -5503,9 +5502,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * on the {@link DisplayControl}s
      *
      * @param de The <code>DisplayEvent</code>
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public void displayChanged(DisplayEvent de)
             throws VisADException, RemoteException {

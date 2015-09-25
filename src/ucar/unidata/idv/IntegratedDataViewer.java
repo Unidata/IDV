@@ -564,8 +564,8 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
     /**
      *  Build the gui, process bundles, etc.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void initInner() throws VisADException, RemoteException {
 
@@ -627,7 +627,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         getIdvUIManager().initDone();
         getArgsManager().initDone();
 
-        if (!getStateManager().getRunningIsl()) {
+        if ( !getStateManager().getRunningIsl()) {
             try {
                 OldVersionCheck.check(this);
             } catch (Exception e) {
