@@ -21,11 +21,12 @@
 package ucar.unidata.idv;
 
 
-
 import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.Displayable;
 
 import visad.VisADException;
+
+
 
 import java.rmi.RemoteException;
 
@@ -148,8 +149,8 @@ public class DisplayInfo {
     /**
      *  Add this displayInfo to the ViewManager.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public void addDisplayable() throws RemoteException, VisADException {
         if ((viewManager != null) && !isDisplayableAdded) {
@@ -167,9 +168,9 @@ public class DisplayInfo {
     }
 
     /**
-     * _more_
+     * Sets the displayable added.
      *
-     * @param v _more_
+     * @param v the new displayable added
      */
     public void setDisplayableAdded(boolean v) {
         isDisplayableAdded = v;
@@ -180,8 +181,8 @@ public class DisplayInfo {
      *
      * @param newViewManager The new view manager
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public void moveTo(ViewManager newViewManager)
             throws RemoteException, VisADException {
@@ -191,10 +192,10 @@ public class DisplayInfo {
     }
 
     /**
-     * Tells the ViewManager  to set the display master active
+     * Tells the ViewManager  to set the display master active.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public void activateDisplay() throws RemoteException, VisADException {
         if (viewManager != null) {
@@ -206,8 +207,8 @@ public class DisplayInfo {
     /**
      * Tells the ViewManager  to set the display master inactive
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public void deactivateDisplay() throws RemoteException, VisADException {
         if (viewManager != null) {
@@ -219,8 +220,8 @@ public class DisplayInfo {
     /**
      * Remove the displayable from the view manager
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public void removeDisplayable() throws RemoteException, VisADException {
         if ((viewManager != null) && isDisplayableAdded) {
@@ -230,13 +231,11 @@ public class DisplayInfo {
     }
 
     /**
-     * to string
-     *
-     * @return to string
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return super.toString() + "---" + displayControl;
 
     }
-
 }
