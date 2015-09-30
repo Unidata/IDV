@@ -21,27 +21,15 @@
 package ucar.unidata.idv;
 
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
 import ucar.unidata.view.sounding.Hodograph3DDisplay;
-import ucar.unidata.view.sounding.WindProfileDisplay;
 
-import ucar.visad.display.*;
+import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.DisplayMaster;
 
-import visad.*;
+import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
 
 import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.*;
 
 
 
@@ -54,7 +42,7 @@ import javax.swing.border.*;
 
 public class HodographViewManager extends ViewManager {
 
-    /** Prefix for preferences */
+    /** Prefix for preferences. */
     public static final String PREF_PREFIX = ViewManager.PREF_PREFIX
                                              + "HODOGRAPH";
 
@@ -71,8 +59,8 @@ public class HodographViewManager extends ViewManager {
      * @param desc         The ViewDescriptor that identifies this VM
      * @param properties   A set of ";" delimited name-value pairs.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public HodographViewManager(ViewContext viewContext, ViewDescriptor desc,
                                 String properties)
@@ -83,16 +71,14 @@ public class HodographViewManager extends ViewManager {
 
     /**
      * Create a HodographViewManager with the given context, descriptor,
-     * object store, properties string and animation state
+     * object store, properties string and animation state.
      *
-     *  @param viewContext Provides a context for the VM to be in.
-     *  @param desc The ViewDescriptor that identifies this VM
-     *  @param properties A set of ";" delimited name-value pairs.
-     *  @param animationInfo Initial animation properties
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     *
+     * @param viewContext Provides a context for the VM to be in.
+     * @param desc The ViewDescriptor that identifies this VM
+     * @param properties A set of ";" delimited name-value pairs.
+     * @param animationInfo Initial animation properties
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public HodographViewManager(ViewContext viewContext, ViewDescriptor desc,
                                 String properties,
@@ -104,16 +90,14 @@ public class HodographViewManager extends ViewManager {
 
     /**
      *  Create a HodographViewManager with the given context, display,
-     *  descriptor, properties string
+     *  descriptor, properties string.
      *
-     *  @param viewContext Provides a context for the VM to be in.
-     *  @param master  display master
-     *  @param viewDescriptor The ViewDescriptor that identifies this VM
-     *  @param properties A set of ";" delimited name-value pairs.
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     *
+     * @param viewContext Provides a context for the VM to be in.
+     * @param master  display master
+     * @param viewDescriptor The ViewDescriptor that identifies this VM
+     * @param properties A set of ";" delimited name-value pairs.
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public HodographViewManager(ViewContext viewContext,
                                 DisplayMaster master,
@@ -125,12 +109,11 @@ public class HodographViewManager extends ViewManager {
     }
 
     /**
-     * Factory method for creating the display master
+     * Factory method for creating the display master.
      *
      * @return The Display Master
-     *
-     * @throws RemoteException On badness
      * @throws VisADException On badness
+     * @throws RemoteException On badness
      */
     protected DisplayMaster doMakeDisplayMaster()
             throws VisADException, RemoteException {
@@ -139,7 +122,7 @@ public class HodographViewManager extends ViewManager {
     }
 
     /**
-     * Set the hodograph display
+     * Set the hodograph display.
      *
      * @param hd  the hodograph display
      */
@@ -149,7 +132,7 @@ public class HodographViewManager extends ViewManager {
 
 
     /**
-     * Don't show the side legend
+     * Don't show the side legend.
      *
      * @return false
      */
@@ -158,7 +141,7 @@ public class HodographViewManager extends ViewManager {
     }
 
     /**
-     * What type of view is this
+     * What type of view is this.
      *
      * @return The type of view
      */
