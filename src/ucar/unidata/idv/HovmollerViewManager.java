@@ -21,19 +21,16 @@
 package ucar.unidata.idv;
 
 
-import ucar.unidata.ui.FontSelector;
 import ucar.unidata.util.BooleanProperty;
 import ucar.unidata.util.GuiUtils;
 
 import ucar.visad.display.DisplayMaster;
 import ucar.visad.display.HovmollerDisplay;
 
-import visad.AxisScale;
 import visad.VisADException;
 
 
 import java.awt.Container;
-import java.awt.Font;
 
 import java.rmi.RemoteException;
 
@@ -54,20 +51,20 @@ public class HovmollerViewManager extends ViewManager {
 
 
 
-    /** Preference for  grid lines or 2d _ */
+    /** Preference for  grid lines or 2d _. */
     public static final String PREF_GRIDLINES = "HovmollerView.Gridlines";
 
-    /** preference for clipping */
+    /** preference for clipping. */
     private boolean clipOn = false;
 
     /**
-     *  Default constructor
+     *  Default constructor.
      */
     public HovmollerViewManager() {}
 
 
     /**
-     * Construct a <code>HovmollerViewManager</code> from an IDV
+     * Construct a <code>HovmollerViewManager</code> from an IDV.
      *
      * @param viewContext Really the IDV
      */
@@ -76,13 +73,13 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * Construct a <code>HovmollerViewManager</code> with the specified params
+     * Construct a <code>HovmollerViewManager</code> with the specified params.
+     *
      * @param viewContext   context in which this MVM exists
      * @param desc   <code>ViewDescriptor</code>
      * @param properties   semicolon separated list of properties (can be null)
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public HovmollerViewManager(ViewContext viewContext, ViewDescriptor desc,
                                 String properties)
@@ -92,7 +89,7 @@ public class HovmollerViewManager extends ViewManager {
 
 
     /**
-     * Helper method
+     * Helper method.
      *
      * @return The time-height display_
      */
@@ -102,12 +99,11 @@ public class HovmollerViewManager extends ViewManager {
 
 
     /**
-     * Factory method to create the display master
+     * Factory method to create the display master.
      *
      * @return The HovmollerDisplay
-     *
-     * @throws RemoteException On badness
      * @throws VisADException On badness
+     * @throws RemoteException On badness
      */
     protected DisplayMaster doMakeDisplayMaster()
             throws VisADException, RemoteException {
@@ -116,10 +112,9 @@ public class HovmollerViewManager extends ViewManager {
 
 
     /**
-     * This is called by display controls and allows us to force fast rendering
+     * This is called by display controls and allows us to force fast rendering.
      *
      * @param b The displays fast rendering flag
-     *
      * @return true
      */
     public boolean getUseFastRendering(boolean b) {
@@ -132,10 +127,10 @@ public class HovmollerViewManager extends ViewManager {
      *
      * @param displayInfo The display info to add.
      * @return Was the addition successful
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
+    @Override
     public boolean addDisplayInfo(DisplayInfo displayInfo)
             throws RemoteException, VisADException {
 
@@ -146,13 +141,13 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * The BooleanProperty identified byt he given id has changed.
+     * The BooleanProperty identified by the given id has changed.
      * Apply the change to the display.
      *
      * @param id Id of the changed BooleanProperty
      * @param value Its new value
      *
-     * @throws Exception problem handeling the change
+     * @throws Exception problem handling the change
      */
     protected void handleBooleanPropertyChange(String id, boolean value)
             throws Exception {
@@ -167,7 +162,7 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * Apply properties
+     * Apply properties.
      *
      * @return true if successful
      */
@@ -212,11 +207,8 @@ public class HovmollerViewManager extends ViewManager {
         return showMenu;
     }
 
-
-
-
     /**
-     * Add to the intial Boolean properties
+     * Add to the intial Boolean properties.
      *
      * @param props  list to add to
      */
@@ -239,7 +231,7 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * Set some properties
+     * Set some properties.
      */
     protected void initBooleanProperties() {
         super.initBooleanProperties();
@@ -258,7 +250,7 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * Initialize the view menu
+     * Initialize the view menu.
      *
      * @param viewMenu The view menu
      */
@@ -305,7 +297,7 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * Set the clipping  flag
+     * Set the clipping  flag.
      *
      * @param value The value
      */
@@ -317,7 +309,8 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * Get the clipping  flag
+     * Get the clipping  flag.
+     *
      * @return The flag value
      */
     public boolean getClipping() {
@@ -334,7 +327,7 @@ public class HovmollerViewManager extends ViewManager {
     }
 
     /**
-     * Don't show the side legend
+     * Don't show the side legend.
      *
      * @return false
      */
