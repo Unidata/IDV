@@ -141,7 +141,8 @@ public abstract class NavigatedViewManager extends ViewManager {
     public static final String SHARE_MATRIX = "MapViewManager.SHARE_MATRIX";
 
     /** Defines the rubber band box for sharing state */
-    public static final String SHARE_RUBBERBAND = "NavigatedViewManager.SHARE_RUBBERBAND";
+    public static final String SHARE_RUBBERBAND =
+        "NavigatedViewManager.SHARE_RUBBERBAND";
 
     /** How far do we zoom on a zoom in or out */
     public static final double ZOOM_FACTOR =
@@ -225,7 +226,7 @@ public abstract class NavigatedViewManager extends ViewManager {
      * Initialize the default vertical range
      */
     private void initVerticalRange() {
-        String typeName         = getTypeName().toLowerCase();
+        String typeName = getTypeName().toLowerCase();
         String verticalRangeStr = getIdv().getProperty("idv.viewmanager."
                                       + typeName
                                       + ".verticalrange", (String) null);
@@ -280,15 +281,15 @@ public abstract class NavigatedViewManager extends ViewManager {
             navDisplay.setCursorStringOn(false);
             final RubberBandBox rbb = navDisplay.getRubberBandBox();
             if (rbb != null) {
-            	rbb.addAction(new ActionImpl("Box Change") {
-            		public void doAction() 
-            		throws VisADException, RemoteException {
-            		   Gridded2DSet bounds = rbb.getBounds();
-            		   if (bounds != null) {
-            			   rubberBandBoxChanged();
-            		   }
-            		}
-            	});
+                rbb.addAction(new ActionImpl("Box Change") {
+                    public void doAction()
+                            throws VisADException, RemoteException {
+                        Gridded2DSet bounds = rbb.getBounds();
+                        if (bounds != null) {
+                            rubberBandBoxChanged();
+                        }
+                    }
+                });
             }
         } catch (Exception e) {
             logException("setDisplayMaster", e);
@@ -298,8 +299,8 @@ public abstract class NavigatedViewManager extends ViewManager {
     /**
      * Initialize this object.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void init() throws VisADException, RemoteException {
         if (getHaveInitialized()) {
@@ -556,28 +557,28 @@ public abstract class NavigatedViewManager extends ViewManager {
 
             return;
         }
-        
+
         if (dataId.equals(SHARE_RUBBERBAND)) {
-    	    //System.out.println("NVM: Rubber Band Box changed from share");
+            //System.out.println("NVM: Rubber Band Box changed from share");
             notifyDisplayControls(SHARE_RUBBERBAND);
             return;
         }
 
         super.receiveShareData(from, dataId, data);
     }
-    
+
     /**
      * Handle the rubber band box changes.
-     * 
+     *
      * @throws VisADException
      */
     protected void rubberBandBoxChanged() throws VisADException {
         if ( !getInitDone()) {
             return;
         }
-    	//System.out.println("NVM: Rubber Band Box changed");
-    	doShare(SHARE_RUBBERBAND, "");
-    	notifyDisplayControls(SHARE_RUBBERBAND);
+        //System.out.println("NVM: Rubber Band Box changed");
+        doShare(SHARE_RUBBERBAND, "");
+        notifyDisplayControls(SHARE_RUBBERBAND);
     }
 
     /**
