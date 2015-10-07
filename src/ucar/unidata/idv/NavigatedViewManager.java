@@ -570,7 +570,7 @@ public abstract class NavigatedViewManager extends ViewManager {
     /**
      * Handle the rubber band box changes.
      *
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
      */
     protected void rubberBandBoxChanged() throws VisADException {
         if ( !getInitDone()) {
@@ -613,9 +613,8 @@ public abstract class NavigatedViewManager extends ViewManager {
      * on the {@link DisplayControl}s
      *
      * @param de The <code>DisplayEvent</code>
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public void displayChanged(DisplayEvent de)
             throws VisADException, RemoteException {

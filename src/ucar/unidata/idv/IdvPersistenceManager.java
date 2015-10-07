@@ -1455,7 +1455,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param formatXml Should the result be formatted (i.e., new lines and indents
      * for easy reading).
      * @return The xml encoded application state
-     * @throws Exception
+     * @throws Exception the exception
      */
     public String getBundleXml(boolean formatXml) throws Exception {
         return getBundleXml(formatXml, true);
@@ -1490,9 +1490,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param formatXml Should the result be formatted (i.e., new lines and indents
      * for easy reading).
      * @param usePersistenceManager If true then use the persistence manager to decide what is saved
-     *
      * @return The xml encoded application state
-     * @throws Exception
+     * @throws Exception the exception
      */
     public String getBundleXml(boolean formatXml,
                                boolean usePersistenceManager)
@@ -3397,8 +3396,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @param bundleProperties  set of properties
      * @param didRemoveAll Was remove all called before we decoded the xml
      * @param letUserChangeData Should popup data path change dialog
-     *
-     * @throws Exception
+     * @throws Exception the exception
      */
     protected void instantiateFromBundle(Hashtable ht, boolean fromCollab,
                                          LoadBundleDialog loadDialog,
@@ -4003,7 +4001,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
     }
 
-    static public String getBundleIdvVersion(){
+    /**
+     * Gets the bundle idv version.
+     *
+     * @return the bundle idv version
+     */
+    static public String getBundleIdvVersion() {
         return bundleIdvVersion;
     }
 
