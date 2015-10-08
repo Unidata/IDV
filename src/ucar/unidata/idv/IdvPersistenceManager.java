@@ -695,7 +695,30 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     }
 
+    /**
+     * This api is called from the ISL to generate the zidv file using
+     * the export tag with what equals zidv and filename
+     */
+    public void doSaveAs(String filename) {
 
+        if (filename == null) {
+            return;
+        }
+        setCurrentFileName(filename);
+
+        boolean prevMakeDataEditable = makeDataEditable;
+        makeDataEditable = makeDataEditableCbx.isSelected();
+
+        boolean prevMakeDataRelative = makeDataRelative;
+        makeDataRelative = makeDataRelativeCbx.isSelected();
+        if (doSave(filename, true, true)) {
+            getPublishManager().publishContent(filename, null, publishCbx);
+            getIdv().addToHistoryList(filename);
+        }
+        makeDataEditable = prevMakeDataEditable;
+        makeDataRelative = prevMakeDataRelative;
+
+    }
 
     /**
      * This will add in to the given combo box the
@@ -1168,7 +1191,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         //TODO: Put call out to the persistence manager to configure
         //what is to be saved.
         doSave(getResourceManager().getResources(
-            IdvResourceManager.RSC_BUNDLES).getWritable(), false);
+                IdvResourceManager.RSC_BUNDLES).getWritable(), false);
     }
 
 
@@ -1295,6 +1318,25 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return Was this save successful
      */
     public boolean doSave(String filename, boolean usePersistenceManager) {
+        return doSave(filename, true, false);
+    }
+
+    /**
+     *  Save the current state into the specified filename
+     *
+     * @param filename bundle file name to write to. If this ends in
+     * &quot;.jnlp&quot; then we base 64 encode the bundle and wrap it in
+     * a jnlp file.
+     *
+     * @param usePersistenceManager If true then we use the persistence manager
+     * to determine what is to be saved.
+     *
+     * @param fromIsl If this api is invoked from the ISL script and save a zidv
+     *                bundle it will call the nogui api to save all display data
+     *
+     * @return Was this save successful
+     */
+    public boolean doSave(String filename, boolean usePersistenceManager, boolean fromIsl) {
 
         try {
             boolean doJnlp = filename.endsWith(SUFFIX_JNLP)
@@ -1307,7 +1349,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             List    zidvFiles = null;
             if (doZidv) {
-                zidvFiles = showDataEmbedGui(getDataSourcesToPersist());
+                if(fromIsl)
+                    zidvFiles = showDataEmbedNoGui(getDataSourcesToPersist());
+                else
+                    zidvFiles = showDataEmbedGui(getDataSourcesToPersist());
                 if (zidvFiles == null) {
                     return false;
                 }

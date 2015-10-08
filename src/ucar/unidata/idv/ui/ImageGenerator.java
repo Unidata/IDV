@@ -1060,7 +1060,7 @@ public class ImageGenerator extends IdvManager {
         pushProperties();
         int  start = XmlUtil.getAttribute(node, "start",0);
         int  end = XmlUtil.getAttribute(node, "end",0);
-        int  inc = XmlUtil.getAttribute(node, "increment",1);
+        int  inc = XmlUtil.getAttribute(node, "increment", 1);
 
         for(int i=start;i<end;i+=inc) {
             putProperty("index", ""+i);
@@ -1146,14 +1146,21 @@ public class ImageGenerator extends IdvManager {
      * @throws Throwable On badness
      */
     protected boolean processTagExport(Element node) throws Throwable {
+        String what     = applyMacros(node, ATTR_WHAT, (String) null);
+        String filename = applyMacros(node, ATTR_FILE, (String) null);
+        //String filename = XmlUtil.getAttribute(node, ATTR_FILE);
+
+        if(what.equals("zidv") && filename != null){
+            getIdv().getPersistenceManager().doSaveAs(filename);
+            return true;
+        }
+
         DisplayControlImpl display = findDisplayControl(node);
         if (display == null) {
-            throw new IllegalArgumentException("Could not find display:"
-                    + XmlUtil.toString(node));
+                throw new IllegalArgumentException("Could not find display:"
+                        + XmlUtil.toString(node));
         }
-        String what     = applyMacros(node, ATTR_WHAT, (String) null);
 
-        String filename = XmlUtil.getAttribute(node, ATTR_FILE);
         display.doExport(what, filename);
         return true;
     }
