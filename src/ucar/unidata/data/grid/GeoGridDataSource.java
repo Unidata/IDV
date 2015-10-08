@@ -21,16 +21,15 @@
 package ucar.unidata.data.grid;
 
 
-import org.jfree.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
+
 import ucar.nc2.Attribute;
 import ucar.nc2.Group;
-import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
@@ -48,6 +47,7 @@ import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
+
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
@@ -80,15 +80,18 @@ import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.util.WrapperException;
 import ucar.unidata.xml.XmlUtil;
+
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
-import visad.*;
+
+import visad.Data;
+import visad.DateTime;
+import visad.FieldImpl;
+import visad.Real;
+import visad.VisADException;
+
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
-
-
-
-
 
 
 import java.awt.Dimension;
@@ -97,10 +100,13 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+
 import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -273,12 +279,12 @@ public class GeoGridDataSource extends GridDataSource {
 
     /**
      * Create a GeoGridDataSource from the filename.
+     *
      * @param descriptor   Describes this data source, has a label etc.
      * @param filename     This is the filename (or url) that points
      *                     to the actual data source.
      * @param properties   General properties used in the base class
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public GeoGridDataSource(DataSourceDescriptor descriptor,
                              String filename, Hashtable properties)
@@ -291,11 +297,11 @@ public class GeoGridDataSource extends GridDataSource {
 
     /**
      * Create a GeoGridDataSource from the filename.
+     *
      * @param descriptor   Describes this data source, has a label etc.
      * @param files List of files or urls
      * @param properties   General properties used in the base class
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public GeoGridDataSource(DataSourceDescriptor descriptor, List files,
                              Hashtable properties)
@@ -908,12 +914,12 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
         // if geoSubset is null or no bbx
-        if(llr ==  null){
+        if (llr == null) {
             llr = dataset.getBoundingBox();
         }
 
-        String        path   = prefix;
-        CFGridWriter2 writer = new CFGridWriter2();
+        String           path         = prefix;
+        CFGridWriter2    writer       = new CFGridWriter2();
         NetcdfFileWriter ncFileWriter = null;
         try {
             ncFileWriter = NetcdfFileWriter.createNew(Version.netcdf3, path);
@@ -937,7 +943,8 @@ public class GeoGridDataSource extends GridDataSource {
             // NetcdfFileWriter writer
 
             writer.writeFile(dataset, varNames, llr, null, hStride, null,
-                    dateRange, timeStride, includeLatLon, ncFileWriter);
+                             dateRange, timeStride, includeLatLon,
+                             ncFileWriter);
         } catch (Exception exc) {
             logException("Error writing local netcdf file.\nData:"
                          + getFilePath() + "\nVariables:" + varNames, exc);
@@ -1589,7 +1596,9 @@ public class GeoGridDataSource extends GridDataSource {
         boolean isProgressiveResolution =
             givenDataSelection.getProperty(
                 DataSelection.PROP_PROGRESSIVERESOLUTION, false);
-        boolean matchDisplayRegion = ((geoSelection != null) ? geoSelection.getUseViewBounds(): false);
+        boolean matchDisplayRegion = ((geoSelection != null)
+                                      ? geoSelection.getUseViewBounds()
+                                      : false);
 
         if ( !isProgressiveResolution
                 && (dataChoice.getDataSelection() != null)) {
@@ -1681,8 +1690,12 @@ public class GeoGridDataSource extends GridDataSource {
             }
             //System.out.println("new x y strides: " + geoSelection.getXStride() + " "
             //        + geoSelection.getYStride());
-            int xStride = (geoSelection != null) ? geoSelection.getXStride() : 1;
-            int yStride = (geoSelection != null) ? geoSelection.getYStride() : 1;
+            int xStride = (geoSelection != null)
+                          ? geoSelection.getXStride()
+                          : 1;
+            int yStride = (geoSelection != null)
+                          ? geoSelection.getYStride()
+                          : 1;
             // Set 0 or -1 to be 1
             if (xStride < 1) {
                 xStride = 1;
@@ -2085,33 +2098,35 @@ public class GeoGridDataSource extends GridDataSource {
         System.err.println("");
         */
         /* forecast hour */
-        CoordinateAxis1DTime dd = geoGrid.getCoordinateSystem().getRunTimeAxis();
-        CoordinateAxis1DTime dt = geoGrid.getCoordinateSystem().getTimeAxis1D();
+        CoordinateAxis1DTime dd =
+            geoGrid.getCoordinateSystem().getRunTimeAxis();
+        CoordinateAxis1DTime dt =
+            geoGrid.getCoordinateSystem().getTimeAxis1D();
         StringBuilder buf = new StringBuilder();
-        if(dd != null && dt != null) {
-            for(int i= 0; i < timeIndices.length; i++){
-                CalendarDate cd = dd.getCalendarDate(timeIndices[i]);
-                CalendarDate ct = dt.getCalendarDate(timeIndices[i]);
-                long diff = ct.getDifferenceInMsecs(cd);
-                float fh = diff/(1000.0f*3600.0f);
+        if ((dd != null) && (dt != null)) {
+            for (int i = 0; i < timeIndices.length; i++) {
+                CalendarDate cd   = dd.getCalendarDate(timeIndices[i]);
+                CalendarDate ct   = dt.getCalendarDate(timeIndices[i]);
+                long         diff = ct.getDifferenceInMsecs(cd);
+                float        fh   = diff / (1000.0f * 3600.0f);
                 buf.append(fh + ",");
             }
 
         } else if (dt != null) {
             CalendarDate ct0 = dt.getCalendarDate(0);
-            if(allTimes.size() >= timeIndices.length) {
+            if (allTimes.size() >= timeIndices.length) {
                 //for speed contour over topo, topo is likely has
                 //its time dimension lenght 1 or zero.
                 for (int i = 0; i < timeIndices.length; i++) {
-                    CalendarDate ct = dt.getCalendarDate(timeIndices[i]);
-                    long diff = ct.getDifferenceInMsecs(ct0);
-                    float fh = diff / (1000.0f * 3600.0f);
+                    CalendarDate ct   = dt.getCalendarDate(timeIndices[i]);
+                    long         diff = ct.getDifferenceInMsecs(ct0);
+                    float        fh   = diff / (1000.0f * 3600.0f);
                     buf.append(fh + ",");
                 }
             }
         }
-        if(buf.length() > 1) {
-            buf.deleteCharAt(buf.length()-1);
+        if (buf.length() > 1) {
+            buf.deleteCharAt(buf.length() - 1);
             dataChoice.setProperty("RUNTIME", buf.toString());
         }
         Trace.call1("GeoGridDataSource.getSequence");
