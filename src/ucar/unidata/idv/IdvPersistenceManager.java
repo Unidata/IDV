@@ -251,7 +251,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** for saving favorites */
     private boolean catSelected;
 
+    /** _more_ */
     static public String bundleIdvVersion;
+
     /**
      * The ctor
      *
@@ -2357,7 +2359,94 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     }
 
+    /**
+     * No gui popup when saving the all display data for the zidv
+     *
+     * @param dataSources _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
+    private List showDataEmbedNoGui(List dataSources) throws IOException {
 
+        List fileDataSources = new ArrayList();
+        List copyDataSources = new ArrayList();
+        List fileComps       = new ArrayList();
+
+        List notSavedLabels  = new ArrayList();
+
+
+        for (int i = 0; i < dataSources.size(); i++) {
+            DataSource          dataSource = (DataSource) dataSources.get(i);
+            List                files      = dataSource.getDataPaths();
+            DataSourceComponent dsc = new DataSourceComponent(dataSource);
+            //defaultRB.addActionListener(new DeselectAL(dsc.cbx));
+            // Can't use DeselectAL because you can't unselect a JRadioButton
+
+            String dataSourceName =
+                DataSelector.getNameForDataSource(dataSource);
+            if (dataSource.canSaveDataToLocalDisk()) {
+                copyDataSources.add(dsc);
+            }
+        }
+
+        if ((notSavedLabels.size() == 0) && (fileDataSources.size() == 0)
+                && (copyDataSources.size() == 0)) {
+            return new ArrayList();
+        }
+
+
+        File dir = getIdv().getObjectStore().getUniqueTmpDirectory();
+
+        //TODO: change this so we use the files to set the tmpFiles on the DS
+        for (int i = 0; i < copyDataSources.size(); i++) {
+            DataSourceComponent dsc =
+                (DataSourceComponent) copyDataSources.get(i);
+            dsc.dataSource.setDefaultSave(true);
+
+            if (true) {
+                List files = dsc.dataSource.saveDataToLocalDisk(false,
+                                 IOUtil.joinDir(dir, "data_" + i));
+                if (files == null) {
+                    continue;
+                }
+                dsc.files = files;
+                fileDataSources.add(dsc);
+            }
+        }
+
+        List filesToEmbed = new ArrayList();
+        for (int i = 0; i < fileDataSources.size(); i++) {
+            DataSourceComponent dsc =
+                (DataSourceComponent) fileDataSources.get(i);
+
+            DataSource dataSource    = dsc.dataSource;
+            List       files         = ((dsc.files != null)
+                                        ? dsc.files
+                                        : dataSource.getDataPaths());
+            List       relativeFiles = new ArrayList();
+            for (int fileIdx = 0; fileIdx < files.size(); fileIdx++) {
+                Object o       = files.get(fileIdx);
+                String file    = null;
+                String newFile = null;
+                if (o.getClass().isArray()) {
+                    file    = ((Object[]) o)[0].toString();
+                    newFile = ((Object[]) o)[1].toString();
+                } else {
+                    newFile = file = (String) o;
+                }
+                //Check if it exists
+                filesToEmbed.add(file);
+                file = "%" + PROP_ZIDVPATH + "%/"
+                       + IOUtil.getFileTail(newFile);
+                relativeFiles.add(file);
+            }
+            dataSource.setTmpPaths(relativeFiles);
+        }
+        return filesToEmbed;
+
+    }
 
     /**
      * Show the gui to select what data sources can have their paths changed from a bundle
