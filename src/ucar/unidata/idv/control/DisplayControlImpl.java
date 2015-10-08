@@ -901,7 +901,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private String smoothingType = LABEL_NONE;
 
     /**
-     * Flag for progressive resolution.  
+     * Flag for progressive resolution.
      */
     public boolean isProgressiveResolution = false;
 
@@ -1020,7 +1020,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             this.dataSelection = new DataSelection();
         }
         setMatchDisplayRegion(
-        	this.dataSelection.getGeoSelection(true).getUseViewBounds());
+            this.dataSelection.getGeoSelection(true).getUseViewBounds());
 
         //Initialize the adjust flags if we have not been unpersisted
         if ( !wasUnPersisted) {
@@ -1104,7 +1104,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                             ds.getProperty(DataSelection.PROP_USESTIMEDRIVER,
                                            false);
                         setMatchDisplayRegion(
-                                ds.getGeoSelection(true).getUseViewBounds());
+                            ds.getGeoSelection(true).getUseViewBounds());
                     }
                 }
             }
@@ -2649,10 +2649,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !getHaveInitialized()) {
             return;
         }
-    	//System.out.println("control changed");
+        //System.out.println("control changed");
         checkBoundsChange();
     }
-        
+
     /**
      * Check to see if the screen bounds have changed
      */
@@ -2661,7 +2661,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (Misc.equals(newBounds, lastBounds)) {
             return;
         }
-    	//System.out.println("control/bounds changed");
+        //System.out.println("control/bounds changed");
         if ((lastBounds != null) && (newBounds != null)) {
             if (boundsClose(lastBounds.getX(), newBounds
                     .getX()) && boundsClose(lastBounds.getY(), newBounds
@@ -2728,15 +2728,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * and have not received another one in some time delta
      */
     public void viewpointChanged() {
-    	//System.out.println("viewpointChanged");
+        //System.out.println("viewpointChanged");
         if (getMatchDisplayRegion()) {
             if (reloadFromBounds) {
-            	loadDataFromViewBounds();
+                loadDataFromViewBounds();
                 reloadFromBounds = false;
             }
         }
     }
-    
+
     /**
      * Method to calculate screen bounds to load new data
      */
@@ -2744,12 +2744,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         NavigatedDisplay nd = getNavigatedDisplay();
         if (nd != null) {
-            GeoSelection geoSelection = 
-            	getDataSelection().getGeoSelection(true);
+            GeoSelection geoSelection =
+                getDataSelection().getGeoSelection(true);
             getViewManager().setProjectionFromData(false);
             try {
-        	    Rectangle2D bbox = nd.getLatLonBox();
-        	    Rectangle2D sbox = nd.getScreenBounds();
+                Rectangle2D bbox = nd.getLatLonBox();
+                Rectangle2D sbox = nd.getScreenBounds();
                 geoSelection.setScreenBound(sbox);
                 geoSelection.setLatLonRect(bbox);
                 geoSelection.setUseViewBounds(true);
@@ -2759,8 +2759,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 EarthLocation el = nd.screenToEarthLocation(
             		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
                 LatLonPointImpl llpi =
-                    new LatLonPointImpl(el.getLatitude().getValue(),  
-                    		            el.getLongitude().getValue());
+                    new LatLonPointImpl(el.getLatitude().getValue(),
+                                        el.getLongitude().getValue());
                 //System.out.print(llpi + "\n");
 
                 getDataSelection().putProperty("centerPosition", llpi);
@@ -3248,7 +3248,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     private boolean initializeDataInstance(DataChoice dataChoice)
             throws RemoteException, VisADException {
 
-    	/*
+        /*
         //Make the new DataInstance through the factory call
         // if(dataChoice instanceof DerivedDataChoice){
         DataSelection mySelection = dataChoice.getDataSelection();
@@ -3273,7 +3273,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         dataChoice.setDataSelection(mySelection);
         // }
-         * 
+         *
          */
         DataInstance di = doMakeDataInstance(dataChoice);
 
@@ -3647,33 +3647,33 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     protected DataSelection updateDataSelection(DataSelection dataSelection)
             throws VisADException, RemoteException {
-    	
-    	// update the geoselection to include at least the screen bounds
-    	// and the screen lat/lon box if usedisplay area
-        GeoSelection geoSelection = 
+
+        // update the geoselection to include at least the screen bounds
+        // and the screen lat/lon box if usedisplay area
+        GeoSelection geoSelection =
         	dataSelection.getGeoSelection(true);
         // always update the screen size
         NavigatedDisplay navDisplay = getNavigatedDisplay();
-      	Rectangle2D sbox = navDisplay.getScreenBounds();
+        Rectangle2D      sbox       = navDisplay.getScreenBounds();
         geoSelection.setScreenBound(sbox);
         boolean levelChanged = dataSelection.getProperty("levelChanged", false);
         //if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
-        //		DataSelection.PROP_USEDISPLAYAREA) && !levelChanged) {
+        //              DataSelection.PROP_USEDISPLAYAREA) && !levelChanged) {
         if (getMatchDisplayRegion() && !levelChanged) {
             getViewManager().setProjectionFromData(false);
-      	    Rectangle2D bbox = navDisplay.getLatLonBox();
+            Rectangle2D bbox = navDisplay.getLatLonBox();
             geoSelection.setLatLonRect(bbox);
             geoSelection.setUseViewBounds(true);
             dataSelection.setGeoSelection(geoSelection);
             EarthLocation el = navDisplay.screenToEarthLocation(
         		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
             LatLonPointImpl llpi =
-                    new LatLonPointImpl(el.getLatitude().getValue(),  
-                    		            el.getLongitude().getValue());
+                new LatLonPointImpl(el.getLatitude().getValue(),
+                                    el.getLongitude().getValue());
 
             dataSelection.putProperty("centerPosition", llpi);
         }
-        if(levelChanged){
+        if (levelChanged) {
             dataSelection.removeProperty("levelChanged");
         }
         if ( !getIdv().getUseTimeDriver()) {
@@ -3698,6 +3698,30 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         return dataSelection;
     }
 
+    /**
+     * This api is called by ISL to set the spatial subset of the datasource to
+     * the Match Display Region, so the user doesn't need to save all data
+     * when saving the zidv bundle, if there is more than one view window it will
+     * do nothing since it will be too much book keeping to find out the region to
+     * subset
+     *
+     * @param n _more_
+     */
+    public void setDisplayAreaSubset(String n) {
+        List dataSources = getDataSources();
+        List vms         = getIdv().getVMManager().getViewManagers();
+        if (vms.size() > 1) {
+            return;
+        } else {
+            for (int i = 0; i < dataSources.size(); i++) {
+                DataSource    dataSource = (DataSource) dataSources.get(i);
+                DataSelection ds         = getDataSelection();
+                ds.setFromLevel(null);
+                ds.setToLevel(null);
+                ((DataSourceImpl) dataSource).setDataSelection(ds);
+            }
+        }
+    }
 
     /**
      * The name of the parameter (initially from the DataChoice) displayed
@@ -3963,28 +3987,42 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         UtcDate.applyTimeMacro(template, dt,
                             getIdv().getPreferenceManager()
                                 .getDefaultTimeZone());
-                    if(i == 0 && hasForecastHourMacro(label)){
-                        String rtime = (String)this.getDataChoice().getProperty("RUNTIME");
-                        if(rtime == null && this.getDataChoice() instanceof DerivedDataChoice){
-                            DataChoice childChoice = (DataChoice)((DerivedDataChoice) this.getDataChoice()).getChoices().get(0);
-                            while(childChoice instanceof DerivedDataChoice){
-                                childChoice = (DataChoice)((DerivedDataChoice) childChoice).getChoices().get(0);
+                    if ((i == 0) && hasForecastHourMacro(label)) {
+                        String rtime =
+                            (String) this.getDataChoice().getProperty(
+                                "RUNTIME");
+                        if ((rtime == null)
+                                && (this.getDataChoice()
+                                    instanceof DerivedDataChoice)) {
+                            DataChoice childChoice =
+                                (DataChoice) ((DerivedDataChoice) this
+                                    .getDataChoice()).getChoices().get(0);
+                            while (childChoice instanceof DerivedDataChoice) {
+                                childChoice =
+                                    (DataChoice) ((DerivedDataChoice) childChoice)
+                                        .getChoices().get(0);
                             }
-                            rtime = (String)childChoice.getProperty("RUNTIME");
+                            rtime =
+                                (String) childChoice.getProperty("RUNTIME");
                         }
-                        if(rtime != null && rtime.length() > 0)
+                        if ((rtime != null) && (rtime.length() > 0)) {
                             fhour = StringUtil.parseFloatListString(rtime);
+                        }
                     }
-                    if(hasForecastHourMacro(label) && fhour != null && fhour.size()== s.getLength()) {
-                        String v = "";
-                        float fh =(Float)fhour.get(i);
-                        if(fh==Math.round(fh))
-                            v = (int)fh + "";
-                        else
+                    if (hasForecastHourMacro(label) && (fhour != null)
+                            && (fhour.size() == s.getLength())) {
+                        String v  = "";
+                        float  fh = (Float) fhour.get(i);
+                        if (fh == Math.round(fh)) {
+                            v = (int) fh + "";
+                        } else {
                             v = fh + "";
-                        label = label.replace(MACRO_FHOUR2, v).replace(MACRO_FHOUR, v + "H");
-                    } else
+                        }
+                        label = label.replace(MACRO_FHOUR2,
+                                v).replace(MACRO_FHOUR, v + "H");
+                    } else {
                         label = applyForecastHourMacro(label, dt);
+                    }
                     Text t = new Text(tt, label);
                     fi.setSample(i, t, false);
                 }
@@ -4182,7 +4220,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             values.add("" + displayUnit);
         }
         patterns.add(MACRO_RESOLUTION);
-        if (resolutionReadout == null || resolutionReadout.isEmpty()) {
+        if ((resolutionReadout == null) || resolutionReadout.isEmpty()) {
             values.add("");
         } else {
             values.add(resolutionReadout);
@@ -4271,7 +4309,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return true if it does
      */
     protected boolean hasForecastHourMacro(String t) {
-        return t.matches(".*(" + MACRO_FHOUR + "|" + MACRO_FHOUR2 +").*");
+        return t.matches(".*(" + MACRO_FHOUR + "|" + MACRO_FHOUR2 + ").*");
     }
 
 
@@ -5908,26 +5946,26 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
 
 
-       /*    try {
-                if (getDataChoice() != null) {
-                    dataSelectionComponents =
-                        dataSource.getDataSelectionComponents(
-                            getDataChoice());
-                    if (dataSelectionComponents != null) {
-                        for (DataSelectionComponent dsc :
-                                dataSelectionComponents) {
-                            if (dsc.getShowInControlProperties()) {
-                               // dsc.getContents(getDataSelection());
-                              //  jtp.add(dsc.getName(),
-                              //          dsc.getContents(getDataSelection()));
-                            }
-                        }
-                    }
-                }
-            } catch (Exception exc) {
-                logException("Initializing  properties", exc);
-            }
-*/
+            /*    try {
+                     if (getDataChoice() != null) {
+                         dataSelectionComponents =
+                             dataSource.getDataSelectionComponents(
+                                 getDataChoice());
+                         if (dataSelectionComponents != null) {
+                             for (DataSelectionComponent dsc :
+                                     dataSelectionComponents) {
+                                 if (dsc.getShowInControlProperties()) {
+                                    // dsc.getContents(getDataSelection());
+                                   //  jtp.add(dsc.getName(),
+                                   //          dsc.getContents(getDataSelection()));
+                                 }
+                             }
+                         }
+                     }
+                 } catch (Exception exc) {
+                     logException("Initializing  properties", exc);
+                 }
+     */
         }
 
 
@@ -6190,14 +6228,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     needToReloadData = true;
                 }
             }
-       /*     if (dataSelectionComponents != null) {
-                for (DataSelectionComponent dsc : dataSelectionComponents) {
-                    if (dsc.getShowInControlProperties()) {
-                        dsc.applyToDataSelection(getDataSelection());
-                        needToReloadData = true;
-                    }
-                }
-            }*/
+            /*     if (dataSelectionComponents != null) {
+                     for (DataSelectionComponent dsc : dataSelectionComponents) {
+                         if (dsc.getShowInControlProperties()) {
+                             dsc.applyToDataSelection(getDataSelection());
+                             needToReloadData = true;
+                         }
+                     }
+                 }*/
             if (dataSelectionWidget != null) {
                 List oldSelectedTimes = getDataSelection().getTimes();
                 List selectedTimes =
@@ -6432,7 +6470,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             }
 
         }
-        
+
 
 
         if (haveDataTimes()) {
@@ -6485,7 +6523,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             items.add(mi);
             if (canDoProgressiveResolution()) {
                items.add(GuiUtils.makeCheckboxMenuItem(MapViewManager.PR_LABEL, this,
-                    "isProgressiveResolution", null));
+                        "isProgressiveResolution", null));
                items.add(GuiUtils.makeCheckboxMenuItem("Match Display Region", this,
                     "matchDisplayRegion", null));
             }
@@ -6705,9 +6743,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         //System.out.println("projection changed");
         if (getMatchDisplayRegion()) {
-        	reloadFromBounds = true;
-        	lastBounds = null;
-        	checkBoundsChange();
+            reloadFromBounds = true;
+            lastBounds       = null;
+            checkBoundsChange();
         }
     }
 
@@ -6731,7 +6769,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             reDisplayColorScales();
         }
         if (property.equals(NavigatedViewManager.SHARE_RUBBERBAND)) {
-        	reloadFromBounds = true;
+            reloadFromBounds = true;
         }
     }
 
@@ -12521,7 +12559,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return  true if display and view supports it
      */
     public boolean getShoulDoProgressiveResolution() {
-    	boolean shouldDo = 
+    	boolean shouldDo =
             canDoProgressiveResolution() &&
             getIsProgressiveResolution();
         MapViewManager mvm = getMapViewManager();
@@ -12538,7 +12576,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return false
      */
     protected boolean canDoProgressiveResolution() {
-    	return false;
+        return false;
     }
 
 
@@ -12564,21 +12602,21 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 this.isProgressiveResolution);
         }
     }
-    
+
     /**
      * Should we match the display region for spatial bounds
      * @return true if match display region
      */
     public boolean getMatchDisplayRegion() {
-    	return matchDisplayRegion;
+        return matchDisplayRegion;
     }
-    
+
     /**
      * Set whether we should match the display region for spatial bounds
      * @param useDR  true if match display region
      */
     public void setMatchDisplayRegion(boolean useDR) {
-    	this.matchDisplayRegion = useDR;
+        this.matchDisplayRegion = useDR;
         if (dataSelection != null) {
             dataSelection.getGeoSelection(true).setUseViewBounds(useDR);
         }
