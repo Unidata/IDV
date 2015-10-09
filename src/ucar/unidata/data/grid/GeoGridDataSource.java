@@ -954,7 +954,7 @@ public class GeoGridDataSource extends GridDataSource {
         }
 
 
-        if (geoSubset != null) {
+        if (geoSubset != null && changeLinks) {
             geoSubset.clearStride();
             geoSubset.setBoundingBox(null);
             if (geoSelectionPanel != null) {

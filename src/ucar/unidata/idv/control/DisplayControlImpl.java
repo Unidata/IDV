@@ -3708,14 +3708,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param n _more_
      */
     public void setDisplayAreaSubset(String n) {
-        List dataSources = getDataSources();
+        List dataSources = getIdv().getAllDataSources();
         List vms         = getIdv().getVMManager().getViewManagers();
         if (vms.size() > 1) {
             return;
         } else {
             for (int i = 0; i < dataSources.size(); i++) {
                 DataSource    dataSource = (DataSource) dataSources.get(i);
-                DataSelection ds         = getDataSelection();
+                DataSelection ds         = dataSource.getDataSelection();
+                DataSelection ds1 = getDataSelection();
+                ds.setGeoSelection(ds1.getGeoSelection());
                 ds.setFromLevel(null);
                 ds.setToLevel(null);
                 ((DataSourceImpl) dataSource).setDataSelection(ds);
