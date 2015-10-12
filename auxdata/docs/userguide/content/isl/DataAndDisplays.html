@@ -246,7 +246,10 @@ or an ID of a display control that refers to an instance of the ObsListControl (
 
 [isl::importxml exportZidv.isl]
 
-Only in this case, the display attribute is not required. In this example, the SetDisplayAreaSubset api is called inside the displayproperties tag
-to set the spatial subset in the data source property level before exporting to the zidv.
+In the case the user only want to save the display area dsata in the zidv,  the SetDisplayAreaSubset
+api can be called inside the displayproperties tag to set the spatial subset in the data source property level,
+with the condition of only one view window exists in the current IDV, before exporting to the zidv. The property
+change of display area spatial subset within one display control will invoke the display area subset of all data sources.
+
 
 </body>
