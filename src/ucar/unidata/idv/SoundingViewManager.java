@@ -23,25 +23,31 @@ package ucar.unidata.idv;
 
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
 import ucar.unidata.view.sounding.AerologicalDisplay;
 import ucar.unidata.view.sounding.AerologicalDisplayConstants;
 
-import ucar.visad.display.*;
+import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.DisplayMaster;
 
-import visad.*;
+import visad.CoordinateSystem;
+import visad.VisADException;
 
-import java.awt.*;
-import java.awt.event.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
+import javax.swing.border.TitledBorder;
 
 
 
@@ -85,9 +91,8 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
      * @param viewContext  Provides a context for the VM to be in.
      * @param desc         The ViewDescriptor that identifies this VM
      * @param properties   A set of ";" delimited name-value pairs.
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public SoundingViewManager(ViewContext viewContext, ViewDescriptor desc,
                                String properties)
@@ -98,16 +103,14 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
 
     /**
      *  Create a SoundingViewManager with the given context, descriptor, object store,
-     *  properties string and animation state
+     *  properties string and animation state.
      *
-     *  @param viewContext Provides a context for the VM to be in.
-     *  @param desc The ViewDescriptor that identifies this VM
-     *  @param properties A set of ";" delimited name-value pairs.
-     *  @param animationInfo Initial animation properties
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     *
+     * @param viewContext Provides a context for the VM to be in.
+     * @param desc The ViewDescriptor that identifies this VM
+     * @param properties A set of ";" delimited name-value pairs.
+     * @param animationInfo Initial animation properties
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public SoundingViewManager(ViewContext viewContext, ViewDescriptor desc,
                                String properties, AnimationInfo animationInfo)
@@ -118,16 +121,14 @@ public class SoundingViewManager extends ViewManager implements AerologicalDispl
 
     /**
      *  Create a SoundingViewManager with the given context, display,
-     *  descriptor, properties string
+     *  descriptor, properties string.
      *
-     *  @param viewContext Provides a context for the VM to be in.
-     *  @param master  display master
-     *  @param viewDescriptor The ViewDescriptor that identifies this VM
-     *  @param properties A set of ";" delimited name-value pairs.
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     *
+     * @param viewContext Provides a context for the VM to be in.
+     * @param master  display master
+     * @param viewDescriptor The ViewDescriptor that identifies this VM
+     * @param properties A set of ";" delimited name-value pairs.
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public SoundingViewManager(ViewContext viewContext, DisplayMaster master,
                                ViewDescriptor viewDescriptor,
