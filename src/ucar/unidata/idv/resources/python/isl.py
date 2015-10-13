@@ -12,7 +12,20 @@ sys.add_package('visad.python');
 sys.add_package('java.util');
 
 from visad.python.JPythonMethods import *
+
 from java.util import ArrayList
+from java.util import Hashtable
+
+def exportZidv(filename, display, displayAreaSubset=True):
+    control = islInterpreter.findDisplayControl(display)
+    if control:
+        if displayAreaSubset:
+            props = Hashtable()
+            props.put('DisplayAreaSubset', displayAreaSubset)
+            control.applyProperties(props)
+        what = islInterpreter.applyMacros('zidv')
+        filename = islInterpreter.applyMacros(filename)
+        idv.getPersistenceManager().doSaveAs(filename)
 
 def pause():
     idv.waitUntilDisplaysAreDone();
