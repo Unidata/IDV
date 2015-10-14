@@ -21,18 +21,23 @@
 package ucar.unidata.idv;
 
 
+import ucar.unidata.util.BooleanProperty;
+import ucar.unidata.util.GuiUtils;
+
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.TimeHeightDisplay;
+
+import visad.VisADException;
+
+
 import java.awt.Container;
+
 import java.rmi.RemoteException;
+
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
-
-import ucar.unidata.util.BooleanProperty;
-import ucar.unidata.util.GuiUtils;
-import ucar.visad.display.DisplayMaster;
-import ucar.visad.display.TimeHeightDisplay;
-import visad.VisADException;
 
 
 /**
@@ -139,7 +144,7 @@ public class TimeHeightViewManager extends ViewManager {
     }
 
     /**
-     * The BooleanProperty identified byt he given id has changed.
+     * The BooleanProperty identified by the given id has changed.
      * Apply the change to the display.
      *
      * @param id Id of the changed BooleanProperty
@@ -282,7 +287,7 @@ public class TimeHeightViewManager extends ViewManager {
     public boolean getClipping() {
         return clipOn;
     }
-    
+
     /**
      * Do we support animation?
      *
