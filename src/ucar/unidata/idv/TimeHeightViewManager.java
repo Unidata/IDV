@@ -21,25 +21,18 @@
 package ucar.unidata.idv;
 
 
-import ucar.unidata.util.BooleanProperty;
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-
-import ucar.visad.display.*;
-
-import visad.*;
-
-import java.awt.*;
-
+import java.awt.Container;
 import java.rmi.RemoteException;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+
+import ucar.unidata.util.BooleanProperty;
+import ucar.unidata.util.GuiUtils;
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.TimeHeightDisplay;
+import visad.VisADException;
 
 
 /**
@@ -133,9 +126,8 @@ public class TimeHeightViewManager extends ViewManager {
      *
      * @param displayInfo The display info to add.
      * @return Was the addition successful
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public boolean addDisplayInfo(DisplayInfo displayInfo)
             throws RemoteException, VisADException {
@@ -153,7 +145,7 @@ public class TimeHeightViewManager extends ViewManager {
      * @param id Id of the changed BooleanProperty
      * @param value Its new value
      *
-     * @throws Exception problem handeling the change
+     * @throws Exception problem handling the change
      */
     protected void handleBooleanPropertyChange(String id, boolean value)
             throws Exception {
