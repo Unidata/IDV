@@ -75,13 +75,13 @@ public class TimeHeightViewManager extends ViewManager {
 
 
     /**
-     * Construct a <code>TimeHeightViewManager</code> with the specified params
+     * Construct a <code>TimeHeightViewManager</code> with the specified params.
+     *
      * @param viewContext   context in which this MVM exists
      * @param desc   <code>ViewDescriptor</code>
      * @param properties   semicolon separated list of properties (can be null)
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public TimeHeightViewManager(ViewContext viewContext,
                                  ViewDescriptor desc, String properties)
