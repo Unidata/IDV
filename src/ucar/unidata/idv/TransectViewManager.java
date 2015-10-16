@@ -120,7 +120,7 @@ public class TransectViewManager extends NavigatedViewManager {
      * @param viewContext   context in which this MVM exists
      * @param desc   <code>ViewDescriptor</code>
      * @param properties   semicolon separated list of properties (can be null)
-     * @throws VisADException the vis ad exception
+     * @throws VisADException the VisAD exception
      * @throws RemoteException the remote exception
      */
     public TransectViewManager(ViewContext viewContext, ViewDescriptor desc,
@@ -673,10 +673,10 @@ public class TransectViewManager extends NavigatedViewManager {
     }
 
     /**
-     * _more_
+     * Sets the transect.
      *
-     * @param value _more_
-     * @param force _more_
+     * @param value the value
+     * @param force the force
      */
     public void setTransect(Transect value, boolean force) {
         if ( !force && Misc.equals(transect, value)) {
