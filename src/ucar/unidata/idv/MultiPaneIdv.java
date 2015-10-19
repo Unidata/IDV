@@ -21,58 +21,38 @@
 package ucar.unidata.idv;
 
 
-import ucar.unidata.data.DataCategory;
-
-
-
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataContext;
-
-import ucar.unidata.data.DataManager;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceFactory;
-import ucar.unidata.data.DerivedDataChoice;
-
-
-
-import ucar.unidata.idv.ui.*;
-
-
-import ucar.unidata.util.FileManager;
-
+import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Resource;
-import ucar.unidata.util.SerializedObjectStore;
-import ucar.unidata.util.SuffixFileFilter;
+
+import visad.DisplayEvent;
+import visad.DisplayListener;
+import visad.VisADException;
 
 
-import ucar.visad.display.DisplayMaster;
-
-import visad.*;
-
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeEvent;
-
-import java.beans.PropertyChangeListener;
-
-import java.lang.reflect.Constructor;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Properties;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.*;
 
 
 
@@ -202,13 +182,12 @@ public class MultiPaneIdv extends IntegratedDataViewer {
 
 
     /**
-     * Make the gui contents
+     * Make the gui contents.
      *
      * @param frame The main window
      * @return The  main gui contents
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public Component doMakeContents(IdvWindow frame)
             throws VisADException, RemoteException {
@@ -321,15 +300,11 @@ public class MultiPaneIdv extends IntegratedDataViewer {
         contents.revalidate();
     }
 
-
-
-
     /**
-     * The main
+     * The main.
      *
      * @param args Command line arguments
-     *
-     * @throws Exception
+     * @throws Exception the exception
      */
     public static void main(String[] args) throws Exception {
         LogUtil.configure();
