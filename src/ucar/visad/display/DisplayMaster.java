@@ -23,20 +23,33 @@ package ucar.visad.display;
 
 import ucar.unidata.util.Counter;
 import ucar.unidata.util.GuiUtils;
-
-
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Trace;
-import ucar.unidata.util.WrapperException;
 
-import ucar.visad.*;
+import visad.ConstantMap;
+import visad.DisplayException;
+import visad.DisplayImpl;
+import visad.DisplayListener;
+import visad.DisplayRenderer;
+import visad.GraphicsModeControl;
+import visad.Gridded1DDoubleSet;
+import visad.KeyboardBehavior;
+import visad.LocalDisplay;
+import visad.MouseBehavior;
+import visad.ProjectionControl;
+import visad.RealType;
+import visad.ScalarMap;
+import visad.Set;
+import visad.VisADException;
 
-import visad.*;
+import visad.java3d.DisplayImplJ3D;
 
-import visad.java3d.*;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import java.beans.PropertyChangeEvent;
@@ -46,20 +59,16 @@ import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
-import javax.media.j3d.*;
-
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
 
 
 /**
@@ -89,7 +98,6 @@ import javax.swing.*;
  * </table>
  *
  * @author Steven R. Emmerson
- * @version $Revision: 1.132 $
  */
 abstract public class DisplayMaster {
 
@@ -1164,10 +1172,10 @@ abstract public class DisplayMaster {
 
     /**
      * Set the mouse functions for this display.
-     * @param map  array of mouse functions to buttons
-     * @see visad.MouseHelper#setFunctionMap(int[][][]) for info.
      *
-     * @throws VisADException
+     * @param map  array of mouse functions to buttons
+     * @throws VisADException the VisAD exception
+     * @see visad.MouseHelper#setFunctionMap(int[][][]) for info.
      */
     public void setMouseFunctions(int[][][] map) throws VisADException {
         mouseFunctionMap = map;
@@ -1176,9 +1184,9 @@ abstract public class DisplayMaster {
 
 
     /**
-     * mouse funtion map
+     * mouse function map
      *
-     * @return mouse funtion map
+     * @return mouse function map
      */
     public int[][][] getMouseFunctionMap() {
         return mouseFunctionMap;
@@ -1401,7 +1409,7 @@ abstract public class DisplayMaster {
     /**
      * Reset the mouse functions to the default.
      *
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
      */
     public void resetMouseFunctions() throws VisADException {
         setDefaultMouseFunctions(display);
@@ -1415,7 +1423,7 @@ abstract public class DisplayMaster {
      *
      * @param display  Display to set functions for
      *
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
      */
     public static void setDefaultMouseFunctions(DisplayImpl display)
             throws VisADException {

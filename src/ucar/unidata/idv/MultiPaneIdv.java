@@ -60,7 +60,7 @@ import javax.swing.border.BevelBorder;
 
 /**
  * An example IDV application that supports muliple view panes
- * in the same window, ala AWIPS
+ * in the same window, a la AWIPS
  *
  * @author IDV development team
  */
