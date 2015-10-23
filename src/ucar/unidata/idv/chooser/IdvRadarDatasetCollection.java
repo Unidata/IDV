@@ -27,23 +27,24 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 
-import thredds.catalog.*;
+import thredds.catalog.InvAccess;
+import thredds.catalog.InvCatalogFactory;
+import thredds.catalog.InvCatalogImpl;
+import thredds.catalog.InvDataset;
+import thredds.catalog.XMLEntityResolver;
 
 import ucar.nc2.dt.DataIterator;
 import ucar.nc2.dt.RadialDatasetSweep;
-import ucar.unidata.data.radar.TDSRadarDatasetCollection;
-import ucar.unidata.data.radar.StationRadarCollectionImpl;
-
-import ucar.nc2.thredds.*;
+import ucar.nc2.thredds.ThreddsDataFactory;
 import ucar.nc2.units.DateType;
-
 import ucar.nc2.units.DateUnit;
 
+import ucar.unidata.data.radar.StationRadarCollectionImpl;
+import ucar.unidata.data.radar.TDSRadarDatasetCollection;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.Station;
 import ucar.unidata.geoloc.StationImpl;
-
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.DatedThing;
@@ -54,7 +55,12 @@ import java.io.IOException;
 
 import java.net.URI;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -91,21 +97,18 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
     private URI docURI;
 
     /**
-     * tds radar dataset collection  factory
+     * tds radar dataset collection  factory.
      *
-     * @param ds _more_
-     * @param dsc_location _more_
-     * @param errlog _more_
-     *
-     * @return any foctory
-     *
-     * @throws IOException _more_
-     * @throws java.net.URISyntaxException _more_
+     * @param ds the ds
+     * @param dsc_location the dsc_location
+     * @param errlog the errlog
+     * @return any factory
+     * @throws IOException Signals that an I/O exception has occurred.
      */
 
     static public IdvRadarDatasetCollection factory(InvDataset ds,
             String dsc_location, StringBuffer errlog)
-            throws IOException, java.net.URISyntaxException {
+            throws IOException {
 
         // URI catalogURI = new URI(dsc_location);
         //this.docURI =    catalogURI;
@@ -113,15 +116,13 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
     }
 
     /**
-     *  tds radar dataset collection  factory
+     *  tds radar dataset collection  factory.
      *
-     * @param desc _more_
-     * @param dsc_location _more_
-     * @param errlog _more_
-     *
+     * @param desc the desc
+     * @param dsc_location the dsc_location
+     * @param errlog the errlog
      * @return dataset collection
-     *
-     * @throws IOException _more_
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     static public IdvRadarDatasetCollection factory(String desc,
             String dsc_location, StringBuffer errlog)
@@ -1061,11 +1062,11 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
 
     /**
      * Getting data URIs for a single radar station, with time range.
+     *
      * @param sName radar station name
      * @param dateInfo the date selection information
      * @return list of URIs
-     *
-     * @throws IOException _more_
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public List getDataURIs(String sName, DateSelection dateInfo)
             throws IOException {
@@ -1075,11 +1076,11 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
 
     /**
      * Getting data for a single radar station, with time range.
+     *
      * @param sName radar station name
      * @param dateInfo the date time selection information
      * @return list of radialDatasetSweep
-     *
-     * @throws IOException _more_
+     * @throws IOException Signals that an I/O exception has occurred.
      */
 
     public List getData(String sName, DateSelection dateInfo)
@@ -1090,12 +1091,12 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
 
     /**
      * Getting data for a single radar station, with time range.
+     *
      * @param sName radar station name
      * @param dateSelect the date time selection information
-     * @param cancel _more_
+     * @param cancel the cancel
      * @return list of radialDatasetSweep
-     *
-     * @throws IOException _more_
+     * @throws IOException Signals that an I/O exception has occurred.
      */
 
     public List getData(String sName, DateSelection dateSelect,
@@ -1127,8 +1128,6 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
         return datasetList;
 
     }
-
-
 
     /**
      * getting data uri list
@@ -1190,17 +1189,17 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
      */
     public class DatasetURIInfo implements DatedThing {
 
-        /** _more_ */
+        /** The uri. */
         private URI uri = null;
 
-        /** _more_ */
+        /** The date. */
         private Date date = null;
 
         /**
-         * _more_
+         * Instantiates a new dataset uri info.
          *
-         * @param u _more_
-         * @param date _more_
+         * @param u the u
+         * @param date the date
          */
         public DatasetURIInfo(URI u, Date date) {
             this.uri  = u;
@@ -1208,9 +1207,7 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
         }
 
         /**
-         * _more_
-         *
-         * @return _more_
+         * {@inheritDoc}
          */
         public Date getDate() {
             return date;
@@ -1273,11 +1270,11 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
         public TDSRadarDatasetInfo() {}
 
         /**
-         * Ctor
+         * Instantiates a new TDS radar dataset info.
          *
-         * @param absTimeList _more_
-         * @param datasetInfoList _more_
-         * @param invDatasetList _more_
+         * @param absTimeList the abs time list
+         * @param datasetInfoList the dataset info list
+         * @param invDatasetList the inv dataset list
          */
         public TDSRadarDatasetInfo(List absTimeList, List datasetInfoList,
                                    List invDatasetList) {
@@ -1317,11 +1314,10 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
     }
 
     /**
-     * Test the program
+     * Test the program.
      *
      * @param args  the args
-     *
-     * @throws IOException _more_
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void main(String args[]) throws IOException {
         StringBuffer              errlog      = new StringBuffer();
@@ -1406,7 +1402,4 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
 
 
     }
-
-
-
 }
