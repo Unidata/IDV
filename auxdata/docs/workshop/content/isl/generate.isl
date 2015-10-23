@@ -90,7 +90,7 @@
 <h3>${title}</h3>
 ${description}
 <i>Generated: ${MMMMM} ${d}, ${yyyy} ${HH}:${mm} ${Z}</i><br>
-<hr>
+<hr />
 <table width="100%"><tr  valign="top">
 ]]>    </append>
   </procedure>

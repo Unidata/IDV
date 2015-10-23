@@ -1,22 +1,35 @@
-<html>
-<head>
-<title>%title%</title>
-%head%
-</head>
+<!DOCTYPE html>
+ <html>
+  <head>
+   <title>Unidata IDV | %title%</title>
+   	%head%
+  </head>
+  <body>
+   <nav>
+    <ul class="toc">
+ 	 <li>%navprev%</li>
+ 	 <li>%navnext%</li>
+    </ul>
+    <div class="breadcrumb">
+     %navbreadcrumb% 
+    </div>
+   </nav>
+   <hr />
+   <h1>%level% %title%</h1>
 
-<body>
-%navprev% %navnext% 
-<span class="breadcrumb">%navbreadcrumb% </span>
-<br>
-<img src="%dotpath%images/blueline.gif">
-<div class="pagetitle">%level% %title%</div>
+   %body%
+   %childlist%
 
-%body%
-%childlist%
-<p>&nbsp;<p>
-<img src="%dotpath%images/blueline.gif">
-<br>
-%navprev% %navnext% 
-<span class="breadcrumb">%navbreadcrumb% </span>
-</body>
-</html>
+   <hr />
+   <nav>
+    <ul class="toc">
+ 	 <li>%navprev%</li>
+ 	 <li>%navnext%</li>
+    </ul>
+    <div class="breadcrumb">
+     %navbreadcrumb% 
+    </div>
+   </nav>
+  </body>
+ </html>
+  

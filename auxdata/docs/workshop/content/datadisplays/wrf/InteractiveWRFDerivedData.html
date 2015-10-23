@@ -8,7 +8,7 @@
 Derived data products and advanced features.
 </div>
 
-<div class="pagetitle">Derived Data</div>
+<h1>Derived Data</h1>
 <p>
 The IDV has the ability to make quantities computed through the use of formulas available under the loaded data source rather than going through the steps to use a formula, as outlined in the previous section. For example, you could compute wind speed using the formula directly &mdash; simply load a Data Source, then from the Field Selector click [ht::menu {Formulas} {Workshop} {Windspeed from u and v data}], then click [ht::command Create Display], then choose the fields for [ht::param u] and [ht::param v] and THEN you're done. Wouldn't it be nice if the IDV could recognize the [ht::param u] and [ht::param v] fields in your dataset and automatically present you with the choice to display [ht::param Flow Vectors] from [ht::param u] and [ht::param v] next to the available fields listed in your dataset? Well, this is exactly what Derived Quantities in the IDV accomplish.
 </p>
@@ -49,7 +49,7 @@ If we reload our data sources (right click on the data source in the Filed Selec
 There are other properties you can assign to your derived quantity, but this is the minimum effort needed to get things working (for more information, see [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/tools/DerivedData.html" "Derived Products"] in the Users Guide).
 </p>
 
-<div class="pagetitle">Aliases</div>
+<h1>Aliases</h1>
 
 <p>
 Sometimes the IDV will not recognize the variables in your file, and thus will not be able to associate D1 with U because it does not know the name of the u component of velocity in your data set. In order to get the IDV to recognize the variables in your dataset, you may need to edit the [ht::param Parameter Aliases]. Click [ht::menu {Tools} {Parameter Alias Editor}], then select [ht::param System Aliases]. Here you will find a list of Names (which are those used in the [ht::param Parameters] box in the Formula Editor), descriptions, and variable names associated with each Name.
@@ -84,7 +84,7 @@ Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPW
 <li>Sounding Data (with and without winds)</li>
 </ul>
 
-<div class="pagetitle">Parameter colored by another</div>
+<h1>Parameter colored by another</h1>
 
 <p>The IDV allows for one parameter to be colored by another parameter's value through the use of a formula. For example, let's view wind vectors colored by temperature:
 </p>
@@ -105,7 +105,7 @@ Once UCOMPWIND is added to the alias list, the IDV will know to associate UCOMPW
 
 <p>You can change the level at which the colored vectors are displayed directly from the [ht::command Displays] tab using the [ht::param Levels] drop-down box.</p>
 
-<div class="pagetitle">2D and 3D Trajectories (and more about bundles)</div>
+<h1>2D and 3D Trajectories (and more about bundles)</h1>
 
 <p>
 The IDV can generate 2D and 3D trajectories. To access the trajectory features:
@@ -137,7 +137,7 @@ Use the IDV to load the GustavTrajectory.zidv bundle (located under the [ht::par
 
 [ht::cimg ./images/WRF_TrajByPotenTemp.gif]
 
-<div class="pagetitle">Ensemble data</div>
+<h1>Ensemble data</h1>
 
 <p>
 The IDV contains many functions designed for analysis of ensemble model data. These functions can be utilized if the data you are using contains an ensemble dimension (alongside temporal and spatial dimensions). The ensemble functions can be accessed in the [ht::command Field Selector] panel by choosing "Formulas" as the Data source and expanding the [ht::param Grids] tab; The ensemble functions will be listed under the Ensemble tab.</li>

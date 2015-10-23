@@ -206,7 +206,7 @@ proc ug::step {html {img {}} {extra {}}} {
 }
 
 proc ug::prefGroup {args} {
-    return "</div>&nbsp;<p><div class=\"pagesubtitle\">[join $args { }]</div>"
+    return "</div>&nbsp;<p><h3>[join $args { }]</h3>"
 }
 
 
@@ -515,7 +515,7 @@ proc ht::convertSpaces {c} {
 }
 
 proc ht::section {t} {
-    return "<div class=\"pagesubtitle\">$t</div>"
+    return "<h3>$t</h3>"
 }
 
 proc ug::controlHtml {path title overview properties} {
@@ -523,11 +523,11 @@ proc ug::controlHtml {path title overview properties} {
     set html "
 <html><head>
   <title>$title</title>
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"/idv.css\">
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"/idv.css\" />
 </head>
 <body>
 <xxxmeta xxxname=\"jhid\" value=\"idv.controls.$controlFile\">
-<div class=\"pagesubtitle\">Overview</div>
+<h3>Overview</h3>
 [ht::convertSpaces $overview]
 
 "
@@ -551,7 +551,7 @@ proc ug::controlHtml {path title overview properties} {
 
 
 proc ug::head {title} {
-    return "<html><head>\n<title>$title</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"idv.css\" title=\"Style\">\n</head>\n<body>\n"
+    return "<html><head>\n<title>$title</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"idv.css\" />\n</head>\n<body>\n"
 }
 
 proc ug::foot {} {

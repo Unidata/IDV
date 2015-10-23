@@ -1,26 +1,49 @@
-<html>
-<head>
-<title>%title%</title>
-%head%
-</head>
+<!DOCTYPE html>
+ <html>
+  <head>
+   <title>Unidata IDV | %title%</title>
+   	%head%
+  </head>
+  <body>
+   <nav>
+    <ul class="toc">
+ 	 <li>%navprev%</li>
+ 	 <li>%navnext%</li>
+ 	 <li>%navtoc%</li>
+ 	 <li>%navimages%</li>   
+ 	 <li>%navschedule%</li>  
+ 	 <li>%navframe%</li>
+    </ul>
+    <div class="breadcrumb">
+     %navbreadcrumb% 
+    </div>
+   </nav>
+   <hr />
 
-<body>
-%navprev% %navnext% %navtoc% %navindex% %navglossary%  %navimages%   %navschedule%  %navframe%
-<span class="breadcrumb">%navbreadcrumb% </span>
-<br>
-<img src="%dotpath%images/blueline.gif">
-<p>
-<div class="pagetitle">%level% %title%</div>
+   <h1>%level% %title%</h1>
 
-%body%
-<p>
-%childlist%
-<p>&nbsp;<p>
-<img src="%dotpath%images/blueline.gif">
-<br>
-%navprev% %navnext% %navtoc% %navindex%  %navglossary%    %navimages%  %navschedule%  %navframe% %extranav%
-<span class="breadcrumb">%navbreadcrumb% </span>
-<p>
+    %body%
+    %childlist%
 
-</body>
-</html>
+   <hr />
+   <nav>
+    <ul class="toc">
+ 	 <li>%navprev%</li>
+ 	 <li>%navnext%</li>
+ 	 <li>%navtoc%</li>
+ 	 <li>%navimages%</li>   
+ 	 <li>%navschedule%</li>  
+ 	 <li>%navframe%</li>
+    </ul>
+    <div class="breadcrumb">
+     %navbreadcrumb% 
+    </div>
+   </nav>
+
+   <div class="footer">
+    Integrated Data Viewer (IDV)<br>
+    Copyright (C) 1997-2015 Unidata Program Center/University Corporation for Atmospheric Research<br>
+   </div>
+  </body>
+ </html>
+  

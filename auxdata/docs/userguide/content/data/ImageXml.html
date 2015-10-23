@@ -1,6 +1,6 @@
 <html><head>
   <title>Image XML Files</title>
-  <link rel="stylesheet" type="text/css" href="../idv.css" title="Style">
+  <link rel="stylesheet" type="text/css" href="../idv.css"/>
 </head>
 
 <body>
@@ -24,7 +24,7 @@ and lower right lat/lon of the image.
 It is assumed that the image is in a geographic (i.e., rectilinear, lat/lon) projection.
 <p>
 
-<div class="pagesubtitle">Collections</div>
+<h3>Collections</h3>
 
 
 You can also define a collection of images:
@@ -81,7 +81,7 @@ There is also a [ug::tag shape] tag for defining shape files:
 }]
 
 
-<div class="pagesubtitle">Grouping</div>
+<h3>Grouping</h3>
 The [ug::tag group] tag allows you to group a set of images in time or space:
 
 [ug::xml {
@@ -110,7 +110,7 @@ If there are no [ug::attr date] attributes
 then the group of images are aggregated together,
 each potentially covering a different area.
 
-<div class="pagesubtitle">Images in 3D Space</div>
+<h3>Images in 3D Space</h3>
 One is not limited to just specifying the positions of the upper left and lower right corners
 of the image. There is support for defining the latitude and longitude
 for any of the four corners of the image:

@@ -383,7 +383,7 @@ proc gen::js::get  {depth extra keyExtra} {
 
 
 return "
-<script language=\"JavaScript\">
+<script type=\"text/javascript\">
     //<!--
     var isNav=false;
     if (parseInt(navigator.appVersion) >= 4) {
@@ -651,7 +651,7 @@ proc gen::addSubHead {from content} {
             foreach id [split $id ,] {
                 append body "<a name=\"$id\"></a>"
             }
-            append body "<div class=\"pagesubtitle\">$levelLabel.$cnt $label</div> "
+            append body "<h3>$levelLabel.$cnt $label</h3> "
             incr cnt
             if {$intoc != "false"} {set intoc 1} else {set intoc 0}
             #set intoc 1
@@ -1335,12 +1335,12 @@ proc gen::getDotPath {depth} {
 proc gen::getCss {depth} {
     set html ""
     foreach cssFile [gen::getCssFiles] {
-        append html  "  <link rel=\"stylesheet\" type=\"text/css\" href=\"[gen::getDotPath $depth][file tail $cssFile]\" title=\"Style\">\n"
+        append html  "  <link rel=\"stylesheet\" type=\"text/css\" href=\"[gen::getDotPath $depth][file tail $cssFile]\">\n"
     }
 
 
     if {[gen::getDoJSNav]} {
-            append html  " <script language=\"JavaScript1.2\" src=\"[gen::getDotPath $depth]/unidata.js\"></script>\n"
+            append html  " <script type=\"text/javascript\" src=\"[gen::getDotPath $depth]/unidata.js\"></script>\n"
     }
     return $html
 }
@@ -1543,11 +1543,11 @@ proc gen::writeToAll  {from body} {
     if {![gen::getDoAll]} {return}
     set popupTextList [gen::getPopupText $from]
     if {[llength $popupTextList]} {
-        append body "<hr><b>Footnotes:</b>"
+        append body "<hr /><b>Footnotes:</b>"
         foreach {title content} $popupTextList {
             append body  [ht::tag div class embeddedpopup body $content] "<p>&nbsp;"
         }
-        append body "<hr>"
+        append body "<hr />"
     }
 
     regsub -all {onClick\s*=\s*"window.open} $body {xxx="} body
@@ -1565,7 +1565,7 @@ proc gen::writeToAll  {from body} {
     regsub -all {<img src=\"(.*?)\"(.*?)>} $bodynoimg "Image: <a href=\"$dir/\\1\">$dir/\\1</a>" bodynoimg
 
     regsub -all {<img src=\"(.*?)\"(.*?)>} $body "<img src=\"$dir/\\1\" \\2>" body
-    regsub -all -nocase {<div\s*class="pagesubtitle">([^<]+)</div>} $body "<h3>\\1</h3>" body
+    regsub -all -nocase {<h3>([^<]+)</h3>} $body "<h3>\\1</h3>" body
     regsub -all -nocase {<code\s*class="menu">([^<]+)</code>} $body "<b>\\1</b>" body 
     
     set aname $from
@@ -2035,7 +2035,7 @@ proc gen::processFaqInner {faq faqCnt} {
     set prefix "faq${faqCnt}_"
     if {![llength $cats]} {return ""}
     set faqTop ""
-    set faqBottom "<p><hr><p>"
+    set faqBottom "<p><hr /><p>"
     set catCnt 0
     set total 0
     foreach cat $cats {
@@ -2062,7 +2062,7 @@ proc gen::processFaqInner {faq faqCnt} {
             }
             append catBottom "<a name=\"$faqid\"></a><div class=\"faq-question\"><h4> ${entry}. $qlabel $q</h4></div>\n"
             append catBottom "</a><div class=\"faq-answer\"><b>$alabel</b> $a</div>\n"
-            append catBottom "<p><hr align=\"center\" width=\"10%\"><p>"
+            append catBottom "<hr class=\"bland\"/>"
             incr cnt
         }
         if {$cat !=""} {
@@ -2158,14 +2158,14 @@ proc  gen::processDetails {from dest content depth {forAll 0}} {
 
         lappend links $link
         incr cnt
-        append detailsHtml  "<a name=\"anchor$cnt\"></a><div class=\"pagesubtitle\">$title</div>$details"
+        append detailsHtml  "<a name=\"anchor$cnt\"></a><h3>$title</h3>$details"
     }
 
 
     if {$cnt} {
         set destdir [file dirname $dest]
 	if {!$forAll} {
-	    set detailsHtml [html::page "$root details" "<div class=\"pagetitle\">[gen::getTitle $from] Details</div>$detailsHtml"  $depth]
+	    set detailsHtml [html::page "$root details" "<h1>[gen::getTitle $from] Details</h1>$detailsHtml"  $depth]
 	    set detailsFile ${root}_details.html
 	    gen::writeFile [file join $destdir $detailsFile] $detailsHtml
 	} else {
@@ -2214,7 +2214,7 @@ proc gen::processQuiz {from content depth} {
         }
 
         set quizBody "
-<script language=\"javascript1.2\">
+<script type=\"text/javascript\">
 function quiz$cnt () {
     var w = window.open('', '','width=440,height=500,resizable=yes,scrollbars=yes,status=yes')
     var html = '';
@@ -2335,7 +2335,7 @@ proc gen::writeMainIndex {} {
             }
             set currentLetter $firstLetter
             append letters "&nbsp;<a href=[html::quote \#letter_$currentLetter]>$currentLetter</a>&nbsp;"
-            append html "<a name=[html::quote letter_$currentLetter]></a><div class=\"pagesubtitle\">$firstLetter</div><ul>"
+            append html "<a name=[html::quote letter_$currentLetter]></a><h3>$firstLetter</h3><ul>"
         }
         append html "<i>$value</i><ul>"
         foreach {title url} $indexInfo($value) {
@@ -2345,7 +2345,7 @@ proc gen::writeMainIndex {} {
     }
 
     append html "</ul>"
-    set html "<center><div class=\"pagesubtitle\">$letters</div></center>$html"
+    set html "<center><h3>$letters</h3></center>$html"
     gen::createGeneralFile [file join [gen::getTargetDir] mainindex.html] "Index" $html
 }
 
@@ -2654,7 +2654,7 @@ proc gen::writeFiles  {} {
 
     if {[gen::haveSchedule]} {
         foreach  day  [lsort [array names ::schedule]] {
-            append html "<div class=\"pagesubtitle\">Day $day</div><ul><table>\n"
+            append html "<h3>Day $day</h3><ul><table>\n"
             foreach item  $::schedule($day) {
                 foreach {time title paths} $item break
                 if {[llength $paths]} {
@@ -2697,7 +2697,7 @@ proc gen::writeFiles  {} {
                 append imageHtml "<li> "
             }
             if {[gen::getDoImageoverview]} {
-                    append imageHtml "<hr><i>$img</i><br>"
+                    append imageHtml "<hr /><i>$img</i><br>"
             }
             append imageHtml "<a href=\"$file\#image$id\"> $thumb Image $id:</a> $caption\n"
             if {[gen::getDoThumbnails]} {
