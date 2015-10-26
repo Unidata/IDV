@@ -1040,9 +1040,10 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
 
     /**
      * Getting data Iterator for a single radar station.
-     * @param bufferSize
+     *
+     * @param bufferSize the buffer size
      * @return data iterator
-     * @throws IOException java io exception
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public DataIterator getDataIterator(int bufferSize) throws IOException {
         return null;
@@ -1052,7 +1053,7 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
      * Getting data relative time list for a single radar station.
      * @param stn radar station name
      *  @return list of relative times
-     * @throws IOException java io exception
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private List queryRadarStationRTimes(String stn) throws IOException {
         return radarTimeSpan;
@@ -1167,10 +1168,10 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
         return uriList;
     }
 
-
     /**
      * Getting data for a single radar station, with time range and interval.
-     * @param roundTo
+     *
+     * @param roundTo the round to
      * @param seconds to be round to
      * @return round to second
      */
@@ -1184,8 +1185,7 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
 
 
     /**
-     * Class DatasetURIInfo _more_
-     *
+     * The Class DatasetURIInfo.
      */
     public class DatasetURIInfo implements DatedThing {
 
