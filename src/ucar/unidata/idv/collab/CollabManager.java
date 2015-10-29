@@ -1,20 +1,18 @@
 /*
- * $Id: CollabManager.java,v 1.30 2006/04/04 21:19:06 jeffmc Exp $
- *
- * Copyright  1997-2016 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,51 +21,50 @@
 package ucar.unidata.idv.collab;
 
 
-
-import ucar.unidata.idv.*;
-
-import ucar.unidata.collab.*;
-
-import ucar.unidata.xml.*;
+import ucar.unidata.collab.Client;
+import ucar.unidata.collab.Server;
+import ucar.unidata.collab.Sharable;
+import ucar.unidata.collab.SharableListener;
+import ucar.unidata.collab.SharableManager;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.idv.DisplayControl;
+import ucar.unidata.idv.IdvManager;
+import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.ViewManager;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.LogUtil;
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.ObjectListener;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlEncoder;
+import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.display.AnimationWidget;
 
 
-import ucar.unidata.collab.Client;
-import ucar.unidata.collab.Server;
 
-import ucar.unidata.util.FileManager;
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-
-import ucar.unidata.util.ObjectListener;
-
-import ucar.unidata.data.*;
-
-
-
-import java.rmi.RemoteException;
-
-import java.io.*;
-
-import java.net.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 
 
 
@@ -75,7 +72,6 @@ import javax.swing.event.*;
  * This class manages the IDV collaboration mechanism
  *
  * @author IDV development team
- * @version $Revision: 1.30 $Date: 2006/04/04 21:19:06 $
  */
 
 
@@ -333,8 +329,7 @@ public class CollabManager extends IdvManager implements SharableListener {
                         + " failed. Listening for connections.");
                 } else {
                     boolean serverOk =
-                        GuiUtils.showYesNoDialog(
-                            null,
+                        GuiUtils.showYesNoDialog(null,
                             "The connect to: " + hostname
                             + " failed. Do you want to listen for connections?", "Connection Failed");
                     if (serverOk) {
@@ -361,10 +356,10 @@ public class CollabManager extends IdvManager implements SharableListener {
      */
     public void connect() {
         String collabHostName = GuiUtils.getInput(null,
-                                                  "Hostname to connect to: ",
-                                                  ((hostname != null)
-                                                   ? hostname
-                                                   : ""));
+                                    "Hostname to connect to: ",
+                                    ((hostname != null)
+                                     ? hostname
+                                     : ""));
         if (collabHostName != null) {
             hostname = collabHostName.trim();
             hostnameFld.setText(hostname);
@@ -417,7 +412,7 @@ public class CollabManager extends IdvManager implements SharableListener {
     protected boolean connectTo(String collabHostName) {
         try {
             CollabClient tmpClient = new CollabClient(this, collabHostName,
-                                                      getPort());
+                                         getPort());
             tmpClient.setIsLocal(true);
             if (tmpClient.isConnectionOk()) {
                 //Announce me to the other IDV
@@ -605,7 +600,7 @@ public class CollabManager extends IdvManager implements SharableListener {
             comps.add(disconnectBtn);
 
             JCheckBox okToSendCbx = new JCheckBox("Ok to send",
-                                                  client.getOkToSend());
+                                        client.getOkToSend());
             okToSendCbx.addActionListener(new ObjectListener(client) {
                 public void actionPerformed(ActionEvent ae) {
                     Client theClient = (Client) theObject;
@@ -615,7 +610,7 @@ public class CollabManager extends IdvManager implements SharableListener {
             comps.add(okToSendCbx);
 
             JCheckBox okToReceiveCbx = new JCheckBox("Ok to receive",
-                                                     client.getOkToReceive());
+                                           client.getOkToReceive());
             okToReceiveCbx.addActionListener(new ObjectListener(client) {
                 public void actionPerformed(ActionEvent ae) {
                     Client theClient = (Client) theObject;
@@ -770,8 +765,8 @@ public class CollabManager extends IdvManager implements SharableListener {
 
         JPanel bottom = GuiUtils.inset(
                             GuiUtils.leftCenterRight(
-                                GuiUtils.rLabel(
-                                    "Input:  "), inputFld, sendBtn), 4);
+                                GuiUtils.rLabel("Input:  "), inputFld,
+                                sendBtn), 4);
         JPanel chatContents =
             GuiUtils.topCenterBottom(GuiUtils.left(clearBtn), sp, bottom);
 
@@ -832,34 +827,29 @@ public class CollabManager extends IdvManager implements SharableListener {
                                               GuiUtils.rLabel("Port: "),
                                               portFld, stopStartBtn,
                                               acceptAllCbx)));
-        JPanel serverPanel = GuiUtils.left(GuiUtils.doLayout(new Component[]{
-                                 startServerPanel,
-                                 serverStatusLbl }, 1, GuiUtils.WT_N,
-                                                    GuiUtils.WT_N));
-        serverPanel =
-            GuiUtils.topCenter(
-                new JLabel("Or you can start your own server so others can connect to your IDV: "),
-                serverPanel);
+        JPanel serverPanel =
+            GuiUtils.left(GuiUtils.doLayout(new Component[] {
+                startServerPanel,
+                serverStatusLbl }, 1, GuiUtils.WT_N, GuiUtils.WT_N));
+        serverPanel = GuiUtils.topCenter(
+            new JLabel(
+                "Or you can start your own server so others can connect to your IDV: "), serverPanel);
 
         JPanel connectContents =
-            GuiUtils.top(
-                GuiUtils.vbox(
-                    new JLabel("You can either connect to another IDV server: "),
-                    connectPanel,
-                    GuiUtils.vbox(new JLabel(" "), new JLabel(" ")),
-                    serverPanel));
+            GuiUtils
+                .top(GuiUtils
+                    .vbox(new JLabel("You can either connect to another IDV server: "),
+                          connectPanel,
+                          GuiUtils.vbox(new JLabel(" "), new JLabel(" ")),
+                          serverPanel));
 
 
         JPanel clientsWidgets =
-            GuiUtils.left(GuiUtils.doLayout(new Component[]{ okToSendCbx,
-                                                             okToRcvCbx,
-                                                             okToRelayCbx,
-                                                             writeStateBtn }, 1,
-                                                                 GuiUtils.WT_N,
-                                                                 GuiUtils
-                                                                     .WT_N));
+            GuiUtils.left(GuiUtils.doLayout(new Component[] { okToSendCbx,
+                okToRcvCbx, okToRelayCbx, writeStateBtn }, 1, GuiUtils.WT_N,
+                    GuiUtils.WT_N));
         JPanel clientsContents = GuiUtils.topCenter(clientsWidgets,
-                                                    clientsPanel);
+                                     clientsPanel);
 
 
         logTextArea.setEditable(false);
@@ -1126,10 +1116,10 @@ public class CollabManager extends IdvManager implements SharableListener {
      * Normal collaboration message we always check. This flag is there
      * so the {@link CaptureManager} can replay messages even though we may
      * have already seen them.
-     *
-     * @throws Exception
+     * @throws Exception the exception
      */
-    protected void handleMessageInner(CollabClient fromClient, String msg, boolean checkIfMessageHasBeenSeen)
+    protected void handleMessageInner(CollabClient fromClient, String msg,
+                                      boolean checkIfMessageHasBeenSeen)
             throws Exception {
         int idx = msg.indexOf(MSG_DELIMITER);
         if (idx < 0) {
@@ -1188,16 +1178,17 @@ public class CollabManager extends IdvManager implements SharableListener {
     }
 
     /**
-     * Really handle the incoming message
+     * Really handle the incoming message.
      *
      * @param fromClient From where
      * @param msgType Type
      * @param from From whom
      * @param contents Message body
-     *
-     * @throws Exception
+     * @throws Exception the exception
      */
-    protected void handleMessageInnerInner(CollabClient fromClient, CollabMsgType msgType, String from, String contents)
+    protected void handleMessageInnerInner(CollabClient fromClient,
+                                           CollabMsgType msgType,
+                                           String from, String contents)
             throws Exception {
 
         String logMsg = null;
@@ -1212,14 +1203,11 @@ public class CollabManager extends IdvManager implements SharableListener {
                                            + fromClient.toString()
                                            + " is requesting a connection.");
                 JLabel label2 = new JLabel("Do you want to connect?");
-                JPanel dialogContents = GuiUtils.inset(
-                                            GuiUtils.vbox(
-                                                GuiUtils.left(
-                                                    label1), GuiUtils.left(
-                                                    label2)), 4);
+                JPanel dialogContents =
+                    GuiUtils.inset(GuiUtils.vbox(GuiUtils.left(label1),
+                        GuiUtils.left(label2)), 4);
                 boolean ok = GuiUtils.showYesNoDialog(null,
-                                                      "Connection Request",
-                                                      dialogContents, null);
+                                 "Connection Request", dialogContents, null);
                 if ( !ok) {
                     fromClient.write(makeMsg(MSG_ACKNEWUSER, "no"));
                     fromClient.close();
@@ -1262,7 +1250,7 @@ public class CollabManager extends IdvManager implements SharableListener {
                 //If we don't have this one already then add it in.
                 if ( !haveDisplayControl(displayControl)) {
                     displayControl.initAfterUnPersistence(getIdv(),
-                                                          new Hashtable());
+                            new Hashtable());
                     logMsg = "Received new display  from " + from;
                 }
             } else {
@@ -1278,10 +1266,10 @@ public class CollabManager extends IdvManager implements SharableListener {
                 logException("Unpersisting VM", exc);
             }
             getIdvUIManager().createNewWindow(Misc.newList(newViewManager),
-                                              false);
+                    false);
         } else if (msgType.equals(MSG_STATE)) {
             String[] stateArray = StringUtil.split(contents, MSG_DELIMITER,
-                                                   3);
+                                      3);
             if (stateArray == null) {
                 return;
             }
@@ -1326,7 +1314,7 @@ public class CollabManager extends IdvManager implements SharableListener {
         } else if (msgType.equals(MSG_BUNDLE)) {
             try {
                 getPersistenceManager().decodeXml(contents, true, null,
-                                                  false);
+                        false);
                 logMsg = "Received bundle from " + from;
             } catch (Throwable exc) {
                 logException("Unable to evaluate bundle", exc);
@@ -1512,11 +1500,3 @@ public class CollabManager extends IdvManager implements SharableListener {
 
 
 }
-
-
-
-
-
-
-
-
