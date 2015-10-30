@@ -25,7 +25,18 @@ import ucar.nc2.time.Calendar;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
-import ucar.unidata.data.*;
+import ucar.unidata.data.DataCancelException;
+import ucar.unidata.data.DataChangeListener;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.DataOperand;
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataSource;
+import ucar.unidata.data.DataSourceImpl;
+import ucar.unidata.data.DataTimeRange;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.GeoSelection;
+import ucar.unidata.data.GeoSelectionPanel;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -42,7 +53,11 @@ import ucar.unidata.idv.TransectViewManager;
 import ucar.unidata.idv.ViewContext;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
-import ucar.unidata.idv.ui.*;
+import ucar.unidata.idv.ui.DataSelectionWidget;
+import ucar.unidata.idv.ui.DataSelector;
+import ucar.unidata.idv.ui.DataTreeDialog;
+import ucar.unidata.idv.ui.IdvComponentHolder;
+import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.ui.DndImageButton;
 import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.Help;
@@ -64,7 +79,6 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.GlobeDisplay;
-import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlObjectStore;
 
@@ -72,9 +86,38 @@ import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
 import ucar.visad.data.CalendarDateTimeSet;
-import ucar.visad.display.*;
+import ucar.visad.display.Animation;
+import ucar.visad.display.AnimationInfo;
+import ucar.visad.display.AnimationWidget;
+import ucar.visad.display.ColorScale;
+import ucar.visad.display.ColorScaleInfo;
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.Displayable;
+import ucar.visad.display.DisplayableData;
+import ucar.visad.display.TextDisplayable;
 
-import visad.*;
+import visad.CommonUnit;
+import visad.ControlEvent;
+import visad.ControlListener;
+import visad.Data;
+import visad.DateTime;
+import visad.DisplayEvent;
+import visad.DisplayListener;
+import visad.DisplayRealType;
+import visad.FieldImpl;
+import visad.FunctionType;
+import visad.GriddedSet;
+import visad.LocalDisplay;
+import visad.ProjectionControl;
+import visad.Real;
+import visad.RealTuple;
+import visad.RealType;
+import visad.Set;
+import visad.SetType;
+import visad.Text;
+import visad.TextType;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
@@ -166,7 +209,6 @@ import javax.swing.text.JTextComponent;
 /**
  * This is the main base class for all DisplayControls.
  * @author IDV development team
- * @version $Revision: 1.726 $
  */
 public abstract class DisplayControlImpl extends DisplayControlBase implements DisplayControl,
         ActionListener, ItemListener, DataChangeListener, HyperlinkListener,
@@ -971,10 +1013,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *                      {@link ucar.unidata.idv.IntegratedDataViewer}
      * @param properties Any properties (usually defined in controls.xml)
      * @param dataSelection Holds any specifications of subsets of the data (e.g., times)
-     *
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      * @deprecated use init that takes a properties Hashtable
-     * @throws RemoteException
-     * @throws VisADException
      */
     public final void init(String displayId, List categories, List choices,
                            ControlContext controlContext, String properties,
@@ -997,9 +1038,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *                      {@link ucar.unidata.idv.IntegratedDataViewer}
      * @param properties Any properties (usually defined in controls.xml)
      * @param dataSelection Holds any specifications of subsets of the data (e.g., times)
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public final void init(String displayId, List categories, List choices,
                            ControlContext controlContext,
@@ -1568,8 +1608,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Used to apply all of the display attributes taht are active
      * to the {@link ucar.visad.display.Displayable}-s
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applyAttributesToDisplayables()
             throws VisADException, RemoteException {
@@ -1719,8 +1759,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_CONTOUR
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applyContourInfo() throws VisADException, RemoteException {
         ContourInfo contourInfo = getContourInfo();
@@ -1782,8 +1822,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_COLORUNIT
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applyColorUnit() throws VisADException, RemoteException {
         Unit unitForColor = getUnitForColor();
@@ -1826,8 +1866,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_DISPLAYUNIT
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applyDisplayUnit() throws VisADException, RemoteException {
         applyDisplayUnit(true);
@@ -1841,9 +1881,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_DISPLAYUNIT
      *
-     * @param firstTime Is tis the first time this method has been called
-     * @throws RemoteException
-     * @throws VisADException
+     * @param firstTime Is this the first time this method has been called
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     private void applyDisplayUnit(boolean firstTime)
             throws VisADException, RemoteException {
@@ -1891,8 +1931,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_COLORTABLE
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applyColorTable() throws VisADException, RemoteException {
         if (displayables == null) {
@@ -2004,8 +2044,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_COLOR
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applyColor() throws VisADException, RemoteException {
         if (displayables == null) {
@@ -2036,8 +2076,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_COLORTABLE
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applyRange() throws VisADException, RemoteException {
         Range range = null;
@@ -2066,8 +2106,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * {@link ucar.visad.display.Displayable}s in the displayables
      * list that are flagged with the FLAG_SELECTRANGE
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void applySelectRange() throws VisADException, RemoteException {
         Range range = null;
@@ -2756,8 +2796,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 getDataSelection().setGeoSelection(geoSelection);
 
                 //getDataSelection().putProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDISPLAYAREA);
-                EarthLocation el = nd.screenToEarthLocation(
-            		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
+                EarthLocation el =
+                    nd.screenToEarthLocation((int) (sbox.getWidth() / 2),
+                                             (int) (sbox.getHeight() / 2));
                 LatLonPointImpl llpi =
                     new LatLonPointImpl(el.getLatitude().getValue(),
                                         el.getLongitude().getValue());
@@ -2765,7 +2806,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
                 getDataSelection().putProperty("centerPosition", llpi);
                 dataChanged();
-            } catch (Exception e) {};
+            } catch (Exception e) {}
+            ;
         }
     }
 
@@ -3160,8 +3202,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param di The {@link ucar.unidata.data.DataInstance} to check
      * @return Is the data held by this data instance ok (typically is it non-null)
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected boolean checkIfDataOk(DataInstance di)
             throws VisADException, RemoteException {
@@ -3221,8 +3263,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param dataChoice The {@link ucar.unidata.data.DataChoice} to use.
      * @return Was this setData call successful
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected boolean setData(DataChoice dataChoice)
             throws VisADException, RemoteException {
@@ -3650,13 +3692,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         // update the geoselection to include at least the screen bounds
         // and the screen lat/lon box if usedisplay area
-        GeoSelection geoSelection =
-        	dataSelection.getGeoSelection(true);
+        GeoSelection geoSelection = dataSelection.getGeoSelection(true);
         // always update the screen size
         NavigatedDisplay navDisplay = getNavigatedDisplay();
         Rectangle2D      sbox       = navDisplay.getScreenBounds();
         geoSelection.setScreenBound(sbox);
-        boolean levelChanged = dataSelection.getProperty("levelChanged", false);
+        boolean levelChanged = dataSelection.getProperty("levelChanged",
+                                   false);
         //if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
         //              DataSelection.PROP_USEDISPLAYAREA) && !levelChanged) {
         if (getMatchDisplayRegion() && !levelChanged) {
@@ -3665,8 +3707,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             geoSelection.setLatLonRect(bbox);
             geoSelection.setUseViewBounds(true);
             dataSelection.setGeoSelection(geoSelection);
-            EarthLocation el = navDisplay.screenToEarthLocation(
-        		(int) (sbox.getWidth()/2), (int)(sbox.getHeight()/2));
+            EarthLocation el =
+                navDisplay.screenToEarthLocation((int) (sbox.getWidth() / 2),
+                    (int) (sbox.getHeight() / 2));
             LatLonPointImpl llpi =
                 new LatLonPointImpl(el.getLatitude().getValue(),
                                     el.getLongitude().getValue());
@@ -3716,7 +3759,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             for (int i = 0; i < dataSources.size(); i++) {
                 DataSource    dataSource = (DataSource) dataSources.get(i);
                 DataSelection ds         = dataSource.getDataSelection();
-                DataSelection ds1 = getDataSelection();
+                DataSelection ds1        = getDataSelection();
                 ds.setGeoSelection(ds1.getGeoSelection());
                 ds.setFromLevel(null);
                 ds.setToLevel(null);
@@ -4473,8 +4516,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      *  Called by the derived class init method to create the gui window.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void doMakeWindow() throws VisADException, RemoteException {
         if (outerContents != null) {
@@ -6524,10 +6567,14 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             });
             items.add(mi);
             if (canDoProgressiveResolution()) {
-               items.add(GuiUtils.makeCheckboxMenuItem(MapViewManager.PR_LABEL, this,
+                items.add(
+                    GuiUtils.makeCheckboxMenuItem(
+                        MapViewManager.PR_LABEL, this,
                         "isProgressiveResolution", null));
-               items.add(GuiUtils.makeCheckboxMenuItem("Match Display Region", this,
-                    "matchDisplayRegion", null));
+                items.add(
+                    GuiUtils.makeCheckboxMenuItem(
+                        "Match Display Region", this, "matchDisplayRegion",
+                        null));
             }
         }
 
@@ -6976,8 +7023,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param displayList List of {@link ucar.unidata.idv.DisplayInfo}s
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     private void activateDisplay(List displayList)
             throws RemoteException, VisADException {
@@ -6992,8 +7039,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Activate each DisplayInfo
      *
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void activateDisplays() throws RemoteException, VisADException {
         //        Trace.call1("DisplayControlImpl.activateDisplays");
@@ -7007,8 +7054,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * DeActivate each DisplayInfo
      *
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void deactivateDisplays()
             throws RemoteException, VisADException {
@@ -7064,8 +7111,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Iterates across the list of {@link ucar.unidata.idv.DisplayInfo}-s, telling them to
      * removeDisplayable.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void removeDisplayables()
             throws RemoteException, VisADException {
@@ -7078,8 +7125,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      *
      * @param andDestroyThem  true to destroy them
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
 
     protected void removeDisplayables(boolean andDestroyThem)
@@ -7106,8 +7153,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param info The info to remove
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     private void removeDisplayInfo(DisplayInfo info)
             throws RemoteException, VisADException {
@@ -7152,8 +7199,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *  their ViewManager-s, remove this object from its  Sharable
      *  group, and sets the visibility of the dialog window to false.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public void doRemove() throws RemoteException, VisADException {
 
@@ -7321,8 +7368,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return User interface contents
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected Container doMakeContents()
             throws VisADException, RemoteException {
@@ -7823,8 +7870,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param controlWidgets List of {@link ControlWidget}s to add into
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public void getControlWidgets(List<ControlWidget> controlWidgets)
             throws VisADException, RemoteException {
@@ -9343,8 +9390,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * Actually create the color scales
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void doMakeColorScales()
             throws VisADException, RemoteException {
@@ -9715,8 +9762,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param d d
      * @param visible visible
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void setDisplayableVisiblity(Displayable d, boolean visible)
             throws RemoteException, VisADException {
@@ -12048,7 +12095,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         : ".nodata");
                 extraLabelTemplate = getStore().get(pref, (String) null);
             }
-            if (extraLabelTemplate == null && canDoProgressiveResolution()) {
+            if ((extraLabelTemplate == null)
+                    && canDoProgressiveResolution()) {
                 extraLabelTemplate = MACRO_RESOLUTION;
             }
         }
@@ -12561,13 +12609,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return  true if display and view supports it
      */
     public boolean getShoulDoProgressiveResolution() {
-    	boolean shouldDo =
-            canDoProgressiveResolution() &&
-            getIsProgressiveResolution();
+        boolean shouldDo = canDoProgressiveResolution()
+                           && getIsProgressiveResolution();
         MapViewManager mvm = getMapViewManager();
         if (mvm != null) {
-            shouldDo = shouldDo &&
-            mvm.getUseProgressiveResolution();
+            shouldDo = shouldDo && mvm.getUseProgressiveResolution();
         }
         return shouldDo;
     }
