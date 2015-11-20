@@ -422,6 +422,7 @@ set ::imageSource ${dirRoot}defineImages.tcl
 set ::logFile     ${logRoot}getImages.log.out
 set ::imageDir ${imgRoot}images
 set ::kmlTemplateFile     ${imgRoot}photooverlay.kml
+set ::imageRoot http://www.unidata.ucar.edu/georesources/webcams/images/
 
 set ::imagePath ${imgRoot}images
 
@@ -441,14 +442,14 @@ for {set i 0} {$i < [llength $argv]} {incr i} {
         -imagedir {incr i; set ::imageDir [lindex $argv $i]}
         -imagepath {incr i; set ::imagePath [lindex $argv $i]}
         -imagesource {incr i; set ::imageSource [lindex $argv $i]}
+        -imageroot {incr i; set ::imageRoot [lindex $argv $i]}
         default {
-            puts "Usage getImages \n\t\[-justindex\] \n\t\[-wait <minutes>\] \n\t\[-imagedir <where to put images>\] \n\t\[-imagesource <what defines the images to load>\] \n\t\[-total <total number of times>\]"
+            puts "Usage getImages \n\t\[-justindex\] \n\t\[-wait <minutes>\] \n\t\[-imagedir <where to put images>\] \n\t\[-imagesource <what defines the images to load>\] \n\t\[-imageroot <URI image root>\] \n\t\[-total <total number of times>\]"
             exit
         }
     }
 }
 
-set ::imageRoot http://www.unidata.ucar.edu/georesources/webcams/images
 
 set cnt 0
 while {1} {
