@@ -3722,6 +3722,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ( !getIdv().getUseTimeDriver()) {
             return dataSelection;
         }
+        if (defaultView != null) {
+            dataSelection.putProperty(DataSelection.PROP_DEFAULTVIEW, defaultView);
+        }
         if (getIsTimeDriver() || !getUsesTimeDriver()) {
             if ( !getUsesTimeDriver()) {
                 dataSelection.setTheTimeDriverTimes(null);

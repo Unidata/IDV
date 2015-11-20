@@ -78,6 +78,9 @@ public class DataSelection {
     /** region option */
     public final static String PROP_USESELECTEDAREA = "Use_Selected_Area";
     
+    /** view manager - used for time/region matching */
+    public final static String PROP_DEFAULTVIEW = "Default_View";
+    
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =
         ucar.unidata.util.LogUtil.getLogInstance(
