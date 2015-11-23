@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,101 +21,48 @@
 package ucar.unidata.idv;
 
 
-import org.w3c.dom.Element;
-
-import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.gis.Transect;
-
-import ucar.unidata.data.grid.GridUtil;
-
-import ucar.unidata.geoloc.Bearing;
-
-
 import ucar.unidata.geoloc.LatLonPointImpl;
-
-import ucar.unidata.gis.maps.MapData;
-import ucar.unidata.gis.maps.MapInfo;
 import ucar.unidata.idv.control.TransectDrawingControl;
-
-import ucar.unidata.idv.ui.*;
-import ucar.unidata.ui.Command;
-
-
-import ucar.unidata.ui.CommandManager;
-import ucar.unidata.ui.XmlUi;
-
-
 import ucar.unidata.util.BooleanProperty;
-import ucar.unidata.util.FileManager;
-
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.view.geoloc.*;
-
-
-import ucar.unidata.xml.PreferenceManager;
-import ucar.unidata.xml.XmlEncoder;
-import ucar.unidata.xml.XmlObjectStore;
-import ucar.unidata.xml.XmlResourceCollection;
-import ucar.unidata.xml.XmlUtil;
-
-import ucar.visad.GeoUtils;
-import ucar.visad.ProjectionCoordinateSystem;
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.view.geoloc.TransectDisplay;
 
 import ucar.visad.Util;
-import ucar.visad.display.*;
+import ucar.visad.display.Animation;
+import ucar.visad.display.AnimationWidget;
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.quantities.CommonUnits;
+import ucar.visad.quantities.Length;
 
-
-
-
-
-import ucar.visad.quantities.*;
-
-
-import visad.*;
+import visad.Gridded2DSet;
+import visad.Real;
+import visad.RealTupleType;
+import visad.Unit;
+import visad.VisADException;
 
 import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-import visad.georef.LatLonPoint;
-import visad.georef.MapProjection;
-import visad.georef.TrivialMapProjection;
 
 
-import java.awt.*;
-import java.awt.event.*;
-
-import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
-
-import java.beans.PropertyChangeEvent;
-
-
-
-import java.beans.PropertyChangeListener;
-
-import java.io.File;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.plaf.SplitPaneUI;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
 
 
@@ -168,13 +115,13 @@ public class TransectViewManager extends NavigatedViewManager {
 
 
     /**
-     * Construct a <code>TransectViewManager</code> with the specified params
+     * Construct a <code>TransectViewManager</code> with the specified params.
+     *
      * @param viewContext   context in which this MVM exists
      * @param desc   <code>ViewDescriptor</code>
      * @param properties   semicolon separated list of properties (can be null)
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public TransectViewManager(ViewContext viewContext, ViewDescriptor desc,
                                String properties)
@@ -259,9 +206,8 @@ public class TransectViewManager extends NavigatedViewManager {
      *
      * @param displayInfo The display info to add.
      * @return Was the addition successful
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public boolean addDisplayInfo(DisplayInfo displayInfo)
             throws RemoteException, VisADException {
@@ -360,13 +306,13 @@ public class TransectViewManager extends NavigatedViewManager {
 
 
     /**
-     * The BooleanProperty identified byt he given id has changed.
+     * The BooleanProperty identified by the given id has changed.
      * Apply the change to the display.
      *
      * @param id Id of the changed BooleanProperty
      * @param value Its new value
      *
-     * @throws Exception problem handeling the change
+     * @throws Exception problem handling the change
      */
     protected void handleBooleanPropertyChange(String id, boolean value)
             throws Exception {
@@ -387,7 +333,7 @@ public class TransectViewManager extends NavigatedViewManager {
     /**
      * Apply properties specific to this ViewManager
      *
-     * @return true if successfule
+     * @return true if successful
      */
     public boolean applyProperties() {
         if ( !super.applyProperties()) {
@@ -478,7 +424,7 @@ public class TransectViewManager extends NavigatedViewManager {
 
 
     /**
-     * Add to the intial Boolean properties
+     * Add to the initial Boolean properties
      *
      * @param props  list to add to
      */
@@ -726,8 +672,14 @@ public class TransectViewManager extends NavigatedViewManager {
         setTransect(value, false);
     }
 
+    /**
+     * Sets the transect.
+     *
+     * @param value the value
+     * @param force the force
+     */
     public void setTransect(Transect value, boolean force) {
-        if (!force && Misc.equals(transect, value)) {
+        if ( !force && Misc.equals(transect, value)) {
             return;
         }
         transect = value;
@@ -844,19 +796,19 @@ public class TransectViewManager extends NavigatedViewManager {
             if (GuiUtils.isControlKey(keyEvent)) {
                 if (keyEvent.isShiftDown()) {
                     if (code == KeyEvent.VK_LEFT) {
-                        transect.shiftPercent(0,-0.25,true,true);
+                        transect.shiftPercent(0, -0.25, true, true);
                     } else if (code == KeyEvent.VK_RIGHT) {
-                        transect.shiftPercent(0,0.25,true,true);
+                        transect.shiftPercent(0, 0.25, true, true);
                     } else if (code == KeyEvent.VK_UP) {
-                        transect.shiftPercent(0.25,0,true,true);
+                        transect.shiftPercent(0.25, 0, true, true);
                     } else if (code == KeyEvent.VK_DOWN) {
-                        transect.shiftPercent(-0.25,0,true,true);
+                        transect.shiftPercent(-0.25, 0, true, true);
                     } else {
                         return;
                     }
                     setTransect(transect, true);
                     return;
-                } 
+                }
 
                 if (code == KeyEvent.VK_LEFT) {
                     getTransectDisplay().extendTransect(1.25);
@@ -869,13 +821,13 @@ public class TransectViewManager extends NavigatedViewManager {
                 }
             } else {
                 if (code == KeyEvent.VK_LEFT) {
-                    getTransectDisplay().translate(-0.25,0);
+                    getTransectDisplay().translate(-0.25, 0);
                 } else if (code == KeyEvent.VK_RIGHT) {
-                    getTransectDisplay().translate(0.25,0);
+                    getTransectDisplay().translate(0.25, 0);
                 } else if (code == KeyEvent.VK_UP) {
-                    getTransectDisplay().translate(0,0.25);
+                    getTransectDisplay().translate(0, 0.25);
                 } else if (code == KeyEvent.VK_DOWN) {
-                    getTransectDisplay().translate(0,-0.25);
+                    getTransectDisplay().translate(0, -0.25);
                 }
 
             }

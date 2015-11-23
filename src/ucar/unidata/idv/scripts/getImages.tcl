@@ -14,9 +14,9 @@ proc logMsg {msg} {
 proc initializeState {} {
 
     if {[info exists ::images]} {
-	foreach  id  $::images {
-	    catch {unset ::image_${id}}
-	}
+        foreach  id  $::images {
+            catch {unset ::image_${id}}
+        }
     }
     catch {unset ::idsInGroup}
     set ::defaultGroup Images
@@ -41,31 +41,31 @@ proc defineImage {url name args}  {
     array  set A {-group {} -desc {} -id {} -dz {} -ll {} -heading {0} }
     array set A $args
     if {$A(-group) == ""} {
-	set tokens [split $name >]
-	if {[llength $tokens]>1} {
-	    set A(-group) [join [lrange $tokens 0 [expr [llength $tokens]-2]] {} ]
-	    set name [lrange $tokens end end]
-	}
+        set tokens [split $name >]
+        if {[llength $tokens]>1} {
+            set A(-group) [join [lrange $tokens 0 [expr [llength $tokens]-2]] {} ]
+            set name [lrange $tokens end end]
+        }
     }
     if {$A(-group) == ""} {
-	set A(-group) $::defaultGroup
+        set A(-group) $::defaultGroup
     }
     if {$A(-id) == ""} {
-	set A(-id) [string tolower $name]
-	regsub -all {[\.\s-]+} $A(-id) {} A(-id)
+        set A(-id) [string tolower $name]
+        regsub -all {[\.\s-]+} $A(-id) {} A(-id)
     }
     if {$A(-desc) == ""} {
-	if {![regexp {(http://[^/]+)/} $url match source]} {
-	    regexp {(ftp://[^/]+)/} $url match source
-	}
-	set A(-desc) "From: $source"
+        if {![regexp {(http://[^/]+)/} $url match source]} {
+            regexp {(ftp://[^/]+)/} $url match source
+        }
+        set A(-desc) "From: $source"
     }
     lappend ::images $A(-id)
     set A(-ll) [string trim $A(-ll)]
     array set ::image_$A(-id) [list url $url name $name group $A(-group) desc $A(-desc) dz $A(-dz) heading $A(-heading) latlon $A(-ll)]
     if {![info exists ::idsInGroup($A(-group))]} {
-	set ::idsInGroup($A(-group)) [list]
-	lappend ::groups $A(-group)
+        set ::idsInGroup($A(-group)) [list]
+        lappend ::groups $A(-group)
     }
     lappend ::idsInGroup($A(-group)) $A(-id)
 }
@@ -79,8 +79,8 @@ proc getName {id} {
 proc getLat {id} {
     set ll [getLatLon $id]
     if {$ll!=""} {
-	foreach {lat lon} [split $ll ,] break
-	return $lat
+        foreach {lat lon} [split $ll ,] break
+        return $lat
     }
     return ""
 }
@@ -88,8 +88,8 @@ proc getLat {id} {
 proc getLon {id} {
     set ll [getLatLon $id]
     if {$ll!=""} {
-	foreach {lat lon} [split $ll ,] break
-	return $lon
+        foreach {lat lon} [split $ll ,] break
+        return $lon
     }
     return ""
 }
@@ -136,34 +136,34 @@ proc getDir {id} {
 
 proc getImages {} {
     foreach  id  $::images {
-	if {[catch {fetchImage $id } err]} {
-	    logMsg  "Error fetching image: $id\n$err\n$::errorInfo"
-	} else {
-	}
+        if {[catch {fetchImage $id } err]} {
+            logMsg  "Error fetching image: $id\n$err\n$::errorInfo"
+        } else {
+        }
     }
 }
 
 
 proc makeIndex {} {
     foreach  id  $::images {
-	makeIndexForImageSet $id
+        makeIndexForImageSet $id
     }
 
     foreach group $::groups {
-	append ::html "<li> $group <ul>\n"
-	append ::xml "<group name=\"$group\">\n"
-	foreach id $::idsInGroup($group) {
-	    set name [getName $id]
-	    append ::html "<li> <a href=\"[cleanId $id]/index.html\"/>$name</a>\n"
-	    set ll [getLatLon $id]
-	    if {$ll!=""} {
-		foreach {lat lon} [split $ll ,] break
-		set ll "lat=\"$lat\" lon=\"$lon\""
-	    }
-	    append ::xml "<imageset name=\"$name\"  index=\"[cleanId $id]/index.xml\"  $ll/>\n"
-	}
-	append ::html "</ul>\n"
-	append ::xml "</group>\n"
+        append ::html "<li> $group <ul>\n"
+        append ::xml "<group name=\"$group\">\n"
+        foreach id $::idsInGroup($group) {
+            set name [getName $id]
+            append ::html "<li> <a href=\"[cleanId $id]/index.html\"/>$name</a>\n"
+            set ll [getLatLon $id]
+            if {$ll!=""} {
+                foreach {lat lon} [split $ll ,] break
+                set ll "lat=\"$lat\" lon=\"$lon\""
+            }
+            append ::xml "<imageset name=\"$name\"  index=\"[cleanId $id]/index.xml\"  $ll/>\n"
+        }
+        append ::html "</ul>\n"
+        append ::xml "</group>\n"
     }
 }
 
@@ -178,57 +178,57 @@ proc fetchImage {id} {
     set status [::http::status $tok]
 
     if {$status == "timeout"} {
-	logMsg "\tfetch timed out"
-	return
+        logMsg "\tfetch timed out"
+        return
     }
     set body [::http::data $tok]
     upvar #0 $tok httpState
     array set meta $httpState(meta)
     if {![info exists meta(Last-Modified)]} {
-	logMsg "\t\tNo Last-Modified"
-	set date [clock format [clock seconds]]
-##	catch {unset httpState}
-##	return
+        logMsg "\t\tNo Last-Modified"
+        set date [clock format [clock seconds]]
+        ##	catch {unset httpState}
+        ##	return
     } else {
-	set date $meta(Last-Modified)
+        set date $meta(Last-Modified)
     }
-#    logMsg "\tdone"
+    #    logMsg "\tdone"
 
 
     catch {unset httpState}
     set dttm [clock scan $date]
 
     if {$dz != ""} {
-	set h [clock format $dttm -format "%H"  -gmt true]
-	regsub {^0} $h {} h
-	set localTime [expr $h+ $dz]
-	if {$localTime<0} {
-	    set localTime [expr 24+$localTime]
-	}
-#	puts "[getName $id] h: $h -- local: $localTime [clock format $dttm -gmt true]" 
-	if {$localTime>21 || $localTime < 5} {
-	    puts "Excluding: $id"
-	    return
-	}
+        set h [clock format $dttm -format "%H"  -gmt true]
+        regsub {^0} $h {} h
+        set localTime [expr $h+ $dz]
+        if {$localTime<0} {
+            set localTime [expr 24+$localTime]
+        }
+        #	puts "[getName $id] h: $h -- local: $localTime [clock format $dttm -gmt true]" 
+        if {$localTime>21 || $localTime < 5} {
+            puts "Excluding: $id"
+            return
+        }
     }
 
 
     if {[info exists meta(Content-Type)]} {
-	set ct $meta(Content-Type)
-	if {![regexp {image/(.*)} $ct match type]} {
-	    logMsg "\t\tUnknown  content type: $ct" 
-##	    puts $body
-	    return
-	}
-	set ext ".$type"
+        set ct $meta(Content-Type)
+        if {![regexp {image/(.*)} $ct match type]} {
+            logMsg "\t\tUnknown  content type: $ct" 
+            ##	    puts $body
+            return
+        }
+        set ext ".$type"
     } else {
-	set ext [file extension $url]
-	regsub {\?.*$} $ext {} ext
+        set ext [file extension $url]
+        regsub {\?.*$} $ext {} ext
     }
     set dttmString [clock format $dttm -format "%Y%m%d%H%M%Z" -gmt true]
     set filename  [file join $dir image_${dttmString}$ext ]
     if {![file exists $filename]} {
-	writeFile $filename  $body
+        writeFile $filename  $body
     }
 }
 
@@ -249,90 +249,90 @@ proc makeIndexForImageSet {id} {
     set images [glob -nocomplain [file join $dir image_*]] 
     set fileList [list]
     foreach f $images {
-	if {![regexp {image_([^\.]+)} $f match dttmString]} {continue}
-	if {[regexp {thumb} $f match dttmString]} {continue}
-	regexp {(\d+)} $dttmString match dttm
-	lappend fileList [list   $dttm $dttmString $f]
+        if {![regexp {image_([^\.]+)} $f match dttmString]} {continue}
+        if {[regexp {thumb} $f match dttmString]} {continue}
+        regexp {(\d+)} $dttmString match dttm
+        lappend fileList [list   $dttm $dttmString $f]
     }
     set fileList [lsort -index 0  -real -decreasing $fileList]
     set cnt 0
-#Purge
+    #Purge
     foreach tuple $fileList {
-	incr cnt
-	foreach {dttm dttmString file} $tuple break
-	set f [file tail $file]
-	if {$cnt>200} {
-##	    puts "Renaming $file to $archiveDir"
-##	    file rename -force $file $archiveDir
-#	    puts "Deleting old $file"
-	    file delete -force $file 
-	    continue;
-	}
+        incr cnt
+        foreach {dttm dttmString file} $tuple break
+        set f [file tail $file]
+        if {$cnt>200} {
+            ##	    puts "Renaming $file to $archiveDir"
+            ##	    file rename -force $file $archiveDir
+            #	    puts "Deleting old $file"
+            file delete -force $file 
+            continue;
+        }
 
-	set dz [getDZ $id]
-	if {$dz != ""} {
-	    if {[regexp {\d\d\d\d\d\d\d\d(\d\d)} $dttm match h]} {
-		regsub {^0} $h {} h
-		set localTime [expr $h+ $dz]
-		if {$localTime>18 || $localTime < 6} {
-##		    puts "Excluding: $id -- $localTime"
-		    continue;
-		}
-	    }
-	}
-
-
-	set lat [getLat $id]
-	set lon [getLon $id]
-	
-	set imgPath "[cleanId $id]/$f"
-	if {$lat!=""}  {
-	    if {$cnt == 1} {
-		set kml $::kmlTemplate
-		regsub -all {%name%} $kml "Latest Image" kml
-		regsub -all {%lon%} $kml $lon kml
-		regsub -all {%lat%} $kml $lat kml
-		regsub -all {%url%} $kml "$::imageRoot/$imgPath" kml
-		regsub -all {%extra%} $kml "" latest
-		append ::latestKml  "<Folder>\n<name>$name</name>\n<visibility>1</visibility>\n"
-		append ::latestKml $latest
-		append ::latestKml "<NetworkLink><name>Time loop</name><visibility>0</visibility><flyToView>1</flyToView>\n<Link><href>$::imageRoot/[cleanId $id]/index.kml</href></Link></NetworkLink>\n"
-		append ::latestKml  "</Folder>\n";
-	    } 
-	    if {$cnt<20} {
-		regexp {(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)} $dttm match yyyy  mm dd hh min  
-		set formattedTime  "$yyyy-$mm-${dd}T$hh:${min}:00" 
-		set timeStamp "<TimeStamp><when>$formattedTime</when></TimeStamp>"
-		set kml $::kmlTemplate
-		set heading  [getHeading $id]
-		regsub -all {%heading%} $kml "$heading" kml
-		regsub -all {%name%} $kml "$formattedTime" kml
-		regsub -all {%lon%} $kml $lon kml
-		regsub -all {%lat%} $kml $lat kml
-		regsub -all {%url%} $kml "$::imageRoot/$imgPath" kml
-		regsub -all {%extra%} $kml "$timeStamp" latest
-		append imageKml $latest
-	    }
-	} 
+        set dz [getDZ $id]
+        if {$dz != ""} {
+            if {[regexp {\d\d\d\d\d\d\d\d(\d\d)} $dttm match h]} {
+                regsub {^0} $h {} h
+                set localTime [expr $h+ $dz]
+                if {$localTime>18 || $localTime < 6} {
+                    ##		    puts "Excluding: $id -- $localTime"
+                    continue;
+                }
+            }
+        }
 
 
+        set lat [getLat $id]
+        set lon [getLon $id]
+        
+        set imgPath "[cleanId $id]/$f"
+        if {$lat!=""}  {
+            if {$cnt == 1} {
+                set kml $::kmlTemplate
+                regsub -all {%name%} $kml "Latest Image" kml
+                regsub -all {%lon%} $kml $lon kml
+                regsub -all {%lat%} $kml $lat kml
+                regsub -all {%url%} $kml "$::imageRoot/$imgPath" kml
+                regsub -all {%extra%} $kml "" latest
+                append ::latestKml  "<Folder>\n<name>$name</name>\n<visibility>1</visibility>\n"
+                append ::latestKml $latest
+                append ::latestKml "<NetworkLink><name>Time loop</name><visibility>0</visibility><flyToView>1</flyToView>\n<Link><href>$::imageRoot/[cleanId $id]/index.kml</href></Link></NetworkLink>\n"
+                append ::latestKml  "</Folder>\n";
+            } 
+            if {$cnt<20} {
+                regexp {(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)} $dttm match yyyy  mm dd hh min  
+                set formattedTime  "$yyyy-$mm-${dd}T$hh:${min}:00" 
+                set timeStamp "<TimeStamp><when>$formattedTime</when></TimeStamp>"
+                set kml $::kmlTemplate
+                set heading  [getHeading $id]
+                regsub -all {%heading%} $kml "$heading" kml
+                regsub -all {%name%} $kml "$formattedTime" kml
+                regsub -all {%lon%} $kml $lon kml
+                regsub -all {%lat%} $kml $lat kml
+                regsub -all {%url%} $kml "$::imageRoot/$imgPath" kml
+                regsub -all {%extra%} $kml "$timeStamp" latest
+                append imageKml $latest
+            }
+        } 
 
-	append imageXml "<image time=\"$dttmString\" file=\"$f\"/>\n"
-	append imageHtml "<li> <a href=\"$f\">$dttmString</a>\n"
-	if {$cnt == 1} {
-	    catch {
-#	    set thumb [file join [file dirname $file] thumb_[file tail $file]]
-#		set thumbDim 140
-#		exec convert -interlace NONE -geometry ${thumbDim}x${thumbDim} $file $thumb
-#               set imgPath $thumb
-	    } err
 
-	    append ::latestHtml "<a href=\"[cleanId $id]/index.html\"><img border=\"0\" src=\"$imgPath\"></a><br>$group - $name $dttmString<p>\n"
-	}
+
+        append imageXml "<image time=\"$dttmString\" file=\"$f\"/>\n"
+        append imageHtml "<li> <a href=\"$f\">$dttmString</a>\n"
+        if {$cnt == 1} {
+            catch {
+                #	    set thumb [file join [file dirname $file] thumb_[file tail $file]]
+                #		set thumbDim 140
+                #		exec convert -interlace NONE -geometry ${thumbDim}x${thumbDim} $file $thumb
+                #               set imgPath $thumb
+            } err
+
+            append ::latestHtml "<a href=\"[cleanId $id]/index.html\"><img border=\"0\" src=\"$imgPath\"></a><br>$group - $name $dttmString<p>\n"
+        }
     }
 
     append imageXml "</images>\n"
-##    puts "$name - $dir"
+    ##    puts "$name - $dir"
     writeFile [file join $dir index.kml] [kml $imageKml $name 0]
     writeFile [file join $dir index.xml] $imageXml
     writeFile [file join $dir index.html ] $imageHtml 0
@@ -342,7 +342,7 @@ proc makeIndexForImageSet {id} {
 proc writeFile {f c {binary 1}} {
     set fp [open $f w]
     if {$binary} {
-	fconfigure $fp -translation binary
+        fconfigure $fp -translation binary
     }
     puts $fp $c
     close $fp
@@ -386,9 +386,9 @@ proc process {justIndex} {
     append ::xml "\n<imagesets base=\"$::imageRoot\" name=\"IDV Webcams\">\n"
     initializeState
     if {!$justIndex} {
-	logMsg "Getting images"
-	getImages
-	logMsg "Done getting images"
+        logMsg "Getting images"
+        getImages
+        logMsg "Done getting images"
     }
     makeIndex
     append ::latestHtml {</body></html>}
@@ -406,7 +406,7 @@ proc process {justIndex} {
 
 proc msg {msg} {
     if {$::verbose} {
-	puts $msg
+        puts $msg
     }
 }
 
@@ -422,6 +422,7 @@ set ::imageSource ${dirRoot}defineImages.tcl
 set ::logFile     ${logRoot}getImages.log.out
 set ::imageDir ${imgRoot}images
 set ::kmlTemplateFile     ${imgRoot}photooverlay.kml
+set ::imageRoot http://www.unidata.ucar.edu/georesources/webcams/images/
 
 set ::imagePath ${imgRoot}images
 
@@ -434,21 +435,21 @@ set ::total -1
 for {set i 0} {$i < [llength $argv]} {incr i} {
     set arg [lindex $argv $i]
     switch -- $arg {
-	-total {incr i; set ::total [lindex $argv $i]}
-	-verbose {set ::verbose 1}
-	-justindex {set ::justIndex 1}
-	-wait {incr i; set ::wait [lindex $argv $i]}
-	-imagedir {incr i; set ::imageDir [lindex $argv $i]}
-	-imagepath {incr i; set ::imagePath [lindex $argv $i]}
-	-imagesource {incr i; set ::imageSource [lindex $argv $i]}
-	default {
-	    puts "Usage getImages \n\t\[-justindex\] \n\t\[-wait <minutes>\] \n\t\[-imagedir <where to put images>\] \n\t\[-imagesource <what defines the images to load>\] \n\t\[-total <total number of times>\]"
-	    exit
-	}
+        -total {incr i; set ::total [lindex $argv $i]}
+        -verbose {set ::verbose 1}
+        -justindex {set ::justIndex 1}
+        -wait {incr i; set ::wait [lindex $argv $i]}
+        -imagedir {incr i; set ::imageDir [lindex $argv $i]}
+        -imagepath {incr i; set ::imagePath [lindex $argv $i]}
+        -imagesource {incr i; set ::imageSource [lindex $argv $i]}
+        -imageroot {incr i; set ::imageRoot [lindex $argv $i]}
+        default {
+            puts "Usage getImages \n\t\[-justindex\] \n\t\[-wait <minutes>\] \n\t\[-imagedir <where to put images>\] \n\t\[-imagesource <what defines the images to load>\] \n\t\[-imageroot <URI image root>\] \n\t\[-total <total number of times>\]"
+            exit
+        }
     }
 }
 
-set ::imageRoot http://www.unidata.ucar.edu/georesources/webcams/images
 
 set cnt 0
 while {1} {
@@ -456,12 +457,12 @@ while {1} {
     process $::justIndex
     logMsg "done fetching at [clock format [clock seconds]]"
     if {$justIndex} {
-	break
+        break
     }
     incr cnt
     if {$total>0 && $cnt>=$total} {
-	puts "Fetched $cnt images"
-	exit
+        puts "Fetched $cnt images"
+        exit
     }
     if {!$::wait} {exit}
     set doNext 0

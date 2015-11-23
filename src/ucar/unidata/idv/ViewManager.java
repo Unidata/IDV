@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -850,20 +850,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     * Create  this ViewManager
+     * Create  this ViewManager.
      *
-     * @param master The DisplayMaster to use
      * @param viewContext As  a hack this really better be an IntegratedDataViewer
+     * @param master The DisplayMaster to use
      * @param viewDescriptor This describes this ViewManager. Mostly just a name.
      * @param properties semi-colon separated list of name=value properties.
      * We apply these properties to this object using reflection- looking for
      * public set methods with the given name. We use reflection on the argument
      * to the set method to coerce the String value in the properties to the
      * correct type.
-     *
-     * @throws RemoteException
-     * @throws VisADException
-     *
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public ViewManager(ViewContext viewContext, DisplayMaster master,
                        ViewDescriptor viewDescriptor, String properties)
@@ -873,7 +871,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
-     *  Instantiate this ViewManager with the given AnimationInfo
+     *  Instantiate this ViewManager with the given AnimationInfo.
      *
      * @param viewContext As  a hack this really better be an IntegratedDataViewer
      * @param viewDescriptor  the view descriptor

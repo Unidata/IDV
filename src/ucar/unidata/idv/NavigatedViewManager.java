@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -208,13 +208,13 @@ public abstract class NavigatedViewManager extends ViewManager {
     }
 
     /**
-     * Construct a <code>NavigatedViewManager</code> with the specified params
+     * Construct a <code>NavigatedViewManager</code> with the specified params.
+     *
      * @param viewContext   context in which this MVM exists
      * @param desc   <code>ViewDescriptor</code>
      * @param properties   semicolon separated list of properties (can be null)
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public NavigatedViewManager(ViewContext viewContext, ViewDescriptor desc,
                                 String properties)

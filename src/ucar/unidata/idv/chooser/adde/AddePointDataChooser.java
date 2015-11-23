@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -29,33 +29,23 @@ import org.w3c.dom.Element;
 import ucar.unidata.data.AddeUtil;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.point.AddePointDataSource;
-
-import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
-
-import ucar.unidata.ui.ChooserList;
-import ucar.unidata.ui.ChooserPanel;
-
 import ucar.unidata.ui.symbol.StationModel;
 import ucar.unidata.ui.symbol.StationModelManager;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.PreferenceList;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.UtcDate;
 
 import visad.DateTime;
 
-import java.awt.*;
-import java.awt.event.*;
 
-import java.beans.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
@@ -63,15 +53,16 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 /**
  * Selection widget for ADDE point data
  *
  * @author MetApps Development Team
- * @version $Revision: 1.6 $ $Date: 2007/08/06 17:03:31 $
  */
 public class AddePointDataChooser extends AddeChooser {
 

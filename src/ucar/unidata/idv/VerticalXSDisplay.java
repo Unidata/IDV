@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -21,14 +21,19 @@
 package ucar.unidata.idv;
 
 
-
 import ucar.visad.display.XSDisplay;
-
 import ucar.visad.quantities.Length;
 
-import visad.*;
+import visad.AxisScale;
+import visad.Real;
+import visad.RealType;
+import visad.Unit;
+import visad.VisADException;
 
-import java.awt.*;
+
+
+import java.awt.Color;
+import java.awt.Dimension;
 
 import java.rmi.RemoteException;
 
@@ -56,8 +61,8 @@ public class VerticalXSDisplay extends XSDisplay {
      * Default cstr with yAxisType of RealType.Altitude, xAxisType of
      * RealType.XAxis.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public VerticalXSDisplay() throws VisADException, RemoteException {
         this(false, null);
@@ -71,8 +76,8 @@ public class VerticalXSDisplay extends XSDisplay {
      * @param offScreen are we in offscreen mode
      * @param dimension the offscreen dimension. may be null
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public VerticalXSDisplay(boolean offScreen, Dimension dimension)
             throws VisADException, RemoteException {
@@ -117,8 +122,8 @@ public class VerticalXSDisplay extends XSDisplay {
      *
      * @param altitude          The cursor altitude.
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     protected void setCursorAltitude(Real altitude)
             throws VisADException, RemoteException {
@@ -174,7 +179,8 @@ public class VerticalXSDisplay extends XSDisplay {
         AxisScale yscale = getYAxisScale();
         if (yscale != null) {
             RealType yAxisType = getYAxisType();
-            yscale.setTitle(yAxisType.toString() + " (" + getYDisplayUnit() + ")");
+            yscale.setTitle(yAxisType.toString() + " (" + getYDisplayUnit()
+                            + ")");
         }
     }
 }

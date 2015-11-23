@@ -1,0 +1,25 @@
+<PhotoOverlay>
+  %extra%
+  <name>%name%</name>
+  <Camera>
+    <longitude>%lon%</longitude>
+    <latitude>%lat%</latitude>
+    <altitude>0</altitude>
+    <altitudeMode>clampToGround</altitudeMode>
+    <heading>%heading%</heading>
+    <tilt>90</tilt>
+  </Camera>
+  <Icon>
+    <href>%url%</href>
+    <refreshMode>onInterval</refreshMode>
+    <refreshInterval>1</refreshInterval>
+  </Icon>
+  <rotation>0</rotation>
+  <ViewVolume>
+    <leftFov>-60</leftFov>
+    <rightFov>60</rightFov>
+    <bottomFov>0</bottomFov>
+    <topFov>60</topFov>
+    <near>100</near>
+  </ViewVolume>
+</PhotoOverlay>

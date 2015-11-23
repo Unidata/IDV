@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -33,6 +33,7 @@ import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
@@ -2149,7 +2150,15 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
             }
             if (useTDT && (timeDriverTimes == null)) {
                 //check view manager
-                ViewManager vm  = getIdv().getViewManager();
+                ViewManager vm  = null;
+                String vmName = givenDataSelection.getProperty(
+                        DataSelection.PROP_DEFAULTVIEW, null);
+                if (vmName !=null) {
+                    vm = getIdv().getViewManager(new ViewDescriptor(vmName), false, null);
+                }
+                if (vm == null) {
+                    vm = getIdv().getViewManager();
+                }
                 List        tdt = null;
                 try {
                     tdt = vm.getTimeDriverTimes();

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -77,6 +77,9 @@ public class DataSelection {
 
     /** region option */
     public final static String PROP_USESELECTEDAREA = "Use_Selected_Area";
+    
+    /** view manager - used for time/region matching */
+    public final static String PROP_DEFAULTVIEW = "Default_View";
     
     /** logging category */
     static ucar.unidata.util.LogUtil.LogCategory log_ =

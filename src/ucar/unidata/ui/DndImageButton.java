@@ -1,20 +1,18 @@
 /*
- * $Id: DndImageButton.java,v 1.8 2007/07/06 20:45:29 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,70 +21,85 @@
 package ucar.unidata.ui;
 
 
-
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Resource;
-
-import java.awt.*;
-import java.awt.datatransfer.*;
 
 
-import java.awt.dnd.*;
-import java.awt.event.*;
 
-import javax.swing.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+
+import javax.swing.JLabel;
 
 
 /**
+ * The Class DndImageButton.
+ *
  * @author Jeff McWhirter
- * @version $Id: DndImageButton.java,v 1.8 2007/07/06 20:45:29 jeffmc Exp $
  */
 public class DndImageButton extends JLabel implements DragSourceListener,
         DragGestureListener, Transferable {
 
-    /** _more_ */
+    /** The drag source. */
     DragSource dragSource = null;
 
-    /** _more_ */
+    /** The data. */
     Object data;
 
-    /** _more_ */
+    /** The mime type. */
     String mimeType;
 
-    /** _more_ */
+    /** The icon name. */
     private static String iconName = "/ucar/unidata/ui/images/dnd.gif";
     //    private static String iconName = "/auxdata/ui/icons/Move16.gif";
 
+    /**
+     * Instantiates a new dnd image button.
+     *
+     * @param label the label
+     * @param data the data
+     * @param mimeType the mime type
+     */
     public DndImageButton(String label, Object data, String mimeType) {
         super(label);
         init(data, mimeType);
     }
 
-
     /**
-     * _more_
+     * Instantiates a new dnd image button.
      *
-     * @param data
-     * @param mimeType
-     *
+     * @param data the data
+     * @param mimeType the mime type
      */
     public DndImageButton(Object data, String mimeType) {
         this(data, mimeType, iconName);
     }
 
     /**
-     * _more_
+     * Instantiates a new dnd image button.
      *
-     * @param data
-     * @param mimeType
-     * @param icon
-     *
+     * @param data the data
+     * @param mimeType the mime type
+     * @param icon the icon
      */
     public DndImageButton(Object data, String mimeType, String icon) {
         super(GuiUtils.getImageIcon(icon, false));
         init(data, mimeType);
     }
 
+    /**
+     * Inits the.
+     *
+     * @param data the data
+     * @param mimeType the mime type
+     */
     private void init(Object data, String mimeType) {
         this.mimeType = mimeType;
         this.data     = data;
@@ -97,18 +110,14 @@ public class DndImageButton extends JLabel implements DragSourceListener,
     }
 
     /**
-     * _more_
-     *
-     * @param event
+     * {@inheritDoc}
      */
     public void dragGestureRecognized(DragGestureEvent event) {
         dragSource.startDrag(event, DragSource.DefaultMoveDrop, this, this);
     }
 
     /**
-     * _more_
-     *
-     * @param event
+     * {@inheritDoc}
      */
     public void dragDropEnd(DragSourceDropEvent event) {
         //      IllegalArgumentException iae = new  IllegalArgumentException ("****DONE****");
@@ -117,64 +126,46 @@ public class DndImageButton extends JLabel implements DragSourceListener,
     }
 
     /**
-     * _more_
-     *
-     * @param event
+     * {@inheritDoc}
      */
     public void dragEnter(DragSourceDragEvent event) {}
 
     /**
-     * _more_
-     *
-     * @param event
+     * {@inheritDoc}
      */
     public void dragExit(DragSourceEvent event) {}
 
     /**
-     * _more_
-     *
-     * @param event
+     * {@inheritDoc}
      */
     public void dragOver(DragSourceDragEvent event) {}
 
     /**
-     * _more_
-     *
-     * @param event
+     * {@inheritDoc}
      */
     public void dropActionChanged(DragSourceDragEvent event) {}
 
     /**
-     * _more_
-     *
-     * @param flavor
-     * @return _more_
+     * {@inheritDoc}
      */
     public Object getTransferData(DataFlavor flavor) {
         return data;
     }
 
     /**
-     * _more_
-     * @return _more_
+     * {@inheritDoc}
      */
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] { new ObjectFlavor(data) };
         //        return new DataFlavor[] { new DataFlavor(mimeType, mimeType) };
     }
 
-
-
     //TODO:Fix this
 
     /**
-     * _more_
-     *
-     * @param flavor
-     * @return _more_
+     * {@inheritDoc}
      */
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return true;
     }
 }
-

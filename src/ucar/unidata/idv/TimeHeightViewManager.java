@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -22,24 +22,22 @@ package ucar.unidata.idv;
 
 
 import ucar.unidata.util.BooleanProperty;
-
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
+
+import ucar.visad.display.DisplayMaster;
+import ucar.visad.display.TimeHeightDisplay;
+
+import visad.VisADException;
 
 
-import ucar.visad.display.*;
-
-import visad.*;
-
-import java.awt.*;
+import java.awt.Container;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
 
 
 /**
@@ -77,13 +75,13 @@ public class TimeHeightViewManager extends ViewManager {
 
 
     /**
-     * Construct a <code>TimeHeightViewManager</code> with the specified params
+     * Construct a <code>TimeHeightViewManager</code> with the specified params.
+     *
      * @param viewContext   context in which this MVM exists
      * @param desc   <code>ViewDescriptor</code>
      * @param properties   semicolon separated list of properties (can be null)
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public TimeHeightViewManager(ViewContext viewContext,
                                  ViewDescriptor desc, String properties)
@@ -133,9 +131,8 @@ public class TimeHeightViewManager extends ViewManager {
      *
      * @param displayInfo The display info to add.
      * @return Was the addition successful
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException the remote exception
+     * @throws VisADException the VisAD exception
      */
     public boolean addDisplayInfo(DisplayInfo displayInfo)
             throws RemoteException, VisADException {
@@ -147,13 +144,13 @@ public class TimeHeightViewManager extends ViewManager {
     }
 
     /**
-     * The BooleanProperty identified byt he given id has changed.
+     * The BooleanProperty identified by the given id has changed.
      * Apply the change to the display.
      *
      * @param id Id of the changed BooleanProperty
      * @param value Its new value
      *
-     * @throws Exception problem handeling the change
+     * @throws Exception problem handling the change
      */
     protected void handleBooleanPropertyChange(String id, boolean value)
             throws Exception {
@@ -290,7 +287,7 @@ public class TimeHeightViewManager extends ViewManager {
     public boolean getClipping() {
         return clipOn;
     }
-    
+
     /**
      * Do we support animation?
      *

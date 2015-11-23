@@ -1,0 +1,42 @@
+The script getImages.tcl gets started at boot time.
+It runs continually, sleeping every 15 minutes.
+It sources defineImages.tcl as an easy way to define the different
+webcam images that are fetched.
+
+To see if this is running do:
+conan.unidata.ucar.edu: ps -eaf | grep getImages
+  jeffmc  5273  5271  0   Oct 20 ?       2025:52 /opt/bin/tclsh ./getImages.tcl
+
+
+Every time it fetches a new image it will run through the existing images and
+only keep around the most recent 200 images. So, roughly speaking, we keep
+around the last 2 days of images.
+
+An overrall index.xml file that defines the image collections is written as
+images/index.xml
+images/index.html
+
+
+All of the images are written to:
+images/<collection>/...
+
+
+The xml format is defined at:
+http://www.unidata.ucar.edu/software/idv/docs/userguide/data/ImageMovie.html
+
+There are also index files written which define the actual images and their times:
+images/<collection>/index.xml
+
+
+When you are debugging or trying out new images you can always run getImages.tcl directly:
+     tclsh getImages.tcl
+
+Passing in -help will list the command line arguments.
+
+Typically, you do:
+    tclsh getImages.tcl -total 1
+
+Which would run it once and then exit
+
+To start this up again in the background run:
+batch <run &

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -24,25 +24,23 @@ package ucar.unidata.idv.chooser;
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceDescriptor;
 import ucar.unidata.data.DataSourceResults;
-
-import ucar.unidata.idv.*;
-
 import ucar.unidata.ui.ChooserPanel;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
 import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.PollingInfo;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-
-
 import ucar.unidata.xml.XmlUtil;
 
-import java.awt.*;
-import java.awt.event.*;
+
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import java.io.File;
 
@@ -51,8 +49,13 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
-
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 
 
@@ -558,12 +561,12 @@ public class FileChooser extends IdvChooser {
     }
 
     /**
-     * Handle the selection of the set of files
+     * Handle the selection of the set of files.
      *
      * @param files The files the user chose
      * @param directory The directory they chose them from
      * @return True if the file was successful
-     * @throws Exception
+     * @throws Exception the exception
      */
     protected boolean selectFilesInner(File[] files, File directory)
             throws Exception {

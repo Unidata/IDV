@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -23,7 +23,6 @@ package ucar.unidata.idv;
 
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.idv.ui.ParamDefaultsEditor;
-
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.GuiUtils;
@@ -32,15 +31,22 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.visad.ProjectionCoordinateSystem;
+import ucar.visad.Util;
 
-import ucar.visad.*;
+import visad.Real;
+import visad.RealType;
+import visad.Unit;
+import visad.VisADException;
 
-import visad.*;
+import visad.georef.EarthLocation;
+import visad.georef.LatLonPoint;
+import visad.georef.MapProjection;
 
-import visad.georef.*;
 
-import java.awt.*;
-
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 
 import java.rmi.RemoteException;
 
@@ -49,10 +55,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
 
 
 /**
@@ -62,7 +67,6 @@ import javax.swing.*;
  * Some of the conventions  are hardcoded but others are defined
  * using property files.
  * @author Unidata Development Team
- * @version $Revision
  */
 public class DisplayConventions extends IdvManager {
 
@@ -307,11 +311,10 @@ public class DisplayConventions extends IdvManager {
     }
 
     /**
-     * Format the lat/lon labels with cardinal points (N,S,E,W)
+     * Format the lat/lon labels with cardinal points (N,S,E,W).
      *
-     * @param value
+     * @param value the value
      * @param type (LATITUDE or LONGITUDE)
-     *
      * @return  the formatted string
      */
     public String formatLatLonCardinal(double value, int type) {
@@ -618,14 +621,13 @@ public class DisplayConventions extends IdvManager {
 
     /**
      * Set range of values for lower and upper parameter values locked
-     * to lower and upper entries in color table
+     * to lower and upper entries in color table.
      *
      * @param paramName name of parm to set range limits for
      * @param unit DEFAULT VisAD unit not display unit
      * @return The {@link ucar.unidata.util.Range} to use for the given parameter
-     *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws VisADException the VisAD exception
+     * @throws RemoteException the remote exception
      */
     public Range getParamRange(String paramName, Unit unit)
             throws VisADException, RemoteException {

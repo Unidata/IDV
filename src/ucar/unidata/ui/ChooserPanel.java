@@ -1,20 +1,18 @@
 /*
-a * $Id: ChooserPanel.java,v 1.34 2007/07/27 13:52:12 jeffmc Exp $
- *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -28,51 +26,38 @@ import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
 
-
-import java.awt.*;
-
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.beans.PropertyChangeSupport;
 
-import java.io.File;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
 
-import javax.swing.*;
-
-import javax.swing.border.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 /**
- * Common class for the chooser panels
- *  @author Unidata Metapps development team
- *  @version $Id: ChooserPanel.java,v 1.34 2007/07/27 13:52:12 jeffmc Exp $
+ * Common class for the chooser panels.
+ *
+ * @author Unidata Metapps development team
  */
 public class ChooserPanel extends JPanel implements ActionListener {
 
-    /** The spacing used in the grid layout */
+    /** The spacing used in the grid layout. */
     protected static final int GRID_SPACING = 5;
+
+    /** The Constant GRID_SPACING_V. */
     protected static final int GRID_SPACING_V = 3;
+
+    /** The Constant GRID_SPACING_H. */
     protected static final int GRID_SPACING_H = 5;
 
     /** Used by derived classes when they do a GuiUtils.doLayout */
@@ -84,11 +69,11 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
 
-    /** The color for station maps */
+    /** The color for station maps. */
     public static final Color MAP_COLOR = Color.lightGray;
 
 
-    /** Text for the load button */
+    /** Text for the load button. */
     public static final String CMD_LOAD = "Add Source";
 
     /**
@@ -97,19 +82,19 @@ public class ChooserPanel extends JPanel implements ActionListener {
     private int cursorCnt = 0;
 
 
-    /** Where can we find help for this panel */
+    /** Where can we find help for this panel. */
     protected String helpPath = "";
 
-    /** Panel holding the contents */
+    /** Panel holding the contents. */
     protected JComponent contents;
 
-    /** Load button */
+    /** Load button. */
     protected JButton loadButton;
 
-    /** Cancel button */
+    /** Cancel button. */
     protected JButton cancelButton;
 
-    /** Flag for whether data has been chosen or not */
+    /** Flag for whether data has been chosen or not. */
     protected boolean haveData = false;
 
     /**
@@ -117,23 +102,24 @@ public class ChooserPanel extends JPanel implements ActionListener {
      */
     private PropertyChangeSupport changeListeners;
 
-    /** Shows the status */
+    /** Shows the status. */
     protected JLabel statusLabel;
 
-    /** _more_ */
+    /** _more_. */
     private JComponent statusComp;
 
-    /** _more_ */
+    /** _more_. */
     private Hashtable statusComps = new Hashtable();
 
-    /** _more_ */
+    /** _more_. */
     protected boolean simpleMode = false;
 
+    /** The message template. */
     private String messageTemplate;
 
     /**
      * Construct an object for selecting a data source from
-     * the current directory and from a default ADDE server
+     * the current directory and from a default ADDE server.
      */
     public ChooserPanel() {
         changeListeners = new PropertyChangeSupport(this);
@@ -141,10 +127,20 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
 
-    public  void setMessageTemplate(String template) {
+    /**
+     * Sets the message template.
+     *
+     * @param template the new message template
+     */
+    public void setMessageTemplate(String template) {
         this.messageTemplate = template;
     }
 
+    /**
+     * Gets the message template.
+     *
+     * @return the message template
+     */
     protected String getMessageTemplate() {
         return messageTemplate;
     }
@@ -160,8 +156,6 @@ public class ChooserPanel extends JPanel implements ActionListener {
             changeListeners.addPropertyChangeListener(listener);
         }
     }
-
-
 
     /**
      * Fires a PropertyChangeEvent.
@@ -182,19 +176,18 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
     /**
-     * _more_
+     * {@inheritDoc}
      */
     public void revalidate() {
         //        getContents().revalidate();
     }
 
     /**
-     * _more_
+     * Register status comp.
      *
-     * @param name _more_
-     * @param comp _more_
-     *
-     * @return _more_
+     * @param name the name
+     * @param comp the comp
+     * @return the JComponent
      */
     protected JComponent registerStatusComp(String name, JComponent comp) {
         comp = GuiUtils.inset(comp, 1);
@@ -213,27 +206,25 @@ public class ChooserPanel extends JPanel implements ActionListener {
         setStatus(msg, "nocomp");
     }
 
-
-
     /**
-     * _more_
+     * Gets the simple mode.
      *
-     * @return _more_
+     * @return the simple mode
      */
     public boolean getSimpleMode() {
         return simpleMode;
     }
 
     /**
-     * _more_
+     * Sets the status.
      *
-     * @param msg _more_
-     * @param compId _more_
+     * @param msg the msg
+     * @param compId the comp id
      */
     public void setStatus(String msg, String compId) {
         String template = getMessageTemplate();
-        if(template!=null) {
-            msg = template.replace("${message}",msg);
+        if (template != null) {
+            msg = template.replace("${message}", msg);
         }
         getStatusLabel().setText(msg);
         if ( !getSimpleMode()) {
@@ -256,8 +247,6 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
     }
 
-
-
     /**
      * Create (if needed) and return the JLabel that shows the status messages.
      *
@@ -273,33 +262,39 @@ public class ChooserPanel extends JPanel implements ActionListener {
         return statusLabel;
     }
 
-
+    /**
+     * Gets the status label background.
+     *
+     * @return the status label background
+     */
     public Color getStatusLabelBackground() {
         return new Color(255, 255, 204);
     }
 
 
+    /**
+     * Gets the status label foreground.
+     *
+     * @return the status label foreground
+     */
     public Color getStatusLabelForeground() {
         return Color.BLACK;
     }
 
-
     /**
-     * _more_
+     * Gets the status component.
      *
-     * @return _more_
+     * @return the status component
      */
     protected JComponent getStatusComponent() {
         if (statusComp == null) {
             JLabel statusLabel = getStatusLabel();
-            statusComp = GuiUtils.inset(statusLabel, new Insets(3,2,1,0));
+            statusComp = GuiUtils.inset(statusLabel, new Insets(3, 2, 1, 0));
             statusComp.setBackground(getStatusLabelBackground());
-            statusComp = GuiUtils.inset(statusComp, new Insets(2,2,2,2));
+            statusComp = GuiUtils.inset(statusComp, new Insets(2, 2, 2, 2));
         }
         return statusComp;
     }
-
-
 
     /**
      * Receive the update,cancel, load commands and call:
@@ -320,7 +315,6 @@ public class ChooserPanel extends JPanel implements ActionListener {
         }
 
     }
-
 
     /**
      * This allows for derived classes to define their own name for the
@@ -343,16 +337,15 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
     /**
-     * _more_
+     * Gets the default buttons.
      *
-     * @param listener _more_
-     *
-     * @return _more_
+     * @param listener the listener
+     * @return the default buttons
      */
     public JComponent getDefaultButtons(ActionListener listener) {
         Hashtable buttonMap   = new Hashtable();
         String[]  commands    = getButtonLabels();
-        String[]  labels     = new String[commands.length];
+        String[]  labels      = new String[commands.length];
         String    loadCommand = getLoadCommandName();
         String[]  tooltips    = new String[commands.length];
         for (int i = 0; i < commands.length; i++) {
@@ -361,10 +354,10 @@ public class ChooserPanel extends JPanel implements ActionListener {
                 tooltips[i] = getLoadToolTip();
             } else if (commands[i].equals(GuiUtils.CMD_UPDATE)) {
                 tooltips[i] = getUpdateToolTip();
-                labels[i] = "icon:/auxdata/ui/icons/view-refresh22.png";
+                labels[i]   = "icon:/auxdata/ui/icons/view-refresh22.png";
             } else if (commands[i].equals(GuiUtils.CMD_HELP)) {
                 tooltips[i] = "Show help for this chooser";
-                labels[i] = "icon:/auxdata/ui/icons/show-help22.png";
+                labels[i]   = "icon:/auxdata/ui/icons/show-help22.png";
             } else if (commands[i].equals(GuiUtils.CMD_CANCEL)) {
                 tooltips[i] = "Cancel choosing and close the window";
             }
@@ -372,8 +365,8 @@ public class ChooserPanel extends JPanel implements ActionListener {
         JPanel comp = GuiUtils.makeButtons(listener, labels, commands,
                                            tooltips, buttonMap);
         loadButton = (JButton) buttonMap.get(getLoadCommandName());
-        JButton tmpButton  = (JButton) buttonMap.get(GuiUtils.CMD_CANCEL);
-        if(tmpButton!=null) {
+        JButton tmpButton = (JButton) buttonMap.get(GuiUtils.CMD_CANCEL);
+        if (tmpButton != null) {
             cancelButton = tmpButton;
             cancelButton.setEnabled(false);
         }
@@ -382,12 +375,14 @@ public class ChooserPanel extends JPanel implements ActionListener {
         //        return comp;
     }
 
-
-
+    /**
+     * Can do update.
+     *
+     * @return true, if successful
+     */
     public boolean canDoUpdate() {
         return true;
     }
-
 
     /**
      * Get the names for the buttons.
@@ -395,18 +390,16 @@ public class ChooserPanel extends JPanel implements ActionListener {
      * @return array of button names
      */
     protected String[] getButtonLabels() {
-        if(canDoUpdate())
-            return new String[] { getLoadCommandName(),
-                                  GuiUtils.CMD_UPDATE,
-                                  GuiUtils.CMD_HELP};
-        else 
-            return new String[] { getLoadCommandName(), GuiUtils.CMD_HELP};
+        if (canDoUpdate()) {
+            return new String[] { getLoadCommandName(), GuiUtils.CMD_UPDATE,
+                                  GuiUtils.CMD_HELP };
+        } else {
+            return new String[] { getLoadCommandName(), GuiUtils.CMD_HELP };
+        }
     }
 
-
-
     /**
-     * Get the tooltip for the load button
+     * Get the tooltip for the load button.
      *
      * @return The tooltip for the load button
      */
@@ -415,14 +408,13 @@ public class ChooserPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Get the tooltip for the update button
+     * Get the tooltip for the update button.
      *
      * @return The tooltip for the update button
      */
     protected String getUpdateToolTip() {
         return "Refresh content shown in this Chooser";
     }
-
 
     /**
      * Set whether the user has made a selection that contains data.
@@ -438,13 +430,17 @@ public class ChooserPanel extends JPanel implements ActionListener {
         //        updateStatus();
     }
 
-
+    /**
+     * Gets the have data.
+     *
+     * @return the have data
+     */
     public boolean getHaveData() {
         return haveData;
     }
 
     /**
-     * Clear any outstanding cursor waits
+     * Clear any outstanding cursor waits.
      */
     public void clearWaitCursor() {
         cursorCnt = 0;
@@ -454,24 +450,26 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
     /**
-     * Set the wait cursor over this panel
+     * Set the wait cursor over this panel.
      */
     public void showWaitCursor() {
-	showWaitCursor(getContents());
+        showWaitCursor(getContents());
     }
 
 
 
     /**
-     * Set the normal cursor over this panel
+     * Set the normal cursor over this panel.
      */
     public void showNormalCursor() {
-	showNormalCursor(getContents());
+        showNormalCursor(getContents());
     }
 
 
     /**
-     * Set the wait cursor over this panel
+     * Set the wait cursor over this panel.
+     *
+     * @param comp the comp
      */
     public void showWaitCursor(JComponent comp) {
         cursorCnt++;
@@ -482,7 +480,9 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
     /**
-     * Set the normal cursor over this panel
+     * Set the normal cursor over this panel.
+     *
+     * @param comp the comp
      */
     public void showNormalCursor(JComponent comp) {
         cursorCnt--;
@@ -491,18 +491,23 @@ public class ChooserPanel extends JPanel implements ActionListener {
         }
         if (cursorCnt == 0) {
             GuiUtils.setCursor(
-			       comp,
-                Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                comp, Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
 
+    /**
+     * Pad label.
+     *
+     * @param s the string
+     * @return the JComponent
+     */
     public JComponent padLabel(String s) {
-        return GuiUtils.inset(new JLabel(s),new Insets(0,5,0,5));
+        return GuiUtils.inset(new JLabel(s), new Insets(0, 5, 0, 5));
     }
 
     /**
-     * Hides the fact that this is really a JPanel
+     * Hides the fact that this is really a JPanel.
      *
      * @return the contents
      */
@@ -517,16 +522,16 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
     /**
-     * _more_
+     * Do make contents.
      *
-     * @return _more_
+     * @return the JComponent
      */
     protected JComponent doMakeContents() {
         return new JPanel();
     }
 
     /**
-     * _more_
+     * Update status.
      */
     protected void updateStatus() {}
 
@@ -574,7 +579,7 @@ public class ChooserPanel extends JPanel implements ActionListener {
 
 
     /**
-     * Gets called to close the panel
+     * Gets called to close the panel.
      */
     protected void doClose() {}
 
@@ -592,12 +597,9 @@ public class ChooserPanel extends JPanel implements ActionListener {
     /**
      * Set the help path used for this chooser.
      *
-     * @param path
+     * @param path the new help path
      */
     public void setHelpPath(String path) {
         this.helpPath = path;
     }
-
-
 }
-

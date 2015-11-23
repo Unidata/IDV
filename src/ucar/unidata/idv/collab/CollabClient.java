@@ -1,7 +1,6 @@
 /*
- * $Id: CollabClient.java,v 1.5 2005/05/13 18:30:36 jeffmc Exp $
  *
- * Copyright  1997-2015 Unidata Program Center/University Corporation for
+ * Copyright  1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -24,46 +23,10 @@ package ucar.unidata.idv.collab;
 
 
 
-import ucar.unidata.idv.*;
-
-import ucar.unidata.collab.*;
-
-import ucar.unidata.xml.*;
-
-import ucar.visad.display.AnimationWidget;
-
+import java.io.IOException;
+import java.net.Socket;
 
 import ucar.unidata.collab.Client;
-import ucar.unidata.collab.Server;
-
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-
-import ucar.unidata.data.*;
-
-
-
-
-import java.rmi.RemoteException;
-
-import java.io.*;
-
-import java.net.*;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
 
 
 
@@ -77,7 +40,6 @@ import javax.swing.event.*;
  * In the future this could hold more information: contact info, etc.
  *
  * @author IDV development team
- * @version $Revision: 1.5 $Date: 2005/05/13 18:30:36 $
  */
 
 public class CollabClient extends Client {
@@ -116,9 +78,7 @@ public class CollabClient extends Client {
      * @param collabManager Reference to the singleton CollabManager
      * @param hostName Host to  connect to
      * @param port Port on host to connect to
-     *
-     * @throws IOException
-     *
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public CollabClient(CollabManager collabManager, String hostName, int port)
             throws IOException {
@@ -132,8 +92,7 @@ public class CollabClient extends Client {
      *
      * @param collabManager Reference to the singleton CollabManager
      * @param socket The socket
-     *
-     * @throws IOException
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public CollabClient(CollabManager collabManager, Socket socket)
             throws IOException {
@@ -189,16 +148,4 @@ public class CollabClient extends Client {
     public boolean getIsLocal() {
         return isLocal;
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
