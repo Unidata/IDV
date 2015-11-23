@@ -241,7 +241,7 @@ def mixr(temp,rh):
 def relh(temp,mixr):
   """ Create Relative Humidity from Temperature, mixing ratio (requires pressure domain) 
   """
-  return DerivedGridFactory.createMixingRatio(temp,rh)
+  return DerivedGridFactory.createRelativeHumidity(temp,mixr)
 
 def pvor(S,V):
   """ Potetial Vorticity (usually from theta and wind)
