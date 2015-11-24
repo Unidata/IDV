@@ -21,10 +21,7 @@
 package ucar.visad.data;
 
 
-import edu.wisc.ssec.mcidas.AREAnav;
-import edu.wisc.ssec.mcidas.AreaDirectory;
-import edu.wisc.ssec.mcidas.AreaFile;
-import edu.wisc.ssec.mcidas.AreaFileFactory;
+import edu.wisc.ssec.mcidas.*;
 
 
 import ucar.ma2.Array;
@@ -240,6 +237,45 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
 
     }
 
+    /**
+     * _more_
+     *
+     * @param aid _more_
+     * @param readLabel _more_
+     * @param unit _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static AreaImageFlatField createImmediateWithUnit(AddeImageDescriptor aid,
+                                                     String readLabel, Unit unit)
+            throws VisADException, IOException {
+        AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
+        visad.meteorology.SingleBandedImageImpl ff =
+                (visad.meteorology.SingleBandedImageImpl) aa.getImage();
+        //Uggh, make a copy for now
+        float[][]        samples       = ff.unpackFloats();
+        FunctionType     type          = (FunctionType) ff.getType();
+        Set              domainSet     = ff.getDomainSet();
+        CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
+        Set[]            rangeSets     = ff.getRangeSets();
+        Unit[]           units         = {unit};
+
+        FunctionType functionType = new FunctionType(type.getDomain(),
+                new RealTupleType(DataUtil.makeRealType(type.getRange().toString(), unit)));
+        AreaImageFlatField aiff = new AreaImageFlatField(aid, functionType,
+                domainSet, rangeCoordSys, rangeSets,
+                units, samples, readLabel);
+
+        aiff.startTime = ff.getStartTime();
+
+
+        return aiff;
+
+    }
 
     /**
      * Create a AIFF without reading any data yet

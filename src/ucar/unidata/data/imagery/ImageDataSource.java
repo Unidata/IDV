@@ -1111,7 +1111,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
      * @throws RemoteException    Java RMI problem
      * @throws VisADException     VisAD problem
      */
-    private SingleBandedImage makeImage(AddeImageDescriptor aid,
+    protected SingleBandedImage makeImage(AddeImageDescriptor aid,
                                         MathType rangeType,
                                         boolean fromSequence,
                                         String readLabel)
