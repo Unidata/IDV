@@ -970,11 +970,13 @@ public class AerologicalDisplay extends DisplayMaster implements AerologicalDisp
             windBarbs = new WindBarbProfile(getDisplay(),
                                             getCoordinateSystem());
             winds.addWindProfile(index, windBarbs);
+            winds.setColor(getForeground());
         }
         if (windBarbs1 == null) {
             windBarbs1 = new WindBarbProfile(getDisplay(),
                                              getCoordinateSystem());
             winds1.addWindProfile(index, windBarbs1);
+            winds1.setColor(getForeground());
         }
 
         sounding.setFields(temperature, dewPoint);
