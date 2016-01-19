@@ -197,7 +197,8 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <category value="flowvector3d"/>
     </categories>
     <operands categories="GRID-3D-*;">
-      <paramgroup name="u_v_w"/>
+        <paramgroup name="u_v_w"/>
+        <paramgroup name="GridRelative_uvw"/>
     </operands>
   </derived>
   <derived
