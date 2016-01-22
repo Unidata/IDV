@@ -1149,6 +1149,16 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
     }
 
     /**
+     * Get the time list.
+     *
+     * @param
+     * @return Time
+     */
+    public DateTime[] getTimesArray() {
+        return timesArray;
+    }
+
+    /**
      * Do we have any times
      *
      * @return have any times

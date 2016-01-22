@@ -607,6 +607,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** Holds the animation state from the AnimationWidget */
     private AnimationInfo animationInfo;
 
+    private DateTime[] timesArray;
+
     /** This holds the visibility toggle animation commands. */
     protected JMenu animationMenu;
 
@@ -802,9 +804,6 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /** flag for sharing */
     private boolean wasSharing;
-
-    /** flag for animation update */
-    boolean isAnimationUpdated = false;
 
     /**
      * We keep the window bounds around for persisting/unpersisting
@@ -1816,7 +1815,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
             matrixLabel = new JLabel("<html></html>");
             matrixLabel.setBorder(
-                BorderFactory.createTitledBorder("Display Matrix Settings"));
+                    BorderFactory.createTitledBorder("Display Matrix Settings"));
             setMatrixLabel(true);
             contents = GuiUtils.centerBottom(contents,
                                              GuiUtils.inset(matrixLabel,
@@ -4604,7 +4603,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public JMenu makeViewMenu() {
         JMenu viewMenu = GuiUtils.makeDynamicMenu("View", this,
-                             "firstInitializeViewMenu");
+                "firstInitializeViewMenu");
 
         viewMenu.setMnemonic(GuiUtils.charToKeyCode("V"));
 
@@ -4672,17 +4671,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JMenuItem mi;
 
         captureMenu.add(
-            mi = (JMenuItem) GuiUtils.setIcon(
-                GuiUtils.makeMenuItem(
-                    "Image...  Ctrl+I", this,
-                    "doSaveImageInThread"), "/auxdata/ui/icons/camera.png"));
+                mi = (JMenuItem) GuiUtils.setIcon(
+                        GuiUtils.makeMenuItem(
+                                "Image...  Ctrl+I", this,
+                                "doSaveImageInThread"), "/auxdata/ui/icons/camera.png"));
 
         // mi.setMnemonic(GuiUtils.charToKeyCode("C"));
         captureMenu.add(
-            mi = (JMenuItem) GuiUtils.setIcon(
-                GuiUtils.makeMenuItem(
-                    "Movie...  Ctrl+M", this,
-                    "startImageCapture"), "/auxdata/ui/icons/film.png"));
+                mi = (JMenuItem) GuiUtils.setIcon(
+                        GuiUtils.makeMenuItem(
+                                "Movie...  Ctrl+M", this,
+                                "startImageCapture"), "/auxdata/ui/icons/film.png"));
 
         // mi.setMnemonic(GuiUtils.charToKeyCode("M"));
         captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...",
@@ -4827,17 +4826,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
                         animationInfo = new AnimationInfo();
                         animationInfo.setBoxesVisible(
                             getShowAnimationBoxes());
-                    }
+                }
                 }
 
                 animationWidget = new AnimationWidget(animationInfo);
                 animationWidget.setUniqueId(getUniqueId() + "_anim");
                 animation = new Animation();
                 animationWidget.setAnimation(animation);
+                timesArray = animationWidget.getTimesArray();
                 animation.addPropertyChangeListener(
                     new PropertyChangeListener() {
                     public void propertyChange(PropertyChangeEvent evt) {
-                        AnimationInfo aniInfo = animation.getAnimationInfo();
+                        AnimationInfo aniInfo = animationWidget.getAnimationInfo();
                         try {
                             if (evt.getPropertyName().equals(
                                     Animation.ANI_VALUE)) {
@@ -4856,21 +4856,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                             Util.makeDates(
                                                 animationWidget.getTimes())));
                                 }
-                                if ((aniInfo != null)
-                                        && !aniInfo.getAnimationSetInfo()
-                                            .equals(animationInfo
-                                                .getAnimationSetInfo())) {
-                                    isAnimationUpdated = false;
-                                    animationInfo.setAnimationSetInfo(
-                                        aniInfo.getAnimationSetInfo());
-                                }
+
                                 if ((aniInfo != null) && aniInfo
                                         .getAnimationSetInfo()
                                         .getActive() && aniInfo
                                         .getAnimationSetInfo()
-                                        .getIsTimeDriver() && !isAnimationUpdated) {
+                                        .getIsTimeDriver() && !timesArray
+                                        .equals(animationWidget.getTimesArray())) {
                                     animationDriverChanged();
-                                    isAnimationUpdated = true;
+                                    timesArray = animationWidget.getTimesArray();
+
                                 }
                             }
                         } catch (Exception exp) {
@@ -6557,7 +6552,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void removeColorPair(String name) {
         XmlResourceCollection colors = getResourceManager().getXmlResources(
-                                           IdvResourceManager.RSC_COLORPAIRS);
+                IdvResourceManager.RSC_COLORPAIRS);
         Element root = colors.getWritableRoot("<colorpairs></colorpairs>");
         Element colorNode = XmlUtil.findElement(root, TAG_COLORPAIR, "label",
                                 name);
