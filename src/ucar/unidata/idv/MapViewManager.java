@@ -2881,7 +2881,7 @@ public class MapViewManager extends NavigatedViewManager {
             MapProjection mp = ucar.visad.Util.makeMapProjection(minY, minX,
                                    maxY, maxX);
             setMapProjection(mp, true);
-            //            getMapDisplay().zoom(ZOOM_FACTOR);
+            getMapDisplay().zoom(ZOOM_FACTOR);
             getMapDisplay().saveProjection();
         } catch (Exception exp) {
             logException("Setting projection", exp);
