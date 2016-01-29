@@ -144,7 +144,7 @@ public class DerivedGridFactory {
     public static FieldImpl createThickness(FieldImpl grid)
             throws VisADException, RemoteException {
         return createLayerDifference(grid, 500, 1000,
-                                     CommonUnits.HECTOPASCAL);
+                CommonUnits.HECTOPASCAL);
     }
 
     /**
@@ -1024,25 +1024,108 @@ public class DerivedGridFactory {
         } else {
             float[][] pressVals = heightGrid.getFloats();
             float[][] heightVals = pressToHeightCS.toReference(pressVals,
-                                       new Unit[] { pressUnit });
+                    new Unit[]{pressUnit});
             ((FlatField) heightGrid).setSamples(heightVals, false);
         }
         return heightGrid;
     }
 
-
     /**
-     * Convert pressure velocity to height velocity
+     * calculate the vertical velocity based on pressure velocity
+     *  dz/dt= dp/dt * dz/dp
      *
-     * @param pressureVelField  pressure velocity field
-     * @param hField  the height field
-     * @param pressToHeightCS  the CS for the transform
+     * @param wGrid  pressure velocity field
      *
      * @return the velocities as m/s
      *
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
      */
+    public static FieldImpl convertPressureVelocityToHeightVelocity(
+            FieldImpl wGrid )
+            throws VisADException, RemoteException {
+        FieldImpl w;
+        final Unit rgUnit =
+                ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
+        if (Unit.canConvert(rgUnit, CommonUnits.METERS_PER_SECOND)) {
+            w = wGrid;
+        } else {
+            FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                    (FlatField) wGrid.getSample(0));
+            FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+            w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
+                    wGrid, hPI, null);
+            w = (FieldImpl)w.multiply(new Real(0.5));;
+            // choices.remove(new String("D3"));
+            //choices.put(new String("D3"), w);
+        }
+        return w;
+    }
+
+    /**
+     * calculate the vertical velocity based on hydrostatic
+     * and ideal gas law equation
+     *  (w, m/s) = -(R*T/gP)*(w, Pa/s)
+     *
+     * @param wGrid  pressure velocity field
+     * @param tGrid  the temperature field
+     *
+     * @return the velocities as m/s
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
+     */
+    public static FieldImpl convertPressureVelocityToHeightVelocity2(
+            FieldImpl wGrid, FieldImpl tGrid )
+            throws VisADException, RemoteException {
+
+        Unit wUnit = GridUtil.getParamUnits(wGrid)[0];
+        Unit tempUnit = GridUtil.getParamUnits(tGrid)[0];
+
+        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                (FlatField) tGrid.getSample(0));
+        Unit pUnit = GridUtil.getParamUnits(pFI)[0];
+
+        // make sure wGrid in pa/s
+        if(!wUnit.getIdentifier().equals("Pa/s")){
+            Unit newWUnit = Util.parseUnit("Pa/s");
+            RealType newType = Util.makeRealType("newVerticalVelocity", newWUnit);
+            wGrid = GridUtil.setParamType(wGrid, newType, true);
+        }
+
+        if(!tempUnit.equals(SI.kelvin)){
+            RealType newType1 = Util.makeRealType("newTemperature", SI.kelvin);
+            tGrid = GridUtil.setParamType(tGrid, newType1, true);
+        }
+
+        if(!pUnit.equals(CommonUnits.PASCAL)){
+            RealType newType2 = Util.makeRealType("newPressure", CommonUnits.PASCAL);
+            pFI = GridUtil.setParamType(pFI, newType2, true);
+        }
+
+        FieldImpl w = (FieldImpl)GridMath.divide(GridMath.multiply( tGrid, wGrid), pFI)
+                    .multiply(new Real(-29.28));
+
+            // choices.remove(new String("D3"));
+            //choices.put(new String("D3"), w);
+            RealType newType2 = Util.makeRealType("newW", CommonUnits.METERS_PER_SECOND);
+            return GridUtil.setParamType(w, newType2, true);
+
+
+    }
+    /**
+     * Convert pressure velocity to height velocity
+     *
+     * @param pressureVelField  pressure velocity field
+     * @param hField  the height field
+     *
+     * @return the velocities as m/s
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
+     */
+
+
     public static FieldImpl convertPressureVelocityToHeightVelocity(
             FieldImpl pressureVelField, FieldImpl hField,
             CoordinateSystem pressToHeightCS)
