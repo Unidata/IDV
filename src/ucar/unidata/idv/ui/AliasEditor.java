@@ -20,9 +20,9 @@
 
 package ucar.unidata.idv.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +33,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -421,7 +423,8 @@ public class AliasEditor extends IdvManager {
                                   StringUtil.split(aliases, ",", true, true));
         JTextField      nameFld    = new JTextField(name, 40);
         JTextField      labelFld   = new JTextField(label, 40);
-        final JTextArea aliasesFld = new JTextArea(aliases, 30, 10);
+        // final JTextArea aliasesFld = new JTextArea(aliases, 30, 10);
+        final JTextArea aliasesFld = new JTextArea(aliases);
         aliasesFld.setToolTipText(
             "<html>Enter parameter name, one per line<br>Right mouse to add current parameters</html>");
         aliasesFld.addMouseListener(new MouseAdapter() {
@@ -439,26 +442,42 @@ public class AliasEditor extends IdvManager {
         // TJJ Sep 2015: Minor layout mods so components resize better.
         // Also, bump the initial size a bit, 150 x 150 was really small.
         
-        sp.setPreferredSize(new Dimension(400, 300));
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         
-        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Easiest and cleanest is a set of mini-panels.
+        // No worries, JPanel is a lightweight component, you can nest lots of them
+        
+        JPanel namePanel = new JPanel();
+        namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.LINE_AXIS));
         namePanel.add(new JLabel("Name: "));
         namePanel.add(nameFld);
-        
-        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.LINE_AXIS));
         labelPanel.add(new JLabel("Label: "));
         labelPanel.add(labelFld);
         
-        double[] WT_YYYY = { 1, 1, 1, 1 };
-        JPanel p = GuiUtils.doLayout(new Component[] {
-        	namePanel, 
-        	labelPanel,
-            new JLabel("Enter aliases one per line:"),
-            sp
-        }, 1, GuiUtils.WT_Y, WT_YYYY);
+        // Group the two labeled text fields at top 
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.PAGE_AXIS));
+        topPanel.add(namePanel);
+        topPanel.add(labelPanel);
+        
+        // Bottom will be the aliases label and text area
+        JPanel botPanel = new JPanel(new BorderLayout());
+        JLabel aliasLabel = new JLabel("Enter aliases one per line:");
+        aliasLabel.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
+        botPanel.add(aliasLabel, BorderLayout.NORTH);
+        botPanel.add(sp, BorderLayout.CENTER);
+        
+        // Put them all together in one main panel that resizes nicely
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setPreferredSize(new Dimension(400, 300));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(botPanel, BorderLayout.CENTER);
 
-        if ( !GuiUtils.showOkCancelDialog(null, "Data Alias", p, null)) {
+        if ( !GuiUtils.showOkCancelDialog(null, "Data Alias", mainPanel, null)) {
             if (deleteOnCancel && !newEntry) {
                 removeEntry(tableModel, row);
             }
@@ -479,10 +498,6 @@ public class AliasEditor extends IdvManager {
         }
         saveAliases();
     }
-
-
-
-
 
     /**
      * show help
@@ -554,7 +569,7 @@ public class AliasEditor extends IdvManager {
      * remove entry
      *
      * @param from which table
-     * @param row kthe row
+     * @param row the row
      */
     private void removeEntry(AliasTableModel from, int row) {
         from.remove(row);
@@ -784,7 +799,7 @@ public class AliasEditor extends IdvManager {
         }
 
         /**
-         * Create and write out the collection of {@link ucar.uinidata.data.DataAlias}-s
+         * Create and write out the collection of
          * defined by this table model.
          */
         private void saveAliases() {
@@ -935,9 +950,6 @@ public class AliasEditor extends IdvManager {
         }
 
     }
-
-
-
 
 
 }
