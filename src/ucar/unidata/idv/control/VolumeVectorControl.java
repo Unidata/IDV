@@ -1,11 +1,10 @@
 package ucar.unidata.idv.control;
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.DirectDataChoice;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.Trace;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.visad.Util;
 import ucar.visad.display.DisplayableData;
@@ -163,6 +162,24 @@ public class VolumeVectorControl extends GridDisplayControl {
         if ( !isDisplay3D()) {
             LogUtil.userMessage(log_, "Can't render volume in 2D display");
             return false;
+        }
+
+        // checeking grid size matching between u and w
+        if(dataChoice instanceof DerivedDataChoice) {
+            DerivedDataChoice ddc = (DerivedDataChoice) dataChoice;
+            List choices0 = ddc.getChoices();
+            DirectDataChoice udc =
+                    (DirectDataChoice) choices0.get(0);
+            DirectDataChoice vdc =
+                    (DirectDataChoice) choices0.get(1);
+            DirectDataChoice wdc =
+                    (DirectDataChoice) choices0.get(2);
+            ThreeDSize us = (ThreeDSize)udc.getProperty("prop.gridsize");
+            ThreeDSize ws = (ThreeDSize)wdc.getProperty("prop.gridsize");
+            if(us.getSizeZ() != ws.getSizeZ()){
+                userErrorMessage("w grid size is different: " + ws + "\n from " + us);
+                return false;
+            }
         }
         myDisplay = (FlowDisplayable)createPlanDisplay();
 
