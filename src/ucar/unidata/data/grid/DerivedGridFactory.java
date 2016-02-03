@@ -1055,7 +1055,7 @@ public class DerivedGridFactory {
             FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
             w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
                     wGrid, hPI, null);
-            w = (FieldImpl)w.multiply(new Real(0.5));;
+            // w = (FieldImpl)w.multiply(new Real(0.5));;
             // choices.remove(new String("D3"));
             //choices.put(new String("D3"), w);
         }
@@ -1106,10 +1106,10 @@ public class DerivedGridFactory {
         FieldImpl w = (FieldImpl)GridMath.divide(GridMath.multiply( tGrid, wGrid), pFI)
                     .multiply(new Real(-29.28));
 
-            // choices.remove(new String("D3"));
-            //choices.put(new String("D3"), w);
-            RealType newType2 = Util.makeRealType("newW", CommonUnits.METERS_PER_SECOND);
-            return GridUtil.setParamType(w, newType2, true);
+        // choices.remove(new String("D3"));
+        //choices.put(new String("D3"), w);
+        RealType newType2 = Util.makeRealType("newW", CommonUnits.METERS_PER_SECOND);
+        return GridUtil.setParamType(w, newType2, true);
 
 
     }
@@ -1124,8 +1124,6 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI problem
      * @throws VisADException   VisAD problem
      */
-
-
     public static FieldImpl convertPressureVelocityToHeightVelocity(
             FieldImpl pressureVelField, FieldImpl hField,
             CoordinateSystem pressToHeightCS)
