@@ -45,4 +45,14 @@ the RHI cross section.
 
 [isl::importxml radarRHI.isl]
 
+<p>
+In the fifth example, we use the displayproperties tag to change the time zone of the display list.
+The ISL only need to provides one of the control in the display, and it is the ContourPlanViewControl in this example.
+After we identify the display, the IDV uses the property name "DisplayListTimeZone" to identify the function to
+reset the time zone value and update the display list. The time zone in the test bundle is GMT, and the ISL script changes
+the time zone to MST and EST before capturing the image.
+<p>
+
+[isl::importxml changingTimeZone.isl]
+
 </body>
