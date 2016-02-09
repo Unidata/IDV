@@ -163,11 +163,7 @@ import java.lang.reflect.Method;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -956,6 +952,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * Flag for matching the display region
      */
     public boolean matchDisplayRegion = false;
+
+
+    private TimeZone displayListTimeZone = null;
 
     /**
      * Default constructor. This is called when the control is
@@ -4031,6 +4030,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 for (int i = 0; i < s.getLength(); i++) {
                     CalendarDateTime dt = new CalendarDateTime(samples[0][i],
                                               cal);
+                    TimeZone tz = CalendarDateTime.getFormatTimeZone();
+                    if(displayListTimeZone != null && tz != displayListTimeZone)
+                        dt.setFormatTimeZone(displayListTimeZone);
                     String label =
                         UtcDate.applyTimeMacro(template, dt,
                             getIdv().getPreferenceManager()
@@ -6024,6 +6026,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
 
+    /**
+     * Set the Time Zone
+     *
+     *
+     * @param timeZoneStr the new time zone name
+     */
+    public void setDisplayListTimeZone(String timeZoneStr) {
+        displayListTimeZone = TimeZone.getTimeZone(timeZoneStr);
+        updateDisplayList();
+        displayListTimeZone = null;
+    }
 
 
 
