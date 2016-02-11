@@ -838,7 +838,8 @@ public class DataSelectionWidget {
 
         if (dataSelectionComponents != null) {
             for (DataSelectionComponent comp : dataSelectionComponents) {
-                comp.applyToDataSelection(dataSelection);
+                if(comp != null)
+                    comp.applyToDataSelection(dataSelection);
             }
         }
 
