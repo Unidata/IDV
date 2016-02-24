@@ -426,6 +426,18 @@ Since this is confusing and needs more work lets remove this for now
      properties="vectors=true;useSpeedForColor=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
+
+  <control
+    id="planviewflow2"
+    categories="*-flowvector-*"
+    class="ucar.unidata.idv.control.FlowPlanViewControl"
+    label="Vector Colored by Another Parameter"
+    doeslevels="true"
+    displaycategory="Flow Displays"
+    code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
+    properties="vectors=true;coloredByAnother=true;">
+   <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
   <!--control
      id="streamlines"
      categories="*-flowvector-*"
@@ -449,16 +461,16 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control-->
 
-  <control
+  <!--control
      id="planviewflow3d"
      categories="*-flowvector3d-*"
      class="ucar.unidata.idv.control.FlowPlanViewControl"
      description="Plan view of 3D flow vectors"
      label="3D Vector Plan View"
-     displaycategory="Flow Displays"
+     displaycategory="3D Flow Displays"
      properties="vectors=true;isThreeComponents=false;coloredByAnother=false">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-    </control>
+    </control-->
 
   <control
      id="windbarbplan"
@@ -484,6 +496,18 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
+   <control
+    id="windbarbplan2"
+    categories="*-flowvector-*"
+    class="ucar.unidata.idv.control.FlowPlanViewControl"
+    description="Wind barb plan view of flow vectors"
+    label="Wind Barb Colored by Another Parameter"
+    doeslevels="true"
+    displaycategory="Flow Displays"
+    code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
+    properties="windbarbs=true; coloredByAnother=true;">
+   <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
   <control
      id="flowxs"
      categories="*-flowvector-*"
@@ -499,7 +523,7 @@ Since this is confusing and needs more work lets remove this for now
      class="ucar.unidata.idv.control.FlowCrossSectionControl"
      description="Cross-section of 3-D flow vectors"
      label="3D Vector Cross Section"
-     displaycategory="Flow Displays"
+     displaycategory="3D Flow Displays"
      properties="windowVisible=true;isThreeComponents=true"/>
 
   <control
@@ -1251,7 +1275,6 @@ Example of how to make an image movie control with a fixed table of contents
      properties="usePoints=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
-
     <control
             id="vectorvolumerender"
             categories="*-flowvector3d-*"
@@ -1259,7 +1282,30 @@ Example of how to make an image movie control with a fixed table of contents
             description="3-D vector Volume"
             label="3D Volume Vector"
             icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="Flow Displays">
+            displaycategory="3D Flow Displays">
+        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    <control
+            id="vectorvolumerender1"
+            categories="*-flowvector3d-*"
+            class="ucar.unidata.idv.control.VolumeVectorControl"
+            description="3-D vector Volume Colored by Speed"
+            label="3D Volume Vector Colored by Speed"
+            icon="/ucar/unidata/idv/images/volume.png"
+            displaycategory="3D Flow Displays"
+            properties="vectors=true;useSpeedForColor=true;">
+        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    <control
+            id="vectorvolumerender2"
+            categories="*-flowvector3d-*"
+            class="ucar.unidata.idv.control.VolumeVectorControl"
+            description="3-D vector Volume Colored by Another Parameter"
+            code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
+            label="3D Volume Vector Colored by Another Paramter"
+            icon="/ucar/unidata/idv/images/volume.png"
+            displaycategory="3D Flow Displays"
+            properties="vectors=true;coloredByAnother=true;">
         <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
     <control
@@ -1269,7 +1315,7 @@ Example of how to make an image movie control with a fixed table of contents
             description="3-D Volume Trajectory"
             label="3D Volume Trajectory"
             icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="Flow Displays"
+            displaycategory="3D Flow Displays"
             properties="trajectories=true;">
         <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
