@@ -21,6 +21,7 @@
 package ucar.visad;
 
 
+import org.apache.derby.iapi.util.StringUtil;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.util.FileManager;
@@ -2196,7 +2197,11 @@ public final class Util {
                     unitIdentifier = unitIdentifier.replace('_', ' ');
                     String realUnitName = MetUnits.makeSymbol(unitIdentifier);
                     u = visad.data.units.Parser.parse(realUnitName);
-                } else {
+                } else if (unitIdentifier.endsWith(".true")){
+                    unitIdentifier = unitIdentifier.replace(".true", "_north");
+                    String realUnitName = MetUnits.makeSymbol(unitIdentifier);
+                    u = visad.data.units.Parser.parse(realUnitName);
+                }else {
                     throw new VisADException("No such unit:" + nsu);
                 }
             }

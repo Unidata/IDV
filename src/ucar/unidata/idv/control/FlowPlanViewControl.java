@@ -32,12 +32,7 @@ import ucar.visad.display.DisplayableData;
 import ucar.visad.display.FlowDisplayable;
 import ucar.visad.display.WindBarbDisplayable;
 
-import visad.Data;
-import visad.FieldImpl;
-import visad.Real;
-import visad.RealTuple;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.EarthLocation;
 
@@ -189,6 +184,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** default type */
     private Integer trajFormType = new Integer(0);
 
+    /** _more_ */
+    private Range flowColorRange;
+
     /**
      * Create a new FlowPlanViewControl; set attribute flags
      */
@@ -278,7 +276,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             throws VisADException, RemoteException {
         Trace.call1("FlowPlanView.setData");
         // checking the grid size matching
-        if (dataChoice.getDescription().contains("3D Flow Vectors")) {
+        //if (dataChoice.getDescription().contains("3D Flow Vectors")) {
             DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
             List              choices0 = ddc.getChoices();
 
@@ -289,22 +287,22 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                 ThreeDSize us = (ThreeDSize) udc.getProperty("prop.gridsize");
                 ThreeDSize ws = (ThreeDSize) wdc.getProperty("prop.gridsize");
                 if (us.getSizeZ() != ws.getSizeZ()) {
-                    userErrorMessage("w grid size is different: " + ws
+                    userErrorMessage("Grid sizes are different: " + ws
                                      + "\n from " + us);
                     return false;
                 }
             }
-        }
+       // }
+
+
+        FlowDisplayable fd = getGridDisplay();
+        fd.setActive(false);
+        boolean result = super.setData(dataChoice);
 
         if (this.getDisplayName().contains("Vector Colored by Another") &&
                 coloredByAnother) {
             colorIndex = 2;
         }
-
-        FlowDisplayable fd = getGridDisplay();
-        fd.setActive(false);
-        boolean result = super.setData(dataChoice);
-        //fd.setUseSpeedForColor(useSpeedForColor);
 
         if ( !result) {
             Trace.call2("FlowPlanView.setData");
@@ -596,11 +594,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                                             sliderPos, this,
                                             "densitySliderChanged");
         densitySlider.setToolTipText(
-            "Control the density of the streamlines");
+                "Control the density of the streamlines");
 
-        return GuiUtils.doLayout(new Component[] { GuiUtils.rLabel("Low "),
+        return GuiUtils.doLayout(new Component[]{GuiUtils.rLabel("Low "),
                 densitySlider, GuiUtils.lLabel(" High"),
-                GuiUtils.filler() }, 4, GuiUtils.WT_NYNY, GuiUtils.WT_N);
+                GuiUtils.filler()}, 4, GuiUtils.WT_NYNY, GuiUtils.WT_N);
     }
 
 
@@ -1225,41 +1223,6 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
-    /**
-     *  Return the range attribute of the colorTable  (if non-null)
-     *  else return null;
-     * @return The range from the color table attribute
-     */
-    public Range getColorRangeFromData() {
-        Range r = super.getColorRangeFromData();
-        return makeFlowRange(r);
-    }
-
-    /**
-     * Get the range for the current slice.
-     * @return range or null
-     */
-    protected Range getLevelColorRange() {
-        return makeFlowRange(super.getLevelColorRange());
-    }
-
-    /**
-     * Make a flow range from the given range (max of abs of min and max)
-     *
-     * @param r   range to normalize
-     *
-     * @return  flow type range
-     */
-    private Range makeFlowRange(Range r) {
-        if (haveMultipleFields()) {
-            return r;
-        }
-        if (r == null) {
-            return r;
-        }
-        double max = Math.max(Math.abs(r.getMax()), Math.abs(r.getMin()));
-        return new Range(-max, max);
-    }
 
     /**
      * Return whether the Data held by this display control contains multiple
@@ -1339,7 +1302,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if ((getGridDisplay() != null) && !getWindbarbs()) {
             if (getFlowRange() == null) {
                 Range[] ranges = null;
-                Data    data   = getGridDisplay().getData();
+                Data data   = getGridDisplay().getData();
                 if (data != null) {
                     ranges = GridUtil.getMinMax((FieldImpl) data);
                     double  max         = Double.NEGATIVE_INFINITY;
@@ -1357,20 +1320,20 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                             numComps  = startComp + 1;
                         }
                     }
-                    if (useSpeedForColor && (ranges.length > numComps)) {
-                        Range compRange = ranges[ranges.length - 1];
+
+                    for (int i = startComp; i < numComps; i++) {
+                        Range compRange = ranges[i];
                         max = Math.max(compRange.getMax(), max);
+                        //min = Math.min(compRange.getMin(), min);
                         min = Math.min(compRange.getMin(), min);
-                    } else {
-                        for (int i = startComp; i < numComps; i++) {
-                            Range compRange = ranges[i];
-                            max = Math.max(compRange.getMax(), max);
-                            //min = Math.min(compRange.getMin(), min);
-                            min = Math.min(compRange.getMin(), min);
-                        }
                     }
 
-                    if ( !useSpeedForColor && !Double.isInfinite(max)
+                    if (useSpeedForColor || coloredByAnother) {
+                        Range compRange = ranges[ranges.length - 1];
+                        flowColorRange = compRange;
+                    }
+
+                    if (!Double.isInfinite(max)
                             && !Double.isInfinite(min)) {
                         max = Math.max(max, -min);
                         min = isCartesian
@@ -1389,6 +1352,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
+    public Range getRangeForColorTable()
+            throws RemoteException, VisADException {
+        if (getFlowColorRange() == null) {
+            setFlowRange();
+        }
+        return flowColorRange;
+    }
+
+
     /**
      * Show the color control widget in the widgets if FLAG_COLOR is set.
      * @return  false  subclasses should override
@@ -1397,7 +1369,23 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         return !haveMultipleFields() && !useSpeedForColor && !coloredByAnother;
     }
 
+    /**
+     * _more_
+     *
+     * @param colorRange _more_
+     */
+    public void setFlowColorRange(Range colorRange) {
+        flowColorRange = colorRange;
+    }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Range getFlowColorRange() {
+        return flowColorRange;
+    }
 
     /**
      * Get the cursor data
