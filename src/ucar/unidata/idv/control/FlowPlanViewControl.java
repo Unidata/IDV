@@ -191,7 +191,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * Create a new FlowPlanViewControl; set attribute flags
      */
     public FlowPlanViewControl() {
-        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH | FLAG_SMOOTHING);
+        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH ); //| FLAG_SMOOTHING);
     }
 
     /**
@@ -299,7 +299,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         fd.setActive(false);
         boolean result = super.setData(dataChoice);
 
-        if (this.getDisplayName().contains("Vector Colored by Another") &&
+        if (this.getDisplayName().contains("Colored by Another") &&
                 coloredByAnother) {
             colorIndex = 2;
         }
@@ -317,7 +317,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
         //fd.setUseSpeedForColor(useSpeedForColor);
         if (useSpeedForColor) {
-            colorIndex = fd.getSpeedTypeIndex();
+            colorIndex = 2; //fd.getSpeedTypeIndex();
         }
 
         if (isTrajectories) {
@@ -883,8 +883,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
         if (fd != null) {
             fd.setUseSpeedForColor(useSpeedForColor);
-            if (useSpeedForColor) {
-                colorIndex = fd.getSpeedTypeIndex();
+            fd.setColoredByAnother(coloredByAnother);
+            if (useSpeedForColor || coloredByAnother) {
+                colorIndex = 2; //fd.getSpeedTypeIndex();
             }
         }
     }
@@ -1299,7 +1300,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @throws VisADException   VisAD Error
      */
     private void setFlowRange() throws RemoteException, VisADException {
-        if ((getGridDisplay() != null) && !getWindbarbs()) {
+        if ((getGridDisplay() != null) ) { //&& !getWindbarbs()) {
             if (getFlowRange() == null) {
                 Range[] ranges = null;
                 Data data   = getGridDisplay().getData();
@@ -1498,8 +1499,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         if (isTrajectories) {
             if (getGridDisplay() != null) {
                 try {
+                    int width = getLineWidth();
                     getGridDisplay().setTrajFormType(trajForm.intValue());
                     getGridDisplay().setArrowHead(arrowHead);
+                    getGridDisplay().setRibbonWidth(width);
+                    getGridDisplay().setTrajWidth(width * 0.01f);
                     getGridDisplay().resetTrojectories();
                 } catch (Exception ex) {
                     logException("setTrajFormType: ", ex);
@@ -1519,16 +1523,17 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void setLineWidth(int width)
             throws RemoteException, VisADException {
+        width = (width < 1) ? 1 : width;
         if (isTrajectories) {
-            if(trajFormType == 2)
+            if (trajFormType == 2)
                 getGridDisplay().setTrajWidth(width * 0.01f);
-            else if(trajFormType == 1 || trajFormType == 3)
+            else if (trajFormType == 1 || trajFormType == 3)
                 getGridDisplay().setRibbonWidth(width);
 
             getGridDisplay().resetTrojectories();
-        }  else {
-            super.setLineWidth(width);
         }
+
+        super.setLineWidth(width);
     }
 
 }

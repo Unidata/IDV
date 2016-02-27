@@ -315,7 +315,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     double     rlen;
 
                     if (refresh) {
-                        rlen = (td[0][1] - td[0][0]);
+                        rlen = (td[0][1] - td[0][0]) * vectorLength;
                         tlen = (td[0][1] - td[0][0]) * vectorLength;
                     } else {
                         rlen = (td[0][1] - td[0][0]) * numTimes;
@@ -375,7 +375,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 double     rlen;
 
                 if (isRefresh) {
-                    rlen = (td[0][1] - td[0][0]);
+                    rlen = (td[0][1] - td[0][0]) * vectorLength;
                     tlen = (td[0][1] - td[0][0]) * vectorLength;
                 } else {
                     rlen = (td[0][1] - td[0][0]) * numTimes;
