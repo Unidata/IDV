@@ -924,9 +924,13 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             FieldImpl spdFimpl = DerivedGridFactory.getUComponent(field);
             FieldImpl dirFimpl = DerivedGridFactory.getVComponent(field);
             FieldImpl otherFimpl = null;
-            if(coloredByAnother && rtt.getDimension() > 2){
-                otherFimpl = DerivedGridFactory.getComponent(field, 2, true);
+
+            if(coloredByAnother && !useSpeedForColor){
+                otherFimpl = DerivedGridFactory.getVComponent(field);;
+                dirFimpl = DerivedGridFactory.getComponent(spdFimpl, 1, true);
+                spdFimpl = DerivedGridFactory.getComponent(spdFimpl, 0, true);
             }
+
             FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.sin()), "Ucomp");
             FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.cos()), "Vcomp");
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
@@ -944,14 +948,18 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             FieldImpl spdFimpl = DerivedGridFactory.getVComponent(field);
             FieldImpl dirFimpl = DerivedGridFactory.getUComponent(field);
             FieldImpl otherFimpl = null;
-            if(coloredByAnother){
-                otherFimpl = DerivedGridFactory.getComponent(field, 2, true);
+
+            if(coloredByAnother && !useSpeedForColor){
+                otherFimpl = DerivedGridFactory.getUComponent(field);
+                dirFimpl = DerivedGridFactory.getComponent(spdFimpl, 0, true);
+                spdFimpl = DerivedGridFactory.getComponent(spdFimpl, 1, true);
             }
+
             FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.sin()), "Ucomp");
             FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.cos()), "Vcomp");
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
 
-            if(useSpeedForColor){
+            if(useSpeedForColor ){
                 field = DerivedGridFactory.combineGrids(field, spdFimpl);
             } else if(coloredByAnother){
                 field = DerivedGridFactory.combineGrids(field, otherFimpl);
