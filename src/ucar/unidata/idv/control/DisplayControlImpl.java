@@ -1142,8 +1142,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         this.usesTimeDriver =
                             ds.getProperty(DataSelection.PROP_USESTIMEDRIVER,
                                            false);
-                        setMatchDisplayRegion(
-                            ds.getGeoSelection(true).getUseViewBounds());
+                        //  setMatchDisplayRegion(
+                        //       ds.getGeoSelection(true).getUseViewBounds());
                     }
                 }
             }
