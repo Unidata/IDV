@@ -930,9 +930,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 dirFimpl = DerivedGridFactory.getComponent(spdFimpl, 1, true);
                 spdFimpl = DerivedGridFactory.getComponent(spdFimpl, 0, true);
             }
-
-            FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.sin()), "Ucomp");
-            FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.cos()), "Vcomp");
+            String oname = spdFimpl.getType().prettyString();
+            FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.sin()), oname+"Uspd");
+            FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.cos()), oname+"Vspd");;
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
 
             if(useSpeedForColor){
@@ -954,9 +956,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 dirFimpl = DerivedGridFactory.getComponent(spdFimpl, 0, true);
                 spdFimpl = DerivedGridFactory.getComponent(spdFimpl, 1, true);
             }
-
-            FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.sin()), "Ucomp");
-            FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl, (FieldImpl) dirFimpl.cos()), "Vcomp");
+            String oname = spdFimpl.getType().prettyString();
+            FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.sin()), oname+"Uspd");
+            FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.cos()), oname+"Vcomp");
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
 
             if(useSpeedForColor ){
