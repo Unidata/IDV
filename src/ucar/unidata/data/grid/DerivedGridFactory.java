@@ -1159,7 +1159,7 @@ public class DerivedGridFactory {
         Unit zUnit = CommonUnits.METERS_PER_SECOND;
 
         FieldImpl heightGrid = GridUtil.setParamType(dhdt,
-                                   RealType.getRealType("zVel", zUnit));
+                RealType.getRealType("zVel", zUnit));
 
         if (GridUtil.isSequence(heightGrid)) {
             Set seqSet = heightGrid.getDomainSet();
@@ -1246,7 +1246,7 @@ public class DerivedGridFactory {
                 wGrid }, true);
         TupleType paramType = GridUtil.getParamType(uvwGrid);
         RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
-                                           CommonUnit.meterPerSecond);
+                CommonUnit.meterPerSecond);
         RealTupleType earthVectorType = new EarthVectorType(reals[0],
                                             reals[1], reals[2]);
 
@@ -1285,9 +1285,15 @@ public class DerivedGridFactory {
             // choices.remove(new String("D3"));
             //choices.put(new String("D3"), w);
         }
-
-        FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid, w },
-                                         true);
+        SampledSet wDomain = GridUtil.getSpatialDomain(w);
+        if(!wDomain.equals(GridUtil.getSpatialDomain(uGrid))){
+            uGrid = GridUtil.resampleGrid(uGrid, wDomain);
+            vGrid = GridUtil.resampleGrid(vGrid, wDomain);
+        }
+        //FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid, w },
+         //                                true);
+        FieldImpl uvwGrid = combineGrids(new FieldImpl[]{uGrid, vGrid, w}, GridUtil.DEFAULT_SAMPLING_MODE,
+                GridUtil.DEFAULT_ERROR_MODE, true);
         TupleType paramType = GridUtil.getParamType(uvwGrid);
         RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
                                            CommonUnit.meterPerSecond);
@@ -1392,6 +1398,38 @@ public class DerivedGridFactory {
         for (int i = 1; i < grids.length; i++) {
             outGrid = combineGrids(outGrid, grids[i], samplingMode,
                                    errorMode, flatten);
+        }
+
+        return outGrid;
+    }
+
+    /**
+     * Combine an array of grids into one.  If the grids are on different
+     * time domains, they are resampled to the domain of the first.
+     *
+     * @param grids  array of grids (must have at least 2)
+     * @param samplingMode  sampling mode (e.g. WEIGHTED_AVERAGE, NEAREST_NEIGHBOR)
+     * @param errorMode   sampling error mode (e.g. NO_ERRORS)
+     * @param flatten     false to keep tuple integrity.
+     *
+     * @return combined grid.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl combineGridsR(FieldImpl[] grids, int samplingMode,
+                                         int errorMode, boolean flatten)
+            throws VisADException, RemoteException {
+        if (grids.length < 2) {
+            throw new IllegalArgumentException(
+                    "must have at least 2 grids for this method");
+        }
+
+        FieldImpl outGrid = grids[grids.length-1];
+
+        for (int i = grids.length-2; i >= 0; i--) {
+            outGrid = combineGrids(outGrid, grids[i], samplingMode,
+                    errorMode, flatten);
         }
 
         return outGrid;
