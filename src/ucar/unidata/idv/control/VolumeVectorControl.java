@@ -230,11 +230,14 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
                 DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
                 DirectDataChoice wdc = (DirectDataChoice) choices0.get(2);
-                ThreeDSize us = (ThreeDSize) udc.getProperty("prop.gridsize");
-                ThreeDSize ws = (ThreeDSize) wdc.getProperty("prop.gridsize");
-                if (us.getSizeZ() != ws.getSizeZ()) {
-                    userErrorMessage("w grid size is different: " + ws
-                                     + "\n from " + us);
+                List usTime = udc.getAllDateTimes();
+                List wsTime = wdc.getAllDateTimes();
+                List selectedTimes = getDataSelection().getTimes();
+                int len = selectedTimes.size();
+                if(usTime.get((int)selectedTimes.get(0)) != wsTime.get((int)selectedTimes.get(0)) ||
+                        usTime.get((int)selectedTimes.get(len-1)) != wsTime.get((int)selectedTimes.get(len-1)) )
+                {
+                    userErrorMessage("w grid selected times are different from u grid " );
                     return false;
                 }
             }
