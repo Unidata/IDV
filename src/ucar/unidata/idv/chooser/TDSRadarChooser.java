@@ -390,6 +390,11 @@ public class TDSRadarChooser extends TimesChooser {
         try {
             datasetList = getRadarCollections(serverUrl);
             GuiUtils.setListData(collectionSelector, datasetList);
+            for(int i = 0; i<datasetList.size(); i++) {
+                TwoFacedObject obj = (TwoFacedObject)datasetList.get(i);
+                if (((String)(obj.getLabel())).contains("NEXRAD Level II Radar from IDD"))
+                    collectionSelector.setSelectedIndex(i);
+            }
         } catch (Exception e) {
             GuiUtils.setListData(collectionSelector, new ArrayList());
         }
