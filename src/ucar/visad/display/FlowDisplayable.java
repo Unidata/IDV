@@ -527,6 +527,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public void setArrowHeadSize(float size) {
         arrowHeadSize = size;
+        if (flowControl != null) {
+            try {
+                flowControl.setArrowScale(arrowHeadSize);
+            } catch (Exception e) {}
+        }
     }
 
 
@@ -570,6 +575,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /**
      * _more_
      *
+     *
+     * @return _more_
      */
     public float getTrajWidth() {
         return trajWidth;
@@ -731,8 +738,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     ? Display.Flow1Y
                     : Display.Flow2Y));
             spdIndex = 0;  // color speed by u component
-            if(coloredByAnother || useSpeedForColor)
+            if (coloredByAnother || useSpeedForColor) {
                 spdIndex = 2;
+            }
         } else if (Unit.canConvert(units[0], CommonUnit.degree)
                    && Unit.canConvert(units[1], CommonUnit.meterPerSecond)) {
             isCartesian = false;
@@ -901,8 +909,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
         // get the RealTupleType of the range data in the  FlatField
         RealTupleType rtt       = new RealTupleType(tt.getRealComponents());
-        RealType rt0 = (RealType) rtt.getComponents()[0];
-        RealType rt1 = (RealType) rtt.getComponents()[1];
+        RealType      rt0       = (RealType) rtt.getComponents()[0];
+        RealType      rt1       = (RealType) rtt.getComponents()[1];
         int           threeDDim = (coloredByAnother || ignoreExtraParameters)
                                   ? 3
                                   : 2;
@@ -919,58 +927,63 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
         // uncomment to determine ad-hoc rather than programatically
         //coloredByAnother = coloredByAnother && (rtt.getDimension() > 2);
-        if(rt0.getDefaultUnit().isConvertible(CommonUnit.meterPerSecond)
-                && rt1.getDefaultUnit().isConvertible(CommonUnit.degree)){
-            FieldImpl spdFimpl = DerivedGridFactory.getUComponent(field);
-            FieldImpl dirFimpl = DerivedGridFactory.getVComponent(field);
+        if (rt0.getDefaultUnit().isConvertible(CommonUnit.meterPerSecond)
+                && rt1.getDefaultUnit().isConvertible(CommonUnit.degree)) {
+            FieldImpl spdFimpl   = DerivedGridFactory.getUComponent(field);
+            FieldImpl dirFimpl   = DerivedGridFactory.getVComponent(field);
             FieldImpl otherFimpl = null;
 
-            if(coloredByAnother && !useSpeedForColor){
+            if (coloredByAnother && !useSpeedForColor) {
                 otherFimpl = DerivedGridFactory.getVComponent(field);;
                 dirFimpl = DerivedGridFactory.getComponent(spdFimpl, 1, true);
                 spdFimpl = DerivedGridFactory.getComponent(spdFimpl, 0, true);
             }
             String oname = spdFimpl.getType().prettyString();
-            FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.sin()), oname+"Uspd");
-            FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.cos()), oname+"Vspd");;
+            FieldImpl uFimpl =
+                GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.sin()), oname + "Uspd");
+            FieldImpl vFimpl =
+                GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.cos()), oname + "Vspd");;
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
 
-            if(useSpeedForColor){
+            if (useSpeedForColor) {
                 field = DerivedGridFactory.combineGrids(field, spdFimpl);
-            } else if(coloredByAnother){
+            } else if (coloredByAnother) {
                 field = DerivedGridFactory.combineGrids(field, otherFimpl);
             }
 
-            tt = GridUtil.getParamType(field);
-            rtt       = new RealTupleType(tt.getRealComponents());
-        } else if(rt0.getDefaultUnit().isConvertible(CommonUnit.degree)
-                && rt1.getDefaultUnit().isConvertible(CommonUnit.meterPerSecond)){
-            FieldImpl spdFimpl = DerivedGridFactory.getVComponent(field);
-            FieldImpl dirFimpl = DerivedGridFactory.getUComponent(field);
+            tt  = GridUtil.getParamType(field);
+            rtt = new RealTupleType(tt.getRealComponents());
+        } else if (rt0.getDefaultUnit().isConvertible(CommonUnit.degree)
+                   && rt1.getDefaultUnit().isConvertible(
+                       CommonUnit.meterPerSecond)) {
+            FieldImpl spdFimpl   = DerivedGridFactory.getVComponent(field);
+            FieldImpl dirFimpl   = DerivedGridFactory.getUComponent(field);
             FieldImpl otherFimpl = null;
 
-            if(coloredByAnother && !useSpeedForColor){
+            if (coloredByAnother && !useSpeedForColor) {
                 otherFimpl = DerivedGridFactory.getUComponent(field);
                 dirFimpl = DerivedGridFactory.getComponent(spdFimpl, 0, true);
                 spdFimpl = DerivedGridFactory.getComponent(spdFimpl, 1, true);
             }
             String oname = spdFimpl.getType().prettyString();
-            FieldImpl uFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.sin()), oname+"Uspd");
-            FieldImpl vFimpl = GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.cos()), oname+"Vcomp");
+            FieldImpl uFimpl =
+                GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.sin()), oname + "Uspd");
+            FieldImpl vFimpl =
+                GridUtil.setParamType(GridMath.multiply(spdFimpl,
+                    (FieldImpl) dirFimpl.cos()), oname + "Vcomp");
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
 
-            if(useSpeedForColor ){
+            if (useSpeedForColor) {
                 field = DerivedGridFactory.combineGrids(field, spdFimpl);
-            } else if(coloredByAnother){
+            } else if (coloredByAnother) {
                 field = DerivedGridFactory.combineGrids(field, otherFimpl);
             }
 
-            tt = GridUtil.getParamType(field);
-            rtt       = new RealTupleType(tt.getRealComponents());
+            tt  = GridUtil.getParamType(field);
+            rtt = new RealTupleType(tt.getRealComponents());
 
         } else if (coloredByAnother || useSpeedForColor) {
             // get the RealType of the range data
@@ -990,9 +1003,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             }
         }
 
-        if(useSpeedForColor || coloredByAnother) {
+        if (useSpeedForColor || coloredByAnother) {
             RealType rgbType = (RealType) rtt.getComponent(rtt.getDimension()
-                    - 1);
+                                   - 1);
             setRGBRealType(rgbType);
         }
 
@@ -1184,5 +1197,21 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     public void setIgnoreExtraParameters(boolean yesno) {
         ignoreExtraParameters = yesno;
     }
+
+    /**
+     * _more_
+     *
+     * @param stp _more_
+     */
+    public void setStartPoints(float[][] stp) {
+        if (flowControl == null) {
+            return;
+        }
+        TrajectoryParams tParm = flowControl.getTrajectoryParams();
+        tParm.setStartPoints(null, stp);
+
+
+    }
+
 
 }
