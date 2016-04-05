@@ -75,8 +75,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** cvector length component */
     JComponent cvectorLengthComponent;
 
-    /** a component to change the cvector arrow head size */
-    ValueSliderWidget cvectorAHLengthWidget;
+    /** a component to change the vector arrow head size */
+    ValueSliderWidget vectorAHSizeWidget;
 
     /** a component to change the skip */
     ValueSliderWidget skipFactorWidget;
@@ -191,7 +191,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * Create a new FlowPlanViewControl; set attribute flags
      */
     public FlowPlanViewControl() {
-        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH ); //| FLAG_SMOOTHING);
+        setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH);  //| FLAG_SMOOTHING);
     }
 
     /**
@@ -277,30 +277,30 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         Trace.call1("FlowPlanView.setData");
         // checking the grid size matching
         //if (dataChoice.getDescription().contains("3D Flow Vectors")) {
-            DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
-            List              choices0 = ddc.getChoices();
+        DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
+        List              choices0 = ddc.getChoices();
 
-            if (choices0.size() == 3) {
-                DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
-                DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
-                DirectDataChoice wdc = (DirectDataChoice) choices0.get(2);
-                ThreeDSize us = (ThreeDSize) udc.getProperty("prop.gridsize");
-                ThreeDSize ws = (ThreeDSize) wdc.getProperty("prop.gridsize");
-                if (us.getSizeZ() != ws.getSizeZ()) {
-                    userErrorMessage("Grid sizes are different: " + ws
-                                     + "\n from " + us);
-                    return false;
-                }
+        if (choices0.size() == 3) {
+            DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
+            DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
+            DirectDataChoice wdc = (DirectDataChoice) choices0.get(2);
+            ThreeDSize us = (ThreeDSize) udc.getProperty("prop.gridsize");
+            ThreeDSize ws = (ThreeDSize) wdc.getProperty("prop.gridsize");
+            if (us.getSizeZ() != ws.getSizeZ()) {
+                userErrorMessage("Grid sizes are different: " + ws
+                                 + "\n from " + us);
+                return false;
             }
-       // }
+        }
+        // }
 
 
         FlowDisplayable fd = getGridDisplay();
         fd.setActive(false);
         boolean result = super.setData(dataChoice);
 
-        if (this.getDisplayName().contains("Colored by Another") &&
-                coloredByAnother) {
+        if (this.getDisplayName().contains("Colored by Another")
+                && coloredByAnother) {
             colorIndex = 2;
         }
 
@@ -317,7 +317,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
         //fd.setUseSpeedForColor(useSpeedForColor);
         if (useSpeedForColor) {
-            colorIndex = 2; //fd.getSpeedTypeIndex();
+            colorIndex = 2;  //fd.getSpeedTypeIndex();
         }
 
         if (isTrajectories) {
@@ -350,6 +350,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * _more_
      *
      * @param
+     *
+     * @return _more_
      */
     public boolean getColoredByAnother() {
         return coloredByAnother;
@@ -443,13 +445,9 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     trajLengthWidget.getContents(false), arrowCbx);
             cvectorLengthWidget = new ValueSliderWidget(this, 1, 21,
                     "VectorLength", "Curly Vector Length");
-            cvectorAHLengthWidget = new ValueSliderWidget(this, 0, 20,
-                    "ArrowHeadSize", "Arrow Head Length", 10.0f);
             cvectorLengthComponent =
                 GuiUtils.hbox(GuiUtils.rLabel("Vector Length: "),
-                              cvectorLengthWidget.getContents(false),
-                              GuiUtils.rLabel("ArrowHead Size: "),
-                              cvectorAHLengthWidget.getContents(false));
+                              cvectorLengthWidget.getContents(false));
 
             trajectoryBtn = new JRadioButton("Trajectories:", isTrajectories);
             cvectorBtn    = new JRadioButton("Curly Vectors:", isCVectors);
@@ -549,6 +547,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                     GuiUtils.rLabel(getSizeLabel()),
                     GuiUtils.left(sizeComponent)));
         }
+
+        vectorAHSizeWidget = new ValueSliderWidget(this, 0, 40,
+                "ArrowHeadSize", "Arrow Head Size", 10.0f);
+
+        controlWidgets.add(
+            new WrapperWidget(
+                this, GuiUtils.rLabel("Arrow Scale: "),
+                    vectorAHSizeWidget.getContents(false)));
+
         controlWidgets.add(
             new WrapperWidget(
                 this, GuiUtils.rLabel("Skip:"),
@@ -594,11 +601,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                                             sliderPos, this,
                                             "densitySliderChanged");
         densitySlider.setToolTipText(
-                "Control the density of the streamlines");
+            "Control the density of the streamlines");
 
-        return GuiUtils.doLayout(new Component[]{GuiUtils.rLabel("Low "),
+        return GuiUtils.doLayout(new Component[] { GuiUtils.rLabel("Low "),
                 densitySlider, GuiUtils.lLabel(" High"),
-                GuiUtils.filler()}, 4, GuiUtils.WT_NYNY, GuiUtils.WT_N);
+                GuiUtils.filler() }, 4, GuiUtils.WT_NYNY, GuiUtils.WT_N);
     }
 
 
@@ -885,7 +892,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             fd.setUseSpeedForColor(useSpeedForColor);
             fd.setColoredByAnother(coloredByAnother);
             if (useSpeedForColor || coloredByAnother) {
-                colorIndex = 2; //fd.getSpeedTypeIndex();
+                colorIndex = 2;  //fd.getSpeedTypeIndex();
             }
         }
     }
@@ -1115,15 +1122,17 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             try {
                 getGridDisplay().setTrajOffset(vectorLengthValue);
                 getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
-                getGridDisplay().resetTrojectories();
+                if (isTrajectories || isCVectors) {
+                    getGridDisplay().resetTrojectories();
+                }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
 
         }
 
-        if (cvectorAHLengthWidget != null) {
-            cvectorAHLengthWidget.setValue(f);
+        if (vectorAHSizeWidget != null) {
+            vectorAHSizeWidget.setValue(f);
         }
     }
 
@@ -1266,8 +1275,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     protected String getColorParamName() {
         if (useSpeedForColor) {
             return "windSpeed";
-        } else if(coloredByAnother) {
-            return  getGridDataInstance().getRealTypeName(colorIndex);
+        } else if (coloredByAnother) {
+            return getGridDataInstance().getRealTypeName(colorIndex);
         } else {
             return super.getColorParamName();
         }
@@ -1285,7 +1294,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     protected Range getInitialRange() throws RemoteException, VisADException {
         if (useSpeedForColor) {
             return flowRange;
-        } else if(coloredByAnother) {
+        } else if (coloredByAnother) {
             return getGridDataInstance().getRanges()[colorIndex];
         } else {
             return super.getInitialRange();
@@ -1300,10 +1309,10 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @throws VisADException   VisAD Error
      */
     private void setFlowRange() throws RemoteException, VisADException {
-        if ((getGridDisplay() != null) ) { //&& !getWindbarbs()) {
+        if ((getGridDisplay() != null)) {  //&& !getWindbarbs()) {
             if (getFlowRange() == null) {
                 Range[] ranges = null;
-                Data data   = getGridDisplay().getData();
+                Data    data   = getGridDisplay().getData();
                 if (data != null) {
                     ranges = GridUtil.getMinMax((FieldImpl) data);
                     double  max         = Double.NEGATIVE_INFINITY;
@@ -1334,8 +1343,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                         flowColorRange = compRange;
                     }
 
-                    if (!Double.isInfinite(max)
-                            && !Double.isInfinite(min)) {
+                    if ( !Double.isInfinite(max) && !Double.isInfinite(min)) {
                         max = Math.max(max, -min);
                         min = isCartesian
                               ? -max
@@ -1353,6 +1361,14 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     public Range getRangeForColorTable()
             throws RemoteException, VisADException {
         if (getFlowColorRange() == null) {
@@ -1367,7 +1383,8 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      * @return  false  subclasses should override
      */
     public boolean showColorControlWidget() {
-        return !haveMultipleFields() && !useSpeedForColor && !coloredByAnother;
+        return !haveMultipleFields() && !useSpeedForColor
+               && !coloredByAnother;
     }
 
     /**
@@ -1523,12 +1540,15 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     public void setLineWidth(int width)
             throws RemoteException, VisADException {
-        width = (width < 1) ? 1 : width;
+        width = (width < 1)
+                ? 1
+                : width;
         if (isTrajectories) {
-            if (trajFormType == 2)
+            if (trajFormType == 2) {
                 getGridDisplay().setTrajWidth(width * 0.01f);
-            else if (trajFormType == 1 || trajFormType == 3)
+            } else if ((trajFormType == 1) || (trajFormType == 3)) {
                 getGridDisplay().setRibbonWidth(width);
+            }
 
             getGridDisplay().resetTrojectories();
         }
