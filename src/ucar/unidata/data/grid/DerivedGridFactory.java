@@ -1601,14 +1601,14 @@ public class DerivedGridFactory {
                     }
                     wvFI.setSample(i, funcFF, false);
                 } else {
-                    if(!GridUtil.isVolume(grid1) && !GridUtil.is2D(grid1)){
+                  /*  if(!GridUtil.isVolume(grid1) && !GridUtil.is2D(grid1)){
                         //we need to reduce dimension to 2 if z = 1
                         grid1 = GridUtil.make2DGridFromSlice(grid1, true);
                     }
                     if(!GridUtil.isVolume(grid2) && !GridUtil.is2D(grid2)){
                         //we need to reduce dimension to 2 if z = 1
                         grid2 = GridUtil.make2DGridFromSlice(grid2, true);
-                    }
+                    } */
                     FlatField wvFF =
                         (FlatField) FieldImpl.combine(new Field[] {
                             (FlatField) grid1.getSample(i),
