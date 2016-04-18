@@ -160,6 +160,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** _more_ */
     private int trajFormType = 0;
 
+    /** _more_ */
+    private int trajStartLevel = 0;
+
+
+
+
     /**
      * Constructs from a name for the Displayable and the type of the
      * parameter, and the desired size of "scale"
@@ -332,7 +338,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setMarkerEnabled(markerOn);
                     tparm.setCylinderWidth(trajWidth);
                     tparm.setRibbonWidthFactor(ribbonWidth);
-                    tparm.setZStartIndex(0);
+                    tparm.setZStartIndex(trajStartLevel);
                     tparm.setZStartSkip(zskip);
                     if (isTrajectories) {
                         tparm.setCachingEnabled(false);
@@ -392,10 +398,10 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 tparm.setCylinderWidth(trajWidth);
                 tparm.setRibbonWidthFactor(ribbonWidth);
                 tparm.setStartSkip(t);
-                tparm.setZStartIndex(0);
+                tparm.setZStartIndex(trajStartLevel);
                 tparm.setZStartSkip(zskip);
                 //if(isTrajectories)
-                //   tparm.setCachingEnabled(false);
+                tparm.setCachingEnabled(false);
                 //flowControl.setTrajectoryParams(tparm);
                 flowControl.enableTrajectory(isTrajectories, tparm);
             } catch (VisADException ve) {
@@ -561,6 +567,15 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public void setTrajFormType(int formType) {
         trajFormType = formType;
+    }
+
+    /**
+     * _more_
+     *
+     * @param startLevel _more_
+     */
+    public void setTrajStartLevel(int startLevel) {
+        trajStartLevel = startLevel;
     }
 
     /**
@@ -1201,17 +1216,32 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /**
      * _more_
      *
+     *
+     * @param types _more_
      * @param stp _more_
      */
-    public void setStartPoints(float[][] stp) {
+    public void setStartPoints(RealTupleType types, float[][] stp) {
         if (flowControl == null) {
             return;
         }
         TrajectoryParams tParm = flowControl.getTrajectoryParams();
-        tParm.setStartPoints(null, stp);
+        tParm.setStartPoints(types, stp);
 
 
     }
 
+    /**
+     * _more_
+     *
+     * @param startLevel _more_
+     */
+    public void setStartLevel(int startLevel) {
+        if (flowControl == null) {
+            return;
+        }
+        TrajectoryParams tParm = flowControl.getTrajectoryParams();
+        tParm.setZStartIndex(startLevel);
+        tParm.setZStartSkip(10);
 
+    }
 }
