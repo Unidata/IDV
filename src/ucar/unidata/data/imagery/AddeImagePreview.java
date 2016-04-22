@@ -22,6 +22,7 @@ package ucar.unidata.data.imagery;
 
 
 import edu.wisc.ssec.mcidas.AreaFileException;
+import edu.wisc.ssec.mcidas.Calibrator;
 import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 
 import ucar.ma2.Array;
@@ -88,6 +89,36 @@ public class AddeImagePreview {
     /** _more_ */
     private ProjectionImpl proj;
 
+    /** _more_ */
+    Calibrator cali;
+
+    /** _more_ */
+    int band;
+
+    /**
+     * Construct a AddeImagePreview
+     *
+     * @param adapter _more_
+     * @param aid _more_
+     * @param cali _more_
+     * @param band _more_
+     *
+     * @throws IOException _more_
+     */
+    public AddeImagePreview(AreaAdapter adapter, AddeImageDescriptor aid,
+                            Calibrator cali, int band)
+            throws IOException {
+
+        this.adapter = adapter;
+        this.aid     = aid;
+        this.cali    = cali;
+        this.band    = band;
+
+        try {
+            init();
+        } catch (Exception e) {}
+    }
+
     /**
      * Construct a AddeImagePreview
      *
@@ -101,6 +132,8 @@ public class AddeImagePreview {
 
         this.adapter = adapter;
         this.aid     = aid;
+        this.cali    = null;
+        this.band    = 0;
 
         try {
             init();
@@ -171,9 +204,15 @@ public class AddeImagePreview {
 
         float[][] image_data = ff.unpackFloats();
 
-        createBufferedImage(image_data);
-
-
+        if ((cali != null) && !cali.getIsPreCalibrated()) {
+            float[] data1 = cali.calibrate(image_data[0], band,
+                                           Calibrator.CAL_BRIT);
+            float[][] data2 = new float[1][data1.length];
+            data2[0] = data1;
+            createBufferedImage(data2);
+        } else {
+            createBufferedImage(image_data);
+        }
     }
 
 

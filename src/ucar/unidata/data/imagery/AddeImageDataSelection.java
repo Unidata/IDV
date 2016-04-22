@@ -23,6 +23,7 @@ package ucar.unidata.data.imagery;
 
 import edu.wisc.ssec.mcidas.AREAnav;
 import edu.wisc.ssec.mcidas.AreaDirectory;
+import edu.wisc.ssec.mcidas.Calibrator;
 import edu.wisc.ssec.mcidas.adde.AddeImageURL;
 import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
@@ -76,7 +77,7 @@ import javax.swing.event.ChangeListener;
 public class AddeImageDataSelection {
 
     /** _more_ */
-    public AddeImageDataSource dataSource;
+    public ImageDataSource dataSource;
 
     /** _more_ */
     public String source;
@@ -111,6 +112,11 @@ public class AddeImageDataSelection {
     /** _more_ */
     public JPanel leMagPanel;
 
+    AddeImageInfo addeImageInfo;
+
+    private Calibrator cali;
+
+    int band;
     /**
      * Construct a AddeImageDataSelection
      *
@@ -122,7 +128,7 @@ public class AddeImageDataSelection {
      * @param sample _more_
      * @param aAdapter _more_
      */
-    public AddeImageDataSelection(AddeImageDataSource dataSource,
+    public AddeImageDataSelection(ImageDataSource dataSource,
                                   DataChoice dc, String source,
                                   AREAnav baseAnav,
                                   AddeImageDescriptor descriptor,
@@ -135,8 +141,9 @@ public class AddeImageDataSelection {
         this.dataChoice       = dc;
         this.sampleProjection = sample;
         this.aAdapter         = aAdapter;
-
-
+        this.cali = null;
+        this.band = 0;
+        this.addeImageInfo = null;
         //prograssiveCbx  = new JCheckBox("", usePR);
 
         try {
@@ -163,6 +170,39 @@ public class AddeImageDataSelection {
         });   */
     }
 
+
+    public AddeImageDataSelection(ImageDataSource dataSource,
+                                  DataChoice dc, String source,
+                                  AREAnav baseAnav,
+                                  AddeImageInfo addeImageInfo,
+                                  MapProjection sample,
+                                  AreaAdapter aAdapter, Calibrator cali, int band) {
+        this.dataSource       = dataSource;
+        this.source           = source;
+        this.addeImageInfo       = addeImageInfo;
+        this.baseAnav         = baseAnav;
+        this.dataChoice       = dc;
+        this.sampleProjection = sample;
+        this.aAdapter         = aAdapter;
+        this.descriptor       = null;
+        this.cali             = cali;
+        this.band             = band;
+        //prograssiveCbx  = new JCheckBox("", usePR);
+
+        try {
+            if(this.aAdapter == null && this.source != null){
+                this.aAdapter = new AreaAdapter(this.source, false);
+            }
+            this.regionPanel = new AddeImagePreviewPanel(this);
+        } catch (Exception e) {}
+
+
+        try {
+            this.advancedPanel = new AddeImageAdvancedPanel(this);
+        } catch (Exception e) {}
+
+
+    }
     /**
      * _more_
      *
@@ -446,6 +486,7 @@ public class AddeImageDataSelection {
         /** Widget for selecting image nav type */
         protected JComboBox navComboBox;
 
+        AddeImageInfo imageInfo;
         /**
          * Construct a AddeImageAdvancedPanel
          *
@@ -463,7 +504,22 @@ public class AddeImageDataSelection {
             super("Advanced");
 
             this.addeImageDataSelection = addeImageDataSelection;
-            urlInfo = new ImageDataSelectionInfo(source);
+            if(addeImageDataSelection.addeImageInfo == null)
+                urlInfo = new ImageDataSelectionInfo(source);
+            else {
+                urlInfo = new ImageDataSelectionInfo();
+                this.imageInfo = addeImageDataSelection.addeImageInfo;
+                urlInfo.setNavType(imageInfo.getNavType());
+                urlInfo.setPlaceValue(imageInfo.getPlaceValue());
+                urlInfo.setLocateKey(imageInfo.getLocateKey());
+                urlInfo.setLocateValue(imageInfo.getLocateValue());
+                urlInfo.setLocate(imageInfo.getLocateValue());
+                urlInfo.setLineMag(imageInfo.getLineMag() * (-1));
+                urlInfo.setElementMag(imageInfo.getElementMag() * (-1));
+                urlInfo.setLine(imageInfo.getLines());
+                urlInfo.setElement(imageInfo.getElements());
+            }
+
 
             /*String magVal = AddeImageDataSource.getKey(source,
                                 AddeImageURL.KEY_MAG);
@@ -473,7 +529,12 @@ public class AddeImageDataSelection {
             */
 
             // init information for the location and the default is LATLON
-            AreaDirectory aDir = descriptor.getDirectory();
+            AreaDirectory aDir = null;
+            if(descriptor != null)
+                aDir = descriptor.getDirectory();
+            else {
+                aDir = addeImageDataSelection.aAdapter.getAreaDirectory();
+            }
 
             this.isLineEle = true;
             //this.place = urlInfo.getPlaceValue();
@@ -529,17 +590,35 @@ public class AddeImageDataSelection {
          */
         public void reset() {
             // init information for the magnification
-            urlInfo = new ImageDataSelectionInfo(source);
-            String magVal = AddeImageDataSource.getKey(source,
+            if(descriptor != null )
+                urlInfo = new ImageDataSelectionInfo(source);
+            else {
+                urlInfo = new ImageDataSelectionInfo();
+                this.imageInfo = addeImageDataSelection.addeImageInfo;
+                urlInfo.setNavType(imageInfo.getNavType());
+                urlInfo.setPlaceValue(imageInfo.getPlaceValue());
+                urlInfo.setLocateKey(imageInfo.getLocateKey());
+                urlInfo.setLocateValue(imageInfo.getLocateValue());
+                urlInfo.setLocate(imageInfo.getLocateValue());
+                urlInfo.setLineMag(imageInfo.getLineMag() * (-1));
+                urlInfo.setElementMag(imageInfo.getElementMag() * (-1));
+            }
+           /* String magVal = AddeImageDataSource.getKey(source,
                                 AddeImageURL.KEY_MAG);
-            String[] magVals = magVal.split(" ");
+            String[] magVals = magVal.split(" "); */
             /*this.elementMag = new Integer(magVals[1]).intValue();
             this.lineMag    = new Integer(magVals[0]).intValue();  */
             setLineMagSlider(urlInfo.getLineMag());
             setElementMagSlider(urlInfo.getElementMag());
 
             // init information for the location and the default is LATLON
-            AreaDirectory aDir = descriptor.getDirectory();
+            AreaDirectory aDir;
+            if(descriptor != null) {
+                aDir = descriptor.getDirectory();
+
+            } else {
+                aDir = addeImageDataSelection.aAdapter.getAreaDirectory();
+            }
             this.coordinateType = urlInfo.getLocateKey();
             this.navType = urlInfo.getNavType();
 
@@ -1415,9 +1494,13 @@ public class AddeImageDataSelection {
             boolean showMagSection = !getIsProgressiveResolution(); //prograssiveCbx1.isSelected();
             GuiUtils.enablePanel(leMagPanel, showMagSection);
             GuiUtils.enablePanel(sizePanel, showMagSection);
-            String s0 = AddeImageDataSource.getKey(source,
-                            AddeImageURL.KEY_LINEELE);
-            if ((s0 != null) && (s0.length() > 1)) {
+            if(descriptor != null) {
+                String s0 = AddeImageDataSource.getKey(source,
+                                AddeImageURL.KEY_LINEELE);
+                if ((s0 != null) && (s0.length() > 1)) {
+                    coordinateTypeComboBox.setSelectedIndex(1);
+                }
+            } else {
                 coordinateTypeComboBox.setSelectedIndex(1);
             }
             chkUseFull = new JCheckBox("Use Default");
@@ -1470,7 +1553,7 @@ public class AddeImageDataSelection {
                 linkBtn.setContentAreaFilled(false);
                 linkBtn.setSelected(true);
                 linkBtn.setToolTipText(
-                    "Link changing image size with magnification factors");
+                        "Link changing image size with magnification factors");
 
             }
             return linkBtn;
@@ -1615,13 +1698,21 @@ public class AddeImageDataSelection {
             try {
                 double[][] el1 = macs.fromReference(ll);
             } catch (Exception e) {}
-            int elem = (int) Math.floor(el[0][0] + 0.5)
-                               * Math.abs(getElementMagValue());
-            int line = (int) Math.floor(el[1][0] + 0.5)
-                            * Math.abs(getLineMagValue());
-            urlInfo.setLocationLine(line);
-            urlInfo.setLocationElem(elem);
-             el                = baseAnav.areaCoordToImageCoord(el);
+            if(addeImageDataSelection.descriptor == null){
+                int elem = (int) Math.floor(el[0][0] + 0.5);
+                int line = (int) Math.floor(el[1][0] + 0.5);
+                urlInfo.setLocationLine(line);
+                urlInfo.setLocationElem(elem);
+            } else {
+                int elem = (int) Math.floor(el[0][0] + 0.5)
+                        * Math.abs(getElementMagValue());
+                int line = (int) Math.floor(el[1][0] + 0.5)
+                        * Math.abs(getLineMagValue());
+                urlInfo.setLocationLine(line);
+                urlInfo.setLocationElem(elem);
+            }
+
+            el                = baseAnav.areaCoordToImageCoord(el);
             this.imageElement = (int) Math.floor(el[0][0] + 0.5);
             this.imageLine    = (int) Math.floor(el[1][0] + 0.5);
         }
@@ -2111,10 +2202,17 @@ public class AddeImageDataSelection {
             display = new NavigatedMapPanel(null, true, false,
                                             imagePreview.getPreviewImage(),
                                             aAdapter.getAreaFile());
-            this.eMag  = dataSource.getEMag();
-            this.lMag  = dataSource.getLMag();
-            this.eMag0  = dataSource.getEMag();
-            this.lMag0  = dataSource.getLMag();
+            if(dataSource instanceof AddeImageDataSource) {
+                this.eMag = ((AddeImageDataSource)dataSource).getEMag();
+                this.lMag = ((AddeImageDataSource)dataSource).getLMag();
+                this.eMag0 = ((AddeImageDataSource)dataSource).getEMag();
+                this.lMag0 = ((AddeImageDataSource)dataSource).getLMag();
+            } else {
+                this.eMag = addeImageInfo.getElementMag();
+                this.lMag = addeImageInfo.getLineMag();
+                this.eMag0 = 1;
+                this.lMag0 = 1;
+            }
             chkUseFull = new JCheckBox(DataSelection.PROP_USEDEFAULTAREA);
 
             chkUseFull.setSelected(true);
@@ -2339,8 +2437,13 @@ public class AddeImageDataSelection {
             //LastBandNames = SelectedBandNames;
             //LastCalInfo = CalString;
             dataSource.getIdv().showWaitCursor();
-            AddeImagePreview image = new AddeImagePreview(aAdapter,
-                                         descriptor);
+            AddeImagePreview image;
+            if(cali != null)
+                image = new AddeImagePreview(aAdapter,
+                                         descriptor, cali, band);
+            else
+                image = new AddeImagePreview(aAdapter,
+                        descriptor);
             dataSource.getDataContext().getIdv().showNormalCursor();
             //String bandInfo = "test";
             // lblBandInfo = new JLabel(bandInfo);

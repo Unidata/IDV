@@ -102,6 +102,25 @@ public class AddeImageInfo extends AddeImageURL {
     }
 
     /**
+     * Create an AddeImageInfo.
+     *
+     * @param locateKey  locate key
+     * @param locateValue  locate value
+     * @param placeValue    PLACE value
+     * @param lines      number of lines
+     * @param elements   number of elements
+     * @param lmag       line magnification
+     * @param emag       element magnification
+     */
+    public AddeImageInfo(String locateKey,
+                         String locateValue, String placeValue, int lines,
+                         int elements, int lmag, int emag) {
+        super(null, null, null, null, locateKey, locateValue, placeValue,
+                lines, elements, lmag, emag, DEFAULT_VALUE, DEFAULT_VALUE, -1);
+
+    }
+
+    /**
      * Get the base ADDE URL
      *
      * @return the base ADDE URL

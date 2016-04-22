@@ -278,6 +278,55 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
     }
 
     /**
+     * _more_
+     *
+     * @param aid _more_
+     * @param readLabel _more_
+     * @param unit _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static AreaImageFlatField createImmediateWithUnit(AddeImageDescriptor aid,
+                                                             String readLabel, Unit unit, int startLine,
+                                                             int startEle, int lines, int elems,
+                                                             int lineMag, int eleMag, int band)
+            throws VisADException, IOException {
+        AreaDirectory ad = aid.getDirectory();
+        int elemNum = ad.getElements();
+        int lineNum = ad.getLines();
+        if(lineMag > 1)
+            lineMag *= -1;
+        if( eleMag > 1)
+            eleMag *= -1;
+        AreaAdapter aa = new AreaAdapter(aid.getSource(), startLine, startEle, lines, elems,
+                lineMag, eleMag, band);
+        visad.meteorology.SingleBandedImageImpl ff =
+                (visad.meteorology.SingleBandedImageImpl) aa.getImage();
+        //Uggh, make a copy for now
+        float[][]        samples       = ff.unpackFloats();
+        FunctionType     type          = (FunctionType) ff.getType();
+        Set              domainSet     = ff.getDomainSet();
+        CoordinateSystem rangeCoordSys = ff.getRangeCoordinateSystem()[0];
+        Set[]            rangeSets     = ff.getRangeSets();
+        Unit[]           units         = {unit};
+
+        FunctionType functionType = new FunctionType(type.getDomain(),
+                new RealTupleType(DataUtil.makeRealType(type.getRange().toString(), unit)));
+        AreaImageFlatField aiff = new AreaImageFlatField(aid, functionType,
+                domainSet, rangeCoordSys, null,
+                units, samples, readLabel);
+
+        aiff.startTime = ff.getStartTime();
+
+
+        return aiff;
+
+    }
+    /**
      * Create a AIFF without reading any data yet
      *
      * @param aid The descriptor

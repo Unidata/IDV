@@ -376,7 +376,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
         //LastCalInfo = CalString;
         this.imageDataSource.getIdv().showWaitCursor();
         AddeImagePreview image = new AddeImagePreview(this.aAdapter,
-                                     this.descriptor);
+                                     this.descriptor, null, 0);
         this.imageDataSource.getDataContext().getIdv().showNormalCursor();
         //String bandInfo = "test";
         // lblBandInfo = new JLabel(bandInfo);
