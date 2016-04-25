@@ -969,23 +969,25 @@ public class McIDASImageDataSource extends ImageDataSource {
                         eMag, band);
                 timeMap.put(aid.getSource(), result.getStartTime());
 
-            } else {
-                AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
-                timeMap.put(aid.getSource(), aa.getImageStartTime());
-                result = aa.getImage();
             }
 
-            float[][] data0 = result.getFloats();
-            if(!isPreCalibrated) {
+            float[][] data0;
+            if(!isPreCalibrated && cali != null) {
+                data0 = result.getFloats();
                 float[] data1 = cali.calibrate(data0[0], band, calOutType);
                 float[][] data2 = new float[1][data1.length];
                 data2[0] = data1;
                 result.setSamples(data2);
             } else if(isPreCalibrated && calOutType == Calibrator.CAL_TEMP){
+                data0 = result.getFloats();
                 float[] data1 = convertBritToTemp(data0[0]);
                 float[][] data2 = new float[1][data1.length];
                 data2[0] = data1;
                 result.setSamples(data2);
+            } else {
+                AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
+                timeMap.put(aid.getSource(), aa.getImageStartTime());
+                result = aa.getImage();
             }
 
             putCache(source, result);
