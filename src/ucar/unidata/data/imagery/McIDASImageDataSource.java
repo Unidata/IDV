@@ -958,10 +958,10 @@ public class McIDASImageDataSource extends ImageDataSource {
                 if (elem0 < 0) elem0 = 1;
                 int elemTotal = areaDir.getElements();
                 int lineTotal = areaDir.getLines();
-                while (lMag * lines > lineTotal){
+                while ((lMag * lines + line0)> lineTotal){
                     lines--;
                 }
-                while (eMag * elems > elemTotal){
+                while ((eMag * elems + elem0)> elemTotal){
                     elems--;
                 }
                 result = AreaImageFlatField.createImmediateWithUnit(aid,
