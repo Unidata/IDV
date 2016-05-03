@@ -514,6 +514,37 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             } else {
                 getGridDisplay().setZskip(ct - 1);
             }
+         /*   if (isTrajectories) {
+                try {
+                    GriddedSet domainSet = (GriddedSet) getGridDataInstance().getSpatialDomain();
+                    CoordinateSystem cs = getNavigatedDisplay().getDisplayCoordinateSystem();
+                    GriddedSet domainSet1 = makeLinearGrid(domainSet, cs);
+                    int sizeX = domainSet1.getLength(0);
+                    int sizeY = domainSet1.getLength(1);
+                    // float[][] setLocs = domainSet1.getSamples(false);
+                    float[][] setLocs = new float[3][3];
+
+
+                    setLocs[0][0] = -0.5f;
+                    setLocs[0][1] = 0;
+                    setLocs[0][2] = 0.5f;
+                    setLocs[1][0] = -0.5f;
+                    setLocs[1][1] = 0;
+                    setLocs[1][2] = 0.5f;
+                    setLocs[2][0] = 0;
+                    setLocs[2][1] = 0;
+                    setLocs[2][2] = 0;
+
+                   // float[][] setLocs1 = cs.toReference(setLocs);
+                    RealTupleType types = cs.getReference();
+                   // FlatField flowFlat = (FlatField) getGridDataInstance().getGrid().getSample(0);
+                  //  float[][] flowValues = flowFlat.getFloats();
+                  //  float[][] stp = setStartPointsFromDomain2D(0, 1, setLocs1, sizeX, sizeY, 2, flowValues, 0.001f);
+                    myDisplay.setStartPoints(types, setLocs);
+                    myDisplay.setStartLevel(1);
+                } catch (Exception e){}
+            } */
+
             getGridDisplay().setTrajStartLevel(trajStartLevel);
             getGridDisplay().setIsTrajectories(isTrajectories);
             getGridDisplay().setTrojectoriesEnabled(isTrajectories,
@@ -847,36 +878,6 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         } else if (getSkipValueZ() > 0) {
             grid    = GridUtil.subset(grid, 1, 1, getSkipValueZ() + 1);
             newGrid = grid;
-        }
-        //  }
-
-        if (isTrajectories) {
-            /*  GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(newGrid);
-              CoordinateSystem cs = getNavigatedDisplay().getDisplayCoordinateSystem();
-              GriddedSet domainSet1 = makeLinearGrid(domainSet, cs);
-              int sizeX = domainSet1.getLength(0);
-              int sizeY = domainSet1.getLength(1);
-             // float[][] setLocs = domainSet1.getSamples(false);
-              float[][] setLocs = new float[3][3];
-
-
-              setLocs[0][0] = -0.5f;
-              setLocs[0][1] = 0;
-              setLocs[0][2] = 0.5f;
-              setLocs[1][0] = -0.5f;
-              setLocs[1][1] = 0;
-              setLocs[1][2] = 0.5f;
-              setLocs[2][0] = 0;
-              setLocs[2][1] = 0;
-              setLocs[2][2] = 0;
-
-              float[][] setLocs1 = cs.toReference(setLocs);
-              RealTupleType types = cs.getReference();
-              FlatField flowFlat = (FlatField) newGrid.getSample(0);
-              float[][] flowValues = flowFlat.getFloats();
-              //float[][] stp = setStartPointsFromDomain2D(0, 1, setLocs1, sizeX, sizeY, 2, flowValues, 0.001f);
-              myDisplay.setStartPoints(types, setLocs);
-              myDisplay.setStartLevel(1);*/
         }
 
         Trace.call1("VRC.loadVolumeData.loadData");
