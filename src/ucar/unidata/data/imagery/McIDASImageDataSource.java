@@ -101,7 +101,8 @@ public class McIDASImageDataSource extends ImageDataSource {
 
     /** _more_ */
     String[] calUnitDesp = {
-        " ", "Raw", "Radiance", "Albedo", "Temperature", "Brightness", "Reflectivity"
+        " ", "Raw", "Radiance", "Albedo", "Temperature", "Brightness",
+        "Reflectivity"
     };
 
     /** _more_ */
@@ -160,6 +161,9 @@ public class McIDASImageDataSource extends ImageDataSource {
 
     /** _more_ */
     int lMag0 = 1;
+
+    /** _more_ */
+    private String choiceName;
 
     /**
      *  The parameterless ctor unpersisting.
@@ -221,7 +225,9 @@ public class McIDASImageDataSource extends ImageDataSource {
 
         String image = (String) images.get(0);
         try {
-            af = AreaFileFactory.getAreaFileInstance(image);
+            this.areaAdapter = new AreaAdapter(image, false);
+            af               = AreaFileFactory.getAreaFileInstance(image);
+            this.baseAnav    = this.af.getNavigation();
             AreaDirectoryList adl = new AreaDirectoryList(image);
             currentDirs = adl.getSortedDirs();
         } catch (Exception ee) {}
@@ -310,6 +316,68 @@ public class McIDASImageDataSource extends ImageDataSource {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public String getChoiceName() {
+        return this.choiceName;
+    }
+
+    /**
+     * _more_
+     *
+     * @param choiceName _more_
+     */
+    public void setChoiceName(String choiceName) {
+        this.choiceName = choiceName;
+    }
+
+
+    /**
+     * _more_
+     */
+    public void initAfterUnpersistence() {
+        super.initAfterUnpersistence();
+        if (getTmpPaths() != null) {  // zidv bundle
+            return;
+        }
+        //String ver = IdvPersistenceManager.getBundleIdvVersion();
+        // ver == null is quicklinks history
+
+        if ((this.source == null) && (imageList != null)
+                && (imageList.size() > 0)) {
+            List descriptors =
+                super.getDescriptors(super.findDataChoice(this.choiceName),
+                                     null);
+            AddeImageDescriptor desc1 =
+                (AddeImageDescriptor) descriptors.get(0);
+            this.source = desc1.getSource();
+            try {
+                this.areaAdapter = new AreaAdapter(this.source, false);
+                this.af          = this.areaAdapter.getAreaFile();
+                this.baseAnav    = this.af.getNavigation();
+                this.acs =
+                    (AREACoordinateSystem) this.areaAdapter
+                        .getCoordinateSystem();
+                af = AreaFileFactory.getAreaFileInstance(this.source);
+                AreaDirectoryList adl = new AreaDirectoryList(this.source);
+                currentDirs = adl.getSortedDirs();
+            } catch (Exception ew) {}
+            allBandDirs = (Hashtable) getProperties().get("allBands");
+            ArrayList oj = (ArrayList) getProperties().get("bandinfo");
+            if (oj != null) {
+                this.bandId = (BandInfo) oj.get(0);
+            }
+
+            AreaDirectory thisDir = desc1.getDirectory();
+            this.descriptor = new AddeImageDescriptor(thisDir, null);
+            init();
+        }
+    }
+
+
+    /**
+     * _more_
+     *
      * @param ad _more_
      * @param bands _more_
      * @param cb _more_
@@ -322,7 +390,7 @@ public class McIDASImageDataSource extends ImageDataSource {
                                          Calibrator cb)
             throws CalibratorException {
         List<BandInfo> l = new ArrayList<BandInfo>();
-        if (ad != null && cb != null) {
+        if ((ad != null) && (cb != null)) {
             if (bands != null) {
                 for (int i = 0; i < bands.length; i++) {
                     int band = bands[i];
@@ -336,14 +404,13 @@ public class McIDASImageDataSource extends ImageDataSource {
                     l.add(bi);
                 }
             }
-        } else if(ad != null) {
+        } else if (ad != null) {
             if (bands != null) {
                 for (int i = 0; i < bands.length; i++) {
-                    int band = bands[i];
-                    BandInfo bi = new BandInfo(ad.getSensorID(), band);
+                    int      band = bands[i];
+                    BandInfo bi   = new BandInfo(ad.getSensorID(), band);
                     bi.setBandDescription(getBandName(ad, band));
-                    bi.setCalibrationUnits(
-                            null);
+                    bi.setCalibrationUnits(null);
                     bi.setPreferredUnit("BRIT");
                     l.add(bi);
                 }
@@ -417,6 +484,7 @@ public class McIDASImageDataSource extends ImageDataSource {
 
 
     }
+
     /**
      *  Overwrite base class  method to return the name of this class.
      *
@@ -466,7 +534,7 @@ public class McIDASImageDataSource extends ImageDataSource {
             throws VisADException, RemoteException {
 
         this.dataChoice = dataChoice;
-
+        this.choiceName = dataChoice.getName();
         GeoSelection geoSelection = dataSelection.getGeoSelection();
 
         boolean isProgressiveResolution =
@@ -583,7 +651,7 @@ public class McIDASImageDataSource extends ImageDataSource {
                     BandInfo      id      = (BandInfo) dataChoice.getId();
                     int[]         dir     = null;
                     AreaDirectory thisDir = null;
-                    if (allBandDirs != null && allBandDirs.size() > 0) {
+                    if ((allBandDirs != null) && (allBandDirs.size() > 0)) {
                         thisDir = (AreaDirectory) allBandDirs.get(
                             id.getBandNumber());
 
@@ -924,7 +992,7 @@ public class McIDASImageDataSource extends ImageDataSource {
         }
 
         //if (dataChoice instanceof CompositeDataChoice) {
-            // binfo = ((CompositeDataChoice) dataChoice).getDataChoices().get(0).g
+        // binfo = ((CompositeDataChoice) dataChoice).getDataChoices().get(0).g
         //}
         String source = aid.getSource() + " band: " + band + " calOutType: "
                         + calOutType + " line0 " + line0 + " elem0 " + elem0
@@ -954,14 +1022,18 @@ public class McIDASImageDataSource extends ImageDataSource {
                 if (unitStr != null) {
                     unit = DataUtil.parseUnit(unitStr);
                 }
-                if (line0 < 0) line0 = 1;
-                if (elem0 < 0) elem0 = 1;
+                if (line0 < 0) {
+                    line0 = 1;
+                }
+                if (elem0 < 0) {
+                    elem0 = 1;
+                }
                 int elemTotal = areaDir.getElements();
                 int lineTotal = areaDir.getLines();
-                while ((lMag * lines + line0)> lineTotal){
+                while ((lMag * lines + line0) > lineTotal) {
                     lines--;
                 }
-                while ((eMag * elems + elem0)> elemTotal){
+                while ((eMag * elems + elem0) > elemTotal) {
                     elems--;
                 }
                 result = AreaImageFlatField.createImmediateWithUnit(aid,
@@ -972,19 +1044,20 @@ public class McIDASImageDataSource extends ImageDataSource {
             }
 
             float[][] data0;
-            if(!isPreCalibrated && cali != null) {
+            if ( !isPreCalibrated && (cali != null)) {
                 data0 = result.getFloats();
-                float[] data1 = cali.calibrate(data0[0], band, calOutType);
+                float[]   data1 = cali.calibrate(data0[0], band, calOutType);
                 float[][] data2 = new float[1][data1.length];
                 data2[0] = data1;
                 result.setSamples(data2);
-            } else if(isPreCalibrated && calOutType == Calibrator.CAL_TEMP){
+            } else if (isPreCalibrated
+                       && (calOutType == Calibrator.CAL_TEMP)) {
                 data0 = result.getFloats();
-                float[] data1 = convertBritToTemp(data0[0]);
+                float[]   data1 = convertBritToTemp(data0[0]);
                 float[][] data2 = new float[1][data1.length];
                 data2[0] = data1;
                 result.setSamples(data2);
-            } else {
+            } else if ((areaDir == null) || (cali == null)) {
                 AreaAdapter aa = new AreaAdapter(aid.getSource(), false);
                 timeMap.put(aid.getSource(), aa.getImageStartTime());
                 result = aa.getImage();
@@ -1022,16 +1095,16 @@ public class McIDASImageDataSource extends ImageDataSource {
                 return;
             }
 
-          /*  if ((id != null) && !id.equals(this.bandId)) {
-                // now different band selected, and the preview and advanced need to be recreated
+            /*  if ((id != null) && !id.equals(this.bandId)) {
+                  // now different band selected, and the preview and advanced need to be recreated
 
-                AreaDirectory thisDir =
-                    (AreaDirectory) allBandDirs.get(id.getBandNumber());
-                //this.source = getPreviewSource(this.source, thisDir);
+                  AreaDirectory thisDir =
+                      (AreaDirectory) allBandDirs.get(id.getBandNumber());
+                  //this.source = getPreviewSource(this.source, thisDir);
 
-                this.descriptor = new AddeImageDescriptor(thisDir, null);
+                  this.descriptor = new AddeImageDescriptor(thisDir, null);
 
-            } */
+              } */
 
             if ((baseAnav == null) || !id.equals(this.bandId)) {
 
@@ -1048,11 +1121,11 @@ public class McIDASImageDataSource extends ImageDataSource {
                 this.bandId = id;
             }
 
-            if (areaAdapter != null) {
-                addeImageDataSelection = new AddeImageDataSelection(this,
-                        dataChoice, source, baseAnav, this.imageInfo, acs,
-                        areaAdapter, cali, this.bandId.getBandNumber());
-            }
+            //if (areaAdapter != null) {
+            addeImageDataSelection = new AddeImageDataSelection(this,
+                    dataChoice, source, baseAnav, this.imageInfo, acs,
+                    areaAdapter, cali, this.bandId.getBandNumber());
+            //}
 
 
 
