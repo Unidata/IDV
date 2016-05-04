@@ -101,7 +101,7 @@ public class McIDASImageDataSource extends ImageDataSource {
 
     /** _more_ */
     String[] calUnitDesp = {
-        " ", "Raw", "Radiance", "Albedo", "Temperature", "Brightness"
+        " ", "Raw", "Radiance", "Albedo", "Temperature", "Brightness", "Reflectivity"
     };
 
     /** _more_ */
