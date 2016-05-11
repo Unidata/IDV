@@ -25,7 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import ucar.httpservices.HTTPAuthSchemes;
+
 import ucar.httpservices.HTTPException;
 import ucar.nc2.util.DiskCache2;
 import ucar.httpservices.HTTPSession;
@@ -369,7 +369,7 @@ public class DataManager {
             }
             AccountManager provider = accountManager;
             try {
-                HTTPSession.setGlobalCredentialsProvider(provider, HTTPAuthSchemes.BASIC);
+                HTTPSession.setGlobalCredentialsProvider(provider);
             } catch (HTTPException e) {
                 e.printStackTrace();
             }
