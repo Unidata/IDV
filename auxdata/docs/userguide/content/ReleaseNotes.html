@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 5.1 release.
+The items below reflect changes since the 5.2 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -24,11 +24,6 @@ The items below reflect changes since the 5.1 release.
   </p>
 </faqitem>
 
-<faqitem q="Jython 2.7" id="jython">
-  <p>
-    Updated the Jython library to version 2.7.
-  </p>
-</faqitem>
 
 <faqitem q="DOI" id="doi">
   <p>
@@ -37,65 +32,53 @@ The items below reflect changes since the 5.1 release.
   </p>
 </faqitem>
 
-<faqitem q="Latest netCDF-Java Version" id="nj46">
+<faqitem q="Latest netCDF-Java Version" id="nj465">
   <p>
     The version of the netCDF-Java library currently distributed with the IDV is
-    the 4.6.2. Its main feature is a rewrite of GRIB handling. This version of
-    netCDF-Java includes changes: AWIPSsat projection, WRF lat/lon coordinates
-    with time dependence, Updated grib1 table for NLDAS, handling of scalar
-    runtime coordinate for GRIB collections.  See
-    the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf_java_library_and_tds10">
-      netCDF-Java Library</a> for a more details on these changes.
+    the 4.6.5. This is a bug fix release.  See
+    the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds2">
+      netCDF-Java Library</a> for a more details information.
   </p>
 </faqitem>
 
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Forecast hour added" id="fhour">
+<faqitem q="Volume Vectors" id="vvectors">
   <p>
-    The IDV can now calculate the forecast hours based on the run time
-    coordinate system and values can be accessed through the forecast hour macro
-    in the display properties window.
+    The IDV can now display 3D volume vectors based on the x, y, and z wind component fields,
+    the unit of the z componet wind could be in meter per seconds or in pascal per second.
   </p>
 </faqitem>
 
-<faqitem q="New Grid Trajectory and Curly Vector" id="ngtrajectory">
+<faqitem q="Volume Trajectories" id="vtrajectory">
   <p>
-    The new 2D grid trajectory and the curly vector display are based on the new
-    APIs of the VisAD library.  Both displays are categorized as flow vector
-    display. The vector plan view display will be created first and there are
-    radio buttons to switch to the trajectory or curly vector display. The
-    trajectory and the curly vector can also be colored by the wind speed.
+    The 3D volume trajectory is based on the new APIs of the VisAD library enhancements
+    with much better performance. The volume trajectory display is categorized as 3D flow
+    displays that also includes 3D vecotr cross section, 3D volume vector, 3D volume vector
+    colored by speed, and 3D volume vector colored by another parameter. The 3D volume vector
+    display could be created first and there is radio button to switch to the volume trajectory
+    display. The start points of volume trajectory could be the whole volume of the gridded
+    dataset or the selected level of the gridded dataset.
   </p>
 </faqitem>
 
-<faqitem q="3D Adaptive Resolution" id="3dAR">
+<faqitem q="Trajectory types" id="ttypes">
   <p>
-    The Adaptive Resolution (AR) feature in the IDV has been expanded to cover
-    several 3 dimensional displays. When creating a 3D display or cross section
-    display, the IDV calculates the resolution of the map view window,
-    dynamically sets the data sampling in all 3 dimensions, and loads sufficient
-    data to generate the image.
+    In addition to the traditional line trajecory display, ribbon, cylinder and deform ribbon are
+    added as new trajectory types and are available in this release.
   </p>
 </faqitem>
 
-<faqitem q="Support for CF Trajectory Format" id="cftraj">
-  <p>
-    The IDV now supports the reading and display of trajectory data as described
-    in
-  <a href="http://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/build/aphs04.html">H.4. Trajectory
-    Data</a> of the CF conventions.
-  </p>
-</faqitem>
-
-<faqitem q="VisAD Vertical Scale Labeling" id="vlab">
-  <p>
-    Incorporated improved vertical scale labeling available in from VisAD.
-  </p>
-</faqitem>
 
 <faqitem cat="Data Changes"></faqitem>
+
+<faqitem q="Local McIDAS Area Files" id="larea">
+    <p>
+      The local McIDAS area files can be calibrated and spatially subset, currently only for the
+      GVAR area files in this release and we are working on area files from other satellites.
+    </p>
+</faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
