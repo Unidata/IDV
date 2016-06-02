@@ -32,7 +32,7 @@ import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
-import ucar.nc2.NetcdfFileWriteable;
+import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.Variable;
 import ucar.nc2.constants.CF;
 import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
@@ -5894,8 +5894,8 @@ public class GridUtil {
         Object loadId =
             JobManager.getManager().startLoad("Writing grid to CF", true);
         try {
-            NetcdfFileWriteable ncfile =
-                NetcdfFileWriteable.createNew(filename, false);
+            NetcdfFileWriter ncfilewriter =
+                NetcdfFileWriter.createNew(filename, false);
             boolean         isTimeSequence = isTimeSequence(grid);
             List<Dimension> dims           = new ArrayList<Dimension>();
             // make variables for the time and xyz axes
@@ -5906,18 +5906,15 @@ public class GridUtil {
                 Unit[] units = timeSet.getSetUnits();
                 numTimes = timeSet.getLength();
                 Dimension timeDim = new Dimension("time", numTimes, true);
-                dims.add(timeDim);
-                ncfile.addDimension(null, timeDim);
-                Variable timeVar = new Variable(ncfile, null, null, "time",
-                                       DataType.DOUBLE, "time");
-                timeVar.addAttribute(new Attribute("units",
-                        units[0].toString()));
-                ncfile.addVariable(null, timeVar);
+                ncfilewriter.addDimension(null, timeDim.getFullNameEscaped(), timeDim.getLength());
+                ncfilewriter.addVariable(null, "time", DataType.DOUBLE, "time");
+                ncfilewriter.addVariableAttribute("time", "units",
+                        units[0].toString());
             }
             GriddedSet domainSet = (GriddedSet) getSpatialDomain(grid);
             CoordinateSystem cs = domainSet.getCoordinateSystem();
             boolean haveEmpirical = cs instanceof EmpiricalCoordinateSystem;
-            HashMap<Variable, Array> varData = addSpatialVars(ncfile,
+            HashMap<Variable, Array> varData = addSpatialVars(ncfilewriter.getNetcdfFile(),
                                                    domainSet, dims);
 
             // TODO: figure out a better way to do this
@@ -5937,38 +5934,37 @@ public class GridUtil {
             RealType[] rTypes = tType.getRealComponents();
             for (int i = 0; i < rTypes.length; i++) {
                 RealType rt = rTypes[i];
-                Variable v  = new Variable(ncfile, null, null,
-                                           getVarName(rt));
+
+                String rtVarName = rt.getName();
+                ncfilewriter.addVariable(null, getVarName(rt), DataType.FLOAT, dims);
+
                 Unit     u  = rt.getDefaultUnit();
                 if (u != null) {
-                    v.addAttribute(new Attribute("units",
-                            rt.getDefaultUnit().toString()));
+                    ncfilewriter.addVariableAttribute(rtVarName, "units",
+                            u.toString());
                 }
                 if (projVar != null) {
-                    v.addAttribute(new Attribute("grid_mapping",
-                            projVar.getName()));
+                    ncfilewriter.addVariableAttribute(rtVarName,"grid_mapping",
+                            projVar.getName());
                 }
                 if (haveEmpirical) {
-                    v.addAttribute(new Attribute("coordinates",
-                            "latitude longitude"));
+                    ncfilewriter.addVariableAttribute(rtVarName, "coordinates",
+                            "latitude longitude");
                 }
-                v.setDataType(DataType.FLOAT);
-                v.setDimensions(dims);
-                ncfile.addVariable(null, v);
             }
-            ncfile.addGlobalAttribute(new Attribute("Conventions", "CF-1.X"));
-            ncfile.addGlobalAttribute(new Attribute("History",
+            ncfilewriter.addGlobalAttribute(new Attribute("Conventions", "CF-1.X"));
+            ncfilewriter.addGlobalAttribute(new Attribute("History",
                     "Translated from VisAD grid to CF-1.X Conventions by IDV\n"
                     + "Original Dataset = " + grid.getType()
                     + "\nTranslation Date = " + new Date()));
-            ncfile.create();
+            ncfilewriter.create();
             // fill in the data
             if (isTimeSequence) {
-                Variable   timeVar  = ncfile.findVariable("time");
+                Variable   timeVar  = ncfilewriter.findVariable("time");
                 double[][] timeVals = timeSet.getDoubles(false);
                 Array varArray = Array.factory(DataType.DOUBLE,
                                      new int[] { numTimes }, timeVals[0]);
-                ncfile.write(timeVar.getName(), varArray);
+                ncfilewriter.write(timeVar, varArray);
             }
             for (Iterator it = keys.iterator(); it.hasNext(); ) {
                 Variable v = (Variable) it.next();
@@ -6002,22 +5998,22 @@ public class GridUtil {
                     float[][] samples = sample.getFloats(false);
                     for (int j = 0; j < rTypes.length; j++) {
                         Variable v =
-                            ncfile.findVariable(getVarName(rTypes[j]));
+                            ncfilewriter.findVariable(getVarName(rTypes[j]));
                         arr = Array.factory(DataType.FLOAT, sizes,
                                             samples[j]);
-                        ncfile.write(v.getName(), origin, arr);
+                        ncfilewriter.write(v, origin, arr);
                     }
                 }
             } else {
                 float[][] samples = ((FlatField) grid).getFloats();
                 for (int j = 0; j < rTypes.length; j++) {
-                    Variable v = ncfile.findVariable(getVarName(rTypes[j]));
+                    Variable v = ncfilewriter.findVariable(getVarName(rTypes[j]));
                     arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
-                    ncfile.write(v.getName(), arr);
+                    ncfilewriter.write(v, arr);
                 }
             }
             // write the file
-            ncfile.close();
+            ncfilewriter.close();
         } catch (Exception exc) {
             LogUtil.logException("Writing grid to netCDF file: " + filename,
                                  exc);
