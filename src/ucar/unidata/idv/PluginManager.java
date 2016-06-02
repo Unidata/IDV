@@ -1757,20 +1757,18 @@ public class PluginManager extends IdvManager {
                                 .CoordSysBuilderIF) c.newInstance();
                         ucar.nc2.dataset.CoordSysBuilder.registerConvention(
                             csbi.getConventionUsed(), c);
-                    } else if (ucar.nc2.dataset.CoordTransBuilderIF.class
+                    } else if (ucar.nc2.dataset.CoordTransBuilder.class
                             .isAssignableFrom(c)) {
-                        ucar.nc2.dataset.CoordTransBuilderIF csbi =
+                        ucar.nc2.dataset.CoordTransBuilder csbi =
                             (ucar.nc2.dataset
-                                .CoordTransBuilderIF) c.newInstance();
+                                .CoordTransBuilder) c.newInstance();
                         ucar.nc2.dataset.CoordTransBuilder.registerTransform(
-                            csbi.getTransformName(), c);
-                    } else if (ucar.nc2.dt.TypedDatasetFactoryIF.class
+                            c.getName(), c);
+                    } else if (ucar.nc2.ft.FeatureDatasetFactory.class
                             .isAssignableFrom(c)) {
-                        ucar.nc2.dt.TypedDatasetFactoryIF tdfi =
-                            (ucar.nc2.dt
-                                .TypedDatasetFactoryIF) c.newInstance();
-                        ucar.nc2.dt.TypedDatasetFactory.registerFactory(
-                            tdfi.getScientificDataType(), c);
+                        ucar.nc2.ft.FeatureDatasetFactory tdfi =
+                            (ucar.nc2.ft.FeatureDatasetFactory) c.newInstance();
+                        ucar.nc2.ft.FeatureDatasetFactoryManager.registerFactory(c);
                     }
 
                 }
