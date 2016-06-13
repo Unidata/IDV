@@ -72,10 +72,10 @@ import javax.swing.event.ChangeEvent;
 public class SymbolGlyph extends DrawingGlyph {
 
     /** the symbol */
-    private static String defaultSymbol = ShapeUtility.CROSS;
+    private String defaultSymbol = ShapeUtility.CROSS;
 
     /** the scale */
-    private static float defaultScale = 1.0f;
+    private float defaultScale = 1.0f;
 
     /** xml attr */
     public static final String ATTR_SCALE = "scale";
@@ -508,6 +508,24 @@ public class SymbolGlyph extends DrawingGlyph {
     }
 
     /**
+     * Set the defaultSymbol property.
+     *
+     * @param value The new value for defaultSymbol
+     */
+    public void setDefaultSymbolSymbol(String value) {
+        defaultSymbol = value;
+    }
+
+    /**
+     * Get the defaultSymbol property.
+     *
+     * @return The defaultSymbol
+     */
+    public String getDefaultSymbol() {
+        return defaultSymbol;
+    }
+
+    /**
      * Set the Scale property.
      *
      * @param value The new value for Scale
@@ -525,6 +543,23 @@ public class SymbolGlyph extends DrawingGlyph {
         return scale;
     }
 
+    /**
+     * Set the defaultScale property.
+     *
+     * @param value The new value for defaultScale
+     */
+    public void setDefaultScale(float value) {
+        defaultScale = value;
+    }
+
+    /**
+     * Get the defaultScale property.
+     *
+     * @return The defaultScale
+     */
+    public float getDefaultScale() {
+        return defaultScale;
+    }
 
 }
 
