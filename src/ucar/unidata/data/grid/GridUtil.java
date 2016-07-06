@@ -5442,15 +5442,15 @@ public class GridUtil {
             Gridded2DSet g   = allSets.get(polygonIdx);
             float[]      low = g.getLow();
             float[]      hi  = g.getHi();
-            lonLow[polygonIdx] = (latLonOrder
+            lonLow[polygonIdx] = (float)GeoUtils.normalizeLongitude((latLonOrder
                                   ? low[1]
-                                  : low[0]);
+                                  : low[0]));
             latLow[polygonIdx] = (latLonOrder
                                   ? low[0]
                                   : low[1]);
-            lonHi[polygonIdx]  = (latLonOrder
+            lonHi[polygonIdx]  = (float)GeoUtils.normalizeLongitude((latLonOrder
                                   ? hi[1]
-                                  : hi[0]);
+                                  : hi[0]));
             latHi[polygonIdx]  = (latLonOrder
                                   ? hi[0]
                                   : hi[1]);
