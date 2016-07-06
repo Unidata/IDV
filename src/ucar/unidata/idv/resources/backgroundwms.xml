@@ -127,7 +127,7 @@
      bbox="71.0,-168.0, 17.0,-65.0"/>
 
   <wms
-     server="http://raster.nationalmap.gov/ArcGIS/services/Elevation/USGS_EDC_Elev_NED_13/ImageServer/WMSServer"
+     server="http://basemap.nationalmap.gov/arcgis/services/USGSShadedReliefOnly/MapServer/WMSServer"
      layer="0"
      title="CONUS Shaded Relief"
      srs="EPSG:4326"
