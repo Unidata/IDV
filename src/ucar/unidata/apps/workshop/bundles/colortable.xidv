@@ -8,7 +8,7 @@
                     <property name="DataRelativeStrings">
                         <object class="java.util.ArrayList" id="id4">
                             <method name="add">
-                                <string><![CDATA[dods://motherlode.ucar.edu:8080/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc]]></string>
+                                <string><![CDATA[dods://thredds.ucar.edu/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc]]></string>
                             </method>
                         </object>
                     </property>
@@ -16,7 +16,7 @@
                         <object idref="id4"/>
                     </property>
                     <property name="Name">
-                        <string><![CDATA[dods://motherlode.ucar.edu:8080/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc]]></string>
+                        <string><![CDATA[dods://thredds.ucar.edu/thredds/dodsC/casestudies/idvtest/grids/small_ruc_grid.nc]]></string>
                     </property>
                     <property name="Properties">
                         <object class="java.util.Hashtable">

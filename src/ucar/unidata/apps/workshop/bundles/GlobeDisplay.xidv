@@ -8,7 +8,7 @@
                     <property name="Sources">
                         <object class="java.util.ArrayList">
                             <method name="add">
-                                <string><![CDATA[dods://motherlode.ucar.edu:8080/thredds/dodsC/casestudies/idvtest/grids/2002062812_avn-x.nc]]></string>
+                                <string><![CDATA[dods://thredds.ucar.edu/thredds/dodsC/casestudies/idvtest/grids/2002062812_avn-x.nc]]></string>
                             </method>
                         </object>
                     </property>
