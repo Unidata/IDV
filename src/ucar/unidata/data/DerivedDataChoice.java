@@ -773,8 +773,10 @@ public class DerivedDataChoice extends ListDataChoice {
                     String      cleanOperandName = op.makeLegalJython();
                     constructedCode = StringUtil.replace(constructedCode,
                             op.getName(), cleanOperandName);
-                    setVariables.add(cleanOperandName);
-                    interp.set(cleanOperandName, op.getData());
+                    if(interp.get(cleanOperandName) == null ) {
+                        setVariables.add(cleanOperandName);
+                        interp.set(cleanOperandName, op.getData());
+                    }
                 }
 
                 //Check here because the hashCode/equals on this object
