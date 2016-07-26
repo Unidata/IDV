@@ -26,12 +26,7 @@ import org.python.util.*;
 
 import ucar.unidata.idv.JythonManager;
 
-import ucar.unidata.util.CacheManager;
-
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
+import ucar.unidata.util.*;
 
 
 import visad.*;
@@ -46,6 +41,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
+//import jep.Jep;
+//import jep.JepException;
 
 /**
  * A subclass of DataChoice for derived quantities.
@@ -764,9 +761,16 @@ public class DerivedDataChoice extends ListDataChoice {
         PythonInterpreter interp =
             dataContext.getJythonManager().getDerivedDataInterpreter(
                 methodName);
+        //Jep jep = null;
+
+       // try {
+        //    jep = new Jep(false);
+       // } catch (JepException e){}
+
         synchronized (interp) {
             //Bind the operand name to the appropriate values.
             List<String> setVariables = new ArrayList<String>();
+            Hashtable setVariables1 = new Hashtable();
             try {
                 for (int i = 0; i < ops.size(); i++) {
                     DataOperand op               = (DataOperand) ops.get(i);
@@ -775,6 +779,13 @@ public class DerivedDataChoice extends ListDataChoice {
                             op.getName(), cleanOperandName);
                     if(interp.get(cleanOperandName) == null ) {
                         setVariables.add(cleanOperandName);
+                        interp.set(cleanOperandName, op.getData());
+                    } else if(cleanOperandName.charAt(0)=='D' &&
+                            Character.isDigit(cleanOperandName.charAt(1))) {
+                        setVariables.add(cleanOperandName);
+                        interp.set(cleanOperandName, op.getData());
+                    } else {
+                        setVariables1.put(cleanOperandName, interp.get(cleanOperandName));
                         interp.set(cleanOperandName, op.getData());
                     }
                 }
@@ -795,6 +806,11 @@ public class DerivedDataChoice extends ListDataChoice {
                     //value of "result" from the interpreter
 
                     PyObject pyResult     = interp.eval(constructedCode);
+
+                    //try {
+                    //    jep.getValue(constructedCode);
+                    //} catch (JepException e){}
+
                     Object   resultObject = null;
                     if (pyResult.getType().toString().contains("ArrayList")) {
                         resultObject = pyResult.__tojava__(List.class);
@@ -848,7 +864,18 @@ public class DerivedDataChoice extends ListDataChoice {
                     for (String varName : setVariables) {
                         interp.set(varName, null);
                     }
+
                 } catch (Exception ignore) {}
+                if(setVariables1.size() > 0){
+                    Enumeration keys = setVariables1.keys();
+                    while (keys.hasMoreElements()) {
+                        Object key = keys.nextElement();
+                        String varName = (String)key;
+                        interp.set(varName, null);
+                        interp.set(varName, setVariables1.get(varName));
+                    }
+
+                }
             }
         }
         Trace.call2("DerivedData.getData");
