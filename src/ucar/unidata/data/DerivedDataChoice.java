@@ -779,15 +779,14 @@ public class DerivedDataChoice extends ListDataChoice {
                             op.getName(), cleanOperandName);
                     if(interp.get(cleanOperandName) == null ) {
                         setVariables.add(cleanOperandName);
-                        interp.set(cleanOperandName, op.getData());
                     } else if(cleanOperandName.charAt(0)=='D' &&
                             Character.isDigit(cleanOperandName.charAt(1))) {
+                        //this block is very unlikely to get in but just in case
                         setVariables.add(cleanOperandName);
-                        interp.set(cleanOperandName, op.getData());
                     } else {
                         setVariables1.put(cleanOperandName, interp.get(cleanOperandName));
-                        interp.set(cleanOperandName, op.getData());
                     }
+                    interp.set(cleanOperandName, op.getData());
                 }
 
                 //Check here because the hashCode/equals on this object
