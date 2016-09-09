@@ -335,7 +335,6 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
 
 
 
-        startMonitor();
         getJythonManager();
         getDataManager();
         getPublishManager().initPublisher();
@@ -626,7 +625,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         //The args manager needs to go first
         getIdvUIManager().initDone();
         getArgsManager().initDone();
-
+        startMonitor();
         if ( !getStateManager().getRunningIsl()) {
             try {
                 OldVersionCheck.check(this);
