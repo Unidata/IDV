@@ -553,7 +553,14 @@ public class ControlDescriptor {
     public void showHelp() {
         try {
             if (prototype == null) {
-                prototype = (DisplayControl) controlClass.newInstance();
+                // TJJ Sep 2016
+                // If user saved a favorite, the display type will be a template prototype object
+                // and controlClass will be null. This fix prevents NPE on F1 (View Help)
+                if (controlClass == null) {
+                    prototype = displayTemplatePrototype;
+                } else {
+                    prototype = (DisplayControl) controlClass.newInstance();
+                }
                 prototype.initBasic(controlId, dataCategories, properties);
             }
             prototype.showHelp();
