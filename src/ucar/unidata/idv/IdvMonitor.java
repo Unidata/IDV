@@ -22,6 +22,7 @@ package ucar.unidata.idv;
 
 
 import ucar.unidata.util.HttpServer;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 
 
@@ -43,6 +44,14 @@ import java.util.Hashtable;
  * @author IDV development team
  */
 public class IdvMonitor extends HttpServer {
+
+    public static final String CMD_PING = "/ping";
+    public static final String CMD_LOADBUNDLE = "/loadbundle";
+    public static final String CMD_LOADISL= "/loadisl";
+
+    public static final String ARG_BUNDLE = "bundle";
+    public static final String ARG_ISL = "isl";
+    public static final String ARG_ISLPATH = "islpath";
 
     /** _more_          */
     private IntegratedDataViewer idv;
@@ -160,8 +169,41 @@ public class IdvMonitor extends HttpServer {
             } else if (path.equals("/reallyshutdown.html")) {
                 writeResult(true, "OK, IDV is shutting down", "text/html");
                 System.exit(0);
+            } else if(path.equals(CMD_PING)) {
+                writeResult(true, "ok", "text/html");
+            } else if(path.equals(CMD_LOADBUNDLE)) {
+                String bundle = (String) formArgs.get(ARG_BUNDLE);
+                if(bundle == null) {
+                    writeResult(false,"No " + ARG_BUNDLE +" argument given" , "text/html");
+                    return;
+                } else {
+                    String xml = IOUtil.readContents(bundle, getClass());
+                    idv.getPersistenceManager().decodeXmlInner(xml, false,
+                                                               bundle, "", false);
+                    writeResult(true, "ok", "text/html");
+                }
+
+            } else if(path.equals(CMD_LOADISL)) {
+                String isl = (String) formArgs.get(ARG_ISL);
+                if(isl == null) {
+                    String islPath = (String) formArgs.get(ARG_ISLPATH);
+                    if(islPath !=null) {
+                        isl =   IOUtil.readContents(islPath, getClass());
+                    }
+                }
+
+
+                if(isl == null) {
+                    writeResult(false,"No " + ARG_ISL +" argument given" , "text/html");
+                    return;
+                } else {
+                    String tmpFile = idv.getStore().getTmpFile("tmp.isl");
+                    IOUtil.writeFile(tmpFile, isl);
+                    idv.getImageGenerator().processScriptFile(tmpFile);
+                    writeResult(true, "ok", "text/html");
+                }
             } else {
-                decorateHtml(new StringBuffer("Unknown url:" + path));
+                writeResult(false,"Unknown url:" + path , "text/html");
             }
             //            System.err.println("handleRequest end:" + path);
         }
