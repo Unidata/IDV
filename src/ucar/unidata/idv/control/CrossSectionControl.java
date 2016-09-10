@@ -31,6 +31,7 @@ import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.CrossSectionViewManager;
 import ucar.unidata.idv.DisplayConventions;
@@ -1187,6 +1188,25 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     public void setEndCoord(Coord c) {
         endCoord = c;
     }
+
+
+    /**
+       When we relocate a bundle this gets called to relocate the display
+       This method gets overwritten by the probe and cross section displays
+       so they can move their selection points to a new location
+       @param originalBounds The original bounds of the datasource
+       @param newBounds  The relocated bounds of the datasource
+     */
+    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
+        super.relocateDisplay(originalBounds, newBounds);
+        double deltaLat = newBounds.getLatMax() - originalBounds.getLatMax();
+        double deltaLon = newBounds.getLonMax() - originalBounds.getLonMax();
+        //TODO: move the end points 
+        //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
+        System.err.println("CrossSectionControl.relocate deltaLat = " + deltaLat +" deltaLon = "   + deltaLon);
+    }
+
+
 
 
     /**
