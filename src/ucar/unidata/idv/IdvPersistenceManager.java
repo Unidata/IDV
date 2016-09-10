@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.grid.GridDataSource;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -37,6 +38,7 @@ import ucar.unidata.idv.ui.IslDialog;
 import ucar.unidata.idv.ui.LoadBundleDialog;
 import ucar.unidata.idv.ui.QuicklinkPanel;
 import ucar.unidata.util.ColorTable;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
@@ -114,6 +116,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     /** property id */
     public static final String PROP_TIMESLIST = "idv.timeslist";
+
+    /* property to override geoselection in a bundle */
+    public static final String PROP_GEOSELECTION = "idv.geoselection";
+
 
     /** property id  for ensemble list */
     public static final String PROP_ENSLIST = "idv.enslist";
@@ -3626,6 +3632,14 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                    : (List) bundleProperties.get(
                                        PROP_ENSLIST));
 
+        GeoSelection overrideGeoSelection = 
+            ((bundleProperties == null)
+             ? null
+             : (GeoSelection) bundleProperties.get(
+                                           PROP_GEOSELECTION));
+
+
+        GeoSelection baseGeoSelection = null;
 
         List dataSources = (List) ht.get(ID_DATASOURCES);
         if (dataSources != null) {
@@ -3692,11 +3706,22 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             //            System.err.println ("time to init data sources:" + (t2-t1));
 
 
+
+
             for (int i = 0; i < dataSources.size(); i++) {
                 final DataSource dataSource = (DataSource) dataSources.get(i);
                 if (overrideTimes != null) {
                     dataSource.setDateTimeSelection(overrideTimes);
                 }
+                if(overrideGeoSelection!=null) {
+                    //Keep the first geoselection we find so we can use it as a 
+                    //reference for relocating the displays
+                    if(baseGeoSelection == null) {
+                        baseGeoSelection = dataSource.getDataSelection().getGeoSelection();
+                    }
+                    dataSource.getDataSelection().setGeoSelection(overrideGeoSelection);
+                }
+
                 if ((overrideEnsMembers != null)
                         && (dataSource instanceof GridDataSource)) {
                     ((GridDataSource) dataSource).setEnsembleSelection(
@@ -3756,7 +3781,26 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             }
             List newControls = (List) ht.get(ID_DISPLAYCONTROLS);
-            //            newControls = new ArrayList();
+
+            //If we have controls and we are relocating the bundle then tell the controls
+            //to relocate themselves
+            if(newControls !=null && overrideGeoSelection!=null && baseGeoSelection !=null) {
+                LatLonRect baseLLR = baseGeoSelection.getLatLonRect();
+                LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
+                if(baseLLR!=null && newLLR != null) {
+                    System.err.println("baseBounds:" +  baseLLR +" new bounds:" + newLLR);
+                    for (int controlIdx = 0;
+                         controlIdx < newControls.size();
+                         controlIdx++) {
+                        DisplayControlImpl dc =
+                            (DisplayControlImpl) newControls.get(
+                                                                 controlIdx);
+                        dc.relocateDisplay(baseLLR, newLLR);
+                    }
+                    
+                }
+            }
+
 
             //If we are not merging we have to reset the ViewDescriptor id
             //in the new view managers. Then we have to tell the new display  

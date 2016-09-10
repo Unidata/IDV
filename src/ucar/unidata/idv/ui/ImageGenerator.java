@@ -2406,6 +2406,7 @@ public class ImageGenerator extends IdvManager {
         }
 
 
+
         List nodes    = XmlUtil.findChildren(node, TAG_SETFILES);
         List ids      = new ArrayList();
         List fileList = new ArrayList();
@@ -2467,6 +2468,14 @@ public class ImageGenerator extends IdvManager {
         }
         if (ensList != null) {
             bundleProperties.put(IdvPersistenceManager.PROP_ENSLIST, ensList);
+        }
+
+        //Check for the bbox override
+        String bboxString = applyMacros(node, ATTR_BBOX, (String) null);
+        if (bboxString != null) {
+            DataSelection dataSelection = new DataSelection();
+            processGeoSelectionTags(node, dataSelection);
+            bundleProperties.put(IdvPersistenceManager.PROP_GEOSELECTION, dataSelection.getGeoSelection());
         }
 
 
