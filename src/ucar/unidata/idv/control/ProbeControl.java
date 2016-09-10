@@ -40,6 +40,7 @@ import ucar.unidata.util.MidiProperties;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.ShapeUtility;
@@ -618,6 +619,24 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         } catch (Exception exc) {
             logException("Error setting probe position", exc);
         }
+    }
+
+
+    /**
+       When we relocate a bundle this gets called to relocate the display
+       This method gets overwritten by the probe and cross section displays
+       so they can move their selection points to a new location
+       @param originalBounds The original bounds of the datasource
+       @param newBounds  The relocated bounds of the datasource
+     */
+    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
+        super.relocateDisplay(originalBounds, newBounds);
+        double deltaLat = newBounds.getLatMax() - originalBounds.getLatMax();
+        double deltaLon = newBounds.getLonMax() - originalBounds.getLonMax();
+
+        //TODO: move the end points by the delta
+        //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
+        System.err.println("ProbeControl.relocate deltaLat = " + deltaLat +" deltaLon = "   + deltaLon);
     }
 
 
