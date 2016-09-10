@@ -67,6 +67,7 @@ import ucar.unidata.util.ContourInfo;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Msg;
@@ -12584,6 +12585,17 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public boolean getUsesTimeDriver() {
         return this.usesTimeDriver;
     }
+
+    /**
+       When we relocate a bundle this gets called to relocate the display
+       This method gets overwritten by the probe and cross section displays
+       so they can move their selection points to a new location
+       @param originalBounds The original bounds of the datasource
+       @param newBounds  The relocated bounds of the datasource
+     */
+    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
+    }
+
 
     /**
      * _more_
