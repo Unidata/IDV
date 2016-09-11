@@ -1199,8 +1199,58 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      */
     public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
         super.relocateDisplay(originalBounds, newBounds);
-        double deltaLat = newBounds.getLatMax() - originalBounds.getLatMax();
-        double deltaLon = newBounds.getLonMax() - originalBounds.getLonMax();
+
+        // get the ratio of original selector point, init value to the center
+        double latRatio1 = 0.5;
+        double lonRatio1 = 0.0;
+        double latRatio2 = 0.5;
+        double lonRatio2 = 1.0;
+        try {
+            double[] oldpvalues1 = getStartPoint().getValues();
+
+            latRatio1 = (oldpvalues1[0] - originalBounds.getLatMin())/
+                    (originalBounds.getLatMax() - originalBounds.getLatMin());
+
+            lonRatio1 = (oldpvalues1[1] - originalBounds.getLonMin())/
+                    (originalBounds.getLonMax() - originalBounds.getLonMin());
+
+            double[] oldpvalues2 = getStartPoint().getValues();
+
+            latRatio2 = (oldpvalues2[0] - originalBounds.getLatMin())/
+                    (originalBounds.getLatMax() - originalBounds.getLatMin());
+
+            lonRatio2 = (oldpvalues2[1] - originalBounds.getLonMin())/
+                    (originalBounds.getLonMax() - originalBounds.getLonMin());
+
+        } catch (Exception e){}
+
+        double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
+        double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
+
+        //TODO: move the end points by the delta
+        //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
+        LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
+        double nlat1 = lowerLeft.getLatitude() + deltaLat*latRatio1;
+        double nlon1 = lowerLeft.getLongitude() + deltaLon*lonRatio1;
+        double nalt1 = 0.0;
+
+        double nlat2 = lowerLeft.getLatitude() + deltaLat*latRatio2;
+        double nlon2 = lowerLeft.getLongitude() + deltaLon*lonRatio2;
+        double nalt2 = 0.0;
+
+        try {
+            RealTuple start =
+                    new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                            new double[] { nlon1, nalt1,
+                                    getSelectorAltitude() });
+            RealTuple end = new RealTuple(RealTupleType.SpatialEarth3DTuple,
+                    new double[] {
+                            nlon2, nalt2, getSelectorAltitude() });
+
+
+            csSelector.setPosition(start, end);
+        } catch (Exception e){}
+
         //TODO: move the end points 
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
         System.err.println("CrossSectionControl.relocate deltaLat = " + deltaLat +" deltaLon = "   + deltaLon);
