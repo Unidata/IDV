@@ -29,6 +29,7 @@ import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.control.chart.LineState;
 import ucar.unidata.idv.control.chart.TimeSeriesChart;
 import ucar.unidata.ui.ImageUtils;
@@ -631,11 +632,28 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
         super.relocateDisplay(originalBounds, newBounds);
-        double deltaLat = newBounds.getLatMax() - originalBounds.getLatMax();
-        double deltaLon = newBounds.getLonMax() - originalBounds.getLonMax();
+        double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
+        double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
 
         //TODO: move the end points by the delta
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
+        LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
+        double nlat = lowerLeft.getLatitude() + deltaLat/2.0;
+        double nlon = lowerLeft.getLongitude() + deltaLon/2.0;
+        double nalt = 0.0;
+
+        try {
+            double[] pvalues = probe.getPosition().getValues();
+            if (pvalues != null && pvalues.length == 3)
+                nalt = pvalues[2];
+
+            probe.setPosition(
+                    new RealTuple(
+                            RealTupleType.SpatialCartesian3DTuple, new double[] { nlat,
+                            nlon, nalt }));
+            updatePosition();
+        } catch (Exception e){}
+
         System.err.println("ProbeControl.relocate deltaLat = " + deltaLat +" deltaLon = "   + deltaLon);
     }
 
