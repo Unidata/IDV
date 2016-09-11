@@ -1150,7 +1150,7 @@ public class ImageGenerator extends IdvManager {
         String filename = applyMacros(node, ATTR_FILE, (String) null);
         //String filename = XmlUtil.getAttribute(node, ATTR_FILE);
 
-        if(what.equals("zidv") && filename != null){
+        if(what != null && what.equals("zidv") && filename != null){
             getIdv().getPersistenceManager().doSaveAs(filename);
             return true;
         }
@@ -1164,6 +1164,16 @@ public class ImageGenerator extends IdvManager {
         display.doExport(what, filename);
         return true;
     }
+
+
+    protected boolean processTagSave(Element node) throws Throwable {
+        String filename = applyMacros(node, ATTR_FILE, "idv.xidv");
+        System.err.println("file:" + filename);
+        getIdv().getPersistenceManager().doSaveAs(filename);
+        return true;
+    }
+
+
 
 
     /**
