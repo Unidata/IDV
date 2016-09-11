@@ -632,14 +632,31 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
         super.relocateDisplay(originalBounds, newBounds);
+
+        // get the ratio of original probe point, init value to the center
+        double latRatio = 0.5;
+        double lonRatio = 0.5;
+        try {
+            double[] oldpvalues = probe.getPosition().getValues();
+            if (oldpvalues == null || oldpvalues.length != 3)
+                return;
+
+            latRatio = (oldpvalues[0] - originalBounds.getLatMin())/
+                    (originalBounds.getLatMax() - originalBounds.getLatMin());
+
+            lonRatio = (oldpvalues[1] - originalBounds.getLonMin())/
+                    (originalBounds.getLonMax() - originalBounds.getLonMin());
+
+        } catch (Exception e){}
+
         double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
         double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
 
         //TODO: move the end points by the delta
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
         LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
-        double nlat = lowerLeft.getLatitude() + deltaLat/2.0;
-        double nlon = lowerLeft.getLongitude() + deltaLon/2.0;
+        double nlat = lowerLeft.getLatitude() + deltaLat*latRatio;
+        double nlon = lowerLeft.getLongitude() + deltaLon*lonRatio;
         double nalt = 0.0;
 
         try {
