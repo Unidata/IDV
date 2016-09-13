@@ -873,6 +873,8 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
             //            infos.add(new ParamInfo("", null, null, null, null));
         }
         ParamDefaultsTable table = new ParamDefaultsTable(infos, isWritable);
+        table.setAutoCreateRowSorter(true);
+        table.getRowSorter().toggleSortOrder(0);
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         String editableStr = "";
         if ( !isWritable) {
