@@ -217,6 +217,8 @@ public class AliasEditor extends IdvManager {
             }
 
             JTable table = createTable(resourceIdx, tableModel);
+            table.setAutoCreateRowSorter(true);
+            table.getRowSorter().toggleSortOrder(0);
             JScrollPane sp =
                 new JScrollPane(
                     table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

@@ -692,6 +692,8 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
                 //            groups.add(new DataGroup("", null, null, null, null));
             }
             JTable table = new ParamGroupsTable(groups, isWritable);
+            table.setAutoCreateRowSorter(true);
+            table.getRowSorter().toggleSortOrder(0);
             table.setPreferredScrollableViewportSize(new Dimension(500, 70));
             String editableStr = "";
             if ( !isWritable) {
