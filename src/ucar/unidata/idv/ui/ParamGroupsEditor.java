@@ -460,7 +460,8 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
 
 
                 public void mouseReleased(MouseEvent e) {
-                    final int row       = rowAtPoint(e.getPoint());
+                    final int origRow   = rowAtPoint(e.getPoint());
+                    final int row       = convertRowIndexToModel(origRow);
                     DataGroup dataGroup = getDataGroup(row);
                     if ( !SwingUtilities.isRightMouseButton(e)) {
                         if ((e.getClickCount() > 1) && (dataGroup != null)) {
@@ -473,7 +474,7 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
                         return;
                     }
 
-                    getSelectionModel().setSelectionInterval(row, row);
+                    getSelectionModel().setSelectionInterval(origRow, origRow);
                     JPopupMenu popup = new JPopupMenu();
                     makePopupMenu(popup, row);
                     popup.show((Component) e.getSource(), e.getX(), e.getY());
@@ -930,7 +931,7 @@ public class ParamGroupsEditor extends IdvManager implements ActionListener {
 
 
     /**
-     * Create xml dom from the given list of {@link ucar.unidata.idv.ui.DataGroup}-s
+     * Create xml dom from the given list of {@link DataGroup DataGroups}
      *
      * @param doc The document to write to
      * @param paramGroups List of param infos
