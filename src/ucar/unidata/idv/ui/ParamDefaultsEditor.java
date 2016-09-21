@@ -650,7 +650,8 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
 
 
                 public void mouseReleased(MouseEvent e) {
-                    final int row       = rowAtPoint(e.getPoint());
+                    final int origRow   = rowAtPoint(e.getPoint());
+                    final int row       = convertRowIndexToModel(origRow);
                     ParamInfo paramInfo = getInfo(row);
                     if ( !SwingUtilities.isRightMouseButton(e)) {
                         if ((e.getClickCount() > 1) && (paramInfo != null)) {
@@ -663,7 +664,7 @@ public class ParamDefaultsEditor extends IdvManager implements ActionListener {
                         return;
                     }
 
-                    getSelectionModel().setSelectionInterval(row, row);
+                    getSelectionModel().setSelectionInterval(origRow, origRow);
                     JPopupMenu popup = new JPopupMenu();
                     makePopupMenu(popup, row);
                     popup.show((Component) e.getSource(), e.getX(), e.getY());

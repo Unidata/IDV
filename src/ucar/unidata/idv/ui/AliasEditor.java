@@ -342,7 +342,8 @@ public class AliasEditor extends IdvManager {
      */
     private void handleMouseEvent(MouseEvent e, JTable table,
                                   final int resourceIdx) {
-        final int row = table.rowAtPoint(e.getPoint());
+        final int origRow   = table.rowAtPoint(e.getPoint());
+        final int row       = table.convertRowIndexToModel(origRow);
         if ( !SwingUtilities.isRightMouseButton(e)) {
             if (e.getClickCount() > 1) {
                 if (isEditableResource(resourceIdx)) {
@@ -353,7 +354,7 @@ public class AliasEditor extends IdvManager {
             }
             return;
         }
-        table.getSelectionModel().setSelectionInterval(row, row);
+        table.getSelectionModel().setSelectionInterval(origRow, origRow);
         JPopupMenu popup = new JPopupMenu();
         JMenuItem  mi    = null;
         if (isEditableResource(resourceIdx)) {
