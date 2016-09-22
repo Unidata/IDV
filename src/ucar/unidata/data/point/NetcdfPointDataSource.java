@@ -382,7 +382,6 @@ public class NetcdfPointDataSource extends PointDataSource {
      */
     public static void main(String[] args) {
         try {
-            //this is a test
             Formatter buf   = new Formatter();
             int       cnt   = ((args.length > 1)
                                ? new Integer(args[1]).intValue()
