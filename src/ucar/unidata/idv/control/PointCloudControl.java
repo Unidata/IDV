@@ -24,45 +24,30 @@ package ucar.unidata.idv.control;
 import org.w3c.dom.Element;
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.gis.KmlUtil;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointCloudDataSource;
+import ucar.unidata.data.point.PointDataInstance;
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
 import ucar.unidata.idv.control.drawing.GlyphCreatorCommand;
 import ucar.unidata.idv.control.drawing.PolyGlyph;
 import ucar.unidata.idv.control.drawing.ShapeGlyph;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
+import ucar.unidata.ui.PropertyFilter;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.GeoUtils;
+import ucar.visad.Util;
 import ucar.visad.display.ImageRGBDisplayable;
 import ucar.visad.display.VolumeDisplayable;
 
-import visad.ConstantMap;
-import visad.Data;
-import visad.Display;
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.FunctionType;
-import visad.Real;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.Set;
-import visad.TupleType;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-import visad.georef.LatLonPoint;
-import visad.georef.MapProjection;
-import visad.georef.TrivialMapProjection;
+import visad.georef.*;
 
 import visad.util.DataUtility;
 
@@ -83,10 +68,9 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 
 
 /**
@@ -125,6 +109,9 @@ public class PointCloudControl extends DrawingControl {
     /** the range types */
     private RealType[] rangeTypes;
 
+    /** stream flow filter */
+    private boolean doFilter = false;
+
     /** clip the points to the shapes */
     private boolean doClip = true;
 
@@ -149,6 +136,21 @@ public class PointCloudControl extends DrawingControl {
 
     /** the animation set */
     private Set animationSet;
+
+    /** The GUI used to show and edit the filters */
+    private PropertyFilter.FilterGui filterGui;
+
+    /** Do we use and logic or or logic for the filters */
+    private boolean matchAll = true;
+
+    /** Are the filters enabled */
+    private boolean filtersEnabled = true;
+
+
+
+    /** filters for showing data */
+    protected List filters = new ArrayList();
+
 
     /**
      * Default constructor; does nothing.
@@ -191,7 +193,8 @@ public class PointCloudControl extends DrawingControl {
      */
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
         super.getSaveMenuItems(items, forMenuBar);
-        items.add(GuiUtils.makeMenuItem("Export Points...", this,
+        items.add(GuiUtils.makeMenuItem("Export Points...",
+                                        this,
                                         "exportPoints"));
 
     }
@@ -206,7 +209,9 @@ public class PointCloudControl extends DrawingControl {
         super.getViewMenuItems(items, forMenuBar);
         if (isSequence) {
             items.add(GuiUtils.makeCheckboxMenuItem("Follow Time Steps",
-                    this, "followTimeStep", null));
+                    this,
+                    "followTimeStep",
+                    null));
         }
     }
 
@@ -250,10 +255,14 @@ public class PointCloudControl extends DrawingControl {
             LatLonPoint llp = timeMap.get(new Integer(index));
             if (llp == null) {
                 //Find the center point of the bounding box of the points in the current time
-                EarthLocation el = new EarthLocationTuple(
-                                       new Real(RealType.Latitude, 40),
-                                       new Real(RealType.Longitude, -107),
-                                       new Real(RealType.Altitude, 0.0));
+                EarthLocation el =
+                    new EarthLocationTuple(new Real(RealType.Latitude,
+                                                    40), new Real(
+                                                        RealType.Longitude,
+                                                                -107), new Real(
+                                                                    RealType
+                                                                        .Altitude,
+                                                                            0.0));
                 llp = el.getLatLonPoint();
                 timeMap.put(new Integer(index), llp);
             }
@@ -466,6 +475,28 @@ public class PointCloudControl extends DrawingControl {
                                 "Can't render point cloud in 2D display");
             return false;
         }
+        Hashtable props = dataChoice.getProperties();
+
+        if ((props != null) && (props.get("doFilter") != null)) {
+            String ns = (String) props.get("doFilter");
+            if (ns == "true") {
+                doFilter = true;
+            }
+        }
+
+        if (doFilter) {
+
+            ActionListener listener = new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    if (getHaveInitialized()) {
+                        applyFilters();
+                    }
+                }
+            };
+
+            filterGui = new PropertyFilter.FilterGui(filters,
+                    getFilterNames(), filtersEnabled, matchAll, listener);
+        }
 
         setEditable(true);
 
@@ -476,6 +507,50 @@ public class PointCloudControl extends DrawingControl {
 
         return true;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected List getFilterNames() {
+        try {
+            DataInstance pdi = (DataInstance) getDataInstance();
+
+            if (pdi == null) {
+                return null;
+            }
+            FieldImpl data = (FieldImpl) pdi.getData();  //pdi.getPointObs();
+
+            Set domainSet = data.getDomainSet();
+            int numObs    = domainSet.getLength();
+            if (numObs == 0) {
+                return null;
+            }
+            FieldImpl    ob  = (FieldImpl) data.getSample(0);
+            FunctionType ft0 = (FunctionType) ob.getType();
+            RealType[]   rt0 = ft0.getFlatRange().getRealComponents();
+            //TupleType  tupleType = (TupleType) ob.getType();
+            List names = new ArrayList();
+            //MathType[] types     = tupleType.getComponents();
+            names.add(PropertyFilter.NULL_NAME);
+            for (int i = 0; i < rt0.length; i++) {
+                String typeId   = rt0[i].toString();
+                String typeName = Util.cleanTypeName(typeId);
+                if ( !typeName.equals("Latitude")
+                        && !typeName.equals("Longitude")
+                        && !typeName.equals("Altitude")) {
+                    names.add(new TwoFacedObject(typeName, typeId));
+                }
+            }
+
+            return names;
+        } catch (Exception exc) {
+            logException("Getting filter names", exc);
+        }
+        return null;
+    }
+
 
     /**
      * Make the display
@@ -494,9 +569,8 @@ public class PointCloudControl extends DrawingControl {
             myRGBDisplay = new ImageRGBDisplayable("pointcloudrgb_"
                     + getDataInstance().getDataChoice().getName());
             myRGBDisplay.addConstantMap(
-                new ConstantMap(
-                    visad.java3d.DisplayImplJ3D.POLYGON_POINT,
-                    Display.PolygonMode));
+                new ConstantMap(visad.java3d.DisplayImplJ3D.POLYGON_POINT,
+                                Display.PolygonMode));
             myRGBDisplay.addConstantMap(new ConstantMap(10,
                     Display.CurvedSize));
             myRGBDisplay.setPointSize(getPointSize());
@@ -580,6 +654,9 @@ public class PointCloudControl extends DrawingControl {
         tabbedPane.add("Point Cloud", mine);
         tabbedPane.add("Clipping", controls);
         tabbedPane.add("Shapes", shapes);
+        if (doFilter) {
+            tabbedPane.add("Filters", doMakeFilterGui());
+        }
         return tabbedPane;
     }
 
@@ -600,25 +677,69 @@ public class PointCloudControl extends DrawingControl {
                     GuiUtils.left(doMakeColorByWidget())));
         }
         super.getControlWidgets(controlWidgets);
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Point Size:"),
-                GuiUtils.left(doMakePointSizeWidget())));
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Point Size:"),
+                                             GuiUtils.left(
+                                             doMakePointSizeWidget())));
 
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Clipping:"),
-                GuiUtils.left(
-                    GuiUtils.hbox(
-                        GuiUtils.makeCheckbox(
-                            "Clip Enabled", this,
-                            "doClip"), GuiUtils.makeCheckbox(
-                                "Show Inside Region", this,
-                                "showInside"), GuiUtils.makeButton(
-                                    "Reload", this, "reloadPointData")))));
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Clipping:"),
+                                             GuiUtils.left(
+                                             GuiUtils.hbox(
+                                                 GuiUtils.makeCheckbox(
+                                                     "Clip Enabled",
+                                                             this,
+                                                             "doClip"),
+                                                         GuiUtils.makeCheckbox(
+                                                         "Show Inside Region",
+                                                                 this,
+                                                                 "showInside"),
+                                                         GuiUtils.makeButton(
+                                                         "Reload",
+                                                                 this,
+                                                                 "reloadPointData")))));
 
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected JComponent doMakeFilterGui() {
+        JComponent buttons = GuiUtils.makeButton("Apply Filters", this,
+                                 "applyFilters");
+
+        JComponent gui =
+            GuiUtils.topCenter(GuiUtils.left(GuiUtils.inset(buttons,
+                                                            5)), filterGui.getContents());
+        return gui;
+
+    }
+
+    /**
+     * Init the vis filters
+     */
+    public void initFilters() {
+        if (filterGui != null) {
+            filters        = filterGui.getFilters();
+            matchAll       = filterGui.getMatchAll();
+            filtersEnabled = filterGui.getEnabled();
+        }
+    }
+
+
+    /**
+     * Apply the vis filters
+     */
+    public void applyFilters() {
+        initFilters();
+        try {
+            loadPointData();
+        } catch (Exception e) {}
+    }
 
     /**
      * Make the color by widget
@@ -629,26 +750,28 @@ public class PointCloudControl extends DrawingControl {
         if (colorParamsBox == null) {
             colorParamsBox = new JComboBox();
             colorParamsBox.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if ((myDisplay == null) || !getHaveInitialized()) {
-                        return;
-                    }
-                    try {
-                        colorRangeIndex = colorParamsBox.getSelectedIndex();
+                        public void actionPerformed(ActionEvent e) {
+                            if ((myDisplay == null)
+                                || !getHaveInitialized()) {
+                                return;
+                            }
+                            try {
+                                colorRangeIndex =
+                                    colorParamsBox.getSelectedIndex();
 
-                        // TJJ Dec 2013, do NOT want to change display, 
-                        // this event handler should only affect current data
-                        // RealType colorType =
-                        //     (RealType) colorParamsBox.getSelectedItem();
-                        // myDisplay.setRGBRealType(colorType);
+                                // TJJ Dec 2013, do NOT want to change display, 
+                                // this event handler should only affect current data
+                                // RealType colorType =
+                                //     (RealType) colorParamsBox.getSelectedItem();
+                                // myDisplay.setRGBRealType(colorType);
 
-                        setRange(getColorRangeFromData());
-                        setSelectRange(getRange());
-                    } catch (Exception excp) {
-                        logException("Setting rgb type", excp);
-                    }
-                }
-            });
+                                setRange(getColorRangeFromData());
+                                setSelectRange(getRange());
+                            } catch (Exception excp) {
+                                logException("Setting rgb type", excp);
+                            }
+                        }
+                    });
             setColorParams();
         }
         return colorParamsBox;
@@ -760,15 +883,26 @@ public class PointCloudControl extends DrawingControl {
      */
     private void loadPointData(Data newData) throws Exception {
 
-        FieldImpl data   = (newData == null)
-                           ? (FieldImpl) getDataInstance().getData()
-                           : (FieldImpl) newData;
-        FlatField points = null;
+        FieldImpl data     = (newData == null)
+                             ? (FieldImpl) getDataInstance().getData()
+                             : (FieldImpl) newData;
+        if (filtersEnabled && (filters.size() > 0)) {
+            try {
+                LogUtil.message("Observation display: filtering data");
+                Trace.call1("filterData");
+                data = filterData(data);
+                Trace.call2("filterData");
+            } catch (Exception exc) {
+                logException("Processing filters", exc);
+            }
+        }
+
+        FieldImpl points = null;
         isSequence = GridUtil.isTimeSequence(data);
         if (isSequence) {
-            points = (FlatField) data.getSample(0, false);
+            points = (FieldImpl) data.getSample(0, false);
         } else {
-            points = (FlatField) data;
+            points = data;
         }
         // set some default indices
         int latIndex = PointCloudDataSource.INDEX_LAT;
@@ -868,7 +1002,7 @@ public class PointCloudControl extends DrawingControl {
         }
         for (int j = 0; j < numTimes; j++) {
             if (j > 0) {
-                pts = ((FlatField) data.getSample(j, false)).getFloats(false);
+                pts = ((FieldImpl) data.getSample(j, false)).getFloats(false);
             }
             float timeminX = Float.POSITIVE_INFINITY;
             float timeminY = Float.POSITIVE_INFINITY;
@@ -895,13 +1029,15 @@ public class PointCloudControl extends DrawingControl {
             }
             EarthLocation el =
                 new EarthLocationTuple(new Real(RealType.Latitude,
-                    timeminY
-                    + (timemaxY - timeminY)
-                      / 2), new Real(RealType.Longitude,
-                                     timeminX
-                                     + (timemaxX - timeminX)
-                                       / 2), new Real(RealType.Altitude,
-                                           0.0));
+                                                timeminY
+                                                + (timemaxY - timeminY)
+                                                  / 2), new Real(
+                                                      RealType.Longitude,
+                                                              timeminX
+                                                              + (timemaxX
+                                                                 - timeminX) / 2), new Real(
+                                                                     RealType.Altitude,
+                                                                             0.0));
             timeMap.put(new Integer(j), el.getLatLonPoint());
             minX = Math.min(timeminX, minX);
             maxX = Math.max(timemaxX, maxX);
@@ -910,37 +1046,14 @@ public class PointCloudControl extends DrawingControl {
         }
 
         if (shapes.size() > 0) {
-            float[][] newPts   = new float[pts.length][pts[0].length];
-            int       pointCnt = 0;
-            for (int i = 0; i < pts[0].length; i++) {
-                boolean ok = !showInside;
-                for (int j = 0; j < shapes.size(); j++) {
-                    Shape shape = shapes.get(j);
-                    if (shape.contains(pts[lonIndex][i] * scales[j],
-                                       pts[latIndex][i] * scales[j])) {
-                        if (showInside) {
-                            ok = true;
-                            break;
-                        } else {
-                            ok = false;
-                            break;
-                        }
-                    } else {
-                        if ( !showInside) {
-                            ok = true;
-                        }
-                    }
-                }
-                if (ok) {
-                    for (int j = 0; j < pts.length; j++) {
-                        newPts[j][pointCnt] = pts[j][i];
-                    }
-                    pointCnt++;
-                }
+            try {
+                LogUtil.message("Observation display: clipping data");
+                Trace.call1("clippingData");
+                data = clippingData(data, shapes, scales, lonIndex, latIndex);
+                Trace.call2("clippingData");
+            } catch (Exception exc) {
+                logException("Processing clipping", exc);
             }
-            pts = Misc.copy(newPts, pointCnt);
-            FunctionType ft = (FunctionType) ((FlatField) points).getType();
-            data = PointCloudDataSource.makeField(ft.getRange(), pts);
         }
 
 
@@ -975,6 +1088,266 @@ public class PointCloudControl extends DrawingControl {
         }
 
     }
+
+    /**
+     * _more_
+     *
+     * @param obs _more_
+     * @param shapes _more_
+     * @param scales _more_
+     * @param lonIndex _more_
+     * @param latIndex _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected FieldImpl clippingData(FieldImpl obs, List<Shape> shapes,
+                                     int[] scales, int lonIndex, int latIndex)
+            throws Exception {
+        boolean   isTimeSequence = GridUtil.isTimeSequence(obs);
+        FieldImpl clippedField   = null;
+        if (isTimeSequence) {
+            Set timeSet = obs.getDomainSet();
+            clippedField = new FieldImpl((FunctionType) obs.getType(),
+                                         timeSet);
+            int numTimes = timeSet.getLength();
+            for (int i = 0; i < numTimes; i++) {
+                FieldImpl oneTime = (FieldImpl) obs.getSample(i);
+                FieldImpl subTime = doTheActualClipping(oneTime, shapes,
+                                        scales, lonIndex, latIndex);
+                if (subTime != null) {
+                    clippedField.setSample(i, subTime, false);
+                }
+            }
+        } else {
+            clippedField = doTheActualClipping((FieldImpl) obs, shapes,
+                    scales, lonIndex, latIndex);
+        }
+        return clippedField;
+    }
+
+    /**
+     * _more_
+     *
+     * @param points _more_
+     * @param shapes _more_
+     * @param scales _more_
+     * @param lonIndex _more_
+     * @param latIndex _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private FieldImpl doTheActualClipping(FieldImpl points,
+                                          List<Shape> shapes, int[] scales,
+                                          int lonIndex, int latIndex)
+            throws Exception {
+
+        float[][] pts      = points.getFloats(false);
+        float[][] newPts   = new float[pts.length][pts[0].length];
+        int       pointCnt = 0;
+        for (int i = 0; i < pts[0].length; i++) {
+            boolean ok = !showInside;
+            for (int j = 0; j < shapes.size(); j++) {
+                Shape shape = shapes.get(j);
+                if (shape.contains(pts[lonIndex][i] * scales[j],
+                                   pts[latIndex][i] * scales[j])) {
+                    if (showInside) {
+                        ok = true;
+                        break;
+                    } else {
+                        ok = false;
+                        break;
+                    }
+                } else {
+                    if ( !showInside) {
+                        ok = true;
+                    }
+                }
+            }
+            if (ok) {
+                for (int j = 0; j < pts.length; j++) {
+                    newPts[j][pointCnt] = pts[j][i];
+                }
+                pointCnt++;
+            }
+        }
+        pts = Misc.copy(newPts, pointCnt);
+        FunctionType ft = (FunctionType) points.getType();
+        FieldImpl data0 = PointCloudDataSource.makeField(ft.getRange(), pts);
+
+        return data0;
+    }
+
+    /**
+     * Apply the filters to the given data
+     *
+     * @param obs The data
+     *
+     * @return The filtered data.
+     *
+     * @throws Exception When bad things happen.
+     */
+    protected FieldImpl filterData(FieldImpl obs) throws Exception {
+        boolean   isTimeSequence = GridUtil.isTimeSequence(obs);
+        FieldImpl filteredField  = null;
+        if (isTimeSequence) {
+            Set timeSet = obs.getDomainSet();
+            filteredField = new FieldImpl((FunctionType) obs.getType(),
+                                          timeSet);
+            int numTimes = timeSet.getLength();
+            for (int i = 0; i < numTimes; i++) {
+                FieldImpl oneTime = (FieldImpl) obs.getSample(i);
+                FieldImpl subTime = doTheActualFiltering(oneTime);
+                if (subTime != null) {
+                    filteredField.setSample(i, subTime, false);
+                }
+            }
+        } else {
+            filteredField = doTheActualFiltering((FieldImpl) obs);
+        }
+        return filteredField;
+    }
+
+
+    /**
+     * Apply the filters to the data
+     *
+     * @param pointObs The data
+     *
+     * @return The filtered data
+     *
+     * @throws Exception When bad things happen
+     */
+    private FieldImpl doTheActualFiltering(FieldImpl pointObs)
+            throws Exception {
+
+        if ((pointObs == null) || pointObs.isMissing()) {
+            return pointObs;
+        }
+        FieldImpl retField  = null;
+        Set       domainSet = pointObs.getDomainSet();
+        int       numObs    = domainSet.getLength();
+        Vector    v         = new Vector();
+        Object[]  tmpValues = new Object[filters.size()];
+
+
+        for (int i = 0; i < numObs; i++) {
+            Object tmp = pointObs.getSample(i);
+            if ( !(tmp instanceof Tuple)) {
+                continue;
+            }
+            //PointOb    ob        = (PointOb) tmp;
+            Tuple      tuple     = (Tuple) tmp;
+            TupleType  tupleType = (TupleType) tuple.getType();
+            RealType[] types     = tupleType.getRealComponents();
+
+            String[]   typeNames = new String[types.length];
+            for (int typeIdx = 0; typeIdx < types.length; typeIdx++) {
+                typeNames[typeIdx] = types[typeIdx].toString();
+            }
+            boolean ok          = true;
+            boolean matchedSome = false;
+            for (int filterIdx = 0; ok && (filterIdx < filters.size());
+                    filterIdx++) {
+                PropertyFilter filter =
+                    (PropertyFilter) filters.get(filterIdx);
+                String paramName   = filter.getName();
+
+                Data   dataElement = null;
+
+
+                int    dataIndex   = -1;
+                for (int typeIdx = 0;
+                        (dataIndex == -1)
+                        && (typeIdx < typeNames.length); typeIdx++) {
+                    if (paramName.equals(typeNames[typeIdx])) {
+                        dataIndex = typeIdx;
+                    }
+                }
+
+                if (dataIndex < 0) {
+                    continue;
+                }
+                dataElement = tuple.getRealComponents()[dataIndex];
+
+                if (dataElement == null) {
+                    continue;
+                }
+                if (dataElement.isMissing()) {
+                    if (matchAll) {
+                        ok = false;
+                    }
+                    continue;
+                }
+                boolean filterOk = false;
+                if ( !(dataElement instanceof Real)
+                        || !filter.isNumericOperator()) {
+                    filterOk = filter.ok(dataElement.toString().trim());
+                } else {
+                    Real obsReal = (Real) dataElement;
+                    if (tmpValues[filterIdx] == null) {
+                        String filterValue = filter.getValue().trim();
+                        tmpValues[filterIdx] = filterValue;
+                        Real filterReal = ucar.visad.Util.toReal(filterValue);
+                        if (filterReal != null) {
+                            //                            System.err.println("filterReal:" + filterReal.getUnit() + " " +
+                            //                                         obsReal.getUnit());
+                            if (obsReal.getUnit() == null) {
+                                tmpValues[filterIdx] =
+                                    new Double(filterReal.getValue());
+                            } else {
+                                tmpValues[filterIdx] = new Double(
+                                    filterReal.getValue(obsReal.getUnit()));
+                            }
+                            //System.err.println("value:" + tmpValues[filterIdx]);
+                        }
+                    }
+                    filterOk = filter.ok(dataElement, tmpValues[filterIdx]);
+                }
+                if (filterOk) {
+                    matchedSome = true;
+                    if ( !matchAll) {
+                        break;
+                    }
+                } else {
+                    if (matchAll) {
+                        ok = false;
+                    }
+                }
+            }
+
+            if (ok && matchedSome) {
+                v.add(tuple);
+            }
+        }
+
+
+
+        //System.out.println("found " + v.size() + " decluttered obs in region");
+        if (v.isEmpty()) {
+            retField = new FieldImpl(
+                (FunctionType) pointObs.getType(),
+                new Integer1DSet(((SetType) domainSet.getType()).getDomain(),
+                                 1));
+        } else if (v.size() == numObs) {
+            retField = pointObs;  // all were in domain, just return input
+        } else {
+            retField = new FieldImpl(
+                (FunctionType) pointObs.getType(),
+                new Integer1DSet(((SetType) domainSet.getType()).getDomain(),
+                                 v.size()));
+
+            retField.setSamples((Tuple[]) v.toArray(new Tuple[v.size()]),
+                                false, false);
+        }
+        return retField;
+
+    }
+
+
 
     /**
      * Is this a raster display
