@@ -12,7 +12,7 @@ Displays for WRF post-processed data.
 The following are examples of some of the different kinds of displays available in the IDV. For more information how to manipulate the display, simply click the image to see the User Guide section for that particular display type. The general format of this section will be an image, followed by the steps needed to reproduce the image. However, before diving into creating different displays in the IDV, let's take a moment to discuss how to handle large data sets.
 </p>
 
-<div class="pagetitle">Preparation: Dealing with Large Data</div>
+<h1>Preparation: Dealing with Large Data</h1>
 
 <p>
 As you may have experienced, it can take quite some time to get the data into the IDV and render the displays. One way to speed this up is to spatially subset the data over an area of interest. For our case, the Gulf of Mexico is where the 'action' is, so let's subest for that particular region:
@@ -68,7 +68,7 @@ To test the bundle, click the scissors symbol, found just below the main menu ba
 <li>An [ht::command Open bundle] dialog box will appear &mdash; make sure [ht::param Remove and displays & data] and [ht::param Try to add displays to current windows] are checked and click [ht::command OK].
 </ul>
 
-<div class="pagetitle">Plan Views</div>
+<h1>Plan Views</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/PlanViewControl.html" [ht::cimg ./images/WRF_PlanView.png]]
 
@@ -100,7 +100,7 @@ To test the bundle, click the scissors symbol, found just below the main menu ba
     and to the right of your display on the Main View Window.</li>
 </ol>
 
-<div class="pagetitle">Wind Barb and Vector Displays</div>
+<h1>Wind Barb and Vector Displays</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/FlowPlanViewControl.html" [ht::cimg ./images/WRF_BarbView.png]]
 
@@ -136,7 +136,7 @@ creating the display.
 </p>
 
 
-<div class="pagetitle">Trajectory Display</div>
+<h1>Trajectory Display</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/FlowPlanViewControl.html" [ht::cimg ./images/traj.gif]]
 
@@ -182,7 +182,7 @@ creating the display.
 </ol>
 
 
-<div class="pagetitle">Hovm&ouml;ller Diagrams</div>
+<h1>Hovm&ouml;ller Diagrams</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/HovmollerControl.html" [ht::cimg ./images/WRF_Hov_detached.png]]
 
@@ -216,7 +216,7 @@ function of time and latitude. Because we chose [ht::display Time-Latitude (Colo
 averaged over longitude for each time-step. To average over latitude instead, recreate the display using [ht::display Time-Longitude (Color Shaded)] display.
 </p>
 
-<div class="pagetitle">Isosurfaces</div>
+<h1>Isosurfaces</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/ThreeDSurfaceControl.html" [ht::cimg ./images/WRF_iso_by_param.png]]
 
@@ -243,7 +243,7 @@ averaged over longitude for each time-step. To average over latitude instead, re
 
 [ht::cimg ./images/WRF_iso_by_param_ani.gif]
 
-<div class="pagetitle">Parameter over Topography</div>
+<h1>Parameter over Topography</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/PlanViewControl.html" [ht::cimg ./images/WRF_ParamOverTopo.png]]
 
@@ -268,7 +268,7 @@ averaged over longitude for each time-step. To average over latitude instead, re
     the changes.</li>
 </ol>
 
-<div class="pagetitle">Parameter as Topography</div>
+<h1>Parameter as Topography</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/PlanViewControl.html" [ht::cimg ./images/WRF_ParamAsTopo.png]]
 
@@ -294,7 +294,7 @@ averaged over longitude for each time-step. To average over latitude instead, re
     the changes.</li>
 </ol>
 
-<div class="pagetitle">Cross Sections</div>
+<h1>Cross Sections</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/CrossSectionControl.html" [ht::cimg images/WRF_WindSpeedVectorX.png]]
 
@@ -378,7 +378,7 @@ Then, add the color scale to the display:
 </ol>
 
 
-<div class="pagetitle">2D and 3D Data Probes</div>
+<h1>2D and 3D Data Probes</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/ProbeControl.html" [ht::cimg images/WRF_2D_Data_Probe.png]]
 
@@ -397,7 +397,7 @@ Then, add the color scale to the display:
 In the Main View Window, you will see contours of [ht::param Pressure_Reduced_to_MSL @ msl], as well as a Probe marker (in the example above, the marker is a yellow rectangle located just NW of Cuba). You can click and drag the probe marker to move it to a location of your choice. The corresponding time series plot will show up in the Dashboard under the [ht::param Display] tab (shown above the Main View Window in our example image). Note that the Data Probe will also work with three-dimensional data, and you will be able to move it vertically as well.
 </p>
 
-<div class="pagetitle">Time-Height Display</div>
+<h1>Time-Height Display</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/TimeHeightControl.html" [ht::cimg images/WRF_Time_Height.png]]
 
@@ -419,7 +419,7 @@ In the Main View Window, you will see contours of [ht::param Pressure_Reduced_to
 In the Main View Window, you will see the 90% RH isosurface, as well as a time-height marker (in the example above, the marker is red vertical line with a rectangle on top). You can click and drag the probe to move it to a location of your choice.
 </p>
 
-<div class="pagetitle">Skew-T Displays</div>
+<h1>Skew-T Displays</h1>
 
 [ht::popup "http://www.unidata.ucar.edu/software/idv/docs/userguide/controls/AerologicalSoundingControl.html" [ht::cimg images/WRF_SkewT.png]]
 

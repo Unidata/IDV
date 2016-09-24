@@ -1,56 +1,60 @@
-<html>
-<head>
-<title>Section: %level% %title%</title>
-%head%
-</html>
-<body>
-%navprev% 
-%navnext% 
-%navtoc% 
-<!--
-%xxxnavindex% 
-%xxxnavglossary%
--->
-
-%navframe%  
-<a href="%urlroot%/docs/userguide%userguide%" target="userguide">
-<img src="%dotpath%/images/UserGuide.gif" alt="User guide" title="User guide" border="0"></a>
-%navschedule%
-
-
-<br>
-<span class="breadcrumb">%navbreadcrumb% </span>
-<br>
-<img src="%dotpath%/images/blueline.gif">
-<p>
-<div class="pagetitle">%level% %title%</div>
-
-
-%body%
-
-<p>
-%childlist%
-
-<p>&nbsp;<p>
-<img src="%dotpath%/images/blueline.gif">
-<br>
-%navprev%
-%navnext%
-%navtoc%
-<!--
-%xxxnavindex%
-%xxxnavglossary%
--->
-%navframe%
-<a href="%urlroot%/docs/userguide%userguide%" target="userguide">
-<img src="%dotpath%/images/UserGuide.gif" alt="User guide" title="User guide" border="0"></a>
-%extranav%
+<!DOCTYPE html>
+ <html>
+  <head>
+   <title>Unidata IDV Workshop | Section: %level% %title%</title>
+   	%head%
+  </head>
+  <body>
+   <nav>
+    <ul class="toc">
+     <li>%navprev%</li>
+     <li>%navnext%</li>
+	 <li>%navtoc%</li>
+   	 <!--
+   	 <li>%navindex%</li>
+   	 <li>%navglossary%</li>
+   	 -->
+     <li>%navschedule%</li>  
+     <li>%navframe%</li>
+   	 <li>
+   	  <a href="%urlroot%/docs/userguide%userguide%" target="userguide">
+   	   <img src="%dotpath%/images/UserGuide.gif" alt="User guide" title="User guide">
+      </a>
+     </li>
+    </ul>
+    <div class="breadcrumb">
+     %navbreadcrumb% 
+    </div>
+   </nav>
+   <hr />
+   <h1>%level% %title%</h1>
 
 
-%navschedule%
-<br>
-<span class="breadcrumb">%navbreadcrumb% </span>
-<p>
+    %body%
+    %childlist%
 
-</body>
-</html>
+   <hr />
+   <nav>
+    <ul class="toc">
+     <li>%navprev%</li>
+     <li>%navnext%</li>
+	 <li>%navtoc%</li>
+   	 <!--
+   	 <li>%navindex%</li>
+   	 <li>%navglossary%</li>
+   	 -->
+     <li>%navschedule%</li>  
+     <li>%navframe%</li>
+   	 <li>
+   	  <a href="%urlroot%/docs/userguide%userguide%" target="userguide">
+   	   <img src="%dotpath%/images/UserGuide.gif" alt="User guide" title="User guide">
+      </a>
+     </li>
+	 <li>%extranav%</li>
+    </ul>
+    <div class="breadcrumb">
+     %navbreadcrumb% 
+    </div>
+   </nav>
+  </body>
+ </html>

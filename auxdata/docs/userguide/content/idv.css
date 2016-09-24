@@ -1,82 +1,65 @@
-
-body {background-color: #FFFFFF;
-      margin: 5;
-      font-size: 12pt;
-      font-family: SansSerif, Arial, Helvetica, sans-serif}       
-
-
-
-
+body {
+ background-color: #FFFFFF;
+ margin: 5px;
+ font-size: 12pt;
+ font-family: SansSerif, Arial, Helvetica, sans-serif;
+} 
 
 .xmlcomment {
-
-
-     background-color: lightgray;
+ background-color: lightgray;
 }
 
 .xmlcdata {
-     background-color: #6495ed;
+ background-color: #6495ed;
 }
 
-
 .xmlattr {
-   font-weight: bold;
+  font-weight: bold;
 }
 
 .cimg {
-    text-align:center;
-    margin-top: 20;
-    margin-bottom: 40;
+ text-align:center;
+ margin-top: 20px;
+ margin-bottom: 40px;
 }
 
-
-
-
-
-
-
-A.faq-category-link {
-    text-decoration: none;
-    color: #8080C0;
+/* FAQs */
+a.faq-category-link {
+ text-decoration: none;
+ color: #8080C0;
 }
 
-A.faq-category-link:hover {
-    text-decoration: underline;
+a.faq-category-link:hover {
+ text-decoration: underline;
 }
 
-A.faq-question-link {
-    text-decoration: none;
-    color: black;
+a.faq-question-link {
+ text-decoration: none;
+ color: black;
 }
 
-A.faq-question-link:hover {
-    text-decoration: underline;
-}
-
-.footer  {
-    text-align:center;
-    font-style:italic;
+a.faq-question-link:hover {
+ text-decoration: underline;
 }
 
 .faq-category-title {
-    margin-top:10px;
-    color: #8080C0;
-    font-size: 16pt;
-    font-weight: bold;
+ margin-top:10px;
+ color: #8080C0;
+ font-size: 16pt;
+ font-weight: bold;
 }
 
-
 .faq-bottom {
-        margin-top:20px;
+ margin-top:20px;
 }
 
 .faq-bottom .faq-question {
-   font-weight:bold;
-   margin-top:5px;
+ font-weight:bold;
+ margin-top:5px;
 }
 
 .faq-category {
-        margin-left:20px;
+ margin-left:20px;
 }
 
 
@@ -85,151 +68,232 @@ A.faq-question-link:hover {
 /*Since applying styles to span tags does not seem to work we use <code class="command">*/
 
 code.command {
-         font-size: 12pt;
-         font-family: SansSerif, Arial, Helvetica, sans-serif;       
-         font-weight: bold;
+  font-size: 12pt;
+  font-family: SansSerif, Arial, Helvetica, sans-serif; 
+  font-weight: bold;
 }
 
 code.menu {
-         font-size: 12pt;
-         font-family: SansSerif, Arial, Helvetica, sans-serif;       
-         font-weight: bold;
+  font-size: 12pt;
+  font-family: SansSerif, Arial, Helvetica, sans-serif; 
+  font-weight: bold;
 }
 
 
-.pagetitle {
-    font-size: 18pt;
-    font-weight: bold;
-    color: #8080C0;
-    margin-top: 5;
-    margin-bottom: 5;
+h1 {
+ font-size: 18pt;
+ font-weight: bold;
+ color: #8080C0;
+ margin-top: 5px 0px;
 }
 
-.pagesubtitle {
-    font-size: 14pt;
-    font-weight: bold;
-    color: #8080C0;
-    margin-top: 10;
-    margin-bottom: 5;
+h3 {
+ font-size: 14pt;
+ font-weight: bold;
+ color: #8080C0;
+ margin-top: 10px;
+ margin-bottom: 5px;
 }
 
+hr {
+ clear: both;
+ margin: 5px 0px;
+ border: 0px;
+ height: 3px;
+ background: #0952b9;
+ background-image: -webkit-linear-gradient(top, #0952b9, #ccc); 
+ background-image: -moz-linear-gradient(top, #0952b9, #ccc); 
+ background-image: -ms-linear-gradient(top, #0952b9, #ccc); 
+ background-image: -o-linear-gradient(top, #0952b9, #ccc); 
+}
 
+hr.bland {
+ border-top: 1px solid #CFCFCF;
+ height: 1px;
+ background: none;
+}
 
+ul.toc {
+ float: left;
+ height: 26px;
+ list-style-type: none;
+ margin: 0px 0px 10px 0px;
+ padding: 0px;
+}
+ul.toc li {
+ height: 26px !important;
+ display: inline;
+ background: none;
+ margin: 0px;
+ padding: 0px;
+ border: none;
+ float: left;
+}
+ul.toc li a {
+ width: 26px !important;
+ height: 26px !important;
+}
+ul.toc li img {
+ width: 26px !important;
+ height: 26px !important;
+ margin-right: 2px;
+ padding: 0px;
+ border: 1px solid #C0C0C0 !important;
+}
+
+.breadcrumb {
+ height: 26px;
+ float: left;
+ margin-left: 20px;
+ font-size: 10pt;
+}
+.breadcrumb a {
+ line-height: 26px;
+}
 
 .preferencegroup {
-    margin-left: 20;
+ margin-left: 20px;
 }
 
 
 .preferencegrouptitle {
-    border-bottom: solid thin;
-    margin-top: 10;
-    margin-bottom: 2;
-    font-size: 12pt;
-    font-weight: bold;
-    color: #8080C0;
+ border-bottom: solid thin;
+ margin-top: 10px;
+ margin-bottom: 2px;
+ font-size: 12pt;
+ font-weight: bold;
+ color: #8080C0;
 }
 
 .pagesubsubtitle {
-    font-size: 12pt;
-    font-weight: bold;
-    color: #8080C0;
-    margin-top: 5;
-    margin-bottom: 5;
+ font-size: 12pt;
+ font-weight: bold;
+ color: #8080C0;
+ margin: 5px 0px;
 }
 
 
 
-p   {
-     font-size: 12pt;
-     font-family: SansSerif, Arial, Helvetica, sans-serif;       
-     margin-top: 10;
-     margin-bottom: 0;
+p  {
+ font-size: 12pt;
+ font-family: SansSerif, Arial, Helvetica, sans-serif; 
+ margin-top: 10px;
 }
 
 p.code {
-        font-family: Monospaced;
-	margin-left: 22;
-       }
+ font-family: Monospaced;
+ margin-left: 22px;
+}
 
 .jython {
-        font-family: Monospaced;
-	margin-left: 22;
-       }
+ font-family: Monospaced;
+ margin-left: 22px;
+}
 
 
 .childlist-level {
-    font-weigt:bold;
-    font-size: 14pt;
-    color: #8080C0;
-    margin-top: 10;
-    margin-bottom: 5;
+ font-weigt:bold;
+ font-size: 14pt;
+ color: #8080C0;
+ margin-top: 10px;
+ margin-bottom: 5px;
 }
 
 .childlist {
-    margin: 10;
-    margin-left: 30;
+ margin: 10px;
+ margin-left: 30px;
+}
+
+p.indent1 {
+ margin-left: 3px;
+}
+
+p.indent2 {
+ margin-left: 12px;
+}
+
+p.indent3 {
+ margin-left: 32px;
+}
+
+p.note {
+ margin-top: -19px;
+ margin-left: 22px;
+}
+
+p.table {
+ font-size: 12pt;
+ font-family: SansSerif, Arial, Helvetica, sans-serif;
+ margin-top: 0px;
+ margin-bottom: 0px;
+}
+
+blockquote.menu {
+ margin-left: 18px;
+ margin-top: 10px;
+}
+
+center {
+ margin-top: 10px;
+}
+
+/*
+[border] {
+ border: solid thin;
+ border-color: silver;
+}
+*/
+
+table {
+ border: none;
+ border-color: white;
+ margin-top: 5px 0px;
+}
+
+td {
+ font-size: 12pt;
+ font-family: SansSerif, Arial, Helvetica, sans-serif;
+ padding: 1px;
+} 
+
+
+th {
+ padding: 1px;
 }
 
 
+small {
+ font-size: x-small;
+}
 
-p.indent1  {margin-left: 3}
+dl.see_also {
+ margin: 10px 0px;
+}
 
-p.indent2  {margin-left: 12}
+a.nounderline {
+ text-decoration: none;
+}
 
-p.indent3  {margin-left: 32}
+pre { 
+ font-family: Monospaced, "Courier New", Courier, mono;
+ font-size: x-small;
+}
 
-p.note {margin-top: -19;
-	margin-left: 22}
-
-p.table {font-size: 12pt;
-     font-family: SansSerif, Arial, Helvetica, sans-serif;
-     margin-top:0;
-     margin-bottom: 0}
-
-blockquote.menu {margin-left: 18;
-		margin-top: 10}
-
-center {margin-top: 10}
-
-
-[border] {border: solid thin;
-       border-color: silver}
-
-table {border: none;
-       border-color: white;
-       margin-top: 5;
-       margin-bottom: 5}
-
-td {font-size: 12pt;
-    font-family: SansSerif, Arial, Helvetica, sans-serif;
-    padding-left: 1;
-    padding-right: 1;
-    padding-top: 1;
-    padding-bottom: 1} 
-
-
-th {padding-left: 1;
-    padding-right: 1;
-    padding-top: 1;
-    padding-bottom: 1}
-
-
-small {font-size: x-small}
-
-dl.see_also {margin-left: 0;
-    margin-top: 10;
-    margin-bottom: 10}
-
-a.nounderline {text-decoration: none }
-
-pre {  font-family: Monospaced, "Courier New", Courier, mono; xxxfont-size: x-small}
-
-code {  font-family: Monospaced, "Courier New", Courier, mono; xxxfont-size: x-small}
-
+code { 
+ font-family: Monospaced, "Courier New", Courier, mono; 
+ font-size: x-small;
+}
 
 .menudesc {
-    margin: 0;
-    margin-left: 0;
-    margin-bottom: 10;
+ margin: 0px;
+ margin-bottom: 10px;
 }
+
+.footer {
+ clear: both;
+ text-align:center;
+ font-style:italic;
+ font-size: 10pt;
+ margin: 5px 0;
+}
+

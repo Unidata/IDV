@@ -46,7 +46,7 @@ proc isl::tagdef {tag  desc {args}} {
     lappend tagDict [list $tag $desc   [file tail $currentFile]]
     array set A {-attrs {}}
     array set A $args
-    set header "<hr><div class=\"pagesubsubtitle\">&lt;<a name=\"$tag\"></a><i>$tag</i>&gt; $desc</div>"
+    set header "<hr /><div class=\"pagesubsubtitle\">&lt;<a name=\"$tag\"></a><i>$tag</i>&gt; $desc</div>"
     set attrs ""
     foreach {name value} $A(-attrs) {
 	if {$attrs == ""} {
