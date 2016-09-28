@@ -20,6 +20,7 @@
 
 package ucar.unidata.idv.control;
 
+
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataChoice;
@@ -30,6 +31,7 @@ import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.control.chart.LineState;
 import ucar.unidata.idv.control.chart.TimeSeriesChart;
 import ucar.unidata.ui.ImageUtils;
@@ -41,7 +43,6 @@ import ucar.unidata.util.MidiProperties;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.ShapeUtility;
@@ -110,6 +111,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 
 import javax.vecmath.Point3d;
+
 
 /**
  * A widget to display data values at one point in the 2d or 3d data field.
@@ -293,27 +295,27 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     public boolean init(List choices) throws VisADException, RemoteException {
 
         // make sure user has selected at least two times.
-    	// can't do a time series with less
-    	boolean singleTime = true;
-    	for (int i = 0; i < choices.size(); i++) {
-    		ProbeRowInfo info = getRowInfo(i);
-    		Data data = info.getDataInstance().getData();
-    		if ( !(data instanceof FieldImpl)) {
-    			continue;
-    		}
-    		Set set = ((FieldImpl) data).getDomainSet();
-    		if (set != null) {
-    			if (set.getLength() > 1) {
-    				singleTime = false;
-    				break;
-    			}
-    		}
-    	}
-    	if (singleTime) {
-    		userMessage("Select at least two times for a time series");
-    		return false;
-    	}
-        
+        // can't do a time series with less
+        boolean singleTime = true;
+        for (int i = 0; i < choices.size(); i++) {
+            ProbeRowInfo info = getRowInfo(i);
+            Data         data = info.getDataInstance().getData();
+            if ( !(data instanceof FieldImpl)) {
+                continue;
+            }
+            Set set = ((FieldImpl) data).getDomainSet();
+            if (set != null) {
+                if (set.getLength() > 1) {
+                    singleTime = false;
+                    break;
+                }
+            }
+        }
+        if (singleTime) {
+            userMessage("Select at least two times for a time series");
+            return false;
+        }
+
         if ((_levels != null) && (infos.size() == 0)) {
             //We have legacy muli-list table state
             for (int i = 0; i < _levels.size(); i++) {
@@ -330,10 +332,14 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 Unit unit = (Unit) Misc.safeGet(_units, i);
                 MidiProperties sound = (MidiProperties) Misc.safeGet(_sounds,
                                            i);
-                infos.add(new ProbeRowInfo(level, alt, theMethod, unit,
+                infos.add(new ProbeRowInfo(level,
+                                           alt,
+                                           theMethod,
+                                           unit,
                                            sound));
             }
         }
+
 
 
 
@@ -374,8 +380,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                                       RealType.ZAxis };
             globePositionType = new RealTupleType(components, null, null);
             probe = new PointProbe(new RealTuple(globePositionType,
-                    new double[] { 0,
-                                   0, 0 }));
+                    new double[] { 0, 0, 0 }));
             probe.getSelectorPoint().setDragAdapter(this);
         } else {
             probe = new PointProbe(0.0, 0.0, 0.0);
@@ -407,6 +412,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             probe.setPointSize(getDisplayScale());
         }
         return true;
+
     }
 
 
@@ -423,10 +429,10 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 } else {
                     double[] screenCenter = getScreenCenter();
                     probe.setPosition(
-                        new RealTuple(
-                            RealTupleType.SpatialCartesian3DTuple,
-                            new double[] { screenCenter[0],
-                                           screenCenter[1], 0.0 }));
+                        new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                                      new double[] { screenCenter[0],
+                                      screenCenter[1],
+                                              0.0 }));
                 }
             }
             setTimesForAnimation();
@@ -520,10 +526,13 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
         List paramItems = new ArrayList();
         paramItems.add(GuiUtils.makeCheckboxMenuItem("Show Parameter Table",
-                this, "showTable", null));
-        paramItems.add(
-            GuiUtils.makeCheckboxMenuItem(
-                "Show Readout In Legend", this, "showTableInLegend", null));
+                this,
+                "showTable",
+                null));
+        paramItems.add(GuiUtils.makeCheckboxMenuItem("Show Readout In Legend",
+                this,
+                "showTableInLegend",
+                null));
         paramItems.add(doMakeChangeParameterMenuItem());
         List choices = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
@@ -537,12 +546,15 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         items.add(chartMenu);
 
         chartMenu.add(
-            GuiUtils.makeCheckboxMenuItem(
-                "Show Thumbnail in Legend", getChart(), "showThumb", null));
+            GuiUtils.makeCheckboxMenuItem("Show Thumbnail in Legend",
+                                          getChart(),
+                                          "showThumb",
+                                          null));
         chartMenu.add(
-            GuiUtils.makeCheckboxMenuItem(
-                "Show Sunrise/Sunset Times", this, "showSunriseSunset",
-                null));
+            GuiUtils.makeCheckboxMenuItem("Show Sunrise/Sunset Times",
+                                          this,
+                                          "showSunriseSunset",
+                                          null));
         List chartMenuItems = new ArrayList();
         getChart().addViewMenuItems(chartMenuItems);
         GuiUtils.makeMenu(chartMenu, chartMenuItems);
@@ -551,28 +563,39 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         items.add(probeMenu);
         JMenu posMenu = new JMenu("Position");
         probeMenu.add(posMenu);
-        posMenu.add(GuiUtils.makeMenuItem("Reset Probe Position", this,
+        posMenu.add(GuiUtils.makeMenuItem("Reset Probe Position",
+                                          this,
                                           "resetProbePosition"));
         if (inGlobeDisplay()) {
             posMenu.add(GuiUtils.makeCheckboxMenuItem("Keep probe at height",
-                    this, "keepProbeAtHeight", null));
+                    this,
+                    "keepProbeAtHeight",
+                    null));
         } else {
-            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock X Axis", this,
-                    "xFixed", null));
-            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Y Axis", this,
-                    "yFixed", null));
+            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock X Axis",
+                    this,
+                    "xFixed",
+                    null));
+            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Y Axis",
+                    this,
+                    "yFixed",
+                    null));
 
-            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Z Axis", this,
-                    "zFixed", null));
+            posMenu.add(GuiUtils.makeCheckboxMenuItem("Lock Z Axis",
+                    this,
+                    "zFixed",
+                    null));
         }
         probeMenu.add(doMakeChangeColorMenu("Color"));
 
         JMenu sizeMenu = new JMenu("Size");
         probeMenu.add(sizeMenu);
 
-        sizeMenu.add(GuiUtils.makeMenuItem("Increase", this,
+        sizeMenu.add(GuiUtils.makeMenuItem("Increase",
+                                           this,
                                            "increaseProbeSize"));
-        sizeMenu.add(GuiUtils.makeMenuItem("Decrease", this,
+        sizeMenu.add(GuiUtils.makeMenuItem("Decrease",
+                                           this,
                                            "decreaseProbeSize"));
 
         JMenu shapeMenu = new JMenu("Probe Shape");
@@ -624,30 +647,47 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
 
     /**
-       When we relocate a bundle this gets called to relocate the display
-       This method gets overwritten by the probe and cross section displays
-       so they can move their selection points to a new location
-       @param originalBounds The original bounds of the datasource
-       @param newBounds  The relocated bounds of the datasource
+     *  When we relocate a bundle this gets called to relocate the display
+     *  This method gets overwritten by the probe and cross section displays
+     *  so they can move their selection points to a new location
+     *  @param originalBounds The original bounds of the datasource
+     *  @param newBounds  The relocated bounds of the datasource
      */
-    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
+    public void relocateDisplay(LatLonRect originalBounds,
+                                LatLonRect newBounds) {
         super.relocateDisplay(originalBounds, newBounds);
 
         // get the ratio of original probe point, init value to the center
-        double latRatio = 0.5;
-        double lonRatio = 0.5;
+        double             latRatio = 0.5;
+        double             lonRatio = 0.5;
+        EarthLocationTuple el       = null;
         try {
             double[] oldpvalues = probe.getPosition().getValues();
-            if (oldpvalues == null || oldpvalues.length != 3)
-                return;
+            el = (EarthLocationTuple) boxToEarth(new double[] { oldpvalues[0],
+                    oldpvalues[1], oldpvalues[2] }, false);
+            if (originalBounds != null) {
+                if ((oldpvalues == null) || (oldpvalues.length != 3)) {
+                    return;
+                }
 
-            latRatio = (oldpvalues[0] - originalBounds.getLatMin())/
-                    (originalBounds.getLatMax() - originalBounds.getLatMin());
+                latRatio =
+                    (el.getLatitude().getValue()
+                     - originalBounds.getLatMin()) / (originalBounds.getLatMax()
+                         - originalBounds.getLatMin());
 
-            lonRatio = (oldpvalues[1] - originalBounds.getLonMin())/
-                    (originalBounds.getLonMax() - originalBounds.getLonMin());
+                lonRatio =
+                    (Misc.normalizeLongitude(el.getLongitude().getValue())
+                     - originalBounds.getLonMin()) / (originalBounds.getLonMax()
+                         - originalBounds.getLonMin());
+                lonRatio = Math.abs(lonRatio);
 
-        } catch (Exception e){}
+                if (lonRatio > 1.0) {
+                    lonRatio = 0.5;
+                    latRatio = 0.5;
+                }
+            }
+
+        } catch (Exception e) {}
 
         double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
         double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
@@ -655,23 +695,22 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         //TODO: move the end points by the delta
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
         LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
-        double nlat = lowerLeft.getLatitude() + deltaLat*latRatio;
-        double nlon = lowerLeft.getLongitude() + deltaLon*lonRatio;
-        double nalt = 0.0;
+        double          nlat = lowerLeft.getLatitude() + deltaLat * latRatio;
+        double          nlon = lowerLeft.getLongitude() + deltaLon * lonRatio;
+        double          nalt      = 0.0;
 
         try {
-            double[] pvalues = probe.getPosition().getValues();
-            if (pvalues != null && pvalues.length == 3)
-                nalt = pvalues[2];
+            //double[] pvalues = probe.getPosition().getValues();
+            if (el != null) {
+                nalt = el.getAltitude().getValue();
+            }
 
-            probe.setPosition(
-                    new RealTuple(
-                            RealTupleType.SpatialCartesian3DTuple, new double[] { nlat,
-                            nlon, nalt }));
-            updatePosition();
-        } catch (Exception e){}
+            EarthLocation newel = makeEarthLocation(nlat, nlon, nalt);;
+            setEarthLocation(newel);
+        } catch (Exception e) {}
 
-        System.err.println("ProbeControl.relocate deltaLat = " + deltaLat +" deltaLon = "   + deltaLon);
+        System.err.println("ProbeControl.relocate deltaLat = " + deltaLat
+                           + " deltaLon = " + deltaLon);
     }
 
 
@@ -760,8 +799,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 NavigatedDisplay navDisplay = getNavigatedDisplay();
                 navDisplay.applyRotation(p);
                 probe.setPosition(new RealTuple(globePositionType,
-                        new double[] { p.x,
-                                       p.y, p.z }));
+                        new double[] { p.x, p.y, p.z }));
 
             } catch (Exception exc) {
                 logException("Resetting probe position", exc);
@@ -784,9 +822,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 return;
             }
             probe.setPosition(
-                new RealTuple(
-                    RealTupleType.SpatialCartesian3DTuple, new double[] { lat,
-                    lon, alt }));
+                new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                              new double[] { lat, lon, alt }));
         } catch (Exception exc) {
             logException("Resetting probe position", exc);
         }
@@ -803,19 +840,18 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         JMenuItem mi;
         items.add(mi = new JMenuItem("Change Display Format..."));
         mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                String newFormat =
-                    GuiUtils.getInput(
-                        "Enter a new value readout format:", " Format: ",
-                        dataTemplate, null,
-                        " (Use HTML with %value%, %unit%, %rawvalue%, %rawunit%)",
-                        "Change Display Format");
-                if (newFormat != null) {
-                    dataTemplate = newFormat;
-                    doMoveProbe();
-                }
-            }
-        });
+                                 public void actionPerformed(ActionEvent ae) {
+                                     String newFormat =
+                                         GuiUtils.getInput("Enter a new value readout format:",
+                                             " Format: ", dataTemplate, null,
+                                             " (Use HTML with %value%, %unit%, %rawvalue%, %rawunit%)",
+                                             "Change Display Format");
+                                     if (newFormat != null) {
+                                         dataTemplate = newFormat;
+                                         doMoveProbe();
+                                     }
+                                 }
+                             });
 
         super.getEditMenuItems(items, forMenuBar);
     }
@@ -1198,15 +1234,16 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     protected void timeChanged(Real time) {
         GuiUtils.invokeInSwingThread(new Runnable() {
-            public void run() {
-                try {
-                    updateTime();
-                    getChart().timeChanged();
-                } catch (Exception exc) {
-                    logException("changePosition", exc);
-                }
-            }
-        });
+                                         public void run() {
+                                             try {
+                                                 updateTime();
+                                                 getChart().timeChanged();
+                                             } catch (Exception exc) {
+                                                 logException(
+                                                 "changePosition", exc);
+                                             }
+                                         }
+                                     });
         super.timeChanged(time);
     }
 
@@ -1392,15 +1429,15 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                         }
                         String name = t.getComponent(i).toString();
                         name = Util.cleanTypeName(name);
-                        subItems.add(GuiUtils.makeMenuItem(name, this,
+                        subItems.add(GuiUtils.makeMenuItem(name,
+                                this,
                                 "changePointParameter",
-                                new Object[] { rowInfo,
-                                name }));
+                                new Object[] { rowInfo, name }));
                     }
                     if (subItems.size() > 0) {
                         paramMenu.add(
-                            GuiUtils.makeMenu(
-                                "Select Point Parameter", subItems));
+                            GuiUtils.makeMenu("Select Point Parameter",
+                                    subItems));
                     }
                 }
             } catch (Exception exc) {
@@ -1413,35 +1450,41 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         jmi = new JMenuItem("Copy");
         paramMenu.add(jmi);
         jmi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-                copyParameter(row);
-            }
-        });
+                                  public void actionPerformed(
+                                          ActionEvent ev) {
+                                      copyParameter(row);
+                                  }
+                              });
 
 
         paramMenu.add(GuiUtils.makeMenuItem("Chart Properties",
                                             ProbeControl.this,
-                                            "showLineProperties", rowInfo));
+                                            "showLineProperties",
+                                            rowInfo));
 
 
         // change unit choice
         jmi = new JMenuItem("Change Unit...");
         paramMenu.add(jmi);
         jmi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-                Unit newUnit = getDisplayConventions().selectUnit(
-                                   getRowInfo(row).getUnit(), null);
-                if (newUnit != null) {
-                    getRowInfo(row).setUnit(newUnit);
-                    try {
-                        updatePosition();
-                    } catch (Exception exc) {
-                        logException("After changing units", exc);
-                    }
-                }
+                                  public void actionPerformed(
+                                          ActionEvent ev) {
+                                      Unit newUnit =
+                                          getDisplayConventions().selectUnit(
+                                              getRowInfo(row).getUnit(),
+                                              null);
+                                      if (newUnit != null) {
+                                          getRowInfo(row).setUnit(newUnit);
+                                          try {
+                                              updatePosition();
+                                          } catch (Exception exc) {
+                                              logException(
+                                              "After changing units", exc);
+                                          }
+                                      }
 
-            }
-        });
+                                  }
+                              });
 
 
         // change unit choice
@@ -1454,11 +1497,12 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         jmi = new JMenuItem("Remove");
         paramMenu.add(jmi);
         jmi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-                removeField(row);
-                updateLegendLabel();
-            }
-        });
+                                  public void actionPerformed(
+                                          ActionEvent ev) {
+                                      removeField(row);
+                                      updateLegendLabel();
+                                  }
+                              });
 
         return items;
     }
@@ -1512,8 +1556,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                     rowInfo.setLevel(r);
                     if (r != null) {
                         rowInfo.setAltitude(
-                            getAltitudeAtLevel(
-                                rowInfo.getGridDataInstance(), r));
+                            getAltitudeAtLevel(rowInfo.getGridDataInstance(),
+                                    r));
                     } else {
                         rowInfo.setAltitude(null);
                     }
@@ -1578,8 +1622,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                         if (lastProbeAltitude != null) {
                             return (amExporting
                                     ? ""
-                                    : "Probe: ") + getDisplayConventions()
-                                        .formatAltitude(lastProbeAltitude);
+                                    : "Probe: ") + getDisplayConventions().formatAltitude(
+                                        lastProbeAltitude);
                         } else {
                             return "";
                         }
@@ -1615,6 +1659,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
                 return "";
             }
+
         };
 
 
@@ -1622,73 +1667,93 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         paramsTable = new JTable(tableModel);
 
         paramsTable.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                if (GuiUtils.isDeleteEvent(e)) {
-                    removeField(paramsTable.getSelectedRow());
-                }
-            }
-        });
+                                       public void keyPressed(KeyEvent e) {
+                                           if (GuiUtils.isDeleteEvent(e)) {
+                                               removeField(
+                                               paramsTable.getSelectedRow());
+                                           }
+                                       }
+                                   });
 
 
         paramsTable.addMouseListener(new MouseAdapter() {
 
-            public void mousePressed(MouseEvent e) {
-                final int row = paramsTable.rowAtPoint(e.getPoint());
-                if ((row < 0) || (row >= getDataChoices().size())) {
-                    return;
-                }
-                ProbeRowInfo rowInfo = getRowInfo(row);
+                                         public void mousePressed(
+                                         MouseEvent e) {
+                                             final int row =
+                                                 paramsTable.rowAtPoint(
+                                                     e.getPoint());
+                                             if ((row < 0)
+                                                     || (row
+                                                     >= getDataChoices().size())) {
+                                                 return;
+                                             }
+                                             ProbeRowInfo rowInfo =
+                                                 getRowInfo(row);
 
-                if ( !SwingUtilities.isRightMouseButton(e)) {
-                    if ((e.getClickCount() > 1) && (rowInfo != null)) {
-                        showLineProperties(rowInfo);
-                    }
-                    return;
-                }
+                                             if (
+                                              !SwingUtilities.isRightMouseButton(
+                                                  e)) {
+                                                 if ((e.getClickCount() > 1)
+                                                         && (rowInfo
+                                                         != null)) {
+                                                     showLineProperties(
+                                                     rowInfo);
+                                                 }
+                                                 return;
+                                             }
 
-                List       choices   = getDataChoices();
-                JPopupMenu popupMenu = new JPopupMenu();
-                JMenuItem  jmi       = doMakeChangeParameterMenuItem();
-                popupMenu.add(jmi);
-                popupMenu.addSeparator();
+                                             List choices = getDataChoices();
+                                             JPopupMenu popupMenu =
+                                                 new JPopupMenu();
+                                             JMenuItem jmi =
+                                                 doMakeChangeParameterMenuItem();
+                                             popupMenu.add(jmi);
+                                             popupMenu.addSeparator();
 
-                for (int rowIdx = 0; rowIdx < infos.size(); rowIdx++) {
-                    List items = getParameterMenuItems(rowIdx);
-                    GuiUtils.makePopupMenu(popupMenu, items);
-                }
-                /*
-                JMenu moveMenu = JMenu("Order");
-                popupMenu.add(moveMenu);
-                if(row!=0) {
-                    JMenuItem mi = new JMenuItem("Move Up");
-                    moveMenu.add(mi);
-                    mi.addActionListener(new ObjectListener(new Integer(row)) {
-                    public void actionPerformed(ActionEvent ev) {
-                        Object o = infos.get(row);
-                        infos.remove(row);
-                        infos.infos.add(row-1,o);
-                    }
-                });
+                                             for (int rowIdx = 0;
+                                                     rowIdx < infos.size();
+                                                     rowIdx++) {
+                                                 List items =
+                                                     getParameterMenuItems(
+                                                         rowIdx);
+                                                 GuiUtils.makePopupMenu(
+                                                 popupMenu, items);
+                                             }
+                                             /*
+                                             JMenu moveMenu = JMenu("Order");
+                                             popupMenu.add(moveMenu);
+                                             if(row!=0) {
+                                                 JMenuItem mi = new JMenuItem("Move Up");
+                                                 moveMenu.add(mi);
+                                                 mi.addActionListener(new ObjectListener(new Integer(row)) {
+                                                 public void actionPerformed(ActionEvent ev) {
+                                                     Object o = infos.get(row);
+                                                     infos.remove(row);
+                                                     infos.infos.add(row-1,o);
+                                                 }
+                                             });
 
-                }
-                if(row<choices.size()-1) {
-                    JMenuItem mi = new JMenuItem("Move Down");
-                    moveMenu.add(mi);
+                                             }
+                                             if(row<choices.size()-1) {
+                                                 JMenuItem mi = new JMenuItem("Move Down");
+                                                 moveMenu.add(mi);
 
-                }
-                */
+                                             }
+                                             */
 
 
-                // Display choices
-                //                JMenu dataChoiceMenu =
-                //                    getControlContext().doMakeDataChoiceMenu(
-                //                        getDataChoiceAtRow(row));
-                //                popupMenu.add(dataChoiceMenu);
-                popupMenu.show(paramsTable, e.getX(), e.getY());
+                                             // Display choices
+                                             //                JMenu dataChoiceMenu =
+                                             //                    getControlContext().doMakeDataChoiceMenu(
+                                             //                        getDataChoiceAtRow(row));
+                                             //                popupMenu.add(dataChoiceMenu);
+                                             popupMenu.show(paramsTable,
+                                             e.getX(), e.getY());
 
-            }
+                                         }
 
-        });
+                                     });
         paramsTable.setToolTipText("Right click to edit");
 
         JScrollPane scrollPane = new JScrollPane(paramsTable);
@@ -1745,6 +1810,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         return GuiUtils.centerBottom(chartScrollPane, bottom);
 
         //        return GuiUtils.centerBottom(getChart().getContents(), bottom);
+
     }  // end domakecontents
 
 
@@ -2041,14 +2107,16 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             return;
         }
         GuiUtils.invokeInSwingThread(new Runnable() {
-            public void run() {
-                try {
-                    updatePositionInSwingThread(position);
-                } catch (Exception exc) {
-                    logException("Updating chart", exc);
-                }
-            }
-        });
+                                         public void run() {
+                                             try {
+                                                 updatePositionInSwingThread(
+                                                 position);
+                                             } catch (Exception exc) {
+                                                 logException(
+                                                 "Updating chart", exc);
+                                             }
+                                         }
+                                     });
     }
 
 
@@ -2066,7 +2134,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         double[] positionValues = position.getValues();
         EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
-                positionValues[1], positionValues[2] }, false);
+                                                           positionValues[1],
+                                                           positionValues[2] }, false);
         LatLonPoint llp = elt.getLatLonPoint();
         lastProbeAltitude = elt.getAltitude();
 
@@ -2281,6 +2350,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             }
         }
         updateLegendLabel();
+
     }
 
 
@@ -2395,7 +2465,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         double[]  positionValues = position.getValues();
         EarthLocationTuple elt =
             (EarthLocationTuple) boxToEarth(new double[] { positionValues[0],
-                positionValues[1], positionValues[2] }, false);
+                                                           positionValues[1],
+                                                           positionValues[2] }, false);
         return elt;
     }
 
@@ -2513,10 +2584,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                 sample = GridUtil.sample(workingGrid, elt,
                                          info.getSamplingMode());
             } else {
-                sample = GridUtil.sample(
-                    workingGrid,
-                    new EarthLocationTuple(llp, info.getAltitude()),
-                    info.getSamplingMode());
+                sample = GridUtil.sample(workingGrid,
+                                         new EarthLocationTuple(llp,
+                                                 info.getAltitude()), info.getSamplingMode());
             }
         } else {
             sample = GridUtil.sample(workingGrid, llp,
@@ -2740,11 +2810,14 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
         super.getSaveMenuItems(items, forMenuBar);
 
-        items.add(GuiUtils.makeMenuItem("Save Chart Image...", getChart(),
+        items.add(GuiUtils.makeMenuItem("Save Chart Image...",
+                                        getChart(),
                                         "saveImage"));
         items.add(GuiUtils.makeMenuItem("Export Current Time as CSV...",
-                                        this, "exportCsv"));
-        items.add(GuiUtils.makeMenuItem("Export All Times as CSV...", this,
+                                        this,
+                                        "exportCsv"));
+        items.add(GuiUtils.makeMenuItem("Export All Times as CSV...",
+                                        this,
                                         "exportCsvAllTimes"));
 
     }
@@ -2800,7 +2873,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         try {
             String filename =
                 FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
-                    FileManager.FILTER_XLS), FileManager.SUFFIX_CSV);
+                                                      FileManager
+                                                          .FILTER_XLS), FileManager
+                                                              .SUFFIX_CSV);
             if (filename == null) {
                 return;
             }
@@ -3269,8 +3344,59 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         return probeRadius;
     }
 
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return true;
+    }
 
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
 
+    /**
+     * _more_
+     */
+    public void viewpointChanged() {
+        System.out.println("viewpointChanged");
+        //super.viewpointChanged();
+        if (getMatchDisplayRegion()) {
+            if (reloadFromBounds) {
+                try {
+                    NavigatedDisplay navDisplay = getMapDisplay();
+                    LatLonRect baseLLR =
+                        dataSelection.getGeoSelection().getLatLonRect();
+                    //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
+                    LatLonRect newLLR = navDisplay.getLatLonRect();
+                    relocateDisplay(baseLLR, newLLR);
+                    reloadFromBounds = false;
+                } catch (Exception e) {}
+            }
+        }
+    }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean hasMapProjection() {
+        if (infos == null) {
+            return false;
+        }
+        if (infos.get(0).getDataInstance() instanceof GridDataInstance) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }
