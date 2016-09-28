@@ -22,12 +22,10 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.collab.Sharable;
-import ucar.unidata.data.BadDataException;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.point.PointDataInstance;
 import ucar.unidata.data.point.PointOb;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -3393,6 +3391,12 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             return false;
         }
         if (infos.get(0).getDataInstance() instanceof GridDataInstance) {
+            DataSelection ds = getDataSelection();
+            Object t = ds.getProperty(
+                    DataSelection.PROP_PROGRESSIVERESOLUTION);
+            if (t != null) {
+                isProgressiveResolution = ((Boolean) t).booleanValue();
+            }
             return true;
         } else {
             return false;
