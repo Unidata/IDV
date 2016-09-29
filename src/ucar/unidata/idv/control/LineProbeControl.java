@@ -23,9 +23,13 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 
+import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
 
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.ViewDescriptor;
 
 import ucar.unidata.util.GuiUtils;
@@ -158,9 +162,8 @@ public abstract class LineProbeControl extends GridDisplayControl {
         if (inGlobeDisplay()) {
             probe = new LineProbe(
                 position1,
-                new RealTuple(
-                    RealTupleType.SpatialCartesian3DTuple, new double[] { 0,
-                    0, 0 }), null);
+                new RealTuple(RealTupleType.SpatialCartesian3DTuple,
+                              new double[] { 0, 0, 0 }), null);
         } else {
             probe = new LineProbe(position1);
         }
@@ -171,19 +174,19 @@ public abstract class LineProbeControl extends GridDisplayControl {
         if (inGlobeDisplay()) {
             probe.getSelectorPoint().setDragAdapter(
                 new DisplayableData.DragAdapter() {
-                public boolean handleDragDirect(VisADRay ray, boolean first,
-                        int mouseModifiers) {
-                    return true;
-                }
-                public boolean constrainDragPoint(float[] x) {
-                    constrainGlobePoint(x);
-                    return true;
-                }
-                public boolean handleAddPoint(float[] x) {
-                    return true;
-                }
+                    public boolean handleDragDirect(VisADRay ray,
+                        boolean first, int mouseModifiers) {
+                        return true;
+                    }
+                    public boolean constrainDragPoint(float[] x) {
+                        constrainGlobePoint(x);
+                        return true;
+                    }
+                    public boolean handleAddPoint(float[] x) {
+                        return true;
+                    }
 
-            });
+                });
 
         }
 
@@ -265,10 +268,11 @@ public abstract class LineProbeControl extends GridDisplayControl {
         if (probe != null) {
             JMenuItem mi = new JMenuItem("Reset Probe Position");
             mi.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    resetProbePosition();
-                }
-            });
+                                     public void actionPerformed(
+                                             ActionEvent ae) {
+                                         resetProbePosition();
+                                     }
+                                 });
             items.add(mi);
         }
         super.getEditMenuItems(items, forMenuBar);
@@ -409,15 +413,18 @@ public abstract class LineProbeControl extends GridDisplayControl {
     public JMenu doMakeProbeMenu(JMenu probeMenu) {
         JMenu posMenu = new JMenu("Position");
         probeMenu.add(posMenu);
-        posMenu.add(GuiUtils.makeMenuItem("Reset Probe Position", this,
+        posMenu.add(GuiUtils.makeMenuItem("Reset Probe Position",
+                                          this,
                                           "resetProbePosition"));
         probeMenu.add(doMakeChangeColorMenu());
         JMenu sizeMenu = new JMenu("Size");
         probeMenu.add(sizeMenu);
 
-        sizeMenu.add(GuiUtils.makeMenuItem("Increase", this,
+        sizeMenu.add(GuiUtils.makeMenuItem("Increase",
+                                           this,
                                            "increaseProbeSize"));
-        sizeMenu.add(GuiUtils.makeMenuItem("Decrease", this,
+        sizeMenu.add(GuiUtils.makeMenuItem("Decrease",
+                                           this,
                                            "decreaseProbeSize"));
 
         JMenu shapeMenu = new JMenu("Probe Shape");
@@ -495,13 +502,14 @@ public abstract class LineProbeControl extends GridDisplayControl {
     public RealTuple getGridCenterPosition()
             throws VisADException, RemoteException {
         RealTuple pos = new RealTuple(RealTupleType.SpatialCartesian2DTuple,
-                                      new double[] { 0,
-                0 });
+                                      new double[] { 0, 0 });
         if (getGridDataInstance() != null) {
             LatLonPoint rt = GridUtil.getCenterLatLonPoint(
                                  getGridDataInstance().getGrid());
             RealTuple xyz = earthToBoxTuple(new EarthLocationTuple(rt,
-                                new Real(RealType.Altitude, 0)));
+                                                                   new Real(RealType
+                                                                       .Altitude,
+                                                                           0)));
             if (xyz != null) {
                 pos = new RealTuple(new Real[] { (Real) xyz.getComponent(0),
                         (Real) xyz.getComponent(1) });
@@ -528,7 +536,7 @@ public abstract class LineProbeControl extends GridDisplayControl {
             navDisplay.applyRotation(p);
             return new RealTuple(RealTupleType.SpatialCartesian3DTuple,
                                  new double[] { p.x,
-                    p.y, p.z });
+                                         p.y, p.z });
         }
 
         double[] center = getScreenCenter();
@@ -616,5 +624,119 @@ public abstract class LineProbeControl extends GridDisplayControl {
         super.getLegendLabels(labels, legendType);
         labels.add(positionText);
     }
+
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean canDoProgressiveResolution() {
+        return true;
+    }
+
+    /**
+     * @override
+     *
+     * @return _more_
+     */
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
+
+    /**
+     * _more_
+     */
+    public void viewpointChanged() {
+        //System.out.println("viewpointChanged");
+        if (getMatchDisplayRegion()) {
+            if (reloadFromBounds) {
+                try {
+                    NavigatedDisplay navDisplay = getMapDisplay();
+                    LatLonRect baseLLR =
+                        dataSelection.getGeoSelection().getLatLonRect();
+                    //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
+                    LatLonRect newLLR = navDisplay.getLatLonRect();
+                    relocateDisplay(baseLLR, newLLR);
+                    reloadFromBounds = false;
+                } catch (Exception e) {}
+            }
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean hasMapProjection() {
+
+        return true;
+
+    }
+
+    /**
+     *  When we relocate a bundle this gets called to relocate the display
+     *  This method gets overwritten by the probe and cross section displays
+     *  so they can move their selection points to a new location
+     *  @param originalBounds The original bounds of the datasource
+     *  @param newBounds  The relocated bounds of the datasource
+     */
+    public void relocateDisplay(LatLonRect originalBounds,
+                                LatLonRect newBounds) {
+        super.relocateDisplay(originalBounds, newBounds);
+        // get the ratio of original probe point, init value to the center
+        double             latRatio = 0.5;
+        double             lonRatio = 0.5;
+        EarthLocationTuple el       = null;
+        try {
+            double[] oldpvalues = probe.getPosition().getValues();
+            el = (EarthLocationTuple) boxToEarth(new double[] { oldpvalues[0],
+                    oldpvalues[1], oldpvalues[2] }, false);
+            if (originalBounds != null) {
+                if ((oldpvalues == null) || (oldpvalues.length != 3)) {
+                    return;
+                }
+
+                latRatio =
+                    (el.getLatitude().getValue()
+                     - originalBounds.getLatMin()) / (originalBounds.getLatMax()
+                         - originalBounds.getLatMin());
+
+                lonRatio =
+                    (Misc.normalizeLongitude(el.getLongitude().getValue())
+                     - originalBounds.getLonMin()) / (originalBounds.getLonMax()
+                         - originalBounds.getLonMin());
+                lonRatio = Math.abs(lonRatio);
+
+                if (lonRatio > 1.0) {
+                    lonRatio = 0.5;
+                    latRatio = 0.5;
+                }
+            }
+
+        } catch (Exception e) {}
+
+        double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
+        double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
+
+        //TODO: move the end points by the delta
+        //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
+        LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
+        double          nlat = lowerLeft.getLatitude() + deltaLat * latRatio;
+        double          nlon = lowerLeft.getLongitude() + deltaLon * lonRatio;
+        double          nalt      = 0.0;
+
+        try {
+            if (el != null) {
+                nalt = el.getAltitude().getValue();
+            }
+
+            EarthLocation newel = makeEarthLocation(nlat, nlon, nalt);;
+            double[]      ets   = earthToBox(newel);
+            setProbePosition(ets[0], ets[1]);
+        } catch (Exception e) {}
+
+    }
+
 
 }
