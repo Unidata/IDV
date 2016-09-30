@@ -1204,23 +1204,37 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         double latRatio1 = 0.5;
         double lonRatio1 = 0.0;
         double latRatio2 = 0.5;
-        double lonRatio2 = 1.0;
+        double lonRatio2 = 0.0;
         try {
-            double[] oldpvalues1 = getStartPoint().getValues();
+            if(originalBounds != null) {
+                double[] oldpvalues1 = getStartPoint().getValues();
 
-            latRatio1 = (oldpvalues1[0] - originalBounds.getLatMin())/
-                    (originalBounds.getLatMax() - originalBounds.getLatMin());
+                latRatio1 = (oldpvalues1[1] - originalBounds.getLatMin()) /
+                        (originalBounds.getLatMax() - originalBounds.getLatMin());
 
-            lonRatio1 = (oldpvalues1[1] - originalBounds.getLonMin())/
-                    (originalBounds.getLonMax() - originalBounds.getLonMin());
+                lonRatio1 = (Misc.normalizeLongitude(oldpvalues1[0])
+                        - Misc.normalizeLongitude(originalBounds.getLonMin())) /
+                        (Misc.normalizeLongitude(originalBounds.getLonMax())
+                                - Misc.normalizeLongitude(originalBounds.getLonMin()));
 
-            double[] oldpvalues2 = getStartPoint().getValues();
+                double[] oldpvalues2 = getEndPoint().getValues();
 
-            latRatio2 = (oldpvalues2[0] - originalBounds.getLatMin())/
-                    (originalBounds.getLatMax() - originalBounds.getLatMin());
+                latRatio2 = (oldpvalues2[1] - originalBounds.getLatMin()) /
+                        (originalBounds.getLatMax() - originalBounds.getLatMin());
 
-            lonRatio2 = (oldpvalues2[1] - originalBounds.getLonMin())/
-                    (originalBounds.getLonMax() - originalBounds.getLonMin());
+                lonRatio2 = (Misc.normalizeLongitude(oldpvalues2[0])
+                        - Misc.normalizeLongitude(originalBounds.getLonMin())) /
+                        (Misc.normalizeLongitude(originalBounds.getLonMax())
+                                - Misc.normalizeLongitude(originalBounds.getLonMin()));
+                lonRatio2 = Math.abs(lonRatio2);
+                lonRatio2 = Math.abs(lonRatio2);
+                if(lonRatio1 >=1 ||  lonRatio2 > 1 || latRatio1 > 1 || latRatio2 > 1){
+                    latRatio1 = 0.5;
+                    lonRatio1 = 0.0;
+                    latRatio2 = 0.5;
+                    lonRatio2 = 0.0;
+                }
+            }
 
         } catch (Exception e){}
 
@@ -1230,22 +1244,24 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         //TODO: move the end points by the delta
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
         LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
+        LatLonPointImpl lowerRight = newBounds.getLowerRightPoint();
+
         double nlat1 = lowerLeft.getLatitude() + deltaLat*latRatio1;
         double nlon1 = lowerLeft.getLongitude() + deltaLon*lonRatio1;
         double nalt1 = 0.0;
 
-        double nlat2 = lowerLeft.getLatitude() + deltaLat*latRatio2;
-        double nlon2 = lowerLeft.getLongitude() + deltaLon*lonRatio2;
+        double nlat2 = lowerRight.getLatitude() + deltaLat*latRatio2;
+        double nlon2 = lowerRight.getLongitude() + deltaLon*lonRatio2;
         double nalt2 = 0.0;
 
         try {
             RealTuple start =
                     new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                            new double[] { nlon1, nalt1,
+                            new double[] { nlon1, nlat1,
                                     getSelectorAltitude() });
             RealTuple end = new RealTuple(RealTupleType.SpatialEarth3DTuple,
                     new double[] {
-                            nlon2, nalt2, getSelectorAltitude() });
+                            nlon2, nlat2, getSelectorAltitude() });
 
 
             csSelector.setPosition(start, end);
@@ -1253,7 +1269,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
         //TODO: move the end points 
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
-        System.err.println("CrossSectionControl.relocate deltaLat = " + deltaLat +" deltaLon = "   + deltaLon);
+        //System.err.println("CrossSectionControl.relocate deltaLat = " + deltaLat +" deltaLon = "   + deltaLon);
     }
 
 
@@ -1570,10 +1586,22 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * Noop for the ControlListener interface
      */
     public void viewpointChanged() {
-        super.viewpointChanged();
+        //super.viewpointChanged();
         //      System.err.println ("viewpoint changed");
         if (autoUpdate && isInTransectView()) {
             loadDataFromTransect();
+        } else if (getMatchDisplayRegion()) {
+            if (reloadFromBounds) {
+                try {
+                    NavigatedDisplay navDisplay = getMapDisplay();
+                    LatLonRect baseLLR =
+                            dataSelection.getGeoSelection().getLatLonRect();
+                    //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
+                    LatLonRect newLLR = navDisplay.getLatLonRect();
+                    relocateDisplay(baseLLR, newLLR);
+                    reloadFromBounds = false;
+                } catch (Exception e) {}
+            }
         }
     }
 
