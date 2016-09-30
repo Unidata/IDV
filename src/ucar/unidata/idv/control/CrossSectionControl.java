@@ -1205,6 +1205,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         double lonRatio1 = 0.0;
         double latRatio2 = 0.5;
         double lonRatio2 = 0.0;
+        /*
         try {
             if(originalBounds != null) {
                 double[] oldpvalues1 = getStartPoint().getValues();
@@ -1238,6 +1239,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
         } catch (Exception e){}
 
+*/
         double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
         double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
 
