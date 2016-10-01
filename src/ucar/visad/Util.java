@@ -2187,6 +2187,7 @@ public final class Util {
         Unit u = null;
         // clean up ** and replace with nothing
         unitIdentifier = unitIdentifier.replaceAll("\\*\\*", "");
+        unitIdentifier = unitIdentifier.replaceAll("\\u00c2", "");
         try {
 
             try {
