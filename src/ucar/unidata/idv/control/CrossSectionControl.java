@@ -1202,9 +1202,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
         // get the ratio of original selector point, init value to the center
         double latRatio1 = 0.5;
-        double lonRatio1 = 0.0;
+        double lonRatio1 = 0.5;
         double latRatio2 = 0.5;
-        double lonRatio2 = 0.0;
+        double lonRatio2 = 0.5;
         /*
         try {
             if(originalBounds != null) {
@@ -1246,27 +1246,31 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         //TODO: move the end points by the delta
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
         LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
+        LatLonPointImpl upperLeft = newBounds.getUpperLeftPoint();
         LatLonPointImpl lowerRight = newBounds.getLowerRightPoint();
+        LatLonPointImpl upperRight = newBounds.getUpperRightPoint();
 
-        double nlat1 = lowerLeft.getLatitude() + deltaLat*latRatio1;
-        double nlon1 = lowerLeft.getLongitude() + deltaLon*lonRatio1;
+
+
+        double nlat1 = newBounds.getLatMin() + deltaLat * latRatio1;
+        double nlon1 = newBounds.getCenterLon() - Math.abs(deltaLon) * lonRatio1;
         double nalt1 = 0.0;
 
-        double nlat2 = lowerRight.getLatitude() + deltaLat*latRatio2;
-        double nlon2 = lowerRight.getLongitude() + deltaLon*lonRatio2;
+        double nlat2 = newBounds.getLatMin() + deltaLat*latRatio2;
+        double nlon2 = newBounds.getCenterLon() + Math.abs(deltaLon) * lonRatio2;
         double nalt2 = 0.0;
 
         try {
             RealTuple start =
                     new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                            new double[] { nlon1, nlat1,
-                                    getSelectorAltitude() });
+                        new double[]{nlon1, nlat1,
+                                getSelectorAltitude()});
             RealTuple end = new RealTuple(RealTupleType.SpatialEarth3DTuple,
-                    new double[] {
-                            nlon2, nlat2, getSelectorAltitude() });
+                        new double[]{
+                                nlon2, nlat2, getSelectorAltitude()});
 
 
-            csSelector.setPosition(start, end);
+                csSelector.setPosition(start, end);
         } catch (Exception e){}
 
         //TODO: move the end points 
