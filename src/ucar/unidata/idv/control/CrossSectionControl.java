@@ -26,6 +26,7 @@ import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DerivedDataChoice;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.gis.Transect;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
@@ -1205,60 +1206,39 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         double lonRatio1 = 0.5;
         double latRatio2 = 0.5;
         double lonRatio2 = 0.5;
-        /*
-        try {
-            if(originalBounds != null) {
-                double[] oldpvalues1 = getStartPoint().getValues();
 
-                latRatio1 = (oldpvalues1[1] - originalBounds.getLatMin()) /
-                        (originalBounds.getLatMax() - originalBounds.getLatMin());
+        NavigatedDisplay nd = getNavigatedDisplay();
+        if (nd != null) {
+            GeoSelection geoSelection =
+                    getDataSelection().getGeoSelection(true);
+            getViewManager().setProjectionFromData(false);
+            try {
+                Rectangle2D bbox = nd.getLatLonBox();
+                Rectangle2D sbox = nd.getScreenBounds();
+                geoSelection.setScreenBound(sbox);
+                geoSelection.setLatLonRect(bbox);
+                geoSelection.setUseViewBounds(true);
+                getDataSelection().setGeoSelection(geoSelection);
 
-                lonRatio1 = (Misc.normalizeLongitude(oldpvalues1[0])
-                        - Misc.normalizeLongitude(originalBounds.getLonMin())) /
-                        (Misc.normalizeLongitude(originalBounds.getLonMax())
-                                - Misc.normalizeLongitude(originalBounds.getLonMin()));
+                //getDataSelection().putProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDISPLAYAREA);
 
-                double[] oldpvalues2 = getEndPoint().getValues();
+                dataChanged();
+            } catch (Exception e) {}
+            ;
+        }
 
-                latRatio2 = (oldpvalues2[1] - originalBounds.getLatMin()) /
-                        (originalBounds.getLatMax() - originalBounds.getLatMin());
-
-                lonRatio2 = (Misc.normalizeLongitude(oldpvalues2[0])
-                        - Misc.normalizeLongitude(originalBounds.getLonMin())) /
-                        (Misc.normalizeLongitude(originalBounds.getLonMax())
-                                - Misc.normalizeLongitude(originalBounds.getLonMin()));
-                lonRatio2 = Math.abs(lonRatio2);
-                lonRatio2 = Math.abs(lonRatio2);
-                if(lonRatio1 >=1 ||  lonRatio2 > 1 || latRatio1 > 1 || latRatio2 > 1){
-                    latRatio1 = 0.5;
-                    lonRatio1 = 0.0;
-                    latRatio2 = 0.5;
-                    lonRatio2 = 0.0;
-                }
-            }
-
-        } catch (Exception e){}
-
-*/
         double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
         double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
 
         //TODO: move the end points by the delta
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
-        LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
-        LatLonPointImpl upperLeft = newBounds.getUpperLeftPoint();
-        LatLonPointImpl lowerRight = newBounds.getLowerRightPoint();
-        LatLonPointImpl upperRight = newBounds.getUpperRightPoint();
-
-
 
         double nlat1 = newBounds.getLatMin() + deltaLat * latRatio1;
         double nlon1 = newBounds.getCenterLon() - Math.abs(deltaLon) * lonRatio1;
-        double nalt1 = 0.0;
+
 
         double nlat2 = newBounds.getLatMin() + deltaLat*latRatio2;
         double nlon2 = newBounds.getCenterLon() + Math.abs(deltaLon) * lonRatio2;
-        double nalt2 = 0.0;
 
         try {
             RealTuple start =
@@ -1270,7 +1250,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                                 nlon2, nlat2, getSelectorAltitude()});
 
 
-                csSelector.setPosition(start, end);
+            csSelector.setPosition(start, end);
+            //loadDataFromLine();
         } catch (Exception e){}
 
         //TODO: move the end points 
