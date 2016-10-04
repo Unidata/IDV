@@ -106,6 +106,7 @@ import javax.swing.event.*;
 
 import javax.vecmath.Point3d;
 
+import static ucar.unidata.idv.IdvConstants.PROP_USE_DISPLAYAREA;
 
 
 /**
@@ -364,6 +365,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                     logException("Setting z position", exc);
                 }
             }
+        }
+        boolean matchDisplayRegion =
+                getIdv().getStateManager().getProperty(PROP_USE_DISPLAYAREA, false);
+        if(matchDisplayRegion) {
+            setStartPoint(null);
+            setEndPoint(null);
         }
         super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
     }
