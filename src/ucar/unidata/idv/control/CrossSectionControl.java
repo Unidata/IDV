@@ -366,6 +366,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                 }
             }
         }
+        // this is only  for invoking the MDR when loading the bundle
         boolean matchDisplayRegion =
                 getIdv().getStateManager().getProperty(PROP_USE_DISPLAYAREA, false);
         if(matchDisplayRegion) {
