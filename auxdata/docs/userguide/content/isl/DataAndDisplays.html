@@ -5,7 +5,9 @@
 <body>
 
 
-[isl::tagdef bundle {Load a bundle} -attrs {file+ {bundle file or url} width {view window width} height  {view window height} times {List of times to use} clear {default is true. remove all existing displays and data} wait {default is true. wait until all displays have been rendered.} }]
+[isl::tagdef bundle {Load a bundle} -attrs {file+ {bundle file or url} width {view window width} height  {view window height} times {List of times to use} clear {default is true. remove all existing displays and data}
+wait {default is true. wait until all displays have been rendered.} bbox {override the geoSelection bounding box.}
+timedriverstart {changing the animation widget time driver start time.} timedriverend {changing the animation widget time driver end time.}}]
 The [isl::tag bundle] tag lets you load in a new bundle and takes the form:
 [isl::xml {
 <bundle file="some_bundle_file.xidv"/>
@@ -58,8 +60,24 @@ For example, we have:
    etc...
 </pre>
 
+The [isl::attr bbox] attribute allows you to override the geoselection bounding box. Note:
+this overrides all grid data sources in the bundle and creates display in the new geoselection area.
 
-[isl::tagdef setfiles {Override the files or urls used in a bundle} -attrs {datasource+ {identifier of the data source} file {new file or url path}  }]
+<p>
+For example, we have:
+[isl::xml {<bundle file="some_bundle_file.xidv" bbox="50,-110,30,-100"/>}]
+
+The [isl::attr timedriverstart] and [isl::attr timedriverend] attributes allow you to override the animation
+widget time driver start time and end time. If there is no time driver setting in the animation widget, these two
+attributes will be ignored.
+
+<p>
+For example, we have:
+[isl::xml {<bundle file="some_bundle_file.xidv" timedriverstart="yyyy_MM_DD:hh:mm:ss" timedriverend="yyyy_MM_DD:hh:mm:ss"/>}]
+
+
+
+    [isl::tagdef setfiles {Override the files or urls used in a bundle} -attrs {datasource+ {identifier of the data source} file {new file or url path}  }]
 
 
 
