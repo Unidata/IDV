@@ -984,10 +984,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     asi.setEndMode(AnimationSetInfo.TIMEMODE_FIXED);
                     asi.setEndOffsetMinutes(0.0);
                 }
+                animationWidget.setProperties(aninfo);
+                animationWidget.resetProperties();
+                animationWidget.animationSetChanged();
             }
-            animationWidget.setProperties(aninfo);
-            animationWidget.resetProperties();
-            animationWidget.animationSetChanged();
         }
 
     }
