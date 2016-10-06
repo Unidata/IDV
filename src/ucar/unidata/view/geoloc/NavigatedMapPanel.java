@@ -336,6 +336,13 @@ public class NavigatedMapPanel extends JPanel {
                         applyProjectionToRenderers(project);
                         //                        setProjectionImpl (project);
                         navigatedPanel.setWorldCenterX(wx0);
+                        /*
+                        llproj.setCenterLon(0.0);
+                        ((LatLonProjection) project).setCenterLon(0.0);
+                        navigatedPanel.setWorldCenterX(0.0);
+                        navigatedPanel.setSelectedRegionBounds(navigatedPanel.getMapArea());
+                        navigatedPanel.selectedRegionChanged();
+                        */
                     }
                 }
                 redraw();

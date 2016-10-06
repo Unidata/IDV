@@ -781,6 +781,13 @@ public class GeoSelectionPanel extends JPanel {
         protected void annotateMap(Graphics2D gNP) {
             super.annotateMap(gNP);
             NavigatedPanel np = getNavigatedPanel();
+            /*
+            points = new ArrayList<>();
+            points.add(new ProjectionPointImpl(-180.0, -90.5));
+            points.add(new ProjectionPointImpl(179.5, -90.5));
+            points.add(new ProjectionPointImpl(179.5, 90.5));
+            points.add(new ProjectionPointImpl(-180.5,
+                    90.5)); */
             if (points.size() == 0) {
                 return;
             }
