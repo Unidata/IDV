@@ -551,7 +551,22 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
         }
     }
 
-
+    /**
+     * Changing the info from the dialog
+     *
+     */
+    public void animationSetChanged(){
+        if (propertiesDialog == null) {
+            AnimationBoxPanel propertiesBoxPanel =
+                    new AnimationBoxPanel(null, boxPanel.getStepsOk());
+            propertiesDialog = new AnimationPropertiesDialog(this,
+                    GuiUtils.getFrame(getContents()), propertiesBoxPanel);
+            animationInfo.shared       = getSharing();
+            animationInfo.boxesVisible = getBoxPanelVisible();
+            propertiesDialog.setInfo(animationInfo);
+        }
+        propertiesDialog.applyAnimationSetProperties();
+    }
     /**
      * Make and show an AnimationPropertiesDialog;
      * if that returns animationInfo ok,

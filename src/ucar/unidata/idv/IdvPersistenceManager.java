@@ -69,11 +69,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -116,6 +112,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
     /** property id */
     public static final String PROP_TIMESLIST = "idv.timeslist";
+
+    /** property id */
+    public static final String PROP_DRIVERTIMESTART = "idv.drivertimestart";
+
+    /** property id */
+    public static final String PROP_DRIVERTIMEEND = "idv.drivertimeend";
 
     /* property to override geoselection in a bundle */
     public static final String PROP_GEOSELECTION = "idv.geoselection";
@@ -3628,9 +3630,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                        PROP_TIMESLIST));
 
         List overrideEnsMembers = ((bundleProperties == null)
-                                   ? null
-                                   : (List) bundleProperties.get(
-                                       PROP_ENSLIST));
+                ? null
+                : (List) bundleProperties.get(
+                PROP_ENSLIST));
 
         GeoSelection overrideGeoSelection = 
             ((bundleProperties == null)
@@ -3638,6 +3640,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
              : (GeoSelection) bundleProperties.get(
                                            PROP_GEOSELECTION));
 
+        Date aniTDTstart  = ((bundleProperties == null)
+                ? null
+                : (Date) bundleProperties.get(PROP_DRIVERTIMESTART));
+
+        Date aniTDTend  = ((bundleProperties == null)
+                ? null
+                : (Date) bundleProperties.get(PROP_DRIVERTIMEEND));
 
         GeoSelection baseGeoSelection = null;
 
@@ -3999,6 +4008,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             getVMManager().setDisplayMastersActive();
             // HACK! - unset this property after bundle loads
             getStateManager().putProperty(PROP_USE_DISPLAYAREA, false);
+            // this might need to move to be done earlier
+            if(aniTDTstart!= null || aniTDTend != null) {
+                List<ViewManager> vms = getVMManager().getViewManagers();
+                for (ViewManager viewManager : vms) {
+                    viewManager.setTimeDriverTimes(aniTDTstart, aniTDTend);
+                }
+            }
         }
 
         loadDialog.setMessage("Activating displays");

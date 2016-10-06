@@ -43,30 +43,18 @@ import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.colortable.ColorTableCanvas;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.view.geoloc.ViewpointInfo;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
+import ucar.visad.UtcDate;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationWidget;
 
-import visad.CommonUnit;
-import visad.MouseBehavior;
-import visad.Real;
-import visad.RealType;
-import visad.Unit;
+import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
@@ -118,6 +106,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import static ucar.visad.UtcDate.*;
 
 
 /**
@@ -354,6 +344,12 @@ public class ImageGenerator extends IdvManager {
 
     /** bounding box attribute */
     public static final String ATTR_BBOX = "bbox";
+
+    /** bounding time driver time attribute */
+    public static final String ATTR_DRIVERTIME_START = "timedriverstart";
+
+    /** bounding time driver time attribute */
+    public static final String ATTR_DRIVERTIME_END = "timedriverend";
 
     /** from level attribute */
     public static final String ATTR_LEVEL_FROM = "levelfrom";
@@ -2486,6 +2482,25 @@ public class ImageGenerator extends IdvManager {
             DataSelection dataSelection = new DataSelection();
             processGeoSelectionTags(node, dataSelection);
             bundleProperties.put(IdvPersistenceManager.PROP_GEOSELECTION, dataSelection.getGeoSelection());
+        }
+
+        //Check for the time driver start time override
+        String tdstartString = applyMacros(node, ATTR_DRIVERTIME_START, (String) null);
+        if (tdstartString != null) {
+            DateTime dd = UtcDate.createDateTime(tdstartString);
+            Date aniTDTstart = new Date(
+                    (long) (((DateTime) dd).getValue(
+                            CommonUnit.secondsSinceTheEpoch) * 1000.0));
+            bundleProperties.put(IdvPersistenceManager.PROP_DRIVERTIMESTART, aniTDTstart);
+        }
+
+        String tdendString = applyMacros(node, ATTR_DRIVERTIME_END, (String) null);
+        if (tdendString != null) {
+            DateTime de = UtcDate.createDateTime(tdendString);
+            Date aniTDTend = new Date(
+                    (long) (((DateTime) de).getValue(
+                            CommonUnit.secondsSinceTheEpoch) * 1000.0));
+            bundleProperties.put(IdvPersistenceManager.PROP_DRIVERTIMEEND, aniTDTend);
         }
 
 

@@ -48,21 +48,7 @@ import ucar.unidata.ui.FontSelector;
 import ucar.unidata.ui.ImagePanel;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.Timeline;
-import ucar.unidata.util.BooleanProperty;
-import ucar.unidata.util.DatedObject;
-import ucar.unidata.util.DatedThing;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Msg;
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.Removable;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlObjectStore;
 import ucar.unidata.xml.XmlResourceCollection;
@@ -976,6 +962,35 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return null;
     }
 
+    /**
+     * set the animation widget starttime and endtime as the time driver times
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
+     */
+    public void setTimeDriverTimes(Date startTime, Date endTime)
+            throws VisADException, RemoteException {
+        if (animationWidget != null) {
+            AnimationInfo aninfo = getAnimationInfo();
+            AnimationSetInfo asi = aninfo.getAnimationSetInfo();
+            if (asi.getActive() && asi.getIsTimeDriver() && (startTime != null || endTime != null)) {
+                if(startTime != null) {
+                    asi.setStartFixedTime(startTime);
+                    asi.setStartMode(AnimationSetInfo.TIMEMODE_FIXED);
+                    asi.setStartOffsetMinutes(0.0);
+                }
+                if(endTime != null) {
+                    asi.setEndFixedTime(endTime);
+                    asi.setEndMode(AnimationSetInfo.TIMEMODE_FIXED);
+                    asi.setEndOffsetMinutes(0.0);
+                }
+            }
+            animationWidget.setProperties(aninfo);
+            animationWidget.resetProperties();
+            animationWidget.animationSetChanged();
+        }
+
+    }
     /**
      * have we initialized
      *
