@@ -31,7 +31,7 @@ defineImage http://www.cograilway.com/Summit/summitcam.jpg {Pikes Peak, CO} -ll 
 
 defineImage http://ouraynet.com/blowout.jpg  {Ouray, CO} -dz -7 -ll {38.04,-107.76} -heading {225}
 
-defineImage {http://www-das.uwyo.edu/weathercam/weathercam.jpg} {Laramie, WY} -ll {41.316,-105.578} -dz -7
+defineImage {http://www.cabincam.biz/laramie/laramie.jpg} {Laramie, WY} -ll {41.316,-105.578} -dz -7
 defineImage http://www2.tetoncam.com/tetonl.jpg {Grand Tetons, WY} -ll {43.74111,-110.80167} -dz -7
 defineImage {http://bridgerbowl.com/assets/webcams/cam4.jpg} {Bridger Bowl, MT} -ll {45.819727,-110.917782} -dz -7
 
@@ -41,7 +41,7 @@ defineImage {http://bridgerbowl.com/assets/webcams/cam4.jpg} {Bridger Bowl, MT} 
 defineGroup {National Parks}
 defineImage {http://www.nps.gov/webcams-glac/ghcam.jpg} {Glacier NP - Goat Haunt, MT} -ll {48.95786,-113.89206} -dz -7
 defineImage {http://www.nps.gov/webcams-glac/smcam.jpg} {Glacier NP - St. Mary, MT} -ll {48.729,-113.442} -dz -7
-defineImage {http://www.nps.gov/webcams-glac/mcdcam.jpg} {Glacier NP - Lake McDonald, MT} -ll {48.52936,-113.99487} -dz -7
+defineImage {http://www.nps.gov/webcams-glac/mcdcam1.jpg} {Glacier NP - Lake McDonald, MT} -ll {48.52936,-113.99487} -dz -7
 defineImage {http://www.nps.gov/webcams-glac/tmcam.jpg} {Glacier NP - Two Medicine, MT} -ll {48.49859,-113.34755} -dz -7
 defineImage {http://www.nps.gov/webcams-yell/oldfaithvc.jpg} {Old Faithful, WY} -ll {44.45972,-110.83139} -dz -7
 defineImage {http://nature.nps.gov/air/WebCams/parks/throcam/thro.jpg}  {Theodore Roosevelt National Park, ND} -ll {46.94889,-103.43306}  -dz -7
@@ -123,7 +123,7 @@ defineImage http://www.cloudcroftwebcam.com/camera2.jpg {Cloudcroft, NM} -ll {32
 
 defineImage http://wwc.instacam.com/instacamimg/KOBTV/KOBTV_l.jpg {Albuquerque, NM}  -ll {35.1029697, -106.6703963}
 
-defineImage http://www.wxnation.com/livecam/ccam.jpg {Fort Worth, TX} -ll {32.725409, -97.3208496} -dz -6
+defineImage http://www.wxnation.com/livecam/tcam.jpg {Fort Worth, TX} -ll {32.725409, -97.3208496} -dz -6
 defineImage http://www.atmo.ttu.edu/includes/Photo_N.jpg {Lubbock, TX} -ll {33.5777778, -101.8547222} -dz -6
 
 defineImage http://www.nps.gov/webcams-glca/hc1.jpg {Halls Crossing, Lake Powell, UT} -ll {37.45694,-110.7122} -dz -7
@@ -166,7 +166,7 @@ defineImage http://wwc.instacam.com/instacamimg/MLLRU/MLLRU_l.jpg {Millersville 
 defineImage http://www.instacam.com/instacamimg/CALIF/CALIF_s.jpg {California University of Pennylvania, PA} -ll {40.066,-79.892} -dz -5
 
 
-defineImage  http://ftpcontent2.worldnow.com/wciv/news/stationcameras/downtown/downtown.jpg {Charleston, WV}  -ll {38.350195,-81.638989}
+defineImage  http://wwc.instacam.com/instacamimg/CHRGW/CHRGW_l.jpg {Charleston, WV}  -ll {38.350195,-81.638989}
 
 
 defineImage http://images.webcamgalore.com/webcam-Mechanicsburg-Pennsylvania-22678-08.jpg {Mechanicsburg, PA} -ll {40.2122, -77.0061} -dz -5
@@ -186,6 +186,7 @@ defineImage http://images.webcamgalore.com/14269-current-webcam-Tampa-Florida.jp
 
 defineImage http://wwc.instacam.com/instacamimg/NPLHH/NPLHH_l.jpg {Naples, FL} -dz -5 -ll {26.145,-81.795}
 
+defineImage http://video-monitoring.com/beachcams/boca/pics/s4/sep2416g/o061326e.jpg {Boca Raton, FL} -dz -5 -ll {26.3683, -80.1289}
 
 defineImage http://images.webcamgalore.com/22141-current-webcam-Raleigh-North-Carolina.jpg {Raleigh, NC} -dz -5 -ll {35,-78}
 
