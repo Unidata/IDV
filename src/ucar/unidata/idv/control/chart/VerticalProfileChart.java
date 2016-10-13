@@ -159,6 +159,7 @@ public class VerticalProfileChart extends XYChartManager {
         dataset.addSeries(series);
 
         NumberAxis rangeAxis;
+        NumberAxis domainAxis = null;
         String     axisLabel = name + ((unit != null)
                                        ? " [" + unit + "]"
                                        : "");
@@ -170,6 +171,12 @@ public class VerticalProfileChart extends XYChartManager {
             rangeAxis = new NumberAxis(axisLabel);
             ((NumberAxis) rangeAxis).setAutoRangeIncludesZero(
                 lineState.getRangeIncludesZero());
+            VerticalProfileInfo vpInfo = (VerticalProfileInfo)profiles.get(0);
+            Unit altUnit = vpInfo.getAltitudeUnit();
+            if(altUnit != null && paramIdx == 0 &&!(altUnit.equals(CommonUnit.meter))) {
+                String     dlabel = "Altitude " + "[" + altUnit + "]";
+                domainAxis = new NumberAxis(dlabel);
+            }
         }
 
         //For now lets use the default number formatting for the range
@@ -211,7 +218,10 @@ public class VerticalProfileChart extends XYChartManager {
         }
 
         synchronized (MUTEX) {
-            chartHolder.add(dataset, rangeAxis, renderer, side);
+            if(domainAxis == null)
+                chartHolder.add(dataset, rangeAxis, renderer, side);
+            else
+                chartHolder.add(dataset, rangeAxis, domainAxis, renderer, side);
         }
 
         return rangeAxis;

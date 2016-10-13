@@ -642,7 +642,30 @@ public class ChartHolder {
         }
     }
 
-
+    /**
+     * add data set
+     *
+     * @param dataset dataset
+     * @param rangeAxis axis
+     * @param domainAxis axis
+     * @param renderer renderer
+     * @param side which side
+     */
+    protected void add(XYDataset dataset, ValueAxis rangeAxis, ValueAxis domainAxis,
+                       XYItemRenderer renderer, AxisLocation side) {
+        synchronized (chartManager.getMutex()) {
+            XYPlot xyPlot = (XYPlot) plot;
+            xyPlot.setRangeAxis(paramCount, rangeAxis, false);
+            xyPlot.setDomainAxis(paramCount, domainAxis, false);
+            xyPlot.setDataset(paramCount, dataset);
+            xyPlot.mapDatasetToRangeAxis(paramCount, paramCount);
+            xyPlot.setRenderer(paramCount, renderer);
+            if (side != null) {
+                xyPlot.setRangeAxisLocation(paramCount, side);
+            }
+            paramCount++;
+        }
+    }
 
 
     /**

@@ -1,18 +1,18 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -42,6 +42,8 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.display.Animation;
 
+
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -113,6 +115,9 @@ public class VerticalProfileControl extends LineProbeControl {
 
     /** Show the jtable */
     private boolean showTable = false;
+
+    /** _more_ */
+    private Unit altUnit = null;
 
     /**
      * Default constructor; set attribute flags
@@ -284,35 +289,47 @@ public class VerticalProfileControl extends LineProbeControl {
 
         paramsTable.addMouseListener(new MouseAdapter() {
 
-            public void mousePressed(MouseEvent e) {
+                                         public void mousePressed(
+                                         MouseEvent e) {
 
-                if ( !SwingUtilities.isRightMouseButton(e)) {
-                    return;
-                }
-                final int row = paramsTable.rowAtPoint(e.getPoint());
-                if ((row < 0) || (row >= getDataChoices().size())) {
-                    return;
-                }
+                                             if (
+                                              !SwingUtilities.isRightMouseButton(
+                                                  e)) {
+                                                 return;
+                                             }
+                                             final int row =
+                                                 paramsTable.rowAtPoint(
+                                                     e.getPoint());
+                                             if ((row < 0)
+                                                     || (row
+                                                     >= getDataChoices().size())) {
+                                                 return;
+                                             }
 
-                List       choices   = getDataChoices();
-                JPopupMenu popupMenu = new JPopupMenu();
-                JMenuItem  jmi       = doMakeChangeParameterMenuItem();
-                popupMenu.add(jmi);
-                popupMenu.addSeparator();
+                                             List choices = getDataChoices();
+                                             JPopupMenu popupMenu =
+                                                 new JPopupMenu();
+                                             JMenuItem jmi =
+                                                 doMakeChangeParameterMenuItem();
+                                             popupMenu.add(jmi);
+                                             popupMenu.addSeparator();
 
-                List items = getParameterMenuItems(row);
-                GuiUtils.makePopupMenu(popupMenu, items);
+                                             List items =
+                                                 getParameterMenuItems(row);
+                                             GuiUtils.makePopupMenu(
+                                             popupMenu, items);
 
-                // Display choices
-                JMenu dataChoiceMenu =
-                    getControlContext().doMakeDataChoiceMenu(
-                        getDataChoiceAtRow(row));
-                popupMenu.add(dataChoiceMenu);
-                popupMenu.show(paramsTable, e.getX(), e.getY());
+                                             // Display choices
+                                             JMenu dataChoiceMenu =
+                                                 getControlContext().doMakeDataChoiceMenu(
+                                                     getDataChoiceAtRow(row));
+                                             popupMenu.add(dataChoiceMenu);
+                                             popupMenu.show(paramsTable,
+                                             e.getX(), e.getY());
 
-            }
+                                         }
 
-        });
+                                     });
         paramsTable.setToolTipText("Right click to edit");
 
         JScrollPane scrollPane = new JScrollPane(paramsTable);
@@ -353,7 +370,8 @@ public class VerticalProfileControl extends LineProbeControl {
             VerticalProfileInfo info = new VerticalProfileInfo(this);
             newInfos.add(info);
             DataChoice dc = (DataChoice) newChoices.get(i);
-            info.setDataInstance(new GridDataInstance(dc, getDataSelection(),
+            info.setDataInstance(new GridDataInstance(dc,
+                    getDataSelection(),
                     getRequestProperties()));
 
             initializeVerticalProfileInfo(info);
@@ -451,7 +469,8 @@ public class VerticalProfileControl extends LineProbeControl {
                 DataChoice dc = (DataChoice) choices.get(row);
                 showWaitCursor();
                 info.setDataInstance(new GridDataInstance(dc,
-                        getDataSelection(), getRequestProperties()));
+                        getDataSelection(),
+                        getRequestProperties()));
                 showNormalCursor();
                 initializeVerticalProfileInfo(info);
             } catch (VisADException exc) {}
@@ -478,6 +497,9 @@ public class VerticalProfileControl extends LineProbeControl {
                     info.getDataInstance().getRawUnit(0));
         }
         info.setUnit(vpUnit);
+        if (altUnit == null) {
+            info.setAltitudeUnit(CommonUnit.meter);
+        }
         Range vpRange = info.getLineState().getRange();
 
         if (vpRange == null) {
@@ -487,8 +509,8 @@ public class VerticalProfileControl extends LineProbeControl {
                 vpRange = info.getDataInstance().getRange(0);
                 Unit u = info.getDataInstance().getRawUnit(0);
                 if ( !Misc.equals(u, vpUnit) && Unit.canConvert(u, vpUnit)) {
-                    vpRange = new Range(vpUnit.toThis(vpRange.getMin(), u),
-                                        vpUnit.toThis(vpRange.getMax(), u));
+                    vpRange = new Range(vpUnit.toThis(vpRange.getMin(),
+                            u), vpUnit.toThis(vpRange.getMax(), u));
                 }
             }
             info.getLineState().setRange(vpRange);
@@ -532,7 +554,8 @@ public class VerticalProfileControl extends LineProbeControl {
         VerticalProfileInfo rowInfo = getVPInfo(row);
         paramMenu.add(GuiUtils.makeMenuItem("Chart Properties",
                                             VerticalProfileControl.this,
-                                            "showLineProperties", rowInfo));
+                                            "showLineProperties",
+                                            rowInfo));
 
 
 
@@ -541,31 +564,36 @@ public class VerticalProfileControl extends LineProbeControl {
         jmi = new JMenuItem("Change Unit...");
         paramMenu.add(jmi);
         jmi.addActionListener(new ObjectListener(new Integer(row)) {
-            public void actionPerformed(ActionEvent ev) {
+                                  public void actionPerformed(
+                                          ActionEvent ev) {
 
-                Unit newUnit = getDisplayConventions().selectUnit(
-                                   getVPInfo(row).getUnit(), null);
-                if (newUnit != null) {
-                    getVPInfo(row).setUnit(newUnit);
-                    try {
-                        doMoveProbe();
-                    } catch (Exception exc) {
-                        logException("After changing units", exc);
-                    }
-                }
+                                      Unit newUnit =
+                                          getDisplayConventions().selectUnit(
+                                              getVPInfo(row).getUnit(), null);
+                                      if (newUnit != null) {
+                                          getVPInfo(row).setUnit(newUnit);
+                                          try {
+                                              doMoveProbe();
+                                          } catch (Exception exc) {
+                                              logException(
+                                              "After changing units", exc);
+                                          }
+                                      }
 
-            }
-        });
+                                  }
+                              });
 
 
         // Remove this parameter
         jmi = new JMenuItem("Remove");
         paramMenu.add(jmi);
         jmi.addActionListener(new ObjectListener(new Integer(row)) {
-            public void actionPerformed(ActionEvent ev) {
-                removeField(((Integer) theObject).intValue());
-            }
-        });
+                                  public void actionPerformed(
+                                          ActionEvent ev) {
+                                      removeField(
+                                          ((Integer) theObject).intValue());
+                                  }
+                              });
 
         return items;
 
@@ -623,7 +651,9 @@ public class VerticalProfileControl extends LineProbeControl {
                     vUnit = cs.getReferenceUnits()[2];
                 }
                 float[] alts = domainVals[2];
-                if ( !vUnit.equals(CommonUnit.meter)) {
+                if (altUnit != null) {
+                    alts = altUnit.toThis(alts, vUnit);
+                } else if ( !vUnit.equals(CommonUnit.meter)) {
                     alts = CommonUnit.meter.toThis(alts, vUnit);
                 }
                 try {  // domain might have NaN's in it
@@ -667,6 +697,45 @@ public class VerticalProfileControl extends LineProbeControl {
     }
 
     /**
+     * This gets called by changing the altitude unit
+     *
+     * @param aUnit _more_
+     */
+    protected void reSetProfileAltitudeUnit(Unit aUnit) {
+        List        localInfos = new ArrayList(infos);
+        List        chartInfos = new ArrayList();
+        LatLonPoint llp        = null;
+        for (int i = 0; i < localInfos.size(); i++) {
+
+            VerticalProfileInfo info =
+                (VerticalProfileInfo) localInfos.get(i);
+            if ((info == null) || (info.getDataInstance() == null)) {
+                continue;
+            }
+
+            try {
+                llp = info.getLastPoint();
+                info.setAltitudeUnit(aUnit);
+                FieldImpl newFI = GridUtil.getProfileAtLatLonPoint(
+                                      info.getDataInstance().getGrid(), llp,
+                                      info.getSamplingMode());
+
+                if (newFI != null) {
+                    info.setProfile(makeProfile(newFI), llp);
+                    chartInfos.add(info);
+                }
+            } catch (Exception ep) {}
+        }
+
+        try {
+            getChart().setProfiles(chartInfos);
+        } catch (Exception epd) {}
+
+
+        updateLegendLabel();
+    }
+
+    /**
      * Given the location of the profile SelectorPoint,
      * and a FieldImpl for one or more times for animation,
      * create a data set for a profile at the profile's SP location.
@@ -694,14 +763,16 @@ public class VerticalProfileControl extends LineProbeControl {
             double[] values = position.getValues();
             EarthLocationTuple elt =
                 (EarthLocationTuple) boxToEarth(new double[] { values[0],
-                    values[1], 1.0 });
+                                                               values[1],
+                                                               1.0 });
             llp = elt.getLatLonPoint();
         } else if (rttype.equals(RealTupleType.SpatialCartesian3DTuple)) {
             //If is a 3d point then we are probably in the globe view
             double[] values = position.getValues();
             double length = new Point3d(0, 0,
                                         0).distance(new Point3d(values[0],
-                                            values[1], values[2]));
+                                                values[1],
+                                                values[2]));
 
 
             if (length != 0) {
@@ -711,7 +782,8 @@ public class VerticalProfileControl extends LineProbeControl {
             }
             EarthLocationTuple elt =
                 (EarthLocationTuple) boxToEarth(new double[] { values[0],
-                    values[1], values[2] });
+                                                               values[1],
+                                                               values[2] });
             llp = elt.getLatLonPoint();
         } else if (rttype.equals(RealTupleType.SpatialEarth2DTuple)) {
             Real[] reals = position.getRealComponents();
@@ -772,7 +844,8 @@ public class VerticalProfileControl extends LineProbeControl {
     protected void getSaveMenuItems(List items, boolean forMenuBar) {
         super.getSaveMenuItems(items, forMenuBar);
 
-        items.add(GuiUtils.makeMenuItem("Save Chart Image...", getChart(),
+        items.add(GuiUtils.makeMenuItem("Save Chart Image...",
+                                        getChart(),
                                         "saveImage"));
 
     }
@@ -788,7 +861,9 @@ public class VerticalProfileControl extends LineProbeControl {
         items.add(GuiUtils.MENU_SEPARATOR);
         List paramItems = new ArrayList();
         paramItems.add(GuiUtils.makeCheckboxMenuItem("Show Parameter Table",
-                this, "showTable", null));
+                this,
+                "showTable",
+                null));
         paramItems.add(doMakeChangeParameterMenuItem());
         List choices = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
@@ -799,14 +874,58 @@ public class VerticalProfileControl extends LineProbeControl {
 
         JMenu chartMenu = new JMenu("Chart");
         chartMenu.add(
-            GuiUtils.makeCheckboxMenuItem(
-                "Show Thumbnail in Legend", getChart(), "showThumb", null));
+            GuiUtils.makeCheckboxMenuItem("Show Thumbnail in Legend",
+                                          getChart(),
+                                          "showThumb",
+                                          null));
+        //
+        JMenuItem jmj;
+        jmj = new JMenuItem("Change Altitude Unit...");
+        jmj.addActionListener(new ObjectListener(new Integer(0)) {
+                                  public void actionPerformed(
+                                          ActionEvent ev) {
+                                      Unit newUnit =
+                                          getDisplayConventions().selectUnit(
+                                              CommonUnit.meter, null);
+                                      altUnit = newUnit;
+                                      if (newUnit != null) {
+                                          try {
+                                              reSetProfileAltitudeUnit(
+                                              altUnit);
+                                          } catch (Exception exc) {
+                                              logException(
+                                              "After changing units", exc);
+                                          }
+                                      }
+
+                                  }
+                              });
+        chartMenu.add(jmj);
         List chartMenuItems = new ArrayList();
         getChart().addViewMenuItems(chartMenuItems);
         GuiUtils.makeMenu(chartMenu, chartMenuItems);
         items.add(chartMenu);
         items.add(doMakeProbeMenu(new JMenu("Probe")));
 
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Unit getAltUnit() {
+        return altUnit;
+    }
+
+    /**
+     * _more_
+     *
+     * @param unit _more_
+     */
+    public void setAltUnit(Unit unit) {
+        altUnit = unit;
     }
 
     /**

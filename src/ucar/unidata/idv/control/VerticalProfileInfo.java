@@ -65,6 +65,9 @@ public class VerticalProfileInfo {
     /** the time set from the last setValue */
     private Set timeSet;
 
+    /** The unit */
+    private Unit altitudeUnit;
+
     /**
      * Default Constructor
      */
@@ -96,6 +99,24 @@ public class VerticalProfileInfo {
      */
     public void setUnit(Unit value) {
         unit = value;
+    }
+
+    /**
+     * Get the Unit property.
+     *
+     * @return The Unit
+     */
+    public Unit getAltitudeUnit() {
+        return altitudeUnit;
+    }
+
+    /**
+     * Set the Unit property.
+     *
+     * @param value The new value for Unit
+     */
+    public void setAltitudeUnit(Unit value) {
+        altitudeUnit = value;
     }
 
     /**
@@ -175,6 +196,14 @@ public class VerticalProfileInfo {
     }
 
 
+    /**
+    * Get the last profile
+    *
+            * @return profile
+    */
+    public LatLonPoint getLastPoint() {
+        return this.lastPoint;
+    }
     /**
      * Get the profile we last used. If The given earth location
      * is not the same as the location of the last point we sampled on
