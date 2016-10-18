@@ -16,8 +16,9 @@
              id="idv.favoritesbar"
              place="North"/>
         </panel>
-        <idv.view embeddednode="true" place="Center" class="${view_class}">
-        </idv.view>
+        <idv.view embeddednode="true" place="Center" class="${view_class}"
+          properties="size=800:600"/>
+
       </panel>
       <idv.statusbar place="South"/>
     </panel>
