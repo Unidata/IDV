@@ -1,18 +1,18 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -22,33 +22,34 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.*;
-import ucar.unidata.data.imagery.*;
-import ucar.unidata.geoloc.*;
 import ucar.unidata.idv.IdvConstants;
-import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.util.*;
-
-import ucar.unidata.view.geoloc.GlobeDisplay;
-import ucar.unidata.view.geoloc.MapProjectionDisplay;
-import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.Grid2DDisplayable;
 
-import ucar.visad.display.RubberBandBox;
-
 import visad.*;
+import visad.VisADException;
 
-import visad.georef.EarthLocation;
+import visad.meteorology.ImageSequenceImpl;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
@@ -62,6 +63,15 @@ public class ImagePlanViewControl extends PlanViewControl {
     /** _more_ */
     public List descripters;
 
+    /** _more_ */
+    private McVHistogramWrapper histoWrapper;
+
+    /** _more_ */
+    private FlatField image;
+
+    /** _more_ */
+    private DataSourceImpl dataSource;
+
     //  NB: For now, we don't subclass ColorPlanViewControl because we get
     //  the DataRange widget from getControlWidgets.  Might want this in
     //  the future.  It would be simpler if we wanted to include that.
@@ -73,6 +83,207 @@ public class ImagePlanViewControl extends PlanViewControl {
     public ImagePlanViewControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DISPLAYUNIT
                           | FLAG_SKIPFACTOR | FLAG_TEXTUREQUALITY);
+    }
+
+
+    /**
+     * _more_
+     */
+    private void setInitialHistogramRange() {
+        try {
+            Range  range = getRange();
+            double lo    = range.getMin();
+            double hi    = range.getMax();
+            histoWrapper.setHigh(hi);
+            histoWrapper.setLow(lo);
+        } catch (Exception exc) {
+            logException("setInitialHistogramRange", exc);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Container doMakeContents() {
+        try {
+            JTabbedPane tab = new MyTabbedPane();
+            tab.add("Settings",
+                    GuiUtils.inset(GuiUtils.top(doMakeWidgetComponent()),
+                                   5));
+
+            // MH: just add a dummy component to this tab for now..
+            //            don't init histogram until the tab is clicked.
+            tab.add("Histogram", new JLabel("Histogram not yet initialized"));
+
+            return tab;
+        } catch (Exception exc) {
+            logException("doMakeContents", exc);
+        }
+        return null;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected JComponent getHistogramTabComponent() {
+        List choices = new ArrayList();
+        if (datachoice == null) {
+            datachoice = getDataChoice();
+        }
+        choices.add(datachoice);
+        histoWrapper = new McVHistogramWrapper("histo", choices,
+                (DisplayControlImpl) this);
+        dataSource = getDataSource();
+
+        if (dataSource == null) {
+            try {
+                image = (FlatField) datachoice.getData(getDataSelection());
+                histoWrapper.loadData(image);
+            } catch (IllegalArgumentException e) {
+                logException("Could not create histogram: nothing to show!",
+                             e);
+            } catch (RemoteException | VisADException e) {
+                logException("Could not create histogram!", e);
+            }
+        } else {
+            Hashtable props = dataSource.getProperties();
+            try {
+                DataSelection testSelection = datachoice.getDataSelection();
+                DataSelection realSelection = getDataSelection();
+                if (testSelection == null) {
+                    datachoice.setDataSelection(realSelection);
+                }
+                ImageSequenceImpl seq = null;
+                if (dataSelection == null) {
+                    dataSelection = dataSource.getDataSelection();
+                }
+                if (dataSelection == null) {
+                    image = (FlatField) dataSource.getData(datachoice, null,
+                            props);
+                    if (image == null) {
+                        image = (FlatField) datachoice.getData(null);
+                    }
+                } else {
+                    Data data = dataSource.getData(datachoice, null,
+                                    dataSelection, props);
+                    if (data instanceof ImageSequenceImpl) {
+                        seq = (ImageSequenceImpl) data;
+                    } else if (data instanceof FlatField) {
+                        image = (FlatField) data;
+                    } else if (data instanceof FieldImpl) {
+                        image = (FlatField) ((FieldImpl) data).getSample(0,
+                                false);
+                    } else {
+                        throw new Exception(
+                            "Histogram must be made from a FlatField");
+                    }
+                }
+                if ((seq != null) && (seq.getImageCount() > 0)) {
+                    image = (FlatField) seq.getImage(0);
+                }
+                try {
+                    histoWrapper.loadData(image);
+                } catch (IllegalArgumentException e) {
+                    logException(
+                        "Could not create histogram: nothing to show!", e);
+                }
+            } catch (Exception e) {
+                logException("attempting to set up histogram", e);
+            }
+        }
+
+        JComponent histoComp   = histoWrapper.doMakeContents();
+        JButton    resetButton = new JButton("Update");
+        resetButton.addActionListener(new ActionListener() {
+                                          public void actionPerformed(
+                                          ActionEvent ae) {
+                                              getIdv().showWaitCursor();
+                                              updateHistogramPanel();
+                                              setInitialHistogramRange();
+                                              getIdv().clearWaitCursor();
+                                              resetColorTable();
+                                          }
+                                      });
+        JPanel resetPanel =
+            GuiUtils.center(GuiUtils.inset(GuiUtils.wrap(resetButton),
+                                           4));
+        return GuiUtils.centerBottom(histoComp, resetPanel);
+    }
+
+    /**
+     * _more_
+     */
+    public void updateHistogramPanel() {
+        Hashtable props = dataSource.getProperties();
+        try {
+            DataSelection testSelection = datachoice.getDataSelection();
+            DataSelection realSelection = getDataSelection();
+            if (testSelection == null) {
+                datachoice.setDataSelection(realSelection);
+            }
+            ImageSequenceImpl seq = null;
+            if (dataSelection == null) {
+                dataSelection = dataSource.getDataSelection();
+            }
+            if (dataSelection == null) {
+                image = (FlatField) dataSource.getData(datachoice, null,
+                        props);
+                if (image == null) {
+                    image = (FlatField) datachoice.getData(null);
+                }
+            } else {
+                Data data = dataSource.getData(datachoice, null,
+                                dataSelection, props);
+                if (data instanceof ImageSequenceImpl) {
+                    seq = (ImageSequenceImpl) data;
+                } else if (data instanceof FlatField) {
+                    image = (FlatField) data;
+                } else if (data instanceof FieldImpl) {
+                    image = (FlatField) ((FieldImpl) data).getSample(0,
+                            false);
+                } else {
+                    throw new Exception(
+                        "Histogram must be made from a FlatField");
+                }
+            }
+            if ((seq != null) && (seq.getImageCount() > 0)) {
+                image = (FlatField) seq.getImage(0);
+            }
+            try {
+                histoWrapper.loadData(image);
+            } catch (IllegalArgumentException e) {
+                logException("Could not create histogram: nothing to show!",
+                             e);
+            }
+        } catch (Exception e) {
+            logException("attempting to set up histogram", e);
+        }
+        ;
+    }
+
+    /**
+     * _more_
+     *
+     * @param newRange _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setRange(final Range newRange)
+            throws RemoteException, VisADException {
+        //        logger.trace("newRange: {} [avoiding NPE!]", newRange);
+        super.setRange(newRange);
+        if (histoWrapper != null) {
+            histoWrapper.modifyRange(newRange.getMin(), newRange.getMax(),
+                                     false);
+        }
     }
 
     /**
@@ -133,7 +344,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                                  IdvConstants.PROP_LOADINGXML, false);
         if (fromBundle) {
             //if (descripters != null) {
-             //   dataChoice.setObjectProperty("descriptors", descripters);
+            //   dataChoice.setObjectProperty("descriptors", descripters);
             //}
             boolean mdr = getMatchDisplayRegion();
             dataChoice.setProperty("MatchDisplayRegion", mdr);
@@ -142,7 +353,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                 userMessage("Selected image(s) not available");
             }
             String magStr = (String) dataChoice.getProperty("MAG");
-            if (magStr != null && !magStr.isEmpty()) {
+            if ((magStr != null) && !magStr.isEmpty()) {
                 resolutionReadout = magStr;
             }
             return result;
@@ -258,7 +469,8 @@ public class ImagePlanViewControl extends PlanViewControl {
         // check to see if the range of the data is outside the range
         // of the default. This will be wrong if someone redefined what image
         // is supposed to be (0-255).
-        if ((range != null) && usingImage
+        if ((range != null)
+                && usingImage
                 && (getGridDataInstance() != null)) {
             Range dataRange = getDataRangeInColorUnits();
             if (dataRange != null) {
@@ -353,6 +565,99 @@ public class ImagePlanViewControl extends PlanViewControl {
      */
     public List getDescripters() {
         return this.descripters;
+    }
+
+    /**
+     * Holds a JFreeChart histogram of image values.
+     */
+    private class MyTabbedPane extends JTabbedPane implements ChangeListener {
+
+        /** Have we been painted */
+        boolean painted = false;
+
+        /** _more_ */
+        boolean popupFlag = false;
+
+        /** _more_ */
+        boolean haveDoneHistogramInit = false;
+
+        /**
+         * Creates a new {@code MyTabbedPane} that gets immediately registered
+         * as a {@link javax.swing.event.ChangeListener} for its own events.
+         */
+        public MyTabbedPane() {
+            addChangeListener(this);
+        }
+
+        /**
+         * The histogram isn't created unless the user selects the histogram
+         * tab (this is done in an effort to avoid a spike in memory usage).
+         *
+         * @param e The event. Ignored for now.
+         */
+        public void stateChanged(ChangeEvent e) {
+            // MH: don't make the histogram until user clicks the tab.
+            int index = getSelectedIndex();
+            if ((index >= 0)
+                    && getTitleAt(index).equals("Histogram")
+                    && !haveDoneHistogramInit) {
+                getIdv().showWaitCursor();
+                this.setComponentAt(index,
+                                    GuiUtils.inset(getHistogramTabComponent(),
+                                            5));
+                setInitialHistogramRange();
+                getIdv().clearWaitCursor();
+                //                haveDoneHistogramInit = true;
+            }
+        }
+
+        /**
+         * MH: Not really doing anything useful...but will leave it here for now...
+         *
+         * @param flag _more_
+         */
+        private void setPopupFlag(boolean flag) {
+            this.popupFlag = flag;
+        }
+
+        /**
+         * MH: Not really doing anything useful...but will leave it here for now...
+         *
+         * @param g graphics
+         */
+        public void paint(java.awt.Graphics g) {
+            if ( !painted) {
+                painted = true;
+            }
+            super.paint(g);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public DataSourceImpl getDataSource() {
+        DataSourceImpl ds          = null;
+        List           dataSources = getDataSources();
+        if ( !dataSources.isEmpty()) {
+            ds = (DataSourceImpl) dataSources.get(0);
+        }
+        return ds;
+    }
+
+    /**
+     * _more_
+     */
+    public void resetColorTable() {
+        try {
+            revertToDefaultColorTable();
+            revertToDefaultRange();
+            histoWrapper.resetPlot();
+        } catch (Exception e) {
+            logException("problem resetting color table", e);
+        }
     }
 
 }
