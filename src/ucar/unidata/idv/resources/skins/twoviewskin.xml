@@ -30,12 +30,12 @@
              class="${left_view_class}"
              viewid="viewleft%version%"
              id="viewleft"
-             properties="clickToFocus=true;shareViews=true;showControlLegend=false;initialSplitPaneLocation=0.2;legendOnLeft=true;size=300:400;shareGroup=view%versionuid%;"/>
+             properties="clickToFocus=true;shareViews=true;showControlLegend=false;initialSplitPaneLocation=0.2;legendOnLeft=true;size=600:700;shareGroup=view%versionuid%;"/>
           <idv.view
              class="${right_view_class}"
              viewid="viewright%version%"
              id="viewright"
-             properties="clickToFocus=true;showToolBars=true;shareViews=true;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;"/>
+             properties="clickToFocus=true;showToolBars=true;shareViews=true;showControlLegend=false;size=600:700;shareGroup=view%versionuid%;"/>
         </splitpane>
       </panel>
       <component idref="bottom_bar"/>
