@@ -25,15 +25,15 @@
           <idv.view
              viewid="viewleft%version%"
              id="viewleft"
-             properties="clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
+             properties="clickToFocus=true;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=500:600;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
           <idv.view
              viewid="viewcenter%version%"
              id="viewcenter"
-             properties="clickToFocus=true;showToolBars=false;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
+             properties="clickToFocus=true;showToolBars=false;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=500:600;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
           <idv.view
              viewid="viewright%version%"
              id="viewright"
-             properties="clickToFocus=true;showToolBars=false;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=300:400;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
+             properties="clickToFocus=true;showToolBars=false;shareViews=true;showEarthNavPanel=false;showControlLegend=false;size=500:600;shareGroup=view%versionuid%;useGlobeDisplay=true;initialMapResources=/auxdata/maps/globemaps.xml;"/>
         </panel>
       </panel>
       <component idref="bottom_bar"/>
