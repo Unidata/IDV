@@ -208,7 +208,7 @@ public class ImagePlanViewControl extends PlanViewControl {
                                               updateHistogramPanel();
                                               setInitialHistogramRange();
                                               getIdv().clearWaitCursor();
-                                              resetColorTable();
+                                              //resetColorTable();
                                           }
                                       });
         JPanel resetPanel =
