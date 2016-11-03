@@ -1681,14 +1681,14 @@ public class JythonManager extends IdvManager implements ActionListener {
 
         try {
             Element root = XmlUtil.getRoot(filename, getClass());
-            List descriptors =
-                DerivedDataDescriptor.readDescriptors(getIdv(), root, true);
-            for (int i = 0; i < descriptors.size(); i++) {
-                DerivedDataDescriptor ddd =
-                    (DerivedDataDescriptor) descriptors.get(i);
-                if ( !descriptors.contains(ddd)) {
-                    ddd.setIsLocalUsers(true);
-                    descriptorDataSource.addDescriptor(ddd);
+            // Descriptor list from file
+            List fileDescriptors = DerivedDataDescriptor.readDescriptors(getIdv(), root, true);
+            // List of current local descriptors
+            List localDescriptors = getLocalDescriptors();
+            for (int i = 0; i < fileDescriptors.size(); i++) {
+                DerivedDataDescriptor ddd = (DerivedDataDescriptor) fileDescriptors.get(i);
+                if (! localDescriptors.contains(ddd)) {
+                    addFormula(ddd);
                 }
             }
             writeUserFormulas();
