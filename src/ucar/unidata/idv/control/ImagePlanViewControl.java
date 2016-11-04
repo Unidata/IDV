@@ -43,11 +43,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -116,7 +112,7 @@ public class ImagePlanViewControl extends PlanViewControl {
 
             // MH: just add a dummy component to this tab for now..
             //            don't init histogram until the tab is clicked.
-            tab.add("Histogram", new JLabel("Histogram not yet initialized"));
+            tab.add("Histogram", getHistogramTabComponent());
 
             return tab;
         } catch (Exception exc) {
@@ -266,6 +262,37 @@ public class ImagePlanViewControl extends PlanViewControl {
             logException("attempting to set up histogram", e);
         }
         ;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param items _more_
+     * @param forMenuBar _more_
+     */
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
+        super.getViewMenuItems(items, forMenuBar);
+        if (true) {
+            items.add(GuiUtils.MENU_SEPARATOR);
+            items.add(GuiUtils.makeMenuItem("Save Chart Image...",
+                                            getChart(),
+                                            "saveImage"));
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public McVHistogramWrapper getChart() {
+        if (histoWrapper == null) {
+            getHistogramTabComponent();
+            setInitialHistogramRange();
+        }
+        return histoWrapper;
     }
 
     /**
