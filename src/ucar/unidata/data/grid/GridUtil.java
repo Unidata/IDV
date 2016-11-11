@@ -5976,7 +5976,7 @@ public class GridUtil {
                     }
                     varData.put(v, af);
                 }
-                ncfile.write(v.getName(), varData.get(v));
+                ncfilewriter.write(v.getName(), varData.get(v));
             }
             int   numDims = dims.size();
             int[] sizes   = new int[numDims];
