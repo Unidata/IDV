@@ -50,6 +50,7 @@ import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
 
+import ucar.nc2.util.IOIterator;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
@@ -1704,7 +1705,12 @@ public class PointObFactory {
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
-            collection = npfc.flatten(llr, dateRange);
+            IOIterator<PointFeatureCollection> itor =  npfc.getCollectionIterator();
+            while(itor.hasNext()){
+                PointFeatureCollection pfcc = itor.next();
+                pfcc = pfcc.subset(llr, dateRange);
+            }
+            //collection = (PointFeatureCollection)npfc;
         } else {
             throw new IllegalArgumentException(
                 "Can't handle collection of type " + fc.getClass().getName());
@@ -1957,7 +1963,7 @@ public class PointObFactory {
                                    realArray, stringArray, allUnits));
 
                 tuples.add(tuple);
-                times.add(new DateTime(po.getNominalTimeAsDate()));
+                times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
                 elts.add(elt);
 
                 if (obIdx % NUM == 0) {
@@ -1971,7 +1977,7 @@ public class PointObFactory {
             Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
                         "found " + ismissing + "/" + missing
                         + " missing out of " + obIdx);
-            dataIterator.finish();
+            dataIterator.close();
         }
         if (tuples.isEmpty()) {
             return null;
@@ -2057,20 +2063,21 @@ public class PointObFactory {
         DsgFeatureCollection      fc         = collectionList.get(0);
         PointFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
-        DateRange dateRange = null;
+        CalendarDateRange dateRange = null;
         if (dateSelection != null) {
             if (dateSelection.getTimes() != null) {
                 List<Date> range = dateSelection.getTimes();
                 Collections.sort(range);
-                dateRange = new DateRange(range.get(0),
-                                          range.get(range.size() - 1));
+                CalendarDate calStart = CalendarDate.of(range.get(0));
+                CalendarDate calEnd = CalendarDate.of(range.get(range.size() - 1));
+                dateRange = CalendarDateRange.of(calStart, calEnd);
             } else if (dateSelection.hasInterval()) {
                 double interval = dateSelection.getInterval();
                 int    count    = dateSelection.getCount();
                 long   timespan = (long) interval * count;
                 Date   now      = new Date();
-                dateRange = new DateRange(new Date(now.getTime() - timespan),
-                                          now);
+                dateRange = CalendarDateRange.of(new Date(now.getTime() - timespan),
+                        now);
             }
         }
         //if (dateRange == null) {
@@ -2087,7 +2094,12 @@ public class PointObFactory {
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
-            collection = npfc.flatten(llr, dateRange);
+            IOIterator<PointFeatureCollection> itor =  npfc.getCollectionIterator();
+            while(itor.hasNext()){
+                PointFeatureCollection pfcc = itor.next();
+                pfcc = pfcc.subset(llr, dateRange);
+            }
+            //collection = (PointFeatureCollection)npfc;
         } else {
             throw new IllegalArgumentException(
                 "Can't handle collection of type " + fc.getClass().getName());
