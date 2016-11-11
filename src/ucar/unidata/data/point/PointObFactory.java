@@ -40,12 +40,14 @@ import ucar.nc2.dt.StationObsDataset;
 import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.CFPointObWriter;
 import ucar.nc2.dt.point.PointObVar;
-import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.DsgFeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.NestedPointFeatureCollection;
+import ucar.nc2.ft.PointFeatureCC; //.NestedPointFeatureCollection;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
+import ucar.nc2.time.CalendarDate;
+import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
 
 import ucar.unidata.data.DataChoice;
@@ -1661,28 +1663,30 @@ public class PointObFactory {
         String  stationFieldName   = null;
 
         // make sure we can read this kind of data
-        List<FeatureCollection> collectionList =
+        List<DsgFeatureCollection> collectionList =
             input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {
             throw new IllegalArgumentException(
                 "Can't handle point data with multiple collections");
         }
-        FeatureCollection      fc         = collectionList.get(0);
+        DsgFeatureCollection      fc         = collectionList.get(0);
         PointFeatureCollection collection = null;
+
         // System.out.println("llr = " + llr);
-        DateRange dateRange = null;
+        CalendarDateRange dateRange = null;
         if (dateSelection != null) {
             if (dateSelection.getTimes() != null) {
                 List<Date> range = dateSelection.getTimes();
                 Collections.sort(range);
-                dateRange = new DateRange(range.get(0),
-                                          range.get(range.size() - 1));
+                CalendarDate calStart = CalendarDate.of(range.get(0));
+                CalendarDate calEnd = CalendarDate.of(range.get(range.size() - 1));
+                dateRange = CalendarDateRange.of(calStart, calEnd);
             } else if (dateSelection.hasInterval()) {
                 double interval = dateSelection.getInterval();
                 int    count    = dateSelection.getCount();
                 long   timespan = (long) interval * count;
                 Date   now      = new Date();
-                dateRange = new DateRange(new Date(now.getTime() - timespan),
+                dateRange = CalendarDateRange.of(new Date(now.getTime() - timespan),
                                           now);
             }
         }
@@ -1694,9 +1698,9 @@ public class PointObFactory {
             if ((llr != null) || (dateRange != null)) {
                 collection = collection.subset(llr, dateRange);
             }
-        } else if (fc instanceof NestedPointFeatureCollection) {
-            NestedPointFeatureCollection npfc =
-                (NestedPointFeatureCollection) fc;
+        } else if (fc instanceof PointFeatureCC) {
+            PointFeatureCC npfc =
+                (PointFeatureCC) fc;
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
@@ -1878,7 +1882,7 @@ public class PointObFactory {
         } else {
             PointFeatureIterator dataIterator =
             //collection.getPointFeatureIterator(-1);
-            collection.getPointFeatureIterator(16384);
+            collection.getPointFeatureIterator();
             while (dataIterator.hasNext()) {
                 PointFeature po = (PointFeature) dataIterator.next();
                 iammissing = false;
@@ -1894,7 +1898,7 @@ public class PointObFactory {
                                         : new String[numStrings]);
 
                 // make the VisAD data object
-                StructureData structure = po.getData();
+                StructureData structure = po.getFeatureData();
                 int           stringCnt = 0;
                 int           realCnt   = 0;
                 if (needToAddStationId) {
@@ -2044,13 +2048,13 @@ public class PointObFactory {
         String  stationFieldName   = null;
 
         // make sure we can read this kind of data
-        List<FeatureCollection> collectionList =
+        List<DsgFeatureCollection> collectionList =
             input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {
             throw new IllegalArgumentException(
                 "Can't handle point data with multiple collections");
         }
-        FeatureCollection      fc         = collectionList.get(0);
+        DsgFeatureCollection      fc         = collectionList.get(0);
         PointFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
         DateRange dateRange = null;
@@ -2077,9 +2081,9 @@ public class PointObFactory {
             if ((llr != null) || (dateRange != null)) {
                 collection = collection.subset(llr, dateRange);
             }
-        } else if (fc instanceof NestedPointFeatureCollection) {
-            NestedPointFeatureCollection npfc =
-                (NestedPointFeatureCollection) fc;
+        } else if (fc instanceof PointFeatureCC) {
+            PointFeatureCC npfc =
+                (PointFeatureCC) fc;
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
