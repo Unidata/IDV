@@ -27,17 +27,19 @@ import ucar.atd.dorade.DoradeSweep;
 import ucar.ma2.InvalidRangeException;
 
 import ucar.nc2.Attribute;
+import ucar.nc2.constants.FeatureType;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.RadialDatasetSweep;
-import ucar.nc2.dt.TypedDatasetFactory;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridCoordSys;
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.units.DateUnit;
 
+import ucar.netcdf.Netcdf;
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -320,14 +322,13 @@ public class CDMRadarAdapter implements RadarAdapter {
         double[] vcpAngles;
         try {
             Trace.call1("CDMRadarAdapter:open dataset");
+            Formatter buf = new Formatter();
             if(swpFileName.endsWith("entry.das"))
-                rds = (RadialDatasetSweep) TypedDatasetFactory.open(
-                    ucar.nc2.constants.FeatureType.RADIAL, DODSNetcdfFile.canonicalURL(swpFileName), null,
-                    new StringBuilder());
+                rds = (RadialDatasetSweep) FeatureDatasetFactoryManager.open(
+                    FeatureType.RADIAL, DODSNetcdfFile.canonicalURL(swpFileName), null, buf);
             else
-                rds = (RadialDatasetSweep) TypedDatasetFactory.open(
-                        ucar.nc2.constants.FeatureType.RADIAL, swpFileName, null,
-                        new StringBuilder());
+                rds = (RadialDatasetSweep) FeatureDatasetFactoryManager.open(
+                        FeatureType.RADIAL, swpFileName, null, buf);
 
             Trace.call2("CDMRadarAdapter:open dataset");
             stationID      = rds.getRadarID();
@@ -455,7 +456,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             }
 
 
-            baseTime = new DateTime(rds.getStartDate());
+            baseTime = new DateTime(rds.getCalendarDateStart().toDate());
 
             Iterator iter = rvars.iterator();
             int      p    = 0;
