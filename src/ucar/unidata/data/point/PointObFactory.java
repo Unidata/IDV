@@ -2060,8 +2060,8 @@ public class PointObFactory {
             throw new IllegalArgumentException(
                 "Can't handle point data with multiple collections");
         }
-        DsgFeatureCollection      fc         = collectionList.get(0);
-        PointFeatureCollection collection = null;
+        //DsgFeatureCollection      fc         = collectionList.get(0);
+        //PointFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
         CalendarDateRange dateRange = null;
         if (dateSelection != null) {
@@ -2083,7 +2083,7 @@ public class PointObFactory {
         //if (dateRange == null) {
         //    dateRange = new DateRange(null, new DateType(true, null), new TimeDuration("1 hour"), null);
         //}
-        if (fc instanceof PointFeatureCollection) {
+   /*     if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
             if ((llr != null) || (dateRange != null)) {
                 collection = collection.subset(llr, dateRange);
@@ -2104,6 +2104,7 @@ public class PointObFactory {
             throw new IllegalArgumentException(
                 "Can't handle collection of type " + fc.getClass().getName());
         }
+        */
         //System.out.println("collection = " + collection.getClass().getName());
         //Trace.call1("FeatureDatasetPoint: calculating bounds");
         //collection.calcBounds();
