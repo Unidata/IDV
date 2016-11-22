@@ -263,7 +263,7 @@ If using the tree panel you can define components that are displayed when a cate
        class="ucar.unidata.idv.chooser.adde.AddeFrontChooser"/>
   </panel>
 
-  <panel
+  <!--panel
      title="Profiler"
      category="Observations"
      layout="border"
@@ -275,7 +275,7 @@ If using the tree panel you can define components that are displayed when a cate
        menutitle="Profiler Winds"
        helppath="idv.data.choosers.profilerchooser"
        class="ucar.unidata.idv.chooser.adde.AddeProfilerDataChooser"/>
-  </panel>
+  </panel-->
   <chooser
      id="chooser.polling.dir"
      title="Directory"
