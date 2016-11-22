@@ -23,12 +23,8 @@ package ucar.unidata.data.sounding;
 
 import ucar.nc2.constants.FeatureType;
 import ucar.nc2.dods.DODSNetcdfFile;
-import ucar.nc2.ft.FeatureCollection;
-import ucar.nc2.ft.FeatureDatasetFactoryManager;
-import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.PointFeatureCollectionIterator;
-import ucar.nc2.ft.ProfileFeatureCollection;
-import ucar.nc2.ft.TrajectoryFeatureCollection;
+import ucar.nc2.ft.*;
+import ucar.nc2.ft.DsgFeatureCollection;
 
 import ucar.unidata.data.BadDataException;
 
@@ -93,9 +89,9 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
             throw new BadDataException("Could not open trajectory file:"
                                        + filename);
         }
-        List<FeatureCollection> fcList =
+        List<DsgFeatureCollection> fcList =
             dataset.getPointFeatureCollectionList();
-        FeatureCollection           fc  = fcList.get(0);
+        DsgFeatureCollection           fc  = fcList.get(0);
         TrajectoryFeatureCollection tfc = null;
         ProfileFeatureCollection    pfc = null;
 
@@ -123,7 +119,7 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
        } */
         else if (dataset.getFeatureType().equals(FeatureType.TRAJECTORY)) {
             PointFeatureCollectionIterator iter =
-                tfc.getPointFeatureCollectionIterator(-1);
+                tfc.getPointFeatureCollectionIterator( );
             while (iter.hasNext()) {
                 addTrackInfo(
                     new CDMTrajectoryFeatureTypeInfo.PointFeatureTypeInfo(

@@ -28,12 +28,7 @@ import ucar.ma2.Range;
 import ucar.ma2.StructureData;
 import ucar.ma2.StructureMembers;
 
-import ucar.nc2.ft.FeatureCollection;
-import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.PointFeature;
-import ucar.nc2.ft.PointFeatureCollection;
-import ucar.nc2.ft.PointFeatureCollectionIterator;
-import ucar.nc2.ft.TrajectoryFeature;
+import ucar.nc2.ft.*;
 import ucar.nc2.ft.TrajectoryFeatureCollection;
 
 import ucar.unidata.data.DataUtil;
@@ -99,7 +94,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
     int positive = 1;
 
     /** The feature collection. */
-    private FeatureCollection fc;
+    private DsgFeatureCollection fc;
 
     /** The category attributes. */
     private static String[] categoryAttributes = { "category", "group" };
@@ -118,7 +113,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      */
     public CDMTrajectoryFeatureTypeInfo(TrajectoryFeatureTypeAdapter adapter,
                                         FeatureDatasetPoint dataset,
-                                        FeatureCollection fc)
+                                        DsgFeatureCollection fc)
             throws Exception {
         super(adapter, fc.getName());
         this.fdp = fdp;
@@ -140,7 +135,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             new ArrayList<TrajectoryFeatureBean>();
 
         PointFeatureCollectionIterator iter =
-            trajCollection.getPointFeatureCollectionIterator(-1);
+            trajCollection.getPointFeatureCollectionIterator();
         while (iter.hasNext()) {
             PointFeatureCollection pob = iter.next();
             TrajectoryFeatureBean trajBean =
@@ -159,9 +154,20 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
      * @param fc the fc
      * @return the trajectory feature bean
      */
-    protected final TrajectoryFeatureBean initHelper(FeatureCollection fc) {
+    protected final TrajectoryFeatureBean initHelper(TrajectoryFeatureCollection fc) {
         TrajectoryFeatureBean trajBean =
-            new TrajectoryFeatureBean((TrajectoryFeature) fc);
+            new TrajectoryFeatureBean(  fc);
+        List pfs   = trajBean.pfs;
+        int  psize = pfs.size();
+        for (int i = 0; i < psize; i++) {
+            obsList.add((PointFeature) pfs.get(i));
+        }
+        return trajBean;
+    }
+
+    protected final TrajectoryFeatureBean initHelper(PointFeatureCollection fc) {
+        TrajectoryFeatureBean trajBean =
+                new TrajectoryFeatureBean(  fc);
         List pfs   = trajBean.pfs;
         int  psize = pfs.size();
         for (int i = 0; i < psize; i++) {
@@ -1020,6 +1026,8 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
         /** The pfc. */
         TrajectoryFeature pfc;
 
+
+        PointFeature ppfc;
         /** The pf. */
         PointFeature pf;
 
@@ -1044,6 +1052,36 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
             npts = pfc.size();
         }
 
+        public TrajectoryFeatureBean(TrajectoryFeatureCollection tfc) {
+            this.pfs = new ArrayList<PointFeature>();
+            try {
+                while (tfc.hasNext()) {
+                    this.pfc = tfc.next();
+                    while (pfc.hasNext()) {
+                        pfs.add(pfc.next());
+                    }
+                    pf = pfs.get(0);
+                }
+            } catch (IOException ioe) {}
+
+            npts = pfs.size();
+        }
+
+
+        public TrajectoryFeatureBean(PointFeatureCollection fc) {
+            this.pfs = new ArrayList<PointFeature>();
+            try {
+                while (fc.hasNext()) {
+                    this.ppfc = fc.next();
+
+                        pfs.add(ppfc);
+
+                    pf = pfs.get(0);
+                }
+            } catch (IOException ioe) {}
+
+            npts = pfs.size();
+        }
         // for BeanTable
 
         /**
@@ -1330,7 +1368,7 @@ public abstract class CDMTrajectoryFeatureTypeInfo extends TrackInfo {
 
             TrajectoryFeatureBean trajBean = null;
             PointFeatureCollectionIterator iter =
-                tfc.getPointFeatureCollectionIterator(-1);
+                tfc.getPointFeatureCollectionIterator();
             while (iter.hasNext()) {
                 trajBean = initHelper(iter.next());
             }
