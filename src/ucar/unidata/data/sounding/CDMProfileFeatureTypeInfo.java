@@ -133,7 +133,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
 
         PointFeatureCollectionIterator iter =
-            pfc.getPointFeatureCollectionIterator(-1);
+            pfc.getPointFeatureCollectionIterator();
         obsList = new ArrayList<PointFeature>();
         ProfileFeatureBean profBean = null;
         int                iii      = 0;
@@ -145,7 +145,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
             // obsList.add(profBean);
             nptsTotal = nptsTotal + pob.size();
 
-            PointFeatureIterator iter1 = pob.getPointFeatureIterator(-1);
+            PointFeatureIterator iter1 = pob.getPointFeatureIterator();
             try {
                 while (iter1.hasNext() && (count < maxCount)) {
                     PointFeature pf = iter1.next();
@@ -154,14 +154,14 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
                     //System.out.println(" here " + count + " and " + i );
                 }
             } finally {
-                iter1.finish();
+                iter1.close();
             }
             obsList.add(null);
             nptsTotal = nptsTotal + 1;
         }
 
         // TrajectoryFeatureBean         pf      = obsList.get(0);
-        StructureData                 pfsd    = obsList.get(0).getData();
+        StructureData                 pfsd    = obsList.get(0).getFeatureData();
         List<StructureMembers.Member> members = pfsd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             StructureMembers.Member mb   = members.get(i);
@@ -526,7 +526,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
                 pf = pf_Old;
             }
 
-            StructureData pfsd = pf.getData();
+            StructureData pfsd = pf.getFeatureData();
             fdata[j++] = pfsd.convertScalarFloat(var);
             pf_Old     = pf;
             i          = i + stride;
@@ -564,7 +564,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
             PointFeature pf = obsList.get(i);
 
             if (pf != null) {
-                StructureData pfsd = pf.getData();
+                StructureData pfsd = pf.getFeatureData();
                 fdata[j++] = pfsd.getScalarDouble(var);
             } else {
                 fdata[j++] = Float.NaN;
@@ -599,7 +599,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
 
             if (pf != null) {
-                StructureData pfsd = pf.getData();
+                StructureData pfsd = pf.getFeatureData();
                 sdata[j++] = pfsd.getScalarString(var);
             } else {
                 sdata[j++] = null;
@@ -1023,7 +1023,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
         public ProfileFeatureBean(ProfileFeature pfc) {
             this.pfc = pfc;
             try {
-                pfc.calcBounds();
+                pfc.getBoundingBox();
                 if (pfc.hasNext()) {
                     pf = pfc.next();
                 }

@@ -161,7 +161,7 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
                 boolean                 first = true;
                 while (pf.hasNext()) {  //Iterating through each profiler level.
                     PointFeature  p    = pf.next();
-                    StructureData data = p.getData();
+                    StructureData data = p.getFeatureData();
 
                     sld.add(mandatoryLevels(data));
                     //Significant levels
@@ -181,8 +181,8 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
                                         0d);
                 stations.add(soundingStation);
                 SoundingOb so = new SoundingOb(soundingStation,
-                                    new DateTime(pf.getTime()));
-                timeSet.add(new DateTime(pf.getTime()));
+                                    new DateTime(pf.getTime().toDate()));
+                timeSet.add(new DateTime(pf.getTime().toDate()));
 
                 soundings.add(so);
                 soundingLevels.add(sld);
