@@ -22,9 +22,11 @@ package ucar.visad.data;
 
 
 import ucar.ma2.Array;
+import ucar.ma2.DataType;
 import ucar.ma2.Index;
 
 //import ucar.nc2.dataset.grid.*;
+import ucar.nc2.Attribute;
 import ucar.nc2.dt.grid.*;
 
 import ucar.unidata.data.DataUtil;
@@ -243,6 +245,12 @@ public class GeoGridFlatField extends CachedFlatField {
                     //arr = geoGrid.readVolumeData(timeIndex);
                     arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
                             -1);
+                    if(geoGrid.getDataType().equals(DataType.BYTE)){
+                        Attribute att = geoGrid.findAttributeIgnoreCase("_unsigned");
+                        if(att != null && att.getStringValue().equals("true")){
+                            arr.setUnsigned(true);
+                        }
+                    }
                 } catch(Exception exc) {
                     if(exc.toString().indexOf("Inconsistent array length read")>=0) {
                         throw new ucar.unidata.data.BadDataException("Error reading data from server");
