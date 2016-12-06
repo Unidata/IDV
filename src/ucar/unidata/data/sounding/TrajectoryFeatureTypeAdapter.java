@@ -58,6 +58,8 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
     /** The is profile. */
     private boolean isProfile = false;
 
+    public TrajectoryFeatureTypeAdapter() throws Exception {
+    }
     /**
      * Construct a new track from the filename.
      *

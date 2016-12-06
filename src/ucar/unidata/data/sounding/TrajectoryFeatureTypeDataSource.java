@@ -506,9 +506,6 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
         }
     }
 
-    public  void setTraceAdapter(TrackAdapter traceAdapter) throws Exception {
-        super.setTraceAdapter(traceAdapter);
-    }
 
     public  void setTraceAdapter(String traceAdapter) throws Exception {
         //super.setTraceAdapter(traceAdapter);

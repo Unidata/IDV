@@ -75,7 +75,9 @@ public abstract class TrackAdapter {
     /** filename. */
     private String filename;
 
+    public TrackAdapter( ) throws Exception {
 
+    }
     /**
      * Construct a new track from the filename.
      *
