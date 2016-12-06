@@ -37,15 +37,7 @@ import ucar.unidata.ui.SqlShell;
 
 import ucar.unidata.ui.TwoListPanel;
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PollingInfo;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
-import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.util.WrapperException;
+import ucar.unidata.util.*;
 
 import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
@@ -80,6 +72,9 @@ import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.*;
+
+import static org.python.core.imp.CodeImport.source;
+import static ucar.unidata.idv.IdvPersistenceManager.PROP_BUNDLEPATH;
 
 
 /**
@@ -1001,9 +996,16 @@ public class TrackDataSource extends FilesDataSource {
     protected Data getSoundingTrace(DataChoice dc,
                                     DataSelection dataSelection)
             throws Exception {
+        if(traceAdapter == null && adapters != null) {
+            if(adapters.size() > 0)
+                traceAdapter = (TrackAdapter)adapters.get(0);
+        } else if(adapters == null) {
+            initTrack();
+            traceAdapter = (TrackAdapter)adapters.get(0);
+        }
+
         return traceAdapter.getAerologicalDiagramData(getTrackId(dc));
     }
-
 
     /**
      * Gets the sounding trace associated with this DataChoice
@@ -1013,6 +1015,10 @@ public class TrackDataSource extends FilesDataSource {
      */
     public TrackAdapter getTraceAdapter() throws Exception {
         return traceAdapter;
+    }
+
+    public  void setTraceAdapter(TrackAdapter traceAdapter) throws Exception {
+        this.traceAdapter = traceAdapter;
     }
 
     /**
