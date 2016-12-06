@@ -2111,9 +2111,15 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             List fileFields = new ArrayList();
             fields.add(fileFields);
             for (int fileIdx = 0; fileIdx < files.size(); fileIdx++) {
-                String file = files.get(fileIdx).toString();
-                file = "%" + PROP_BUNDLEPATH + "%/"
-                       + IOUtil.getFileTail(file);
+                String file = files.get(fileIdx).toString();String bpath = (String)getIdv().getStateManager().getProperty(PROP_BUNDLEPATH);
+                String bdir = IOUtil.getFileRoot(currentFileName);
+                if(file.contains(bdir)){
+                    file = "%" + PROP_BUNDLEPATH + "%"
+                            +  file.replace(bdir, "");
+                } else {
+                    file = "%" + PROP_BUNDLEPATH + "%/"
+                            + IOUtil.getFileTail(file);
+                }
                 JTextField fld = new JTextField(file);
                 fileFields.add(fld);
             }
