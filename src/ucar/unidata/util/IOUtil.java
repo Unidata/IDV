@@ -1577,16 +1577,16 @@ public class IOUtil {
      * @return is relative
      */
     public static boolean isRelativePath(String path) {
-        if (path.startsWith("http:") || path.startsWith("ftp:")
-                || path.startsWith("/") || path.startsWith(File.separator)) {
-            return false;
-        }
-        //Check for windows drives
-        if (path.substring(1, 2).equals(":")) {
-            return false;
-        }
-        return true;
-
+      if (path.startsWith("https:") || path.startsWith("ftp:")
+          || path.startsWith("http:") || path.startsWith("/")
+          || path.startsWith(File.separator)) {
+        return false;
+      }
+      // Check for windows drives
+      if (path.substring(1, 2).equals(":")) {
+        return false;
+      }
+      return true;
     }
 
 
