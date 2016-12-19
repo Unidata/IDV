@@ -139,10 +139,9 @@ public class SavedBundle {
         this.url = resourceManager.getResourcePath(XmlUtil.getAttribute(node,
                 ATTR_URL));
 
-
-        if ( !url.startsWith("/") && !url.startsWith("http:")
-                && !url.startsWith("ftp:")) {
-            url = dirRoot + "/" + url;
+        if (!url.startsWith("/") && !url.startsWith("http:")
+        		&& !url.startsWith("https:") && !url.startsWith("ftp:")) {
+        	url = dirRoot + "/" + url;
         }
         this.name = XmlUtil.getAttribute(node, ATTR_NAME);
 
