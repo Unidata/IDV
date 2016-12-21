@@ -390,7 +390,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 }
             });
             trajFormComponent =
-                GuiUtils.hbox(GuiUtils.rLabel("Trajecotry Form: "),
+                GuiUtils.hbox(GuiUtils.rLabel("Trajectory Form: "),
                               GuiUtils.filler(), trajFormBox,
                               GuiUtils.filler());
 
