@@ -5,7 +5,7 @@
 <body>
 
 
-[isl::tagdef bundle {Load a bundle} -attrs {file+ {bundle file or url} width {view window width} height  {view window height} times {List of times to use} clear {default is true. remove all existing displays and data}
+[isl::tagdef bundle {Load a bundle} -attrs {file+ {bundle file or url} width {view window width} height  {view window height} times {List of times to use} bbox {north,west,south,east} clear {default is true. remove all existing displays and data}
 wait {default is true. wait until all displays have been rendered.} bbox {override the geoSelection bounding box.}
 timedriverstart {changing the animation widget time driver start time.} timedriverend {changing the animation widget time driver end time.}}]
 The [isl::tag bundle] tag lets you load in a new bundle and takes the form:
@@ -19,6 +19,9 @@ attribute:
 <bundle file="some_bundle_file.xidv" clear="false"/>
 }]
 
+<p>
+
+The [isl::attr bbox] attribute is a string of the form "north,west,south,east" and will relocate any gridded data to use these bounds.
 
 <p>
 The [isl::attr wait] attribute, if true (the default), will essentially do a pause,
