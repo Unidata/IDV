@@ -32,6 +32,7 @@ import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.grid.GridDataSource;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.idv.control.MapDisplayControl;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.idv.ui.IslDialog;
@@ -3797,24 +3798,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             }
             List newControls = (List) ht.get(ID_DISPLAYCONTROLS);
 
-            //If we have controls and we are relocating the bundle then tell the controls
-            //to relocate themselves
-            if(newControls !=null && overrideGeoSelection!=null && baseGeoSelection !=null) {
-                LatLonRect baseLLR = baseGeoSelection.getLatLonRect();
-                LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
-                if(baseLLR!=null && newLLR != null) {
-                    System.err.println("baseBounds:" +  baseLLR +" new bounds:" + newLLR);
-                    for (int controlIdx = 0;
-                         controlIdx < newControls.size();
-                         controlIdx++) {
-                        DisplayControlImpl dc =
-                            (DisplayControlImpl) newControls.get(
-                                                                 controlIdx);
-                        dc.relocateDisplay(baseLLR, newLLR);
-                    }
-                    
-                }
-            }
+
+
 
 
             //If we are not merging we have to reset the ViewDescriptor id
@@ -4008,6 +3993,30 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                          * }
                          */
                     }
+                }
+            }
+            //If we have controls and we are relocating the bundle then tell the controls
+            //to relocate themselves
+            if(newControls !=null && overrideGeoSelection!=null ) { // && baseGeoSelection !=null) {
+                LatLonRect baseLLR = (baseGeoSelection != null ) ? baseGeoSelection.getLatLonRect() : null;
+                LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
+                if( newLLR != null) {
+                    System.err.println("baseBounds:" +  baseLLR +" new bounds:" + newLLR);
+                    boolean useDataProjection = true;
+                    for (int controlIdx = 0;
+                         controlIdx < newControls.size();
+                         controlIdx++) {
+                        DisplayControlImpl dc =
+                                (DisplayControlImpl) newControls.get(
+                                        controlIdx);
+                        if(!(dc instanceof MapDisplayControl) && useDataProjection) {
+                            dc.relocateDisplay(baseLLR, newLLR, true);
+                            useDataProjection = false;
+                        }
+                        else
+                            dc.relocateDisplay(baseLLR, newLLR, false);
+                    }
+
                 }
             }
         } finally {
