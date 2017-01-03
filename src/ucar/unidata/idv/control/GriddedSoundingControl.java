@@ -25,12 +25,20 @@ import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.visad.GeoUtils;
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 import ucar.visad.display.AnimationWidget;
@@ -44,6 +52,7 @@ import ucar.visad.quantities.Altitude;
 
 import visad.*;
 
+import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.LatLonTuple;
@@ -782,6 +791,89 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
         return profilesVisibility;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public void relocateDisplay(LatLonRect originalBounds,
+                                LatLonRect newBounds, boolean useDataProjection) {
+        //super.relocateDisplay(originalBounds, newBounds);
+        // get the ratio of original probe point, init value to the center
+        double             latRatio = 0.5;
+        double             lonRatio = 0.5;
+        EarthLocationTuple el       = null;
+        //doUpdateRegion = false;
+
+        double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
+        double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
+
+        //TODO: move the end points by the delta
+        //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
+        LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
+        double          nlat = lowerLeft.getLatitude() + deltaLat * latRatio;
+        double          nlon = lowerLeft.getLongitude() + deltaLon * lonRatio;
+        double          nalt      = 0.0;
+        if(originalBounds == null ){
+            GeoSelection gs = dataSelection.getGeoSelection();
+            GeoLocationInfo ginfo = new GeoLocationInfo(newBounds);
+            gs.setBoundingBox(ginfo);
+            try {
+                updateDataSelection(dataSelection);
+                getDataInstance().setDataSelection(dataSelection);
+                getDataInstance().reInitialize();
+                dataNode.setData(getData(getDataInstance()));
+            } catch (Exception eee) {}
+        }
+        try {
+            if (el != null) {
+                nalt = el.getAltitude().getValue();
+            }
+            if(nlon < 0)
+                nlon = GeoUtils.normalizeLongitude360(nlon);
+            EarthLocation newel = makeEarthLocation(nlat, nlon, nalt);;
+            double[]      ets   = earthToBox(newel);
+            setPosition(new RealTuple(new Real[] {
+                                      new Real(RealType.XAxis, ets[0]),
+                                      new Real(RealType.YAxis, ets[1]) }));
+            probeMoved(getPosition());
+        } catch (Exception e) {
+            System.out.print(e);
+        }
+
+    }
 
 
+    public void viewpointChanged() {
+        //System.out.println("viewpointChanged");
+        if (getMatchDisplayRegion()) {
+            if (reloadFromBounds) {
+                try {
+                    NavigatedDisplay navDisplay = getMapDisplay();
+                    LatLonRect baseLLR =
+                            dataSelection.getGeoSelection().getLatLonRect();
+                    //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
+                    LatLonRect newLLR = navDisplay.getLatLonRect();
+
+                    relocateDisplay(baseLLR, newLLR, false);
+
+                    reloadFromBounds = false;
+                } catch (Exception e) {}
+            }
+        }
+    }
+
+    protected boolean shouldAddControlListener() {
+        return true;
+    }
+
+    protected boolean canDoProgressiveResolution() {
+        return true;
+    }
+
+    public boolean hasMapProjection() {
+
+        return true;
+
+    }
 }
