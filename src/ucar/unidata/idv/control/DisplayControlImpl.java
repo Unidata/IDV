@@ -25,21 +25,11 @@ import ucar.nc2.time.Calendar;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.collab.SharableImpl;
-import ucar.unidata.data.DataCancelException;
-import ucar.unidata.data.DataChangeListener;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.DataOperand;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DataTimeRange;
-import ucar.unidata.data.DerivedDataChoice;
-import ucar.unidata.data.GeoSelection;
-import ucar.unidata.data.GeoSelectionPanel;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.ProjectionPointImpl;
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.ControlDescriptor;
 import ucar.unidata.idv.DisplayControl;
@@ -80,6 +70,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.GlobeDisplay;
+import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.unidata.xml.XmlObjectStore;
 
@@ -97,33 +88,14 @@ import ucar.visad.display.Displayable;
 import ucar.visad.display.DisplayableData;
 import ucar.visad.display.TextDisplayable;
 
-import visad.CommonUnit;
-import visad.ControlEvent;
-import visad.ControlListener;
-import visad.Data;
-import visad.DateTime;
-import visad.DisplayEvent;
-import visad.DisplayListener;
-import visad.DisplayRealType;
-import visad.FieldImpl;
-import visad.FunctionType;
-import visad.GriddedSet;
-import visad.LocalDisplay;
-import visad.ProjectionControl;
-import visad.Real;
-import visad.RealTuple;
-import visad.RealType;
-import visad.Set;
-import visad.SetType;
-import visad.Text;
-import visad.TextType;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
+import visad.Set;
 import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
 
+import visad.georef.TrivialMapProjection;
 import visad.util.DataUtility;
 
 
@@ -371,6 +343,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /** The smoothing factor widget */
     private ValueSliderWidget sww;
 
+    //protected  boolean doUpdateRegion = true;
 
     /**
      *  We maintain a list of the checkboxes use for toggling the visibility
@@ -3701,7 +3674,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                    false);
         //if (Misc.equals(dataSelection.getProperty(DataSelection.PROP_REGIONOPTION), 
         //              DataSelection.PROP_USEDISPLAYAREA) && !levelChanged) {
-        if (getMatchDisplayRegion() && !levelChanged) {
+        if (getMatchDisplayRegion() && !levelChanged ) { //&& doUpdateRegion) {
             getViewManager().setProjectionFromData(false);
             Rectangle2D bbox = navDisplay.getLatLonBox();
             geoSelection.setLatLonRect(bbox);
@@ -6933,6 +6906,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected void setProjectionInView(boolean useViewPreference,
                                        boolean maintainViewpoint) {
         MapViewManager mvm = getMapViewManager();
+        ViewManager vm = getDefaultViewManager();
         if (mvm == null) {
             return;
         }
@@ -6948,8 +6922,30 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             useViewPreference, true, maintainViewpoint);
     }
 
+    /**
+     * Set the projection in the map view manager.
+     *
+     * @param useViewPreference  if true, will let the view decide if
+     *                           preference to reset data is used or not
+     * @param maintainViewpoint  keep the same viewpoint
+     */
+    protected void setProjectionInView(MapViewManager mvm, boolean useViewPreference,
+                                       boolean maintainViewpoint) {
 
-
+        if (mvm == null) {
+            return;
+        }
+        MapProjection mp = (useViewPreference
+                ? getDataProjection()
+                : getDataProjectionForMenu());
+        if (mp == null) {
+            return;
+        }
+        mvm.setMapProjection(
+                mp, true,
+                getDisplayConventions().getMapProjectionLabel(mp, this),
+                useViewPreference, true, maintainViewpoint);
+    }
 
     /**
      * If this display has a dataprojection then center the view to it
@@ -12587,13 +12583,49 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     }
 
     /**
+     When we relocate a bundle this gets called to relocate the display
+     This method gets overwritten by the probe and cross section displays
+     so they can move their selection points to a new location
+     @param originalBounds The original bounds of the datasource
+     @param newBounds  The relocated bounds of the datasource
+     */
+    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
+        this.relocateDisplay(originalBounds, newBounds, false);
+    }
+    /**
        When we relocate a bundle this gets called to relocate the display
        This method gets overwritten by the probe and cross section displays
        so they can move their selection points to a new location
        @param originalBounds The original bounds of the datasource
        @param newBounds  The relocated bounds of the datasource
      */
-    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
+    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds, boolean useDataProjection) {
+        GeoSelection gs = dataSelection.getGeoSelection();
+        GeoLocationInfo ginfo = new GeoLocationInfo(newBounds);
+        gs.setBoundingBox(ginfo);
+        NavigatedDisplay navDisplay = getNavigatedDisplay();
+
+        if(navDisplay instanceof MapProjectionDisplay) {
+            float[][] values = new float[2][2];
+
+            values[0][0] = (float) newBounds.getLatMax();
+            values[0][1] = (float) newBounds.getLatMin();
+            values[1][0] = (float) newBounds.getLonMax();
+            values[1][1] = (float) newBounds.getLonMin();
+
+            // values       = project.toReference(values);
+            try {
+                Gridded2DSet region =
+                       new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple, values, 2);
+
+                ((MapProjectionDisplay) navDisplay).setMapRegion(region);
+
+            } catch (Exception e) {
+
+            }
+        }
+
+
     }
 
 
