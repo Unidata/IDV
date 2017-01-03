@@ -1207,8 +1207,8 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
        @param originalBounds The original bounds of the datasource
        @param newBounds  The relocated bounds of the datasource
      */
-    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds) {
-        super.relocateDisplay(originalBounds, newBounds);
+    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds, boolean useDataProjection) {
+        super.relocateDisplay(originalBounds, newBounds, useDataProjection);
 
         // get the ratio of original selector point, init value to the center
         double latRatio1 = 0.5;
@@ -1257,9 +1257,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             RealTuple end = new RealTuple(RealTupleType.SpatialEarth3DTuple,
                         new double[]{
                                 nlon2, nlat2, getSelectorAltitude()});
-
-
-            csSelector.setPosition(start, end);
+            if(csSelector == null)
+                createCrossSectionSelector1(start, end);
+            else
+                csSelector.setPosition(start, end);
+            //
             //loadDataFromLine();
         } catch (Exception e){}
 
@@ -1312,9 +1314,23 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
     }
 
+    /**
+     * Create the cross section selector
+     *
+     * @param start  the starting location
+     * @param end  the ending location
+     *
+     * @throws RemoteException  Java RMI Exception
+     * @throws VisADException   VisAD Exception
+     */
 
+    protected void createCrossSectionSelector1(RealTuple start,
+                                              RealTuple end)
+            throws VisADException, RemoteException {
+        csSelector = new CrossSectionSelector(
+                start,  end);
 
-
+    }
 
     /**
      * Convert three ints of grid index values to VisAD RealTuple of
@@ -1594,7 +1610,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                             dataSelection.getGeoSelection().getLatLonRect();
                     //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
                     LatLonRect newLLR = navDisplay.getLatLonRect();
-                    relocateDisplay(baseLLR, newLLR);
+                    relocateDisplay(baseLLR, newLLR, false);
                     reloadFromBounds = false;
                 } catch (Exception e) {}
             }
