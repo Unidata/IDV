@@ -652,8 +652,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      *  @param newBounds  The relocated bounds of the datasource
      */
     public void relocateDisplay(LatLonRect originalBounds,
-                                LatLonRect newBounds) {
-        super.relocateDisplay(originalBounds, newBounds);
+                                LatLonRect newBounds, boolean useDataProjection) {
+        super.relocateDisplay(originalBounds, newBounds, false);
 
         // get the ratio of original probe point, init value to the center
         double             latRatio = 0.5;
@@ -3374,7 +3374,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                         dataSelection.getGeoSelection().getLatLonRect();
                     //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
                     LatLonRect newLLR = navDisplay.getLatLonRect();
-                    relocateDisplay(baseLLR, newLLR);
+                    relocateDisplay(baseLLR, newLLR, false);
                     reloadFromBounds = false;
                 } catch (Exception e) {}
             }

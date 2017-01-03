@@ -24,6 +24,8 @@ package ucar.unidata.idv.control;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
@@ -656,7 +658,17 @@ public abstract class LineProbeControl extends GridDisplayControl {
                         dataSelection.getGeoSelection().getLatLonRect();
                     //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
                     LatLonRect newLLR = navDisplay.getLatLonRect();
-                    relocateDisplay(baseLLR, newLLR);
+
+                    if(!newLLR.containedIn(baseLLR)) {
+                        GeoSelection gs = dataSelection.getGeoSelection();
+                        GeoLocationInfo ginfo = new GeoLocationInfo(newLLR);
+                        gs.setBoundingBox(ginfo);
+                        updateDataSelection(dataSelection);
+                        getGridDataInstance().setDataSelection(dataSelection);
+                        getGridDataInstance().reInitialize();
+                    }
+                    relocateDisplay(baseLLR, newLLR, false);
+                    //probePositionChanged(getPosition());
                     reloadFromBounds = false;
                 } catch (Exception e) {}
             }
@@ -682,39 +694,13 @@ public abstract class LineProbeControl extends GridDisplayControl {
      *  @param newBounds  The relocated bounds of the datasource
      */
     public void relocateDisplay(LatLonRect originalBounds,
-                                LatLonRect newBounds) {
-        super.relocateDisplay(originalBounds, newBounds);
+                                LatLonRect newBounds, boolean useDataProjection) {
+        super.relocateDisplay(originalBounds, newBounds, useDataProjection);
         // get the ratio of original probe point, init value to the center
         double             latRatio = 0.5;
         double             lonRatio = 0.5;
         EarthLocationTuple el       = null;
-        try {
-            double[] oldpvalues = probe.getPosition().getValues();
-            el = (EarthLocationTuple) boxToEarth(new double[] { oldpvalues[0],
-                    oldpvalues[1], oldpvalues[2] }, false);
-            if (originalBounds != null) {
-                if ((oldpvalues == null) || (oldpvalues.length != 3)) {
-                    return;
-                }
-
-                latRatio =
-                    (el.getLatitude().getValue()
-                     - originalBounds.getLatMin()) / (originalBounds.getLatMax()
-                         - originalBounds.getLatMin());
-
-                lonRatio =
-                    (Misc.normalizeLongitude(el.getLongitude().getValue())
-                     - originalBounds.getLonMin()) / (originalBounds.getLonMax()
-                         - originalBounds.getLonMin());
-                lonRatio = Math.abs(lonRatio);
-
-                if (lonRatio > 1.0) {
-                    lonRatio = 0.5;
-                    latRatio = 0.5;
-                }
-            }
-
-        } catch (Exception e) {}
+        //doUpdateRegion = false;
 
         double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
         double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
