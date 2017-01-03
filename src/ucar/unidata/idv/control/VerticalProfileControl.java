@@ -25,10 +25,16 @@ import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.GeoLocationInfo;
+import ucar.unidata.data.GeoSelection;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.control.chart.LineState;
 import ucar.unidata.idv.control.chart.VerticalProfileChart;
 
@@ -40,6 +46,7 @@ import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.visad.GeoUtils;
 import ucar.visad.display.Animation;
 
 
@@ -47,6 +54,7 @@ import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
+import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.LatLonTuple;
@@ -391,6 +399,10 @@ public class VerticalProfileControl extends LineProbeControl {
     protected void resetData() throws VisADException, RemoteException {
         updateLegendLabel();
         setTimesForAnimation();
+      //  if (getDataInstance() != null) {
+      //      updateDataInstance(getDataInstance()).reInitialize();
+      //  }
+      //  super.resetData();
         doMoveProbe();
         fireStructureChanged();
     }
@@ -1149,5 +1161,75 @@ public class VerticalProfileControl extends LineProbeControl {
         return chart;
     }
 
+    public void relocateDisplay(LatLonRect originalBounds,
+                                LatLonRect newBounds, boolean useDataProjection) {
+        //super.relocateDisplay(originalBounds, newBounds);
+        // get the ratio of original probe point, init value to the center
+        //doUpdateRegion = false;
+        double             latRatio = 0.5;
+        double             lonRatio = 0.5;
+        EarthLocationTuple el       = null;
+        if(originalBounds == null ){
+            GeoSelection gs = dataSelection.getGeoSelection();
+            GeoLocationInfo ginfo = new GeoLocationInfo(newBounds);
+            gs.setBoundingBox(ginfo);
+            try {
+                updateDataSelection(dataSelection);
+                getGridDataInstance().setDataSelection(dataSelection);
+                getGridDataInstance().reInitialize();
+            } catch (Exception eee) {}
+            for (int row = 0; row < infos.size(); row++) {
+                VerticalProfileInfo info = (VerticalProfileInfo) infos.get(row);
+                if (info.getDataInstance() != null) {  // first time through
+                    try {
+                        info.setDataInstance(getGridDataInstance());
+                    } catch (Exception exc) {
+                    }
+                }
+            }
+        } else if(originalBounds != null && !newBounds.containedIn(originalBounds)) {
+            for (int row = 0; row < infos.size(); row++) {
+                VerticalProfileInfo info = (VerticalProfileInfo) infos.get(row);
+                if (info.getDataInstance() != null) {  // first time through
+                    try {
+                        info.setDataInstance(getGridDataInstance());
+                    } catch (Exception exc) {
+                    }
+                }
+            }
+        }
+        double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
+        double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
+
+        //TODO: move the end points by the delta
+        //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
+        LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
+        double          nlat = lowerLeft.getLatitude() + deltaLat * latRatio;
+        double          nlon = lowerLeft.getLongitude() + deltaLon * lonRatio;
+        double          nalt      = 0.0;
+
+        try {
+            if (el != null) {
+                nalt = el.getAltitude().getValue();
+            }
+            if(nlon < 0)
+                nlon = GeoUtils.normalizeLongitude360(nlon);
+            EarthLocation newel = makeEarthLocation(nlat, nlon, nalt);;
+            double[]      ets   = earthToBox(newel);
+
+
+            setPosition(new RealTuple(new Real[] {
+                                      new Real(RealType.XAxis, ets[0]),
+                                       new Real(RealType.YAxis, ets[1]) }));
+            setProbePosition(ets[0], ets[1]);
+            probePositionChanged(getPosition());
+            //ViewManager vm = ((VerticalProfileControl) this).defaultViewManager;
+            //if(vm instanceof MapViewManager) {
+                //setProjectionInView((MapViewManager)vm, false, false);
+            //}
+
+        } catch (Exception e) {}
+
+    }
 
 }
