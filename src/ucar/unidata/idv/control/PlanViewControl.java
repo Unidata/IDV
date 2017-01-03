@@ -24,7 +24,10 @@ package ucar.unidata.idv.control;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.idv.IdvConstants;
+import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -63,6 +66,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 
 import java.rmi.RemoteException;
@@ -1162,6 +1166,42 @@ public abstract class PlanViewControl extends GridDisplayControl {
         }
     }
 
+    /**
+     *  When we relocate a bundle this gets called to relocate the display
+     *  This method gets overwritten by the probe and cross section displays
+     *  so they can move their selection points to a new location
+     *  @param originalBounds The original bounds of the datasource
+     *  @param newBounds  The relocated bounds of the datasource
+     */
+    public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds, boolean useDataProjection) {
+        try {
+            super.relocateDisplay(originalBounds, newBounds, useDataProjection);
+            //doUpdateRegion = false;
+            NavigatedDisplay nd = getNavigatedDisplay();
+            if (nd != null) {
+                GeoSelection geoSelection =
+                        getDataSelection().getGeoSelection(true);
+                getViewManager().setProjectionFromData(false);
+                try {
+                    Rectangle2D bbox = nd.getLatLonBox();
+                    Rectangle2D sbox = nd.getScreenBounds();
+                    geoSelection.setScreenBound(sbox);
+                    geoSelection.setLatLonRect(bbox);
+                    geoSelection.setUseViewBounds(true);
+                    getDataSelection().setGeoSelection(geoSelection);
+
+                    //getDataSelection().putProperty(DataSelection.PROP_REGIONOPTION, DataSelection.PROP_USEDISPLAYAREA);
+
+                    dataChanged();
+                } catch (Exception e) {}
+                ;
+            }
+            ViewManager vm = ((PlanViewControl) this).defaultViewManager;
+            if(vm instanceof MapViewManager && useDataProjection) {
+                setProjectionInView((MapViewManager)vm, false, false);
+            }
+        } catch (Exception e){}
+    }
 
     /**
      * Load data at the level specified.  Uses the working grid.
