@@ -19,6 +19,7 @@ the  image or images.
       what {what part of the display control should be captured} 
       combine {true or false. If there are multiple images, they will all be captured} 
       animation_index {list of animation indices. Can be specified in the same manner as the bundles times attribute} 
+       publish {If true then popup the publish dialog}      
       columns {If multiple images are being captured, optionally set the number of columns. This option is for offscreen mode only.}}]
 The [isl::tag image] tag   allows you to capture an image from a main display or from the GUI of a display control.
 
@@ -54,6 +55,7 @@ to capture the time series chart of the station model and data probe displays.
      imagetemplate {The file name template to use} 
      imagesuffix {Should be jpg if generating a QuickTime movie but can be gif or png as well} 
      combine {true or false. If there are multiple images, they will all be captured} 
+       publish {If true then popup the publish dialog}      
      columns {If multiple movies are being captured, optionally set the number of columns.} 
      framerate {number of frames/sec} 
      endframepause {seconds to pause on last frame (gif only)} }]
@@ -132,6 +134,13 @@ in a panelized or gridded fashion. It is column oriented so you specify the numb
 [isl::xml {
 <panel file="test.gif" width="400" columns="2" space="10"/>
 }]
+
+
+
+[isl::tagdef publish {Publish a file to RAMADDA} -attrs {
+     file {the file to publish} 
+}]
+
 
 
 
