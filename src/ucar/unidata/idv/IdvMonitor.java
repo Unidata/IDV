@@ -30,6 +30,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import java.util.Hashtable;
+import java.util.List;
 
 
 
@@ -200,7 +201,10 @@ public class IdvMonitor extends HttpServer {
                     String tmpFile = idv.getStore().getTmpFile("tmp.isl");
                     IOUtil.writeFile(tmpFile, isl);
                     idv.getImageGenerator().processScriptFile(tmpFile);
-                    writeResult(true, "ok", "text/html");
+                    List<String> results = idv.getImageGenerator().getResults();
+                    String result = "";
+                    if(results.size()>0) result = results.get(0);
+                    writeResult(true, result, "text/html");
                 }
             } else {
                 writeResult(false,"Unknown url:" + path , "text/html");
