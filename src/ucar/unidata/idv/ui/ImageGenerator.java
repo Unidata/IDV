@@ -791,6 +791,8 @@ public class ImageGenerator extends IdvManager {
     /** Maps id to data source */
     private Hashtable idToDataSource = new Hashtable();
 
+    private List<String> results = new ArrayList<String>();
+
     /** The interpreter */
     private PythonInterpreter interpreter;
 
@@ -881,6 +883,7 @@ public class ImageGenerator extends IdvManager {
         idToDataSource  = new Hashtable();
         propertiesStack = new ArrayList();
         pushProperties();
+        results = new ArrayList<String>();
 
         if (islFile.endsWith(".jy") || islFile.endsWith(".py")) {
             try {
@@ -955,6 +958,13 @@ public class ImageGenerator extends IdvManager {
         }
         return true;
     }
+
+
+    public List<String> getResults() {
+        return results;
+    }
+
+
 
     /**
      * Handle the error
@@ -1164,11 +1174,25 @@ public class ImageGenerator extends IdvManager {
 
     protected boolean processTagSave(Element node) throws Throwable {
         String filename = applyMacros(node, ATTR_FILE, "idv.xidv");
-        System.err.println("file:" + filename);
         getIdv().getPersistenceManager().doSaveAs(filename);
+        if(XmlUtil.getAttribute(node, "publish", false)) {
+            String result = getIdv().getPublishManager().publishFile(filename);
+            if(result!=null) {
+                results.add(result);
+            } 
+       }
         return true;
     }
 
+
+    protected boolean processTagPublish(Element node) throws Throwable {
+        String filename = applyMacros(node, ATTR_FILE, "idv.xidv");
+        String result = getIdv().getPublishManager().publishFile(filename);
+        if(result!=null) {
+            results.add(result);
+        }
+        return true;
+    }
 
 
 
@@ -2912,9 +2936,19 @@ public class ImageGenerator extends IdvManager {
      * @throws Throwable On badness
      */
     protected boolean processTagMovie(Element node) throws Throwable {
+        String filename = XmlUtil.getAttribute(node, ATTR_FILE);
         pushProperties();
         captureMovie(null, node);
         popProperties();
+        if(XmlUtil.getAttribute(node, "publish", false)) {
+            String result = getIdv().getPublishManager().publishFile(filename);
+            if(result!=null) {
+                results.add(result);
+            } 
+       }
+
+
+
         return true;
     }
 
@@ -3005,7 +3039,15 @@ public class ImageGenerator extends IdvManager {
      * @throws Throwable On badness
      */
     protected boolean processTagImage(Element node) throws Throwable {
-        captureImage(XmlUtil.getAttribute(node, ATTR_FILE), node);
+        String filename = XmlUtil.getAttribute(node, ATTR_FILE);
+        captureImage(filename, node);
+        if(XmlUtil.getAttribute(node, "publish", false)) {
+            String result = getIdv().getPublishManager().publishFile(filename);
+            if(result!=null) {
+                results.add(result);
+            } 
+       }
+
         return true;
     }
 
