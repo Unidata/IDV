@@ -131,10 +131,16 @@ public abstract class IdvPublisher implements Cloneable {
     }
 
 
+    public boolean identifiedBy(String url) {
+        return false;
+    }
+
     public void doPublish() {
     }
 
-    public void publishContent(String file,ViewManager fromViewmanager) {}
+    public String publishContent(String file,ViewManager fromViewmanager) {
+        return null;
+    }
 
 
     /**
