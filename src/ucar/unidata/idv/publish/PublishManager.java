@@ -99,6 +99,8 @@ public class PublishManager extends IdvManager {
     /** _more_ */
     private List<JComboBox> comboBoxes = new ArrayList<JComboBox>();
 
+    /** This is used for the direct publishFile call */
+    private JComboBox myPublisherBox;
 
     /**
      * Create me with the IDV
@@ -215,6 +217,37 @@ public class PublishManager extends IdvManager {
         IdvPublisher publisher = (IdvPublisher) box.getSelectedItem();
         publisher.publishContent(file, fromViewmanager);
     }
+
+
+
+    /**
+     * Publish a file directly. This is used by the ISL publish routines"
+     * @param file THe file to publish
+     * @return The URL to the published file
+     */
+
+    public String  publishFile(String file) {
+        if(myPublisherBox == null) {
+            myPublisherBox =  makeSelector();
+        }
+        JComponent contents  = GuiUtils.vbox(new JLabel("Publish the file: " + file),
+                                             GuiUtils.inset(myPublisherBox, 5));
+                                             
+        if ( !GuiUtils.showOkCancelDialog(null, "Select a publisher",
+                                          GuiUtils.inset(contents, 5), null)) {
+            return null;
+        }
+
+        if ((myPublisherBox.getSelectedIndex() == 0)) {
+            return null;
+        }
+        IdvPublisher publisher = (IdvPublisher) myPublisherBox.getSelectedItem();
+        return publisher.publishContent(file, null);
+    }
+
+
+
+
 
     /**
      * _more_
