@@ -3374,6 +3374,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
                         dataSelection.getGeoSelection().getLatLonRect();
                     //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
                     LatLonRect newLLR = navDisplay.getLatLonRect();
+                    loadDataFromViewBounds();
                     relocateDisplay(baseLLR, newLLR, false);
                     reloadFromBounds = false;
                 } catch (Exception e) {}

@@ -2753,7 +2753,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * Method to calculate screen bounds to load new data
      */
-    private void loadDataFromViewBounds() {
+    protected void loadDataFromViewBounds() {
 
         NavigatedDisplay nd = getNavigatedDisplay();
         if (nd != null) {
