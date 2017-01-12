@@ -190,6 +190,11 @@
        id="data.special"/>
     <separator/>
   </menu>
+    <menu
+    id="bundles"
+    label="Bundles"
+    mnemonic="B">
+    </menu>
   <menu
      label="Tools"
      id="menu.tools"
@@ -237,7 +242,7 @@
          tooltip="View all resource"
          action="action:edit.resources"/>
    </menu>
-   <menu
+  <menu
      id="help"
      label="Help"
      mnemonic="H">

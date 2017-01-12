@@ -521,6 +521,8 @@ public class IdvUIManager extends IdvManager {
     public static final String PREF_LightWeightPopupEnabled =
         "LightWeightPopupEnabled";
 
+    public static final String MENU_BUNDLES = "bundles";
+
     /**
      * Create me with the IDV
      *
@@ -1765,6 +1767,9 @@ public class IdvUIManager extends IdvManager {
             //            initializeViewMenu(menu);
         } else if (id.equals(MENU_DATA)) {
             updateDataMenu(menu);
+        } else if (id.equals(MENU_BUNDLES)) {
+            menu.removeAll();
+            initializeBundleMenu(menu);
         }
     }
 
@@ -1780,6 +1785,8 @@ public class IdvUIManager extends IdvManager {
     protected void handleMenuDeSelected(String id, JMenu menu,
                                         IdvWindow idvWindow) {
         if (id.equals(MENU_DISPLAYS)) {
+            menu.removeAll();
+        } else if (id.equals(MENU_BUNDLES)) {
             menu.removeAll();
         } else if (id.equals(MENU_DATA)) {
             menu.removeAll();
@@ -2763,27 +2770,29 @@ public class IdvUIManager extends IdvManager {
 
         JMenu bundleMenu = new JMenu(title);
         bundleMenu.setMnemonic(GuiUtils.charToKeyCode(title));
+        displayMenu.add(bundleMenu);
         JMenuItem mi;
 
         getPersistenceManager().initBundleMenu(bundleType, bundleMenu);
 
         mi = new JMenuItem("Manage...");
         mi.setMnemonic(GuiUtils.charToKeyCode("M"));
-        bundleMenu.add(mi);
+        //bundleMenu.add(mi);
+        displayMenu.add(mi);
         mi.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 showBundleDialog(bundleType);
             }
         });
-        bundleMenu.addSeparator();
+        displayMenu.addSeparator();
 
 
         Hashtable catMenus = new Hashtable();
-        displayMenu.add(bundleMenu);
+
         for (int i = 0; i < bundles.size(); i++) {
             SavedBundle bundle       = (SavedBundle) bundles.get(i);
             List        categories   = bundle.getCategories();
-            JMenu       catMenu      = bundleMenu;
+            JMenu       catMenu      = displayMenu;
             String      mainCategory = "";
             for (int catIdx = 0; catIdx < categories.size(); catIdx++) {
                 String category = (String) categories.get(catIdx);
@@ -3033,9 +3042,9 @@ public class IdvUIManager extends IdvManager {
      * @param displayMenu The display menu
      */
     protected void initializeDisplayMenu(JMenu displayMenu) {
-        processBundleMenu(displayMenu,
-                          IdvPersistenceManager.BUNDLES_FAVORITES);
-        processBundleMenu(displayMenu, IdvPersistenceManager.BUNDLES_DISPLAY);
+        //processBundleMenu(displayMenu,
+         //                 IdvPersistenceManager.BUNDLES_FAVORITES);
+        //processBundleMenu(displayMenu, IdvPersistenceManager.BUNDLES_DISPLAY);
         processMapMenu(displayMenu, true);
         processStationMenu(displayMenu, true);
         processStandAloneMenu(displayMenu, true);
@@ -3043,7 +3052,19 @@ public class IdvUIManager extends IdvManager {
         Msg.translateTree(displayMenu);
     }
 
+    /**
+     * Add in the menu items for the given display menu
+     *
+     * @param bundleMenu The display menu
+     */
+    protected void initializeBundleMenu(JMenu bundleMenu) {
+        processBundleMenu(bundleMenu,
+                IdvPersistenceManager.BUNDLES_FAVORITES);
+        processBundleMenu(bundleMenu, IdvPersistenceManager.BUNDLES_DISPLAY);
 
+        //processInstanceMenu(bundleMenu);
+        Msg.translateTree(bundleMenu);
+    }
 
     /**
      * Popup the favorites manage dialog

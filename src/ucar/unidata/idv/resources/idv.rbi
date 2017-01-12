@@ -426,6 +426,8 @@
     <resource location="%SITEPATH%/bundles.xml"/>
     <resource location="%APPPATH%/bundles.xml"/>
     <resource location="%IDVPATH%/bundles.xml"/>
+    <resource location="http://ramadda.unidata.ucar.edu/repository/entry/show?entryid=5096049b-17cb-443a-9c85-d9795b954a2e&amp;output=idv.bundles&amp;top= "/>
+    <resource location="http://ramadda.unidata.ucar.edu/repository/entry/show?entryid=499df7f2-6d4e-426e-852b-92d4a282b94a&amp;output=idv.bundles&amp;top= "/>
   </resources>
 
 <!-- This points to the xml document(s) that hold the user defined chooser panels   -->
