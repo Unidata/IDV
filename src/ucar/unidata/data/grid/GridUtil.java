@@ -394,6 +394,8 @@ public class GridUtil {
             field         = (isSequence(fi) == true)
                             ? (FlatField) fi.getSample(0)
                             : (FlatField) fi;
+            if(field == null)
+                return null;
 
             spatialDomain = (SampledSet) Util.getDomainSet(field);
         } catch (ClassCastException cce) {  //Misc.printStack("grid" + grid.getType(), 5);
@@ -2427,7 +2429,7 @@ public class GridUtil {
             int errorMode)
             throws VisADException {
         FieldImpl fi = grid;
-        if (isSinglePointDomain(grid)) {
+        if (isSinglePointDomain(grid) || grid == null) {
             return grid;
         }
         if (is3D(grid) && !isVolume(grid)) {
