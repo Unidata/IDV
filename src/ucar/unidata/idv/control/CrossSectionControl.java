@@ -1956,6 +1956,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         GriddedSet domainSet = null;
         if (GridUtil.isConstantSpatialDomain(xsectSequence)) {
             domainSet = (GriddedSet) GridUtil.getSpatialDomain(xsectSequence);
+            if (domainSet == null) {
+                return null;
+            }
             GriddedSet newDomain = make2DDomainSet(domainSet);
             if (newDomain == null) {
                 return null;
