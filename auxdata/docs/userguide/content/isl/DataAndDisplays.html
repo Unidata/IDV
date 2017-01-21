@@ -194,6 +194,11 @@ for a listing.
 The spatial subset attributes described in the [isl::tagref datasource] tag above can be used with each display to override the default.
 
 
+[isl::tagdef loadcatalog {Load a remote catalog URL} -attrs {url  {url to the catalog}}]
+
+
+
+
 [isl::tagdef removedisplays {Remove all displays} -attrs {display  {display id to remove}}]
 This removes all current displays. If there is the [isl::attr display] attribute set
 then it removes that display. (<a href="#displayattr">See below</a>).
