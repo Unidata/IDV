@@ -1867,6 +1867,18 @@ public class ImageGenerator extends IdvManager {
         return true;
     }
 
+    /**
+       Load a catalog URL
+       @param node The ISL node
+       @return  Keep going
+    */
+    protected boolean processTagLoadcatalog(Element node) throws Throwable {
+        String url = applyMacros(node, ATTR_URL, (String) null);
+        getIdv().getIdvChooserManager().showCatalogUrl(url);
+        return true;
+    }
+
+
 
     /**
      * process the given node
