@@ -219,10 +219,18 @@ public class IdvChooserManager extends IdvManager {
     private List choosersWeAreCreating;
 
 
+
+
     /**
      * Holds the XmlChooser if we have one. We keep this around if there are any catalog command
      *   line args we can show the chooser.
      */
+    private XmlChooser xmlChooser;
+
+
+    /**
+       The gui for the XmlChooser
+    */
     private JComponent xmlChooserWrapper;
 
 
@@ -717,13 +725,26 @@ public class IdvChooserManager extends IdvManager {
         //                               GuiUtils.filler());
         componentToChooserId.put(chooserContents, id);
 
+        //Set the xmlChooser attributes
         if (chooser instanceof XmlChooser) {
             xmlChooserWrapper = chooserContents;
+            xmlChooser = (XmlChooser) chooser;
         }
 
         return chooserContents;
     }
 
+
+    /**
+       Show the given catalog URL in the XmlChooser
+       @param url The URL to show
+     */
+    public void showCatalogUrl(String url) {
+        if(xmlChooser!=null) {
+            xmlChooser.makeUiFromPath(url);
+            GuiUtils.showComponentInTabs(xmlChooserWrapper);
+        }
+    }
 
     /**
      * Make the chooser menu items
