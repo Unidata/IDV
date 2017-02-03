@@ -1911,9 +1911,12 @@ public class ImageGenerator extends IdvManager {
                     "datasource tag requires either a url, fileset or a bundle");
             }
 
+            Hashtable properties = new Hashtable();
+            String name= applyMacros(node, ATTR_NAME, (String) null);
+            if(name!=null) properties.put(DataSource.PROP_NAME, name);
             if (dataObject != null) {
                 dataSource = getIdv().makeOneDataSource(dataObject, type,
-                        null);
+                                                        properties);
                 if (dataSource == null) {
                     return error("Failed to create data source:" + dataObject
                                  + " " + type);
