@@ -122,9 +122,6 @@ public class CrossSectionViewManager extends ViewManager {
         showControlMenu = false;
         super.initializeViewMenu(viewMenu);
         viewMenu.add(makeColorMenu());
-        viewMenu.addSeparator();
-        viewMenu.add(GuiUtils.makeMenuItem("Properties", this,
-                                           "showPropertiesDialog"));
     }
 
 
