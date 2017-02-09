@@ -49,7 +49,7 @@ import java.io.File;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -441,6 +441,17 @@ public class ArgsManager extends IdvManager {
         for (int i = 0; i < captureFiles.size(); i++) {
             getCollabManager().runCaptureFile(captureFiles.get(i).toString());
         }
+    }
+
+
+    /**
+     * Clears out the automatic display creation arguments by setting
+     * {@link #initParams} and {@link #initDisplays} to
+     * {@link Collections#emptyList()}.
+     */
+    protected void clearAutomaticDisplayArgs() {
+        initParams = Collections.emptyList();
+        initDisplays = Collections.emptyList();
     }
 
 
