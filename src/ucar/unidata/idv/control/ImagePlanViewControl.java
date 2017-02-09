@@ -415,7 +415,7 @@ public class ImagePlanViewControl extends PlanViewControl {
         List dataSources = new ArrayList();
 
         dc.getDataSources(dataSources);
-        if(!(dataSources.get(0) instanceof AddeImageDataSource))
+        if((dataSources.size() == 0) || !(dataSources.get(0) instanceof AddeImageDataSource))
             return null;
 
         AddeImageDataSource aids = (AddeImageDataSource) dataSources.get(0);
