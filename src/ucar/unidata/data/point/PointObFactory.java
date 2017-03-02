@@ -46,6 +46,7 @@ import ucar.nc2.ft.NestedPointFeatureCollection;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
 import ucar.nc2.ft.PointFeatureIterator;
+import ucar.nc2.ft.point.PointIteratorFiltered;
 import ucar.nc2.units.DateRange;
 
 import ucar.unidata.data.DataChoice;
@@ -57,6 +58,8 @@ import ucar.unidata.util.*;
 import ucar.visad.GeoUtils;
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
+import ucar.visad.physics.Speed;
+import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
 
 import visad.CommonUnit;
@@ -125,15 +128,22 @@ import java.util.Vector;
  */
 public class PointObFactory {
 
-    /** logging category */
+    /**
+     * logging category
+     */
     static LogUtil.LogCategory log_ =
-        LogUtil.getLogInstance(PointObFactory.class.getName());
+            LogUtil.getLogInstance(PointObFactory.class.getName());
 
-    /** OA Grid Default value */
+    /**
+     * OA Grid Default value
+     */
     public static final float OA_GRID_DEFAULT = 0;
 
-    /** Constructor */
-    public PointObFactory() {}
+    /**
+     * Constructor
+     */
+    public PointObFactory() {
+    }
 
     /**
      * Returns a point observation as a FieldImpl of type.
@@ -142,29 +152,26 @@ public class PointObFactory {
      *  (Time -> ((lat, lon, alt) -> (data)))
      * </pre>
      *
-     * @param point    point observation
-     * @return  PointOb as a field
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
+     * @param point point observation
+     * @return PointOb as a field
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Error
      */
     public static FieldImpl makePointObField(PointOb point)
             throws VisADException, RemoteException {
 
         return new PointObField(point.getEarthLocation(),
-                                point.getDateTime(), point.getData());
+                point.getDateTime(), point.getData());
     }
 
     /**
      * Make a point cloud structure from point obs
      *
      * @param pointObs the point obs
-     * @param param  the parameter to extract - null if want all
-     *
-     * @return  a PointCloud (time->((index)->((Latitude, Longitude, Altitude),param)))
-     *
-     * @throws RemoteException  Java RMI problem
-     * @throws VisADException   VisAD problem
+     * @param param    the parameter to extract - null if want all
+     * @return a PointCloud (time->((index)->((Latitude, Longitude, Altitude),param)))
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
      */
     public static FieldImpl makePointCloud(FieldImpl pointObs, String param)
             throws VisADException, RemoteException {
@@ -184,46 +191,46 @@ public class PointObFactory {
         Trace.call1("PointObFactory: makingTimeSequence");
         FieldImpl timeObs = makeTimeSequenceOfPointObs(pointObs);
         Trace.call2("PointObFactory: makingTimeSequence");
-        FieldImpl    cloudData     = null;
-        Set          timeSet       = timeObs.getDomainSet();
-        FunctionType cloudType     = null;
-        TupleType    cloudDataType = null;
+        FieldImpl cloudData = null;
+        Set timeSet = timeObs.getDomainSet();
+        FunctionType cloudType = null;
+        TupleType cloudDataType = null;
         FunctionType timeCloudType = null;
         Trace.call1("PointObFactory: makingCloudFI");
-        float[][] timeStepVals  = null;
-        Unit[]    dataUnits     = null;
-        Unit[]    rangeUnits    = null;
-        boolean   needToConvert = false;
+        float[][] timeStepVals = null;
+        Unit[] dataUnits = null;
+        Unit[] rangeUnits = null;
+        boolean needToConvert = false;
         for (int i = 0; i < timeSet.getLength(); i++) {
-            FieldImpl    obs      = (FieldImpl) timeObs.getSample(i, false);
+            FieldImpl obs = (FieldImpl) timeObs.getSample(i, false);
             Integer1DSet indexSet = (Integer1DSet) obs.getDomainSet();
-            FlatField    timeStep = null;
+            FlatField timeStep = null;
             //Trace.call1("PointObFactory: makingCloudFF", "numObs for time " + i + " is " + indexSet.getLength());
             for (int j = 0; j < indexSet.getLength(); j++) {
                 PointOb ob = (PointOb) obs.getSample(j, false);
                 if (cloudType == null) {
-                    cloudDataType = new TupleType(new MathType[] {
-                        ob.getEarthLocation().getType(),
-                        ob.getData().getType() });
+                    cloudDataType = new TupleType(new MathType[]{
+                            ob.getEarthLocation().getType(),
+                            ob.getData().getType()});
                     cloudType =
-                        new FunctionType(DataUtility.getDomainType(indexSet),
-                                         cloudDataType);
+                            new FunctionType(DataUtility.getDomainType(indexSet),
+                                    cloudDataType);
                 }
                 double[] elVals =
-                    ((RealTuple) ob.getEarthLocation()).getValues();
+                        ((RealTuple) ob.getEarthLocation()).getValues();
                 double[] dataVals = ((RealTuple) ob.getData()).getValues();
                 if (timeStep == null) {  // first time through
                     timeStep = new FlatField(cloudType, indexSet);
                     timeStepVals =
-                        new float[elVals.length + dataVals.length][timeStep.getLength()];
+                            new float[elVals.length + dataVals.length][timeStep.getLength()];
                     Unit[] elUnits =
-                        ((RealTuple) ob.getEarthLocation()).getTupleUnits();
+                            ((RealTuple) ob.getEarthLocation()).getTupleUnits();
                     if (elUnits == null) {
-                        elUnits = new Unit[] { CommonUnit.degree,
-                                CommonUnit.degree, CommonUnit.meter };
+                        elUnits = new Unit[]{CommonUnit.degree,
+                                CommonUnit.degree, CommonUnit.meter};
                     }
                     Unit[] valUnits =
-                        ((RealTuple) ob.getData()).getTupleUnits();
+                            ((RealTuple) ob.getData()).getTupleUnits();
                     dataUnits = new Unit[elUnits.length + valUnits.length];
                     for (int k = 0; k < elUnits.length; k++) {
                         dataUnits[k] = elUnits[k];
@@ -257,8 +264,8 @@ public class PointObFactory {
             timeStep.setSamples(timeStepVals, false);
             if (timeCloudType == null) {
                 timeCloudType =
-                    new FunctionType(DataUtility.getDomainType(timeSet),
-                                     timeStep.getType());
+                        new FunctionType(DataUtility.getDomainType(timeSet),
+                                timeStep.getType());
                 cloudData = new FieldImpl(timeCloudType, timeSet);
             }
             //Trace.call2("PointObFactory: makingCloudFF");
@@ -272,11 +279,10 @@ public class PointObFactory {
      * From a field of point observations, reorder them with time
      * as the outer dimension.
      *
-     * @param pointObs    Field of point observations (index -> pointobs)
-     * @return    time sequence of obs (time -> (index -> pointobs))
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
+     * @param pointObs Field of point observations (index -> pointobs)
+     * @return time sequence of obs (time -> (index -> pointobs))
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Error
      */
     public static FieldImpl makeTimeSequenceOfPointObs(FieldImpl pointObs)
             throws VisADException, RemoteException {
@@ -289,17 +295,16 @@ public class PointObFactory {
      *
      * @param pointObs    Field of point observations (index -> pointobs)
      * @param lumpMinutes If greater then 0 is used to lump the times of the point obs
-     * together
-     * @return    time sequence of obs (time -> (index -> pointobs))
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
+     *                    together
+     * @return time sequence of obs (time -> (index -> pointobs))
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Error
      */
     public static FieldImpl makeTimeSequenceOfPointObs(FieldImpl pointObs,
-            int lumpMinutes)
+                                                       int lumpMinutes)
             throws VisADException, RemoteException {
-        int  numObs = pointObs.getDomainSet().getLength();
-        List obs    = new ArrayList(numObs);
+        int numObs = pointObs.getDomainSet().getLength();
+        List obs = new ArrayList(numObs);
         Trace.call1("makeTimeSequence: get list of obs");
         for (int i = 0; i < numObs; i++) {
             obs.add(pointObs.getSample(i, false));
@@ -315,29 +320,28 @@ public class PointObFactory {
      * We also skip the intermediate index field and only use the first PointOb
      * for each time step
      *
-     * @param pointObs    Field of point observations (index -> pointobs)
-     * @param lumpMinutes If greater then 0 is used to lump the times of the point obs together
+     * @param pointObs       Field of point observations (index -> pointobs)
+     * @param lumpMinutes    If greater then 0 is used to lump the times of the point obs together
      * @param componentIndex If &gt;= 0 then make a T-&gt;componentvalue field
-     * @return    time sequence of obs (time -> (index -> pointobs))
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
+     * @return time sequence of obs (time -> (index -> pointobs))
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Error
      */
     public static FieldImpl makeTimeSequenceOfPointObs(List pointObs,
-            int lumpMinutes, int componentIndex)
+                                                       int lumpMinutes, int componentIndex)
             throws VisADException, RemoteException {
 
         Trace.call1("makeTimeSequence");
 
 
-        List      uniqueTimes = new ArrayList();
-        int       numObs      = pointObs.size();
-        MathType  obType      = null;
-        Hashtable timeToObs   = new Hashtable();
+        List uniqueTimes = new ArrayList();
+        int numObs = pointObs.size();
+        MathType obType = null;
+        Hashtable timeToObs = new Hashtable();
         // loop through and find all the unique times
         Trace.call1("makeTimeSequence-loop1",
-                    " " + lumpMinutes + " component " + componentIndex
-                    + ", num obs:" + numObs);
+                " " + lumpMinutes + " component " + componentIndex
+                        + ", num obs:" + numObs);
         Hashtable seenTime = new Hashtable();
         for (int i = 0; i < numObs; i++) {
             PointObTuple ob = (PointObTuple) pointObs.get(i);
@@ -346,7 +350,7 @@ public class PointObFactory {
                     obType = ob.getType();
                 } else {
                     obType = ((Tuple) ob.getData()).getComponent(
-                        componentIndex).getType();
+                            componentIndex).getType();
                 }
             }
             DateTime dttm = ob.getDateTime();
@@ -358,12 +362,12 @@ public class PointObFactory {
             if (lumpMinutes > 0) {
                 double seconds = dttm.getValue();
                 seconds = seconds - seconds % (lumpMinutes * 60);
-                dttm    = new DateTime(seconds);
+                dttm = new DateTime(seconds);
             }
-            Double  dValue   = new Double(dttm.getValue());
-            List    obs      = null;
+            Double dValue = new Double(dttm.getValue());
+            List obs = null;
             boolean contains = (seenTime.put(dValue, dValue) != null);
-            if ( !contains) {
+            if (!contains) {
                 uniqueTimes.add(dttm);
                 obs = new ArrayList();
                 timeToObs.put(dValue, obs);
@@ -373,42 +377,42 @@ public class PointObFactory {
             obs.add(ob);
         }
         Trace.call2("makeTimeSequence-loop1",
-                    " #times:" + uniqueTimes.size());
+                " #times:" + uniqueTimes.size());
 
         DateTime[] times = (DateTime[]) uniqueTimes.toArray(
-                               new DateTime[uniqueTimes.size()]);
+                new DateTime[uniqueTimes.size()]);
         Arrays.sort(times);
-        RealType     index      = RealType.getRealType("index");
+        RealType index = RealType.getRealType("index");
 
         FunctionType sampleType = new FunctionType(index, obType);
         FunctionType timeSequenceType = new FunctionType(RealType.Time,
-                                            ((componentIndex < 0)
-                                             ? (MathType) sampleType
-                                             : obType));
+                ((componentIndex < 0)
+                        ? (MathType) sampleType
+                        : obType));
         SampledSet timeSet = (times.length > 1)
-                             ? CalendarDateTime.makeTimeSet(times)
-                             : (SampledSet) new SingletonSet(
-                                 new RealTuple(new Real[] { times[0] }));
+                ? CalendarDateTime.makeTimeSet(times)
+                : (SampledSet) new SingletonSet(
+                new RealTuple(new Real[]{times[0]}));
 
 
         FieldImpl timeSequence = new FieldImpl(timeSequenceType, timeSet);
 
-        List      samples      = new ArrayList();
+        List samples = new ArrayList();
         Trace.call1("makeTimeSequence-loop2");
         Data[] timeSamples = new Data[times.length];
         for (int i = 0; i < times.length; i++) {
-            DateTime dttm   = times[i];
+            DateTime dttm = times[i];
 
-            Double   dValue = new Double(dttm.getValue());
-            List     v      = (List) timeToObs.get(dValue);
-            Data[]   obs    = null;
+            Double dValue = new Double(dttm.getValue());
+            List v = (List) timeToObs.get(dValue);
+            Data[] obs = null;
             if (componentIndex < 0) {
                 //obs = (Data[]) v.toArray(new PointOb[v.size()]);
             } else {
                 obs = new Data[v.size()];
                 for (int obIdx = 0; obIdx < v.size(); obIdx++) {
                     obs[obIdx] = ((Tuple) ((PointOb) v.get(
-                        obIdx)).getData()).getComponent(componentIndex);
+                            obIdx)).getData()).getComponent(componentIndex);
                 }
             }
             Integer1DSet set = new Integer1DSet(index, v.size());
@@ -434,12 +438,11 @@ public class PointObFactory {
      * Returns a subset of the field of point observations that lie
      * within the boundaries of the LinearLatLonSet.
      *
-     * @param pointObs    set of obs.
-     * @param bounds      LinearLatLonSet bounding box
-     * @return   subset within the bounds
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
+     * @param pointObs set of obs.
+     * @param bounds   LinearLatLonSet bounding box
+     * @return subset within the bounds
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Error
      */
     public static FieldImpl subSet(FieldImpl pointObs, LatLonRect bounds)
             throws VisADException, RemoteException {
@@ -450,24 +453,23 @@ public class PointObFactory {
      * Returns a subset of the field of point observations that lie
      * within the boundaries of the LinearLatLonSet.
      *
-     * @param pointObs    set of obs.
-     * @param bounds      LinearLatLonSet bounding box
-     * @return   subset within the bounds
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
+     * @param pointObs set of obs.
+     * @param bounds   LinearLatLonSet bounding box
+     * @return subset within the bounds
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Error
      */
     public static FieldImpl subSet(FieldImpl pointObs, LinearLatLonSet bounds)
             throws VisADException, RemoteException {
-        long      t1             = System.currentTimeMillis();
-        boolean   isTimeSequence = GridUtil.isTimeSequence(pointObs);
-        FieldImpl subSet         = null;
+        long t1 = System.currentTimeMillis();
+        boolean isTimeSequence = GridUtil.isTimeSequence(pointObs);
+        FieldImpl subSet = null;
         if (isTimeSequence) {
             Trace.call1("subSet");
-            Set timeSet  = pointObs.getDomainSet();
+            Set timeSet = pointObs.getDomainSet();
             int numTimes = timeSet.getLength();
             subSet = new FieldImpl((FunctionType) pointObs.getType(),
-                                   timeSet);
+                    timeSet);
             List samples = new Vector();
             for (int i = 0; i < numTimes; i++) {
                 FieldImpl oneTime = (FieldImpl) pointObs.getSample(i);
@@ -475,8 +477,8 @@ public class PointObFactory {
                 samples.add(subTime);
             }
             subSet.setSamples(
-                (Data[]) samples.toArray(new Data[samples.size()]), false,
-                false);
+                    (Data[]) samples.toArray(new Data[samples.size()]), false,
+                    false);
             Trace.call2("subSet");
         } else {
             subSet = findIntersection(pointObs, bounds);
@@ -491,29 +493,27 @@ public class PointObFactory {
      * Get the list of PointOb objects from the given field
      *
      * @param field the field that contains the PointObs
-     *
      * @return List of PointObs
-     *
      * @throws RemoteException on badness
-     * @throws VisADException on badness
+     * @throws VisADException  on badness
      */
     public static List<PointOb> getPointObs(FieldImpl field)
             throws VisADException, RemoteException {
-        List<PointOb> obs            = new ArrayList<PointOb>();
-        boolean       isTimeSequence = GridUtil.isTimeSequence(field);
+        List<PointOb> obs = new ArrayList<PointOb>();
+        boolean isTimeSequence = GridUtil.isTimeSequence(field);
         if (isTimeSequence) {
-            Set timeSet  = field.getDomainSet();
+            Set timeSet = field.getDomainSet();
             int numTimes = timeSet.getLength();
             for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
                 FieldImpl oneTime = (FieldImpl) field.getSample(timeIdx);
-                int       numObs  = oneTime.getDomainSet().getLength();
+                int numObs = oneTime.getDomainSet().getLength();
                 for (int obIdx = 0; obIdx < numObs; obIdx++) {
                     obs.add((PointOb) oneTime.getSample(obIdx));
                 }
             }
         } else {
             FieldImpl oneTime = field;
-            int       numObs  = oneTime.getDomainSet().getLength();
+            int numObs = oneTime.getDomainSet().getLength();
             for (int obIdx = 0; obIdx < numObs; obIdx++) {
                 obs.add((PointOb) oneTime.getSample(obIdx));
             }
@@ -526,12 +526,11 @@ public class PointObFactory {
     /**
      * Write the PointObs contained in the given field as a netcdf file
      *
-     * @param file file to write to
+     * @param file  file to write to
      * @param field The field
-     *
-     * @throws IOException on badness
+     * @throws IOException     on badness
      * @throws RemoteException on badness
-     * @throws VisADException on badness
+     * @throws VisADException  on badness
      */
     public static void writeToNetcdf(File file, FieldImpl field)
             throws VisADException, RemoteException, IOException {
@@ -539,33 +538,33 @@ public class PointObFactory {
         List<PointOb> obs = getPointObs(field);
         if (obs.size() == 0) {
             throw new IllegalArgumentException(
-                "No point observations to write");
+                    "No point observations to write");
         }
-        List<Attribute>  attrs    = new ArrayList<Attribute>();
+        List<Attribute> attrs = new ArrayList<Attribute>();
         List<PointObVar> dataVars = new ArrayList<PointObVar>();
         DataOutputStream dos =
-            new DataOutputStream(new FileOutputStream(file));
-        CFPointObWriter writer    = null;
-        int             numFloat  = 0;
-        int             numString = 0;
-        int[]           lengths   = null;
-        boolean[]       isText    = null;
+                new DataOutputStream(new FileOutputStream(file));
+        CFPointObWriter writer = null;
+        int numFloat = 0;
+        int numString = 0;
+        int[] lengths = null;
+        boolean[] isText = null;
         for (PointOb ob : obs) {
-            EarthLocation el        = ob.getEarthLocation();
-            Real          alt       = el.getAltitude();
-            LatLonPoint   llp       = el.getLatLonPoint();
-            Tuple         tuple     = (Tuple) ob.getData();
-            TupleType     type      = (TupleType) tuple.getType();
-            MathType[]    types     = type.getComponents();
-            int           numFields = types.length;
+            EarthLocation el = ob.getEarthLocation();
+            Real alt = el.getAltitude();
+            LatLonPoint llp = el.getLatLonPoint();
+            Tuple tuple = (Tuple) ob.getData();
+            TupleType type = (TupleType) tuple.getType();
+            MathType[] types = type.getComponents();
+            int numFields = types.length;
             if (writer == null) {
                 lengths = new int[numFields];
-                isText  = new boolean[numFields];
+                isText = new boolean[numFields];
                 boolean haveText = false;
                 for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                     lengths[fieldIdx] = 0;
                     if (types[fieldIdx] instanceof TextType) {
-                        haveText         = true;
+                        haveText = true;
                         isText[fieldIdx] = true;
                         continue;
                     }
@@ -594,15 +593,15 @@ public class PointObFactory {
 
                 if (haveText) {
                     for (PointOb ob2 : obs) {
-                        Tuple  tuple2 = (Tuple) ob2.getData();
-                        Data[] data   = tuple2.getComponents();
+                        Tuple tuple2 = (Tuple) ob2.getData();
+                        Data[] data = tuple2.getComponents();
                         for (int fieldIdx = 0; fieldIdx < lengths.length;
-                                fieldIdx++) {
-                            if ( !isText[fieldIdx]) {
+                             fieldIdx++) {
+                            if (!isText[fieldIdx]) {
                                 continue;
                             }
-                            String s   = ((Text) data[fieldIdx]).getValue();
-                            int    len = s.length();
+                            String s = ((Text) data[fieldIdx]).getValue();
+                            int len = s.length();
                             if (len > lengths[fieldIdx]) {
                                 lengths[fieldIdx] = len;
                             }
@@ -611,10 +610,9 @@ public class PointObFactory {
                 }
 
 
-
                 for (int fieldIdx = 0; fieldIdx < lengths.length;
-                        fieldIdx++) {
-                    if ( !isText[fieldIdx]) {
+                     fieldIdx++) {
+                    if (!isText[fieldIdx]) {
                         continue;
                     }
                     PointObVar pointObVar = new PointObVar();
@@ -635,13 +633,13 @@ public class PointObFactory {
 
             double[] dvals = new double[numFloat];
             String[] svals = new String[numString];
-            int      dcnt  = 0;
-            int      scnt  = 0;
-            Data[]   data  = tuple.getComponents();
+            int dcnt = 0;
+            int scnt = 0;
+            Data[] data = tuple.getComponents();
             for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
                 if (isText[fieldIdx]) {
                     String s = ((Text) data[fieldIdx]).getValue();
-                    s             = StringUtil.padLeft(s, lengths[fieldIdx]);
+                    s = StringUtil.padLeft(s, lengths[fieldIdx]);
                     svals[scnt++] = s;
                     //                    System.err.println(fieldIdx + ":" + svals[scnt - 1]);
                 } else {
@@ -652,23 +650,23 @@ public class PointObFactory {
 
             try {
                 writer.addPoint(
-                    llp.getLatitude().getValue(CommonUnit.degree),
-                    llp.getLongitude().getValue(CommonUnit.degree),
-                    ((alt != null)
-                     ? alt.getValue(CommonUnit.meter)
-                     : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
-                             dvals, svals);
+                        llp.getLatitude().getValue(CommonUnit.degree),
+                        llp.getLongitude().getValue(CommonUnit.degree),
+                        ((alt != null)
+                                ? alt.getValue(CommonUnit.meter)
+                                : 0.0), ucar.visad.Util.makeDate(ob.getDateTime()),
+                        dvals, svals);
             } catch (Exception exc) {
                 int xxx = 1;
                 for (PointObVar pov : dataVars) {
                     System.out.println("var #" + xxx + " " + pov.getName()
-                                       + " " + pov.getDataType() + " unit:"
-                                       + pov.getUnits() + " length:"
-                                       + pov.getLen());
+                            + " " + pov.getDataType() + " unit:"
+                            + pov.getUnits() + " length:"
+                            + pov.getLen());
                     xxx++;
                 }
                 System.out.println("#dvals:" + dvals.length + " #svals:"
-                                   + svals.length);
+                        + svals.length);
 
                 for (String s : svals) {
                     System.err.println("sval=" + s + ":");
@@ -688,17 +686,15 @@ public class PointObFactory {
     /**
      * Make a CFPointObWriter
      *
-     * @param dos  the output stream
-     * @param type the tupe
-     * @param skipIndices which indices to skip
-     * @param defaultStringLength  the default string length
-     * @param altUnit  the altitude unit
-     * @param cnt      the number
-     * @param slengths string lengths
-     *
-     * @return  the writer
-     *
-     * @throws Exception  problem creating something
+     * @param dos                 the output stream
+     * @param type                the tupe
+     * @param skipIndices         which indices to skip
+     * @param defaultStringLength the default string length
+     * @param altUnit             the altitude unit
+     * @param cnt                 the number
+     * @param slengths            string lengths
+     * @return the writer
+     * @throws Exception problem creating something
      */
     public static CFPointObWriter makeWriter(DataOutputStream dos,
                                              TupleType type,
@@ -707,16 +703,16 @@ public class PointObFactory {
                                              String altUnit, int cnt,
                                              int[] slengths)
             throws Exception {
-        MathType[]       types     = type.getComponents();
-        int              numFields = types.length;
-        int              numFloat  = 0;
-        int              numString = 0;
-        int[]            lengths   = new int[numFields];
-        boolean[]        isText    = new boolean[numFields];
-        boolean          haveText  = false;
-        List<Attribute>  attrs     = new ArrayList<Attribute>();
-        List<PointObVar> dataVars  = new ArrayList<PointObVar>();
-        HashSet          skip      = new HashSet();
+        MathType[] types = type.getComponents();
+        int numFields = types.length;
+        int numFloat = 0;
+        int numString = 0;
+        int[] lengths = new int[numFields];
+        boolean[] isText = new boolean[numFields];
+        boolean haveText = false;
+        List<Attribute> attrs = new ArrayList<Attribute>();
+        List<PointObVar> dataVars = new ArrayList<PointObVar>();
+        HashSet skip = new HashSet();
         for (int i = 0; i < skipIndices.length; i++) {
             skip.add(new Integer(skipIndices[i]));
         }
@@ -729,14 +725,14 @@ public class PointObFactory {
 
             if (types[fieldIdx] instanceof TextType) {
                 lengths[fieldIdx] = ((slengths == null)
-                                     ? defaultStringLength
-                                     : slengths[fieldIdx]);
-                haveText          = true;
-                isText[fieldIdx]  = true;
+                        ? defaultStringLength
+                        : slengths[fieldIdx]);
+                haveText = true;
+                isText[fieldIdx] = true;
                 continue;
             }
             lengths[fieldIdx] = 0;
-            isText[fieldIdx]  = false;
+            isText[fieldIdx] = false;
             PointObVar pointObVar = new PointObVar();
             pointObVar.setName(Util.cleanTypeName(types[fieldIdx]));
             Unit unit = ((RealType) types[fieldIdx]).getDefaultUnit();
@@ -758,7 +754,7 @@ public class PointObFactory {
             if (skip.contains(new Integer(fieldIdx))) {
                 continue;
             }
-            if ( !isText[fieldIdx]) {
+            if (!isText[fieldIdx]) {
                 continue;
             }
             PointObVar pointObVar = new PointObVar();
@@ -774,42 +770,39 @@ public class PointObFactory {
     }
 
 
-
-
     /**
      * Find the intersection of a field of PointObs and the lat/lon bounds
      *
-     * @param pointObs     Field of point observations
-     * @param bounds       lat/lon bounds
-     * @return  Field of point obs in the bounds
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
+     * @param pointObs Field of point observations
+     * @param bounds   lat/lon bounds
+     * @return Field of point obs in the bounds
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  VisAD Error
      */
     private static FieldImpl findIntersection(FieldImpl pointObs,
-            LinearLatLonSet bounds)
+                                              LinearLatLonSet bounds)
             throws VisADException, RemoteException {
         if ((pointObs == null) || pointObs.isMissing()) {
             return pointObs;
         }
-        FieldImpl retField  = null;
-        Set       domainSet = pointObs.getDomainSet();
-        int       numObs    = domainSet.getLength();
-        Unit[]    units     = bounds.getSetUnits();
+        FieldImpl retField = null;
+        Set domainSet = pointObs.getDomainSet();
+        int numObs = domainSet.getLength();
+        Unit[] units = bounds.getSetUnits();
         int latIndex =
-            (((RealType) ((SetType) bounds.getType()).getDomain()
-            .getComponent(0)).equals(RealType.Latitude) == true)
-            ? 0
-            : 1;
-        Vector    v      = new Vector();
+                (((RealType) ((SetType) bounds.getType()).getDomain()
+                        .getComponent(0)).equals(RealType.Latitude) == true)
+                        ? 0
+                        : 1;
+        Vector v = new Vector();
         float[][] values = new float[2][1];
         //        Trace.call1("findIntersection-loop 1");
         for (int i = 0; i < numObs; i++) {
-            PointOb       ob = (PointOb) pointObs.getSample(i);
+            PointOb ob = (PointOb) pointObs.getSample(i);
             EarthLocation el = ob.getEarthLocation();
             values[0][0] = (float) el.getLatitude().getValue(units[latIndex]);
             values[1][0] =
-                (float) el.getLongitude().getValue(units[1 - latIndex]);
+                    (float) el.getLongitude().getValue(units[1 - latIndex]);
             float[][] grids = bounds.valueToGrid(values);
             if ((grids[0][0] == grids[0][0])
                     && (grids[1][0] == grids[1][0])) {  //not NaN
@@ -821,31 +814,31 @@ public class PointObFactory {
         //System.out.println("found " + v.size() + " obs in region");
         if (v.size() == numObs) {
             retField = pointObs;  // all were in domain, just return input
-        } else if ( !v.isEmpty()) {
+        } else if (!v.isEmpty()) {
             retField = new FieldImpl(
-                (FunctionType) pointObs.getType(),
-                new Integer1DSet(((SetType) domainSet.getType()).getDomain(),
-                                 v.size()));
+                    (FunctionType) pointObs.getType(),
+                    new Integer1DSet(((SetType) domainSet.getType()).getDomain(),
+                            v.size()));
             retField.setSamples((PointOb[]) v.toArray(new PointOb[v.size()]),
-                                false, false);
+                    false, false);
         } else {
             PointOb point = (PointOb) pointObs.getSample(0);
             retField = new FieldImpl(
-                (FunctionType) pointObs.getType(),
-                new Integer1DSet(((SetType) domainSet.getType()).getDomain(),
-                                 1));
+                    (FunctionType) pointObs.getType(),
+                    new Integer1DSet(((SetType) domainSet.getType()).getDomain(),
+                            1));
             retField.setSamples(
-                new PointOb[] {
-                    new PointObTuple(
-                        new EarthLocationLite(new Real(RealType.Latitude),
-                                new Real(RealType.Longitude),
-                                new Real(RealType.Altitude)), new DateTime(
+                    new PointOb[]{
+                            new PointObTuple(
+                                    new EarthLocationLite(new Real(RealType.Latitude),
+                                            new Real(RealType.Longitude),
+                                            new Real(RealType.Altitude)), new DateTime(
                                     Double.NaN),
-                        (point.getData() instanceof RealTuple)
-                        ? new RealTuple(
-                            (RealTupleType) point.getData().getType())
-                        : new Tuple(
-                            (TupleType) point.getData().getType())) }, false);
+                                    (point.getData() instanceof RealTuple)
+                                            ? new RealTuple(
+                                            (RealTupleType) point.getData().getType())
+                                            : new Tuple(
+                                            (TupleType) point.getData().getType()))}, false);
         }
         return retField;
     }
@@ -854,11 +847,9 @@ public class PointObFactory {
      * Take a field of data and turn it into a field of PointObs.  Right
      * now, this assumes a surface data from an ADDE server.
      *
-     * @param input     FieldImpl of raw VisAD data
-     *
+     * @param input FieldImpl of raw VisAD data
      * @return field of PointObs
-     *
-     * @throws VisADException  couldn't create the VisAD data
+     * @throws VisADException couldn't create the VisAD data
      */
 
     public static FieldImpl makePointObsFromField(FieldImpl input)
@@ -868,19 +859,17 @@ public class PointObFactory {
 
 
     /**
-     *  Take a field of data and turn it into a field of PointObs.  Right
-     *  now, this assumes a surface data from an ADDE server.
+     * Take a field of data and turn it into a field of PointObs.  Right
+     * now, this assumes a surface data from an ADDE server.
      *
-     *  @param input     FieldImpl of raw VisAD data
-     *  @param binRoundTo time bin  round to
-     *  @param binWidth time bin size
-     *
-     *  @return The data
-     *
-     *  @throws VisADException On badness
+     * @param input      FieldImpl of raw VisAD data
+     * @param binRoundTo time bin  round to
+     * @param binWidth   time bin size
+     * @return The data
+     * @throws VisADException On badness
      */
     public static FieldImpl makePointObsFromField(FieldImpl input,
-            double binRoundTo, double binWidth)
+                                                  double binRoundTo, double binWidth)
             throws VisADException {
 
         FieldImpl retField = null;
@@ -889,31 +878,31 @@ public class PointObFactory {
             // input has to be of form (index -> (parm1, parm2, parm3, ...., parmN))
 
             //System.out.print("Starting to make PointObs for ");
-            TupleType    type     = null;
+            TupleType type = null;
             Gridded1DSet indexSet = null;
             try {
                 type = (TupleType) ((FunctionType) input.getType()).getRange();
                 indexSet = (Gridded1DSet) input.getDomainSet();
             } catch (ClassCastException ce) {
                 throw new IllegalArgumentException(
-                    "don't know how to convert input to a point ob");
+                        "don't know how to convert input to a point ob");
             }
             //System.out.println(indexSet.getLength() + " obs");
             boolean allReals = (type instanceof RealTupleType);
 
             // check for time fields (DAY & TIME or DATE & HMS)
-            int     dayIndex   = type.getIndex("DAY");
-            int     timeIndex  = type.getIndex("TIME");
-            int     dateIndex  = type.getIndex("DATE");
-            int     hmsIndex   = type.getIndex("HMS");
+            int dayIndex = type.getIndex("DAY");
+            int timeIndex = type.getIndex("TIME");
+            int dateIndex = type.getIndex("DATE");
+            int hmsIndex = type.getIndex("HMS");
             boolean hasDayTime = ((dayIndex != -1) && (timeIndex != -1));
             boolean hasDateHMS = ((dateIndex != -1) && (hmsIndex != -1));
-            if ( !hasDayTime && !hasDateHMS) {
+            if (!hasDayTime && !hasDateHMS) {
                 throw new IllegalArgumentException(
-                    "can't find DateTime components");
+                        "can't find DateTime components");
             }
             if (hasDateHMS) {
-                dayIndex  = dateIndex;
+                dayIndex = dateIndex;
                 timeIndex = hmsIndex;
             }
 
@@ -929,25 +918,29 @@ public class PointObFactory {
             int cc1Index = type.getIndex("CC1");
             int cc2Index = type.getIndex("CC2");
             int cigIndex = type.getIndex("CIGC");
-            int caIndex  = type.getIndex("CA");
+            int caIndex = type.getIndex("CA");
+            int tempIndex = type.getIndex("T");
+            int dewIndex = type.getIndex("TD");
+            int speedIndex = type.getIndex("SPD");
+
             boolean mergeClouds = ((cc1Index >= 0)
-                                   && (cc2Index >= 0)
-                                   && (cigIndex >= 0)
-                                   && (caIndex < 0));
+                    && (cc2Index >= 0)
+                    && (cigIndex >= 0)
+                    && (caIndex < 0));
 
-            int[] indicies = new int[] { dayIndex, timeIndex, latIndex,
-                                         lonIndex, altIndex };
+            int[] indicies = new int[]{dayIndex, timeIndex, latIndex,
+                    lonIndex, altIndex};
 
-            int numVars        = type.getDimension();
+            int numVars = type.getDimension();
             int numNotRequired = numVars - ((altIndex != -1)
-                                            ? 5
-                                            : 4);
+                    ? 5
+                    : 4);
             //System.out.println("Of " + numVars + " vars, " + numNotRequired +
             //                   " are not required");
 
             int[] notReqIndices = new int[numNotRequired];
 
-            int   l             = 0;
+            int l = 0;
             for (int i = 0; i < numVars; i++) {
                 if ((i != dayIndex)
                         && (i != timeIndex)
@@ -966,24 +959,24 @@ public class PointObFactory {
 
 
             Trace.call1("loop-1", " Size:" + indexSet.getLength());
-            int               length      = indexSet.getLength();
-            List              times       = new ArrayList();
-            boolean           hasTimeOnly = false;
-            GregorianCalendar cal         = null;
+            int length = indexSet.getLength();
+            List times = new ArrayList();
+            boolean hasTimeOnly = false;
+            GregorianCalendar cal = null;
 
 
             for (int i = 0; i < length; i++) {
-                Tuple ob      = (Tuple) input.getSample(i);
-                Real  realDay = (Real) ob.getComponent(dayIndex);
+                Tuple ob = (Tuple) input.getSample(i);
+                Real realDay = (Real) ob.getComponent(dayIndex);
                 // might only have time in seconds
                 //Can this be done just once?
                 hasTimeOnly =
-                //realDay.getUnit().equals(CommonUnit.second);
-                CommonUnit.second.equals(realDay.getUnit());
-                int    day  = (int) realDay.getValue();
+                        //realDay.getUnit().equals(CommonUnit.second);
+                        CommonUnit.second.equals(realDay.getUnit());
+                int day = (int) realDay.getValue();
                 double time = ((Real) ob.getComponent(timeIndex)).getValue();
 
-                if ( !hasTimeOnly) {
+                if (!hasTimeOnly) {
                     if (hasDayTime) {
                         if (cal == null) {
                             cal = McIDASUtil.makeCalendarForDayTimeToSecs();
@@ -999,15 +992,15 @@ public class PointObFactory {
             Trace.call2("loop-1");
             times = binTimes(times, binRoundTo, binWidth);
 
-            TupleType tupleType      = null;
+            TupleType tupleType = null;
             TupleType finalTupleType = null;
             Trace.call1("loop-2", " num vars: " + numNotRequired);
-            int            cnt       = 0;
+            int cnt = 0;
             List<RealType> realTypes = new ArrayList<RealType>();
             List<TextType> textTypes = new ArrayList<TextType>();
             for (int j = 0; j < numNotRequired; j++) {
                 ScalarType stype =
-                    (ScalarType) type.getComponent(notReqIndices[j]);
+                        (ScalarType) type.getComponent(notReqIndices[j]);
                 if (stype instanceof TextType) {
                     textTypes.add((TextType) stype);
                 } else {
@@ -1015,38 +1008,62 @@ public class PointObFactory {
                 }
             }
             RealType caType = null;
+            RealType rhType = null;
+            RealType windChillType = null;
+            RealType heatIndexType = null;
             if (mergeClouds) {
                 caType = DataUtil.makeRealType("CA", DataUtil.parseUnit(""));
                 realTypes.add(caType);
             }
+            if(tempIndex >=0 && speedIndex >=0) {
+                rhType = DataUtil.makeRealType("RH", DataUtil.parseUnit("%"));
+                windChillType = DataUtil.makeRealType("windChill", DataUtil.parseUnit("Fahrenheit"));
+                heatIndexType = DataUtil.makeRealType("heatIndex", DataUtil.parseUnit("Fahrenheit"));
+                realTypes.add(rhType);
+                realTypes.add(windChillType);
+                realTypes.add(heatIndexType);
+            }
             if (allReals) {
                 tupleType = new RealTupleType(
-                    (RealType[]) realTypes.toArray(
-                        new RealType[realTypes.size()]));
+                        (RealType[]) realTypes.toArray(
+                                new RealType[realTypes.size()]));
             } else {
                 tupleType = DoubleStringTuple.makeTupleType(realTypes,
                         textTypes);
             }
-            int    numDouble = realTypes.size();
-            int    numString = textTypes.size();
-            Real[] protos    = null;
+            int numDouble = realTypes.size();
+            int numString = textTypes.size();
+            Real[] protos = null;
             Unit[] realUnits = null;
-            Real   caProto   = null;
-            double caValue   = 0;
-            if (mergeClouds) {
+            Real caProto = null;
+            Real rhProto = null;
+            Real windChillProto = null;
+            Real heatIndexProto = null;
+
+            double caValue = 0;
+            if (mergeClouds && rhType != null) {
                 caProto = new Real(caType, 0);
+                rhProto = new Real(rhType, 0);
+                windChillProto = new Real(windChillType, 0);
+                heatIndexProto = new Real(heatIndexType, 0);
+            } else if(mergeClouds) {
+                caProto = new Real(caType, 0);
+            } else if(rhType != null) {
+                rhProto = new Real(rhType, 0);
+                windChillProto = new Real(windChillType, 0);
+                heatIndexProto = new Real(heatIndexType, 0);
             }
 
             for (int i = 0; i < length; i++) {
                 DateTime dateTime = (DateTime) times.get(i);
-                Tuple    ob       = (Tuple) input.getSample(i);
+                Tuple ob = (Tuple) input.getSample(i);
                 // get location
                 EarthLocation location =
-                    new EarthLocationLite((Real) ob.getComponent(latIndex),
-                                          (Real) ob.getComponent(lonIndex),
-                                          (altIndex != -1)
-                                          ? (Real) ob.getComponent(altIndex)
-                                          : new Real(RealType.Altitude, 0));
+                        new EarthLocationLite((Real) ob.getComponent(latIndex),
+                                (Real) ob.getComponent(lonIndex),
+                                (altIndex != -1)
+                                        ? (Real) ob.getComponent(altIndex)
+                                        : new Real(RealType.Altitude, 0));
 
                 Tuple rest = null;
                 // McIDAS Metar Cloud covers are:
@@ -1058,11 +1075,11 @@ public class PointObFactory {
                 int wmo = 0;
                 if (mergeClouds) {
                     double cc1 =
-                        ((Real) ob.getComponent(cc1Index)).getValue();
+                            ((Real) ob.getComponent(cc1Index)).getValue();
                     double cc2 =
-                        ((Real) ob.getComponent(cc2Index)).getValue();
+                            ((Real) ob.getComponent(cc2Index)).getValue();
                     double cig =
-                        ((Real) ob.getComponent(cigIndex)).getValue();
+                            ((Real) ob.getComponent(cigIndex)).getValue();
                     if (Double.isNaN(cc1)) {
                         cc1 = 0;
                     }
@@ -1073,16 +1090,16 @@ public class PointObFactory {
                         cig = 0;
                     }
                     boolean haveFew = ((cc1 == 5) || (cc2 == 5));
-                    int     largest = 0;
-                    if ( !haveFew) {
+                    int largest = 0;
+                    if (!haveFew) {
                         largest = (int) Math.max(Math.max(cc1, cc2), cig);
                     } else {
                         double val1 = (cc1 == 5)
-                                      ? 0
-                                      : cc1;
+                                ? 0
+                                : cc1;
                         double val2 = (cc2 == 5)
-                                      ? 0
-                                      : cc2;
+                                ? 0
+                                : cc2;
                         largest = (int) Math.max(Math.max(val1, val2), cig);
                     }
                     if (largest < 2) {          // CLR or SCT
@@ -1096,54 +1113,105 @@ public class PointObFactory {
                         wmo++;                  // FEW
                     }
                 }
-
+                double temp = 0.0;
+                double temp1 = 0.0;
+                double dew = 0.0;
+                double speed = 0.0;
+                if(rhType != null) {
+                    temp = ((Real) ob.getComponent(tempIndex)).getValue(DataUtil.parseUnit("Celsius"));
+                    temp1 = ((Real) ob.getComponent(tempIndex)).getValue(DataUtil.parseUnit("Fahrenheit"));
+                    dew = ((Real) ob.getComponent(dewIndex)).getValue(DataUtil.parseUnit("Celsius"));
+                    speed = ((Real) ob.getComponent(speedIndex)).getValue(Speed.MILES_PER_HOUR);
+                }
                 // now make data
                 if (allReals) {
-                    double[] obValues   = ((RealTuple) ob).getValues();
+                    double[] obValues = ((RealTuple) ob).getValues();
                     double[] realValues = new double[numDouble];
                     for (int j = 0; j < numNotRequired; j++) {
                         realValues[j] = obValues[notReqIndices[j]];
                     }
-                    if (mergeClouds) {
+                    if (mergeClouds && rhType !=null) {
+                        realValues[numDouble - 4] = wmo;
+                        realValues[numDouble - 3] = relativeHumidity(temp, dew);
+                        realValues[numDouble - 2] = windChill(speed, temp1);
+                        realValues[numDouble - 1] = heatIndex(temp1, realValues[numDouble - 3]);
+                    } else if(mergeClouds){
                         realValues[numDouble - 1] = wmo;
+                    } else if (rhType !=null) {
+                        realValues[numDouble - 3] = relativeHumidity(temp, dew);
+                        realValues[numDouble - 2] = windChill(speed, temp1);
+                        realValues[numDouble - 1] = heatIndex(temp1, realValues[numDouble - 3]);
                     }
 
                     if (protos == null) {
-                        protos    = new Real[numDouble];
+                        protos = new Real[numDouble];
                         realUnits = new Unit[numDouble];
                         for (int j = 0; j < numNotRequired; j++) {
                             protos[j] =
-                                (Real) ob.getComponent(notReqIndices[j]);
+                                    (Real) ob.getComponent(notReqIndices[j]);
                             realUnits[j] = protos[j].getUnit();
                         }
-                        if (mergeClouds) {
-                            protos[numDouble - 1]    = caProto;
+                        if (mergeClouds && rhType != null) {
+                            protos[numDouble - 4] = caProto;
+                            realUnits[numDouble - 4] = caProto.getUnit();
+                            protos[numDouble - 3] = rhProto;
+                            realUnits[numDouble - 3] = rhProto.getUnit();
+                            protos[numDouble - 2] = windChillProto;
+                            realUnits[numDouble - 2] = windChillProto.getUnit();
+                            protos[numDouble - 1] = heatIndexProto;
+                            realUnits[numDouble - 1] = heatIndexProto.getUnit();
+                        } else if(mergeClouds) {
+                            protos[numDouble - 1] = caProto;
                             realUnits[numDouble - 1] = caProto.getUnit();
+                        } else if (rhType != null) {
+                            protos[numDouble - 3] = rhProto;
+                            realUnits[numDouble - 3] = rhProto.getUnit();
+                            protos[numDouble - 2] = windChillProto;
+                            realUnits[numDouble - 2] = windChillProto.getUnit();
+                            protos[numDouble - 1] = heatIndexProto;
+                            realUnits[numDouble - 1] = heatIndexProto.getUnit();
                         }
                     }
 
                     rest = new DoubleTuple((RealTupleType) tupleType, protos,
-                                           realValues, realUnits);
+                            realValues, realUnits);
+
                 } else {
                     String[] strings = (numString > 0)
-                                       ? new String[numString]
-                                       : null;
-                    double[] values  = (numDouble > 0)
-                                       ? new double[numDouble]
-                                       : null;
+                            ? new String[numString]
+                            : null;
+                    double[] values = (numDouble > 0)
+                            ? new double[numDouble]
+                            : null;
                     if (i == 0) {
-                        protos    = new Real[numDouble];
+                        protos = new Real[numDouble];
                         realUnits = new Unit[numDouble];
-                        if (mergeClouds) {
-                            protos[numDouble - 1]    = caProto;
+                        if (mergeClouds && rhType != null) {
+                            protos[numDouble - 4] = caProto;
+                            realUnits[numDouble - 4] = caProto.getUnit();
+                            protos[numDouble - 3] = rhProto;
+                            realUnits[numDouble - 3] = rhProto.getUnit();
+                            protos[numDouble - 2] = windChillProto;
+                            realUnits[numDouble - 2] = windChillProto.getUnit();
+                            protos[numDouble - 1] = heatIndexProto;
+                            realUnits[numDouble - 1] = heatIndexProto.getUnit();
+                        } else if(mergeClouds) {
+                            protos[numDouble - 1] = caProto;
                             realUnits[numDouble - 1] = caProto.getUnit();
+                        } else if (rhType != null) {
+                            protos[numDouble - 3] = rhProto;
+                            realUnits[numDouble - 3] = rhProto.getUnit();
+                            protos[numDouble - 2] = windChillProto;
+                            realUnits[numDouble - 2] = windChillProto.getUnit();
+                            protos[numDouble - 1] = heatIndexProto;
+                            realUnits[numDouble - 1] = heatIndexProto.getUnit();
                         }
                     }
                     int stringIdx = 0;
-                    int valIdx    = 0;
+                    int valIdx = 0;
                     for (int j = 0; j < numNotRequired; j++) {
                         Scalar scalar =
-                            (Scalar) ob.getComponent(notReqIndices[j]);
+                                (Scalar) ob.getComponent(notReqIndices[j]);
                         if (scalar instanceof Text) {
                             strings[stringIdx++] = ((Text) scalar).getValue();
                         } else {
@@ -1151,14 +1219,23 @@ public class PointObFactory {
                             values[valIdx] = real.getValue();
                             if (i == 0) {
                                 realUnits[valIdx] = real.getUnit();
-                                protos[valIdx]    = real;
+                                protos[valIdx] = real;
                             }
                             valIdx++;
                         }
 
                     }
-                    if (mergeClouds) {
+                    if (mergeClouds && rhType != null) {
+                        values[numDouble - 4] = wmo;
+                        values[numDouble - 3] = relativeHumidity(temp, dew);
+                        values[numDouble - 2] = windChill(speed, temp1);
+                        values[numDouble - 1] = heatIndex(temp1, values[numDouble - 3]);
+                    } else if(mergeClouds) {
                         values[numDouble - 1] = wmo;
+                    } else if (rhType != null) {
+                        values[numDouble - 3] = relativeHumidity(temp, dew);
+                        values[numDouble - 2] = windChill(speed, temp1);
+                        values[numDouble - 1] = heatIndex(temp1, values[numDouble - 3]);
                     }
                     rest = new DoubleStringTuple(tupleType, protos, values,
                             strings, realUnits);
@@ -1166,18 +1243,18 @@ public class PointObFactory {
 
                 if (finalTupleType == null) {
                     PointObTuple pot = new PointObTuple(location, dateTime,
-                                           rest);
-                    obs[i]         = pot;
+                            rest);
+                    obs[i] = pot;
                     finalTupleType =
-                        Tuple.buildTupleType(pot.getComponents());
+                            Tuple.buildTupleType(pot.getComponents());
 
                     Data[] comps = rest.getComponents();
                     for (int compIdx = 0; compIdx < comps.length; compIdx++) {
                         String name = ucar.visad.Util.cleanTypeName(
-                                          comps[compIdx].getType());
+                                comps[compIdx].getType());
                         DataChoice.addCurrentName(
-                            new TwoFacedObject("Point Data" + ">" + name,
-                                    name));
+                                new TwoFacedObject("Point Data" + ">" + name,
+                                        name));
                     }
 
                 } else {
@@ -1189,8 +1266,8 @@ public class PointObFactory {
 
 
             retField = new FieldImpl(
-                new FunctionType(((SetType) indexSet.getType()).getDomain(),
-                                 obs[0].getType()), indexSet);
+                    new FunctionType(((SetType) indexSet.getType()).getDomain(),
+                            obs[0].getType()), indexSet);
             retField.setSamples(obs, false, false);
         } catch (RemoteException re) {
             throw new VisADException("got RemoteException " + re);
@@ -1203,9 +1280,7 @@ public class PointObFactory {
      * Make point obs from a PointObsDataset
      *
      * @param input pointobs dataset to load
-     *
      * @return FieldImpl of form (index) -&gt; PointOb
-     *
      * @throws Exception problem creating the ob or a cancel
      */
     public static FieldImpl makePointObs(PointObsDataset input)
@@ -1217,29 +1292,27 @@ public class PointObFactory {
     /**
      * Bin the times
      *
-     * @param times List of times
+     * @param times      List of times
      * @param binRoundTo round to factor
-     * @param binWidth bin size
-     *
+     * @param binWidth   bin size
      * @return Binned times
-     *
      * @throws VisADException On badness
      */
     public static List binTimes(List times, double binRoundTo,
                                 double binWidth)
             throws VisADException {
         binRoundTo = binRoundTo * 60;
-        binWidth   = binWidth * 60;
+        binWidth = binWidth * 60;
         if (binWidth <= 0) {
             return times;
         }
         //        System.err.println ("binWidth:" + binWidth + " rt:" + binRoundTo);
 
-        double   minTime = Double.MAX_VALUE;
+        double minTime = Double.MAX_VALUE;
         DateTime minDttm = null;
         for (int i = 0; i < times.size(); i++) {
             DateTime dttm = (DateTime) times.get(i);
-            double   time = dttm.getValue(CommonUnit.secondsSinceTheEpoch);
+            double time = dttm.getValue(CommonUnit.secondsSinceTheEpoch);
             if (time < minTime) {
                 minTime = time;
                 minDttm = dttm;
@@ -1247,9 +1320,9 @@ public class PointObFactory {
         }
         //        System.err.println ("min time:" + minDttm);
 
-        List   newTimes = new ArrayList();
+        List newTimes = new ArrayList();
         double baseTime;
-        int    roundToSeconds = (int) binRoundTo;
+        int roundToSeconds = (int) binRoundTo;
         //        System.err.println ("round to seconds:" + roundToSeconds);
         if (roundToSeconds == 0) {
             baseTime = minTime;
@@ -1264,12 +1337,12 @@ public class PointObFactory {
         }
         //        System.err.println ("round to:" + binRoundTo +" bin width:" + binWidth +" base time:"  + new DateTime(baseTime));
         Hashtable seen = new Hashtable();
-        int       ucnt = 0;
+        int ucnt = 0;
         for (int i = 0; i < times.size(); i++) {
-            DateTime dttm    = (DateTime) times.get(i);
-            double   time    = dttm.getValue(CommonUnit.secondsSinceTheEpoch);
-            double   rem     = time - baseTime;
-            double   newTime = baseTime + binWidth * (int) (rem / binWidth);
+            DateTime dttm = (DateTime) times.get(i);
+            double time = dttm.getValue(CommonUnit.secondsSinceTheEpoch);
+            double rem = time - baseTime;
+            double newTime = baseTime + binWidth * (int) (rem / binWidth);
             DateTime newDttm = new DateTime(newTime);
             //            if (seen.get(newDttm) == null) {
             //                ucnt++;
@@ -1283,17 +1356,13 @@ public class PointObFactory {
     }
 
 
-
-
     /**
      * Make point obs
      *
-     * @param input the data set
+     * @param input      the data set
      * @param binRoundTo bin round to
-     * @param binWidth time bin size
-     *
+     * @param binWidth   time bin size
      * @return The field
-     *
      * @throws Exception On badness
      */
     public static FieldImpl makePointObs(PointObsDataset input,
@@ -1336,21 +1405,14 @@ public class PointObFactory {
     */
 
 
-
-
-
-
-
     /**
      * Make point obs
      *
-     * @param input the data set
+     * @param input      the data set
      * @param binRoundTo bin round to
-     * @param binWidth time bin size
-     * @param llr bounding box
-     *
+     * @param binWidth   time bin size
+     * @param llr        bounding box
      * @return The field
-     *
      * @throws Exception On badness
      */
     public static FieldImpl makePointObs(PointObsDataset input,
@@ -1365,14 +1427,12 @@ public class PointObFactory {
     /**
      * Make point obs
      *
-     * @param input the data set
+     * @param input      the data set
      * @param binRoundTo bin round to
-     * @param binWidth time bin size
-     * @param llr bounding box
-     * @param sample If true then just sample the data, i.e., read the first ob
-     *
+     * @param binWidth   time bin size
+     * @param llr        bounding box
+     * @param sample     If true then just sample the data, i.e., read the first ob
      * @return The field
-     *
      * @throws Exception On badness
      */
     public static FieldImpl makePointObs(PointObsDataset input,
@@ -1381,14 +1441,13 @@ public class PointObFactory {
             throws Exception {
 
 
+        Object loadId = JobManager.getManager().startLoad("PointObFactory");
 
-        Object  loadId = JobManager.getManager().startLoad("PointObFactory");
-
-        List    actualVariables    = input.getDataVariables();
-        int     numVars            = actualVariables.size();
+        List actualVariables = input.getDataVariables();
+        int numVars = actualVariables.size();
 
         boolean needToAddStationId = false;
-        String  stationFieldName   = null;
+        String stationFieldName = null;
 
         //Is this station data
         if (input instanceof StationObsDataset) {
@@ -1416,7 +1475,6 @@ public class PointObFactory {
         }
 
 
-
         int varIdxBase = 0;
         if (needToAddStationId) {
             numVars++;
@@ -1427,13 +1485,13 @@ public class PointObFactory {
 
         log_.debug("number of data variables = " + numVars);
 
-        boolean[]    isVarNumeric = new boolean[numVars];
-        boolean      allReals     = true;
-        ScalarType[] types        = new ScalarType[numVars];
-        Unit[]       varUnits     = new Unit[numVars];
-        List         numericTypes = new ArrayList();
-        List         numericUnits = new ArrayList();
-        List         stringTypes  = new ArrayList();
+        boolean[] isVarNumeric = new boolean[numVars];
+        boolean allReals = true;
+        ScalarType[] types = new ScalarType[numVars];
+        Unit[] varUnits = new Unit[numVars];
+        List numericTypes = new ArrayList();
+        List numericUnits = new ArrayList();
+        List stringTypes = new ArrayList();
 
         //If we really have a StationObsDataset then we need to add in the station id
         //into the data fields
@@ -1455,8 +1513,8 @@ public class PointObFactory {
             VariableSimpleIF var = (VariableSimpleIF) iter.next();
             shortNamesList.add(var.getShortName());
             isVarNumeric[varIdx] = !((var.getDataType() == DataType.STRING)
-                                     || (var.getDataType() == DataType.CHAR));
-            if ( !isVarNumeric[varIdx]) {
+                    || (var.getDataType() == DataType.CHAR));
+            if (!isVarNumeric[varIdx]) {
                 allReals = false;
             }
 
@@ -1473,7 +1531,7 @@ public class PointObFactory {
                 numericTypes.add(types[varIdx]);
                 numericUnits.add(unit);
             } else {
-                types[varIdx]    = DataUtil.makeTextType(var.getShortName());
+                types[varIdx] = DataUtil.makeTextType(var.getShortName());
                 varUnits[varIdx] = null;
                 stringTypes.add(types[varIdx]);
             }
@@ -1483,36 +1541,36 @@ public class PointObFactory {
 
 
         String[] shortNames = (String[]) shortNamesList.toArray(
-                                  new String[shortNamesList.size()]);
+                new String[shortNamesList.size()]);
 
 
-        int    numReals   = numericTypes.size();
-        int    numStrings = stringTypes.size();
+        int numReals = numericTypes.size();
+        int numStrings = stringTypes.size();
         Data[] firstTuple = null;
-        int    total      = input.getDataCount();
+        int total = input.getDataCount();
         //        System.err.println("#obs:" + total +" #vars:" +  numVars);
-        int       obIdx        = 0;
-        Iterator  dataIterator = input.getDataIterator(16384);
-        int       NUM          = 500;
+        int obIdx = 0;
+        Iterator dataIterator = input.getDataIterator(16384);
+        int NUM = 500;
         TupleType allTupleType = (allReals
-                                  ? new RealTupleType(
-                                      (RealType[]) numericTypes.toArray(
-                                          new RealType[numericTypes.size()]))
-                                  : DoubleStringTuple.makeTupleType(
-                                      numericTypes, stringTypes));
+                ? new RealTupleType(
+                (RealType[]) numericTypes.toArray(
+                        new RealType[numericTypes.size()]))
+                : DoubleStringTuple.makeTupleType(
+                numericTypes, stringTypes));
         Unit[] allUnits =
-            (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
+                (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
 
 
-        Real              lat      = new Real(RealType.Latitude, 40),
-                          lon      = new Real(RealType.Longitude, -100),
-                          alt      = new Real(RealType.Altitude, 0);
-        DateTime          dateTime = null;
+        Real lat = new Real(RealType.Latitude, 40),
+                lon = new Real(RealType.Longitude, -100),
+                alt = new Real(RealType.Altitude, 0);
+        DateTime dateTime = null;
         EarthLocationLite elt;
-        TupleType         finalTT = null;
-        PointObTuple      pot     = null;
-        List              pos     = new ArrayList(100000);
-        List              times   = new ArrayList(1000000);
+        TupleType finalTT = null;
+        PointObTuple pot = null;
+        List pos = new ArrayList(100000);
+        List times = new ArrayList(1000000);
 
         //First do spatial subset and collect times
         //        Trace.call1("loop-2");
@@ -1539,49 +1597,49 @@ public class PointObFactory {
         times = binTimes(times, binRoundTo, binWidth);
 
         StructureMembers.Member member;
-        PointOb[]               obs = new PointOb[pos.size()];
+        PointOb[] obs = new PointOb[pos.size()];
         //Make the obs
         //        Trace.call1("loop-3");
-        int    size      = pos.size();
+        int size = pos.size();
 
         Data[] prototype = null;
         for (int i = 0; i < size; i++) {
             PointObsDatatype po = (PointObsDatatype) pos.get(i);
             ucar.unidata.geoloc.EarthLocation el = po.getLocation();
             elt = new EarthLocationLite(lat.cloneButValue(el.getLatitude()),
-                                        lon.cloneButValue(el.getLongitude()),
-                                        alt.cloneButValue(el.getAltitude()));
-            double[] realArray   = new double[numReals];
+                    lon.cloneButValue(el.getLongitude()),
+                    alt.cloneButValue(el.getAltitude()));
+            double[] realArray = new double[numReals];
             String[] stringArray = ((numStrings == 0)
-                                    ? null
-                                    : new String[numStrings]);
+                    ? null
+                    : new String[numStrings]);
 
             // make the VisAD data object
             StructureData structure = po.getData();
-            int           stringCnt = 0;
-            int           realCnt   = 0;
+            int stringCnt = 0;
+            int realCnt = 0;
             if (needToAddStationId) {
                 StationObsDatatype sod = (StationObsDatatype) po;
                 stringArray[stringCnt++] = sod.getStation().getName();
             }
             for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
                 member = structure.findMember((String) shortNames[varIdx]);
-                if ( !isVarNumeric[varIdx]) {
+                if (!isVarNumeric[varIdx]) {
                     stringArray[stringCnt++] =
-                        structure.getScalarString(member);
+                            structure.getScalarString(member);
                 } else {
                     realArray[realCnt++] =
-                        structure.convertScalarFloat(member);
+                            structure.convertScalarFloat(member);
                 }
             }
 
 
             Tuple tuple = (allReals
-                           ? (Tuple) new DoubleTuple(
-                               (RealTupleType) allTupleType, prototype,
-                               realArray, allUnits)
-                           : new DoubleStringTuple(allTupleType, prototype,
-                               realArray, stringArray, allUnits));
+                    ? (Tuple) new DoubleTuple(
+                    (RealTupleType) allTupleType, prototype,
+                    realArray, allUnits)
+                    : new DoubleStringTuple(allTupleType, prototype,
+                    realArray, stringArray, allUnits));
 
             if (prototype == null) {
                 prototype = tuple.getComponents();
@@ -1592,18 +1650,18 @@ public class PointObFactory {
                 finalTT = Tuple.buildTupleType(pot.getComponents());
             } else {
                 pot = new PointObTuple(elt, (DateTime) times.get(i), tuple,
-                                       finalTT, false);
+                        finalTT, false);
 
             }
             obs[obIdx++] = pot;
             if (obIdx % NUM == 0) {
-                if ( !JobManager.getManager().canContinue(loadId)) {
+                if (!JobManager.getManager().canContinue(loadId)) {
                     LogUtil.message("");
                     return null;
                 }
                 if (llr == null) {
                     LogUtil.message("Read " + obIdx + "/" + total
-                                    + " observations");
+                            + " observations");
                 } else {
                     LogUtil.message("Read " + obIdx + " observations");
                 }
@@ -1619,11 +1677,11 @@ public class PointObFactory {
         LogUtil.message("Processing point data");
 
         Integer1DSet indexSet =
-            new Integer1DSet(RealType.getRealType("index"), obs.length);
+                new Integer1DSet(RealType.getRealType("index"), obs.length);
         FieldImpl retField =
-            new FieldImpl(
-                new FunctionType(((SetType) indexSet.getType()).getDomain(),
-                                 obs[0].getType()), indexSet);
+                new FieldImpl(
+                        new FunctionType(((SetType) indexSet.getType()).getDomain(),
+                                obs[0].getType()), indexSet);
         retField.setSamples(obs, false, false);
         return retField;
     }
@@ -1631,15 +1689,13 @@ public class PointObFactory {
     /**
      * Make point obs
      *
-     * @param input the data set
-     * @param binRoundTo bin round to
-     * @param binWidth time bin size
-     * @param llr bounding box
-     * @param dateSelection  the date selection
-     * @param sample If true then just sample the data, i.e., read the first ob
-     *
+     * @param input         the data set
+     * @param binRoundTo    bin round to
+     * @param binWidth      time bin size
+     * @param llr           bounding box
+     * @param dateSelection the date selection
+     * @param sample        If true then just sample the data, i.e., read the first ob
      * @return The field
-     *
      * @throws Exception On badness
      */
     public static FieldImpl makePointObs(FeatureDatasetPoint input,
@@ -1650,24 +1706,23 @@ public class PointObFactory {
             throws Exception {
 
 
+        Object loadId = JobManager.getManager().startLoad("PointObFactory");
 
-        Object  loadId = JobManager.getManager().startLoad("PointObFactory");
-
-        List    actualVariables    = input.getDataVariables();
-        int     numVars            = actualVariables.size();
-        String  _isMissing         = "_isMissing";
+        List actualVariables = input.getDataVariables();
+        int numVars = actualVariables.size();
+        String _isMissing = "_isMissing";
 
         boolean needToAddStationId = false;
-        String  stationFieldName   = null;
+        String stationFieldName = null;
 
         // make sure we can read this kind of data
         List<FeatureCollection> collectionList =
-            input.getPointFeatureCollectionList();
+                input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {
             throw new IllegalArgumentException(
-                "Can't handle point data with multiple collections");
+                    "Can't handle point data with multiple collections");
         }
-        FeatureCollection      fc         = collectionList.get(0);
+        FeatureCollection fc = collectionList.get(0);
         PointFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
         DateRange dateRange = null;
@@ -1676,14 +1731,14 @@ public class PointObFactory {
                 List<Date> range = dateSelection.getTimes();
                 Collections.sort(range);
                 dateRange = new DateRange(range.get(0),
-                                          range.get(range.size() - 1));
+                        range.get(range.size() - 1));
             } else if (dateSelection.hasInterval()) {
                 double interval = dateSelection.getInterval();
-                int    count    = dateSelection.getCount();
-                long   timespan = (long) interval * count;
-                Date   now      = new Date();
+                int count = dateSelection.getCount();
+                long timespan = (long) interval * count;
+                Date now = new Date();
                 dateRange = new DateRange(new Date(now.getTime() - timespan),
-                                          now);
+                        now);
             }
         }
         //if (dateRange == null) {
@@ -1696,14 +1751,14 @@ public class PointObFactory {
             }
         } else if (fc instanceof NestedPointFeatureCollection) {
             NestedPointFeatureCollection npfc =
-                (NestedPointFeatureCollection) fc;
+                    (NestedPointFeatureCollection) fc;
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
             collection = npfc.flatten(llr, dateRange);
         } else {
             throw new IllegalArgumentException(
-                "Can't handle collection of type " + fc.getClass().getName());
+                    "Can't handle collection of type " + fc.getClass().getName());
         }
         //System.out.println("collection = " + collection.getClass().getName());
         //Trace.call1("FeatureDatasetPoint: calculating bounds");
@@ -1727,14 +1782,14 @@ public class PointObFactory {
         List<String> shortNamesList = new ArrayList<String>();
 
         log_.debug("number of data variables = " + numVars);
-        boolean[]        isVarNumeric = new boolean[numVars];
-        boolean          allReals     = true;
-        ScalarType[]     types        = new ScalarType[numVars];
-        Unit[]           varUnits     = new Unit[numVars];
+        boolean[] isVarNumeric = new boolean[numVars];
+        boolean allReals = true;
+        ScalarType[] types = new ScalarType[numVars];
+        Unit[] varUnits = new Unit[numVars];
 
         List<ScalarType> numericTypes = new ArrayList<ScalarType>();
-        List<Unit>       numericUnits = new ArrayList<Unit>();
-        List<ScalarType> stringTypes  = new ArrayList<ScalarType>();
+        List<Unit> numericUnits = new ArrayList<Unit>();
+        List<ScalarType> stringTypes = new ArrayList<ScalarType>();
 
         //If we really have a StationObsDataset then we need to add in the station id
         //into the data fields
@@ -1753,14 +1808,14 @@ public class PointObFactory {
         Trace.call1("FeatureDatasetPoint: getting variable info");
         int varIdx = varIdxBase;
         for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
-            VariableSimpleIF var       = (VariableSimpleIF) iter.next();
-            String           shortName = var.getShortName();
+            VariableSimpleIF var = (VariableSimpleIF) iter.next();
+            String shortName = var.getShortName();
             if (shortName.equals(_isMissing)) {
                 numVars--;
                 continue;
             }
             // make sure data is either numeric or string
-            if ( !((var.getDataType() == DataType.BYTE)
+            if (!((var.getDataType() == DataType.BYTE)
                     || (var.getDataType() == DataType.SHORT)
                     || (var.getDataType() == DataType.INT)
                     || (var.getDataType() == DataType.LONG)
@@ -1774,8 +1829,8 @@ public class PointObFactory {
             shortNamesList.add(shortName);
 
             isVarNumeric[varIdx] = !((var.getDataType() == DataType.STRING)
-                                     || (var.getDataType() == DataType.CHAR));
-            if ( !isVarNumeric[varIdx]) {
+                    || (var.getDataType() == DataType.CHAR));
+            if (!isVarNumeric[varIdx]) {
                 allReals = false;
             }
 
@@ -1795,7 +1850,7 @@ public class PointObFactory {
                 numericUnits.add(unit);
             } else {
                 types[varIdx] =
-                    DataUtil.makeTextType(Util.cleanName(var.getShortName()));
+                        DataUtil.makeTextType(Util.cleanName(var.getShortName()));
                 varUnits[varIdx] = null;
                 stringTypes.add(types[varIdx]);
             }
@@ -1805,60 +1860,60 @@ public class PointObFactory {
 
 
         String[] shortNames = (String[]) shortNamesList.toArray(
-                                  new String[shortNamesList.size()]);
+                new String[shortNamesList.size()]);
 
 
-        int       numReals     = numericTypes.size();
-        int       numStrings   = stringTypes.size();
-        int       obIdx        = 0;
-        int       NUM          = 500;
+        int numReals = numericTypes.size();
+        int numStrings = stringTypes.size();
+        int obIdx = 0;
+        int NUM = 500;
         TupleType allTupleType = (allReals
-                                  ? new RealTupleType(
-                                      (RealType[]) numericTypes.toArray(
-                                          new RealType[numericTypes.size()]))
-                                  : DoubleStringTuple.makeTupleType(
-                                      numericTypes, stringTypes));
+                ? new RealTupleType(
+                (RealType[]) numericTypes.toArray(
+                        new RealType[numericTypes.size()]))
+                : DoubleStringTuple.makeTupleType(
+                numericTypes, stringTypes));
         Unit[] allUnits =
-            (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
+                (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
 
 
-        int               listSize = (sample)
-                                     ? 1
-                                     : 100000;
-        Real              lat      = new Real(RealType.Latitude, 40);
-        Real              lon      = new Real(RealType.Longitude, -100);
-        Real              alt      = new Real(RealType.Altitude, 0);
-        DateTime          dateTime = null;
+        int listSize = (sample)
+                ? 1
+                : 100000;
+        Real lat = new Real(RealType.Latitude, 40);
+        Real lon = new Real(RealType.Longitude, -100);
+        Real alt = new Real(RealType.Altitude, 0);
+        DateTime dateTime = null;
         EarthLocationLite elt;
-        TupleType         finalTT = null;
-        PointObTuple      pot     = null;
-        List<Tuple>       tuples  = new ArrayList<Tuple>(listSize);
-        List<DateTime>    times   = new ArrayList<DateTime>(listSize);
+        TupleType finalTT = null;
+        PointObTuple pot = null;
+        List<Tuple> tuples = new ArrayList<Tuple>(listSize);
+        List<DateTime> times = new ArrayList<DateTime>(listSize);
         List<EarthLocationLite> elts =
-            new ArrayList<EarthLocationLite>(listSize);
+                new ArrayList<EarthLocationLite>(listSize);
 
         StructureMembers.Member member;
         Trace.call1("FeatureDatasetPoint: iterating on PointFeatures",
-                    "sample = " + sample);
-        int     missing    = 0;
-        int     ismissing  = 0;
+                "sample = " + sample);
+        int missing = 0;
+        int ismissing = 0;
         boolean iammissing = false;
-        String  svalue     = "missing";
-        float   value      = Float.NaN;
+        String svalue = "missing";
+        float value = Float.NaN;
         // if we are only getting a sample there's no need to use the iterator
         if (sample) {
             obIdx++;
             elt = new EarthLocationLite(lat, lon, alt);
-            double[] realArray   = new double[numReals];
+            double[] realArray = new double[numReals];
             String[] stringArray = ((numStrings == 0)
-                                    ? null
-                                    : new String[numStrings]);
+                    ? null
+                    : new String[numStrings]);
 
             // make the VisAD data object
             int stringCnt = 0;
-            int realCnt   = 0;
+            int realCnt = 0;
             for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
-                if ( !isVarNumeric[varIdx]) {
+                if (!isVarNumeric[varIdx]) {
                     stringArray[stringCnt++] = svalue;
                 } else {
                     realArray[realCnt++] = value;
@@ -1866,37 +1921,37 @@ public class PointObFactory {
             }
 
             Tuple tuple = (allReals
-                           ? (Tuple) new DoubleTuple(
-                               (RealTupleType) allTupleType, realArray,
-                               allUnits)
-                           : new DoubleStringTuple(allTupleType, realArray,
-                               stringArray, allUnits));
+                    ? (Tuple) new DoubleTuple(
+                    (RealTupleType) allTupleType, realArray,
+                    allUnits)
+                    : new DoubleStringTuple(allTupleType, realArray,
+                    stringArray, allUnits));
 
             tuples.add(tuple);
             times.add(new DateTime(0));
             elts.add(elt);
         } else {
             PointFeatureIterator dataIterator =
-            //collection.getPointFeatureIterator(-1);
-            collection.getPointFeatureIterator(16384);
+                    //collection.getPointFeatureIterator(-1);
+                    collection.getPointFeatureIterator(16384);
             while (dataIterator.hasNext()) {
                 PointFeature po = (PointFeature) dataIterator.next();
                 iammissing = false;
                 obIdx++;
                 ucar.unidata.geoloc.EarthLocation el = po.getLocation();
                 elt = new EarthLocationLite(
-                    lat.cloneButValue(el.getLatitude()),
-                    lon.cloneButValue(el.getLongitude()),
-                    alt.cloneButValue(el.getAltitude()));
-                double[] realArray   = new double[numReals];
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(el.getAltitude()));
+                double[] realArray = new double[numReals];
                 String[] stringArray = ((numStrings == 0)
-                                        ? null
-                                        : new String[numStrings]);
+                        ? null
+                        : new String[numStrings]);
 
                 // make the VisAD data object
                 StructureData structure = po.getData();
-                int           stringCnt = 0;
-                int           realCnt   = 0;
+                int stringCnt = 0;
+                int realCnt = 0;
                 if (needToAddStationId) {
                     StationObsDatatype sod = (StationObsDatatype) po;
                     stringArray[stringCnt++] = sod.getStation().getName();
@@ -1917,11 +1972,11 @@ public class PointObFactory {
 
                 for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
                     member =
-                        structure.findMember((String) shortNames[varIdx]);
+                            structure.findMember((String) shortNames[varIdx]);
                     if (member == null) {
                         continue;
                     }
-                    if ( !isVarNumeric[varIdx]) {
+                    if (!isVarNumeric[varIdx]) {
                         svalue = structure.getScalarString(member);
                         if (svalue.length() != 0) {
                             allMissing = false;
@@ -1946,18 +2001,18 @@ public class PointObFactory {
                 }
 
                 Tuple tuple = (allReals
-                               ? (Tuple) new DoubleTuple(
-                                   (RealTupleType) allTupleType, realArray,
-                                   allUnits)
-                               : new DoubleStringTuple(allTupleType,
-                                   realArray, stringArray, allUnits));
+                        ? (Tuple) new DoubleTuple(
+                        (RealTupleType) allTupleType, realArray,
+                        allUnits)
+                        : new DoubleStringTuple(allTupleType,
+                        realArray, stringArray, allUnits));
 
                 tuples.add(tuple);
                 times.add(new DateTime(po.getNominalTimeAsDate()));
                 elts.add(elt);
 
                 if (obIdx % NUM == 0) {
-                    if ( !JobManager.getManager().canContinue(loadId)) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
                         LogUtil.message("");
                         return null;
                     }
@@ -1965,8 +2020,8 @@ public class PointObFactory {
                 }
             }
             Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
-                        "found " + ismissing + "/" + missing
-                        + " missing out of " + obIdx);
+                    "found " + ismissing + "/" + missing
+                            + " missing out of " + obIdx);
             dataIterator.finish();
         }
         if (tuples.isEmpty()) {
@@ -1980,17 +2035,17 @@ public class PointObFactory {
 
 
         Trace.call1("FeatureDatasetPoint: making PointObTuples");
-        PointOb[] obs  = new PointOb[tuples.size()];
-        int       size = tuples.size();
+        PointOb[] obs = new PointOb[tuples.size()];
+        int size = tuples.size();
         for (int i = 0; i < size; i++) {
 
             if (finalTT == null) {
                 pot = new PointObTuple(elts.get(i), (DateTime) times.get(i),
-                                       tuples.get(i));
+                        tuples.get(i));
                 finalTT = Tuple.buildTupleType(pot.getComponents());
             } else {
                 pot = new PointObTuple(elts.get(i), (DateTime) times.get(i),
-                                       tuples.get(i), finalTT, false);
+                        tuples.get(i), finalTT, false);
 
             }
             obs[i] = pot;
@@ -2002,11 +2057,11 @@ public class PointObFactory {
         LogUtil.message("Processing point data");
 
         Integer1DSet indexSet =
-            new Integer1DSet(RealType.getRealType("index"), obs.length);
+                new Integer1DSet(RealType.getRealType("index"), obs.length);
         FieldImpl retField =
-            new FieldImpl(
-                new FunctionType(((SetType) indexSet.getType()).getDomain(),
-                                 obs[0].getType()), indexSet);
+                new FieldImpl(
+                        new FunctionType(((SetType) indexSet.getType()).getDomain(),
+                                obs[0].getType()), indexSet);
         retField.setSamples(obs, false, false);
         return retField;
     }
@@ -2014,15 +2069,13 @@ public class PointObFactory {
     /**
      * _more_
      *
-     * @param input _more_
-     * @param binRoundTo _more_
-     * @param binWidth _more_
-     * @param llr _more_
+     * @param input         _more_
+     * @param binRoundTo    _more_
+     * @param binWidth      _more_
+     * @param llr           _more_
      * @param dateSelection _more_
-     * @param sample _more_
-     *
+     * @param sample        _more_
      * @return _more_
-     *
      * @throws Exception _more_
      */
     public static FieldImpl makePointObsWRF(FeatureDatasetPoint input,
@@ -2033,24 +2086,23 @@ public class PointObFactory {
             throws Exception {
 
 
-
-        Object  loadId = JobManager.getManager().startLoad("PointObFactory");
-        double  defOrder           = 0.0;
-        List    actualVariables    = input.getDataVariables();
-        int     numVars            = actualVariables.size();
-        String  _isMissing         = "_isMissing";
+        Object loadId = JobManager.getManager().startLoad("PointObFactory");
+        double defOrder = 0.0;
+        List actualVariables = input.getDataVariables();
+        int numVars = actualVariables.size();
+        String _isMissing = "_isMissing";
 
         boolean needToAddStationId = false;
-        String  stationFieldName   = null;
+        String stationFieldName = null;
 
         // make sure we can read this kind of data
         List<FeatureCollection> collectionList =
-            input.getPointFeatureCollectionList();
+                input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {
             throw new IllegalArgumentException(
-                "Can't handle point data with multiple collections");
+                    "Can't handle point data with multiple collections");
         }
-        FeatureCollection      fc         = collectionList.get(0);
+        FeatureCollection fc = collectionList.get(0);
         PointFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
         DateRange dateRange = null;
@@ -2059,14 +2111,14 @@ public class PointObFactory {
                 List<Date> range = dateSelection.getTimes();
                 Collections.sort(range);
                 dateRange = new DateRange(range.get(0),
-                                          range.get(range.size() - 1));
+                        range.get(range.size() - 1));
             } else if (dateSelection.hasInterval()) {
                 double interval = dateSelection.getInterval();
-                int    count    = dateSelection.getCount();
-                long   timespan = (long) interval * count;
-                Date   now      = new Date();
+                int count = dateSelection.getCount();
+                long timespan = (long) interval * count;
+                Date now = new Date();
                 dateRange = new DateRange(new Date(now.getTime() - timespan),
-                                          now);
+                        now);
             }
         }
         //if (dateRange == null) {
@@ -2079,14 +2131,16 @@ public class PointObFactory {
             }
         } else if (fc instanceof NestedPointFeatureCollection) {
             NestedPointFeatureCollection npfc =
-                (NestedPointFeatureCollection) fc;
+                    (NestedPointFeatureCollection) fc;
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
-            collection = npfc.flatten(llr, dateRange);
+            if ((llr != null) || (dateRange != null)) {
+                collection = npfc.flatten(llr, dateRange);
+            }
         } else {
             throw new IllegalArgumentException(
-                "Can't handle collection of type " + fc.getClass().getName());
+                    "Can't handle collection of type " + fc.getClass().getName());
         }
         //System.out.println("collection = " + collection.getClass().getName());
         //Trace.call1("FeatureDatasetPoint: calculating bounds");
@@ -2110,14 +2164,14 @@ public class PointObFactory {
         List<String> shortNamesList = new ArrayList<String>();
 
         log_.debug("number of data variables = " + numVars);
-        boolean[]        isVarNumeric = new boolean[numVars];
-        boolean          allReals     = true;
-        ScalarType[]     types        = new ScalarType[numVars];
-        Unit[]           varUnits     = new Unit[numVars];
+        boolean[] isVarNumeric = new boolean[numVars];
+        boolean allReals = true;
+        ScalarType[] types = new ScalarType[numVars];
+        Unit[] varUnits = new Unit[numVars];
 
         List<ScalarType> numericTypes = new ArrayList<ScalarType>();
-        List<Unit>       numericUnits = new ArrayList<Unit>();
-        List<ScalarType> stringTypes  = new ArrayList<ScalarType>();
+        List<Unit> numericUnits = new ArrayList<Unit>();
+        List<ScalarType> stringTypes = new ArrayList<ScalarType>();
 
         //If we really have a StationObsDataset then we need to add in the station id
         //into the data fields
@@ -2136,13 +2190,13 @@ public class PointObFactory {
         Trace.call1("FeatureDatasetPoint: getting variable info");
         int varIdx = varIdxBase;
         for (Iterator iter = actualVariables.iterator(); iter.hasNext(); ) {
-            VariableSimpleIF var       = (VariableSimpleIF) iter.next();
-            String           shortName = var.getShortName();
+            VariableSimpleIF var = (VariableSimpleIF) iter.next();
+            String shortName = var.getShortName();
             if (shortName.equals(_isMissing)) {
                 numVars--;
                 continue;
             }
-            if ( !shortName.equals("streamflow")
+            if (!shortName.equals("streamflow")
                     && !shortName.equals("order")) {
                 numVars--;
                 continue;
@@ -2152,7 +2206,7 @@ public class PointObFactory {
                 varIdx = 1;
             }
             // make sure data is either numeric or string
-            if ( !((var.getDataType() == DataType.BYTE)
+            if (!((var.getDataType() == DataType.BYTE)
                     || (var.getDataType() == DataType.SHORT)
                     || (var.getDataType() == DataType.INT)
                     || (var.getDataType() == DataType.LONG)
@@ -2166,8 +2220,8 @@ public class PointObFactory {
             shortNamesList.add(shortName);
 
             isVarNumeric[varIdx] = !((var.getDataType() == DataType.STRING)
-                                     || (var.getDataType() == DataType.CHAR));
-            if ( !isVarNumeric[varIdx]) {
+                    || (var.getDataType() == DataType.CHAR));
+            if (!isVarNumeric[varIdx]) {
                 allReals = false;
             }
 
@@ -2187,7 +2241,7 @@ public class PointObFactory {
                 numericUnits.add(unit);
             } else {
                 types[varIdx] =
-                    DataUtil.makeTextType(Util.cleanName(var.getShortName()));
+                        DataUtil.makeTextType(Util.cleanName(var.getShortName()));
                 varUnits[varIdx] = null;
                 stringTypes.add(types[varIdx]);
             }
@@ -2197,60 +2251,60 @@ public class PointObFactory {
 
 
         String[] shortNames = (String[]) shortNamesList.toArray(
-                                  new String[shortNamesList.size()]);
+                new String[shortNamesList.size()]);
 
 
-        int       numReals     = numericTypes.size();
-        int       numStrings   = stringTypes.size();
-        int       obIdx        = 0;
-        int       NUM          = 5000;
+        int numReals = numericTypes.size();
+        int numStrings = stringTypes.size();
+        int obIdx = 0;
+        int NUM = 5000;
         TupleType allTupleType = (allReals
-                                  ? new RealTupleType(
-                                      (RealType[]) numericTypes.toArray(
-                                          new RealType[numericTypes.size()]))
-                                  : DoubleStringTuple.makeTupleType(
-                                      numericTypes, stringTypes));
+                ? new RealTupleType(
+                (RealType[]) numericTypes.toArray(
+                        new RealType[numericTypes.size()]))
+                : DoubleStringTuple.makeTupleType(
+                numericTypes, stringTypes));
         Unit[] allUnits =
-            (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
+                (Unit[]) numericUnits.toArray(new Unit[numericUnits.size()]);
 
 
-        int               listSize = (sample)
-                                     ? 1
-                                     : 100000;
-        Real              lat      = new Real(RealType.Latitude, 40);
-        Real              lon      = new Real(RealType.Longitude, -100);
-        Real              alt      = new Real(RealType.Altitude, 0);
-        DateTime          dateTime = null;
+        int listSize = (sample)
+                ? 1
+                : 100000;
+        Real lat = new Real(RealType.Latitude, 40);
+        Real lon = new Real(RealType.Longitude, -100);
+        Real alt = new Real(RealType.Altitude, 0);
+        DateTime dateTime = null;
         EarthLocationLite elt;
-        TupleType         finalTT = null;
-        PointObTuple      pot     = null;
-        List<Tuple>       tuples  = new ArrayList<Tuple>(listSize);
-        List<DateTime>    times   = new ArrayList<DateTime>(listSize);
+        TupleType finalTT = null;
+        PointObTuple pot = null;
+        List<Tuple> tuples = new ArrayList<Tuple>(listSize);
+        List<DateTime> times = new ArrayList<DateTime>(listSize);
         List<EarthLocationLite> elts =
-            new ArrayList<EarthLocationLite>(listSize);
+                new ArrayList<EarthLocationLite>(listSize);
 
         StructureMembers.Member member;
         Trace.call1("FeatureDatasetPoint: iterating on PointFeatures",
-                    "sample = " + sample);
-        int     missing    = 0;
-        int     ismissing  = 0;
+                "sample = " + sample);
+        int missing = 0;
+        int ismissing = 0;
         boolean iammissing = false;
-        String  svalue     = "missing";
-        float   value      = Float.NaN;
+        String svalue = "missing";
+        float value = Float.NaN;
         // if we are only getting a sample there's no need to use the iterator
         if (sample) {
             obIdx++;
             elt = new EarthLocationLite(lat, lon, alt);
-            double[] realArray   = new double[numReals];
+            double[] realArray = new double[numReals];
             String[] stringArray = ((numStrings == 0)
-                                    ? null
-                                    : new String[numStrings]);
+                    ? null
+                    : new String[numStrings]);
 
             // make the VisAD data object
             int stringCnt = 0;
-            int realCnt   = 0;
+            int realCnt = 0;
             for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
-                if ( !isVarNumeric[varIdx]) {
+                if (!isVarNumeric[varIdx]) {
                     stringArray[stringCnt++] = svalue;
                 } else {
                     realArray[realCnt++] = value;
@@ -2258,100 +2312,112 @@ public class PointObFactory {
             }
 
             Tuple tuple = (allReals
-                           ? (Tuple) new DoubleTuple(
-                               (RealTupleType) allTupleType, realArray,
-                               allUnits)
-                           : new DoubleStringTuple(allTupleType, realArray,
-                               stringArray, allUnits));
+                    ? (Tuple) new DoubleTuple(
+                    (RealTupleType) allTupleType, realArray,
+                    allUnits)
+                    : new DoubleStringTuple(allTupleType, realArray,
+                    stringArray, allUnits));
 
             tuples.add(tuple);
             times.add(new DateTime(0));
             elts.add(elt);
         } else {
-            NetcdfDataset netcdfDataset =
-                (NetcdfDataset) input.getNetcdfFile();
-            List coords = netcdfDataset.getCoordinateAxes();
-            List vars = netcdfDataset.getVariables();
-            ucar.nc2.dataset.VariableDS vds0 = null;  //(ucar.nc2.dataset.VariableDS)vars.get(2);
-            ucar.nc2.dataset.VariableDS vds1 = null;  //(ucar.nc2.dataset.VariableDS)vars.get(0);
-            for (int i = 0; i < vars.size(); i++) {
-                if (vars.get(i) instanceof ucar.nc2.dataset.VariableDS) {
-                    ucar.nc2.dataset.VariableDS vds =
-                        (ucar.nc2.dataset.VariableDS) vars.get(i);
-                    if (vds.getShortName().equals("order")) {
-                        vds0 = vds;
-                    } else if (vds.getShortName().equals("streamflow")) {
-                        vds1 = vds;
+            PointFeatureIterator dataIterator =
+                    //collection.getPointFeatureIterator(-1);
+                    collection.getPointFeatureIterator(16384);
+            while (dataIterator.hasNext()) {
+                PointFeature po = (PointFeature) dataIterator.next();
+                iammissing = false;
+                obIdx++;
+                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+                double elt0 = 0.0;
+                if (el.getAltitude() == el.getAltitude()) {
+                    elt0 = el.getAltitude();
+                }
+                elt = new EarthLocationLite(
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(elt0));
+                double[] realArray = new double[numReals];
+                String[] stringArray = ((numStrings == 0)
+                        ? null
+                        : new String[numStrings]);
+
+                // make the VisAD data object
+                StructureData structure = po.getData();
+                int stringCnt = 0;
+                int realCnt = 0;
+                if (needToAddStationId) {
+                    StationObsDatatype sod = (StationObsDatatype) po;
+                    stringArray[stringCnt++] = sod.getStation().getName();
+                }
+                boolean allMissing = true;
+
+                // check for a missing flag
+                member = structure.findMember(_isMissing);
+                if (member != null) {
+                    value = structure.convertScalarInt(member);
+                    if (value == 1) {
+                        iammissing = true;
+                        ismissing++;
+                        missing++;
+                        continue;
                     }
                 }
-            }
-            //ucar.nc2.dataset.VariableDS vds2 = (ucar.nc2.dataset.VariableDS)vars.get(1);
-            CoordinateAxis1D lats = null;
-            CoordinateAxis1D lons = null;
-            CoordinateAxis1D alts = null;
-            CoordinateAxis1D ttts = null;
-            if (coords.size() == 4) {
-                lats = (CoordinateAxis1D) coords.get(0);
-                lons = (CoordinateAxis1D) coords.get(1);
-                alts = (CoordinateAxis1D) coords.get(2);
-                ttts = (CoordinateAxis1D) coords.get(3);
-            } else if (coords.size() == 3) {
-                lats = (CoordinateAxis1D) coords.get(1);
-                lons = (CoordinateAxis1D) coords.get(2);
-                //CoordinateAxis1D alts = (CoordinateAxis1D)coords.get(2);
-                ttts = (CoordinateAxis1D) coords.get(0);
-            }
-            int      ssize = (int) lats.getSize();
-            double[] dlats = lats.getCoordValues();
-            double[] dlons = lons.getCoordValues();
-            double[] dalts = new double[ssize];
-            if (alts != null) {
-                dalts = alts.getCoordValues();
-            }
-            double[] dttts = ttts.getCoordValues();
 
-            int[] sdata0 =
-                (int[]) (vds0.getOriginalVariable().read()
-                .copyTo1DJavaArray());
-            float[] sdata1 =
-                (float[]) (vds1.getOriginalVariable().read()
-                .copyTo1DJavaArray());
-
-            for (int i = 0; i < ssize; i++) {
-                if (alts == null) {
-                    dalts[i] = 0.0;
+                for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
+                    member =
+                            structure.findMember((String) shortNames[varIdx]);
+                    if (member == null) {
+                        continue;
+                    }
+                    if (!isVarNumeric[varIdx]) {
+                        svalue = structure.getScalarString(member);
+                        if (svalue.length() != 0) {
+                            allMissing = false;
+                        }
+                        stringArray[stringCnt++] = svalue;
+                    } else {
+                        value = structure.convertScalarFloat(member);
+                        if (value == value) {
+                            allMissing = false;
+                        }
+                        realArray[realCnt++] = value;
+                    }
                 }
-                String   ustr = ttts.getUnitsString();
-                double   hh   = dttts[0];
-                DateTime time = new DateTime(hh, Util.parseUnit(ustr));
-                elt = new EarthLocationLite(dlats[i], dlons[i], dalts[i]);
+                /*
+                if (allMissing  && !iammissing) {
+                    System.out.println("has all missing, but not iammissing: " + el);
+                }
+                */
+                if (allMissing) {
+                    missing++;
+                    continue;
+                }
 
-                double[] realArray = new double[2];
+                Tuple tuple = (allReals
+                        ? (Tuple) new DoubleTuple(
+                        (RealTupleType) allTupleType, realArray,
+                        allUnits)
+                        : new DoubleStringTuple(allTupleType,
+                        realArray, stringArray, allUnits));
 
-                realArray[0] = sdata0[i];
-                realArray[1] = sdata1[i];
-                //if(realArray[0] >= defOrder) {
-                Tuple tuple = new DoubleTuple((RealTupleType) allTupleType,
-                                  realArray, allUnits);
-
-                elts.add(elt);
                 tuples.add(tuple);
-                times.add(time);
-                obIdx++;
-                //}
+                times.add(new DateTime(po.getNominalTimeAsDate()));
+                elts.add(elt);
+
                 if (obIdx % NUM == 0) {
-                    if ( !JobManager.getManager().canContinue(loadId)) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
                         LogUtil.message("");
                         return null;
                     }
                     LogUtil.message("Read " + obIdx + " observations");
                 }
             }
-
             Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
-                        "found " + ismissing + "/" + missing
-                        + " missing out of " + obIdx);
-            netcdfDataset.finish();
+                    "found " + ismissing + "/" + missing
+                            + " missing out of " + obIdx);
+            dataIterator.finish();
         }
         if (tuples.isEmpty()) {
             return null;
@@ -2364,17 +2430,17 @@ public class PointObFactory {
 
 
         Trace.call1("FeatureDatasetPoint: making PointObTuples");
-        PointOb[] obs  = new PointOb[tuples.size()];
-        int       size = tuples.size();
+        PointOb[] obs = new PointOb[tuples.size()];
+        int size = tuples.size();
         for (int i = 0; i < size; i++) {
 
             if (finalTT == null) {
                 pot = new PointObTuple(elts.get(i), (DateTime) times.get(i),
-                                       tuples.get(i));
+                        tuples.get(i));
                 finalTT = Tuple.buildTupleType(pot.getComponents());
             } else {
                 pot = new PointObTuple(elts.get(i), (DateTime) times.get(i),
-                                       tuples.get(i), finalTT, false);
+                        tuples.get(i), finalTT, false);
 
             }
             obs[i] = pot;
@@ -2386,11 +2452,11 @@ public class PointObFactory {
         LogUtil.message("Processing point data");
 
         Integer1DSet indexSet =
-            new Integer1DSet(RealType.getRealType("index"), obs.length);
+                new Integer1DSet(RealType.getRealType("index"), obs.length);
         FieldImpl retField =
-            new FieldImpl(
-                new FunctionType(((SetType) indexSet.getType()).getDomain(),
-                                 obs[0].getType()), indexSet);
+                new FieldImpl(
+                        new FunctionType(((SetType) indexSet.getType()).getDomain(),
+                                obs[0].getType()), indexSet);
         retField.setSamples(obs, false, false);
         return retField;
 
@@ -2399,9 +2465,9 @@ public class PointObFactory {
 
     /**
      * Merge a List of FieldImpls of point obs into one.
-     * @param datas   List of FieldImpls of point obs
-     * @return merged FieldImpl
      *
+     * @param datas List of FieldImpls of point obs
+     * @return merged FieldImpl
      * @throws VisADException problem getting the data
      */
     public static FieldImpl mergeData(List datas) throws VisADException {
@@ -2417,7 +2483,7 @@ public class PointObFactory {
             int numObs = 0;
             for (int i = 0; i < datas.size(); i++) {
                 numObs +=
-                    ((FieldImpl) datas.get(i)).getDomainSet().getLength();
+                        ((FieldImpl) datas.get(i)).getDomainSet().getLength();
             }
             int curPos = 0;
             for (int i = 0; i < datas.size(); i++) {
@@ -2425,15 +2491,15 @@ public class PointObFactory {
                 if (i == 0) {
                     FunctionType retType = (FunctionType) data.getType();
                     retField =
-                        new FieldImpl(retType,
-                                      new Integer1DSet(retType.getDomain(),
-                                              numObs));
+                            new FieldImpl(retType,
+                                    new Integer1DSet(retType.getDomain(),
+                                            numObs));
                 }
 
                 int length = data.getDomainSet().getLength();
                 for (int j = 0; j < length; j++) {
                     retField.setSample(curPos, data.getSample(j), false,
-                                       false);
+                            false);
                     curPos++;
                 }
             }
@@ -2446,11 +2512,11 @@ public class PointObFactory {
     /**
      * Make a PointOb from an EarthLocation.  The time and data
      * are bogus.
-     * @param el  EarthLocation to use
-     * @return PointOb
      *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @param el EarthLocation to use
+     * @return PointOb
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static PointOb makePointOb(EarthLocation el)
             throws VisADException, RemoteException {
@@ -2460,30 +2526,28 @@ public class PointObFactory {
     /**
      * Make a PointOb from an EarthLocation.  The time and data
      * are bogus.
-     * @param el  EarthLocation to use
-     * @param dt  DateTime to use
-     * @return PointOb
      *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @param el EarthLocation to use
+     * @param dt DateTime to use
+     * @return PointOb
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static PointOb makePointOb(EarthLocation el, DateTime dt)
             throws VisADException, RemoteException {
-        return makePointOb(el, dt, new RealTuple(new Real[] { new Real(0) }));
+        return makePointOb(el, dt, new RealTuple(new Real[]{new Real(0)}));
     }
 
 
     /**
      * Make a point ob
      *
-     * @param el earth location
-     * @param dt date time
-     * @param tuple  data
-     *
+     * @param el    earth location
+     * @param dt    date time
+     * @param tuple data
      * @return the point ob
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static PointOb makePointOb(EarthLocation el, DateTime dt,
                                       Tuple tuple)
@@ -2497,11 +2561,11 @@ public class PointObFactory {
     /**
      * Make a FieldImpl of PointOb-s from an EarthLocation.  The time and data
      * are bogus.
-     * @param el  EarthLocation to use
-     * @return FieldImpl of index-&gt;po
      *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @param el EarthLocation to use
+     * @return FieldImpl of index-&gt;po
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FieldImpl makePointObs(EarthLocation el)
             throws VisADException, RemoteException {
@@ -2511,12 +2575,12 @@ public class PointObFactory {
     /**
      * Make a FieldImpl of PointOb-s from an EarthLocation.  The time and data
      * are bogus.
-     * @param el  EarthLocation to use
-     * @param dt  DateTime to use
-     * @return FieldImpl of index-&gt;po
      *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @param el EarthLocation to use
+     * @param dt DateTime to use
+     * @return FieldImpl of index-&gt;po
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FieldImpl makePointObs(EarthLocation el, DateTime dt)
             throws VisADException, RemoteException {
@@ -2529,18 +2593,17 @@ public class PointObFactory {
      *
      * @param po The ob
      * @return FieldImpl of index-&gt;po
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FieldImpl makePointObs(PointOb po)
             throws VisADException, RemoteException {
 
         RealType index = RealType.getRealType("index");
         FieldImpl stationField = new FieldImpl(new FunctionType(index,
-                                                                po.getType()), new Integer1DSet(
-                                                                    index,
-                                                                            1));
+                po.getType()), new Integer1DSet(
+                index,
+                1));
         stationField.setSample(0, po, false);
         return stationField;
     }
@@ -2549,21 +2612,19 @@ public class PointObFactory {
      * Remove the time dimension from a field of point obs, returning
      * just and indexed list of the obs
      *
-     * @param pointObs  time field of obs
-     *
+     * @param pointObs time field of obs
      * @return indexed list of obs
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FieldImpl removeTimeDimension(FieldImpl pointObs)
             throws VisADException, RemoteException {
-        if ( !GridUtil.isTimeSequence(pointObs)) {
+        if (!GridUtil.isTimeSequence(pointObs)) {
             return pointObs;
         }
-        Set          timeSet = pointObs.getDomainSet();
-        List         l       = new ArrayList();
-        FunctionType ft      = null;
+        Set timeSet = pointObs.getDomainSet();
+        List l = new ArrayList();
+        FunctionType ft = null;
         for (int i = 0; i < timeSet.getLength(); i++) {
             FieldImpl indexField = (FieldImpl) pointObs.getSample(i, false);
             if (ft == null) {
@@ -2577,9 +2638,9 @@ public class PointObFactory {
                 l.add(d);
             }
         }
-        RealTupleType rt       = ft.getDomain();
-        Integer1DSet  domain   = new Integer1DSet(rt, l.size());
-        FieldImpl     retField = new FieldImpl(ft, domain);
+        RealTupleType rt = ft.getDomain();
+        Integer1DSet domain = new Integer1DSet(rt, l.size());
+        FieldImpl retField = new FieldImpl(ft, domain);
         for (int i = 0; i < l.size(); i++) {
             retField.setSample(i, (Data) l.get(i), false, false);
         }
@@ -2587,44 +2648,40 @@ public class PointObFactory {
     }
 
     /**
-     *  Perform an object analysis on a set of point obs
+     * Perform an object analysis on a set of point obs
      *
-     * @param pointObs Observations to analyze
-     * @param type  RealTypes of parameter
+     * @param pointObs  Observations to analyze
+     * @param type      RealTypes of parameter
      * @param xSpacing  x spacing (degrees)
      * @param ySpacing  y spacing (degrees)
      * @param numPasses number of passes
-     *
-     * @return  Grid of objectively analyzed data
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @return Grid of objectively analyzed data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FieldImpl barnes(FieldImpl pointObs, RealType type,
                                    float xSpacing, float ySpacing,
                                    int numPasses)
             throws VisADException, RemoteException {
         return barnes(pointObs, type, xSpacing, ySpacing, numPasses, 10f,
-                      1.0f, null, null);
+                1.0f, null, null);
     }
 
     /**
-     *  Perform an object analysis on a set of point obs
+     * Perform an object analysis on a set of point obs
      *
-     * @param pointObs Observations to analyze
-     * @param type  RealTypes of parameter
-     * @param xSpacing  x spacing (degrees)
-     * @param ySpacing  y spacing (degrees)
-     * @param numPasses number of passes
-     * @param gain      grid convergence/pass
-     * @param scaleLength  search radius
-     * @param params       analysis parameters - used to pass back computed vals
+     * @param pointObs        Observations to analyze
+     * @param type            RealTypes of parameter
+     * @param xSpacing        x spacing (degrees)
+     * @param ySpacing        y spacing (degrees)
+     * @param numPasses       number of passes
+     * @param gain            grid convergence/pass
+     * @param scaleLength     search radius
+     * @param params          analysis parameters - used to pass back computed vals
      * @param firstGuessField The data to use for a first guess. May be null.
-     *
-     * @return  Grid of objectively analyzed data
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @return Grid of objectively analyzed data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FieldImpl barnes(FieldImpl pointObs, RealType type,
                                    float xSpacing, float ySpacing,
@@ -2637,16 +2694,16 @@ public class PointObFactory {
         // System.err.println("xspacing: " + xSpacing+" ySpacing:" + ySpacing);
         boolean haveGuess = firstGuessField != null;
         boolean guessIsTime = (firstGuessField != null)
-                              && GridUtil.isTimeSequence(firstGuessField);
+                && GridUtil.isTimeSequence(firstGuessField);
         if (haveGuess && guessIsTime && GridUtil.isTimeSequence(pointObs)) {
             firstGuessField =
-                (FieldImpl) firstGuessField.resample(pointObs.getDomainSet(),
-                    Data.NEAREST_NEIGHBOR, Data.NO_ERRORS);
+                    (FieldImpl) firstGuessField.resample(pointObs.getDomainSet(),
+                            Data.NEAREST_NEIGHBOR, Data.NO_ERRORS);
         }
         FlatField guessField = null;
 
         if (GridUtil.isTimeSequence(pointObs)) {
-            Set timeSet    = GridUtil.getTimeSet(pointObs);
+            Set timeSet = GridUtil.getTimeSet(pointObs);
             int errorCount = 0;
             for (int i = 0; i < timeSet.getLength(); i++) {
                 if (haveGuess) {
@@ -2659,22 +2716,22 @@ public class PointObFactory {
                     if (guessField.isMissing()) {
                         if (errorCount == 0) {
                             LogUtil.userMessage(
-                                log_,
-                                "Unable to find matching time for first guess");
+                                    log_,
+                                    "Unable to find matching time for first guess");
                         }
                         guessField = null;
                         errorCount++;
                     }
                 }
                 FieldImpl oneTime =
-                    barnesOneTime((FieldImpl) pointObs.getSample(i), type,
-                                  xSpacing, ySpacing, numPasses, gain,
-                                  scaleLength, params, guessField);
+                        barnesOneTime((FieldImpl) pointObs.getSample(i), type,
+                                xSpacing, ySpacing, numPasses, gain,
+                                scaleLength, params, guessField);
                 if ((retFI == null) && (oneTime != null)) {
                     FunctionType ft =
-                        new FunctionType(
-                            ((SetType) timeSet.getType()).getDomain(),
-                            oneTime.getType());
+                            new FunctionType(
+                                    ((SetType) timeSet.getType()).getDomain(),
+                                    oneTime.getType());
                     retFI = new FieldImpl(ft, timeSet);
                 }
                 if (oneTime != null) {
@@ -2691,52 +2748,48 @@ public class PointObFactory {
                 }
             }
             retFI = barnesOneTime(pointObs, type, xSpacing, ySpacing,
-                                  numPasses, gain, scaleLength, params,
-                                  guessField);
+                    numPasses, gain, scaleLength, params,
+                    guessField);
         }
         return retFI;
     }
 
     /**
      * Do the analysis on the single time.  Should be of the structure:
-     *  (index -> PointOb)
+     * (index -> PointOb)
      *
-     * @param pointObs Observations to analyze
-     * @param type  RealTypes of parameter
+     * @param pointObs  Observations to analyze
+     * @param type      RealTypes of parameter
      * @param xSpacing  x spacing (degrees)
      * @param ySpacing  y spacing (degrees)
      * @param numPasses number of passes
-     *
-     * @return  Grid of objectively analyzed data
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @return Grid of objectively analyzed data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
                                           float xSpacing, float ySpacing,
                                           int numPasses)
             throws VisADException, RemoteException {
         return barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses,
-                             10f, 1.0f, null);
+                10f, 1.0f, null);
     }
 
     /**
      * Do the analysis on the single time.  Should be of the structure:
-     *  (index -> PointOb)
+     * (index -> PointOb)
      *
-     * @param pointObs Observations to analyze
-     * @param type  RealTypes of parameter
-     * @param xSpacing  x spacing (degrees)
-     * @param ySpacing  y spacing (degrees)
-     * @param numPasses number of passes
-     * @param gain      grid convergence/pass
-     * @param scaleLength  search radius
-     * @param params       analysis parameters - used to pass back computed vals
-     *
-     * @return  Grid of objectively analyzed data
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @param pointObs    Observations to analyze
+     * @param type        RealTypes of parameter
+     * @param xSpacing    x spacing (degrees)
+     * @param ySpacing    y spacing (degrees)
+     * @param numPasses   number of passes
+     * @param gain        grid convergence/pass
+     * @param scaleLength search radius
+     * @param params      analysis parameters - used to pass back computed vals
+     * @return Grid of objectively analyzed data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
                                           float xSpacing, float ySpacing,
@@ -2745,27 +2798,25 @@ public class PointObFactory {
                                           Barnes.AnalysisParameters params)
             throws VisADException, RemoteException {
         return barnesOneTime(pointObs, type, xSpacing, ySpacing, numPasses,
-                             gain, scaleLength, params, null);
+                gain, scaleLength, params, null);
     }
 
     /**
      * Do the analysis on the single time.  Should be of the structure:
-     *  (index -> PointOb)
+     * (index -> PointOb)
      *
-     * @param pointObs Observations to analyze
-     * @param type  RealTypes of parameter
-     * @param xSpacing  x spacing (degrees)
-     * @param ySpacing  y spacing (degrees)
-     * @param numPasses number of passes
-     * @param gain      grid convergence/pass
-     * @param scaleLength  search radius
-     * @param params       analysis parameters - used to pass back computed vals
-     * @param firstGuess   analysis parameters - used to pass back computed vals
-     *
-     * @return  Grid of objectively analyzed data
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException problem getting the data
+     * @param pointObs    Observations to analyze
+     * @param type        RealTypes of parameter
+     * @param xSpacing    x spacing (degrees)
+     * @param ySpacing    y spacing (degrees)
+     * @param numPasses   number of passes
+     * @param gain        grid convergence/pass
+     * @param scaleLength search radius
+     * @param params      analysis parameters - used to pass back computed vals
+     * @param firstGuess  analysis parameters - used to pass back computed vals
+     * @return Grid of objectively analyzed data
+     * @throws RemoteException Java RMI error
+     * @throws VisADException  problem getting the data
      */
     public static FlatField barnesOneTime(FieldImpl pointObs, RealType type,
                                           float xSpacing, float ySpacing,
@@ -2779,26 +2830,26 @@ public class PointObFactory {
         if (numObs < 4) {
             return null;
         }
-        float[][] obVals  = new float[3][numObs];
-        PointOb   firstOb = (PointOb) pointObs.getSample(0);
+        float[][] obVals = new float[3][numObs];
+        PointOb firstOb = (PointOb) pointObs.getSample(0);
         // TODO: May not be a tuple
-        Tuple     data      = (Tuple) firstOb.getData();
-        TupleType ttype     = (TupleType) data.getType();
-        int       typeIndex = ttype.getIndex(type);
+        Tuple data = (Tuple) firstOb.getData();
+        TupleType ttype = (TupleType) data.getType();
+        int typeIndex = ttype.getIndex(type);
         if (typeIndex == -1) {
             return null;
         }
-        float latMin      = 90;
-        float lonMin      = 180;
-        float latMax      = -90;
-        float lonMax      = -180;
-        int   cnt         = 0;
-        int   numMissing  = 0;
-        Unit  outputUnits = type.getDefaultUnit();
+        float latMin = 90;
+        float lonMin = 180;
+        float latMax = -90;
+        float lonMax = -180;
+        int cnt = 0;
+        int numMissing = 0;
+        Unit outputUnits = type.getDefaultUnit();
         for (int i = 0; i < numObs; i++) {
-            PointOb po     = (PointOb) pointObs.getSample(i);
-            Tuple   obData = (Tuple) po.getData();
-            Real    val    = (Real) obData.getComponent(typeIndex);
+            PointOb po = (PointOb) pointObs.getSample(i);
+            Tuple obData = (Tuple) po.getData();
+            Real val = (Real) obData.getComponent(typeIndex);
             //if (i == 0) System.out.println("val["+i+"] ="+ val.toValueString() + ">"+val.getUnit()+"<");
             double obVal = val.getValue(type.getDefaultUnit());
             if (Double.isNaN(obVal)) {
@@ -2858,25 +2909,25 @@ public class PointObFactory {
 
 
         log_.debug("lat range = " + latMin + " " + latMax + ", lon range = "
-                   + lonMin + " " + lonMax);
+                + lonMin + " " + lonMax);
         float[] faGridX = null;
         float[] faGridY = null;
         if (firstGuess == null) {
             if ((xSpacing == OA_GRID_DEFAULT)
                     || (ySpacing == OA_GRID_DEFAULT)) {
                 Barnes.AnalysisParameters ap =
-                    Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
-                        latMax,
-                                                    new float[][] {
-                    obVals[0], obVals[1]
-                });
+                        Barnes.getRecommendedParameters(lonMin, latMin, lonMax,
+                                latMax,
+                                new float[][]{
+                                        obVals[0], obVals[1]
+                                });
                 faGridX = ap.getGridXArray();
                 faGridY = ap.getGridYArray();
                 if (scaleLength == OA_GRID_DEFAULT) {
                     scaleLength = (float) ap.getScaleLengthGU();
                 }
                 log_.debug("random data spacing = "
-                           + ap.getRandomDataSpacing());
+                        + ap.getRandomDataSpacing());
             } else {
                 faGridX = Barnes.getRecommendedGridX(lonMin, lonMax,
                         xSpacing);
@@ -2885,18 +2936,18 @@ public class PointObFactory {
             }
         } else {  // figure out XY, convert units
             GriddedSet domainSet =
-                (GriddedSet) GridUtil.getSpatialDomain(firstGuess);
+                    (GriddedSet) GridUtil.getSpatialDomain(firstGuess);
             CoordinateSystem refCS = domainSet.getCoordinateSystem();
-            float[]          his   = domainSet.getHi();
-            float[]          lows  = domainSet.getLow();
-            int[]            sizes = domainSet.getLengths();
+            float[] his = domainSet.getHi();
+            float[] lows = domainSet.getLow();
+            int[] sizes = domainSet.getLengths();
             faGridX = Barnes.getRecommendedGridX(lows[0], his[0],
                     (his[0] - lows[0]) / (sizes[0] - 1));
             faGridY = Barnes.getRecommendedGridX(lows[1], his[1],
                     (his[1] - lows[1]) / (sizes[1] - 1));
             if (refCS != null) {
                 float[][] transformedXY =
-                    new float[domainSet.getDimension()][];
+                        new float[domainSet.getDimension()][];
                 if (GridUtil.isLatLonOrder(firstGuess)) {
                     transformedXY[0] = obVals[1];
                     transformedXY[1] = obVals[0];
@@ -2908,17 +2959,17 @@ public class PointObFactory {
                     transformedXY[2] = new float[obVals[0].length];
                 }
                 transformedXY = refCS.fromReference(transformedXY);
-                obVals[0]     = transformedXY[0];
-                obVals[1]     = transformedXY[1];
+                obVals[0] = transformedXY[0];
+                obVals[1] = transformedXY[1];
             } else {
                 // check for 0-360 in domain
                 float low, hi;
                 if (GridUtil.isLatLonOrder(firstGuess)) {
                     low = lows[1];
-                    hi  = his[1];
+                    hi = his[1];
                 } else {
                     low = lows[0];
-                    hi  = his[0];
+                    hi = his[0];
                 }
                 if ((hi > 180) || (low < -180)) {
                     //System.out.println("normalizing longitudes to 0-360");
@@ -2929,12 +2980,12 @@ public class PointObFactory {
             Unit guessUnits = firstGuess.getDefaultRangeUnits()[0];
             if (guessUnits.equals(GeopotentialAltitude.getGeopotentialMeter())
                     && Unit.canConvert(type.getDefaultUnit(),
-                                       CommonUnit.meter)) {
+                    CommonUnit.meter)) {
                 guessUnits = CommonUnit.meter;
             }
             //System.out.println("guess units = " + guessUnits + ", obUnits = " + type.getDefaultUnit());
             obVals[2] = guessUnits.toThis(obVals[2], type.getDefaultUnit(),
-                                          false);
+                    false);
             outputUnits = guessUnits;
         }
         if (params != null) {
@@ -2943,26 +2994,26 @@ public class PointObFactory {
             params.setScaleLengthGU(scaleLength);
         }
         log_.debug("num X pts = " + faGridX.length + "  num Y pts = "
-                   + faGridY.length + " scaleLength = " + scaleLength
-                   + " gain = " + gain);
+                + faGridY.length + " scaleLength = " + scaleLength
+                + " gain = " + gain);
 
 
         float[][] griddedData = null;
 
         if (firstGuess != null) {
             float[][] gridVals =
-                GridUtil.makeGrid2D(firstGuess).getvalues()[0];
+                    GridUtil.makeGrid2D(firstGuess).getvalues()[0];
             griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
-                                            gridVals, scaleLength, gain,
-                                            numPasses);
+                    gridVals, scaleLength, gain,
+                    numPasses);
         } else {
             griddedData = Barnes.point2grid(faGridX, faGridY, obVals,
-                                            scaleLength, gain, numPasses);
+                    scaleLength, gain, numPasses);
         }
 
 
         float[][] faaGridValues3 =
-            new float[1][faGridX.length * faGridY.length];
+                new float[1][faGridX.length * faGridY.length];
 
         int m = 0;
         for (int j = 0; j < faGridY.length; j++) {
@@ -2972,31 +3023,31 @@ public class PointObFactory {
             }
         }
 
-        GriddedSet    gdsSet  = null;
+        GriddedSet gdsSet = null;
         RealTupleType gdsType = null;
         if (firstGuess == null) {
             Linear1DSet xSet = new Linear1DSet(RealType.Longitude,
-                                   faGridX[0], faGridX[faGridX.length - 1],
-                                   faGridX.length);
+                    faGridX[0], faGridX[faGridX.length - 1],
+                    faGridX.length);
             Linear1DSet ySet = new Linear1DSet(RealType.Latitude, faGridY[0],
-                                   faGridY[faGridY.length - 1],
-                                   faGridY.length);
+                    faGridY[faGridY.length - 1],
+                    faGridY.length);
             gdsSet = new LinearLatLonSet(RealTupleType.SpatialEarth2DTuple,
-                                         new Linear1DSet[] { xSet,
-                                                 ySet }, (CoordinateSystem) null,
-                                                 (Unit[]) null,
-                                                     (ErrorEstimate[]) null,
-                                                         true);
+                    new Linear1DSet[]{xSet,
+                            ySet}, (CoordinateSystem) null,
+                    (Unit[]) null,
+                    (ErrorEstimate[]) null,
+                    true);
         } else {
             gdsSet = (GriddedSet) GridUtil.getSpatialDomain(firstGuess);
         }
         FunctionType ftLatLon2Param =
-            new FunctionType(((SetType) gdsSet.getType()).getDomain(),
-                             new RealTupleType(type));
+                new FunctionType(((SetType) gdsSet.getType()).getDomain(),
+                        new RealTupleType(type));
         FlatField retData = new FlatField(ftLatLon2Param, gdsSet,
-                                          (CoordinateSystem) null,
-                                          (Set[]) null,
-                                          new Unit[] { outputUnits });
+                (CoordinateSystem) null,
+                (Set[]) null,
+                new Unit[]{outputUnits});
         retData.setSamples(faaGridValues3, false);
         return retData;
 
@@ -3004,10 +3055,10 @@ public class PointObFactory {
 
     /**
      * Extract the parameter from some point obs
-     * @param obs  Field of point obs
+     *
+     * @param obs       Field of point obs
      * @param paramName name of the parameter to extract
      * @return new FieldImpl where the data for each Point ob is just the param
-     *
      * @throws RemoteException Java RMI exception
      * @throws VisADException  problem extracting parameter
      */
@@ -3018,10 +3069,10 @@ public class PointObFactory {
 
     /**
      * Extract the parameter from some point obs
-     * @param obs  Field of point obs
-     * @param parameter  parameter to extract
-     * @return new FieldImpl where the data for each Point ob is just the param
      *
+     * @param obs       Field of point obs
+     * @param parameter parameter to extract
+     * @return new FieldImpl where the data for each Point ob is just the param
      * @throws RemoteException Java RMI exception
      * @throws VisADException  problem extracting parameter
      */
@@ -3029,12 +3080,12 @@ public class PointObFactory {
                                              RealType parameter)
             throws VisADException, RemoteException {
 
-        boolean   isTimeSequence = GridUtil.isTimeSequence(obs);
-        FieldImpl subset         = null;
+        boolean isTimeSequence = GridUtil.isTimeSequence(obs);
+        FieldImpl subset = null;
         if (isTimeSequence) {
             FieldImpl timeSubset = null;
-            Set       timeSet    = obs.getDomainSet();
-            int       numTimes   = timeSet.getLength();
+            Set timeSet = obs.getDomainSet();
+            int numTimes = timeSet.getLength();
             for (int i = 0; i < numTimes; i++) {
                 FieldImpl timeStep = (FieldImpl) obs.getSample(i);
                 if ((timeStep == null) || timeStep.isMissing()) {
@@ -3046,42 +3097,42 @@ public class PointObFactory {
                 }
                 if (timeSubset == null) {
                     FunctionType newFieldType =
-                        new FunctionType(
-                            ((SetType) timeSet.getType()).getDomain(),
-                            newSample.getType());
+                            new FunctionType(
+                                    ((SetType) timeSet.getType()).getDomain(),
+                                    newSample.getType());
                     timeSubset = new FieldImpl(newFieldType, timeSet);
                 }
                 timeSubset.setSample(i, newSample, false);
             }
             subset = timeSubset;
         } else {
-            Set     indexSet = obs.getDomainSet();
-            PointOb po       = null;
+            Set indexSet = obs.getDomainSet();
+            PointOb po = null;
             try {
                 po = (PointOb) obs.getSample(0);
             } catch (ClassCastException cce) {
                 throw new VisADException(
-                    "not a field of pointObs: "
-                    + obs.getSample(0).getClass().getName());
+                        "not a field of pointObs: "
+                                + obs.getSample(0).getClass().getName());
             }
-            Tuple ob         = (Tuple) po.getData();
-            int   paramIndex = ((TupleType) ob.getType()).getIndex(parameter);
+            Tuple ob = (Tuple) po.getData();
+            int paramIndex = ((TupleType) ob.getType()).getIndex(parameter);
             if (paramIndex == -1) {
                 throw new VisADException("Parameter does not exist in obs");
             }
             for (int i = 0; i < indexSet.getLength(); i++) {
                 PointOb sample = (PointOb) obs.getSample(i);
-                Tuple   data   = (Tuple) sample.getData();
-                Real    parm   = (Real) data.getComponent(paramIndex);
+                Tuple data = (Tuple) sample.getData();
+                Real parm = (Real) data.getComponent(paramIndex);
                 PointObTuple newPO =
-                    new PointObTuple(sample.getEarthLocation(),
-                                     sample.getDateTime(),
-                                     new RealTuple(new Real[] { parm }));
+                        new PointObTuple(sample.getEarthLocation(),
+                                sample.getDateTime(),
+                                new RealTuple(new Real[]{parm}));
                 if (subset == null) {
                     FunctionType subsetType =
-                        new FunctionType(
-                            ((SetType) indexSet.getType()).getDomain(),
-                            newPO.getType());
+                            new FunctionType(
+                                    ((SetType) indexSet.getType()).getDomain(),
+                                    newPO.getType());
                     subset = new FieldImpl(subsetType, indexSet);
                 }
                 subset.setSample(i, newPO, false);
@@ -3095,19 +3146,17 @@ public class PointObFactory {
      * Get the bounding box of the given obs
      *
      * @param pointObs the obs
-     *
      * @return bbox of the given time field-  { minY, minX, maxY, maxX };
-     *
      * @throws RemoteException On badness
-     * @throws VisADException On badness
+     * @throws VisADException  On badness
      */
     public static double[] getBoundingBox(FieldImpl pointObs)
             throws VisADException, RemoteException {
         boolean isTimeSequence = GridUtil.isTimeSequence(pointObs);
         if (isTimeSequence) {
-            double[] bbox     = null;
-            Set      timeSet  = pointObs.getDomainSet();
-            int      numTimes = timeSet.getLength();
+            double[] bbox = null;
+            Set timeSet = pointObs.getDomainSet();
+            int numTimes = timeSet.getLength();
             for (int i = 0; i < numTimes; i++) {
                 FieldImpl oneTime = (FieldImpl) pointObs.getSample(i);
                 //{ minY, minX, maxY, maxX };
@@ -3132,11 +3181,9 @@ public class PointObFactory {
      * Get the bounding box of the given obs
      *
      * @param pointObs the obs
-     *
      * @return bbox of the given time field-  { minY, minX, maxY, maxX };
-     *
      * @throws RemoteException On badness
-     * @throws VisADException On badness
+     * @throws VisADException  On badness
      */
     public static double[] getBoundingBoxOneTime(FieldImpl pointObs)
             throws VisADException, RemoteException {
@@ -3147,11 +3194,11 @@ public class PointObFactory {
         double maxY = Double.NEGATIVE_INFINITY;
 
 
-        if ( !pointObs.isMissing()) {
+        if (!pointObs.isMissing()) {
             Set domainSet = pointObs.getDomainSet();
-            int numObs    = domainSet.getLength();
+            int numObs = domainSet.getLength();
             for (int i = 0; i < numObs; i++) {
-                PointOb     ob  = (PointOb) pointObs.getSample(i);
+                PointOb ob = (PointOb) pointObs.getSample(i);
                 LatLonPoint llp = ob.getEarthLocation().getLatLonPoint();
                 double lat = llp.getLatitude().getValue(CommonUnit.degree);
                 double lon = llp.getLongitude().getValue(CommonUnit.degree);
@@ -3168,12 +3215,62 @@ public class PointObFactory {
 
             }
         }
-        double[] bbox = { minY, minX, maxY, maxX };
+        double[] bbox = {minY, minX, maxY, maxX};
         return bbox;
     }
 
+    /**
+     * Create heatIndex from temperature and relative humidity.
+     *
+     * @param T          temperature (F)
+     * @param RH         wind direction (%)
+     *
+     */
+    public static double heatIndex(double  T, double RH) {
+        double heatIndex = 0.0;
+        double hidx = 0.5 * (T + 61.0 + ((T-68.0)*1.2) + (RH*0.094));
 
+        double avg = (hidx + T)*0.5;
 
+        if(avg > 80) {
+            double adj = 0.0;
+            heatIndex = -42.379 + 2.04901523 * T + 10.14333127 * RH - .22475541 * T * RH - .00683783 * T * T -
+                    .05481717 * RH * RH + .00122874 * T * T * RH + .00085282 * T * RH * RH - .00000199 * T * T * RH * RH;
+            if(RH < 13.0 && (T > 80 && T < 112)){
+                adj = ((13.0-RH)/4.0)*Math.sqrt((17.0-Math.abs(T-95.0))/17.0);
+            } else if(RH > 85 && (T > 80 && T < 87)) {
+                adj = -((RH-85.0)/10.0) * ((87.0-T)/5.0);
+            }
+            heatIndex = heatIndex - adj;
+        } else
+           heatIndex = hidx;
+
+        return heatIndex;
+    }
+
+    /**
+     * WC = 35.74 + 0.6215 * (T - 273.15) - 35.75 * (WS)**0.16 +
+     *         0.4275 * ( T - 273.15) * (WS)**0.16
+     * @param speed     wind speed (mph)
+     * @param T         temperature(F)
+     */
+    public static double windChill(double speed, double T) {
+        double windChill =  35.74 + 0.6215 * (T ) - 35.75 * Math.pow(speed, 0.16)
+                + 0.4275 * ( T ) * Math.pow(speed, 0.16);
+
+        return windChill;
+    }
+
+    /**
+     * 100*(EXP((17.625*TD)/(243.04+TD))/EXP((17.625*T)/(243.04+T)))
+     *
+     * @param T     temperature (Celsius)
+     * @param TD    dewPoint(Celsius)
+     */
+    public static double relativeHumidity(double T, double TD) {
+        double rh =  100.0f*(float)(Math.exp((17.625*TD)/(243.04+TD))/Math.exp((17.625*T)/(243.04+T)));
+        return rh;
+    }
 
 
 }
