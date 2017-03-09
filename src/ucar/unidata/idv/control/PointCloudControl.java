@@ -1152,7 +1152,7 @@ public class PointCloudControl extends DrawingControl {
             boolean ok = !showInside;
             for (int j = 0; j < shapes.size(); j++) {
                 Shape shape = shapes.get(j);
-                if (shape.contains(pts[lonIndex][i] * scales[j],
+                if (shape.contains(Misc.normalizeLongitude(pts[lonIndex][i]) * scales[j],
                                    pts[latIndex][i] * scales[j])) {
                     if (showInside) {
                         ok = true;
@@ -1394,6 +1394,24 @@ public class PointCloudControl extends DrawingControl {
      */
     public boolean getDoClip() {
         return this.doClip;
+    }
+
+    /**
+     *  Set the DoFilter property.
+     *
+     *  @param value The new value for DoClip
+     */
+    public void setDoFilter(boolean value) {
+        this.doFilter = value;
+    }
+
+    /**
+     *  Get the DoFilter property.
+     *
+     *  @return The DoFilter
+     */
+    public boolean getDoFilter() {
+        return this.doFilter;
     }
 
     /**
