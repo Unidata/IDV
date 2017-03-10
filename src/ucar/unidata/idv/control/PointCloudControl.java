@@ -886,6 +886,7 @@ public class PointCloudControl extends DrawingControl {
         FieldImpl data     = (newData == null)
                              ? (FieldImpl) getDataInstance().getData()
                              : (FieldImpl) newData;
+        //System.out.println(" Filtering data0" + " Size=" + filters.size());
         if (filtersEnabled && (filters.size() > 0)) {
             try {
                 LogUtil.message("Observation display: filtering data");
@@ -1406,6 +1407,23 @@ public class PointCloudControl extends DrawingControl {
     }
 
     /**
+     *  Get the filters property.
+     *
+     *  @return The filters
+     */
+    public List getFilters() {
+        return this.filters;
+    }
+
+    /**  Set the filters property.
+    *
+    *  @param value The new value for filters
+    */
+    public void setFilters(List value) {
+        this.filters = value;
+    }
+
+    /**
      *  Get the DoFilter property.
      *
      *  @return The DoFilter
@@ -1413,7 +1431,6 @@ public class PointCloudControl extends DrawingControl {
     public boolean getDoFilter() {
         return this.doFilter;
     }
-
     /**
      *  Set the FollowTimeStep property.
      *
