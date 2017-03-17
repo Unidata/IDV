@@ -4702,6 +4702,57 @@ public class GridUtil {
     }
 
     /**
+     * Get the altitude corresponding to the level specified using
+     * the domain of the grid.
+     *
+     * @param  domainSet   sampledSet to use
+     * @param  level  must be compatible (unit wise) with vertical coordinate
+     *                of the grid
+     *
+     * @return  altitude (in m) corresponding to level using coordinate
+     *          system of the grid's domain.  May be missing if conversion
+     *          can't happen.
+     *
+     *
+     * @throws VisADException    VisAD error
+     */
+    public static Real getAltitude(SampledSet domainSet, Real level)
+            throws VisADException {
+
+        if ((level == null) || (domainSet == null)) {
+            throw new IllegalArgumentException(
+                    "GridUtil.getAltitude(): domainSet and level must not be null");
+        }
+        if ( !is3D(domainSet)) {
+            throw new IllegalArgumentException(
+                    "GridUtil.getAltitude(): Grid must be 3D");
+        }
+
+        double altVal = Double.NaN;
+        if (Unit.canConvert(level.getUnit(), CommonUnit.meter)) {
+            altVal = level.getValue(CommonUnit.meter);
+        } else {
+            Unit       zUnit     = getVerticalUnit(domainSet);
+            if ( !Unit.canConvert(zUnit, level.getUnit())) {
+                throw new VisADException(
+                        "level units not compatible with grid units");
+            }
+            CoordinateSystem domainCS = domainSet.getCoordinateSystem();
+            if (domainCS != null) {
+                float[][] samples   = domainSet.getSamples(false);
+                Unit[]    csUnits   = domainCS.getCoordinateSystemUnits();
+                float[][] latlonalt = domainCS.toReference(new float[][] {
+                        { samples[0][0] }, { samples[1][0] },
+                        { (float) level.getValue(csUnits[2]) }
+                });
+
+                altVal = latlonalt[2][0];
+            }
+        }
+        return new Real(RealType.Altitude, altVal);
+    }
+
+    /**
      * Get the RealType of the vertical dimension of the spatial domain
      * of the grid.
      *
