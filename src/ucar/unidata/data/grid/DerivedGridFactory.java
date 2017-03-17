@@ -25,6 +25,7 @@ import ucar.unidata.data.DataUtil;
 
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.util.Range;
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.quantities.AirPressure;
@@ -2336,6 +2337,23 @@ public class DerivedGridFactory {
         // make es from temperature
         FlatField esFF =
             (FlatField) SaturationVaporPressure.create((FlatField) temp);
+        Unit percentUnit = CommonUnits.PERCENT;
+        Unit rUnit = rh.getRangeUnits()[0][0];
+        FunctionType newFFType;
+        if( rUnit == null || !(rUnit.isConvertible(percentUnit))){
+
+            Range[] range = GridUtil.fieldMinMax(rh);
+            if(range[0].max <= 1 && range[0].min > 0){
+                //it is fraction
+                rh = (FlatField)rh.__mul__(100.0);
+
+            }
+            RealType rt = GridUtil.getParamType(rh).getRealComponents()[0];
+            RealType newType = Util.makeRealType(rt.getName(), percentUnit);
+
+            rh = (FlatField) GridUtil.setParamType(rh, newType);
+
+        }
 
         // make grid of actual vapor pressure
         FlatField eFF = (FlatField) (GridMath.multiply(esFF, (FlatField) rh));
