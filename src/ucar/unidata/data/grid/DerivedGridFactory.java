@@ -1474,6 +1474,26 @@ public class DerivedGridFactory {
 
     /**
      * Combine two Fields into one.  If the grids are on different
+     * spatial domains, the second is resampled to the domain of the first.
+     *
+     * @param grid1  first grid.  This will be used for the time/space domain
+     * @param grid2  second grid.
+     *
+     * @return combined grid.
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl combineGridsN(FieldImpl grid1, FieldImpl grid2)
+            throws VisADException, RemoteException {
+        SampledSet grid1Domain = GridUtil.getSpatialDomain(grid1);
+        if(!grid1Domain.equals(GridUtil.getSpatialDomain(grid2))){
+            grid2 = GridUtil.resampleGrid(grid2, grid1Domain);
+        }
+        return combineGrids(grid1, grid2, false);
+    }
+    /**
+     * Combine two Fields into one.  If the grids are on different
      * time domains, the second is resampled to the domain of the first.
      *
      * @param grid1  first grid.  This will be used for the time/space domain
