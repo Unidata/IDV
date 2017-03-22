@@ -634,7 +634,23 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         DataSelection tmpSelection = new DataSelection(getDataSelection());
         tmpSelection.setFromLevel(null);
         tmpSelection.setToLevel(null);
-        List     levelsList = choice.getAllLevels(tmpSelection);
+        List cchoices = ((DerivedDataChoice) choice).getChoices();
+        List     levelsList;
+        if(cchoices.size() == 2) { //colored by other
+            DataChoice uvwchoice =
+                    ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                            0));
+            DataChoice wchoice =
+            ((DataChoice) ((DerivedDataChoice) uvwchoice).getChoices().get(
+                    2));
+            levelsList = wchoice.getAllLevels(tmpSelection);
+        } else {
+            DataChoice wchoice =
+                    ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                            2));
+            levelsList = wchoice.getAllLevels(tmpSelection);
+        }
+        //List     levelsList = wchoice.getAllLevels(tmpSelection);
         Object[] levels     = null;
         if ((levelsList != null) && (levelsList.size() > 0)) {
             levels =
