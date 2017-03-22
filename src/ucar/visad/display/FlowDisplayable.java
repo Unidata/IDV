@@ -1024,7 +1024,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             setRGBRealType(rgbType);
         }
 
-        setType(rtt);
+        //setType(rtt);
 
         TupleType newParamType = null;
         // if u/v, then set as EarthVectorType (determined in course of setType)
@@ -1054,6 +1054,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         setData((newParamType == null)
                 ? field
                 : GridUtil.setParamType(field, newParamType, false));
+        setType(rtt);
     }
 
     /**
