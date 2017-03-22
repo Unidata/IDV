@@ -276,19 +276,31 @@ example:
      label="Trajectory Colored By Parameter"
      displaycategory="GridTrajectory"
      properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
-
+  <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   <control
      id="gridtrajectorycontrol1"
-     categories="trace"
-     class="ucar.unidata.idv.control.GridTrajectoryControl"
+     categories="*-display:gridtrajectorycontrol1-*"
+     class="ucar.unidata.idv.control.GridTrajectoryControlNew"
      canstandalone="false"
      doeslevels="true"
-     label="Trajectory Colored By Parameter"
-     code="GridTrajectory.combineGridsArray( D1, parameter )"
-     displaycategory="GridTrajectory"
+     description="3-D Trajectory"
+     label="3D Grid Trajectory"
+     displaycategory="3D Grid Trajectory"
      properties="windowVisible=false;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-
+  <control
+      id="gridtrajectorycontrol2"
+      categories="*-display:gridtrajectorycontrol1-*"
+      class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+      canstandalone="false"
+      doeslevels="true"
+      description="3-D Trajectory"
+      label="3D Grid Trajectory Colored by Speed"
+      displaycategory="3D Grid Trajectory"
+      properties="windowVisible=false;useSpeedForColor=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
 
   <control
      id="pointcloud"
@@ -1301,7 +1313,7 @@ Example of how to make an image movie control with a fixed table of contents
             categories="*-flowvector3d-*"
             class="ucar.unidata.idv.control.VolumeVectorControl"
             description="3-D vector Volume Colored by Another Parameter"
-            code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
+            code="DerivedGridFactory.combineGridsN(D1, Other_Parameter)"
             label="3D Volume Vector Colored by Another Paramter"
             icon="/ucar/unidata/idv/images/volume.png"
             displaycategory="3D Flow Displays"
