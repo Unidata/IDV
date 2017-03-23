@@ -163,7 +163,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** _more_ */
     private int trajStartLevel = 0;
 
-
+    /** _more_ */
+    private boolean forward = true;
 
 
     /**
@@ -340,6 +341,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setRibbonWidthFactor(ribbonWidth);
                     tparm.setZStartIndex(trajStartLevel);
                     tparm.setZStartSkip(zskip);
+                    //tparm.setDirectionFlag(forward);
                     if (isTrajectories) {
                         tparm.setCachingEnabled(false);
                     }
@@ -400,6 +402,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 tparm.setStartSkip(t);
                 tparm.setZStartIndex(trajStartLevel);
                 tparm.setZStartSkip(zskip);
+                //tparm.setDirectionFlag(forward);
                 //if(isTrajectories)
                 tparm.setCachingEnabled(false);
                 //flowControl.setTrajectoryParams(tparm);
@@ -633,6 +636,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public int getZskip() {
         return zskip;
+    }
+
+    public boolean getForward(){
+        return forward;
+    }
+
+    public void setForward(boolean forw){
+        forward = forw;
     }
 
     /**
