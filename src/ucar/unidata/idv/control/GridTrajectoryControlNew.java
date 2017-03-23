@@ -699,7 +699,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 }
             }
         }
+        public boolean getArrowHead(){
+            return arrowHead;
+        }
 
+        public void setArrowHead(boolean ah){
+            arrowHead = ah;
+        }
         /**
          * Set the data in this control.
          *
@@ -1358,7 +1364,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         @Override
         public void initAfterUnPersistence(ControlContext vc,
                                            Hashtable properties) {
-            super.initAfterUnPersistence(vc, properties);
+            //super.initAfterUnPersistence(vc, properties);
 
             setTrajFormType(getTrajFormType());
             int width = super.getLineWidth();
@@ -1809,7 +1815,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
 
         if (createTrjBtnClicked) {
-            if ((getGlyphs() != null) && (glyphs.size() > 0)) {
+            //if ((getGlyphs() != null) && (glyphs.size() > 0)) {
                 currentLevel = getCurrentLevel();
                 if ((currentLevel != null)
                         && (bundleLevel != null)
@@ -1818,6 +1824,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     levelBox.setSelectedItem(bundleLevel);
                 }
                 newUnit = getDisplayUnit();
+             gridTrackControl.initAfterUnPersistence(vc,properties);
                 createTrjBtn.doClick();
                 //gridTrackControl.setLineWidth(getTrackLineWidth());
                 // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
@@ -1830,7 +1837,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     bundleColorRange = getTrjColorRange();
                 } catch (Exception ee) {}
 
-            }
+           // }
         }
 
     }
@@ -2042,7 +2049,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         gridTrackControl.loadVolumeData();
         gridTrackControl.setTrajStartLevel(slevel, idx);
         //
-        if ( !hiddenBtn.isSelected()) {
+        if ( !hiddenBtn.isSelected() || glyphs.size() > 0) {
             GriddedSet domainSet =
                 (GriddedSet) gridTrackControl.getGridDataInstance()
                 .getSpatialDomain();
@@ -2071,6 +2078,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             RealTupleType types = cs.getReference();
             gridTrackControl.myDisplay.setStartPoints(types, setLocs);
+
         } else {
             gridTrackControl.myDisplay.setStartPoints(null, null);
         }
