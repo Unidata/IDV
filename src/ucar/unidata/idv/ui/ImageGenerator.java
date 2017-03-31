@@ -1157,6 +1157,8 @@ public class ImageGenerator extends IdvManager {
         //String filename = XmlUtil.getAttribute(node, ATTR_FILE);
 
         if(what != null && what.equals("zidv") && filename != null){
+            getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
+                    getIdv().getIdvUIManager(), 0);
             getIdv().getPersistenceManager().doSaveAs(filename);
             return true;
         }
@@ -2953,6 +2955,8 @@ public class ImageGenerator extends IdvManager {
     protected boolean processTagMovie(Element node) throws Throwable {
         String filename = XmlUtil.getAttribute(node, ATTR_FILE);
         pushProperties();
+        getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
+                getIdv().getIdvUIManager(), 0);
         captureMovie(null, node);
         popProperties();
         if(XmlUtil.getAttribute(node, "publish", false)) {
