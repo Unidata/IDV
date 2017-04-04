@@ -195,6 +195,18 @@ public class GridTrajectoryControlNew extends DrawingControl {
     int trackLineWidth = 1;
 
     /** _more_ */
+    boolean trackArrowHead = false;
+
+    /** _more_ */
+    Integer trackFormType = new Integer(0);
+
+    /** _more_ */
+    float trackOffsetValue = 4.0f;
+
+    /** _more_ */
+    Color trackColor = Color.red;
+
+    /** _more_ */
     private DataTimeRange trjDataTimeRange;
 
     /** _more_ */
@@ -213,7 +225,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
     ValueSliderWidget skipFactorWidget;
 
     /** _more_ */
-    int coordinateType = DrawingGlyph.COORD_LATLON;;
+    int coordinateType = DrawingGlyph.COORD_LATLONALT;;
 
     /** _more_ */
     Unit newUnit = null;
@@ -574,6 +586,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                    getGridDisplay().setArrowHead(
                                                    arrowHead);
                                                }
+                                               if (gtc != null) {
+                                                   gtc.setTrackArrowHead(
+                                                   arrowHead);
+                                               }
                                                getGridDisplay().resetTrojectories();
                                            }
                                        });
@@ -699,13 +715,29 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 }
             }
         }
-        public boolean getArrowHead(){
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean getArrowHead() {
             return arrowHead;
         }
 
-        public void setArrowHead(boolean ah){
+        /**
+         * _more_
+         *
+         * @param ah _more_
+         */
+        public void setArrowHead(boolean ah) {
             arrowHead = ah;
+            if (gtc != null) {
+                gtc.setTrackArrowHead(ah);
+            }
         }
+
+
         /**
          * Set the data in this control.
          *
@@ -985,25 +1017,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
         }
 
 
-        /**
-         * _more_
-         *
-         * @param A _more_
-         * @param B _more_
-         *
-         * @return _more_
-         */
-        public static float[] AxB(float[] A, float[] B) {
-            float[] axb = new float[3];
-
-            axb[0] = A[1] * B[2] - A[2] * B[1];
-            axb[1] = -(A[0] * B[2] - A[2] * B[0]);
-            axb[2] = A[0] * B[1] - A[1] * B[0];
-
-            return axb;
-        }
-
-
 
         /**
          * Method to call if projection changes.  Subclasses that
@@ -1082,13 +1095,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
             trajOffsetValue = f;
             if (getGridDisplay() != null) {
                 try {
+                    if (gtc != null) {
+                        gtc.setTrackOffsetValue(f);
+                    }
                     getGridDisplay().setTrajOffset(trajOffsetValue);
                     getGridDisplay().resetTrojectories();
-                    if (arrowHead) {
-                        getGridDisplay().setArrowHead(arrowHead);
-                    } else {
-                        getGridDisplay().setArrowHead(arrowHead);
-                    }
                 } catch (Exception ex) {
                     logException("setFlowScale: ", ex);
                 }
@@ -1119,13 +1130,16 @@ public class GridTrajectoryControlNew extends DrawingControl {
         public void setTrajFormType(Integer trajForm) {
             trajFormType = trajForm;
 
+            if (gtc != null) {
+                gtc.setTrackFormType(trajFormType);
+            }
             if (getGridDisplay() != null) {
                 try {
                     getGridDisplay().setTrajFormType(trajForm.intValue());
                     //getGridDisplay().resetTrojectories();
                     getGridDisplay().setArrowHead(arrowHead);
-                    //getGridDisplay().resetTrojectories();
-                    setLineWidth(super.getLineWidth());
+                    getGridDisplay().resetTrojectories();
+                    //setLineWidth(super.getLineWidth());
                 } catch (Exception ex) {
                     logException("setFlowScale: ", ex);
                 }
@@ -1340,7 +1354,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
                 getGridDisplay().resetTrojectories();
             }
-
+            if (gtc != null) {
+                gtc.setTrackLineWidth(width);
+            }
             super.setLineWidth(width);
 
         }
@@ -1369,16 +1385,34 @@ public class GridTrajectoryControlNew extends DrawingControl {
             setTrajFormType(getTrajFormType());
             int width = super.getLineWidth();
             if (getGridDisplay() != null) {
+                setTrajFormType(gtc.getTrackFormType());
                 if (trajFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
                     getGridDisplay().setRibbonWidth(width);
                 }
+                setArrowHead(gtc.getTrackArrowHead());
+                getGridDisplay().setArrowHead(gtc.getTrackArrowHead());
+
             }
 
             getGridDisplay().resetTrojectories();
         }
 
+        /**
+         * _more_
+         *
+         * @param c _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public void setColor(Color c) throws RemoteException, VisADException {
+            super.setColor(c);
+            if (gtc != null) {
+                gtc.setTrackColor(c);
+            }
+        }
 
         /**
          * _more_
@@ -1501,6 +1535,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
      * @param width _more_
      */
     public void setTrackLineWidth(int width) {
+
         trackLineWidth = width;
     }
 
@@ -1816,28 +1851,31 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         if (createTrjBtnClicked) {
             //if ((getGlyphs() != null) && (glyphs.size() > 0)) {
-                currentLevel = getCurrentLevel();
-                if ((currentLevel != null)
-                        && (bundleLevel != null)
-                        && !currentLevel.equals(bundleLevel)) {
-                    setLevel(bundleLevel);
-                    levelBox.setSelectedItem(bundleLevel);
-                }
-                newUnit = getDisplayUnit();
-             gridTrackControl.initAfterUnPersistence(vc,properties);
-                createTrjBtn.doClick();
-                //gridTrackControl.setLineWidth(getTrackLineWidth());
-                // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
-                gridTrackControl.getDataTimeRange(true).getTimeModeLabel();
+            currentLevel = getCurrentLevel();
+            if ((currentLevel != null)
+                    && (bundleLevel != null)
+                    && !currentLevel.equals(bundleLevel)) {
+                setLevel(bundleLevel);
+                levelBox.setSelectedItem(bundleLevel);
+            }
+            newUnit = getDisplayUnit();
+            gridTrackControl.initAfterUnPersistence(vc, properties);
+            createTrjBtn.doClick();
 
-                try {
-                    //gridTrackControl.setColorScaleInfo(getColorScaleInfo());
-                    gridTrackControl.setColorTable(getTrjColorTable());
-                    doMakeColorScales();
-                    bundleColorRange = getTrjColorRange();
-                } catch (Exception ee) {}
+            // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
+            gridTrackControl.getDataTimeRange(true).getTimeModeLabel();
 
-           // }
+            try {
+                gridTrackControl.setLineWidth(getTrackLineWidth());
+                gridTrackControl.setTrajOffset(getTrackOffsetValue());
+                gridTrackControl.setColor(getTrackColor());
+                //gridTrackControl.setColorScaleInfo(getColorScaleInfo());
+                gridTrackControl.setColorTable(getTrjColorTable());
+                doMakeColorScales();
+                bundleColorRange = getTrjColorRange();
+            } catch (Exception ee) {}
+
+            // }
         }
 
     }
@@ -2049,7 +2087,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         gridTrackControl.loadVolumeData();
         gridTrackControl.setTrajStartLevel(slevel, idx);
         //
-        if ( !hiddenBtn.isSelected() || glyphs.size() > 0) {
+        if ( !hiddenBtn.isSelected() || (glyphs.size() > 0)) {
             GriddedSet domainSet =
                 (GriddedSet) gridTrackControl.getGridDataInstance()
                 .getSpatialDomain();
@@ -2072,7 +2110,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             alt = GridUtil.getAltitude(
                 domainSet, (Real) ((TwoFacedObject) currentLevel).getId());
             float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
-                                    domain2D, alt);
+                                    domain2D, alt, getSkipValue());
             float[][] setLocs = cs.toReference(geoVals);
             setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
 
@@ -2083,8 +2121,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
             gridTrackControl.myDisplay.setStartPoints(null, null);
         }
         //gridTrackControl.loadVolumeData();
+        gridTrackControl.myDisplay.setArrowHead(
+            gridTrackControl.getArrowHead());
         Range range = gridTrackControl.getGridDataInstance().getRange(
                           gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
+        gridTrackControl.myDisplay.resetTrojectories();
         gridTrackControl.setRange(range);
 
         controlPane.setVisible(true);
@@ -2109,12 +2150,14 @@ public class GridTrajectoryControlNew extends DrawingControl {
      * @param lonIndex _more_
      * @param domain0 _more_
      * @param alt _more_
+     * @param skipFactor _more_
      * @return _more_
      *
      * @throws Exception _more_
      */
     public float[][] getEarthLocationPoints(int latIndex, int lonIndex,
-                                            SampledSet domain0, Real alt)
+                                            SampledSet domain0, Real alt,
+                                            int skipFactor)
             throws Exception {
 
         double clevel = 0;
@@ -2201,7 +2244,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             //int       skipFactor = 0; //(int) skipFactorWidget.getValue();
 
-            //int       onum       = num / (skipFactor + 1);
+            int       onum   = num / (skipFactor + 1) + 1;
 
             float[][] points = new float[3][num];
             int       psize  = 0;
@@ -2215,10 +2258,23 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 }
                 psize = psize + isize;
             }
-            setCurrentCommand(CMD_SELECT);
-            hiddenBtn.doClick();
+            // now skipFactor
+            if (skipFactor > 0) {
+                float[][] points0 = new float[3][onum];
+                for (int i = 0, j = 0; (i < onum)
+                                       && (j < num);
+                        i++, j = i * (skipFactor + 1)) {
+                    points0[0][i] = points[0][j];
+                    points0[1][i] = points[1][j];
+                    points0[2][i] = points[2][j];
+                }
+                setCurrentCommand(CMD_SELECT);
+                hiddenBtn.doClick();
 
-            return points;
+                return points0;
+            } else {
+                return points;
+            }
         }
 
     }
@@ -2323,9 +2379,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     isClosePlgn = false;
                     isRectangle = false;
                     isSelector  = false;
+                    skipFactorWidget.setValue(0.0f);
                     skipFactorWidget.setEnabled(false);
                     removeAllGlyphs();
                 } else if (source == rectangleBtn) {
+
                     setCurrentCommand(GlyphCreatorCommand.CMD_RECTANGLE);
                     isRectangle = true;
                     isPoints    = false;
@@ -2334,7 +2392,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     skipFactorWidget.setEnabled(true);
                     removeAllGlyphs();
                 } else if (source == closePolygonBtn) {
-                    coordinateType = DrawingGlyph.COORD_XY;
+
                     setCurrentCommand(GlyphCreatorCommand.CMD_CLOSEDPOLYGON);
                     isRectangle = false;
                     isPoints    = false;
@@ -2396,6 +2454,39 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
 
 
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected double getInitialZPosition() {
+        Real alt = null;
+        GriddedSet domainSet =
+            (GriddedSet) gridTrackControl.getGridDataInstance()
+            .getSpatialDomain();
+        // if(zunit.getIdentifier().length() == 0) {
+        try {
+            alt = GridUtil.getAltitude(
+                domainSet, (Real) ((TwoFacedObject) currentLevel).getId());
+        } catch (Exception e) {}
+        return alt.getValue();
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public double getZPosition() {
+        NavigatedDisplay navDisplay = getNavigatedDisplay();
+        double[]         rg         = navDisplay.getVerticalRange();
+        double           z          = getInitialZPosition();
+        double           zz         = -1.0 + (z / (rg[1] - rg[0])) * 2.0;
+        return zz;
     }
 
     /**
@@ -2537,15 +2628,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
     }
 
 
-    /*
-   public void setGridTrackControl(MyTrackControl mtc) {
-       gridTrackControl = mtc;
-   }
-
-   public MyTrackControl getGridTrackControl() {
-       return gridTrackControl;
-   }     */
-
     /**
      * _more_
      *
@@ -2572,6 +2654,86 @@ public class GridTrajectoryControlNew extends DrawingControl {
      */
     public DrawingCommand getCurrentCmd() {
         return currentCmd;
+    }
+
+    /**
+     * _more_
+     *
+     *
+     * @param ah _more_
+     * @return _more_
+     */
+    public void setTrackArrowHead(boolean ah) {
+        trackArrowHead = ah;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getTrackArrowHead() {
+        return trackArrowHead;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Integer getTrackFormType() {
+        return trackFormType;
+    }
+
+    /**
+     * _more_
+     *
+     *
+     * @param ah _more_
+     * @return _more_
+     */
+    public void setTrackFormType(Integer ah) {
+        trackFormType = ah;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public float getTrackOffsetValue() {
+        return trackOffsetValue;
+    }
+
+    /**
+     * _more_
+     *
+     *
+     * @param ah _more_
+     * @return _more_
+     */
+    public void setTrackOffsetValue(float ah) {
+        trackOffsetValue = ah;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Color getTrackColor() {
+        return trackColor;
+    }
+
+    /**
+     * _more_
+     *
+     *
+     * @param ah _more_
+     * @return _more_
+     */
+    public void setTrackColor(Color ah) {
+        trackColor = ah;
     }
 
     /**
