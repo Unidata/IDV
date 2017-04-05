@@ -544,6 +544,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             if (useSpeedForColor || coloredByAnother) {
                 addAttributedDisplayable(planDisplay, FLAG_COLORTABLE);
+                addAttributedDisplayable(planDisplay, FLAG_LINEWIDTH);
             } else {
                 addAttributedDisplayable(planDisplay);
             }
