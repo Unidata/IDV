@@ -589,6 +589,16 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         trajStartLevel = startLevel;
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getTrajStartLevel() {
+        return trajStartLevel;
+    }
+
     /**
      * _more_
      *
