@@ -2321,7 +2321,7 @@ public class PointObFactory {
             tuples.add(tuple);
             times.add(new DateTime(0));
             elts.add(elt);
-        } else {
+        } else if(collection instanceof  PointFeatureCollection){
             PointFeatureIterator dataIterator =
                     //collection.getPointFeatureIterator(-1);
                     collection.getPointFeatureIterator(16384);
@@ -2418,6 +2418,86 @@ public class PointObFactory {
                     "found " + ismissing + "/" + missing
                             + " missing out of " + obIdx);
             dataIterator.finish();
+        } else {
+            NetcdfDataset netcdfDataset =
+                    (NetcdfDataset) input.getNetcdfFile();
+            List coords = netcdfDataset.getCoordinateAxes();
+            List vars = netcdfDataset.getVariables();
+            ucar.nc2.dataset.VariableDS vds0 = null;  //(ucar.nc2.dataset.VariableDS)vars.get(2);
+            ucar.nc2.dataset.VariableDS vds1 = null;  //(ucar.nc2.dataset.VariableDS)vars.get(0);
+            for (int i = 0; i < vars.size(); i++) {
+                if (vars.get(i) instanceof ucar.nc2.dataset.VariableDS) {
+                    ucar.nc2.dataset.VariableDS vds =
+                            (ucar.nc2.dataset.VariableDS) vars.get(i);
+                    if (vds.getShortName().equals("order")) {
+                        vds0 = vds;
+                    } else if (vds.getShortName().equals("streamflow")) {
+                        vds1 = vds;
+                    }
+                }
+            }
+            //ucar.nc2.dataset.VariableDS vds2 = (ucar.nc2.dataset.VariableDS)vars.get(1);
+            CoordinateAxis1D lats = null;
+            CoordinateAxis1D lons = null;
+            CoordinateAxis1D alts = null;
+            CoordinateAxis1D ttts = null;
+            if (coords.size() == 4) {
+                lats = (CoordinateAxis1D) coords.get(0);
+                lons = (CoordinateAxis1D) coords.get(1);
+                alts = (CoordinateAxis1D) coords.get(2);
+                ttts = (CoordinateAxis1D) coords.get(3);
+            } else if (coords.size() == 3) {
+                lats = (CoordinateAxis1D) coords.get(1);
+                lons = (CoordinateAxis1D) coords.get(2);
+                //CoordinateAxis1D alts = (CoordinateAxis1D)coords.get(2);
+                ttts = (CoordinateAxis1D) coords.get(0);
+            }
+            int      ssize = (int) lats.getSize();
+            double[] dlats = lats.getCoordValues();
+            double[] dlons = lons.getCoordValues();
+            double[] dalts = new double[ssize];
+            if (alts != null) {
+                dalts = alts.getCoordValues();
+            }
+            double[] dttts = ttts.getCoordValues();
+
+            int[] sdata0 =
+                    (int[]) (vds0.getOriginalVariable().read()
+                            .copyTo1DJavaArray());
+            float[] sdata1 =
+                    (float[]) (vds1.getOriginalVariable().read()
+                            .copyTo1DJavaArray());
+
+            for (int i = 0; i < ssize; i++) {
+                if (alts == null) {
+                    dalts[i] = 0.0;
+                }
+                String ustr = ttts.getUnitsString();
+                double hh = dttts[0];
+                DateTime time = new DateTime(hh, Util.parseUnit(ustr));
+                elt = new EarthLocationLite(dlats[i], dlons[i], dalts[i]);
+
+                double[] realArray = new double[2];
+
+                realArray[0] = sdata0[i];
+                realArray[1] = sdata1[i];
+                //if(realArray[0] >= defOrder) {
+                Tuple tuple = new DoubleTuple((RealTupleType) allTupleType,
+                        realArray, allUnits);
+
+                elts.add(elt);
+                tuples.add(tuple);
+                times.add(time);
+                obIdx++;
+                //}
+                if (obIdx % NUM == 0) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+            }
         }
         if (tuples.isEmpty()) {
             return null;
