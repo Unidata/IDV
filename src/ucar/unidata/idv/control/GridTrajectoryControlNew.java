@@ -505,6 +505,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
             addDisplayable(myDisplay, getAttributeFlags());
 
             //DataSelection ds = getDataSelection();
+            DataSelection tmpSelection =
+                    new DataSelection(gtc.getDataSelection());
+            tmpSelection.setFromLevel(null);
+            tmpSelection.setToLevel(null);
+            setDataSelection(tmpSelection);
 
             //updateDataSelection(ds);
             //doMakeDataInstance(dataChoice);
