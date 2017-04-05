@@ -1,18 +1,18 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2016 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -46,7 +46,7 @@ import java.rmi.RemoteException;
  * @author IDV Development Team
  */
 public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
-    implements GridDisplayable {
+        implements GridDisplayable {
 
     /** use Flow1 ScalarMaps */
     private static boolean useFlow1 = false;
@@ -165,6 +165,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
     /** _more_ */
     private boolean forward = true;
+
+    /** _more_ */
+    RealTupleType trajStartPointType = null;
+
+    /** _more_ */
+    float[][] trajStartPoints = null;
 
 
     /**
@@ -340,6 +346,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setCylinderWidth(trajWidth);
                     tparm.setRibbonWidthFactor(ribbonWidth);
                     tparm.setZStartIndex(trajStartLevel);
+                    tparm.setStartPoints(trajStartPointType, trajStartPoints);
                     tparm.setZStartSkip(zskip);
                     //tparm.setDirectionFlag(forward);
                     if (isTrajectories) {
@@ -402,6 +409,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 tparm.setStartSkip(t);
                 tparm.setZStartIndex(trajStartLevel);
                 tparm.setZStartSkip(zskip);
+                tparm.setStartPoints(trajStartPointType, trajStartPoints);
                 //tparm.setDirectionFlag(forward);
                 //if(isTrajectories)
                 tparm.setCachingEnabled(false);
@@ -638,12 +646,58 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         return zskip;
     }
 
-    public boolean getForward(){
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getForward() {
         return forward;
     }
 
-    public void setForward(boolean forw){
+    /**
+     * _more_
+     *
+     * @param forw _more_
+     */
+    public void setForward(boolean forw) {
         forward = forw;
+    }
+
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
+    public void setTrajStartPointType(RealTupleType type) {
+        trajStartPointType = type;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public RealTupleType getTrajStartPointType() {
+        return trajStartPointType;
+    }
+
+    /**
+     * _more_
+     *
+     * @param pts _more_
+     */
+    public void setTrajStartPoints(float[][] pts) {
+        trajStartPoints = pts;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public float[][] getTrajStartPoints() {
+        return trajStartPoints;
     }
 
     /**
@@ -714,7 +768,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public int getSpeedTypeIndex() {
         int index = -1;
-        if ( !isCartesianWind() && (flowYMap != null)
+        if ( !isCartesianWind()
+                && (flowYMap != null)
                 && (flowRealTupleType != null)) {
             RealType   speedType = (RealType) flowYMap.getScalar();
             RealType[] realTypes = flowRealTupleType.getRealComponents();
@@ -751,12 +806,13 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         spdIndex = 1;
 
         // if data is u,v (so far as you can tell by units)
-        if ((Unit.canConvert(units[0], CommonUnit.meterPerSecond)
-                && Unit.canConvert(units[1],
-                    CommonUnit.meterPerSecond)) || ((units[0] == null)
-                        && (units[1]
-                            == null)) || (CommonUnit.dimensionless.equals(units[0])
-                                && CommonUnit.dimensionless.equals(units[1]))) {
+        if ((Unit.canConvert(units[0],
+                             CommonUnit.meterPerSecond) && Unit.canConvert(
+                                 units[1],
+                                 CommonUnit.meterPerSecond))
+                || ((units[0] == null) && (units[1] == null))
+                || (CommonUnit.dimensionless.equals(units[0])
+                    && CommonUnit.dimensionless.equals(units[1]))) {
             flowXMap = new ScalarMap(realTypes[0], (useFlow1
                     ? Display.Flow1X
                     : Display.Flow2X));
@@ -824,29 +880,40 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
         flowYMap.addScalarMapListener(new ScalarMapListener() {
 
-            public void controlChanged(ScalarMapControlEvent event)
-                    throws RemoteException, VisADException {
+                                          public void controlChanged(
+                                          ScalarMapControlEvent event)
+                                                  throws RemoteException,
+                                                  VisADException {
 
-                int id = event.getId();
+                                              int id = event.getId();
 
-                if ((id == event.CONTROL_ADDED)
-                        || (id == event.CONTROL_REPLACED)) {
-                    flowControl = (FlowControl) flowYMap.getControl();
-                    flowControl.enableStreamlines(isStreamlines);
-                    flowControl.enableTrajectory(isTrajectories);
-                    flowControl.setAutoScale(autoScale);
-                    flowControl.setStreamlineDensity(streamlineDensity);
-                    flowControl.setAdjustFlowToEarth(adjustFlow);
-                    flowControl.setBarbOrientation(barborientation);
-                    if (isTrajectories) {
-                        resetTrojectories();
-                    }
-                    adjustScale(flowscale);
-                }
-            }
+                                              if ((id == event.CONTROL_ADDED)
+                                                      || (id == event
+                                                      .CONTROL_REPLACED)) {
+                                                  flowControl =
+                                                  (FlowControl) flowYMap.getControl();
+                                                  flowControl.enableStreamlines(
+                                                  isStreamlines);
+                                                  flowControl.enableTrajectory(
+                                                  isTrajectories);
+                                                  flowControl.setAutoScale(
+                                                  autoScale);
+                                                  flowControl.setStreamlineDensity(
+                                                  streamlineDensity);
+                                                  flowControl.setAdjustFlowToEarth(
+                                                  adjustFlow);
+                                                  flowControl.setBarbOrientation(
+                                                  barborientation);
+                                                  if (isTrajectories) {
+                                                      resetTrojectories();
+                                                  }
+                                                  adjustScale(flowscale);
+                                              }
+                                          }
 
-            public void mapChanged(ScalarMapEvent event) {}  // ignore
-        });
+                                          public void mapChanged(
+                                          ScalarMapEvent event) {}  // ignore
+                                      });
         //System.out.println("FlowX = " + flowXMap);
         //System.out.println("FlowY = " + flowYMap);
         //System.out.println("isCartesian = " + isCartesian);
@@ -859,6 +926,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
         setFlowRange(flowMinValue, flowMaxValue);
         setScalarMapSet(maps);
+
     }
 
     /**
@@ -967,10 +1035,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             String oname = spdFimpl.getType().prettyString();
             FieldImpl uFimpl =
                 GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.sin()), oname + "Uspd");
+                                                        (FieldImpl) dirFimpl.sin()), oname
+                                                            + "Uspd");
             FieldImpl vFimpl =
                 GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.cos()), oname + "Vspd");;
+                                                        (FieldImpl) dirFimpl.cos()), oname
+                                                            + "Vspd");;
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
 
             if (useSpeedForColor) {
@@ -996,10 +1066,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             String oname = spdFimpl.getType().prettyString();
             FieldImpl uFimpl =
                 GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.sin()), oname + "Uspd");
+                                                        (FieldImpl) dirFimpl.sin()), oname
+                                                            + "Uspd");
             FieldImpl vFimpl =
                 GridUtil.setParamType(GridMath.multiply(spdFimpl,
-                    (FieldImpl) dirFimpl.cos()), oname + "Vcomp");
+                                                        (FieldImpl) dirFimpl.cos()), oname
+                                                            + "Vcomp");
             field = DerivedGridFactory.createFlowVectors(uFimpl, vFimpl);
 
             if (useSpeedForColor) {
@@ -1018,7 +1090,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
             // for the colorby
             if (rt0.getDefaultUnit().isConvertible(CommonUnit.meterPerSecond)
                     && rt1.getDefaultUnit().isConvertible(
-                        CommonUnit.meterPerSecond) && useSpeedForColor) {
+                        CommonUnit.meterPerSecond)
+                    && useSpeedForColor) {
                 FieldImpl uFimpl = DerivedGridFactory.getUComponent(field);
                 FieldImpl vFimpl = DerivedGridFactory.getVComponent(field);
                 FieldImpl speedImpl =
@@ -1066,6 +1139,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 ? field
                 : GridUtil.setParamType(field, newParamType, false));
         setType(rtt);
+
     }
 
     /**
@@ -1236,6 +1310,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         if (flowControl == null) {
             return;
         }
+        trajStartPoints    = stp;
+        trajStartPointType = types;
         TrajectoryParams tParm = flowControl.getTrajectoryParams();
         tParm.setStartPoints(types, stp);
 
@@ -1256,4 +1332,5 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         tParm.setZStartSkip(10);
 
     }
+
 }
