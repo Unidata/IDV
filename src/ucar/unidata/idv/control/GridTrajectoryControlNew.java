@@ -509,7 +509,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     new DataSelection(gtc.getDataSelection());
             tmpSelection.setFromLevel(null);
             tmpSelection.setToLevel(null);
-            setDataSelection(tmpSelection);
+            dataChoice.setDataSelection(tmpSelection);
 
             //updateDataSelection(ds);
             //doMakeDataInstance(dataChoice);
@@ -1645,14 +1645,14 @@ public class GridTrajectoryControlNew extends DrawingControl {
         isBundle = getIdv().getStateManager().isLoadingXml();
         super.init((DataChoice) null);
         gridTrackControl = new MyTrajectoryControl(this);
-        // super.init(dataChoice);
+        //super.init(dataChoice);
+        dataSelection1 = getDataSelection();
+        dataChoice.setDataSelection(dataSelection1);
         this.dataChoice                 = dataChoice;
         gridTrackControl.controlContext = getControlContext();
-        gridTrackControl.updateDataSelection(getDataSelection());
+
+        gridTrackControl.updateDataSelection(dataSelection1);
         gridTrackControl.init(dataChoice);
-        //setCurrentCmd(CMD_SELECT.getLabel());
-        //   if(!isBundle) {
-        dataSelection1 = gridTrackControl.getDataSelection();
 
         updateDataSelection(dataSelection1);
 
@@ -2137,11 +2137,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
 
-        Unit cUnit = getDisplayUnit();
+        //Unit cUnit = getDisplayUnit();
 
-        if (newUnit != null) {
-            cUnit = newUnit;
-        }
+        //if (newUnit != null) {
+        //    cUnit = newUnit;
+        //}
 
         // gridTrackControl.getColorRangeFromData());
     }
@@ -2199,7 +2199,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         if (currentCmd.getLabel().equals(
                 GlyphCreatorCommand.CMD_SYMBOL.getLabel())
-                || (glyphs.get(0) instanceof SymbolGlyph)) {
+                || (glyphs != null && glyphs.size() > 0
+                && (glyphs.get(0) instanceof SymbolGlyph))) {
             int       pointNum = glyphs.size();
 
             float[][] points   = new float[3][pointNum];
