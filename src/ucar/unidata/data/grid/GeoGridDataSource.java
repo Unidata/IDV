@@ -791,9 +791,11 @@ public class GeoGridDataSource extends GridDataSource {
                 continue;
             }
             String label = dataChoice.getDescription();
-            if (label.length() > 30) {
-                label = label.substring(0, 29) + "...";
-            }
+            /* Fix for McV inq. 1887: Don't truncate labels in "Write Local 
+               Grid" dialog.  */
+            // if (label.length() > 30) {
+            //     label = label.substring(0, 29) + "...";
+            // }
             JCheckBox cbx =
                 new JCheckBox(label,
                               currentDataChoices.get(dataChoice.getName())
