@@ -2528,21 +2528,21 @@ public class ImageGenerator extends IdvManager {
         //Check for the time driver start time override
         String tdstartString = applyMacros(node, ATTR_DRIVERTIME_START, (String) null);
         if (tdstartString != null) {
-            Date aniTDTstart = DateUtil.parse(tdstartString);
-           // DateTime dd = UtcDate.createDateTime(tdstartString);
-           // Date aniTDTstart = new Date(
-            //        (long) (((DateTime) dd).getValue(
-            //                CommonUnit.secondsSinceTheEpoch) * 1000.0));
+            //Date aniTDTstart = DateUtil.parse(tdstartString);
+            DateTime dd = UtcDate.createDateTime(tdstartString);
+            Date aniTDTstart = new Date(
+                    (long) (((DateTime) dd).getValue(
+                            CommonUnit.secondsSinceTheEpoch) * 1000.0));
             bundleProperties.put(IdvPersistenceManager.PROP_DRIVERTIMESTART, aniTDTstart);
         }
 
         String tdendString = applyMacros(node, ATTR_DRIVERTIME_END, (String) null);
         if (tdendString != null) {
-            Date aniTDTend = DateUtil.parse(tdendString);
-            //DateTime de = UtcDate.createDateTime(tdendString);
-            //Date aniTDTend = new Date(
-            //        (long) (((DateTime) de).getValue(
-             //               CommonUnit.secondsSinceTheEpoch) * 1000.0));
+            //Date aniTDTend = DateUtil.parse(tdendString);
+            DateTime de = UtcDate.createDateTime(tdendString);
+            Date aniTDTend = new Date(
+                    (long) (((DateTime) de).getValue(
+                            CommonUnit.secondsSinceTheEpoch) * 1000.0));
             bundleProperties.put(IdvPersistenceManager.PROP_DRIVERTIMEEND, aniTDTend);
         }
 
