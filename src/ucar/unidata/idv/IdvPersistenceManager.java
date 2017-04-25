@@ -160,6 +160,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** List of OjbectPairs that define a name->list of files mapping */
     private List fileMapping;
 
+    /**  if addWindows true then in the ISL offscreen mode, the windows will be created*/
+    private boolean addWindows = false;
+
     /**
      * Use this so the persisted display control can acces the template name
      * when it is saved
@@ -462,6 +465,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         fileMapping = null;
     }
 
+    /**
+     * create window in the ISL offscreen mode
+     */
+    public void setAddWindows(boolean bl){
+        addWindows = bl;
+    }
     /**
      * Add a file mapping. See above.
      *
@@ -3837,7 +3846,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
 
             if (newViewManagers != null) {
-                if (getArgsManager().getIsOffScreen()) {
+                if (getArgsManager().getIsOffScreen() && !addWindows) {
                     Trace.call1("Decode.addViewManagers");
                     getVMManager().addViewManagers(newViewManagers);
                     Trace.call2("Decode.addViewManagers");

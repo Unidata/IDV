@@ -762,6 +762,9 @@ public class ImageGenerator extends IdvManager {
     public static final String ATTR_CLEAR = "clear";
 
     /** isl tag */
+    public static final String ATTR_WINDOW = "window";
+
+    /** isl tag */
     public static final String ATTR_CODE = "code";
 
     /** isl tag */
@@ -2499,6 +2502,10 @@ public class ImageGenerator extends IdvManager {
         }
         String  bundleFile = applyMacros(node, ATTR_FILE, (String) null);
         boolean doRemove   = applyMacros(node, ATTR_CLEAR, true);
+        boolean addWindows = applyMacros(node, ATTR_WINDOW, false);
+        if(addWindows){
+            getPersistenceManager().setAddWindows(addWindows);
+        }
         if (doRemove) {
             //            try {
             cleanup();
