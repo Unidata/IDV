@@ -6,7 +6,7 @@
 
 
 [isl::tagdef bundle {Load a bundle} -attrs {file+ {bundle file or url} width {view window width} height  {view window height} times {List of times to use} bbox {north,west,south,east} clear {default is true. remove all existing displays and data}
-wait {default is true. wait until all displays have been rendered.} bbox {override the geoSelection bounding box.}
+wait {default is true. wait until all displays have been rendered.} window {default is false. if set to true and in the isl offscreen mode, the idv window will be created.} bbox {override the geoSelection bounding box.}
 timedriverstart {changing the animation widget time driver start time.} timedriverend {changing the animation widget time driver end time.}}]
 The [isl::tag bundle] tag lets you load in a new bundle and takes the form:
 [isl::xml {
@@ -26,6 +26,11 @@ The [isl::attr bbox] attribute is a string of the form "north,west,south,east" a
 <p>
 The [isl::attr wait] attribute, if true (the default), will essentially do a pause,
 waiting until all displays have been rendered.
+<p>
+
+<p>
+The [isl::attr window] attribute, if true and in offscreen mode, will generate idv window object,
+that is needed when saving to a zidv bundle.
 <p>
 
 The [isl::attr times] attribute allows you to override the set of time indices
