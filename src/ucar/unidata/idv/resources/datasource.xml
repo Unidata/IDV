@@ -566,6 +566,11 @@
      fileselection="true"
      label="I'm Still Feeling Lucky"/>
 
-
+  <!-- datasource
+          id="HRIT"
+          factory="ucar.unidata.data.imagery.HRITDataSource"
+          fileselection="true"
+          doesmultiples="true"
+          label="HRIT data source"/ -->
 
 </datasources>
