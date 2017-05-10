@@ -1406,6 +1406,29 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     }
 
     /**
+     * _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public Range getRange() throws RemoteException, VisADException {
+        return super.getRange();
+    }
+
+    /**
+     * _more_
+     *
+     * @param nRange _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void setRange(Range nRange)
+            throws RemoteException, VisADException {
+        super.setRange(nRange);
+        setFlowColorRange(nRange);
+    }
+    /**
      * Get the cursor data
      *
      * @param el  earth location
