@@ -503,7 +503,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             myDisplay.setPointSize(getPointSize());
             addDisplayable(myDisplay, getAttributeFlags());
-
+            //myDisplay.setForward(!gtc.backwardTrajectory);
             //DataSelection ds = getDataSelection();
             DataSelection tmpSelection =
                     new DataSelection(gtc.getDataSelection());
@@ -1011,7 +1011,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             //            arrowHeadSizeValue, false);
             //if(!isTrajectories) {
             if (gtc.getSkipValue() > 0) {
-                grid    = GridUtil.subset(grid, skipFactor + 1);
+                grid    = GridUtil.subset(grid, gtc.getSkipValue());
                 newGrid = grid;
             }
 
@@ -1388,7 +1388,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                            Hashtable properties) {
             //super.initAfterUnPersistence(vc, properties);
 
-            setTrajFormType(getTrajFormType());
+            setTrajFormType(gtc.getTrackFormType());
             int width = super.getLineWidth();
             if (getGridDisplay() != null) {
                 setTrajFormType(gtc.getTrackFormType());
@@ -1864,6 +1864,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 setLevel(bundleLevel);
                 levelBox.setSelectedItem(bundleLevel);
             }
+            if(backwardTrajectory){
+                backwardCbx.doClick();
+            }
             newUnit = getDisplayUnit();
             gridTrackControl.initAfterUnPersistence(vc, properties);
             createTrjBtn.doClick();
@@ -2127,6 +2130,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             gridTrackControl.myDisplay.setStartPoints(null, null);
         }
         //gridTrackControl.loadVolumeData();
+        gridTrackControl.myDisplay.setForward(!backwardCbx.isSelected());
         gridTrackControl.myDisplay.setArrowHead(
             gridTrackControl.getArrowHead());
         Range range = gridTrackControl.getGridDataInstance().getRange(

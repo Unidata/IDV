@@ -348,7 +348,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setZStartIndex(trajStartLevel);
                     tparm.setStartPoints(trajStartPointType, trajStartPoints);
                     tparm.setZStartSkip(zskip);
-                    //tparm.setDirectionFlag(forward);
+                    tparm.setDirectionFlag(forward);
                     if (isTrajectories) {
                         tparm.setCachingEnabled(false);
                     }
@@ -410,7 +410,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 tparm.setZStartIndex(trajStartLevel);
                 tparm.setZStartSkip(zskip);
                 tparm.setStartPoints(trajStartPointType, trajStartPoints);
-                //tparm.setDirectionFlag(forward);
+                tparm.setDirectionFlag(forward);
                 //if(isTrajectories)
                 tparm.setCachingEnabled(false);
                 //flowControl.setTrajectoryParams(tparm);
@@ -1317,15 +1317,12 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      * @param stp _more_
      */
     public void setStartPoints(RealTupleType types, float[][] stp) {
-        if (flowControl == null) {
-            return;
-        }
         trajStartPoints    = stp;
         trajStartPointType = types;
-        TrajectoryParams tParm = flowControl.getTrajectoryParams();
-        tParm.setStartPoints(types, stp);
-
-
+        if (flowControl != null) {
+            TrajectoryParams tParm = flowControl.getTrajectoryParams();
+            tParm.setStartPoints(types, stp);
+        }
     }
 
     /**
