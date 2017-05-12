@@ -1392,6 +1392,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
             int width = super.getLineWidth();
             if (getGridDisplay() != null) {
                 setTrajFormType(gtc.getTrackFormType());
+                try {
+                    setRange(gtc.getRange());
+                } catch (Exception ee){}
                 if (trajFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
@@ -1420,6 +1423,68 @@ public class GridTrajectoryControlNew extends DrawingControl {
             }
         }
 
+        /**
+         * _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public Range getRange() throws RemoteException, VisADException {
+            return super.getRange();
+        }
+
+        /**
+         * _more_
+         *
+         * @param nRange _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public void setRange(Range nRange)
+                throws RemoteException, VisADException {
+            super.setRange(nRange);
+            setFlowColorRange(nRange);
+            if (gtc != null) {
+                gtc.setRange(nRange);
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @param newColorTable _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public void setColorTable(ColorTable newColorTable)
+                throws RemoteException, VisADException {
+
+            if (newColorTable != super.getColorTable()) {
+                super.setColorTable(newColorTable);
+            }
+            if ((gtc != null) && (newColorTable != gtc.getTrjColorTable())) {
+
+                gtc.setTrjColorTable(newColorTable);
+            }
+        }
+
+
+        /**
+         * Get the {@link ucar.unidata.util.ColorTable} property.
+         *
+         * @return The ColorTable
+         */
+        public ColorTable getColorTable() {
+
+
+            if ((gtc != null) && (gtc.getTrjColorTable() != null)) {
+                return gtc.getTrjColorTable();
+            } else {
+                return super.getColorTable();
+            }
+        }
         /**
          * _more_
          *
@@ -2134,9 +2199,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
         gridTrackControl.myDisplay.setArrowHead(
             gridTrackControl.getArrowHead());
         Range range = gridTrackControl.getGridDataInstance().getRange(
-                          gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
+                          gridTrackControl.getColorRangeIndex());
         gridTrackControl.myDisplay.resetTrojectories();
-        gridTrackControl.setRange(range);
+        //gridTrackControl.setRange(range);
 
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());
