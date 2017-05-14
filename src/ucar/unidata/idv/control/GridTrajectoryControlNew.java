@@ -366,10 +366,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
         private final static String[] trajFormLabels = new String[] { "Line",
                                                                       "Ribbon",
                                                                       "Cylinder",
-                                                                      "Deform Ribbon" };
+                                                                      "Deform Ribbon",
+                                                                        "Point"};
 
         /** types of smoothing functions */
-        private final static int[] trajForm = new int[] { 0, 1, 2, 3 };
+        private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
 
         /** vector/traj length component */
         JComponent trajFormComponent;
@@ -501,7 +502,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                        });
             myDisplay = (FlowDisplayable) createPlanDisplay();
 
-            myDisplay.setPointSize(getPointSize());
+            //myDisplay.setPointSize(4);
             addDisplayable(myDisplay, getAttributeFlags());
             //myDisplay.setForward(!gtc.backwardTrajectory);
             //DataSelection ds = getDataSelection();
@@ -523,6 +524,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
             return true;
         }
 
+        public String getLineWidthWidgetLabel() {
+            return "Line Width/Point Size";
+        }
 
         /**
          * _more_
@@ -1352,13 +1356,16 @@ public class GridTrajectoryControlNew extends DrawingControl {
         public void setLineWidth(int width)
                 throws RemoteException, VisADException {
             if (getGridDisplay() != null) {
-                if (trajFormType == 2) {
+                if (trajFormType == 4) {
+                    setPointSize(width * 1.0f);
+                } else if (trajFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
+                    getGridDisplay().resetTrojectories();
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
                     getGridDisplay().setRibbonWidth(width);
+                    getGridDisplay().resetTrojectories();
                 }
-
-                getGridDisplay().resetTrojectories();
+                //getGridDisplay().resetTrojectories();
             }
             if (gtc != null) {
                 gtc.setTrackLineWidth(width);
