@@ -639,7 +639,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <paramgroup categories="GRID-3D-*;" name="GridRelative_uvw"/>
     </operands>
   </derived>
-  <derived
+  <!--derivedmyDisplay = (FlowDisplayable) createPlanDisplay();
      id="gridTrajectory"
      description="Grid 2D Trajectory (from %N1% &amp; %N2% )"
      label="Grid 2D Trajectory"
@@ -663,7 +663,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
         <paramgroup categories="GRID-3D-*;" name="u_and_v"/>
         <paramgroup categories="GRID-3D-*;" name="GridRelative_uv"/>
      </operands>
-  </derived>
+  </derived -->
 
   <derived
      id="fluxdivergence"
