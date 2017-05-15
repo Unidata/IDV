@@ -301,7 +301,19 @@ example:
       properties="windowVisible=false;useSpeedForColor=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-
+  <control
+      id="gridtrajectorycontrol3"
+      categories="*-display:gridtrajectorycontrol1-*"
+      class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+      canstandalone="false"
+      doeslevels="true"
+      description="3-D Trajectory"
+      label="Trajectory Colored by Another Parameter"
+      displaycategory="3D Grid Trajectory"
+      code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
+      properties="windowVisible=false;coloredByAnother=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
   <control
      id="pointcloud"
      categories="pointcloud"
