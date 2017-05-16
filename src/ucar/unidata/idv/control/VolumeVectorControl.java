@@ -245,7 +245,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                     if ((select != null) && isTrajectories) {
                         int ct = ((JComboBox) e.getSource()).getItemCount();
                         if (select.toString().equals("All Levels")) {
-                            setTrajStartLevel(select, selectIdx);
+                            setTrajStartLevel(select, 0);
                         } else {
                             setTrajStartLevel(select, selectIdx);
                         }
@@ -1253,7 +1253,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         if (getGridDisplay() != null) {
             try {
                 getGridDisplay().setTrajStartLevel(idx);
-                getGridDisplay().setZskip(ct - 1);
+                if(((TwoFacedObject)startLevel).getLabel().equals("All Levels"))
+                    getGridDisplay().setZskip(1);
+                else
+                    getGridDisplay().setZskip(ct - 1);
                 getGridDisplay().resetTrojectories();
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
