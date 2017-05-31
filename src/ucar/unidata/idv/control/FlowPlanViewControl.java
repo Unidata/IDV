@@ -277,22 +277,23 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
         Trace.call1("FlowPlanView.setData");
         // checking the grid size matching
         //if (dataChoice.getDescription().contains("3D Flow Vectors")) {
-        DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
-        List              choices0 = ddc.getChoices();
+        if(dataChoice instanceof DerivedDataChoice) {
+            DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
+            List              choices0 = ddc.getChoices();
 
-        if (choices0.size() == 3) {
-            DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
-            DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
-            DirectDataChoice wdc = (DirectDataChoice) choices0.get(2);
-            ThreeDSize us = (ThreeDSize) udc.getProperty("prop.gridsize");
-            ThreeDSize ws = (ThreeDSize) wdc.getProperty("prop.gridsize");
-            if (us.getSizeZ() != ws.getSizeZ()) {
-                userErrorMessage("Grid sizes are different: " + ws
-                                 + "\n from " + us);
-                return false;
+            if (choices0.size() == 3) {
+                DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
+                DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
+                DirectDataChoice wdc = (DirectDataChoice) choices0.get(2);
+                ThreeDSize us = (ThreeDSize) udc.getProperty("prop.gridsize");
+                ThreeDSize ws = (ThreeDSize) wdc.getProperty("prop.gridsize");
+                if (us.getSizeZ() != ws.getSizeZ()) {
+                    userErrorMessage("Grid sizes are different: " + ws
+                                     + "\n from " + us);
+                    return false;
+                }
             }
         }
-        // }
 
 
         FlowDisplayable fd = getGridDisplay();
