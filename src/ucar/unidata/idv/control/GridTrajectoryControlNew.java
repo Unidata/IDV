@@ -1753,10 +1753,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
         this.dataChoice                 = dataChoice;
         gridTrackControl.controlContext = getControlContext();
 
+        gridTrackControl.setUsesTimeDriver(this.getUsesTimeDriver());
         gridTrackControl.updateDataSelection(dataSelection1);
         gridTrackControl.init(dataChoice);
 
-        updateDataSelection(dataSelection1);
+        //updateDataSelection(dataSelection1);
 
         Object fromLevel = dataSelection1.getFromLevel();
         dataSelection1.setLevel(null);
@@ -1895,7 +1896,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
     @Override
     public synchronized void dataChanged() {
         try {
-            removeAllGlyphs();
+            //removeAllGlyphs();
             //initData();
         } catch (Exception e) {}
 
@@ -1991,15 +1992,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
     }
 
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean getHaveInitialized() {
-        return true;
-    }
 
     /**
      * current level
