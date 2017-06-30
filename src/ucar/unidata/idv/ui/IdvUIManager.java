@@ -155,6 +155,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.text.JTextComponent;
 
+import static ucar.unidata.idv.IdvPersistenceManager.BUNDLES_DATA;
 
 
 /**
@@ -1628,46 +1629,49 @@ public class IdvUIManager extends IdvManager {
                 }
                 ViewManager vm = getIdv().getViewManager();
                 if ((vm != null) && (vm instanceof TransectViewManager)) {
-                    DisplayControl dc =
-                        getIdv().doMakeControl("transectdrawingcontrol");
-                    // searching for the shared group map view and move the control there
-                    List    vmList = vm.getVMManager().getViewManagers();
-                    Boolean moved  = false;
-                    for (int ii = 0; ii < vmList.size(); ii++) {
-                        ViewManager vm0 = (ViewManager) vmList.get(ii);
-                        if (vm0 instanceof TransectViewManager) {
-                            String grp0 = (String) vm0.getShareGroup();
-                            if (vm0.getShareViews() && (grp0 != null)) {
-                                for (int j = 0; j < vmList.size(); j++) {
-                                    ViewManager vm1 =
-                                        (ViewManager) vmList.get(j);
-                                    if (vm1 instanceof MapViewManager) {
-                                        String grp1 =
-                                            (String) vm1.getShareGroup();
-                                        if (grp0.equals(grp1) && (j != ii)) {
-                                            dc.moveTo(vm1);
-                                            moved = true;
-                                            break;
+                    List tclist = vm.getVMManager().findTransectDrawingControls();
+                    if(tclist.size() == 0) {
+                        DisplayControl dc =
+                                getIdv().doMakeControl("transectdrawingcontrol");
+                        // searching for the shared group map view and move the control there
+                        List vmList = vm.getVMManager().getViewManagers();
+                        Boolean moved = false;
+                        for (int ii = 0; ii < vmList.size(); ii++) {
+                            ViewManager vm0 = (ViewManager) vmList.get(ii);
+                            if (vm0 instanceof TransectViewManager) {
+                                String grp0 = (String) vm0.getShareGroup();
+                                if (vm0.getShareViews() && (grp0 != null)) {
+                                    for (int j = 0; j < vmList.size(); j++) {
+                                        ViewManager vm1 =
+                                                (ViewManager) vmList.get(j);
+                                        if (vm1 instanceof MapViewManager) {
+                                            String grp1 =
+                                                    (String) vm1.getShareGroup();
+                                            if (grp0.equals(grp1) && (j != ii)) {
+                                                dc.moveTo(vm1);
+                                                moved = true;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    if ( !moved) {
-                        if (dc.getDefaultViewManager() != null) {
-                            dc.moveTo(dc.getDefaultViewManager());
-                        } else {
-                            List vms = vm.getVMManager().getViewManagers();
-                            for (int ii = 0; ii < vms.size(); ii++) {
-                                ViewManager mvm = (ViewManager) vms.get(ii);
-                                if (mvm instanceof MapViewManager) {
-                                    dc.moveTo(mvm);
-                                    break;
+                        if (!moved) {
+                            if (dc.getDefaultViewManager() != null) {
+                                dc.moveTo(dc.getDefaultViewManager());
+                            } else {
+                                List vms = vm.getVMManager().getViewManagers();
+                                for (int ii = 0; ii < vms.size(); ii++) {
+                                    ViewManager mvm = (ViewManager) vms.get(ii);
+                                    if (mvm instanceof MapViewManager) {
+                                        dc.moveTo(mvm);
+                                        break;
+                                    }
                                 }
                             }
-                        }
 
+                        }
                     }
                 }
                 getIdv().doMakeControl(Misc.newList(dataChoice), cd, props,
@@ -2770,29 +2774,37 @@ public class IdvUIManager extends IdvManager {
 
         JMenu bundleMenu = new JMenu(title);
         bundleMenu.setMnemonic(GuiUtils.charToKeyCode(title));
-        displayMenu.add(bundleMenu);
         JMenuItem mi;
-
-        getPersistenceManager().initBundleMenu(bundleType, bundleMenu);
-
         mi = new JMenuItem("Manage...");
         mi.setMnemonic(GuiUtils.charToKeyCode("M"));
-        //bundleMenu.add(mi);
-        displayMenu.add(mi);
-        mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                showBundleDialog(bundleType);
-            }
-        });
-        displayMenu.addSeparator();
-
-
+        if(bundleType == BUNDLES_DATA) {
+            getPersistenceManager().initBundleMenu(bundleType, bundleMenu);
+            bundleMenu.add(mi);
+            mi.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    showBundleDialog(bundleType);
+                }
+            });
+            bundleMenu.addSeparator();
+            displayMenu.add(bundleMenu);
+        } else {
+            displayMenu.add(bundleMenu);
+            getPersistenceManager().initBundleMenu(bundleType, bundleMenu);
+            //bundleMenu.add(mi);
+            displayMenu.add(mi);
+            mi.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    showBundleDialog(bundleType);
+                }
+            });
+            displayMenu.addSeparator();
+        }
         Hashtable catMenus = new Hashtable();
-
         for (int i = 0; i < bundles.size(); i++) {
             SavedBundle bundle       = (SavedBundle) bundles.get(i);
             List        categories   = bundle.getCategories();
-            JMenu       catMenu      = displayMenu;
+            JMenu       catMenu      = (bundleType == BUNDLES_DATA) ? bundleMenu : displayMenu;
+
             String      mainCategory = "";
             for (int catIdx = 0; catIdx < categories.size(); catIdx++) {
                 String category = (String) categories.get(catIdx);
