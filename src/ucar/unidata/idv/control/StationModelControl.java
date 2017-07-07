@@ -1486,7 +1486,25 @@ public class StationModelControl extends ObsDisplayControl {
         return stationModelColorTable;
     }
 
-
+    /**
+     * Get the {@link ucar.unidata.util.ColorTable} property.
+     *
+     * @return The ColorTable
+     */
+    public ColorTable getColorTable() {
+        return stationModelColorTable;
+    }
+    /**
+     * Get the range for the color table.
+     *
+     * @return range being used
+     * @throws RemoteException  some RMI exception occured
+     * @throws VisADException  error getting the range in VisAD
+     */
+    public Range getRangeForColorTable()
+            throws RemoteException, VisADException {
+        return getRangeToApply();
+    }
     /**
      * Set the data for this instance from the choice supplied.
      * @param choice  <code>DataChoice</code> that describes the data to
