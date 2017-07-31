@@ -907,7 +907,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
 
-  <derived
+  <!--derived
           description="L-P Index (from %N1% &amp; %N2% &amp; %N3% &amp; %N4%)"
           formula="LPIndex(D1, D2, D3, D4,level[isuser=true,default=500])"
           id="LP Index"
@@ -930,6 +930,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <paramgroup categories="GRID-3D-*;" name="u_v_z_t"/>
       <paramgroup categories="GRID-3D-*;" name="urel_vrel_z_t"/>
     </operands>
-  </derived>
+  </derived-->
 
 </derived_parameters>
