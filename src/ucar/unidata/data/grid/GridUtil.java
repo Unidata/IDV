@@ -2037,6 +2037,65 @@ public class GridUtil {
         return newDomainSet;
     }
 
+    /**
+     * Add a level to a 2D grid
+     *
+     * @param domainSet  the 2D domain
+     * @param levelValue the level value
+     * @param levelUnit  the level unit
+     * @return domain with a 3rd dimension
+     * @throws VisADException problems
+     */
+    public static GriddedSet addLevelTo2DDomain(GriddedSet domainSet, double levelValue, String levelUnit) throws VisADException {
+        if ( !(domainSet.getDimension() == 2 && domainSet.getManifoldDimension() == 2)) {
+            throw new VisADException(
+                "Input domain needs to be a 2D set on a 2D manifold");
+        }
+        GriddedSet newDomain = null;
+        RealTupleType domainType = ((SetType) domainSet.getType()).getDomain();
+        RealType xType = (RealType) domainType.getComponent(0);
+        RealType yType = (RealType) domainType.getComponent(1);
+        Unit zUnit = Util.parseUnit(levelUnit);
+        CoordinateSystem cs = domainType.getCoordinateSystem();
+        if (domainSet instanceof Gridded2DSet) {
+            float[][] samples = domainSet.getSamples();
+            int sizeX = domainSet.getLength(0);
+            int sizeY = domainSet.getLength(1);
+            Unit[] setUnits = domainSet.getSetUnits();
+            CoordinateSystem zCS = null;
+            RealType zType = null;
+            if (zUnit.isConvertible(CommonUnits.HECTOPASCAL)) {
+                zType = AirPressure.getRealType();
+                zCS = AirPressure.getStandardAtmosphereCS();
+            } else if (zUnit.isConvertible(CommonUnit.meter)) {
+                zType = RealType.Altitude;
+                zCS = new IdentityCoordinateSystem(new RealTupleType(zType), new Unit[] {zUnit});
+            } else {
+                throw new VisADException("Unknown vertical Unit");
+            }
+            CoordinateSystem compCS = new CartesianProductCoordinateSystem(cs,zCS);
+            float[][] newSamples = new float[3][];
+            newSamples[0] = samples[0];
+            newSamples[1] = samples[1];
+            float[] zSamples = new float[newSamples[0].length];
+            Arrays.fill(zSamples, (float) levelValue);
+            newSamples[2] = zSamples;
+            RealTupleType newDomainType = new RealTupleType(xType,yType,zType,compCS, null);
+            Unit[] newUnits = new Unit[] { setUnits[0], setUnits[1], zUnit };
+            newDomain = GriddedSet.create(newDomainType,  newSamples,
+                    domainSet.getLengths(), (CoordinateSystem) null, newUnits,
+                    (ErrorEstimate[]) null, false, true);
+        } else {
+            System.out.println("not a gridded2D set: "+domainSet.getClass().getName());
+        }
+        return newDomain;
+    }
+
+    public static FieldImpl addLevelToGrid(FieldImpl grid, double levelValue, String levelUnit) throws VisADException {
+        return setSpatialDomain(grid, addLevelTo2DDomain((GriddedSet) getSpatialDomain(grid), levelValue, levelUnit));
+    }
+
+
 
     /**
      * Make a new type for the field by appending the suffix to the exiting
@@ -2414,6 +2473,82 @@ public class GridUtil {
      * Slice the grid along the line specified by the two LatLonPoint-s
      *
      * @param  grid   grid to slice (must be a valid 2D or 3D grid)
+     * @param  points  list of points along the line
+     * @param samplingMode mode for sampling
+     *
+     * @return  spatial slice along the line.  If this is a sequence of grids
+     *          it will be a sequence of the slices.
+     *
+     * @throws  VisADException  problem in resampling
+     */
+    public static FieldImpl sliceAlongLatLonLine(FieldImpl grid,
+            List<LatLonPoint> points, int samplingMode) throws VisADException {
+        return sliceAlongLatLonLine(grid, points, samplingMode, DEFAULT_ERROR_MODE );
+    }
+
+    /**
+     * Slice the grid along the line specified by the two LatLonPoint-s
+     *
+     * @param  grid   grid to slice (must be a valid 2D or 3D grid)
+     * @param  points  list of points along the line
+     * @param samplingMode mode for sampling
+     * @param  errorMode Data.NO_ERRORS, Data.DEPENDENT, Data.INDEPENDENT
+     *
+     * @return  spatial slice along the line.  If this is a sequence of grids
+     *          it will be a sequence of the slices.
+     *
+     * @throws  VisADException  problem in resampling
+     */
+    public static FieldImpl sliceAlongLatLonLine(FieldImpl grid,
+            List<LatLonPoint> points, int samplingMode,
+            int errorMode)
+            throws VisADException {
+        FieldImpl fi = grid;
+        if (isSinglePointDomain(grid) || grid == null) {
+            return grid;
+        }
+        if (is3D(grid) && !isVolume(grid)) {
+            grid = make2DGridFromSlice(grid, false);
+        }
+
+        if ((getTimeSet(grid) == null) || isConstantSpatialDomain(grid)) {
+            fi = slice(
+                grid,
+                makeSliceFromLatLonPoints(
+                    (GriddedSet) getSpatialDomain(grid), points), samplingMode, errorMode);
+        } else {
+            try {
+                Set timeSet = getTimeSet(grid);
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    FieldImpl ff    = (FieldImpl) grid.getSample(i);
+                    FieldImpl slice = null;
+                    if (ff.isMissing()) {
+                        slice = ff;
+                    } else {
+                        slice = slice(
+                            ff,
+                            makeSliceFromLatLonPoints(
+                                (GriddedSet) getSpatialDomain(grid, i),
+                                points), samplingMode, errorMode);
+                    }
+                    if (i == 0) {
+                        fi = new FieldImpl(
+                            new FunctionType(
+                                ((SetType) timeSet.getType()).getDomain(),
+                                (FunctionType) slice.getType()), timeSet);
+                    }
+                    fi.setSample(i, slice, false);
+
+                }
+            } catch (RemoteException re) {}  // won't happen - grids are local
+        }
+        return fi;
+    }
+
+    /**
+     * Slice the grid along the line specified by the two LatLonPoint-s
+     *
+     * @param  grid   grid to slice (must be a valid 2D or 3D grid)
      * @param  start  starting LatLonPoint of the line
      * @param  end    starting LatLonPoint of the line
      * @param samplingMode mode for sampling
@@ -2428,6 +2563,13 @@ public class GridUtil {
             LatLonPoint start, LatLonPoint end, int samplingMode,
             int errorMode)
             throws VisADException {
+
+        if (true) {
+            List<LatLonPoint> points = new ArrayList<LatLonPoint>();
+            points.add(start);
+            points.add(end);
+            return sliceAlongLatLonLine(grid, points, samplingMode, errorMode);
+        }
         FieldImpl fi = grid;
         if (isSinglePointDomain(grid) || grid == null) {
             return grid;
@@ -3624,6 +3766,13 @@ public class GridUtil {
             GriddedSet spatialSet, LatLonPoint start, LatLonPoint end)
             throws VisADException {
 
+        if (true) {
+            List<LatLonPoint> points = new ArrayList<LatLonPoint>();
+            points.add(start);
+            points.add(end);
+            return makeSliceFromLatLonPoints(spatialSet,points);
+        }
+
         boolean is3D = is3D(spatialSet);
         // make sure this is a sliceable grid
         if (is3D && (spatialSet.getManifoldDimension() != 3)) {
@@ -3694,7 +3843,8 @@ public class GridUtil {
             //endpoints[otherIndex][1] = 0.f;  // set vertical to 0
             endpoints[otherIndex][1] = domainCoords[otherIndex][0];  // set vertical to first point vertical
         }
-        float[][] savedEndpoints  = (float[][]) endpoints.clone();
+        //float[][] savedEndpoints  = (float[][]) endpoints.clone();
+        float[][] savedEndpoints  = Misc.cloneArray(endpoints);
 
         boolean   compatibleUnits = false;
         Unit[]    setUnits        = spatialSet.getSetUnits();
@@ -3900,6 +4050,332 @@ public class GridUtil {
         return samplingSet;
     }
 
+    /**
+     * Create a Set describing a vertical slice, a set of locations, below the
+     * two points specified, based on the spatial
+     * domain.  If points are the same, this makes a vertical line.
+     *
+     * @param  spatialSet a GriddedSet of all data point locations
+     * @param  start      starting point of slice
+     * @param  end        ending point of slice
+     *
+     * @return a SampledSet a 3-D spatial set of 2-D manifold.
+     *
+     * @throws VisADException   problem creating slice
+     */
+    private static SampledSet makeSliceFromLatLonPoints(
+            GriddedSet spatialSet, List<LatLonPoint> points)
+            throws VisADException {
+
+        boolean is3D = is3D(spatialSet);
+        // make sure this is a sliceable grid
+        if (is3D && (spatialSet.getManifoldDimension() != 3)) {
+            throw new IllegalArgumentException(
+                " Domain must have same manifold size as dimension");
+        }
+        if ( !isNavigated(spatialSet)) {
+            throw new IllegalArgumentException("Domain is not georeferenced");
+        }
+
+        // for grid Field of form (time -> ((x,y,z) - > parm)
+        // get the x,y,z which may be (x,y,z) in km,
+        // or row,col,level, or VisAD Latitude, Longitude, Altitude
+        RealTupleType spatialType =
+            ((SetType) spatialSet.getType()).getDomain();
+        // System.out.println("spatialType = " + spatialType);
+
+        // if native grid is already VisAD
+        //   Latitude Longitude Altitude, the coordsys is null, and get null here
+        RealTupleType spatialReferenceType =
+            (spatialSet.getCoordinateSystem() != null)
+            ? spatialSet.getCoordinateSystem().getReference()
+            : null;
+        // System.out.println("spatialRefType = " + spatialReferenceType);
+
+        // now see whether the domain or the reference is the lat/lon
+        boolean isLatLonDomain = ((spatialReferenceType == null) ||  // has to be in domain
+            ((spatialType.getIndex(RealType.Latitude) != -1)
+             && (spatialType.getIndex(RealType.Longitude) != -1)));
+        // System.out.println("isLatLonDomain = " + isLatLonDomain);
+        int latIndex, lonIndex;
+        if (isLatLonDomain) {
+            latIndex = spatialType.getIndex(RealType.Latitude);
+            lonIndex = spatialType.getIndex(RealType.Longitude);
+        } else {
+            latIndex = spatialReferenceType.getIndex(RealType.Latitude);
+            lonIndex = spatialReferenceType.getIndex(RealType.Longitude);
+        }
+        int       otherIndex = 3 - (latIndex + lonIndex);
+        int numPoints = points.size();
+
+        float[][] endpoints  = new float[(is3D)
+                                         ? 3
+                                         : 2][numPoints];  // lat/lon/(possibly something) start/end
+        float[][] domainCoords = spatialSet.getSamples(false);
+
+        // start point location
+        //System.out.println("     from start lat, lon "+ start);
+
+        int pi = 0;
+        for (LatLonPoint llp : points) {
+            endpoints[latIndex][pi] =
+                (float) llp.getLatitude().getValue(CommonUnit.degree);
+            endpoints[lonIndex][pi] =
+                (float) llp.getLongitude().getValue(CommonUnit.degree);
+
+            if (is3D) {
+                //endpoints[otherIndex][0] = 0.f;  // set vertical to 0
+                endpoints[otherIndex][pi] = domainCoords[otherIndex][0];  // set vertical to first point vertical
+            }
+            pi++;
+        }
+
+        //float[][] savedEndpoints  = (float[][]) endpoints.clone();
+        float[][] savedEndpoints  = Misc.cloneArray(endpoints);
+
+        boolean   compatibleUnits = false;
+        Unit[]    setUnits        = spatialSet.getSetUnits();
+        Unit[]    refUnits        = Unit.copyUnitsArray(setUnits);
+
+        if ( !isLatLonDomain) {  // convert to native
+            CoordinateSystem cs = spatialSet.getCoordinateSystem();
+            endpoints = cs.fromReference(endpoints);
+            refUnits  = cs.getReferenceUnits();
+            compatibleUnits = Unit.canConvertArray(new Unit[] {
+                setUnits[latIndex],
+                setUnits[lonIndex] }, new Unit[] { refUnits[latIndex],
+                    refUnits[lonIndex] });
+
+        } else {  // make sure the units are right
+            endpoints = Unit.convertTuple(endpoints,
+                                          new Unit[] { CommonUnit.degree,
+                    CommonUnit.degree, CommonUnit.meter }, setUnits, false);
+        }
+
+
+        // Interpolate a plane between end positions,
+        // numLocs number of positions equal spaced along
+        // a straight line in the native grid (as km) coordinate system.
+        // (This straight cross section may appear curved in some
+        // map projections.)
+        // There will be numLocs number of positions horizontally,
+        // a somewhat arbitrary but reasonable number.
+        int   newi;
+        float firstx, lastx, firsty, lasty, height, frac;
+        float xval, yval;
+        List<float[][]> coords = new ArrayList<float[][]>(numPoints-1);
+        int totalLocs = 0;
+        int numLocs;
+        LatLonPoint start, end;
+        int sizeX = spatialSet.getLengths()[lonIndex];
+        int sizeY = spatialSet.getLengths()[latIndex];
+        int sizeZ = (is3D)
+                    ? spatialSet.getLengths()[otherIndex]
+                    : 1;
+
+        for (int p = 0; p < numPoints-1; p++) {
+
+            start = points.get(p);
+            end = points.get(p+1);
+            // get x and y values at first and last position: (kilometers)
+            firstx = endpoints[lonIndex][p];
+            lastx  = endpoints[lonIndex][p+1];
+
+            firsty = endpoints[latIndex][p];
+            lasty  = endpoints[latIndex][p+1];
+
+            // kludge for EmpericalCoordinateSystem
+            // if the cs returns null values (because of the vertical dimension
+            // assume that the spatial dimensions are the same and use those
+            if (Float.isNaN(firstx) || Float.isNaN(lastx) || Float.isNaN(firsty)
+                    || Float.isNaN(lasty)) {
+                if ( !compatibleUnits) {
+                    // try to convert to reference and make slice there
+                    CoordinateSystem cs = spatialSet.getCoordinateSystem();
+                    if (cs != null) {
+                        if (cs instanceof EmpiricalCoordinateSystem) {
+                            spatialSet =
+                                ((EmpiricalCoordinateSystem) cs)
+                                    .getReferenceSet();
+                            spatialType =
+                                ((SetType) spatialSet.getType()).getDomain();
+                            setUnits = spatialSet.getSetUnits();
+
+                        } else {
+                            try {
+                                spatialSet =
+                                    (GriddedSet) Util.convertDomain(spatialSet,
+                                        spatialReferenceType, null);
+                                spatialType =
+                                    ((SetType) spatialSet.getType()).getDomain();
+                                setUnits = spatialSet.getSetUnits();
+                            } catch (RemoteException re) {
+                                throw new VisADException(
+                                    "Couldn't convert domain");
+                            }
+                        }
+                        isLatLonDomain = true;
+                        domainCoords   = spatialSet.getSamples(false);
+                    } else {
+                        throw new VisADException("unable to make slice");
+                    }
+                }
+                savedEndpoints = Unit.convertTuple(savedEndpoints,
+                        new Unit[] { CommonUnit.degree,
+                                     CommonUnit.degree,
+                                     CommonUnit.meter }, refUnits, false);
+                firstx = savedEndpoints[lonIndex][p];
+                lastx  = savedEndpoints[lonIndex][p+1];
+                firsty = savedEndpoints[latIndex][p];
+                lasty  = savedEndpoints[latIndex][p+1];
+            }
+
+            //float[][] domainCoords = spatialSet.getSamples(false);
+
+            /*
+            System.out.println("        horiz native value    "+firstx+
+                              " to  "+lastx);
+            System.out.println("        vertical native value "+firsty+
+                          " to "+lasty);
+            */
+
+
+            //System.out.println("size xyz = " + sizeX + "," + sizeY + "," +sizeZ);
+            if ( !start.equals(end)) {
+                float[] highs   = spatialSet.getHi();
+                float[] lows    = spatialSet.getLow();
+                float   numPerX = (highs[lonIndex] - lows[lonIndex]) / sizeX;
+                float   numPerY = (highs[latIndex] - lows[latIndex]) / sizeY;
+
+                int numXPoints  = Math.round(Math.abs(firstx - lastx) / numPerX);
+                int numYPoints  = Math.round(Math.abs(firsty - lasty) / numPerY);
+                numLocs = Math.max(1, Math.min(Math.max(numXPoints, numYPoints),
+                                               sizeX));
+            } else {  // points are the same
+                numLocs = 1;
+            }
+            // System.out.println("        numLocs "+numLocs);
+
+            // make a working array for x,y,z positions in 3D space
+            // coords2D is in the native coordinates of the data grid (such as km),
+            float[][] coords2D = new float[is3D
+                                           ? 3
+                                           : 2][numLocs * sizeZ];
+
+            //System.out.println("  x vals are ");
+
+            //  Make a Set of locations for data points
+            //    loop over all heights
+            for (int k = 0; k < sizeZ; k++) {
+
+                // the index for this height value in domainCoords
+                int zindex = k * sizeY * sizeX;
+
+                // the value
+                // (can be any kind of height indication, even atmospheric pressure)
+                height = (is3D)
+                         ? domainCoords[otherIndex][zindex]
+                         : 0f;
+
+                // compute positions x,y,z for points in cross section (km)
+                // these define positions in the 2d cross-section plane
+                // cutting through the 3d x,y,z coordinate system
+                for (int i = 0; i < numLocs; i++) {
+                    // index of this point in array coords2D
+                    newi = i + k * numLocs;
+
+                    // fractional distance along the cross section:
+                    frac = (numLocs == 1)
+                           ? 1
+                           : (float) i / (numLocs - 1);
+
+                    // x value for point:
+                    xval = (float) (firstx + ((lastx - firstx) * frac));
+
+                    // ensure its inside native grid area if lat-lon coordinates
+                    //if (k==0) System.out.print("    xval "+xval);
+                    xval = (float) normalizeLongitude(spatialSet, xval);
+                    //if (k==0) System.out.println(" -> "+xval);
+
+                    coords2D[lonIndex][newi] = xval;
+
+                    // y value
+                    yval = (float) (firsty + ((lasty - firsty) * frac));
+                    coords2D[latIndex][newi] = yval;
+
+                    // height value - native grid units
+                    if (is3D) {
+                        coords2D[otherIndex][newi] = height;
+                    }
+                }
+            }
+            coords.add(coords2D);
+            totalLocs += numLocs;
+        }
+
+        // make a Gridded3DSet of manifold dimension 2 -
+        // where to sample in the DATA grid
+        // 3D volume (not on display map) to make the planar cross section
+        Unit[] units = null;
+        if (isLatLonDomain) {
+            units = setUnits;
+        } else {
+            Unit[] csUnits =
+                spatialSet.getCoordinateSystem().getCoordinateSystemUnits();
+            units = (is3D)
+                    ? new Unit[] { csUnits[0], csUnits[1], setUnits[2] }
+                    : new Unit[] { csUnits[0], csUnits[1] };
+        }
+
+        // make a working array for x,y,z positions in 3D space
+        // coords2D is in the native coordinates of the data grid (such as km),
+        float[][] allCoords;
+
+        if (numPoints > 2) { // combine separate coords into one
+            totalLocs -= numPoints-2;
+            allCoords = new float[is3D ? 3 : 2][totalLocs * sizeZ];
+            int pIndex = 0;
+            for (int k = 0; k < sizeZ; k++) {
+                float zVal;
+                for (int c = 0; c < coords.size(); c++) {
+                    float[][] sectionCoords = coords.get(c);
+                    int numSectionPoints = sectionCoords[0].length/sizeZ;
+                    for (int l = 0; l < numSectionPoints; l++) {
+                        // skip first point in coords after the first section since its the
+                        // same as the last point of the previous section
+                        if (l == 0 && c > 0) continue;
+                        allCoords[0][pIndex] = sectionCoords[0][l + k*numSectionPoints];
+                        allCoords[1][pIndex] = sectionCoords[1][l + k*numSectionPoints];
+                        if (is3D) {
+                            allCoords[2][pIndex] = sectionCoords[2][l + k*numSectionPoints];
+                        }
+                        pIndex++;
+                    }
+                }
+            }
+        } else {
+          allCoords = coords.get(0);
+        }
+
+        GriddedSet samplingSet = ( !is3D)
+                                 ? (GriddedSet) new Gridded2DSet(spatialType,
+                                     allCoords, totalLocs,
+                                     spatialSet.getCoordinateSystem(), units,
+                                     spatialSet.getSetErrors(), false)
+                                 : (totalLocs > 1)
+                                   ? (GriddedSet) new Gridded3DSet(
+                                       spatialType, allCoords, totalLocs, sizeZ,
+                                       spatialSet.getCoordinateSystem(),
+                                       units, spatialSet.getSetErrors(),
+                                       false)
+                                   : (GriddedSet) new Gridded3DSet(
+                                       spatialType, allCoords, sizeZ,
+                                       spatialSet.getCoordinateSystem(),
+                                       units, spatialSet.getSetErrors(),
+                                       false);
+        // System.out.println("llslice = " + samplingSet);
+        return samplingSet;
+    }
 
 
     /**
@@ -8209,4 +8685,5 @@ public class GridUtil {
         return visad.util.Util.isApproximatelyEqual(first + 360., last,
                 epsilon);
     }
+
 }
