@@ -432,3 +432,6 @@ def make2DFlowTraj(u,v,s,s0):
   """
   ff = GridTrajectory.createTrajectoryGrid(u,v,s,s0)
   return ff
+
+def setLevel(grid, level, unit):
+  return GridUtil.addLevelToGrid(grid, float(level), unit)
