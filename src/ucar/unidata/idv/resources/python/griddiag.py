@@ -666,3 +666,39 @@ def vsub(V1,V2):
   """
   return sub(V1,V2)
 
+def LPIndex(u, v, z, t, top, bottom, unit):
+  """ calculate the wind shear between discrete layers
+  <div class=jython>
+  LP = 7.268DUDZ + 0.718DTDN + 0.318DUDN - 2.52
+  </div>
+  """
+  Z = windShear(u, v, z, top, bottom, unit)*726.8
+  uwind = getSliceAtLevel(u, top)
+  vwind = getSliceAtLevel(v, top)
+  temp = newUnit(getSliceAtLevel(t, top), "temperature", "celsius")
+  HT = sqrt(ddx(temp)*ddx(temp) + ddy(temp)*ddy(temp))*71.8
+  HU = (ddx(vwind) + ddy(uwind))*31.8
+  L = add(noUnit(Z), add(noUnit(HU), noUnit(HT)))
+  L = (L - 2.52)*(-0.59)
+  P= 1.0/(1.0 + GridMath.applyFunctionOverGridsExt(L,"exp"))
+  LP = setLevel(P ,top, unit)
+  return LP
+
+def EllrodIndex(u, v, z, top, bottom, unit):
+  """ calculate the wind shear between discrete layers
+  <div class=jython>
+   EI = VWS X ( DEF + DIV)
+  </div>
+  """
+  VWS = windShear(u, v, z, top, bottom, unit)*100.0
+#
+  uwind = getSliceAtLevel(u, top)
+  vwind = getSliceAtLevel(v, top)
+  DIV = (ddx(uwind) + ddy(vwind))* (-1.0)
+#
+  DSH = ddx(vwind) + ddy(uwind)
+  DST = ddx(uwind) - ddy(vwind)
+  DEF = sqrt(DSH * DSH + DST * DST)
+  EI = mul(noUnit(VWS), add(noUnit(DEF), noUnit(DIV)))
+  return setLevel(EI, top, unit)
+
