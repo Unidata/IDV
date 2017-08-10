@@ -290,7 +290,7 @@ example:
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
-      id="gridtrajectorycontrol2"
+      id="gridtrajectorycontrol20"
       categories="*-display:gridtrajectorycontrol1-*"
       class="ucar.unidata.idv.control.GridTrajectoryControlNew"
       canstandalone="false"
@@ -312,6 +312,43 @@ example:
       displaycategory="3D Grid Trajectory"
       code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
       properties="windowVisible=false;coloredByAnother=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
+          id="gridtrajectorycontrol11"
+          categories="*-display:gridtrajectorycontrol2-*"
+          class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+          canstandalone="false"
+          doeslevels="true"
+          description="2-D Trajectory"
+          label="2D Grid Trajectory"
+          displaycategory="2D Grid Trajectory"
+          properties="windowVisible=false;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
+          id="gridtrajectorycontrol12"
+          categories="*-display:gridtrajectorycontrol2-*"
+          class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+          canstandalone="false"
+          doeslevels="true"
+          description="2-D Trajectory"
+          label="2D Grid Trajectory Colored by Speed"
+          displaycategory="2D Grid Trajectory"
+          properties="windowVisible=false;useSpeedForColor=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
+          id="gridtrajectorycontrol13"
+          categories="*-display:gridtrajectorycontrol2-*"
+          class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+          canstandalone="false"
+          doeslevels="true"
+          description="2-D Trajectory"
+          label="Trajectory Colored by Another Parameter"
+          displaycategory="2D Grid Trajectory"
+          code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
+          properties="windowVisible=false;coloredByAnother=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
