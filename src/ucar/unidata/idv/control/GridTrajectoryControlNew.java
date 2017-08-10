@@ -390,6 +390,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
         /** _more_ */
         GridTrajectoryControlNew gtc;
 
+        boolean is2D = false;
+
         /**
          * Default constructor; does nothing.
          *
@@ -475,6 +477,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                             return false;
                         }
                     }
+                } else if(choices0.size() == 2) {
+                    is2D = true;
                 }
             }
 
@@ -557,8 +561,12 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     false);
 
             if (useSpeedForColor || coloredByAnother) {
-                if(coloredByAnother)
-                    colorIndex = 3;
+                if(coloredByAnother) {
+                    if(is2D)
+                        colorIndex = 2;
+                    else
+                        colorIndex = 3;
+                }
                 addAttributedDisplayable(planDisplay, FLAG_COLORTABLE);
                 addAttributedDisplayable(planDisplay, FLAG_LINEWIDTH);
             } else {
@@ -780,8 +788,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if(coloredByAnother){
                 DerivedDataChoice derivedDataChoice = ((DerivedDataChoice) ((DerivedDataChoice) choice).getChoices().get(
                         0));
-                wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(
-                        2));
+                if(is2D)
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(0));
+                else
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(2));
+            } else if(is2D){
+                wchoice = ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                        0));
             } else {
                 wchoice = ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
                         2));
@@ -1546,8 +1559,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if(coloredByAnother){
                 DerivedDataChoice derivedDataChoice = ((DerivedDataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
                         0));
-                wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(
-                        2));
+                if(is2D)
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(0));
+                else
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(2));
+            } else if( is2D ){
+                wchoice = ((DataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
+                        0));
             } else {
                 wchoice = ((DataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
                         2));
