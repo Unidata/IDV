@@ -1304,7 +1304,34 @@ public class DerivedGridFactory {
         return GridUtil.setParamType(uvwGrid, earthVectorType,
                                      false /* copy */);
     }
+    /**
+     * _more_
+     *
+     * @param uGrid _more_
+     * @param vGrid _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl createFlowVectorsN(FieldImpl uGrid,
+                                               FieldImpl vGrid)
+            throws VisADException, RemoteException {
 
+        //FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid, w },
+        //                                true);
+        FieldImpl uvGrid = combineGrids(new FieldImpl[]{uGrid, vGrid}, GridUtil.DEFAULT_SAMPLING_MODE,
+                GridUtil.DEFAULT_ERROR_MODE, true);
+        TupleType paramType = GridUtil.getParamType(uvGrid);
+        RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
+                CommonUnit.meterPerSecond);
+        RealTupleType earthVectorType = new EarthVectorType(reals[0],
+                reals[1]);
+
+        return GridUtil.setParamType(uvGrid, earthVectorType,
+                false /* copy */);
+    }
     /**
      * _more_
      *
@@ -2363,7 +2390,7 @@ public class DerivedGridFactory {
         if( rUnit == null || !(rUnit.isConvertible(percentUnit))){
 
             Range[] range = GridUtil.fieldMinMax(rh);
-            if(range[0].max <= 1 && range[0].min > 0){
+            if(range[0].max <= 1.1 && range[0].min > 0){
                 //it is fraction
                 rh = (FlatField)rh.__mul__(100.0);
 
