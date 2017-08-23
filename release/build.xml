@@ -259,8 +259,9 @@ line using: and -Dbasedir=/some/other/dir
 
   <target name="-if-localgitrepo" depends="-check-localgitrepo" if="localgitrepo.present">
     <!-- Pulling the git repo, but from outside the git repo. This requires some special command line arguments as explained below. -->
-    <exec executable="git">
-      <arg line="--git-dir=${localgitrepo}/.git --work-tree=${localgitrepo} pull" />
+    <exec executable="/bin/sh">
+      <arg value="-c" />
+      <arg value="(cd ${localgitrepo}; pwd ; git pull)" />
     </exec>
   </target>
 
