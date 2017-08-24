@@ -316,7 +316,7 @@ example:
   </control>
   <control
           id="gridtrajectorycontrol11"
-          categories="*-display:gridtrajectorycontrol2-*"
+          categories="*-display:gridtrajectorycontrol11-*"
           class="ucar.unidata.idv.control.GridTrajectoryControlNew"
           canstandalone="false"
           doeslevels="true"
@@ -328,7 +328,7 @@ example:
   </control>
   <control
           id="gridtrajectorycontrol12"
-          categories="*-display:gridtrajectorycontrol2-*"
+          categories="*-display:gridtrajectorycontrol11-*"
           class="ucar.unidata.idv.control.GridTrajectoryControlNew"
           canstandalone="false"
           doeslevels="true"
@@ -340,7 +340,7 @@ example:
   </control>
   <control
           id="gridtrajectorycontrol13"
-          categories="*-display:gridtrajectorycontrol2-*"
+          categories="*-display:gridtrajectorycontrol11-*"
           class="ucar.unidata.idv.control.GridTrajectoryControlNew"
           canstandalone="false"
           doeslevels="true"
