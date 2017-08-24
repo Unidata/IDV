@@ -1,20 +1,18 @@
 /*
- * $Id: ShapeGlyph.java,v 1.33 2007/04/16 20:53:47 jeffmc Exp $
- *
- * Copyright  1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2017 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -92,7 +90,7 @@ public class ShapeGlyph extends LineGlyph {
 
     /** Shape type names */
     public static final String[] SHAPE_NAMES = { "Rectangle", "Oval", "Line",
-            "Diamond" };
+                                                 "Diamond" };
 
 
     /** The shape type */
@@ -315,12 +313,38 @@ public class ShapeGlyph extends LineGlyph {
         float[][] lineVals  = getPointValues();
         if (shapeType == SHAPE_LINE) {
             if (getNumInterpolationPoints() > 0) {
-                lineVals = interpolate(2 + getNumInterpolationPoints(),
-                                       new float[] { lineVals[0][0],
-                        lineVals[1][0], lineVals[2][0] }, new float[] {
-                            lineVals[0][1],
-                            lineVals[1][1], lineVals[2][1] });
-
+                float[][] segment;
+                float[][] allLines = null;
+                for (int p = 0; p < lineVals[0].length - 1; p++) {
+                    segment = interpolate(2 + getNumInterpolationPoints(),
+                                          new float[] { lineVals[0][p],
+                                                  lineVals[1][p],
+                                                  lineVals[2][p] }, new float[] {
+                                                      lineVals[0][p + 1],
+                                                              lineVals[1][p + 1],
+                                                              lineVals[2][p + 1] });
+                    int newPoints = segment[0].length;
+                    if (allLines == null) {
+                        allLines = segment;
+                    } else {
+                        int numExistingPoints = allLines[0].length;
+                        float[][] tmpArray =
+                            new float[3][numExistingPoints + newPoints];
+                        for (int j = 0; j < numExistingPoints; j++) {
+                            for (int k = 0; k < 3; k++) {
+                                tmpArray[k][j] = allLines[k][j];
+                            }
+                        }
+                        for (int j = 0; j < newPoints; j++) {
+                            for (int k = 0; k < 3; k++) {
+                                tmpArray[k][numExistingPoints + j] =
+                                    segment[k][j];
+                            }
+                        }
+                        allLines = tmpArray;
+                    }
+                }
+                lineVals = allLines;
             }
 
             Data theData = new Gridded3DSet(mathType, lineVals,
@@ -479,21 +503,28 @@ public class ShapeGlyph extends LineGlyph {
         return pts;
     }
 
+    /**
+     * Make a rectangle from the points
+     *
+     * @param pts  the points
+     *
+     * @return the rectangle
+     */
     public static Rectangle2D.Float makeRectangle2D(float[][] pts) {
-        float  minX     = Float.POSITIVE_INFINITY;
-        float  minY     = Float.POSITIVE_INFINITY;
-        float  maxX     = Float.NEGATIVE_INFINITY;
-        float  maxY     = Float.NEGATIVE_INFINITY;
-        for(int i=0;i<pts[0].length;i++) {
-            minX = (float)Math.min(minX, pts[IDX_LON][i]);
-            maxX = (float)Math.max(maxX, pts[IDX_LON][i]);
-            minY = (float)Math.min(minY, pts[IDX_LAT][i]);
-            maxY = (float)Math.max(maxY, pts[IDX_LAT][i]);
+        float minX = Float.POSITIVE_INFINITY;
+        float minY = Float.POSITIVE_INFINITY;
+        float maxX = Float.NEGATIVE_INFINITY;
+        float maxY = Float.NEGATIVE_INFINITY;
+        for (int i = 0; i < pts[0].length; i++) {
+            minX = (float) Math.min(minX, pts[IDX_LON][i]);
+            maxX = (float) Math.max(maxX, pts[IDX_LON][i]);
+            minY = (float) Math.min(minY, pts[IDX_LAT][i]);
+            maxY = (float) Math.max(maxY, pts[IDX_LAT][i]);
         }
 
-        float width = (maxX - minX);
+        float width  = (maxX - minX);
         float height = (maxY - minY);
-        return  new Rectangle2D.Float( minX, minY,  width, height);
+        return new Rectangle2D.Float(minX, minY, width, height);
     }
 
 
@@ -563,4 +594,3 @@ public class ShapeGlyph extends LineGlyph {
 
 
 }
-

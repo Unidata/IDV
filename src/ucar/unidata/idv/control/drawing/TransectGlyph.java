@@ -1,20 +1,18 @@
 /*
- * $Id: TransectGlyph.java,v 1.23 2007/04/16 20:53:48 jeffmc Exp $
- *
- * Copyright  1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2017 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -56,6 +54,8 @@ import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import java.rmi.RemoteException;
 
@@ -114,6 +114,8 @@ public class TransectGlyph extends ShapeGlyph {
     /** End text */
     private String endText = "E";
 
+    /** Waypoint prefixtext */
+    private String waypointPrefixText = "W";
 
     /** property widget */
     private JTextField startTextFld;
@@ -126,6 +128,13 @@ public class TransectGlyph extends ShapeGlyph {
 
     /** My view manager wen I am showing the display transect */
     private TransectViewManager tvm;
+
+    /** Last point */
+    private Object lastPoint = null;
+
+    /** property to allow multiple segments for transect */
+    private static final String PROP_MULTIPLE_SEGMENTS =
+        "idv.transect.multisegment";
 
 
     /**
@@ -246,7 +255,8 @@ public class TransectGlyph extends ShapeGlyph {
         }
         if (showText) {
             setText(startTextDisplayable, 0, startText, startTextType);
-            setText(endTextDisplayable, 1, endText, endTextType);
+            setText(endTextDisplayable, points.size() - 1, endText,
+                    endTextType);
         }
 
 
@@ -260,7 +270,8 @@ public class TransectGlyph extends ShapeGlyph {
         }
 
         EarthLocation p1       = (EarthLocation) points.get(0);
-        EarthLocation p2       = (EarthLocation) points.get(1);
+        EarthLocation p2       = (EarthLocation) points.get(points.size()
+                                     - 1);
 
 
         MathType      mathType = RealTupleType.LatitudeLongitudeAltitude;
@@ -305,16 +316,16 @@ public class TransectGlyph extends ShapeGlyph {
         float[][] tmp = new float[3][];
 
         for (int i = 0; i < lineVals[0].length - 1; i++) {
-            tmp[0] =
-                Misc.merge(tmp[0],
-                           Misc.interpolate(2 + getNumInterpolationPoints(),
-                                            lineVals[0][i],
-                                            lineVals[0][i + 1]));
-            tmp[1] =
-                Misc.merge(tmp[1],
-                           Misc.interpolate(2 + getNumInterpolationPoints(),
-                                            lineVals[1][i],
-                                            lineVals[1][i + 1]));
+            tmp[0] = Misc.merge(tmp[0],
+                                Misc.interpolate(2
+                                    + getNumInterpolationPoints(),
+                                        lineVals[0][i],
+                                        lineVals[0][i + 1]));
+            tmp[1] = Misc.merge(tmp[1],
+                                Misc.interpolate(2
+                                    + getNumInterpolationPoints(),
+                                        lineVals[1][i],
+                                        lineVals[1][i + 1]));
         }
 
         tmp[2]   = new float[tmp[0].length];
@@ -454,7 +465,17 @@ public class TransectGlyph extends ShapeGlyph {
         if ( !editable) {
             return null;
         }
-        return super.handleMouseDragged(event);
+        if ( !canDoMultiSegment()) {
+            return super.handleMouseDragged(event);
+        }
+        lastPoint = getPoint(event);
+        if (points.size() < 2) {
+            points.add(getPoint(event));
+        } else {
+            points.set(points.size() - 1, getPoint(event));
+        }
+        updateLocation();
+        return this;
     }
 
 
@@ -640,5 +661,47 @@ public class TransectGlyph extends ShapeGlyph {
     public Real getMaxDataDistance() {
         return maxDataDistance;
     }
-}
 
+    /**
+     * Handle event.
+     *
+     * @param event The display event.
+     *
+     * @return This or null
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public DrawingGlyph handleKeyPressed(DisplayEvent event)
+            throws VisADException, RemoteException {
+        if ((points.size() < 2)
+                || (lastPoint == null)
+                || !canDoMultiSegment()) {
+            return this;
+        }
+        InputEvent inputEvent = event.getInputEvent();
+        if ( !(inputEvent instanceof KeyEvent)) {
+            return this;
+        }
+        KeyEvent keyEvent = (KeyEvent) inputEvent;
+        if (keyEvent.getKeyCode() != KeyEvent.VK_SPACE) {
+            return this;
+        }
+        points.add(lastPoint);
+        lastPoint = null;
+        updateLocation();
+        return this;
+    }
+
+    /**
+     * See if we can do multiple segments
+     * return true if property is set
+     *
+     * @return _more_
+     */
+    private boolean canDoMultiSegment() {
+        return control.getControlContext().getIdv().getStateManager()
+        .getPreferenceOrProperty(PROP_MULTIPLE_SEGMENTS, false);
+    }
+
+}
