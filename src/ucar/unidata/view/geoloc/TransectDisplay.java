@@ -2099,7 +2099,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                      *  the distance to the segment and the distance along each line and find the minimum distance
                      *  to the segment that still is in the line.  The old method would pick the wrong segment.
                      */
-                    for (int j = 0; j < numLinePoints; j++) {
+                    for (int j = 0; j < numLinePoints -1 ; j++) {
                         //System.out.println("Line Point: "+linePoints[0][j]+","+linePoints[1][j]);
                         workBearing =
                             Bearing.calculateBearing(linePoints[0][j],
@@ -2247,7 +2247,9 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                      *  the distance to the segment and the distance along each line and find the minimum distance
                      *  to the segment that still is in the line.  The old method would pick the wrong segment.
                      */
-                    for (int j = 0; j < numLinePoints; j++) {
+
+                   // System.out.println("Line Point: "+lat[i]+","+lon[i]);
+                    for (int j = 0; j < numLinePoints - 1; j++) {
                         //System.out.println("Line Point: "+linePoints[0][j]+","+linePoints[1][j]);
                         workBearing =
                             Bearing.calculateBearing(linePoints[0][j],
