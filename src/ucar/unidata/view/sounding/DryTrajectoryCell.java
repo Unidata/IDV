@@ -177,10 +177,10 @@ public class DryTrajectoryCell extends ComputeCell {
                                               Math.exp(logPresRatio));
                 float[] pressures    = new float[count];
                 float[] temperatures = new float[count];
-                Real    pressure     = initPres;
+                Real    pressure     = new Real(AirPressure.getRealType(), (double)initPres.getValue(presUnit), presUnit);
                 Real    temperature  = initTemp;
                 TemperatureCalculator calculator =
-                    factory.newTemperatureCalculator(initPres, initTemp);
+                    factory.newTemperatureCalculator(pressure, initTemp);
 
                 pressures[0] = (float) pressure.getValue(presUnit);
 
