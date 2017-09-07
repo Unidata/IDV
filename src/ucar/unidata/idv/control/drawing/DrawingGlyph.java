@@ -616,6 +616,7 @@ public abstract class DrawingGlyph {
             double lat = Misc.decodeLatLon(pointStrings.get(i).toString());
             double lon = Misc.decodeLatLon(pointStrings.get(i
                              + 1).toString());
+            lon = LatLonPointImpl.lonNormal360(lon);
             double alt;
             if (coordType == COORD_LATLONALT) {
                 alt = Double.parseDouble((String) pointStrings.get(i + 2));
