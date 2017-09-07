@@ -40,6 +40,7 @@ import ucar.nc2.time.Calendar;
 
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.point.PointObTuple;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.projection.LambertConformal;
 import ucar.unidata.geoloc.projection.Mercator;
@@ -3836,7 +3837,7 @@ public class GridUtil {
             endpoints[latIndex][pi] =
                 (float) llp.getLatitude().getValue(CommonUnit.degree);
             endpoints[lonIndex][pi] =
-                (float) llp.getLongitude().getValue(CommonUnit.degree);
+                (float) LatLonPointImpl.lonNormal360(llp.getLongitude().getValue(CommonUnit.degree));
 
             if (is3D) {
                 //endpoints[otherIndex][0] = 0.f;  // set vertical to 0
