@@ -96,11 +96,14 @@ public class TransectGlyph extends ShapeGlyph {
     /** So we show the end point text */
     private boolean showText = true;
 
-    /** Text displayable */
+    /** StartText displayable */
     private TextDisplayable startTextDisplayable;
 
-    /** Text displayable */
+    /** EndText displayable */
     private TextDisplayable endTextDisplayable;
+
+    /** Waypoint displayable */
+    private CompositeDisplayable waypointDisplayable;
 
     /** The type used in the display */
     private TextType startTextType;
@@ -108,20 +111,26 @@ public class TransectGlyph extends ShapeGlyph {
     /** text type */
     private TextType endTextType;
 
+    /** waypoint text type */
+    private TextType waypointTextType;
+
     /** Start text */
     private String startText = "B";
 
     /** End text */
     private String endText = "E";
 
-    /** Waypoint prefixtext */
-    private String waypointPrefixText = "W";
+    /** Waypoint prefix text */
+    private String waypointText = "W";
 
     /** property widget */
     private JTextField startTextFld;
 
     /** property widget */
     private JTextField endTextFld;
+
+    /** property widget */
+    private JTextField waypointTextFld;
 
     /** property widget */
     private JTextField maxDistanceFld;
@@ -255,6 +264,23 @@ public class TransectGlyph extends ShapeGlyph {
         }
         if (showText) {
             setText(startTextDisplayable, 0, startText, startTextType);
+            if (points.size() > 2) {
+                for (int i = 1; i < points.size()-1; i++) {
+                    int numwaypoints = waypointDisplayable.displayableCount();
+                    if (i > numwaypoints) {
+                        TextDisplayable waypoint = new TextDisplayable("waypoint text_"
+                              + (typeCnt++), waypointTextType);
+                        waypoint.setTextSize(control.getDisplayScale() * 2.0f);
+                        if (getColor() != null) {
+                        	setColor(waypoint, getColor());
+                        }
+                        setText(waypoint, i, waypointText+i, waypointTextType);
+                        waypointDisplayable.addDisplayable(waypoint);
+                    } else {
+                        setText((TextDisplayable) waypointDisplayable.getDisplayable(i-1), i, waypointText+i, waypointTextType);
+                    }
+                }
+            }
             setText(endTextDisplayable, points.size() - 1, endText,
                     endTextType);
         }
@@ -443,8 +469,12 @@ public class TransectGlyph extends ShapeGlyph {
             endTextDisplayable = new TextDisplayable("end text_"
                     + (typeCnt++), endTextType);
             endTextDisplayable.setTextSize(control.getDisplayScale() * 2.0f);
+            waypointTextType = TextType.getTextType("TransectGlyphText_"
+                    + (typeCnt++));
+            waypointDisplayable = new CompositeDisplayable("waypoints");
             addDisplayable(startTextDisplayable);
             addDisplayable(endTextDisplayable);
+            addDisplayable(waypointDisplayable);
         }
         return true;
 
@@ -493,6 +523,11 @@ public class TransectGlyph extends ShapeGlyph {
         comps.add(GuiUtils.left(startTextFld));
         comps.add(GuiUtils.rLabel("End Label:"));
         comps.add(GuiUtils.left(endTextFld));
+        if (points.size() > 2) {
+            waypointTextFld = new JTextField(waypointText, 5);
+            comps.add(GuiUtils.rLabel("Waypoint Label:"));
+            comps.add(GuiUtils.left(waypointTextFld));
+        }
         maxDistanceFld = null;
         tvm            = null;
         if (viewDescriptor != null) {
@@ -530,6 +565,9 @@ public class TransectGlyph extends ShapeGlyph {
         }
         setStartText(startTextFld.getText().trim());
         setEndText(endTextFld.getText().trim());
+        if (waypointTextFld != null) {
+            setWaypointText(waypointTextFld.getText().trim());
+        }
         try {
             if (maxDistanceFld != null) {
                 Real oldMaxDataDistance = maxDataDistance;
@@ -591,6 +629,24 @@ public class TransectGlyph extends ShapeGlyph {
      */
     public String getEndText() {
         return endText;
+    }
+
+    /**
+     * Set the WaypointText property.
+     *
+     * @param value The new value for WaypointText
+     */
+    public void setWaypointText(String value) {
+        waypointText = value;
+    }
+
+    /**
+     * Get the WaypointText property.
+     *
+     * @return The WaypointText
+     */
+    public String getWaypointText() {
+        return waypointText;
     }
 
 
