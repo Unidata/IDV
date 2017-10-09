@@ -490,7 +490,7 @@
 
   <derived
      description="3D Map"
-     formula="make3DMap(MapData, Topography[categories=param:ALTITUDE;param:Elevation])"
+     formula="make3DMap(MapData, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
      id="3Dmap"
      isdefault="false"
      isenduser="true">

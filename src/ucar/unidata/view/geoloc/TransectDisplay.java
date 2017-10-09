@@ -1,26 +1,22 @@
 /*
- * $Id: TransectDisplay.java,v 1.41 2007/08/09 20:46:19 dmurray Exp $
- *
- * Copyright  1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2017 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 
 package ucar.unidata.view.geoloc;
 
@@ -328,14 +324,18 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                                           RealType.YAxis,
                                           InputEvent.SHIFT_MASK);
         rubberBandBox.addAction(new ActionImpl("RBB Action") {
-            public void doAction() throws VisADException, RemoteException {
-                RubberBandBox box = getRubberBandBox();
-                if ((box == null) || (box.getBounds() == null)) {
-                    return;
-                }
-                setMapRegion(box.getBounds());
-            }
-        });
+                                    public void doAction()
+                                            throws VisADException,
+                                            RemoteException {
+                                        RubberBandBox box =
+                                            getRubberBandBox();
+                                        if ((box == null)
+                                            || (box.getBounds() == null)) {
+                                            return;
+                                        }
+                                        setMapRegion(box.getBounds());
+                                    }
+                                });
         setRubberBandBox(rubberBandBox);
         enableRubberBanding(true);
         // set the moust functions
@@ -375,10 +375,14 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
         Rectangle bounds = getScreenBounds();
         EarthLocation leftEl =
             getEarthLocation(getSpatialCoordinatesFromScreen(0
-                + (int) (SCALE_OFFSET * bounds.width), bounds.height, 0));
+                + (int) (SCALE_OFFSET * bounds.width),
+                                                             bounds.height,
+                                                             0));
         EarthLocation rightEl =
             getEarthLocation(getSpatialCoordinatesFromScreen(bounds.width
-                - (int) (SCALE_OFFSET * bounds.width), bounds.height, 0));
+                - (int) (SCALE_OFFSET * bounds.width),
+                                                             bounds.height,
+                                                             0));
         return new EarthLocation[] { leftEl, rightEl };
     }
 
@@ -661,6 +665,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
 
         addScalarMaps(mapSet);
         setDisplayActive();
+
     }
 
     /**
@@ -749,7 +754,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
     public void setVerticalRange(double min, double max)
             throws VisADException, RemoteException {
         super.setVerticalRange(min, max);
-        System.err.println("min:" + min +" max:" + max);
+        //System.err.println("min:" + min +" max:" + max);
 
         verticalMapSet.setVerticalRange(min, max);
         altitudeMin = min;
@@ -872,7 +877,8 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
      */
     public void setMaxDataDistance(double distance) throws VisADException {
         setMaxDataDistance(new Real((RealType) maxDistance.getType(),
-                                    distance, getHorizontalRangeUnit()));
+                                    distance,
+                                    getHorizontalRangeUnit()));
     }
 
     /**
@@ -945,12 +951,14 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
         for (int i = 0; i < xyzPoints[0].length; i++) {
             workPoint.set(linePoints[0][i], linePoints[1][i]);
             String txtLabel;
-            if(i == 0)
-                txtLabel = workPoint.toString()+ " (B)";
-            else if (i == xyzPoints[0].length-1)
-                txtLabel =  workPoint.toString() + " (E)";
-            else
-                txtLabel = workPoint.toString();
+            if (i == 0) {
+                txtLabel = workPoint.toString() + " (B)";
+            } else if (i == xyzPoints[0].length - 1) {
+                txtLabel = workPoint.toString() + " (E)";
+            } else {
+                //txtLabel = workPoint.toString();
+                txtLabel = "W" + i;
+            }
 
             labelTable.put(new Double(xyzPoints[0][i]), txtLabel);
         }
@@ -1021,22 +1029,36 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
      * @throws VisADException  can't get VisAD Data
      */
     private void setTransectRange() throws VisADException, RemoteException {
-        float[][] linePoints = transect.getSamples();
-        int       numpoints  = linePoints[0].length;
-        float[][] xyzPoints = coordinateSystem.toReference(new float[][] {
-            linePoints[0], linePoints[1], new float[numpoints]
-        });
+        float[][] linePoints  = transect.getSamples();
+        int       numpoints   = linePoints[0].length;
+        double    distance    = 0;
+        Bearing   workBearing = new Bearing();
+        for (int p = 0; p < numpoints - 1; p++) {
+            LatLonPointImpl startPoint =
+                new LatLonPointImpl(linePoints[0][p], linePoints[1][p]);
+            LatLonPointImpl endPoint =
+                new LatLonPointImpl(linePoints[0][p + 1],
+                                    linePoints[1][p + 1]);
+            workBearing = Bearing.calculateBearing(startPoint, endPoint,
+                    workBearing);
+            distance += workBearing.getDistance();
+        }
+        distance = horizontalRangeUnit.toThis(distance,
+                CommonUnits.KILOMETER);
+        //System.out.println("loop distance "+ distance);
+        /*
         LatLonPointImpl startPoint = new LatLonPointImpl(linePoints[0][0],
                                          linePoints[1][0]);
         LatLonPointImpl endPoint =
             new LatLonPointImpl(linePoints[0][numpoints - 1],
                                 linePoints[1][numpoints - 1]);
-        Bearing workBearing = new Bearing();
         workBearing = Bearing.calculateBearing(startPoint, endPoint,
                 workBearing);
-        double distance =
+        distance =
             horizontalRangeUnit.toThis(workBearing.getDistance(),
                                        CommonUnits.KILOMETER);
+        System.out.println("end point distance "+ distance);
+        */
         if (distanceMap != null) {
             distanceMap.setRange(0., distance);
         }
@@ -1244,6 +1266,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                 zoom(zoom);
             }
         }
+
     }
 
     /**
@@ -1300,9 +1323,9 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                              new float[][] {
             { (float) start.getLatitude(), (float) end.getLatitude() },
             { (float) start.getLongitude(), (float) end.getLongitude() }
-        }, 2,       // 1-D manifold
-           (CoordinateSystem) null, (Unit[]) null, (ErrorEstimate[]) null,
-           false);  // don't copy
+        }, 2,                                                 // 1-D manifold
+                             (CoordinateSystem) null, (Unit[]) null,
+                             (ErrorEstimate[]) null, false);  // don't copy
         return line;
     }
 
@@ -1585,14 +1608,13 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                 new float[] { (float) (x) }, new float[] { (float) (y) },
                 new float[] { (float) (z) }
             });
-            Real lat = new Real(RealType.Latitude,
-                                getScaledValue(latitudeMap, numbers[0][0]),
-                                csUnits[0]);
+            Real lat = new Real(RealType.Latitude, getScaledValue(latitudeMap,
+                                                                  numbers[0][0]), csUnits[0]);
             Real lon = new Real(RealType.Longitude,
-                                getScaledValue(longitudeMap, numbers[1][0]),
-                                csUnits[1]);
-            Real alt = new Real(RealType.Altitude,
-                                getScaledValue(altitudeMap, numbers[2][0]));
+                                getScaledValue(longitudeMap,
+                                        numbers[1][0]), csUnits[1]);
+            Real alt = new Real(RealType.Altitude, getScaledValue(altitudeMap,
+                                                                  numbers[2][0]));
             value = new EarthLocationTuple(lat, lon, alt);
         } catch (VisADException e) {
             e.printStackTrace();
@@ -1892,10 +1914,9 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
          * @param that a CacheInfo
          */
         public void debug(CacheInfo that) {
-            System.err.println("debug:"
-                               + Misc.arraysEquals(this.lla, that.lla) + " "
-                               + Misc.arraysEquals(this.linePoints,
-                                   that.linePoints));
+            System.err.println("debug:" + Misc.arraysEquals(this.lla,
+                    that.lla) + " " + Misc.arraysEquals(this.linePoints,
+                            that.linePoints));
         }
 
         /**
@@ -2020,6 +2041,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
         public float[][] toReference(float[][] latlonalt)
                 throws VisADException {
 
+            //System.out.println("Starting toReference");
             if ((latlonalt == null) || (latlonalt[0].length < 1)) {
                 return latlonalt;
             }
@@ -2062,6 +2084,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                 maxDataDistance = Double.MAX_VALUE;
             }
             for (int i = 0; i < numpoints; i++) {
+                //System.out.println("Point: "+lat[i]+","+lon[i]);
                 if (numLinePoints == 2) {
                     workBearing = Bearing.calculateBearing(linePoints[0][0],
                             linePoints[1][0], lat[i], lon[i], workBearing);
@@ -2069,8 +2092,15 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                     minDistance = workBearing.getDistance();
                     minAngle    = workBearing.getAngle();
                 } else {  // more than 2 points
-                    int closestSegment = 0;
-                    for (int j = 0; j < numLinePoints; j++) {
+                    //int closestSegment = 0;
+                    minDistance = Double.MAX_VALUE;
+                    double minDistToSegment = Double.MAX_VALUE;
+                    /*  Brute force method of finding out which segment the point is closest to.  Calculate
+                     *  the distance to the segment and the distance along each line and find the minimum distance
+                     *  to the segment that still is in the line.  The old method would pick the wrong segment.
+                     */
+                    for (int j = 0; j < numLinePoints -1 ; j++) {
+                        //System.out.println("Line Point: "+linePoints[0][j]+","+linePoints[1][j]);
                         workBearing =
                             Bearing.calculateBearing(linePoints[0][j],
                                 linePoints[1][j], lat[i], lon[i],
@@ -2078,6 +2108,33 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
 
                         double dist  = workBearing.getDistance();
                         double angle = workBearing.getAngle();
+                        // the segment which has this point as it's start.
+                        int    segment          = (j < numLinePoints - 1)
+                                ? j
+                                : j - 1;
+                        double thisSegmentAngle = angles[segment];
+                        double segmentLength    = distances[segment];
+                        double distToThisSegment =
+                            Math.abs(dist
+                                     * Math.sin(Math.toRadians(Math.abs(angle
+                                         - thisSegmentAngle))));
+                        double distAlongThisSegment =
+                            Math.abs(dist
+                                     * Math.cos(Math.toRadians(Math.abs(angle
+                                         - thisSegmentAngle))));
+                        //System.out.println("Dist to point: "+linePoints[0][j]+","+linePoints[1][j]+" = "+dist+", dist to segment: "+distToThisSegment+", dist along segment ="+distAlongThisSegment+", segment length = "+segmentLength);
+
+                        if ((distAlongThisSegment <= segmentLength)
+                                && (distToThisSegment < minDistToSegment)) {
+                            minDistToSegment = distToThisSegment;
+                            minAngle         = angle;
+                            minDistance      = dist;
+                            segmentAngle     = angles[segment];
+                            len              = lenToPoint[segment];
+                            //System.out.println("Closest segment = "+segment+", minDistToSegment = "+minDistToSegment);
+                        }
+                    }
+                    /*  Old method:
                         if (dist < minDistance) {
                             closestSegment = Math.max(0, j - 1);
                             if (j == 0) {
@@ -2093,7 +2150,9 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                     }
                     segmentAngle = angles[closestSegment];
                     len          = lenToPoint[closestSegment];
+                    */
                 }
+                //System.out.println("minDist: "+minDistance+", minAngle = "+minAngle);
                 double distToSegment =
                     minDistance
                     * Math.sin(Math.toRadians(Math.abs(minAngle
@@ -2125,6 +2184,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             }
             call2("toReference(f)", numpoints);
             return xyz;
+
         }
 
 
@@ -2181,6 +2241,52 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                     minAngle    = workBearing.getAngle();
                 } else {  // more than 2 points
                     int closestSegment = 0;
+                    minDistance = Double.MAX_VALUE;
+                    double minDistToSegment = Double.MAX_VALUE;
+                    /*  Brute force method of finding out which segment the point is closest to.  Calculate
+                     *  the distance to the segment and the distance along each line and find the minimum distance
+                     *  to the segment that still is in the line.  The old method would pick the wrong segment.
+                     */
+
+                   // System.out.println("Line Point: "+lat[i]+","+lon[i]);
+                    for (int j = 0; j < numLinePoints - 1; j++) {
+                        //System.out.println("Line Point: "+linePoints[0][j]+","+linePoints[1][j]);
+                        workBearing =
+                            Bearing.calculateBearing(linePoints[0][j],
+                                linePoints[1][j], lat[i], lon[i],
+                                workBearing);
+
+                        double dist  = workBearing.getDistance();
+                        double angle = workBearing.getAngle();
+                        // the segment which has this point as it's start.
+                        int    segment          = (j < numLinePoints - 1)
+                                ? j
+                                : j - 1;
+                        double thisSegmentAngle = angles[segment];
+                        double segmentLength    = distances[segment];
+                        double distToThisSegment =
+                            Math.abs(dist
+                                     * Math.sin(Math.toRadians(Math.abs(angle
+                                         - thisSegmentAngle))));
+                        double distAlongThisSegment =
+                            Math.abs(dist
+                                     * Math.cos(Math.toRadians(Math.abs(angle
+                                         - thisSegmentAngle))));
+                        //System.out.println("Dist to point: "+linePoints[0][j]+","+linePoints[1][j]+" = "+dist+", dist to segment: "+distToThisSegment+", dist along segment ="+distAlongThisSegment+", segment length = "+segmentLength);
+
+                        if ((distAlongThisSegment <= segmentLength)
+                                && (distToThisSegment < minDistToSegment)) {
+                            minDistToSegment = distToThisSegment;
+                            minAngle         = angle;
+                            minDistance      = dist;
+                            segmentAngle     = angles[segment];
+                            len              = lenToPoint[segment];
+                            //System.out.println("Closest segment = "+segment+", minDistToSegment = "+minDistToSegment);
+                        }
+                    }
+                    /*
+                    int closestSegment = 0;
+                    minDistance = Double.MAX_VALUE;
                     for (int j = 0; j < numLinePoints; j++) {
                         workBearing =
                             Bearing.calculateBearing(linePoints[0][j],
@@ -2204,6 +2310,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                     }
                     segmentAngle = angles[closestSegment];
                     len          = lenToPoint[closestSegment];
+                    */
                 }
                 double distToSegment =
                     minDistance
@@ -2226,6 +2333,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             }
             call2("toReference(d)", numpoints);
             return xyz;
+
         }
 
         /**
@@ -2397,6 +2505,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             }
             totalLength = lenToPoint[numLinePoints - 1];
         }
+
     }
 
     /**
@@ -2410,10 +2519,10 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
 
         JFrame frame = new JFrame();
         frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
+                                    public void windowClosing(WindowEvent e) {
+                                        System.exit(0);
+                                    }
+                                });
         float[][] points = new float[][] {
             { 39, 38, 41 }, { -110, -107, -105 }
         };
@@ -2473,5 +2582,5 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             return true;
         }
     }
-}
 
+}

@@ -21,30 +21,43 @@
 package ucar.unidata.data.grid;
 
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataSelection;
-
 import ucar.unidata.util.LogUtil;
-
 import ucar.unidata.util.ObjectArray;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.ThreeDSize;
 import ucar.unidata.util.Trace;
-
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
-
-import visad.*;
-
+import visad.CoordinateSystem;
+import visad.Data;
+import visad.DateTime;
+import visad.EarthVectorType;
+import visad.FieldImpl;
+import visad.FlatField;
+import visad.FunctionType;
+import visad.GridVectorType;
+import visad.Gridded1DSet;
+import visad.Gridded3DSet;
+import visad.MathType;
+import visad.Real;
+import visad.RealTupleType;
+import visad.RealType;
+import visad.RealVectorType;
+import visad.SampledSet;
+import visad.SetType;
+import visad.TupleType;
+import visad.Unit;
+import visad.VisADException;
 import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
-
-
-
-import java.rmi.RemoteException;
-
-import java.util.Hashtable;
 
 
 /**
@@ -817,7 +830,7 @@ public class GridDataInstance extends DataInstance {
      * @see GridUtil#sliceAtLevel(FieldImpl, Real)
      */
     public FieldImpl sliceAtLevel(Real level) throws VisADException {
-        return GridUtil.sliceAtLevel(getFieldImpl(), level);
+        return GridUtil.sliceAtLevel(getGrid(), level);
     }
 
     /**
@@ -851,8 +864,27 @@ public class GridDataInstance extends DataInstance {
     public FieldImpl sliceAlongLatLonLine(LatLonPoint start, LatLonPoint end,
                                           int samplingMode)
             throws VisADException {
-        return GridUtil.sliceAlongLatLonLine(getFieldImpl(), start, end,
-                                             samplingMode);
+        List<LatLonPoint> points = new ArrayList<LatLonPoint>(2);
+        points.add(start);
+        points.add(end);
+        return sliceAlongLatLonLine(points, samplingMode);
+    }
+
+    /**
+     * Slice the grid at along a lat/lon line
+     * Interface to GridUtil.sliceAlongLatLonLine().
+     *
+     * @param start  starting position for line
+     * @param end    ending position for line
+     * @param samplingMode    type of sampling
+     * @return  slice along the line
+     *
+     * @throws VisADException   problem doing slice
+     * @see GridUtil#sliceAlongLatLonLine(FieldImpl, LatLonPoint, LatLonPoint)
+     */
+    public FieldImpl sliceAlongLatLonLine(List<LatLonPoint> points, int samplingMode)
+            throws VisADException {
+        return GridUtil.sliceAlongLatLonLine(getGrid(), points, samplingMode);
     }
 
     /**
@@ -865,7 +897,7 @@ public class GridDataInstance extends DataInstance {
      * @throws VisADException  problem with slice
      */
     public FieldImpl slice(SampledSet slice) throws VisADException {
-        return GridUtil.slice(getFieldImpl(), slice);
+        return GridUtil.slice(getGrid(), slice);
     }
 
     /**

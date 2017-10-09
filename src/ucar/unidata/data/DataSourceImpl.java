@@ -2178,6 +2178,21 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                     List<DateTime> selectedTimes =
                         selectTimesFromList(givenDataSelection,
                                             dataSourceTimes, timeDriverTimes);
+                    // comment out for further investigation
+                  /*  if(selectedTimes!= null && selectedTimes.size() == 1){
+                        // when it is single time it is likely to be outside
+                        // driver time bound, so we check it out here
+                        int len = timeDriverTimes.size();
+                        DateTime tdriver0 = timeDriverTimes.get(0);
+                        DateTime tdriver1 = timeDriverTimes.get(len - 1);
+                        DateTime td = selectedTimes.get(0);
+                        double intval = tdriver1.getValue() - tdriver0.getValue();
+
+                        if(td.getValue() < (tdriver0.getValue() - intval)
+                                || td.getValue() > (tdriver1.getValue() + intval)){
+                            selectedTimes.remove(0);
+                        }
+                    } */
                     if (selectedTimes != null) {
                         return selectedTimes;
                     }

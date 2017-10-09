@@ -11,18 +11,24 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 5.2 release.
+The items below reflect changes since the 5.3 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-
+<faqitem q="Java Version 1.8" id="jv18">
+  <p>
+    Migrated the IDV to Java 8 u51. Because of a Windows 10 related bug on some older Intel hardware,
+    the latest version of Java will not be deploying with the IDV.
+  </p>
+</faqitem>
 <faqitem q="Latest netCDF-Java Version" id="nj465">
+
   <p>
     The version of the netCDF-Java library currently distributed with the IDV is
-    the 4.6.5. This is a bug fix release.  See
-    the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds2">
+    the 4.6.10. This is a bug fix release.  See
+    the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds6">
       netCDF-Java Library</a> for a more details information.
   </p>
 </faqitem>
@@ -30,42 +36,59 @@ The items below reflect changes since the 5.2 release.
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem q="Volume Vectors" id="vvectors">
+
+<faqitem q="Grid 3D Trajectories" id="g3trajectory">
   <p>
-    The IDV can now display 3D volume vectors based on the x, y, and z wind component fields,
-    the unit of the z componet wind could be in meter per second or in pascal per second.
+    The new grid 3D trajectory is based on the VisAD library enhancements. The
+    Grid 3D trajectory includes 3D Grid Trajectory, 3D Grid
+    Trajectory colored by speed, and Trajectory colored by another parameter. By default, the initial area of 3D
+    trajectory is the whole domain of the dataset, and the user could choose one of the option: points,
+    closed polygon, and rectangle to setup the initial area.
   </p>
 </faqitem>
 
-<faqitem q="Volume Trajectories" id="vtrajectory">
+<faqitem q="Grid 3D Trajectory Types" id="g3dttypes">
   <p>
-    The 3D volume trajectory is based on the new APIs of the VisAD library enhancements
-    with much better performance. The volume trajectory display is categorized as 3D flow
-    displays that also includes 3D vecotr cross section, 3D volume vector, 3D volume vector
-    colored by speed, and 3D volume vector colored by another parameter. The 3D volume vector
-    display could be created first and there is radio button to switch to the volume trajectory
-    display. The start points of volume trajectory could be the whole volume of the gridded
-    dataset or the selected level of the gridded dataset.
-  </p>
-</faqitem>
-
-<faqitem q="Trajectory types" id="ttypes">
-  <p>
-    In addition to the traditional line trajecory display, ribbon, cylinder and deform ribbon are
-    added as new trajectory dispaly types and are available in this release.
+    In addition to the traditional line trajectory display, ribbon, cylinder, deform ribbon and point are
+    added as new trajectory display types in this release.
   </p>
 </faqitem>
 
 
-<faqitem cat="Data Changes"></faqitem>
+<faqitem cat="ISL Changes"></faqitem>
 
-<faqitem q="Local McIDAS Area Files" id="larea">
+<faqitem q="Changing the bounding box in ISL" id="islarea">
+  <p>
+    The new attribute of ISL bundle tag will load an existing bundle and change the
+    coverage region dynamically.
+  </p>
+</faqitem>
+
+<faqitem q="Changing driver times in ISL" id="isltime">
+  <p>
+    The new attribute of ISL bundle tag will load an existing bundle and change the
+    driver times of the bundle.
+  </p>
+</faqitem>
+
+<faqitem q="Saving a ZIDV in ISL" id="zidvisl">
+  <p>
+     The new attribute of ISL export tag will save the display area data in the zidv bundle file
+    in an offscreen mode.
+  </p>
+</faqitem>
+
+<faqitem q="Loading a remote catalog URL" id="islurl">
+  <p>
+    The new ISL loadcatalog tag will load a remote catalog URL.
+  </p>
+</faqitem>
+
+  <faqitem q="Publishing to the RAMADDA" id="islpub">
     <p>
-      The local McIDAS area files can be calibrated and spatially subset, currently only for the
-      GVAR (GOES) area files in this release and we are working on area files from other satellites.
+      The new ISL publish tag will publish a file to RAMADDA server.
     </p>
-</faqitem>
-
+  </faqitem>
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">

@@ -366,10 +366,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
         private final static String[] trajFormLabels = new String[] { "Line",
                                                                       "Ribbon",
                                                                       "Cylinder",
-                                                                      "Deform Ribbon" };
+                                                                      "Deform Ribbon",
+                                                                        "Point"};
 
         /** types of smoothing functions */
-        private final static int[] trajForm = new int[] { 0, 1, 2, 3 };
+        private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
 
         /** vector/traj length component */
         JComponent trajFormComponent;
@@ -388,6 +389,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         /** _more_ */
         GridTrajectoryControlNew gtc;
+
+        boolean is2D = false;
 
         /**
          * Default constructor; does nothing.
@@ -439,6 +442,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if (dataChoice instanceof DerivedDataChoice) {
                 DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
                 List              choices0 = ddc.getChoices();
+                if(choices0.size() == 1) { // colored by another param
+                    ddc      = (DerivedDataChoice) choices0.get(0);
+                    choices0 = ddc.getChoices();
+                }
                 if (choices0.size() == 3) {
                     DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
                     DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
@@ -470,6 +477,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                             return false;
                         }
                     }
+                } else if(choices0.size() == 2) {
+                    is2D = true;
                 }
             }
 
@@ -499,11 +508,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                }
                                            }
                                        });
-            myDisplay = (FlowDisplayable) createPlanDisplay();
+            //myDisplay = (FlowDisplayable) createPlanDisplay();
 
-            myDisplay.setPointSize(getPointSize());
-            addDisplayable(myDisplay, getAttributeFlags());
-
+            //myDisplay.setPointSize(4);
+            //addDisplayable(myDisplay, getAttributeFlags());
+            //myDisplay.setForward(!gtc.backwardTrajectory);
             //DataSelection ds = getDataSelection();
             DataSelection tmpSelection =
                     new DataSelection(gtc.getDataSelection());
@@ -518,11 +527,15 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 return false;
             }
 
+            addDisplayable(myDisplay, getAttributeFlags());
 
             //Now set up the flags and add the displayable
             return true;
         }
 
+        public String getLineWidthWidgetLabel() {
+            return "Line Width/Point Size";
+        }
 
         /**
          * _more_
@@ -548,6 +561,12 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     false);
 
             if (useSpeedForColor || coloredByAnother) {
+                if(coloredByAnother) {
+                    if(is2D)
+                        colorIndex = 2;
+                    else
+                        colorIndex = 3;
+                }
                 addAttributedDisplayable(planDisplay, FLAG_COLORTABLE);
                 addAttributedDisplayable(planDisplay, FLAG_LINEWIDTH);
             } else {
@@ -764,9 +783,22 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 new DataSelection(getDataSelection());
             tmpSelection.setFromLevel(null);
             tmpSelection.setToLevel(null);
-            DataChoice wchoice =
-                ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
-                    2));
+            DataChoice wchoice = null;
+
+            if(coloredByAnother){
+                DerivedDataChoice derivedDataChoice = ((DerivedDataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                        0));
+                if(is2D)
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(0));
+                else
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(2));
+            } else if(is2D){
+                wchoice = ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                        0));
+            } else {
+                wchoice = ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                        2));
+            }
             List     levelsList = wchoice.getAllLevels(tmpSelection);
             Object[] levels     = null;
             if ((levelsList != null) && (levelsList.size() > 0)) {
@@ -780,7 +812,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
 
             setLevels(levels);
-
+            myDisplay = (FlowDisplayable) createPlanDisplay();
             myDisplay.setActive(false);
             myDisplay.setUseSpeedForColor(useSpeedForColor);
             myDisplay.setColoredByAnother(coloredByAnother);
@@ -1011,7 +1043,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             //            arrowHeadSizeValue, false);
             //if(!isTrajectories) {
             if (gtc.getSkipValue() > 0) {
-                grid    = GridUtil.subset(grid, skipFactor + 1);
+                grid    = GridUtil.subset(grid, gtc.getSkipValue());
                 newGrid = grid;
             }
 
@@ -1311,7 +1343,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if (useSpeedForColor) {
                 return "windSpeed";
             } else if (coloredByAnother) {
-                return getGridDataInstance().getRealTypeName(colorIndex);
+                if(getGridDataInstance()==null)
+                    return "ColoredByAnother";
+                String pname = getGridDataInstance().getRealTypeName(colorIndex);
+                int eidx = pname.indexOf("[unit");
+                return pname.substring(0, eidx);
             } else {
                 return super.getColorParamName();
             }
@@ -1331,6 +1367,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if (useSpeedForColor) {
                 return flowRange;
             } else if (coloredByAnother) {
+                if(getGridDataInstance() == null)
+                    return null;
                 return getGridDataInstance().getRanges()[colorIndex];
             } else {
                 return super.getInitialRange();
@@ -1352,13 +1390,16 @@ public class GridTrajectoryControlNew extends DrawingControl {
         public void setLineWidth(int width)
                 throws RemoteException, VisADException {
             if (getGridDisplay() != null) {
-                if (trajFormType == 2) {
+                if (trajFormType == 4) {
+                    setPointSize(width * 1.0f);
+                } else if (trajFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
+                    getGridDisplay().resetTrojectories();
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
                     getGridDisplay().setRibbonWidth(width);
+                    getGridDisplay().resetTrojectories();
                 }
-
-                getGridDisplay().resetTrojectories();
+                //getGridDisplay().resetTrojectories();
             }
             if (gtc != null) {
                 gtc.setTrackLineWidth(width);
@@ -1388,10 +1429,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                            Hashtable properties) {
             //super.initAfterUnPersistence(vc, properties);
 
-            setTrajFormType(getTrajFormType());
+            setTrajFormType(gtc.getTrackFormType());
             int width = super.getLineWidth();
             if (getGridDisplay() != null) {
                 setTrajFormType(gtc.getTrackFormType());
+                try {
+                    setRange(gtc.getRange());
+                } catch (Exception ee){}
                 if (trajFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
@@ -1423,6 +1467,68 @@ public class GridTrajectoryControlNew extends DrawingControl {
         /**
          * _more_
          *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public Range getRange() throws RemoteException, VisADException {
+            return super.getRange();
+        }
+
+        /**
+         * _more_
+         *
+         * @param nRange _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public void setRange(Range nRange)
+                throws RemoteException, VisADException {
+            super.setRange(nRange);
+            setFlowColorRange(nRange);
+            if (gtc != null) {
+                gtc.setRange(nRange);
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @param newColorTable _more_
+         *
+         * @throws RemoteException _more_
+         * @throws VisADException _more_
+         */
+        public void setColorTable(ColorTable newColorTable)
+                throws RemoteException, VisADException {
+
+            if (newColorTable != super.getColorTable()) {
+                super.setColorTable(newColorTable);
+            }
+            if ((gtc != null) && (newColorTable != gtc.getTrjColorTable())) {
+
+                gtc.setTrjColorTable(newColorTable);
+            }
+        }
+
+
+        /**
+         * Get the {@link ucar.unidata.util.ColorTable} property.
+         *
+         * @return The ColorTable
+         */
+        public ColorTable getColorTable() {
+
+
+            if ((gtc != null) && (gtc.getTrjColorTable() != null)) {
+                return gtc.getTrjColorTable();
+            } else {
+                return super.getColorTable();
+            }
+        }
+        /**
+         * _more_
+         *
          * @return _more_
          *
          * @throws RemoteException _more_
@@ -1447,9 +1553,23 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 new DataSelection(getDataSelection());
             tmpSelection.setFromLevel(null);
             tmpSelection.setToLevel(null);
-            DataChoice wchoice =
-                ((DataChoice) ((DerivedDataChoice) datachoice).getChoices()
-                .get(2));
+
+            DataChoice wchoice = null;
+
+            if(coloredByAnother){
+                DerivedDataChoice derivedDataChoice = ((DerivedDataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
+                        0));
+                if(is2D)
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(0));
+                else
+                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(2));
+            } else if( is2D ){
+                wchoice = ((DataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
+                        0));
+            } else {
+                wchoice = ((DataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
+                        2));
+            }
             List     levelsList = wchoice.getAllLevels(tmpSelection);
             Object[] levels     = null;
             if ((levelsList != null) && (levelsList.size() > 0)) {
@@ -1651,10 +1771,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
         this.dataChoice                 = dataChoice;
         gridTrackControl.controlContext = getControlContext();
 
+        gridTrackControl.setUsesTimeDriver(this.getUsesTimeDriver());
         gridTrackControl.updateDataSelection(dataSelection1);
         gridTrackControl.init(dataChoice);
 
-        updateDataSelection(dataSelection1);
+        //updateDataSelection(dataSelection1);
 
         Object fromLevel = dataSelection1.getFromLevel();
         dataSelection1.setLevel(null);
@@ -1793,7 +1914,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
     @Override
     public synchronized void dataChanged() {
         try {
-            removeAllGlyphs();
+            //removeAllGlyphs();
             //initData();
         } catch (Exception e) {}
 
@@ -1864,6 +1985,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 setLevel(bundleLevel);
                 levelBox.setSelectedItem(bundleLevel);
             }
+            if(backwardTrajectory){
+                backwardCbx.doClick();
+            }
             newUnit = getDisplayUnit();
             gridTrackControl.initAfterUnPersistence(vc, properties);
             createTrjBtn.doClick();
@@ -1886,15 +2010,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
     }
 
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean getHaveInitialized() {
-        return true;
-    }
 
     /**
      * current level
@@ -2127,12 +2242,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
             gridTrackControl.myDisplay.setStartPoints(null, null);
         }
         //gridTrackControl.loadVolumeData();
+        gridTrackControl.myDisplay.setForward(!backwardCbx.isSelected());
         gridTrackControl.myDisplay.setArrowHead(
             gridTrackControl.getArrowHead());
         Range range = gridTrackControl.getGridDataInstance().getRange(
-                          gridTrackControl.getColorRangeIndex());  //GridUtil.getMinMax(fi)[0];
+                          gridTrackControl.getColorRangeIndex());
         gridTrackControl.myDisplay.resetTrojectories();
-        gridTrackControl.setRange(range);
+        //gridTrackControl.setRange(range);
 
         controlPane.setVisible(true);
         controlPane.add(gridTrackControl.doMakeContents());

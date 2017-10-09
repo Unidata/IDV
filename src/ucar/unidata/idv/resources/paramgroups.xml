@@ -26,6 +26,14 @@
        p2="nV"
        label="Normal Year Wind vectors"/>
   </paramgroup>
+  <paramgroup name="u_v">
+    <params
+       p1="U"
+       p2="V"/>
+    <params
+       p1="u"
+       p2="v"/>
+  </paramgroup>
   <paramgroup name="u_v_w">
     <params
        p1="U"
@@ -47,6 +55,20 @@
        p1="UREL"
        p2="VREL"
        p3="Z"/>
+  </paramgroup>
+  <paramgroup name="u_v_z_t">
+    <params
+            p1="U"
+            p2="V"
+            p3="Z"
+            p4="TEMP"/>
+  </paramgroup>
+  <paramgroup name="urel_vrel_z_t">
+    <params
+            p1="UREL"
+            p2="VREL"
+            p3="Z"
+            p4="TEMP"/>
   </paramgroup>
   <paramgroup name="temp_and_pressure">
     <params

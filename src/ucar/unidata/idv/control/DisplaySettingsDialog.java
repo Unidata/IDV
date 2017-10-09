@@ -100,7 +100,7 @@ public class DisplaySettingsDialog {
     /** gui component */
     private JComponent contents;
 
-    /** _more_          */
+    /** The menu bar*/
     private JMenuBar menuBar;
 
     /** list of dipslays */
@@ -220,8 +220,8 @@ public class DisplaySettingsDialog {
      * @param label label to use
      * @param category The category of the property
      */
-    protected void addPropertyValue(Object object, String propName,
-                                    String label, String category) {
+    public void addPropertyValue(Object object, String propName,
+                                 String label, String category) {
 
         PropertyValue propertyValue = new PropertyValue(propName, label,
                                           object, category);
@@ -390,8 +390,8 @@ public class DisplaySettingsDialog {
             displayComps.add(GuiUtils.inset(new JLabel(label), labelInsets));
             for (int compIdx = 0; compIdx < comps.size(); compIdx++) {
                 displayComps.add(
-                    GuiUtils.inset(
-                        (JComponent) comps.get(compIdx), compInsets));
+                    GuiUtils.inset((JComponent) comps.get(compIdx),
+                                   compInsets));
             }
         }
 
@@ -400,10 +400,11 @@ public class DisplaySettingsDialog {
 
         final JButton selectBtn    = new JButton("Display Groups");
         selectBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                popupDisplayGroupMenu(selectBtn);
-            }
-        });
+                                        public void actionPerformed(
+                                        ActionEvent ae) {
+                                            popupDisplayGroupMenu(selectBtn);
+                                        }
+                                    });
 
         applyBtn = GuiUtils.makeButton("Apply>>", this, "doApply");
         JButton okBtn     = GuiUtils.makeButton("OK", this, "doOk");
@@ -427,15 +428,15 @@ public class DisplaySettingsDialog {
             displaysList.setSelectedValue(display, true);
         }
         displaysList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                DisplayControlImpl display =
-                    (DisplayControlImpl) displaysList.getSelectedValue();
-                if (display != null) {
-                    displaySettingsList.clearSelection();
-                    setDisplay(display);
-                }
-            }
-        });
+                    public void valueChanged(ListSelectionEvent e) {
+                        DisplayControlImpl display =
+                            (DisplayControlImpl) displaysList.getSelectedValue();
+                        if (display != null) {
+                            displaySettingsList.clearSelection();
+                            setDisplay(display);
+                        }
+                    }
+                });
 
 
         displaySettingsList = new JList(
@@ -450,16 +451,16 @@ public class DisplaySettingsDialog {
                 listHeight));
         displaySettingsList.addListSelectionListener(
             new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                DisplaySetting displaySetting =
-                    (DisplaySetting) displaySettingsList.getSelectedValue();
-                if (displaySetting != null) {
-                    displaysList.clearSelection();
-                    applyDisplaySetting(displaySetting);
+                public void valueChanged(ListSelectionEvent e) {
+                    DisplaySetting displaySetting =
+                        (DisplaySetting) displaySettingsList.getSelectedValue();
+                    if (displaySetting != null) {
+                        displaysList.clearSelection();
+                        applyDisplaySetting(displaySetting);
 
+                    }
                 }
-            }
-        });
+            });
 
 
 
@@ -483,8 +484,10 @@ public class DisplaySettingsDialog {
                                         new JLabel("Displays"),
                                         displaysSP,
                                         new JLabel("Saved Settings"),
-                                        displaySettingsSP }, 1,
-                                            GuiUtils.WT_Y, GuiUtils.WT_NYNY));
+                                        displaySettingsSP },
+                                            1,
+                                            GuiUtils.WT_Y,
+                                            GuiUtils.WT_NYNY));
 
         JTabbedPane sourcePane = new JTabbedPane();
         sourcePane.addTab("Displays", displaysSP);
@@ -500,9 +503,11 @@ public class DisplaySettingsDialog {
 
         JComponent applyContents = GuiUtils.doLayout(new Component[] {
                                        sourceComp,
-                                       propComp, GuiUtils.wrap(applyBtn),
+                                       propComp,
+                                       GuiUtils.wrap(applyBtn),
                                        targetComp }, 4, new double[] { 1,
-                1.25, 0, 1 }, GuiUtils.WT_Y);
+                                               1.25,
+                                               0, 1 }, GuiUtils.WT_Y);
 
         applyContents = GuiUtils.centerBottom(applyContents,
                 GuiUtils.wrap(buttons));
@@ -514,7 +519,8 @@ public class DisplaySettingsDialog {
                              "showSelectMenu");
         menus.add(fileMenu);
         menus.add(editMenu);
-        fileMenu.add(GuiUtils.makeMenuItem("Save Selected Properties", this,
+        fileMenu.add(GuiUtils.makeMenuItem("Save Selected Properties",
+                                           this,
                                            "doSave"));
         menuBar       = GuiUtils.makeMenuBar(menus);
         applyContents = GuiUtils.topCenter(menuBar, applyContents);
@@ -570,15 +576,21 @@ public class DisplaySettingsDialog {
             JMenuItem mi = new JMenuItem(labels[i]);
             menu.add(mi);
             mi.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    List selected = display.findDisplays(key, displays);
-                    for (int i = 0; i < displays.size(); i++) {
-                        DisplayWrapper dw =
-                            (DisplayWrapper) displayWrappers.get(i);
-                        dw.cbx.setSelected(selected.contains(dw.dci));
-                    }
-                }
-            });
+                                     public void actionPerformed(
+                                             ActionEvent ae) {
+                                         List selected =
+                                             display.findDisplays(key,
+                                                 displays);
+                                         for (int i = 0; i < displays.size();
+                                                 i++) {
+                                             DisplayWrapper dw =
+                                                 (DisplayWrapper) displayWrappers.get(
+                                                     i);
+                                             dw.cbx.setSelected(
+                                             selected.contains(dw.dci));
+                                         }
+                                     }
+                                 });
         }
     }
 
@@ -632,15 +644,21 @@ public class DisplaySettingsDialog {
             JMenuItem mi = new JMenuItem(labels[i]);
             items.add(mi);
             mi.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    List selected = display.findDisplays(key, displays);
-                    for (int i = 0; i < displays.size(); i++) {
-                        DisplayWrapper dw =
-                            (DisplayWrapper) displayWrappers.get(i);
-                        dw.cbx.setSelected(selected.contains(dw.dci));
-                    }
-                }
-            });
+                                     public void actionPerformed(
+                                             ActionEvent ae) {
+                                         List selected =
+                                             display.findDisplays(key,
+                                                 displays);
+                                         for (int i = 0; i < displays.size();
+                                                 i++) {
+                                             DisplayWrapper dw =
+                                                 (DisplayWrapper) displayWrappers.get(
+                                                     i);
+                                             dw.cbx.setSelected(
+                                             selected.contains(dw.dci));
+                                         }
+                                     }
+                                 });
         }
 
         JPopupMenu popup = GuiUtils.makePopupMenu(items);
@@ -686,7 +704,9 @@ public class DisplaySettingsDialog {
         propertiesHolder.validate();
         propertiesHolder.repaint();
         propertiesSP.validate();
-        propertiesSP.getViewport().scrollRectToVisible(new Rectangle(0, 0, 1,
+        propertiesSP.getViewport().scrollRectToVisible(new Rectangle(0,
+                0,
+                1,
                 1));
     }
 
@@ -859,12 +879,12 @@ public class DisplaySettingsDialog {
         applyBtn.setEnabled(false);
         display.showWaitCursor();
         Misc.run(new Runnable() {
-            public void run() {
-                applyPropertyValues(selectedDisplays, propList);
-                display.showNormalCursor();
-                applyBtn.setEnabled(true);
-            }
-        });
+                     public void run() {
+                         applyPropertyValues(selectedDisplays, propList);
+                         display.showNormalCursor();
+                         applyBtn.setEnabled(true);
+                     }
+                 });
     }
 
 
@@ -939,11 +959,16 @@ public class DisplaySettingsDialog {
          * @return can we change this
          */
         private boolean canChange(Object v) {
-            return (v instanceof String) || (v instanceof Double)
-                   || (v instanceof Integer) || (v instanceof Float)
-                   || (v instanceof Range) || (v instanceof ContourInfo)
-                   || (v instanceof Color) || (v instanceof ColorScaleInfo)
-                   || (v instanceof Unit) || (v instanceof Real)
+            return (v instanceof String)
+                   || (v instanceof Double)
+                   || (v instanceof Integer)
+                   || (v instanceof Float)
+                   || (v instanceof Range)
+                   || (v instanceof ContourInfo)
+                   || (v instanceof Color)
+                   || (v instanceof ColorScaleInfo)
+                   || (v instanceof Unit)
+                   || (v instanceof Real)
                    || (v instanceof ColorTable);
 
         }
@@ -969,11 +994,12 @@ public class DisplaySettingsDialog {
                 List items = new ArrayList();
                 idv.getColorTableManager().makeColorTableMenu(
                     new ObjectListener(null) {
-                    public void actionPerformed(ActionEvent ae, Object data) {
-                        changeValueTo(data);
-                        cbx.setSelected(true);
-                    }
-                }, items);
+                        public void actionPerformed(ActionEvent ae,
+                            Object data) {
+                            changeValueTo(data);
+                            cbx.setSelected(true);
+                        }
+                    }, items);
                 GuiUtils.showPopupMenu(items, changeBtn);
             }
 
@@ -1035,7 +1061,8 @@ public class DisplaySettingsDialog {
                                           5);
                 if ( !GuiUtils.showOkCancelDialog(dialog,
                         "Change " + propertyValue.getLabel(),
-                        GuiUtils.inset(contents, 5), null)) {
+                        GuiUtils.inset(contents, 5),
+                        null)) {
                     return;
                 }
                 Range newRange =
@@ -1088,7 +1115,8 @@ public class DisplaySettingsDialog {
                     return;
                 }
                 propertyValue.setValue(ci);
-            } else if ((value instanceof String) || (value instanceof Double)
+            } else if ((value instanceof String)
+                       || (value instanceof Double)
                        || (value instanceof Integer)
                        || (value instanceof Float)) {
                 String newString = GuiUtils.getInput("Enter new value for "

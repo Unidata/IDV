@@ -1,20 +1,18 @@
 /*
- * $Id: Transect.java,v 1.14 2006/12/01 20:42:32 jeffmc Exp $
- *
  * Copyright 1997-2017 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Found2ation; either version 2.1 of the License, or (at
+ * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -23,23 +21,18 @@
 package ucar.unidata.data.gis;
 
 
-import org.w3c.dom.*;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import ucar.unidata.geoloc.LatLonPoint;
 import ucar.unidata.geoloc.LatLonPointImpl;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-
 import ucar.unidata.xml.XmlUtil;
-
-
-import visad.*;
-
-import java.awt.Color;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 
@@ -74,6 +67,9 @@ public class Transect {
     /** xml attribute */
     private static final String ATTR_ENDTEXT = "endtext";
 
+    /** xml attribute */
+    private static final String ATTR_WAYPOINTTEXT = "waypointtext";
+
     /** The name */
     private String name = "";
 
@@ -82,6 +78,9 @@ public class Transect {
 
     /** End label */
     private String endText = "";
+
+    /** End label */
+    private String waypointText = "";
 
     /** Color */
     private Color color;
@@ -118,9 +117,16 @@ public class Transect {
         this.points = points;
     }
 
+    /**
+     * Construct a Transect 
+     *
+     * @param name  name of transect
+     * @param p1 start point
+     * @param p2 end point
+     */
     public Transect(String name, LatLonPoint p1, LatLonPoint p2) {
         this.name = name;
-        points= Misc.newList(p1,p2);
+        points    = Misc.newList(p1, p2);
     }
 
     /**
@@ -136,20 +142,28 @@ public class Transect {
         for (int i = 0; i < nodes.size(); i++) {
             Element node = (Element) nodes.get(i);
             double[] latLons = Misc.parseLatLons(XmlUtil.getAttribute(node,
-                                   ATTR_POINTS));
+                                                                      ATTR_POINTS));
             List points = new ArrayList();
             for (int ptIdx = 0; ptIdx < latLons.length; ptIdx += 2) {
                 points.add(new LatLonPointImpl(latLons[ptIdx],
                         latLons[ptIdx + 1]));
             }
             Transect transect = new Transect(XmlUtil.getAttribute(node,
-                                    ATTR_NAME, ""), points);
+                                                                  ATTR_NAME,
+                                                                  ""), points);
 
-            transect.setColor(XmlUtil.getAttribute(node, ATTR_COLOR,
+            transect.setColor(XmlUtil.getAttribute(node,
+                    ATTR_COLOR,
                     (Color) null));
-            transect.setStartText(XmlUtil.getAttribute(node, ATTR_STARTTEXT,
+            transect.setStartText(XmlUtil.getAttribute(node,
+                    ATTR_STARTTEXT,
                     ""));
             transect.setEndText(XmlUtil.getAttribute(node, ATTR_ENDTEXT, ""));
+            if (points.size() > 2) {
+                transect.setWaypointText(XmlUtil.getAttribute(node,
+                        ATTR_WAYPOINTTEXT,
+                        ""));
+            }
             transects.add(transect);
 
         }
@@ -182,6 +196,11 @@ public class Transect {
                     && (transect.getEndText().length() > 0)) {
                 node.setAttribute(ATTR_ENDTEXT, transect.getEndText());
             }
+            if ((transect.getWaypointText() != null)
+                    && (transect.getWaypointText().length() > 0)) {
+                node.setAttribute(ATTR_WAYPOINTTEXT,
+                                  transect.getWaypointText());
+            }
             if (transect.getColor() != null) {
                 XmlUtil.setAttribute(node, ATTR_COLOR, transect.getColor());
             }
@@ -201,23 +220,39 @@ public class Transect {
         return XmlUtil.toString(root);
     }
 
-    public void shiftPercent(double latPercent, double lonPercent, boolean doPoint1, boolean doPoint2 ) {
-        System.err.println("before:" + this);
-        List newPoints = new ArrayList();
-        LatLonPoint llp1 = (LatLonPoint) points.get(0);
-        LatLonPoint llp2 = (LatLonPoint) points.get(1);
-        double latDelta = latPercent*Math.abs(llp1.getLatitude()-llp2.getLatitude());
-        double lonDelta = lonPercent*Math.abs(llp1.getLongitude()-llp2.getLongitude());
+    /**
+     * Shift the line by a percent
+     *
+     * @param latPercent lat percent
+     * @param lonPercent lon percent	
+     * @param doPoint1  point 1
+     * @param doPoint2  point 2
+     */
+    public void shiftPercent(double latPercent, double lonPercent,
+                             boolean doPoint1, boolean doPoint2) {
+        //System.err.println("before:" + this);
+        List        newPoints = new ArrayList();
+        LatLonPoint llp1      = (LatLonPoint) points.get(0);
+        LatLonPoint llp2      = (LatLonPoint) points.get(1);
+        double latDelta = latPercent
+                          * Math.abs(llp1.getLatitude() - llp2.getLatitude());
+        double lonDelta = lonPercent
+                          * Math.abs(llp1.getLongitude()
+                                     - llp2.getLongitude());
 
 
 
-        newPoints.add(doPoint1?new LatLonPointImpl(llp1.getLatitude()+latDelta,
-                                                   llp1.getLongitude()+lonDelta):llp1);
-        newPoints.add(doPoint2?new LatLonPointImpl(llp2.getLatitude()+latDelta,
-                                                   llp2.getLongitude()+lonDelta):llp2);
+        newPoints.add(doPoint1
+                      ? new LatLonPointImpl(llp1.getLatitude() + latDelta,
+                                            llp1.getLongitude() + lonDelta)
+                      : llp1);
+        newPoints.add(doPoint2
+                      ? new LatLonPointImpl(llp2.getLatitude() + latDelta,
+                                            llp2.getLongitude() + lonDelta)
+                      : llp2);
         points = newPoints;
-        System.err.println("after:" + this);
-        
+        //System.err.println("after:" + this);
+
     }
 
 
@@ -346,6 +381,24 @@ public class Transect {
     }
 
     /**
+     * Set the waypointText property.
+     *
+     * @param value The new value for waypointText
+     */
+    public void setWaypointText(String value) {
+        waypointText = value;
+    }
+
+    /**
+     * Get the EndText property.
+     *
+     * @return The EndText
+     */
+    public String getWaypointText() {
+        return waypointText;
+    }
+
+    /**
      * Set the Color property.
      *
      * @param value The new value for Color
@@ -366,4 +419,3 @@ public class Transect {
 
 
 }
-

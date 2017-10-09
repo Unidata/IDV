@@ -1,20 +1,18 @@
 /*
- * $Id: TransectGlyph.java,v 1.23 2007/04/16 20:53:48 jeffmc Exp $
- *
- * Copyright  1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2017 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- *
+ * 
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -56,6 +54,8 @@ import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import java.rmi.RemoteException;
 
@@ -96,11 +96,14 @@ public class TransectGlyph extends ShapeGlyph {
     /** So we show the end point text */
     private boolean showText = true;
 
-    /** Text displayable */
+    /** StartText displayable */
     private TextDisplayable startTextDisplayable;
 
-    /** Text displayable */
+    /** EndText displayable */
     private TextDisplayable endTextDisplayable;
+
+    /** Waypoint displayable */
+    private CompositeDisplayable waypointDisplayable;
 
     /** The type used in the display */
     private TextType startTextType;
@@ -108,12 +111,17 @@ public class TransectGlyph extends ShapeGlyph {
     /** text type */
     private TextType endTextType;
 
+    /** waypoint text type */
+    private TextType waypointTextType;
+
     /** Start text */
     private String startText = "B";
 
     /** End text */
     private String endText = "E";
 
+    /** Waypoint prefix text */
+    private String waypointText = "W";
 
     /** property widget */
     private JTextField startTextFld;
@@ -122,10 +130,20 @@ public class TransectGlyph extends ShapeGlyph {
     private JTextField endTextFld;
 
     /** property widget */
+    private JTextField waypointTextFld;
+
+    /** property widget */
     private JTextField maxDistanceFld;
 
     /** My view manager wen I am showing the display transect */
     private TransectViewManager tvm;
+
+    /** Last point */
+    private Object lastPoint = null;
+
+    /** property to allow multiple segments for transect */
+    private static final String PROP_MULTIPLE_SEGMENTS =
+        "idv.transect.multisegment";
 
 
     /**
@@ -246,7 +264,25 @@ public class TransectGlyph extends ShapeGlyph {
         }
         if (showText) {
             setText(startTextDisplayable, 0, startText, startTextType);
-            setText(endTextDisplayable, 1, endText, endTextType);
+            if (points.size() > 2) {
+                for (int i = 1; i < points.size()-1; i++) {
+                    int numwaypoints = waypointDisplayable.displayableCount();
+                    if (i > numwaypoints) {
+                        TextDisplayable waypoint = new TextDisplayable("waypoint text_"
+                              + (typeCnt++), waypointTextType);
+                        waypoint.setTextSize(control.getDisplayScale() * 2.0f);
+                        if (getColor() != null) {
+                        	setColor(waypoint, getColor());
+                        }
+                        setText(waypoint, i, waypointText+i, waypointTextType);
+                        waypointDisplayable.addDisplayable(waypoint);
+                    } else {
+                        setText((TextDisplayable) waypointDisplayable.getDisplayable(i-1), i, waypointText+i, waypointTextType);
+                    }
+                }
+            }
+            setText(endTextDisplayable, points.size() - 1, endText,
+                    endTextType);
         }
 
 
@@ -260,7 +296,8 @@ public class TransectGlyph extends ShapeGlyph {
         }
 
         EarthLocation p1       = (EarthLocation) points.get(0);
-        EarthLocation p2       = (EarthLocation) points.get(1);
+        EarthLocation p2       = (EarthLocation) points.get(points.size()
+                                     - 1);
 
 
         MathType      mathType = RealTupleType.LatitudeLongitudeAltitude;
@@ -305,16 +342,16 @@ public class TransectGlyph extends ShapeGlyph {
         float[][] tmp = new float[3][];
 
         for (int i = 0; i < lineVals[0].length - 1; i++) {
-            tmp[0] =
-                Misc.merge(tmp[0],
-                           Misc.interpolate(2 + getNumInterpolationPoints(),
-                                            lineVals[0][i],
-                                            lineVals[0][i + 1]));
-            tmp[1] =
-                Misc.merge(tmp[1],
-                           Misc.interpolate(2 + getNumInterpolationPoints(),
-                                            lineVals[1][i],
-                                            lineVals[1][i + 1]));
+            tmp[0] = Misc.merge(tmp[0],
+                                Misc.interpolate(2
+                                    + getNumInterpolationPoints(),
+                                        lineVals[0][i],
+                                        lineVals[0][i + 1]));
+            tmp[1] = Misc.merge(tmp[1],
+                                Misc.interpolate(2
+                                    + getNumInterpolationPoints(),
+                                        lineVals[1][i],
+                                        lineVals[1][i + 1]));
         }
 
         tmp[2]   = new float[tmp[0].length];
@@ -432,8 +469,12 @@ public class TransectGlyph extends ShapeGlyph {
             endTextDisplayable = new TextDisplayable("end text_"
                     + (typeCnt++), endTextType);
             endTextDisplayable.setTextSize(control.getDisplayScale() * 2.0f);
+            waypointTextType = TextType.getTextType("TransectGlyphText_"
+                    + (typeCnt++));
+            waypointDisplayable = new CompositeDisplayable("waypoints");
             addDisplayable(startTextDisplayable);
             addDisplayable(endTextDisplayable);
+            addDisplayable(waypointDisplayable);
         }
         return true;
 
@@ -454,7 +495,17 @@ public class TransectGlyph extends ShapeGlyph {
         if ( !editable) {
             return null;
         }
-        return super.handleMouseDragged(event);
+        if ( !canDoMultiSegment()) {
+            return super.handleMouseDragged(event);
+        }
+        lastPoint = getPoint(event);
+        if (points.size() < 2) {
+            points.add(getPoint(event));
+        } else {
+            points.set(points.size() - 1, getPoint(event));
+        }
+        updateLocation();
+        return this;
     }
 
 
@@ -472,6 +523,11 @@ public class TransectGlyph extends ShapeGlyph {
         comps.add(GuiUtils.left(startTextFld));
         comps.add(GuiUtils.rLabel("End Label:"));
         comps.add(GuiUtils.left(endTextFld));
+        if (points.size() > 2) {
+            waypointTextFld = new JTextField(waypointText, 5);
+            comps.add(GuiUtils.rLabel("Waypoint Label:"));
+            comps.add(GuiUtils.left(waypointTextFld));
+        }
         maxDistanceFld = null;
         tvm            = null;
         if (viewDescriptor != null) {
@@ -509,6 +565,9 @@ public class TransectGlyph extends ShapeGlyph {
         }
         setStartText(startTextFld.getText().trim());
         setEndText(endTextFld.getText().trim());
+        if (waypointTextFld != null) {
+            setWaypointText(waypointTextFld.getText().trim());
+        }
         try {
             if (maxDistanceFld != null) {
                 Real oldMaxDataDistance = maxDataDistance;
@@ -570,6 +629,24 @@ public class TransectGlyph extends ShapeGlyph {
      */
     public String getEndText() {
         return endText;
+    }
+
+    /**
+     * Set the WaypointText property.
+     *
+     * @param value The new value for WaypointText
+     */
+    public void setWaypointText(String value) {
+        waypointText = value;
+    }
+
+    /**
+     * Get the WaypointText property.
+     *
+     * @return The WaypointText
+     */
+    public String getWaypointText() {
+        return waypointText;
     }
 
 
@@ -640,5 +717,47 @@ public class TransectGlyph extends ShapeGlyph {
     public Real getMaxDataDistance() {
         return maxDataDistance;
     }
-}
 
+    /**
+     * Handle event.
+     *
+     * @param event The display event.
+     *
+     * @return This or null
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public DrawingGlyph handleKeyPressed(DisplayEvent event)
+            throws VisADException, RemoteException {
+        if ((points.size() < 2)
+                || (lastPoint == null)
+                || !canDoMultiSegment()) {
+            return this;
+        }
+        InputEvent inputEvent = event.getInputEvent();
+        if ( !(inputEvent instanceof KeyEvent)) {
+            return this;
+        }
+        KeyEvent keyEvent = (KeyEvent) inputEvent;
+        if (keyEvent.getKeyCode() != KeyEvent.VK_SPACE) {
+            return this;
+        }
+        points.add(lastPoint);
+        lastPoint = null;
+        updateLocation();
+        return this;
+    }
+
+    /**
+     * See if we can do multiple segments
+     * return true if property is set
+     *
+     * @return _more_
+     */
+    private boolean canDoMultiSegment() {
+        return control.getControlContext().getIdv().getStateManager()
+        .getPreferenceOrProperty(PROP_MULTIPLE_SEGMENTS, false);
+    }
+
+}

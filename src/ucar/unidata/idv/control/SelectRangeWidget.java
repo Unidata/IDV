@@ -83,7 +83,7 @@ public class SelectRangeWidget extends ControlWidget {
     public SelectRangeWidget(DisplayControlImpl control, Range range,
                              String dialogTitle) {
         super(control);
-        label   = new JLabel("Visible Range:", SwingConstants.RIGHT);
+        label   = new JLabel("Clip Displayed Range:", SwingConstants.RIGHT);
         rhLabel = new JLabel(" ");
         setRange(range);
         button     = new JButton("Change");
