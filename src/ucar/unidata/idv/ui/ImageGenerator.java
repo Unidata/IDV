@@ -722,6 +722,7 @@ public class ImageGenerator extends IdvManager {
     /** isl tag */
     public static final String ATTR_URL = "url";
 
+
     /** isl tag */
     public static final String ATTR_FILE = "file";
 
@@ -1880,6 +1881,17 @@ public class ImageGenerator extends IdvManager {
     protected boolean processTagLoadcatalog(Element node) throws Throwable {
         String url = applyMacros(node, ATTR_URL, (String) null);
         getIdv().getIdvChooserManager().showCatalogUrl(url);
+        return true;
+    }
+
+    /**
+       Load a directory to the file chooser
+       @param node The ISL node
+       @return  Keep going
+    */
+    protected boolean processTagListdirectory(Element node) throws Throwable {
+        String file = applyMacros(node, ATTR_FILE, (String) null);
+        getIdv().getIdvChooserManager().showFileChooser(file);
         return true;
     }
 
@@ -4341,10 +4353,11 @@ public class ImageGenerator extends IdvManager {
         }
         pushProperties();
 
+        //If there are no time indices specified then add a -1 to the list
         List<Integer> indices = StringUtil.parseIntegerListString(
                                     XmlUtil.getAttribute(
                                         scriptingNode, ATTR_ANIMATION_INDEX,
-                                        "1"));
+                                        "-1"));
 
         int idx = 0;
         for (int j = 0; j < indices.size(); j++) {
@@ -4352,10 +4365,14 @@ public class ImageGenerator extends IdvManager {
             String      fname  = (indices.size() > 1)
                                  ? fixFileName(filename, indices.get(j))
                                  : filename;
+            int timeIndex = indices.get(j);
             for (int i = 0; i < viewManagers.size(); i++) {
                 ViewManager viewManager = (ViewManager) viewManagers.get(i);
-                if (viewManager.getAnimation() != null)
-                   viewManager.getAnimation().setCurrent(indices.get(j));
+                //If there was a time index specified then set the time
+                if(timeIndex>=0) {
+                    if (viewManager.getAnimation() != null)
+                        viewManager.getAnimation().setCurrent(timeIndex);
+                }
                 putIndex(getProperties(), PROP_VIEWINDEX, idx);
                 String name = viewManager.getName();
                 if (name == null) {
