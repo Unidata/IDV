@@ -721,6 +721,32 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
     }
 
     /**
+     * Export displayed data to file
+     * @param what type of data netcdf
+     */
+    public void doExport(String what, String filename) throws Exception {
+
+        if (what.contains("netcdf")) {
+            if ( !((this instanceof CrossSectionControl)
+                    || (this instanceof RadarSweepControl))) {
+                try {
+                    Data d = getDisplayedData();
+                    if (d == null) {
+                        return;
+                    }
+                    if(!filename.endsWith(".nc"))
+                        filename = filename + ".nc";
+                    if (d instanceof FieldImpl) {
+                        GridUtil.exportGridToNetcdf((FieldImpl) d, filename);
+                    }
+
+                } catch (Exception e) {
+                    logException("Unable to export the data", e);
+                }
+            }
+        }
+    }
+    /**
      * _more_
      *
      * @return _more_
