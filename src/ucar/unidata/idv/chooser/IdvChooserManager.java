@@ -234,6 +234,20 @@ public class IdvChooserManager extends IdvManager {
     private JComponent xmlChooserWrapper;
 
 
+
+    /**
+     * Holds the Filechooser if we have one. We keep this around if there are any catalog command
+     *   line args we can show the chooser.
+     */
+    private FileChooser fileChooser;
+
+
+    /**
+       The gui for the Filechooser
+    */
+    private JComponent fileChooserWrapper;
+
+
     /** Have we called init */
     private boolean haveInitialized = false;
 
@@ -731,6 +745,11 @@ public class IdvChooserManager extends IdvManager {
             xmlChooser = (XmlChooser) chooser;
         }
 
+        if (chooser instanceof FileChooser) {
+            fileChooserWrapper = chooserContents;
+            fileChooser = (FileChooser) chooser;
+        }
+
         return chooserContents;
     }
 
@@ -743,6 +762,16 @@ public class IdvChooserManager extends IdvManager {
         if(xmlChooser!=null) {
             xmlChooser.makeUiFromPath(url);
             GuiUtils.showComponentInTabs(xmlChooserWrapper);
+        }
+    }
+
+    /**
+     * show the file chooser in the chooser GUI with the given file path
+     */
+    public void showFileChooser(String path) {
+        if(fileChooser!=null) {
+            fileChooser.getFileChooser().setCurrentDirectory(new File(path));
+            GuiUtils.showComponentInTabs(fileChooserWrapper);
         }
     }
 
