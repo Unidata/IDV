@@ -1547,6 +1547,7 @@ public class DrawingControl extends DisplayControlImpl {
     protected List getShapeCommands() {
         List commands = new ArrayList();
         commands.add(GlyphCreatorCommand.CMD_SMOOTHPOLYGON);
+        commands.add(GlyphCreatorCommand.CMD_CLOSEDPOLYGON);
         //        commands.add(GlyphCreatorCommand.CMD_POLYGON);
         //        commands.add(GlyphCreatorCommand.CMD_LINE);
         commands.add(GlyphCreatorCommand.CMD_RECTANGLE);

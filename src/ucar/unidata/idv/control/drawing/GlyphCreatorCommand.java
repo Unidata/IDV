@@ -66,7 +66,7 @@ public abstract class GlyphCreatorCommand extends DrawingCommand {
     public static final DrawingCommand CMD_CLOSEDPOLYGON =
         new GlyphCreatorCommand("Create a closed polygon",
                                 "Click and drag: create a closed polygon",
-                                "/auxdata/ui/icons/ClosedPoly16.gif",
+                                "/auxdata/ui/icons/Poly16.gif",
                                 DrawingControl.FLAG_STRAIGHT) {
         public DrawingGlyph createGlyph(DrawingControl control,
                                         DisplayEvent event)
