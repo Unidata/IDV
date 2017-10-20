@@ -672,14 +672,14 @@ def LPIndex(u, v, z, t, top, bottom, unit):
   LP = 7.268DUDZ + 0.718DTDN + 0.318DUDN - 2.52
   </div>
   """
-  Z = windShear(u, v, z, top, bottom, unit)*726.8
+  Z = windShear(u, v, z, top, bottom, unit)*7.268
   uwind = getSliceAtLevel(u, top)
   vwind = getSliceAtLevel(v, top)
   temp = newUnit(getSliceAtLevel(t, top), "temperature", "celsius")
-  HT = sqrt(ddx(temp)*ddx(temp) + ddy(temp)*ddy(temp))*71.8
-  HU = (ddx(vwind) + ddy(uwind))*31.8
+  HT = sqrt(ddx(temp)*ddx(temp) + ddy(temp)*ddy(temp))*0.718
+  HU = (ddx(vwind) + ddy(uwind))*0.318
   L = add(noUnit(Z), add(noUnit(HU), noUnit(HT)))
-  L = (L - 2.52)*(-0.59)
+  L = (L - 2.520)*(-0.59)
   P= 1.0/(1.0 + GridMath.applyFunctionOverGridsExt(L,"exp"))
   LP = setLevel(P ,top, unit)
   return LP
