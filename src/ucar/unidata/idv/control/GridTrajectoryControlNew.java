@@ -810,8 +810,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 levels = getGridDataInstance().getLevels();
             }
 
-
-            setLevels(levels);
+            if(levels != null)
+                setLevels(levels);
+            else
+                is2D = true;
             myDisplay = (FlowDisplayable) createPlanDisplay();
             myDisplay.setActive(false);
             myDisplay.setUseSpeedForColor(useSpeedForColor);
@@ -1849,7 +1851,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 && (currentLevel == null)) {
             currentLevel = levels[0];
         }
-        if (fromLevel == null) {
+        if (levels != null && fromLevel == null) {
             int len = levels.length;
             if (((Real) levels[0]).getValue()
                     < ((Real) levels[len - 1]).getValue()) {
@@ -1858,8 +1860,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 fromLevel = levels[0];
             }
         }
-
-        setLevels(levels, fromLevel);
+        if(levels != null)
+            setLevels(levels, fromLevel);
 
         // the control for the track
         setDisplayActive();
@@ -2228,8 +2230,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             Real    alt      = null;
             // if(zunit.getIdentifier().length() == 0) {
-            alt = GridUtil.getAltitude(
-                domainSet, (Real) ((TwoFacedObject) currentLevel).getId());
+            if(currentLevel != null)
+                alt = GridUtil.getAltitude(
+                    domainSet, (Real) ((TwoFacedObject) currentLevel).getId());
+            else
+                alt = new Real(0.0);
             float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
                                     domain2D, alt, getSkipValue());
             float[][] setLocs = cs.toReference(geoVals);
@@ -2594,6 +2599,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
             alt = GridUtil.getAltitude(
                 domainSet, (Real) ((TwoFacedObject) currentLevel).getId());
         } catch (Exception e) {}
+        if(alt == null)
+            return 0.0;
         return alt.getValue();
     }
 
