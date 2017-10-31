@@ -6,9 +6,9 @@ ucar.  (Unless overwritten by a calling ant process or by a command line
 argument -Dfoo=bar) -->
 
 
-<project basedir="../../../../" default="plugin" name="TrexIdv">
+<project basedir="../../../../../" default="plugin" name="TrexIdv">
 
-    <import file="../../../build.xml"/>
+    <import file="../../../../../build.xml"/>
 
     <target name="trex" depends="init">
         <javac
@@ -19,7 +19,7 @@ argument -Dfoo=bar) -->
             destdir="${compiledir}"
             failonerror="${failonerror}" 
             nowarn="true"
-            srcdir="${srcdir}"
+            srcdir="${sourcedir}"
         >
         <include name="ucar/unidata/apps/trex/**"/>
         </javac>
@@ -28,11 +28,11 @@ argument -Dfoo=bar) -->
 
     <target name="trexjar" depends="trex">
         <jar 
-            basedir="${srcdir}"
+            basedir="${sourcedir}"
             compress="true"
             update="false"
             jarfile="${jars_dest}/trex.jar"
-            manifest="${srcdir}/ucar/unidata/apps/trex/trex.manifest">
+            manifest="${sourcedir}/ucar/unidata/apps/trex/trex.manifest">
             <include name="ucar/unidata/apps/trex/**"/>
             <include name="ucar/unidata/apps/trex/sensors/*.xml"/>
 
