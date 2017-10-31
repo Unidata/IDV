@@ -23,10 +23,22 @@
 package ucar.unidata.util;
 
 
+import org.apache.http.auth.AuthScope;
+
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+
+import ucar.unidata.xml.XmlEncoder;
+import ucar.unidata.xml.XmlUtil;
+
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.io.File;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -37,14 +49,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.auth.AuthScope;
-
-import ucar.unidata.xml.XmlEncoder;
-import ucar.unidata.xml.XmlUtil;
 
 
 /**
@@ -144,9 +148,7 @@ public class AccountManager implements CredentialsProvider,
      * @param creds
      *
      */
-    public void setCredentials(AuthScope scope, Credentials creds)
-    {
-    }
+    public void setCredentials(AuthScope scope, Credentials creds) {}
 
     /**
      * Do the authentication
@@ -155,38 +157,41 @@ public class AccountManager implements CredentialsProvider,
      * @return Null if the user presses cancel. Else return the credentials
      *
      */
-    public Credentials getCredentials(AuthScope scope)
-    {
+    public Credentials getCredentials(AuthScope scope) {
         //TODO: What should this do?
         if (scope == null) {
             throw new IllegalArgumentException(
                 "Authentication scope may not be null");
         }
 
-        if(currentCredentials == null) {
+        if (currentCredentials == null) {
             String host = scope.getHost();
-            int port = scope.getPort();
+            int    port = scope.getPort();
 
-            String key = host + ":" + port + ":"
-                         + scope.getRealm();
+            String key  = host + ":" + port + ":" + scope.getRealm();
             //        System.err.println ("got auth call " + key);
 
             UserInfo userInfo = getUserNamePassword(key,
-                                    "The server " + host + ":"
-                                    + port
+                                    "The server " + host + ":" + port
                                     + " requires a username/password");
             if (userInfo == null) {
                 return null;
             }
 
             currentCredentials =
-                    new UsernamePasswordCredentials(userInfo.getUserId(),
-                        userInfo.getPassword());
+                new UsernamePasswordCredentials(userInfo.getUserId(),
+                    userInfo.getPassword());
         }
         return currentCredentials;
     }
 
-
+    /**
+     *
+     * @return _more_
+     */
+    public Credentials getCredentials() {
+        return currentCredentials;
+    }
 
     /**
      * _more_
@@ -280,8 +285,8 @@ public class AccountManager implements CredentialsProvider,
     protected void writeTable() {
         try {
             String xml = XmlEncoder.encodeObject(getTable());
-            IOUtil.writeFile(IOUtil.joinDir(stateDir, "authentication.xml"),
-                             xml);
+            IOUtil.writeFile(IOUtil.joinDir(stateDir,
+                                            "authentication.xml"), xml);
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
@@ -296,7 +301,7 @@ public class AccountManager implements CredentialsProvider,
         if (table == null) {
             try {
                 String xml = IOUtil.readContents(IOUtil.joinDir(stateDir,
-                                 "authentication.xml"), (String) null);
+                                                                "authentication.xml"), (String) null);
                 Hashtable tmp = null;
                 if (xml != null) {
                     tmp = (Hashtable) XmlEncoder.decodeXml(xml);
@@ -365,11 +370,12 @@ public class AccountManager implements CredentialsProvider,
         okBtn.addActionListener(okListener);
         JButton cancelBtn = new JButton("Cancel");
         cancelBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                ok = false;
-                dialog.dispose();
-            }
-        });
+                                        public void actionPerformed(
+                                        ActionEvent ae) {
+                                            ok = false;
+                                            dialog.dispose();
+                                        }
+                                    });
 
 
         GuiUtils.tmpInsets = GuiUtils.INSETS_5;
@@ -382,8 +388,10 @@ public class AccountManager implements CredentialsProvider,
         contents = GuiUtils.topCenterBottom(
             serverLabel, contents,
             GuiUtils.wrap(GuiUtils.doLayout(new Component[] { okBtn,
-                new JLabel(" "), cancelBtn }, 3, GuiUtils.WT_N,
-                GuiUtils.WT_N)));
+                    new JLabel(" "), cancelBtn },
+                                            3,
+                                            GuiUtils.WT_N,
+                                            GuiUtils.WT_N)));
         dialog = GuiUtils.createDialog("Server Authentication", true);
         dialog.getContentPane().add(GuiUtils.inset(contents, 5));
         dialog.pack();
