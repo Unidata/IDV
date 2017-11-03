@@ -20,7 +20,7 @@
 
 package ucar.unidata.data;
 
-
+import org.apache.http.auth.InvalidCredentialsException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -1574,7 +1574,35 @@ public class DataManager {
                 DataSource dataSource = factory.getDataSource();
 
                 if (dataSource != null) {
-                    dataSource.initAfterCreation();
+                    AccountManager accountManager =
+                            AccountManager.getGlobalAccountManager();
+
+                    int numTries = 3;
+                    while (true) {
+                        try {
+                            dataSource.initAfterCreation();
+                            break;
+                        } catch (WrapperException e ) {
+                            if(accountManager == null || accountManager.getCredentials() == null){
+                                throw e;  //no id and pwd enter
+                            }
+                            if (e.getException().getCause().getCause()
+                                    instanceof InvalidCredentialsException ||
+                                    e.getException().getCause().getCause().getCause()
+                                            instanceof InvalidCredentialsException) {
+                                --numTries;
+
+                                accountManager.clear();
+                                dataSource.setInError(false);
+                                if(numTries <= 0) {
+                                    dataSource.setInError(true);
+                                    throw e;
+                                }
+                            }
+                        } catch (Exception ee){
+                            throw ee;
+                        }
+                    }
                     //Ask for the data choices as one way to see if this datasource is ok
                     List choices = dataSource.getDataChoices();
                     if (dataSource.getInError()) {
