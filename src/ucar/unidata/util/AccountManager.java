@@ -97,6 +97,8 @@ public class AccountManager implements CredentialsProvider,
     /** Save last created credentials */
     private Credentials currentCredentials = null;
 
+    /** _more_ */
+    private String currentKey = null;
 
     /**
      * constructor
@@ -181,6 +183,7 @@ public class AccountManager implements CredentialsProvider,
             currentCredentials =
                 new UsernamePasswordCredentials(userInfo.getUserId(),
                     userInfo.getPassword());
+            currentKey = key;
         }
         return currentCredentials;
     }
@@ -278,6 +281,29 @@ public class AccountManager implements CredentialsProvider,
         return userInfo;
     }
 
+
+    /**
+     * _more_
+     */
+    public void removeUserNamePassword() {
+        if (currentKey == null) {
+            return;
+        }
+
+        UserInfo userInfo = getTable().get(currentKey);
+
+        if (userInfo != null) {
+            if (currentlyUsedOnes.get(userInfo) != null) {
+                // userInfo = null;
+                currentlyUsedOnes.remove(userInfo);
+            }
+            if (table.get(currentKey) != null) {
+                table.remove(currentKey);
+                writeTable();
+            }
+        }
+
+    }
 
     /**
      * _more_

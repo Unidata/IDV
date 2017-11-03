@@ -1591,7 +1591,8 @@ public class DataManager {
                                     e.getException().getCause().getCause().getCause()
                                             instanceof InvalidCredentialsException) {
                                 --numTries;
-
+                                //remove idNpwd from unidata folder if fail
+                                accountManager.removeUserNamePassword();
                                 accountManager.clear();
                                 dataSource.setInError(false);
                                 if(numTries <= 0) {
