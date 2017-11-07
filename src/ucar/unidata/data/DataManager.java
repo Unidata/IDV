@@ -1624,11 +1624,7 @@ public class DataManager {
                                     .contains("InvalidCredentialsException")
                                     || e.getException().getCause().getCause()
                                     .getCause().getMessage()
-                                    .contains("InvalidCredentialsException")
-                                    || (e.getException().getCause().getCause()
-                                        instanceof InvalidCredentialsException)
-                                    || (e.getException().getCause().getCause().getCause()
-                                        instanceof InvalidCredentialsException)) {
+                                    .contains("InvalidCredentialsException")) {
                                 --numTries;
                                 //remove idNpwd from unidata folder if fail
                                 accountManager.removeUserNamePassword();
