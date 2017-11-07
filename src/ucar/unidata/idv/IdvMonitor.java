@@ -207,7 +207,7 @@ public class IdvMonitor extends HttpServer {
                     writeResult(true, result, "text/html");
                 }
             } else {
-                writeResult(false,"Unknown url:" + path , "text/html");
+                decorateHtml(new StringBuffer("Unknown url:" + path));
             }
             //            System.err.println("handleRequest end:" + path);
         }
