@@ -21,14 +21,17 @@
 package ucar.unidata.data;
 
 
+import org.apache.http.auth.InvalidCredentialsException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 
 import ucar.httpservices.HTTPException;
-import ucar.nc2.util.DiskCache2;
 import ucar.httpservices.HTTPSession;
+
+import ucar.nc2.util.DiskCache2;
 
 import ucar.unidata.idv.IdvResourceManager;
 import ucar.unidata.idv.PluginManager;
@@ -320,13 +323,14 @@ public class DataManager {
         for (String visadProp : visadProperties) {
             System.setProperty(visadProp,
                                dataContext.getIdv().getStateManager()
-                                   .getPreferenceOrProperty(visadProp,
+                               .getPreferenceOrProperty(visadProp,
                                        "false"));
         }
 
         SampledSet.setCacheSizeThreshold(
             dataContext.getIdv().getProperty(
-                "visad.sampledset.cachesizethreshold", 10000));
+                "visad.sampledset.cachesizethreshold",
+                10000));
 
 
         //The IDV can run normally (i.e., the usual interactive IDV) and also in server mode (e.g., within RAMADDA)
@@ -346,19 +350,22 @@ public class DataManager {
             ucar.nc2.util.DiskCache.setRootDirectory(nj22TmpFile);
             ucar.nc2.util.DiskCache.setCachePolicy(true);
             DiskCache2 dc = new DiskCache2(nj22TmpFile, false, -1, -1);
-            boolean doCache = dataContext.getIdv().getStateManager()
-                    .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true);
+            boolean doCache =
+                dataContext.getIdv().getStateManager()
+                .getPreferenceOrProperty(PREF_GRIBINDEXINCACHE, true);
             dc.setAlwaysUseCache(doCache);
             ucar.nc2.grib.GribIndexCache.setDiskCache2(dc);
 
             // Doesn't seem to work in nc 4.3
-            ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(doCache);
+            ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(
+                doCache);
 
             visad.data.DataCacheManager.getCacheManager().setCacheDir(
                 new File(getDataCacheDirectory()));
             visad.data.DataCacheManager.getCacheManager()
-                .setMemoryPercent(dataContext.getIdv().getStateManager()
-                    .getPreferenceOrProperty(PROP_CACHE_PERCENT, 0.25));
+            .setMemoryPercent(dataContext.getIdv().getStateManager()
+            .getPreferenceOrProperty(PROP_CACHE_PERCENT,
+                                     0.25));
 
             AccountManager accountManager =
                 AccountManager.getGlobalAccountManager();
@@ -402,36 +409,53 @@ public class DataManager {
                                              (String) null);
 
         TextAdapter.addDateParser(new TextAdapter.DateParser() {
-            public DateTime createDateTime(String value, String format,
-                                           TimeZone timezone)
-                    throws VisADException {
-                if (format.endsWith("dh1") || format.endsWith("dh2")
-                        || format.endsWith("dh3") || format.endsWith("dh4")) {
-                    int len = new Integer(format.substring(format.length()
-                                  - 1)).intValue();
-                    value = value.trim();
-                    int idx = value.lastIndexOf(" ");
-                    if (idx < 0) {
-                        idx = 0;
-                    }
-                    String dh    = value.substring(idx + 1);
-                    int    ptIdx = dh.length() - len;
-                    dh = dh.substring(0, ptIdx) + "." + dh.substring(ptIdx);
-                    while ((dh.length() > 1) && dh.startsWith("0")) {
-                        dh = dh.substring(1);
-                    }
-                    double hours = new Double(dh);
-                    String HH    = "" + (int) hours;
-                    String mm    = "" + (int) (60 * (hours - (int) hours));
-                    format = format.replace("dh" + len, "HH:mm");
-                    String newValue = value.trim().substring(0, idx + 1) + HH
-                                      + ":" + mm;
-                    return UtcDate.createDateTime(newValue, format, timezone);
-                }
+                                      public DateTime createDateTime(
+                                      String value, String format,
+                                      TimeZone timezone)
+                                              throws VisADException {
+                                          if (format.endsWith("dh1")
+                                                  || format.endsWith("dh2")
+                                                  || format.endsWith("dh3")
+                                                  || format.endsWith("dh4")) {
+                                              int len =
+                                                  new Integer(
+                                                      format.substring(
+                                                          format.length()
+                                                          - 1)).intValue();
+                                              value = value.trim();
+                                              int idx =
+                                                  value.lastIndexOf(" ");
+                                              if (idx < 0) {
+                                                  idx = 0;
+                                              }
+                                              String dh = value.substring(idx
+                                                              + 1);
+                                              int ptIdx = dh.length() - len;
+                                              dh = dh.substring(0, ptIdx)
+                                              + "." + dh.substring(ptIdx);
+                                              while ((dh.length() > 1)
+                                                      && dh.startsWith("0")) {
+                                                  dh = dh.substring(1);
+                                              }
+                                              double hours = new Double(dh);
+                                              String HH    = "" + (int) hours;
+                                              String mm =
+                                                  "" + (int) (60
+                                                      * (hours
+                                                         - (int) hours));
+                                              format = format.replace("dh"
+                                              + len, "HH:mm");
+                                              String newValue =
+                                                  value.trim().substring(0,
+                                                      idx + 1) + HH + ":"
+                                                          + mm;
+                                              return UtcDate.createDateTime(
+                                              newValue, format, timezone);
+                                          }
 
-                return null;
-            }
-        });
+                                          return null;
+                                      }
+                                  });
 
 
         if (defaultBoundingBoxString != null) {
@@ -524,8 +548,9 @@ public class DataManager {
                 String grib1TableName = grib1Resources.get(i).toString();
                 File   grib1TableFile = new File(grib1TableName);
                 if (grib1TableFile.exists()) {
-                    ucar.nc2.grib.grib1.tables.Grib1ParamTables
-                        .addParameterTableLookup(grib1TableName);
+                    ucar.nc2.grib.grib1.tables
+                        .Grib1ParamTables.addParameterTableLookup(
+                            grib1TableName);
                 }
                 // ucar.grib.grib1.GribPDSParamTable.addParameterUserLookup(
                 //     grib1Resources.get(i).toString());
@@ -702,7 +727,7 @@ public class DataManager {
                 String value = (String) properties.get(key);
                 Element propNode = XmlUtil.create(doc, TAG_PROPERTY, node,
                                        value, new String[] { ATTR_NAME,
-                        key });
+                                               key });
             }
         }
         if (attributes != null) {
@@ -806,7 +831,7 @@ public class DataManager {
                     if (XmlUtil.hasAttribute(propNode, ATTR_VALUE)) {
                         properties.put(XmlUtil.getAttribute(propNode,
                                 ATTR_NAME), XmlUtil.getAttribute(propNode,
-                                    ATTR_VALUE));
+                                        ATTR_VALUE));
                     } else {
                         String value = XmlUtil.getChildText(propNode);
                         properties.put(XmlUtil.getAttribute(propNode,
@@ -819,14 +844,15 @@ public class DataManager {
                                              patterns, fileSelection,
                                              doesMultiples, properties);
                 descriptor.setStandalone(XmlUtil.getAttribute(datasourceNode,
-                        ATTR_STANDALONE, false));
+                        ATTR_STANDALONE,
+                        false));
                 if (descriptor.getStandalone()) {
                     standaloneDescriptors.add(descriptor);
                 }
                 if (XmlUtil.hasAttribute(datasourceNode, ATTR_NCMLTEMPLATE)) {
                     descriptor.setNcmlTemplate(
-                        XmlUtil.getAttribute(
-                            datasourceNode, ATTR_NCMLTEMPLATE));
+                        XmlUtil.getAttribute(datasourceNode,
+                                             ATTR_NCMLTEMPLATE));
                 }
                 descriptors.add(descriptor);
                 idToDescriptor.put(id, descriptor);
@@ -1113,7 +1139,8 @@ public class DataManager {
                         props = (Hashtable) properties.get(
                             DataSource.PROP_SUBPROPERTIES + result.size());
                     }
-                    result.add(new DataType(descriptor.getId(), workingList,
+                    result.add(new DataType(descriptor.getId(),
+                                            workingList,
                                             props));
                     didone = true;
                 }
@@ -1218,7 +1245,8 @@ public class DataManager {
      */
     public boolean validDatasourceId(Object definingObject) {
         List dataTypes = getDataTypes(definingObject, allFilters, true, null);
-        if ((dataTypes == null) || (dataTypes.size() == 0)
+        if ((dataTypes == null)
+                || (dataTypes.size() == 0)
                 || dataTypes.get(0).equals(DATATYPE_UNKNOWN)) {
             return false;
         }
@@ -1441,9 +1469,8 @@ public class DataManager {
                     List sources = (List) definingObject;
                     dataTypes = new ArrayList(sources.size());
                     for (int i = 0; i < sources.size(); i++) {
-                        dataTypes.add(
-                            new DataType(
-                                dataType, sources.get(i),
+                        dataTypes.add(new DataType(dataType,
+                                sources.get(i),
                                 (Hashtable) properties.get(
                                     DataSource.PROP_SUBPROPERTIES
                                     + dataTypes.size())));
@@ -1466,7 +1493,8 @@ public class DataManager {
                                      properties);
         }
         DataSourceResults results = new DataSourceResults();
-        if ((dataTypes == null) || (dataTypes.size() == 0)
+        if ((dataTypes == null)
+                || (dataTypes.size() == 0)
                 || (definingObject instanceof ArrayList)) {
             //If it is a string then let's just try the VisadDataSource
             if (definingObject instanceof String) {
@@ -1492,7 +1520,7 @@ public class DataManager {
                             for (int i = 0; i < dataTypes.size(); i++) {
                                 dataTypes.set(i,
                                         new DataType(overrideDataType,
-                                            definingObject));
+                                                definingObject));
                             }
                         }
                     }
@@ -1570,11 +1598,47 @@ public class DataManager {
                 DataSourceFactory factory =
                     (DataSourceFactory) ctor.newInstance(new Object[] {
                         descriptor,
-                        definingObject, propertiesToUse });
+                        definingObject,
+                        propertiesToUse });
                 DataSource dataSource = factory.getDataSource();
 
                 if (dataSource != null) {
-                    dataSource.initAfterCreation();
+                    AccountManager accountManager =
+                        AccountManager.getGlobalAccountManager();
+
+                    int numTries = 3;
+                    while (true) {
+                        try {
+                            dataSource.initAfterCreation();
+                            break;
+                        } catch (WrapperException e) {
+                            if ((accountManager == null)
+                                    || (accountManager.getCredentials()
+                                        == null)) {
+                                throw e;  //no id and pwd enter
+                            }
+                            if (e.getException().getCause().getMessage()
+                            .contains("InvalidCredentialsException")
+                                    || e.getException().getCause().getCause()
+                                    .getMessage()
+                                    .contains("InvalidCredentialsException")
+                                    || e.getException().getCause().getCause()
+                                    .getCause().getMessage()
+                                    .contains("InvalidCredentialsException")) {
+                                --numTries;
+                                //remove idNpwd from unidata folder if fail
+                                accountManager.removeUserNamePassword();
+                                accountManager.clear();
+                                dataSource.setInError(false);
+                                if (numTries <= 0) {
+                                    dataSource.setInError(true);
+                                    throw e;
+                                }
+                            }
+                        } catch (Exception ee) {
+                            throw ee;
+                        }
+                    }
                     //Ask for the data choices as one way to see if this datasource is ok
                     List choices = dataSource.getDataChoices();
                     if (dataSource.getInError()) {
@@ -1606,32 +1670,37 @@ public class DataManager {
             } catch (java.lang.IllegalArgumentException iae) {
                 results.addFailed(definingObject,
                                   new BadDataException("Cannot open file: "
-                                      + definingObject, iae));
+                                      + definingObject,
+                                          iae));
                 break;
             } catch (java.lang.reflect.InvocationTargetException ite) {
                 results.addFailed(
                     definingObject,
                     new BadDataException(
                         "Error creating data source:" + dataType + " with: "
-                        + definingObject + "\n", ite.getTargetException()));
+                        + definingObject + "\n",
+                        ite.getTargetException()));
                 break;
             } catch (WrapperException wexc) {
                 results.addFailed(
-                    definingObject, new BadDataException(
+                    definingObject,
+                    new BadDataException(
                         "Error creating data source:" + dataType + " with: "
-                        + definingObject + "\n" + wexc.getMessage()
-                        + "\n", wexc.getException()));
+                        + definingObject + "\n" + wexc.getMessage() + "\n",
+                        wexc.getException()));
                 break;
             } catch (Throwable exc) {
                 results.addFailed(
                     definingObject,
                     new BadDataException(
                         "Error creating data source:" + dataType + " with: "
-                        + definingObject + "\n", exc));
+                        + definingObject + "\n",
+                        exc));
                 break;
             }
         }
         return results;
+
     }
 
 
@@ -1738,31 +1807,34 @@ public class DataManager {
     public void initURLStreamHandlers() {
         try {
             URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
-                public URLStreamHandler createURLStreamHandler(
-                        String protocol) {
-                    if (protocol.equalsIgnoreCase("adde")) {
-                        return new edu.wisc.ssec.mcidas.adde
-                            .AddeURLStreamHandler();
-                    } else if (protocol.equalsIgnoreCase(
-                            PluginManager.PLUGIN_PROTOCOL)) {
-                        return new URLStreamHandler() {
-                            protected URLConnection openConnection(URL url) {
-                                try {
-                                    return IOUtil.getURL(url.getPath(),
+                        public URLStreamHandler createURLStreamHandler(
+                                String protocol) {
+                            if (protocol.equalsIgnoreCase("adde")) {
+                                return new edu.wisc.ssec.mcidas.adde
+                                    .AddeURLStreamHandler();
+                            } else if (
+                                protocol.equalsIgnoreCase(
+                                    PluginManager.PLUGIN_PROTOCOL)) {
+                                return new URLStreamHandler() {
+                                    protected URLConnection openConnection(
+                                            URL url) {
+                                        try {
+                                            return IOUtil.getURL(
+                                            url.getPath(),
                                             getClass()).openConnection();
-                                } catch (Exception exc) {
-                                    LogUtil.logException(
-                                        "Handling idvresource", exc);
-                                    return null;
-                                }
-                            }
-                        };
+                                        } catch (Exception exc) {
+                                            LogUtil.logException(
+                                            "Handling idvresource", exc);
+                                            return null;
+                                        }
+                                    }
+                                };
 
-                    } else {
-                        return null;
-                    }
-                }
-            });
+                            } else {
+                                return null;
+                            }
+                        }
+                    });
         } catch (Throwable exc) {}
     }
 
