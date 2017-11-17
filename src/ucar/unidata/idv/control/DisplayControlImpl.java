@@ -1803,9 +1803,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if ((unitForColor == null) || (displayables == null)) {
             return;
         }
-        for (int i = 0, n = displayables.size(); i < n; i++) {
-            FlaggedDisplayable fd = (FlaggedDisplayable) displayables.get(i);
-            if ( !fd.ok(FLAG_COLORUNIT)) {
+        for (Object displayable : displayables) {
+            FlaggedDisplayable fd = (FlaggedDisplayable) displayable;
+            if (!fd.ok(FLAG_COLORUNIT)) {
                 continue;
             }
             try {
@@ -3011,10 +3011,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             } else if (dataId.equals(SHARE_DISPLAYUNIT)) {
                 setNewDisplayUnit((Unit) data[0], true);
             } else if (dataId.equals(SHARE_VISIBILITY)) {
-                setDisplayVisibility(((Boolean) data[0]).booleanValue(),
+                setDisplayVisibility((Boolean) data[0],
                                      false);
             } else if (dataId.equals(SHARE_SKIPVALUE)) {
-                skipValue = ((Integer) data[0]).intValue();
+                skipValue = (Integer) data[0];
                 applySkipFactor();
             } else {
                 super.receiveShareData(from, dataId, data);
@@ -4195,8 +4195,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     public List getDataSources() {
         List dataSources = new ArrayList();
         if (myDataChoices != null) {
-            for (int i = 0; i < myDataChoices.size(); i++) {
-                DataChoice dc = (DataChoice) myDataChoices.get(i);
+            for (Object myDataChoice : myDataChoices) {
+                DataChoice dc = (DataChoice) myDataChoice;
                 dc.getDataSources(dataSources);
             }
         }
@@ -4585,8 +4585,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         DndImageButton dndBtn  = new DndImageButton(this, "control");
         List           menus   = doMakeMenuBarMenus(new ArrayList());
         JMenuBar       menuBar = new JMenuBar();
-        for (int i = 0; i < menus.size(); i++) {
-            menuBar.add((JMenu) menus.get(i));
+        for (Object menu : menus) {
+            menuBar.add((JMenu) menu);
         }
         //        menuBar.add(dndBtn);
         return menuBar;
@@ -5069,9 +5069,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @return Window visibility
      */
     public boolean getWindowVisible() {
-        return ((myWindow != null)
-                ? myWindow.isShowing()
-                : false);
+        return ((myWindow != null) && myWindow.isShowing());
     }
 
 
@@ -5168,9 +5166,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         boolean hasDisplayWithData = false;
         try {
             List infos = getDisplayInfos();
-            for (int i = 0, n = infos.size(); i < n; i++) {
-                DisplayInfo info = (DisplayInfo) infos.get(i);
-                Data        data = info.getDisplayable().getData();
+            for (Object info1 : infos) {
+                DisplayInfo info = (DisplayInfo) info1;
+                Data data = info.getDisplayable().getData();
                 if ((data != null) && (data instanceof FieldImpl)) {
                     hasDisplayWithData = true;
                     break;
@@ -5368,7 +5366,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
     /**
-     * Add the  relevant edit menu items into the list
+     * Add the relevant edit menu items into the list
      *
      * @param items List of menu items
      * @param forMenuBar Is this for the menu in the window's menu bar or
@@ -5474,6 +5472,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 "showDisplaySettingsDialog"), "/auxdata/ui/icons/Settings16.png"));
 
 
+
         items.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Properties...",
                 this,
                 "showProperties"), "/auxdata/ui/icons/information.png"));
@@ -5522,8 +5521,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     protected Set getDataTimeSet() throws RemoteException, VisADException {
         Set  aniSet = null;
         List infos  = getDisplayInfos();
-        for (int i = 0; i < infos.size(); i++) {
-            DisplayInfo displayInfo = (DisplayInfo) infos.get(i);
+        for (Object info : infos) {
+            DisplayInfo displayInfo = (DisplayInfo) info;
             Animation animation = displayInfo.getViewManager().getAnimation();
             if (animation == null) {
                 continue;
@@ -5534,7 +5533,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             //Displayable.debug = false;
 
             Set set = displayInfo.getDisplayable().getAnimationSet(aniType,
-                          true);
+                    true);
 
             if (set == null) {
                 //if(this instanceof PlanViewControl) 
@@ -5542,8 +5541,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 continue;
             }
             aniSet = (aniSet == null)
-                     ? set
-                     : aniSet.merge1DSets(set);
+                    ? set
+                    : aniSet.merge1DSets(set);
         }
         return aniSet;
     }
@@ -5769,19 +5768,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         addPropertiesComponents(jtp);
         final JDialog propertiesDialog =
             GuiUtils.createDialog("Properties -- " + getTitle(), true);
-        ActionListener listener = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                String cmd = event.getActionCommand();
-                if (cmd.equals(GuiUtils.CMD_OK)
-                        || cmd.equals(GuiUtils.CMD_APPLY)) {
-                    if ( !applyProperties()) {
-                        return;
-                    }
+        ActionListener listener = event -> {
+            String cmd = event.getActionCommand();
+            if (cmd.equals(GuiUtils.CMD_OK)
+                    || cmd.equals(GuiUtils.CMD_APPLY)) {
+
+                if ( !applyProperties()) {
+                    return;
                 }
-                if (cmd.equals(GuiUtils.CMD_OK)
-                        || cmd.equals(GuiUtils.CMD_CANCEL)) {
-                    propertiesDialog.dispose();
-                }
+            }
+            if (cmd.equals(GuiUtils.CMD_OK)
+                    || cmd.equals(GuiUtils.CMD_CANCEL)) {
+                propertiesDialog.dispose();
             }
         };
         Window     f       = GuiUtils.getWindow(contents);
@@ -6302,14 +6300,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public boolean doApplyProperties() {
         if (csd != null) {
-            csd.doApply();
+
+            if (!csd.doApply()) {
+                return false;
+            }
         }
         if (idFld == null) {
             return true;
         }
         setId(idFld.getText());
-        visbilityAnimationPause = new Integer(
-            visbilityAnimationPauseFld.getText().trim()).intValue();
+        visbilityAnimationPause = Integer.parseInt(visbilityAnimationPauseFld.getText().trim());
 
         setDisplayCategory(categoryFld.getText());
         setDisplayListTemplate(displayListTemplateFld.getText());
@@ -6989,15 +6989,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private boolean insertDisplayables() {
         try {
-            List v = getDisplayInfos();
+            List displayInfos = getDisplayInfos();
             //Tell each of my displayInfo's to add themselves to their viewManger
             boolean addOk = true;
             Hashtable<ViewManager, List<DisplayInfo>> vmMap =
                 new Hashtable<ViewManager, List<DisplayInfo>>();
             List<ViewManager> vms = new ArrayList<ViewManager>();
-            for (int i = 0, n = v.size(); i < n; i++) {
-                DisplayInfo info = (DisplayInfo) v.get(i);
-                ViewManager vm   = info.getViewManager();
+            for (Object displayInfo : displayInfos) {
+                DisplayInfo info = (DisplayInfo) displayInfo;
+                ViewManager vm = info.getViewManager();
                 if (vm == null) {
                     continue;
                 }
@@ -7013,18 +7013,18 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 vm.addDisplayInfos(infos);
             }
 
-            for (int i = 0, n = v.size(); i < n; i++) {
-                DisplayInfo info = (DisplayInfo) v.get(i);
-                if ( !info.getDisplayableAdded()) {
+            for (Object displayInfo : displayInfos) {
+                DisplayInfo info = (DisplayInfo) displayInfo;
+                if (!info.getDisplayableAdded()) {
                     removeDisplayInfo(info);
                     addOk = false;
                 }
             }
-            if ( !addOk) {
+            if (!addOk) {
                 doRemove();
                 return false;
             }
-            activateDisplay(v);
+            activateDisplay(displayInfos);
         } catch (Exception exc) {
             logException("Inserting displayables", exc);
         }
@@ -7041,8 +7041,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private void activateDisplay(List displayList)
             throws RemoteException, VisADException {
-        for (int i = 0, n = displayList.size(); i < n; i++) {
-            DisplayInfo info = (DisplayInfo) displayList.get(i);
+        for (Object aDisplayList : displayList) {
+            DisplayInfo info = (DisplayInfo) aDisplayList;
             info.activateDisplay();
         }
     }
@@ -7074,8 +7074,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             throws RemoteException, VisADException {
         //        Trace.call1("DisplayControlImpl.deactivateDisplays");
         List displayList = getDisplayInfos();
-        for (int i = 0, n = displayList.size(); i < n; i++) {
-            DisplayInfo info = (DisplayInfo) displayList.get(i);
+        for (Object aDisplayList : displayList) {
+            DisplayInfo info = (DisplayInfo) aDisplayList;
             info.deactivateDisplay();
         }
         //        Trace.call2("DisplayControlImpl.deactivateDisplays");
@@ -7093,8 +7093,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (displayList == null) {
             return null;
         }
-        for (int i = 0; i < displayList.size(); i++) {
-            DisplayInfo info = (DisplayInfo) displayList.get(i);
+        for (Object aDisplayList : displayList) {
+            DisplayInfo info = (DisplayInfo) aDisplayList;
             if (info.getDisplayable() == displayable) {
                 return info;
             }
@@ -7146,8 +7146,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             throws RemoteException, VisADException {
         List displayList = getDisplayInfos();
         displays = new ArrayList();
-        for (int i = 0, n = displayList.size(); i < n; i++) {
-            DisplayInfo info        = (DisplayInfo) displayList.get(i);
+        for (Object aDisplayList : displayList) {
+            DisplayInfo info = (DisplayInfo) aDisplayList;
             Displayable displayable = info.getDisplayable();
             if (displayable != null) {
                 displayable.removePropertyChangeListener(this);
@@ -7281,8 +7281,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         if (sharables != null) {
-            for (int i = 0, n = sharables.size(); i < n; i++) {
-                ((SharableImpl) sharables.get(i)).removeSharable();
+            for (Object sharable : sharables) {
+                ((SharableImpl) sharable).removeSharable();
             }
             sharables = null;
         }
@@ -7295,8 +7295,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
 
         if (displayMasters != null) {
-            for (int i = 0, n = displayMasters.size(); i < n; i++) {
-                ((DisplayMaster) displayMasters.get(i)).destroy();
+            for (Object displayMaster : displayMasters) {
+                ((DisplayMaster) displayMaster).destroy();
             }
             displayMasters = null;
         }
@@ -7345,9 +7345,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (choices == null) {
             return;
         }
-        List tmp = new ArrayList(choices);
-        for (int i = 0; i < tmp.size(); i++) {
-            ((DataChoice) tmp.get(i)).addDataChangeListener(this);
+        List tmpChoices = new ArrayList(choices);
+        for (Object tmpChoice : tmpChoices) {
+            ((DataChoice) tmpChoice).addDataChangeListener(this);
         }
     }
 
@@ -7359,9 +7359,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (myDataChoices == null) {
             return;
         }
-        List tmp = new ArrayList(myDataChoices);
-        for (int i = 0; i < tmp.size(); i++) {
-            ((DataChoice) tmp.get(i)).removeDataChangeListener(this);
+        List tmpDataChoices = new ArrayList(myDataChoices);
+        for (Object tmpDataChoice : tmpDataChoices) {
+            ((DataChoice) tmpDataChoice).removeDataChangeListener(this);
         }
     }
 
@@ -9019,13 +9019,13 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                                           final Color color) {
         List items  = new ArrayList();
         List colors = getDisplayConventions().getColorNameList();
-        for (Iterator iter = colors.iterator(); iter.hasNext(); ) {
-            String colorName = iter.next().toString();
+        for (Object aColor : colors) {
+            String colorName = aColor.toString();
             final Color menuColor =
-                getDisplayConventions().getColor(colorName);
+                    getDisplayConventions().getColor(colorName);
             JMenuItem mi = new JMenuItem(colorName.substring(0,
-                               1).toUpperCase() + colorName.substring(1)
-                                   + "  ") {
+                    1).toUpperCase() + colorName.substring(1)
+                    + "  ") {
                 public void paint(Graphics g) {
                     super.paint(g);
                     Rectangle b = getBounds();
@@ -9034,7 +9034,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                         g.fillRect(b.width - b.height, 0, b.height, b.height);
                         g.setColor(Color.black);
                         g.drawRect(b.width - b.height, 0, b.height - 1,
-                                   b.height - 1);
+                                b.height - 1);
                     }
                     g.setColor(menuColor);
                     int w = b.height;
@@ -9269,12 +9269,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (dataSelection != null) {
             GeoSelection geoSelection = dataSelection.getGeoSelection();
             if (geoSelection != null) {
-                sb.append("Geo selection:" + geoSelection);
+                sb.append("Geo selection:").append(geoSelection);
                 sb.append("<br>\n");
             }
             List times = dataSelection.getTimes();
             if ((times != null) && (times.size() > 0)) {
-                sb.append("Selected times:" + StringUtil.join(" ", times));
+                sb.append("Selected times:").append(StringUtil.join(" ", times));
             }
         }
 
@@ -9308,11 +9308,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (dataInstances != null) {
             try {
                 sb.append("<p>Data Types:<br>");
-                for (int i = 0; i < dataInstances.size(); i++) {
+                for (Object dataInstance1 : dataInstances) {
                     DataInstance dataInstance =
-                        (DataInstance) dataInstances.get(i);
+                            (DataInstance) dataInstance1;
                     Data data = dataInstance.getData();
-                    sb.append("<b>" + data.getType().toString() + "<br>");
+                    sb.append("<b>").append(data.getType().toString()).append("<br>");
                 }
             } catch (Exception exc) {
                 logException("Making debug details", exc);
@@ -9389,9 +9389,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 }
                 doMakeColorScales();
             }
-            for (int i = 0; i < colorScales.size(); i++) {
-                setDisplayableVisibility(((Displayable) colorScales.get(i)),
-                                         show);
+            for (Object colorScale : colorScales) {
+                setDisplayableVisibility(((Displayable) colorScale),
+                        show);
             }
             return true;
         } catch (Exception exc) {
@@ -9461,10 +9461,10 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         //TODO: Is this all we need to do?
         return (v.size() > 0);
 
-        /**
-         *        for (int i=0, n=v.size(); i < n; i++) {
-         *   DisplayInfo info = (DisplayInfo) v.get (i);
-         *   }
+        /*
+                 for (int i=0, n=v.size(); i < n; i++) {
+            DisplayInfo info = (DisplayInfo) v.get (i);
+            }
          */
     }
 
@@ -9497,8 +9497,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         List displayList = getDisplayInfos();
         try {
             boolean didone = false;
-            for (int i = 0, n = displayList.size(); i < n; i++) {
-                DisplayInfo info = (DisplayInfo) displayList.get(i);
+            for (Object aDisplayList : displayList) {
+                DisplayInfo info = (DisplayInfo) aDisplayList;
                 if (info.getViewManager() == newViewManager) {
                     continue;
                 }
@@ -9537,8 +9537,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         legendBackground = bg;
         GuiUtils.setBackgroundOnTree(getBottomLegendComponent(), bg);
         if (color != null) {
-            for (int i = 0; i < colorSwatches.size(); i++) {
-                ((JComponent) colorSwatches.get(i)).setBackground(color);
+            for (Object colorSwatche : colorSwatches) {
+                ((JComponent) colorSwatche).setBackground(color);
             }
         }
     }
@@ -9549,8 +9549,8 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param on Visibility on or off
      */
     protected void showColorSwatches(boolean on) {
-        for (int i = 0; i < colorSwatches.size(); i++) {
-            JComponent swatch = (JComponent) colorSwatches.get(i);
+        for (Object colorSwatche : colorSwatches) {
+            JComponent swatch = (JComponent) colorSwatche;
             swatch.setVisible(on);
             swatch.invalidate();
             if (swatch.getParent() != null) {
@@ -9583,9 +9583,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * notify views  of change
      */
     protected void notifyViewManagersOfChange() {
-        List v = getViewManagers();
-        for (int i = 0; i < v.size(); i++) {
-            ((ViewManager) v.get(i)).displayControlChanged(this);
+        List viewManagers = getViewManagers();
+        for (Object viewManager : viewManagers) {
+            ((ViewManager) viewManager).displayControlChanged(this);
         }
 
     }
@@ -9622,12 +9622,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * Set the locking visibility of the display
      *
-     * @param v true to set locking visibility on
+     * @param lockVisibilityToggle true to set locking visibility on
      */
-    public void setLockVisibilityToggle(boolean v) {
-        lockVisibiltyToggle = v;
-        for (int i = 0; i < lockButtons.size(); i++) {
-            updateLockButton((JButton) lockButtons.get(i));
+    public void setLockVisibilityToggle(boolean lockVisibilityToggle) {
+        lockVisibiltyToggle = lockVisibilityToggle;
+        for (Object lockButton : lockButtons) {
+            updateLockButton((JButton) lockButton);
         }
     }
 
@@ -9672,10 +9672,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * Set IsRaster property
      *
-     * @param v  the value
+     * @param isRaster  the value
      */
-    public void setIsRaster(boolean v) {
-        isRaster = v;
+    public void setIsRaster(boolean isRaster) {
+
+        this.isRaster = isRaster;
     }
 
     /**
@@ -9712,12 +9713,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
         try {
             //Now run through all of the visibility buttons and update them
-            for (int i = 0, n = visibilityCbs.size(); i < n; i++) {
-                ((AbstractButton) visibilityCbs.get(i)).setSelected(on);
+            for (Object visibilityCb : visibilityCbs) {
+                ((AbstractButton) visibilityCb).setSelected(on);
             }
             List displayList = getDisplayInfos();
-            for (int i = 0, n = displayList.size(); i < n; i++) {
-                DisplayInfo info        = (DisplayInfo) displayList.get(i);
+            for (Object aDisplayList : displayList) {
+                DisplayInfo info = (DisplayInfo) aDisplayList;
                 Displayable displayable = (Displayable) info.getDisplayable();
                 //Preserve if the displayable   was initially hidden
                 if (isVisible) {
@@ -9734,9 +9735,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
             if (colorScales != null) {
                 boolean shouldBeVisible = getColorScaleInfo().getIsVisible();
-                for (int i = 0; i < colorScales.size(); i++) {
-                    ColorScale scale = (ColorScale) colorScales.get(i);
-                    if ( !on) {
+                for (Object colorScale : colorScales) {
+                    ColorScale scale = (ColorScale) colorScale;
+                    if (!on) {
                         scale.setVisible(false);
                     } else {
                         scale.setVisible(shouldBeVisible);
@@ -9758,12 +9759,12 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
         settingVisibility = false;
         if (shouldShare) {
-            doShareExternal(SHARE_VISIBILITY, new Boolean(isVisible));
+            doShareExternal(SHARE_VISIBILITY, isVisible);
         }
 
-        List v = getViewManagers();
-        for (int i = 0; i < v.size(); i++) {
-            ((ViewManager) v.get(i)).displayControlVisibilityChanged(this);
+        List viewManagers = getViewManagers();
+        for (Object viewManager : viewManagers) {
+            ((ViewManager) viewManager).displayControlVisibilityChanged(this);
         }
 
     }
@@ -10091,9 +10092,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     public MapViewManager getMapViewManager() {
         List displayList = getDisplayInfos();
-        for (int i = 0, n = displayList.size(); i < n; i++) {
-            DisplayInfo info = (DisplayInfo) displayList.get(i);
-            ViewManager vm   = info.getViewManager();
+        for (Object aDisplayList : displayList) {
+            DisplayInfo info = (DisplayInfo) aDisplayList;
+            ViewManager vm = info.getViewManager();
             if (vm instanceof MapViewManager) {
                 return (MapViewManager) vm;
             }
@@ -10465,7 +10466,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             return;
         }
         this.colorTable = new ColorTable(newColorTable);
-        if ((ctw != null) && (colorTable != null)) {
+        if (ctw != null) {
             ctw.setColorTable(colorTable);
         }
         if (getHaveInitialized()) {
@@ -12266,7 +12267,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 //            System.err.println("max size:" + maxSize + " image size:" + sizeX
                 //                               + "/" + sizeY);
                 int skipValue = getSkipValue();
-                if ((skipValue == 0) && ( !getWasUnPersisted() || true)) {
+                if (skipValue == 0) {
                     while (sizeX * sizeY > maxSize) {
                         skipValue++;
                         sizeX = sizeX / (skipValue + 1);
@@ -12512,8 +12513,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             public void actionPerformed(ActionEvent ae) {
                 try {
                     setPointSize(
-                        new Float(
-                            pointSizeFld.getText().trim()).floatValue());
+                            Float.parseFloat(pointSizeFld.getText().trim()));
                 } catch (Exception exc) {
                     logException("Error parsing size:"
                                  + pointSizeFld.getText(), exc);
