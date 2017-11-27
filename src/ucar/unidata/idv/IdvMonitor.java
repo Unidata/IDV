@@ -21,10 +21,11 @@
 package ucar.unidata.idv;
 
 
+import ucar.unidata.idv.ui.ImageGenerator;
 import ucar.unidata.util.HttpServer;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
-
+import ucar.unidata.xml.XmlUtil;
 
 import java.net.InetAddress;
 import java.net.Socket;
@@ -195,16 +196,21 @@ public class IdvMonitor extends HttpServer {
 
 
                 if(isl == null) {
-                    writeResult(false,"No " + ARG_ISL +" argument given" , "text/html");
+                    writeResult(false,getReturnXml(false, "No " + ARG_ISL +" argument given") , "text/xml");
                     return;
                 } else {
                     String tmpFile = idv.getStore().getTmpFile("tmp.isl");
                     IOUtil.writeFile(tmpFile, isl);
-                    idv.getImageGenerator().processScriptFile(tmpFile);
-                    List<String> results = idv.getImageGenerator().getResults();
+                    ImageGenerator imageGenerator = idv.getImageGenerator();
+                    //interactive = false
+                    if(!imageGenerator.processScriptFile(tmpFile, new Hashtable(), false)) {
+                        String error = imageGenerator.getError();
+                        writeResult(true, getReturnXml(false, error), "text/xml");
+                    }
+                    List<String> results = imageGenerator.getResults();
                     String result = "";
                     if(results.size()>0) result = results.get(0);
-                    writeResult(true, result, "text/html");
+                    writeResult(true, getReturnXml(true,result), "text/xml");
                 }
             } else {
                 decorateHtml(new StringBuffer("Unknown url:" + path));
@@ -214,7 +220,16 @@ public class IdvMonitor extends HttpServer {
     }
 
 
-
+    /**
+     * Utility to create the return xml format
+     * @param ok Was the call successful or not
+     * @param msg The message to return
+     */
+    private String getReturnXml(boolean ok, String msg) {
+        msg = XmlUtil.encodeString(msg);
+        System.err.println("msg:" + msg);
+        return "<result ok=\"" + ok +"\">" + msg +"</result>";
+    }
 
 
 
