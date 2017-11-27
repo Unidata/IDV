@@ -797,6 +797,10 @@ public class ImageGenerator extends IdvManager {
 
     private List<String> results = new ArrayList<String>();
 
+    private boolean interactive;
+
+    private String error = null;
+
     /** The interpreter */
     private PythonInterpreter interpreter;
 
@@ -868,7 +872,7 @@ public class ImageGenerator extends IdvManager {
      *
      * @return Was it successful
      */
-    public synchronized boolean processScriptFile(String islFile) {
+    public boolean processScriptFile(String islFile) {
         return processScriptFile(islFile, new Hashtable());
     }
 
@@ -878,17 +882,30 @@ public class ImageGenerator extends IdvManager {
      *
      * @param islFile  the ISL file
      * @param properties optional properties
+     * @return true if successful
+     */
+    public boolean processScriptFile(String islFile,
+            Hashtable properties) {
+        return processScriptFile(islFile, properties, true);
+    }
+
+    /**
+     * Process the script file
      *
+     * @param islFile  the ISL file
+     * @param properties optional properties
+     * @param interactive Is this call interactive. If not interactive then we don't pop up the error dialog
      * @return true if successful
      */
     public synchronized boolean processScriptFile(String islFile,
-            Hashtable properties) {
+                                                  Hashtable properties, boolean interactive) {
         procs           = new Hashtable();
         idToDataSource  = new Hashtable();
         propertiesStack = new ArrayList();
+        this.interactive = interactive;
         pushProperties();
         results = new ArrayList<String>();
-
+        error = null;
         if (islFile.endsWith(".jy") || islFile.endsWith(".py")) {
             try {
                 String islPath = IOUtil.getFileRoot(islFile);
@@ -907,7 +924,6 @@ public class ImageGenerator extends IdvManager {
                 return error("Error running jython script:" + islFile + "\n"
                              + exc);
             }
-
         }
 
 
@@ -968,6 +984,10 @@ public class ImageGenerator extends IdvManager {
         return results;
     }
 
+    public String getError() {
+        return error;
+    }
+
 
 
     /**
@@ -984,7 +1004,10 @@ public class ImageGenerator extends IdvManager {
         } else {
             exc.printStackTrace();
         }
-        return error("An error occurred:" + exc);
+        if(interactive)
+            return error("An error occurred:" + exc);
+        else
+            return error(exc.getMessage());
     }
 
     /**
@@ -1167,10 +1190,25 @@ public class ImageGenerator extends IdvManager {
             return true;
         }
 
+
         DisplayControlImpl display = findDisplayControl(node);
+        
+
+        //If we can't find a display and no display attribute is given then find the first display that can export data and use that
+        String displayId  = XmlUtil.getAttribute(node, ATTR_DISPLAY,(String)null);
+        if (display == null &&  displayId == null) {
+            List controls = getIdv().getDisplayControls();
+            for(int i=0;i<controls.size();i++) {
+                DisplayControlImpl tmpDisplay = (DisplayControlImpl) controls.get(i);
+                if(tmpDisplay.canExportData()) {
+                    display = tmpDisplay;
+                    break;
+                }
+            }
+        }
+
         if (display == null) {
-                throw new IllegalArgumentException("Could not find display:"
-                        + XmlUtil.toString(node));
+            throw new IllegalArgumentException(displayId == null? "Could not find display: No display attribute provided":"Could not find display with id:" + displayId);
         }
 
         display.doExport(what, filename);
@@ -2392,13 +2430,14 @@ public class ImageGenerator extends IdvManager {
 
     /**
      * Find the display control that is identified by the given xml node
-     *
+     * This uses an display attribute in the tag. If none found then it returns null
      * @param node node
      *
      * @return The display control source or null
      */
     private DisplayControlImpl findDisplayControl(Element node) {
-        String id = XmlUtil.getAttribute(node, ATTR_DISPLAY);
+        String id = XmlUtil.getAttribute(node, ATTR_DISPLAY,(String)null);
+        if(id == null) return null;
         return findDisplayControl(id);
     }
 
@@ -3412,10 +3451,11 @@ public class ImageGenerator extends IdvManager {
      * @return false
      */
     protected boolean error(String msg) {
-        if ( !getIdv().getArgsManager().getIsOffScreen()) {
+        if (interactive &&  !getIdv().getArgsManager().getIsOffScreen()) {
             LogUtil.userErrorMessage(msg);
         } else {
             System.err.println(msg);
+            this.error = msg;
         }
         return false;
     }
