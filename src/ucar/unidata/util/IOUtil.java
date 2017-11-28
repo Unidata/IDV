@@ -1257,6 +1257,7 @@ public class IOUtil {
             if (url != null) {
                 URLConnection connection = url.openConnection();
                 connection.setAllowUserInteraction(true);
+                connection.setReadTimeout(30000); //30 sec
                 if (connection instanceof HttpURLConnection) {
                     HttpURLConnection huc = (HttpURLConnection) connection;
                     if (huc.getResponseCode() == 401) {
@@ -1293,7 +1294,13 @@ public class IOUtil {
                                 }
                             }
                         }
+                    } else if (huc.getResponseCode() == 301 || huc.getResponseCode() == 302) {
+                        String urlStr = url.toString().replaceFirst("http:", "https:");
+                        URL newURL = new URL(urlStr);
+                        connection = newURL.openConnection();
+                        connection.setReadTimeout(30000); //30 sec
                     }
+
                 }
                 return connection.getInputStream();
             }
