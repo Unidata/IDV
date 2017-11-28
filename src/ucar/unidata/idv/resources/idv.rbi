@@ -426,8 +426,8 @@
     <resource location="%SITEPATH%/bundles.xml"/>
     <resource location="%APPPATH%/bundles.xml"/>
     <resource location="%IDVPATH%/bundles.xml"/>
-    <resource location="http://ramadda.unidata.ucar.edu/repository/entry/show?entryid=5096049b-17cb-443a-9c85-d9795b954a2e&amp;output=idv.bundles&amp;top= "/>
-    <resource location="http://ramadda.unidata.ucar.edu/repository/entry/show?entryid=499df7f2-6d4e-426e-852b-92d4a282b94a&amp;output=idv.bundles&amp;top= "/>
+    <resource location="https://ramadda.unidata.ucar.edu/repository/entry/show?entryid=5096049b-17cb-443a-9c85-d9795b954a2e&amp;output=idv.bundles&amp;top= "/>
+    <resource location="https://ramadda.unidata.ucar.edu/repository/entry/show?entryid=499df7f2-6d4e-426e-852b-92d4a282b94a&amp;output=idv.bundles&amp;top= "/>
   </resources>
 
 <!-- This points to the xml document(s) that hold the user defined chooser panels   -->
@@ -641,7 +641,7 @@
 
 <!-- Where to look for extensions  -->
   <resources name="idv.resource.pluginindex">
-    <resource location="http://www.unidata.ucar.edu/software/idv/plugins/plugins.xml"/>
+    <resource location="https://www.unidata.ucar.edu/software/idv/plugins/plugins.xml"/>
   </resources>
 
 <!-- Where to look for prototypes  -->
@@ -687,7 +687,7 @@
     <resource location="%SITEPATH%/imagesets.xml"/>
     <resource location="%APPPATH%/imagesets.xml"/>
     <resource location="%IDVPATH%/imagesets.xml"/>
-    <resource location="http://www.unidata.ucar.edu/georesources/webcams/images/index.xml"/>
+    <resource location="https://www.unidata.ucar.edu/georesources/webcams/images/index.xml"/>
   </resources>
 
   <resources name="idv.resource.njconfig">
