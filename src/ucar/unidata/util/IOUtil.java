@@ -1256,10 +1256,22 @@ public class IOUtil {
             URL url = getURL(filename, origin);
             if (url != null) {
                 URLConnection connection = url.openConnection();
+                connection.setReadTimeout(30000); 
                 connection.setAllowUserInteraction(true);
-                connection.setReadTimeout(30000); //30 sec
                 if (connection instanceof HttpURLConnection) {
                     HttpURLConnection huc = (HttpURLConnection) connection;
+                    int response = huc.getResponseCode();
+                    //Check for redirect
+                    if (response == HttpURLConnection.HTTP_MOVED_TEMP
+                        || response == HttpURLConnection.HTTP_MOVED_PERM
+                        || response == HttpURLConnection.HTTP_SEE_OTHER) {
+                        String newUrl = connection.getHeaderField("Location");
+                        connection = new URL(newUrl).openConnection();
+                        connection.setReadTimeout(30000); 
+                        connection.setAllowUserInteraction(true);
+                        huc = (HttpURLConnection) connection;
+                    }
+
                     if (huc.getResponseCode() == 401) {
                         String auth =
                             connection.getHeaderField("WWW-Authenticate");
@@ -1294,13 +1306,7 @@ public class IOUtil {
                                 }
                             }
                         }
-                    } else if (huc.getResponseCode() == 301 || huc.getResponseCode() == 302) {
-                        String urlStr = url.toString().replaceFirst("http:", "https:");
-                        URL newURL = new URL(urlStr);
-                        connection = newURL.openConnection();
-                        connection.setReadTimeout(30000); //30 sec
                     }
-
                 }
                 return connection.getInputStream();
             }
