@@ -1375,6 +1375,17 @@ public class ImageGenerator extends IdvManager {
 
 
     /**
+     * make a beep
+     * @param node the isl xml node
+     * @return true
+     */
+    protected boolean processTagBeep(Element node) throws Throwable {
+        java.awt.Toolkit.getDefaultToolkit().beep();
+        return true;
+    }
+
+
+    /**
      * process the given node
      *
      * @param node Node to process
@@ -4447,7 +4458,21 @@ public class ImageGenerator extends IdvManager {
                     else
                         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                                 getIdv().getIdvUIManager(), 0);
-                    lastImage       = viewManager.getMaster().getImage(false);
+                    //Check to see what should be captured
+                    String capture = XmlUtil.getAttribute(scriptingNode,"capture",(String) null);
+                    if(capture == null) {
+                        lastImage       = viewManager.getMaster().getImage(false);
+                    } else {
+                        Component component = null;
+                        viewManager.toFront();
+                        if(capture.equals("window")) 
+                            component = viewManager.getDisplayWindow().getComponent();
+                        else if(capture.equals("legend")) 
+                            component = viewManager.getContents();
+                        else
+                            throw new IllegalArgumentException("Unknown image capture attribute:" + capture);
+                        lastImage  = viewManager.makeBufferedImage(component, capture);
+                    }
                     imageProperties = new Hashtable();
                     lastImage = processImage((BufferedImage) lastImage,
                                              loopFilename, scriptingNode,
