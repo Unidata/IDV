@@ -4458,21 +4458,8 @@ public class ImageGenerator extends IdvManager {
                     else
                         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
                                 getIdv().getIdvUIManager(), 0);
-                    //Check to see what should be captured
-                    String capture = XmlUtil.getAttribute(scriptingNode,"capture",(String) null);
-                    if(capture == null) {
-                        lastImage       = viewManager.getMaster().getImage(false);
-                    } else {
-                        Component component = null;
-                        viewManager.toFront();
-                        if(capture.equals("window")) 
-                            component = viewManager.getDisplayWindow().getComponent();
-                        else if(capture.equals("legend")) 
-                            component = viewManager.getContents();
-                        else
-                            throw new IllegalArgumentException("Unknown image capture attribute:" + capture);
-                        lastImage  = viewManager.makeBufferedImage(component, capture);
-                    }
+                    
+                    lastImage = viewManager.captureIslImage(scriptingNode);
                     imageProperties = new Hashtable();
                     lastImage = processImage((BufferedImage) lastImage,
                                              loopFilename, scriptingNode,

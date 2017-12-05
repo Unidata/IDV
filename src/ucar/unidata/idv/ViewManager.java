@@ -6250,6 +6250,34 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
+     * Capture the image for for ISL. If scriptingNode has a capture attribute then capture the legend or
+     * the full window. Else just capture the display
+     *
+     * @param scriptingNode The ISL node
+     * @return The image
+     */
+    public BufferedImage captureIslImage(Element scriptingNode) throws Exception {
+        BufferedImage image;
+        //Check to see what should be captured
+        String capture = XmlUtil.getAttribute(scriptingNode,"capture",(String) null);
+        if(capture  == null) {
+            return  getMaster().getImage(false);
+        } else {
+            Component component = null;
+            toFront();
+            if(capture.equals("window")) 
+                component = getDisplayWindow().getComponent();
+            else if(capture.equals("legend")) 
+                component = getContents();
+            else
+                throw new IllegalArgumentException("Unknown image capture attribute:" + capture);
+            return makeBufferedImage(component, capture);
+        }
+    }
+
+
+
+    /**
      * Make buffered image.
      *
      * @param comp the component
