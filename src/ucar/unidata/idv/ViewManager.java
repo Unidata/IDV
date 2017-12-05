@@ -6257,7 +6257,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return the buffered image
      * @throws AWTException the AWT exception
      */
-    private BufferedImage makeBufferedImage(Component comp,
+    public BufferedImage makeBufferedImage(Component comp,
                                             String whichComponent)
             throws AWTException {
         Dimension             dim   = comp.getSize();
