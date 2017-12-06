@@ -99,6 +99,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
@@ -5926,7 +5927,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             PrinterJob printJob = PrinterJob.getPrinterJob();
 
             printJob.setPrintable(
-                ((DisplayImpl) getMaster().getDisplay()).getPrintable());
+                                  ((DisplayImpl) getMaster().getDisplay()).getPrintable());
 
             if ( !printJob.printDialog()) {
                 return;
@@ -6271,8 +6272,34 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 component = getContents();
             else
                 throw new IllegalArgumentException("Unknown image capture attribute:" + capture);
-            return makeBufferedImage(component, capture);
+            return makeMixedImage(component);
+            //            return makeBufferedImage(component, capture);
         }
+    }
+
+
+
+    /**
+     * This creates an image from the given lightweight component and then looks for all of the
+     * heavyweight DisplayManager views and overlays those images on the main image
+     *
+     * @param component the component
+     * @return the image
+     */
+    private BufferedImage makeMixedImage(Component component)  throws Exception {
+        Point    baseLoc   = component.getLocationOnScreen();
+        Image mainImage = ImageUtils.getImage(component);
+        Graphics graphics = mainImage.getGraphics();
+        List<ViewManager> viewManagers = getDisplayWindow().getViewManagers();
+        List<Component> heavyWeightComponents = new ArrayList<Component>();
+        for(ViewManager vm: viewManagers) {
+            Component comp = vm.getMaster().getComponent();
+            Dimension             dim   = comp.getSize();
+            Point                 loc   = comp.getLocationOnScreen();
+            Image image =  vm.getMaster().getImage(false);
+            graphics.drawImage(image, loc.x-baseLoc.x, loc.y-baseLoc.y, null);
+        }
+        return ImageUtils.toBufferedImage(mainImage);
     }
 
 
