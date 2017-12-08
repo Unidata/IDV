@@ -26,6 +26,7 @@ import ucar.unidata.data.DataUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.Range;
+
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.quantities.AirPressure;
@@ -145,7 +146,7 @@ public class DerivedGridFactory {
     public static FieldImpl createThickness(FieldImpl grid)
             throws VisADException, RemoteException {
         return createLayerDifference(grid, 500, 1000,
-                CommonUnits.HECTOPASCAL);
+                                     CommonUnits.HECTOPASCAL);
     }
 
     /**
@@ -247,12 +248,12 @@ public class DerivedGridFactory {
                            : new Real(levelType, value2);
         FieldImpl first  =
         // GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
-        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
-                                     false);
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid,
+                level1), false);
         FieldImpl second =
         // GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
-        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
-                                     false);
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid,
+                level2), false);
         TupleType paramType = GridUtil.getParamType(grid);
         FieldImpl result    = (FieldImpl) first.subtract(second);
 
@@ -262,7 +263,7 @@ public class DerivedGridFactory {
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
-                    rt.getDefaultUnit()));
+                                                        rt.getDefaultUnit()));
 
             result = GridUtil.setParamType(result, rtt,
                                            false /* don't copy */);
@@ -366,12 +367,12 @@ public class DerivedGridFactory {
                            : new Real(levelType, value2);
         FieldImpl first  =
         // GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value1),
-        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level1),
-                                     false);
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid,
+                level1), false);
         FieldImpl second =
         // GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, value2),
-        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid, level2),
-                                     false);
+        GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid,
+                level2), false);
         TupleType paramType = GridUtil.getParamType(grid);
         FieldImpl result =
             (FieldImpl) (first.add(second)).divide(new Real(2));
@@ -382,7 +383,7 @@ public class DerivedGridFactory {
                              + (int) value2;
             RealTupleType rtt =
                 new RealTupleType(DataUtil.makeRealType(newName,
-                    rt.getDefaultUnit()));
+                                                        rt.getDefaultUnit()));
 
             result = GridUtil.setParamType(result, rtt,
                                            false /* don't copy */);
@@ -740,8 +741,8 @@ public class DerivedGridFactory {
                     funcFF0 = new FieldImpl(newinnerType, ss);
                     funcFF0.setSample(0, innerField, false);
                     FieldImpl innerrvFF =
-                        (FieldImpl) GridRelativeHorizontalWind
-                            .cartesianHorizontalWind(funcFF0);
+                        (FieldImpl) GridRelativeHorizontalWind.cartesianHorizontalWind(
+                            funcFF0);
 
                     if (rangeType == null) {
                         rangeType = GridUtil.getParamType(innerrvFF);
@@ -768,8 +769,8 @@ public class DerivedGridFactory {
 
         } else {
             result =
-                (FieldImpl) GridRelativeHorizontalWind
-                    .cartesianHorizontalWind(uvGrid);
+                (FieldImpl) GridRelativeHorizontalWind.cartesianHorizontalWind(
+                    uvGrid);
         }
         ucar.unidata.util.Trace.call2("DGF:createTrueFlowVector");
 
@@ -872,10 +873,8 @@ public class DerivedGridFactory {
             topoGrid = convertPressureToHeight(topoGrid);
         }
         if ( !(Unit.canConvert(topoUnit,
-                               GeopotentialAltitude
-                                   .getGeopotentialMeter()) || Unit
-                                       .canConvert(topoUnit,
-                                           CommonUnit.meter))) {
+                               GeopotentialAltitude.getGeopotentialMeter())
+                || Unit.canConvert(topoUnit, CommonUnit.meter))) {
             throw new VisADException("topography units " + topoUnit
                                      + " must convertible with m or gpm");
         }
@@ -910,11 +909,10 @@ public class DerivedGridFactory {
                 // System.err.println("new topo domain " +topoDomain);
                 // unequal 3D grid and topo with 2D manifolds
             } else if (((paramDomain.getDimension() == 3)
-                        && (paramDomain.getManifoldDimension()
-                            == 2)) && ((topoDomain.getDimension() == 3)
-                                       && (topoDomain.getManifoldDimension()
-                                           == 2)) && !topoDomain.equals(
-                                               paramDomain)) {
+                        && (paramDomain.getManifoldDimension() == 2))
+                       && ((topoDomain.getDimension() == 3)
+                           && (topoDomain.getManifoldDimension() == 2))
+                       && !topoDomain.equals(paramDomain)) {
                 grid        = GridUtil.make2DGridFromSlice(paramGrid, true);
                 paramDomain = GridUtil.getSpatialDomain(grid);
                 topoGrid    = GridUtil.make2DGridFromSlice(topoGrid, true);
@@ -1012,7 +1010,7 @@ public class DerivedGridFactory {
         // setParamType will create a new FieldImpl of the same structure as the original using Util.clone()
         FieldImpl heightGrid = GridUtil.setParamType(pressureField,
                                    RealType.getRealType("topo",
-                                       CommonUnit.meter));
+                                           CommonUnit.meter));
         if (GridUtil.isSequence(heightGrid)) {
             Set seqSet = heightGrid.getDomainSet();
             for (int i = 0; i < seqSet.getLength(); i++) {
@@ -1025,7 +1023,7 @@ public class DerivedGridFactory {
         } else {
             float[][] pressVals = heightGrid.getFloats();
             float[][] heightVals = pressToHeightCS.toReference(pressVals,
-                    new Unit[]{pressUnit});
+                                       new Unit[] { pressUnit });
             ((FlatField) heightGrid).setSamples(heightVals, false);
         }
         return heightGrid;
@@ -1043,19 +1041,19 @@ public class DerivedGridFactory {
      * @throws VisADException   VisAD problem
      */
     public static FieldImpl convertPressureVelocityToHeightVelocity(
-            FieldImpl wGrid )
+            FieldImpl wGrid)
             throws VisADException, RemoteException {
         FieldImpl w;
         final Unit rgUnit =
-                ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
+            ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
         if (Unit.canConvert(rgUnit, CommonUnits.METERS_PER_SECOND)) {
             w = wGrid;
         } else {
             FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
-                    (FlatField) wGrid.getSample(0));
+                                (FlatField) wGrid.getSample(0));
             FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
             w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
-                    wGrid, hPI, null);
+                wGrid, hPI, null);
             // w = (FieldImpl)w.multiply(new Real(0.5));;
             // choices.remove(new String("D3"));
             //choices.put(new String("D3"), w);
@@ -1077,48 +1075,57 @@ public class DerivedGridFactory {
      * @throws VisADException   VisAD problem
      */
     public static FieldImpl convertPressureVelocityToHeightVelocity2(
-            FieldImpl wGrid, FieldImpl tGrid )
+            FieldImpl wGrid, FieldImpl tGrid)
             throws VisADException, RemoteException {
 
-        Unit wUnit = GridUtil.getParamUnits(wGrid)[0];
+        Unit wUnit    = GridUtil.getParamUnits(wGrid)[0];
         Unit tempUnit = GridUtil.getParamUnits(tGrid)[0];
 
         FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
-                (FlatField) tGrid.getSample(0));
+                            (FlatField) tGrid.getSample(0));
         Unit pUnit = GridUtil.getParamUnits(pFI)[0];
 
         // make sure wGrid in pa/s
-        if(!wUnit.getIdentifier().equals("Pa/s")){
+        if ( !wUnit.getIdentifier().equals("Pa/s")) {
             Unit newWUnit = Util.parseUnit("Pa/s");
-            RealType newType = Util.makeRealType("newVerticalVelocity", newWUnit);
+            RealType newType = Util.makeRealType("newVerticalVelocity",
+                                   newWUnit);
             wGrid = GridUtil.setParamType(wGrid, newType, true);
         }
 
-        if(!tempUnit.equals(SI.kelvin)){
-            RealType newType1 = Util.makeRealType("newTemperature", SI.kelvin);
+        if ( !tempUnit.equals(SI.kelvin)) {
+            RealType newType1 = Util.makeRealType("newTemperature",
+                                    SI.kelvin);
             tGrid = GridUtil.setParamType(tGrid, newType1, true);
         }
 
-        if(!pUnit.equals(CommonUnits.PASCAL)){
-            RealType newType2 = Util.makeRealType("newPressure", CommonUnits.PASCAL);
+        if ( !pUnit.equals(CommonUnits.PASCAL)) {
+            RealType newType2 = Util.makeRealType("newPressure",
+                                    CommonUnits.PASCAL);
             pFI = GridUtil.setParamType(pFI, newType2, true);
         }
 
-        FieldImpl w = (FieldImpl)GridMath.divide(GridMath.multiply( tGrid, wGrid), pFI)
-                    .multiply(new Real(-29.28));
+        FieldImpl w = (FieldImpl) GridMath.divide(GridMath.multiply(tGrid,
+                                                                    wGrid), pFI)
+                                                                    .multiply(
+                                                                        new Real(
+                                                                            -29.28));
 
         // choices.remove(new String("D3"));
         //choices.put(new String("D3"), w);
-        RealType newType2 = Util.makeRealType("newW", CommonUnits.METERS_PER_SECOND);
+        RealType newType2 = Util.makeRealType("newW",
+                                CommonUnits.METERS_PER_SECOND);
         return GridUtil.setParamType(w, newType2, true);
 
 
     }
+
     /**
      * Convert pressure velocity to height velocity
      *
      * @param pressureVelField  pressure velocity field
      * @param hField  the height field
+     * @param pressToHeightCS _more_
      *
      * @return the velocities as m/s
      *
@@ -1150,24 +1157,26 @@ public class DerivedGridFactory {
         Unit      dunit = dhdp.getDefaultRangeUnits()[0];
         if (dunit instanceof ScaledUnit) {
             ScaledUnit scaledUnit = (ScaledUnit) dunit;
-            Unit rUnit = scaledUnit.getUnit();
-            dhdp = GridUtil.setParamType(dhdp,
-                    RealType.getRealType("ddp", rUnit));
+            Unit       rUnit      = scaledUnit.getUnit();
+            dhdp = GridUtil.setParamType(dhdp, RealType.getRealType("ddp",
+                    rUnit));
         }
         FieldImpl dhdt  = GridMath.multiply(pressureVelField, dhdp);
 
 
-        Unit zUnit = CommonUnits.METERS_PER_SECOND;
+        Unit      zUnit = CommonUnits.METERS_PER_SECOND;
 
         FieldImpl heightGrid = GridUtil.setParamType(dhdt,
-                RealType.getRealType("zVel", zUnit));
+                                   RealType.getRealType("zVel",
+                                           zUnit));
 
         if (GridUtil.isSequence(heightGrid)) {
             Set seqSet = heightGrid.getDomainSet();
             for (int i = 0; i < seqSet.getLength(); i++) {
                 FlatField ff = (FlatField) heightGrid.getSample(i, false);
-                FlatField fd = (FlatField)GridUtil.setParamType(ff,
-                        RealType.getRealType("zVel", zUnit));
+                FlatField fd = (FlatField) GridUtil.setParamType(ff,
+                                   RealType.getRealType("zVel",
+                                           zUnit));
                 float[][] pressVals = fd.getFloats();
                 fd.setSamples(pressVals, false);
             }
@@ -1244,10 +1253,10 @@ public class DerivedGridFactory {
             FieldImpl vGrid, FieldImpl wGrid)
             throws VisADException, RemoteException {
         FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid,
-                wGrid }, true);
+                                                           wGrid }, true);
         TupleType paramType = GridUtil.getParamType(uvwGrid);
         RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
-                CommonUnit.meterPerSecond);
+                                           CommonUnit.meterPerSecond);
         RealTupleType earthVectorType = new EarthVectorType(reals[0],
                                             reals[1], reals[2]);
 
@@ -1287,14 +1296,15 @@ public class DerivedGridFactory {
             //choices.put(new String("D3"), w);
         }
         SampledSet wDomain = GridUtil.getSpatialDomain(w);
-        if(!wDomain.equals(GridUtil.getSpatialDomain(uGrid))){
+        if ( !wDomain.equals(GridUtil.getSpatialDomain(uGrid))) {
             uGrid = GridUtil.resampleGrid(uGrid, wDomain);
             vGrid = GridUtil.resampleGrid(vGrid, wDomain);
         }
         //FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid, w },
-         //                                true);
-        FieldImpl uvwGrid = combineGrids(new FieldImpl[]{uGrid, vGrid, w}, GridUtil.DEFAULT_SAMPLING_MODE,
-                GridUtil.DEFAULT_ERROR_MODE, true);
+        //                                true);
+        FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid, w },
+                                         GridUtil.DEFAULT_SAMPLING_MODE,
+                                         GridUtil.DEFAULT_ERROR_MODE, true);
         TupleType paramType = GridUtil.getParamType(uvwGrid);
         RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
                                            CommonUnit.meterPerSecond);
@@ -1304,6 +1314,29 @@ public class DerivedGridFactory {
         return GridUtil.setParamType(uvwGrid, earthVectorType,
                                      false /* copy */);
     }
+
+    /**
+     * _more_
+     *
+     * @param uGrid _more_
+     * @param vGrid _more_
+     * @param wGrid _more_
+     * @param topo _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static List<FieldImpl> createFlowVectorsNA(FieldImpl uGrid,
+            FieldImpl vGrid, FieldImpl wGrid, FieldImpl topo)
+            throws VisADException, RemoteException, Exception {
+        FieldImpl w = createFlowVectorsN(uGrid, vGrid, wGrid);
+
+        return GridTrajectory.combineGridsArray(w, topo);
+    }
+
     /**
      * _more_
      *
@@ -1316,22 +1349,24 @@ public class DerivedGridFactory {
      * @throws VisADException _more_
      */
     public static FieldImpl createFlowVectorsN(FieldImpl uGrid,
-                                               FieldImpl vGrid)
+            FieldImpl vGrid)
             throws VisADException, RemoteException {
 
         //FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uGrid, vGrid, w },
         //                                true);
-        FieldImpl uvGrid = combineGrids(new FieldImpl[]{uGrid, vGrid}, GridUtil.DEFAULT_SAMPLING_MODE,
-                GridUtil.DEFAULT_ERROR_MODE, true);
+        FieldImpl uvGrid = combineGrids(new FieldImpl[] { uGrid, vGrid },
+                                        GridUtil.DEFAULT_SAMPLING_MODE,
+                                        GridUtil.DEFAULT_ERROR_MODE, true);
         TupleType paramType = GridUtil.getParamType(uvGrid);
         RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
-                CommonUnit.meterPerSecond);
+                                           CommonUnit.meterPerSecond);
         RealTupleType earthVectorType = new EarthVectorType(reals[0],
-                reals[1]);
+                                            reals[1]);
 
         return GridUtil.setParamType(uvGrid, earthVectorType,
-                false /* copy */);
+                                     false /* copy */);
     }
+
     /**
      * _more_
      *
@@ -1445,19 +1480,20 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl combineGridsR(FieldImpl[] grids, int samplingMode,
-                                         int errorMode, boolean flatten)
+    public static FieldImpl combineGridsR(FieldImpl[] grids,
+                                          int samplingMode, int errorMode,
+                                          boolean flatten)
             throws VisADException, RemoteException {
         if (grids.length < 2) {
             throw new IllegalArgumentException(
-                    "must have at least 2 grids for this method");
+                "must have at least 2 grids for this method");
         }
 
-        FieldImpl outGrid = grids[grids.length-1];
+        FieldImpl outGrid = grids[grids.length - 1];
 
-        for (int i = grids.length-2; i >= 0; i--) {
+        for (int i = grids.length - 2; i >= 0; i--) {
             outGrid = combineGrids(outGrid, grids[i], samplingMode,
-                    errorMode, flatten);
+                                   errorMode, flatten);
         }
 
         return outGrid;
@@ -1514,11 +1550,12 @@ public class DerivedGridFactory {
     public static FieldImpl combineGridsN(FieldImpl grid1, FieldImpl grid2)
             throws VisADException, RemoteException {
         SampledSet grid1Domain = GridUtil.getSpatialDomain(grid1);
-        if(!grid1Domain.equals(GridUtil.getSpatialDomain(grid2))){
+        if ( !grid1Domain.equals(GridUtil.getSpatialDomain(grid2))) {
             grid2 = GridUtil.resampleGrid(grid2, grid1Domain);
         }
         return combineGrids(grid1, grid2, false);
     }
+
     /**
      * Combine two Fields into one.  If the grids are on different
      * time domains, the second is resampled to the domain of the first.
@@ -1649,14 +1686,14 @@ public class DerivedGridFactory {
                     }
                     wvFI.setSample(i, funcFF, false);
                 } else {
-                  /*  if(!GridUtil.isVolume(grid1) && !GridUtil.is2D(grid1)){
-                        //we need to reduce dimension to 2 if z = 1
-                        grid1 = GridUtil.make2DGridFromSlice(grid1, true);
-                    }
-                    if(!GridUtil.isVolume(grid2) && !GridUtil.is2D(grid2)){
-                        //we need to reduce dimension to 2 if z = 1
-                        grid2 = GridUtil.make2DGridFromSlice(grid2, true);
-                    } */
+                    /*  if(!GridUtil.isVolume(grid1) && !GridUtil.is2D(grid1)){
+                          //we need to reduce dimension to 2 if z = 1
+                          grid1 = GridUtil.make2DGridFromSlice(grid1, true);
+                      }
+                      if(!GridUtil.isVolume(grid2) && !GridUtil.is2D(grid2)){
+                          //we need to reduce dimension to 2 if z = 1
+                          grid2 = GridUtil.make2DGridFromSlice(grid2, true);
+                      } */
                     FlatField wvFF =
                         (FlatField) FieldImpl.combine(new Field[] {
                             (FlatField) grid1.getSample(i),
@@ -1704,8 +1741,9 @@ public class DerivedGridFactory {
 
                 if (i == 0) {  // first time through
                     FunctionType functionType =
-                        new FunctionType(((FunctionType) sequenceGrid
-                            .getType()).getDomain(), wvFF.getType());
+                        new FunctionType(
+                            ((FunctionType) sequenceGrid.getType()).getDomain(),
+                            wvFF.getType());
 
                     // make the new FieldImpl for dewpoint
                     // (but as yet empty of data)
@@ -1850,9 +1888,8 @@ public class DerivedGridFactory {
 
             // compute each divFlatField in turn; load in FieldImpl
             for (int i = 0; i < timeSet.getLength(); i++) {
-                FlatField dirFF =
-                    createVectorDirectionFF((FlatField) vector.getSample(i,
-                        false));
+                FlatField dirFF = createVectorDirectionFF(
+                                      (FlatField) vector.getSample(i, false));
 
                 if ((dirFI == null) && (dirFF != null)) {
                     FunctionType dirFT =
@@ -2109,14 +2146,15 @@ public class DerivedGridFactory {
      * @throws VisADException   VisAD Error
      */
     public static FieldImpl createHorizontalAdvection(FieldImpl paramGrid,
-                                                      FieldImpl flowVector)
+            FieldImpl flowVector)
             throws VisADException, RemoteException {
         FieldImpl uGrid = getUComponent(flowVector);
         FieldImpl vGrid = getVComponent(flowVector);
 
-        return createHorizontalAdvection(paramGrid,uGrid,vGrid);
+        return createHorizontalAdvection(paramGrid, uGrid, vGrid);
 
     }
+
     /**
      * Make a FieldImpl of horizontal scalar advection from u and v components,
      *  defined as u*(dp/dx) + v*(dp/dy)
@@ -2210,8 +2248,9 @@ public class DerivedGridFactory {
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(((FunctionType) paramGrid
-                                .getType()).getDomain(), divFF.getType());
+                            new FunctionType(
+                                ((FunctionType) paramGrid.getType()).getDomain(),
+                                divFF.getType());
 
                         // make the new FieldImpl for advection
                         divFI = new FieldImpl(functionType, timeSet);
@@ -2344,8 +2383,9 @@ public class DerivedGridFactory {
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(((FunctionType) temperFI
-                                .getType()).getDomain(), dewptFF.getType());
+                            new FunctionType(
+                                ((FunctionType) temperFI.getType()).getDomain(),
+                                dewptFF.getType());
 
                         // make the new FieldImpl for dewpoint
                         // (but as yet empty of data)
@@ -2384,15 +2424,15 @@ public class DerivedGridFactory {
         // make es from temperature
         FlatField esFF =
             (FlatField) SaturationVaporPressure.create((FlatField) temp);
-        Unit percentUnit = CommonUnits.PERCENT;
-        Unit rUnit = rh.getRangeUnits()[0][0];
+        Unit         percentUnit = CommonUnits.PERCENT;
+        Unit         rUnit       = rh.getRangeUnits()[0][0];
         FunctionType newFFType;
-        if( rUnit == null || !(rUnit.isConvertible(percentUnit))){
+        if ((rUnit == null) || !(rUnit.isConvertible(percentUnit))) {
 
             Range[] range = GridUtil.fieldMinMax(rh);
-            if(range[0].max <= 1.1 && range[0].min > 0){
+            if ((range[0].max <= 1.1) && (range[0].min > 0)) {
                 //it is fraction
-                rh = (FlatField)rh.__mul__(100.0);
+                rh = (FlatField) rh.__mul__(100.0);
 
             }
             RealType rt = GridUtil.getParamType(rh).getRealComponents()[0];
@@ -2448,7 +2488,8 @@ public class DerivedGridFactory {
             if (ensble) {
                 FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
                 press = createPressureGridFromDomain(
-                    (FlatField) sample1.getSample(0, false));
+                    (FlatField) sample1.getSample(0,
+                            false));
             } else {
                 press = createPressureGridFromDomain(
                     (FlatField) temperFI.getSample(0));
@@ -2518,8 +2559,9 @@ public class DerivedGridFactory {
                     // first time through
                     if (i == 0) {
                         FunctionType functionType =
-                            new FunctionType(((FunctionType) temperFI
-                                .getType()).getDomain(), eptFF.getType());
+                            new FunctionType(
+                                ((FunctionType) temperFI.getType()).getDomain(),
+                                eptFF.getType());
 
                         // make the new FieldImpl for mixing ratio
                         // (but as yet empty of data)
@@ -2601,7 +2643,8 @@ public class DerivedGridFactory {
             if (ensble) {
                 FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
                 press = createPressureGridFromDomain(
-                    (FlatField) sample1.getSample(0, false));
+                    (FlatField) sample1.getSample(0,
+                            false));
             } else {
                 press = createPressureGridFromDomain(
                     (FlatField) temperFI.getSample(0));
@@ -2679,8 +2722,9 @@ public class DerivedGridFactory {
                     // first time through
                     if (i == 0) {
                         FunctionType functionType =
-                            new FunctionType(((FunctionType) temperFI
-                                .getType()).getDomain(), rhFF.getType());
+                            new FunctionType(
+                                ((FunctionType) temperFI.getType()).getDomain(),
+                                rhFF.getType());
 
                         // make the new FieldImpl for relative humidity
                         // (but as yet empty of data)
@@ -2752,7 +2796,8 @@ public class DerivedGridFactory {
             if (ensble) {
                 FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
                 press = createPressureGridFromDomain(
-                    (FlatField) sample1.getSample(0, false));
+                    (FlatField) sample1.getSample(0,
+                            false));
             } else {
                 press = createPressureGridFromDomain(
                     (FlatField) temperFI.getSample(0));
@@ -2811,8 +2856,9 @@ public class DerivedGridFactory {
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(((FunctionType) temperFI
-                                .getType()).getDomain(), mixFF.getType());
+                            new FunctionType(
+                                ((FunctionType) temperFI.getType()).getDomain(),
+                                mixFF.getType());
 
                         // make the new FieldImpl for mixing ratio
                         // (but as yet empty of data)
@@ -2855,7 +2901,7 @@ public class DerivedGridFactory {
         RealType rhRT =
             (RealType) DataUtility.getFlatRangeType(rh).getComponent(0);
         FlatField mr = (FlatField) (satMR.multiply(rh.divide(new Real(rhRT,
-                           100.0))));
+                                                                      100.0))));
 
         return mr;
     }
@@ -2884,7 +2930,7 @@ public class DerivedGridFactory {
             FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
             press =
                 createPressureGridFromDomain((FlatField) sample1.getSample(0,
-                    false));
+                        false));
         } else {
             if (GridUtil.isTimeSequence(temperFI) == true) {
                 press = createPressureGridFromDomain(
@@ -3047,8 +3093,9 @@ public class DerivedGridFactory {
 
                     if (i == 0) {  // first time through
                         FunctionType functionType =
-                            new FunctionType(((FunctionType) temperFI
-                                .getType()).getDomain(), thetaFF.getType());
+                            new FunctionType(
+                                ((FunctionType) temperFI.getType()).getDomain(),
+                                thetaFF.getType());
 
                         // ((FunctionType)temperFI.getType()).getDomain() = "Time"
                         // make the new FieldImpl for theta  (but as yet empty of data)
@@ -3093,7 +3140,7 @@ public class DerivedGridFactory {
             FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
             press =
                 createPressureGridFromDomain((FlatField) sample1.getSample(0,
-                    false));
+                        false));
         } else {
             if (GridUtil.isTimeSequence(temperFI) == true) {
                 press = createPressureGridFromDomain(
@@ -3189,8 +3236,8 @@ public class DerivedGridFactory {
                             // first time through
                             // get the "level" coord of the grid; x,y,level; a "RealType"
                             pressure =
-                                (RealType) ((FunctionType) innerdivFF
-                                    .getType()).getDomain().getComponent(2);
+                                (RealType) ((FunctionType) innerdivFF.getType()).getDomain()
+                                .getComponent(2);
                         }
 
                         if ( !Unit.canConvert(pressure.getDefaultUnit(),
@@ -3250,8 +3297,8 @@ public class DerivedGridFactory {
                         // first time through
                         // get the "level" coord of the grid; x,y,level; a "RealType"
                         pressure =
-                            (RealType) ((FunctionType) thetaFF.getType())
-                                .getDomain().getComponent(2);
+                            (RealType) ((FunctionType) thetaFF.getType()).getDomain()
+                            .getComponent(2);
                     }
 
                     if ( !Unit.canConvert(pressure.getDefaultUnit(),
@@ -3286,8 +3333,9 @@ public class DerivedGridFactory {
                             ipvRT);
 
                         FunctionType functionType =
-                            new FunctionType(((FunctionType) temperFI
-                                .getType()).getDomain(), ipvFFType);
+                            new FunctionType(
+                                ((FunctionType) temperFI.getType()).getDomain(),
+                                ipvFFType);
 
                         // System.out.println ("    first func type = "+functionType);
                         // make the new FieldImpl for IPV (but as yet empty of data)
@@ -3444,7 +3492,7 @@ public class DerivedGridFactory {
         // check to make sure we have a pressure domain
         RealType pressure =
             (RealType) ((FunctionType) tempFF.getType()).getDomain()
-                .getComponent(2);
+            .getComponent(2);
 
         if ( !Unit.canConvert(pressure.getDefaultUnit(),
                               CommonUnits.HECTOPASCAL)) {
@@ -3885,8 +3933,9 @@ public class DerivedGridFactory {
                 } else {
                     if ( !isConstantDomain || (latFF == null)) {
                         latFF = createLatitudeBasedGrid(
-                            (FlatField) fi.getSample(i, false), latType,
-                            domIsLatLon, makeCoriolis);
+                            (FlatField) fi.getSample(i,
+                                    false), latType, domIsLatLon,
+                                            makeCoriolis);
                     }
 
                     if (i == 0) {
@@ -3967,7 +4016,7 @@ public class DerivedGridFactory {
                 if ( !isConstantDomain || (lonFF == null)) {
                     lonFF =
                         createLongitudeBasedGrid((FlatField) fi.getSample(i,
-                            false), lonType, domIsLatLon);
+                                false), lonType, domIsLatLon);
                 }
 
                 if (i == 0) {
@@ -4139,7 +4188,7 @@ public class DerivedGridFactory {
             retField = new FlatField(retType, newDomain,
                                      domainSet.getCoordinateSystem(), rset,
                                      new Unit[] { uset[0][0],
-                    uset[1][0] });
+                                             uset[1][0] });
             retField.setSamples(values, false);
 
         } catch (RemoteException re) {
@@ -4456,8 +4505,8 @@ public class DerivedGridFactory {
                     365,
                     GridMath.applyFunctionOverGrids(
                         new FlatField[] { firstDay,
-                                          lastDay }, GridMath
-                                          .FUNC_AVERAGE), false, false);
+                                          lastDay },
+                        GridMath.FUNC_AVERAGE), false, false);
             }
         } catch (RemoteException re) {}
         return dailyClim;
@@ -4565,7 +4614,8 @@ public class DerivedGridFactory {
                             ANOM_PERCENT_TYPE, false);
                     // subtract 100% to get the percent change from normal
                     dayAnom = (FlatField) dayAnom.subtract(
-                        new Real(ANOM_PERCENT_TYPE, 100));
+                        new Real(ANOM_PERCENT_TYPE,
+                                 100));
                 } else {
                     dayAnom = (FlatField) GridMath.subtract(dayData,
                             climData);
@@ -4584,4 +4634,5 @@ public class DerivedGridFactory {
 
         return dailyAnom;
     }
+
 }
