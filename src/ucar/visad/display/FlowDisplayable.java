@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Unidata Program Center/University Corporation for
+ * Copyright 1997-2017 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -27,6 +27,7 @@ import ucar.unidata.data.grid.GridMath;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.Range;
 
+import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
@@ -1145,11 +1146,29 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 }
             } catch (VisADException ve) {}
         }
+
         setData((newParamType == null)
                 ? field
                 : GridUtil.setParamType(field, newParamType, false));
+
         setType(rtt);
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param topo _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void loadTopoData(FieldImpl topo)
+            throws VisADException, RemoteException {
+        if (flowControl != null) {
+            TrajectoryParams tparm = flowControl.getTrajectoryParams();
+            tparm.setTerrain(((GeoGridFlatField) topo.getSample(0)));
+        }
     }
 
     /**
