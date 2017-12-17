@@ -347,7 +347,7 @@ example:
           description="2-D Trajectory"
           label="2D Grid Trajectory"
           displaycategory="2D Grid Trajectory"
-          properties="windowVisible=false;">
+          properties="windowVisible=false;is2D=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
@@ -359,7 +359,7 @@ example:
           description="2-D Trajectory"
           label="2D Grid Trajectory Colored by Speed"
           displaycategory="2D Grid Trajectory"
-          properties="windowVisible=false;useSpeedForColor=true;">
+          properties="windowVisible=false;useSpeedForColor=true;is2D=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
@@ -372,7 +372,7 @@ example:
           label="Trajectory Colored by Another Parameter"
           displaycategory="2D Grid Trajectory"
           code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
-          properties="windowVisible=false;coloredByAnother=true;">
+          properties="windowVisible=false;coloredByAnother=true;is2D=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control

@@ -254,6 +254,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
     /** _more_ */
     private boolean withTopo = false;
 
+    /** _more_ */
+    private boolean is2D = false;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -315,6 +317,24 @@ public class GridTrajectoryControlNew extends DrawingControl {
      */
     public boolean getWithTopo() {
         return withTopo;
+    }
+
+    /**
+     * _more_
+     *
+     * @param yesno _more_
+     */
+    public void setIs2D(boolean yesno) {
+        is2D = yesno;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIs2D() {
+        return is2D;
     }
 
     /**
@@ -815,6 +835,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             tmpSelection.setToLevel(null);
             DataChoice wchoice = null;
 
+            is2D = gtc.is2D;
             if (coloredByAnother) {
                 DerivedDataChoice derivedDataChoice =
                     ((DerivedDataChoice) ((DerivedDataChoice) choice).getChoices()
