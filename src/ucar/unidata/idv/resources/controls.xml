@@ -314,7 +314,7 @@ example:
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
-      id="gridtrajectorycontrol20"
+      id="gridtrajectorycontrol2"
       categories="*-display:gridtrajectorycontrol1-*"
       class="ucar.unidata.idv.control.GridTrajectoryControlNew"
       canstandalone="false"
