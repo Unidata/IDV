@@ -144,10 +144,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** labels for trajectory form */
     private final static String[] trajFormLabels = new String[] { "Line",
-            "Ribbon", "Cylinder", "Deform Ribbon" };
+            "Ribbon", "Cylinder", "Deform Ribbon", "Point"};
 
     /** types of smoothing functions */
-    private final static int[] trajForm = new int[] { 0, 1, 2, 3 };
+    private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
 
     /** vector/traj length component */
     JComponent trajFormComponent;
@@ -687,6 +687,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** level selection box */
     private JComboBox levelBox;
+
+    /** level selection box */
+    private JComboBox levelBoxEnd;
 
     /** current level */
     protected Object currentLevel;
