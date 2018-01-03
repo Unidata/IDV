@@ -1484,7 +1484,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     public void setLineWidth(int width)
             throws RemoteException, VisADException {
         if (isTrajectories && (getGridDisplay() != null)) {
-            if (trajFormType == 2) {
+            if (trajFormType == 4) {
+                setPointSize(width * 1.0f);
+            } else if (trajFormType == 2) {
                 getGridDisplay().setTrajWidth(width * 0.01f);
             } else if ((trajFormType == 1) || (trajFormType == 3)) {
                 getGridDisplay().setRibbonWidth(width);
