@@ -416,7 +416,7 @@ specified  -->
      range_min="0.0" 
      table="VisAD" />
   <param
-     name="thetaSurface"
+     name="iso_theta_surface"
      table="default"
      range_min="0.0"
      range_max="10000.0"
