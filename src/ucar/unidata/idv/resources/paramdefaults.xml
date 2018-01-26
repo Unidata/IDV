@@ -415,5 +415,14 @@ specified  -->
      range_max="20.0" 
      range_min="0.0" 
      table="VisAD" />
-
+  <param
+     name="thetaSurface"
+     table="default"
+     range_min="0.0"
+     range_max="10000.0"
+     ci_interval="500"
+     ci_base="0.0"
+     ci_min="0.0"
+     ci_max="10000.0"
+     unit="m"/>
 </params>
