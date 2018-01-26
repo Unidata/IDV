@@ -104,7 +104,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="Z"
      label="Z"
-     aliases="z,Z,Geopotential_height,Geopotential_height_isobaric,Geopotential_height_pressure,HGHT,HGTM,HGTK,HGTD,HGFT,HGFK,HGML,HGHT_PRES,HGHT_THTA,thickness_1000_500,Anythickness,HGT_surface,hgt,Geopotential_height_surface,Geopotential_height_isobaric_weightedMean,Geopotential_height_pressure_weightedMean,thetaSurface"/>
+     aliases="z,Z,Geopotential_height,Geopotential_height_isobaric,Geopotential_height_pressure,HGHT,HGTM,HGTK,HGTD,HGFT,HGFK,HGML,HGHT_PRES,HGHT_THTA,thickness_1000_500,Anythickness,HGT_surface,hgt,Geopotential_height_surface,Geopotential_height_isobaric_weightedMean,Geopotential_height_pressure_weightedMean,iso_theta_surface"/>
   <alias
      name="GP"
      label="Geopotential"
@@ -112,7 +112,7 @@ The label is used  (if defined) for  the AliasEditor gui.
   <alias
      name="ALTITUDE"
      label="Altitude"
-     aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT,HGHT.*,height,.*Band.*_ELEV,thetaSurface"/>
+     aliases="Z_sfc, Altitude, altitude, Elevation, elevation, topo, Geopotential_height_surface,HGT,HGHT.*,height,.*Band.*_ELEV,iso_theta_surface"/>
   <alias
      name="LOWCLOUD"
      label="Low Cloud Type"
