@@ -895,10 +895,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
         setOkToFireEvents(false);
         currentLevels = levels;
         levelEnabled  = (levels != null);
-        if ( !levelEnabled || (datachoice instanceof DerivedDataChoice && !getGridDataInstance().is3D())) {
+        if ( !levelEnabled) {
             currentLevelAnimation = false;
             cycleLevelsCbx.setSelected(false);
-            levelEnabled = false;
         }
 
         if (levelBox == null) {
