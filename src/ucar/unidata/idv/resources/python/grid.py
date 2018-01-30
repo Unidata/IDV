@@ -435,3 +435,12 @@ def make2DFlowTraj(u,v,s,s0):
 
 def setLevel(grid, level, unit):
   return GridUtil.addLevelToGrid(grid, float(level), unit)
+
+def thetaSurface(grid, theta0):
+  return DerivedGridFactory.extractGridOverThetaTopoSurface(grid, float(theta0))
+
+def thetaSurfaceA(grid, grid1, theta0):
+  return DerivedGridFactory.extractGridOverThetaTopoSurface(grid, grid1, float(theta0))
+
+def thetaSurfaceV(gridt, gridu, gridv, theta0):
+  return DerivedGridFactory.extractGridOverThetaTopoSurface(gridt, gridu, gridv, float(theta0))
