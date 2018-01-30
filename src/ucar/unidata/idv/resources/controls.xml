@@ -730,6 +730,55 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
+  <control
+          id="planviewcontourovertheta"
+          categories="*-isentropic3d-*"
+          class="ucar.unidata.idv.control.ContourPlanViewControl"
+          doeslevels="true"
+          icon="/ucar/unidata/idv/images/planview.png"
+          label="Contours Over Constant Theta Surface"
+          displaycategory="3D Theta Surface"
+          properties="multipleIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
+          id="planviewcontourfilledovertheta"
+          categories="*-isentropic3d-*"
+          class="ucar.unidata.idv.control.ContourPlanViewControl"
+          label="Color-Filled Contours Over Constant Theta Surface"
+          doeslevels="true"
+          displaycategory="3D Theta Surface"
+          properties="colorFill=true;multipleIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
+          id="planviewcolorovertheta"
+          categories="*-isentropic3d-*"
+          class="ucar.unidata.idv.control.ColorPlanViewControl"
+          doeslevels="true"
+          label="Color-Shaded Image Over Constant Theta Surface"
+          displaycategory="3D Theta Surface"
+          properties="smoothed=false;multipleIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+  <control
+          id="flowovertheta"
+          categories="*-isentropic3dv-*"
+          class="ucar.unidata.idv.control.FlowPlanViewControl"
+          description="Flow vectors Over Theta Surface"
+          label="Vectors Over Theta Surface"
+          doeslevels="true"
+          displaycategory="Constant Theta Surface Flow Displays"
+          properties="multipleIsTopography=true" />
+  <control
+          id="flowovertheta1"
+          categories="*-isentropic3dv-*"
+          class="ucar.unidata.idv.control.FlowPlanViewControl"
+          description="Flow vectors Colored by Speed"
+          label="Vectors Colored by Speed over Theta Surface"
+          doeslevels="true"
+          displaycategory="Constant Theta Surface Flow Displays"
+          properties="vectors=true;useSpeedForColor=true;multipleIsTopography=true" />
 <!--
   <control
      id="planviewcolorasz"

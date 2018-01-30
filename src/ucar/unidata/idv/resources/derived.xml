@@ -438,6 +438,67 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
+          id="iso_theta_surface"
+          description="Potential Temperature IsoSurface(from %N1%)"
+          label="Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurface(D1, user_Theta0[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"/>
+    </operands>
+  </derived>
+  <derived
+          id="thetaSurfaceAnalysis"
+          description="Potential Temperature IsoSurface Scalar Analysis(from %N1%)"
+          label="Analysis on Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurfaceA(D1, Parameter, user_Theta0[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic3d"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"/>
+    </operands>
+  </derived>
+  <derived
+          id="thetaSurfaceVAnalysis"
+          description="Potential Temperature IsoSurface Vector Analysis(from %N1% &amp; %N2% &amp; %N3%)"
+          label="Vector Analysis on Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurfaceV(D1, D2, D3, user_Theta0[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic3dv"/>
+
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"
+              p2="U"
+              p3="V"/>
+    </operands>
+  </derived>
+  <derived
      id="thetaP"
      description="Potential Temperature (from %N1% &amp; %N2%)"
      label="Potential Temperature"
