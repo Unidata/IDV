@@ -1105,6 +1105,15 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     && useSpeedForColor) {
                 FieldImpl uFimpl = DerivedGridFactory.getUComponent(field);
                 FieldImpl vFimpl = DerivedGridFactory.getVComponent(field);
+
+                if(!GridUtil.getParamUnits(vFimpl)[0].isConvertible(CommonUnit.meterPerSecond)){
+                    if(GridUtil.getParamUnits(uFimpl).length == 2 &&
+                            GridUtil.getParamUnits(uFimpl)[0].isConvertible(CommonUnit.meterPerSecond) &&
+                            GridUtil.getParamUnits(uFimpl)[1].isConvertible(CommonUnit.meterPerSecond)){
+                        vFimpl = DerivedGridFactory.getVComponent(uFimpl);
+                        uFimpl = DerivedGridFactory.getUComponent(uFimpl);
+                    }
+                }
                 FieldImpl speedImpl =
                     DerivedGridFactory.createWindSpeed(uFimpl, vFimpl);
                 field = DerivedGridFactory.combineGrids(field, speedImpl);
