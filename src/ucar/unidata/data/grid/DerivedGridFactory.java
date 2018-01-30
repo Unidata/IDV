@@ -29,20 +29,7 @@ import ucar.unidata.util.Range;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
-import ucar.visad.quantities.AirPressure;
-import ucar.visad.quantities.CommonUnits;
-import ucar.visad.quantities.DewPoint;
-import ucar.visad.quantities.Direction;
-import ucar.visad.quantities.EquivalentPotentialTemperature;
-import ucar.visad.quantities.GeopotentialAltitude;
-import ucar.visad.quantities.Gravity;
-import ucar.visad.quantities.GridRelativeHorizontalWind;
-import ucar.visad.quantities.Length;
-import ucar.visad.quantities.PotentialTemperature;
-import ucar.visad.quantities.RelativeHumidity;
-import ucar.visad.quantities.SaturationMixingRatio;
-import ucar.visad.quantities.SaturationVaporPressure;
-import ucar.visad.quantities.WaterVaporMixingRatio;
+import ucar.visad.quantities.*;
 
 import visad.*;
 
@@ -3590,6 +3577,678 @@ public class DerivedGridFactory {
         return pressureFF;
     }
 
+    /**
+     * Every data grid with pressure as the z coord can be used
+     * to make a grid with altitude with the constant grid value
+     *
+     * @param theta  FlatField with pressure in grid domain
+     * @param theta0  constant value
+     * @return  grid of altitude
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl extractGridOverThetaTopoSurface(FieldImpl theta, float theta0)
+            throws VisADException, RemoteException {
+        boolean copy = true;
+        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                (FlatField) theta.getSample(0));;
+        FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
+        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
+        if ((domainSet.getDimension() != 3)) {
+            throw new VisADException("slice is not 3D ");
+        }
+        Gridded2DSet new2DDomainSet = GridUtil.makeDomain2D(domainSet);
+
+        TupleType paramType = GridUtil.getParamType(theta);
+        FunctionType rangeFT =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        Altitude.getRealTupleType());
+
+        FieldImpl newFieldImpl = null;
+
+        if (GridUtil.isSequence(theta) ) {
+            // could be (time -> (domain -> value))   or
+            //          (time -> (index -> (domain -> value)))  or
+            //          (index -> (domain -> value))
+
+            try {
+
+                Set sequenceSet = Util.getDomainSet(theta);
+                int numSteps    = sequenceSet.getLength();
+                MathType sequenceType =
+                        ((SetType) sequenceSet.getType()).getDomain();
+
+                FieldImpl firstSample = (FieldImpl) theta.getSample(0, false);
+                boolean      hasInnerSteps = GridUtil.isSequence(firstSample);
+
+                FunctionType newFieldType;
+                FunctionType innerFieldType = null;
+
+                if ( !(GridUtil.isSequence(firstSample))) {
+
+                    newFieldType = new FunctionType(sequenceType, rangeFT);
+
+                } else {
+
+                    hasInnerSteps = true;
+                    innerFieldType = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT);
+
+                    newFieldType = new FunctionType(sequenceType,
+                            innerFieldType);
+
+                }
+                newFieldImpl = new FieldImpl(newFieldType, sequenceSet);
+
+                // get each grid in turn; change domain;
+                // set result into new sequence
+                for (int i = 0; i < numSteps; i++) {
+                    FieldImpl data = (FieldImpl) theta.getSample(i, false);
+                    //FieldImpl datap = (FieldImpl) hPI.getSample(i, false);
+
+
+                    FieldImpl fi;
+                    if (data.isMissing()) {
+                        fi = data;
+                    } else {
+                       /* if (hasInnerSteps) {
+                            Set innerSet = Util.getDomainSet(data);
+                            fi = new FieldImpl(innerFieldType, innerSet);
+                            for (int j = 0; j < innerSet.getLength(); j++) {
+                                FlatField dataFF =
+                                        (FlatField) data.getSample(j, false);
+                                FlatField ff = null;
+                                if (dataFF.isMissing()) {
+                                    ff = dataFF;
+                                } else {
+                                    ff = new FlatField(rangeFT, new2DDomainSet);
+                                    ff.setSamples(dataFF.getFloats(copy),
+                                            false);
+                                }
+                                fi.setSample(j, ff);
+                            }
+                        } else */
+                        {
+                            float[][][] dataA = convert3Darray((FlatField) data, 0);
+                            int sizeX = ((Gridded3DSet) domainSet).getLengths()[0];
+                            int sizeY = ((Gridded3DSet) domainSet).getLengths()[1];
+                            float [][] newdata = new  float[1][sizeX*sizeY];
+                           // float [][] newdata0 = new  float[sizeY][sizeX];
+                            for (int jj = 0; jj < sizeY; jj++) {
+                                for (int ii = 0; ii < sizeX; ii++) {
+                                    newdata[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                   // newdata0[jj][ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0);
+                                }
+                            }
+                            fi = new FlatField(rangeFT, new2DDomainSet);
+                            ((FlatField) fi).setSamples(
+                                    newdata, false);
+                        }
+                    }
+                    newFieldImpl.setSample(i, fi);
+                }
+            } catch (RemoteException re) {}
+        } else {  // single time
+            if ( !theta.isMissing()) {
+                newFieldImpl = new FlatField(rangeFT, new2DDomainSet);
+                try {
+                    ((FlatField) newFieldImpl).setSamples(
+                            theta.getFloats(copy), false);
+                } catch (RemoteException re) {}
+            } else {
+                newFieldImpl = theta;
+            }
+        }
+
+        return newFieldImpl;
+    }
+
+    /**
+     * Every data grid with pressure as the z coord can be used
+     * to make a grid with altitude with the constant grid value
+     *
+     * @param theta   FlatField with pressure in grid domain
+     * @param other1  FlatField with pressure in grid domain
+     * @param other2  FlatField with pressure in grid domain
+     * @param theta0  constant value
+     * @return  grid of altitude
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl extractGridOverThetaTopoSurface(FieldImpl theta, FieldImpl other1, FieldImpl other2, float theta0)
+            throws VisADException, RemoteException {
+        boolean copy = true;
+        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                (FlatField) theta.getSample(0));;
+        FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
+        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
+        if ((domainSet.getDimension() != 3)) {
+            throw new VisADException("slice is not 3D ");
+        }
+        Gridded2DSet new2DDomainSet = GridUtil.makeDomain2D(domainSet);
+
+        TupleType paramType1 = GridUtil.getParamType(other1);
+        TupleType paramType2 = GridUtil.getParamType(other2);
+        FunctionType rangeFT =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        Altitude.getRealTupleType());
+        FunctionType rangeFT1 =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        paramType1);
+        FunctionType rangeFT2 =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        paramType2);
+
+        FieldImpl newFieldImpl = null;
+        FieldImpl newFieldImpl1 = null;
+        FieldImpl newFieldImpl2 = null;
+
+        if (GridUtil.isSequence(theta) ) {
+            // could be (time -> (domain -> value))   or
+            //          (time -> (index -> (domain -> value)))  or
+            //          (index -> (domain -> value))
+
+            try {
+
+                Set sequenceSet = Util.getDomainSet(theta);
+                int numSteps    = sequenceSet.getLength();
+                MathType sequenceType =
+                        ((SetType) sequenceSet.getType()).getDomain();
+
+                FieldImpl firstSample = (FieldImpl) theta.getSample(0, false);
+                boolean      hasInnerSteps = GridUtil.isSequence(firstSample);
+
+                FunctionType newFieldType;
+                FunctionType innerFieldType = null;
+                FunctionType newFieldType1;
+                FunctionType innerFieldType1 = null;
+                FunctionType newFieldType2;
+                FunctionType innerFieldType2 = null;
+
+                if ( !(GridUtil.isSequence(firstSample))) {
+                    newFieldType = new FunctionType(sequenceType, rangeFT);
+                    newFieldType1 = new FunctionType(sequenceType, rangeFT1);
+                    newFieldType2 = new FunctionType(sequenceType, rangeFT2);
+                } else {
+
+                    hasInnerSteps = true;
+                    innerFieldType = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT);
+                    newFieldType = new FunctionType(sequenceType,
+                            innerFieldType);
+
+                    innerFieldType1 = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT1);
+                    newFieldType1 = new FunctionType(sequenceType,
+                            innerFieldType1);
+
+                    innerFieldType2 = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT2);
+                    newFieldType2 = new FunctionType(sequenceType,
+                            innerFieldType2);
+
+                }
+                newFieldImpl = new FieldImpl(newFieldType, sequenceSet);
+                newFieldImpl1 = new FieldImpl(newFieldType1, sequenceSet);
+                newFieldImpl2 = new FieldImpl(newFieldType2, sequenceSet);
+                // get each grid in turn; change domain;
+                // set result into new sequence
+                for (int i = 0; i < numSteps; i++) {
+                    FieldImpl data = (FieldImpl) theta.getSample(i, false);
+                    FieldImpl data1 = (FieldImpl) other1.getSample(i, false);
+                    FieldImpl data2 = (FieldImpl) other2.getSample(i, false);
+                    //FieldImpl datap = (FieldImpl) hPI.getSample(i, false);
+
+
+                    FieldImpl fi;
+                    FieldImpl fi1;
+                    FieldImpl fi2;
+                    if (data.isMissing()) {
+                        fi = data;
+                        fi1 = data1;
+                        fi2 = data2;
+                    } else {
+                       /* if (hasInnerSteps) {
+                            Set innerSet = Util.getDomainSet(data);
+                            fi = new FieldImpl(innerFieldType, innerSet);
+                            fi1 = new FieldImpl(innerFieldType, innerSet);
+                            fi2 = new FieldImpl(innerFieldType, innerSet);
+                            for (int j = 0; j < innerSet.getLength(); j++) {
+                                FlatField dataFF =
+                                        (FlatField) data.getSample(j, false);
+                                FlatField ff = null;
+                                if (dataFF.isMissing()) {
+                                    ff = dataFF;
+                                } else {
+                                    ff = new FlatField(rangeFT, new2DDomainSet);
+                                    ff.setSamples(dataFF.getFloats(copy),
+                                            false);
+                                }
+                                fi.setSample(j, ff);
+                            }
+                        } else */
+                        {
+                            float[][][] dataA = convert3Darray((FlatField) data, 0);
+                            float[][][] dataA1 = convert3Darray((FlatField) data1, 0);
+                            float[][][] dataA2 = convert3Darray((FlatField) data2, 0);
+
+                            int sizeX = ((Gridded3DSet) domainSet).getLengths()[0];
+                            int sizeY = ((Gridded3DSet) domainSet).getLengths()[1];
+                            float [][] newdata = new  float[1][sizeX*sizeY];
+                            float [][] newdata1 = new  float[1][sizeX*sizeY];
+                            float [][] newdata2 = new  float[1][sizeX*sizeY];
+
+                            for (int jj = 0; jj < sizeY; jj++) {
+                                for (int ii = 0; ii < sizeX; ii++) {
+                                    newdata[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                    newdata1[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii], dataA1[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                    newdata2[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii], dataA2[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                }
+                            }
+
+                            fi = new FlatField(rangeFT, new2DDomainSet);
+                            fi1 = new FlatField(rangeFT1, new2DDomainSet);
+                            fi2 = new FlatField(rangeFT2, new2DDomainSet);
+                            ((FlatField) fi).setSamples(
+                                    newdata, false);
+                            ((FlatField) fi1).setSamples(
+                                    newdata1, false);
+                            ((FlatField) fi2).setSamples(
+                                    newdata2, false);
+                        }
+                    }
+                    newFieldImpl.setSample(i, fi);
+                    newFieldImpl1.setSample(i, fi1);
+                    newFieldImpl2.setSample(i, fi2);
+                }
+            } catch (RemoteException re) {}
+        } else {  // single time
+            if ( !theta.isMissing()) {
+                newFieldImpl = new FlatField(rangeFT, new2DDomainSet);
+                try {
+                    ((FlatField) newFieldImpl).setSamples(
+                            theta.getFloats(copy), false);
+                } catch (RemoteException re) {}
+            } else {
+                newFieldImpl = theta;
+            }
+        }
+
+        return create2DTopography( createFlowVectors(newFieldImpl1, newFieldImpl2),   newFieldImpl);
+        //return createFlowVectors(newFieldImpl1, newFieldImpl2);
+    }
+
+    /**
+     * Every data grid with pressure as the z coord can be used
+     * to make a grid with altitude with the constant grid value
+     *
+     * @param theta   FlatField with pressure in grid domain
+     * @param other  FlatField with pressure in grid domain
+     * @param theta0  constant value
+     * @return  grid of altitude
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl extractGridOverThetaTopoSurface(FieldImpl theta, FieldImpl other, float theta0)
+            throws VisADException, RemoteException {
+        boolean copy = true;
+        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                (FlatField) theta.getSample(0));;
+        FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
+        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
+        if ((domainSet.getDimension() != 3)) {
+            throw new VisADException("slice is not 3D ");
+        }
+        Gridded2DSet new2DDomainSet = GridUtil.makeDomain2D(domainSet);
+
+        TupleType paramType = GridUtil.getParamType(other);
+        FunctionType rangeFT =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        Altitude.getRealTupleType());
+        FunctionType rangeFT0 =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        paramType);
+
+        FieldImpl newFieldImpl = null;
+        FieldImpl newFieldImpl0 = null;
+
+        if (GridUtil.isSequence(theta) ) {
+            // could be (time -> (domain -> value))   or
+            //          (time -> (index -> (domain -> value)))  or
+            //          (index -> (domain -> value))
+
+            try {
+
+                Set sequenceSet = Util.getDomainSet(theta);
+                int numSteps    = sequenceSet.getLength();
+                MathType sequenceType =
+                        ((SetType) sequenceSet.getType()).getDomain();
+
+                FieldImpl firstSample = (FieldImpl) theta.getSample(0, false);
+                boolean      hasInnerSteps = GridUtil.isSequence(firstSample);
+
+                FunctionType newFieldType;
+                FunctionType innerFieldType = null;
+                FunctionType newFieldType0;
+                FunctionType innerFieldType0 = null;
+
+                if ( !(GridUtil.isSequence(firstSample))) {
+                    newFieldType = new FunctionType(sequenceType, rangeFT);
+                    newFieldType0 = new FunctionType(sequenceType, rangeFT0);
+                } else {
+
+                    hasInnerSteps = true;
+                    innerFieldType = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT);
+                    newFieldType = new FunctionType(sequenceType,
+                            innerFieldType);
+
+                    innerFieldType0 = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT0);
+                    newFieldType0 = new FunctionType(sequenceType,
+                            innerFieldType0);
+
+                }
+                newFieldImpl = new FieldImpl(newFieldType, sequenceSet);
+                newFieldImpl0 = new FieldImpl(newFieldType0, sequenceSet);
+                // get each grid in turn; change domain;
+                // set result into new sequence
+                for (int i = 0; i < numSteps; i++) {
+                    FieldImpl data = (FieldImpl) theta.getSample(i, false);
+                    FieldImpl data0 = (FieldImpl) other.getSample(i, false);
+                    //FieldImpl datap = (FieldImpl) hPI.getSample(i, false);
+
+
+                    FieldImpl fi;
+                    FieldImpl fi0;
+                    if (data.isMissing()) {
+                        fi = data;
+                        fi0 = data0;
+                    } else {
+                      /*  if (hasInnerSteps) {
+                            Set innerSet = Util.getDomainSet(data);
+                            fi = new FieldImpl(innerFieldType, innerSet);
+                            fi0 = new FieldImpl(innerFieldType, innerSet);
+                            for (int j = 0; j < innerSet.getLength(); j++) {
+                                FlatField dataFF =
+                                        (FlatField) data.getSample(j, false);
+                                FlatField ff = null;
+                                if (dataFF.isMissing()) {
+                                    ff = dataFF;
+                                } else {
+                                    ff = new FlatField(rangeFT, new2DDomainSet);
+                                    ff.setSamples(dataFF.getFloats(copy),
+                                            false);
+                                }
+                                fi.setSample(j, ff);
+                            }
+                        } else */
+                        {
+                            float[][][] dataA = convert3Darray((FlatField) data, 0);
+                            float[][][] dataA0 = convert3Darray((FlatField) data0, 0);
+                            float[][][] dataA1 = null;
+                            if(rangeFT0.getRealComponents().length == 2){
+                                dataA1 = convert3Darray((FlatField) data0, 1);
+                            }
+
+                            int sizeX = ((Gridded3DSet) domainSet).getLengths()[0];
+                            int sizeY = ((Gridded3DSet) domainSet).getLengths()[1];
+                            float [][] newdata = new  float[1][sizeX*sizeY];
+                            float [][] newdata0 = new  float[1][sizeX*sizeY];
+                            if(rangeFT0.getRealComponents().length == 2){
+                                newdata0 = new  float[2][sizeX*sizeY];
+                            }
+                            float [][] newdata1 = new  float[sizeY][sizeX];
+                            for (int jj = 0; jj < sizeY; jj++) {
+                                for (int ii = 0; ii < sizeX; ii++) {
+                                    newdata[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                    newdata0[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii], dataA0[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                    //newdata1[jj][ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0);
+                                }
+                            }
+                            if(rangeFT0.getRealComponents().length == 2) {
+                                for (int jj = 0; jj < sizeY; jj++) {
+                                    for (int ii = 0; ii < sizeX; ii++) {
+                                        newdata0[1][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii], dataA1[jj][ii], dataAP[jj][ii], theta0, isDecrese);
+                                    }
+                                }
+                            }
+                            fi = new FlatField(rangeFT, new2DDomainSet);
+                            fi0 = new FlatField(rangeFT0, new2DDomainSet);
+                            ((FlatField) fi).setSamples(
+                                    newdata, false);
+                            ((FlatField) fi0).setSamples(
+                                    newdata0, false);
+                        }
+                    }
+                    newFieldImpl.setSample(i, fi);
+                    newFieldImpl0.setSample(i, fi0);
+                }
+            } catch (RemoteException re) {}
+        } else {  // single time
+            if ( !theta.isMissing()) {
+                newFieldImpl = new FlatField(rangeFT, new2DDomainSet);
+                try {
+                    ((FlatField) newFieldImpl).setSamples(
+                            theta.getFloats(copy), false);
+                } catch (RemoteException re) {}
+            } else {
+                newFieldImpl = theta;
+            }
+        }
+
+        return create2DTopography(  newFieldImpl0 ,  newFieldImpl);
+    }
+
+    /**
+     * _more_
+     *
+     * @param theta _more_
+     * @param theta0 _more_
+     *
+     *
+     * @return _more_
+     */
+    public static float linearInterpolateHeight(float[] theta, float[] z, float theta0, boolean isDec){
+        int len = theta.length;
+
+        int idx = 0;
+        int jdx = 0;
+       /* for(int i = 0; i < len-1; i++){
+            if(theta[i] >= theta0 && theta[i+1] < theta0){
+                jdx = i;
+            }
+        } */
+        if(isDec) {
+            if( theta0 < theta[len-1] || theta0 > theta[0]) {
+                idx = 999;
+                return Float.NaN;
+            }
+            idx = binaryIndexDec(theta, theta0);
+        }
+        else {
+            if( theta0 > theta[len-1] || theta0 < theta[0]) {
+                idx = 999;
+                return Float.NaN;
+            }
+            idx = binaryIndexInc(theta, theta0);
+        }
+
+        float delthata = theta[idx + 1] - theta[idx];
+        //float theta1 = theta[idx + 1];
+        //float theta2 = theta[idx];
+        //System.out.print("deltheta " + delthata + " theta1 " + theta1 + " theta2 " + theta2 + "\n");
+        float delz = z[idx + 1] -z[idx];
+
+        float h = z[idx] + (theta0 - theta[idx])*(delz/delthata);
+
+        return h;
+    }
+
+    /**
+     * _more_
+     *
+     * @param a _more_
+     * @param theta0 _more_
+     *
+     *
+     * @return _more_
+     */
+    public static int binaryIndexDec(float[] a, float theta0) {
+        int lowerBound = 0;
+        int nElems = a.length;
+        int upperBound = nElems - 1;
+        int curIn;
+
+        while (true) {
+            curIn = (upperBound + lowerBound) / 2;
+            if (nElems == 0) {
+                return curIn = 0;
+            }
+            if (lowerBound == curIn) {
+                if (a[curIn] < theta0) {
+                    return curIn -= 1;
+                }
+            }
+            if (a[curIn] > theta0) {
+                lowerBound = curIn + 1;          // its in the upper
+                if (lowerBound > upperBound) {
+                    return curIn;
+                }
+            } else if (lowerBound > upperBound) {
+                return curIn;
+            } else {
+                upperBound = curIn - 1;          // its in the lower
+            }
+        }
+    }
+    /**
+     * _more_
+     *
+     * @param a _more_
+     * @param theta0 _more_
+     *
+     *
+     * @return _more_
+     */
+    public static int binaryIndexInc(float[] a, float theta0) {
+        int lowerBound = 0;
+        int nElems = a.length;
+        int upperBound = nElems - 1;
+        int curIn;
+
+        while (true) {
+            curIn = (upperBound + lowerBound) / 2;
+            if (nElems == 0) {
+                return curIn = 0;
+            }
+            if (lowerBound == curIn) {
+                if (a[curIn] > theta0) {
+                    return curIn -= 1;
+                }
+            }
+            if (a[curIn] < theta0 ) {
+                lowerBound = curIn + 1;          // its in the upper
+                if (lowerBound > upperBound ) {
+                    return curIn;
+                }
+            } else if (lowerBound > upperBound) {
+                return curIn;
+            } else {
+                upperBound = curIn - 1;          // its in the lower
+            }
+        }
+    }
+    /**
+     * _more_
+     *
+     * @param theta _more_
+     * @param other _more_
+     * @param z _more_
+     * @param theta0 _more_
+     *
+     * @return _more_
+     */
+    public static float linearInterpolateHeight(float[] theta, float[] other, float[] z, float theta0, boolean isDec){
+        int len = theta.length;
+
+        int idx = 0;
+
+        if(isDec) {
+            if( theta0 < theta[len-1] || theta0 > theta[0]) {
+                idx = 999;
+                return Float.NaN;
+            }
+            idx = binaryIndexDec(theta, theta0);
+        }
+        else {
+            if( theta0 > theta[len-1] || theta0 < theta[0]) {
+                idx = 999;
+                return Float.NaN;
+            }
+            idx = binaryIndexInc(theta, theta0);
+        /*     for(int i = 0; i < len-1; i++) {
+                if (theta[i] <= theta0 && theta[i + 1] > theta0) {
+                    jdx = i;
+                }
+            } */
+        }
+
+        float deltheta = theta[idx + 1] - theta[idx];
+        float delother = other[idx + 1] - other[idx];
+        float delz = z[idx + 1] -z[idx];
+
+        float delh = (theta0 - theta[idx])*(delz/deltheta);
+        float o = other[idx] + (delother/delz) * delh;
+
+        return o;
+    }
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     * @param ii _more_
+     *
+     *
+     * @return _more_
+     */
+    public static float[][][] convert3Darray(FlatField grid, int ii) throws VisADException, RemoteException{
+        float[][]  samples = grid.getFloats(false);
+        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(grid);
+
+        int[]      lengths = domain.getLengths();
+
+        int sizeX = lengths[0];
+        int sizeY = lengths[1];
+        int sizeZ = lengths[2];
+
+        float [][][] newgrid = new float[sizeY][sizeX][sizeZ];
+        for (int k = 0; k < lengths[2]; k++) {
+            for (int j = 0; j < lengths[1]; j++) {
+                for (int i = 0; i < lengths[0]; i++) {
+
+                    newgrid[j][i][k] = samples[ii][k * sizeY * (sizeX) + j * (sizeX) + i];
+                }
+            }
+        }
+
+        return newgrid;
+    }
 
     /**
      * Mask the values in a grid with the mask
