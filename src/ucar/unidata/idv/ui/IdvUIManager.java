@@ -1694,86 +1694,104 @@ public class IdvUIManager extends IdvManager {
      */
     protected void handleMenuSelected(String id, JMenu menu,
                                       IdvWindow idvWindow) {
-        if (id.equals("file.new")) {
-            if (idvWindow == null) {
-                return;
-            }
-            List<IdvComponentGroup> groups = idvWindow.getComponentGroups();
-            if (groups.size() == 0) {
-                return;
-            }
-            int i = 0;
-            //a hack to remove the last group menu we created
-            while (i < menu.getItemCount()) {
-                JMenuItem mi = menu.getItem(i);
-                if (mi.getLabel().startsWith("Group:")) {
-                    menu.remove(mi);
-                    break;
+        switch (id) {
+            case "file.new":
+                if (idvWindow == null) {
+                    return;
                 }
-                i++;
-            }
+                List<IdvComponentGroup> groups = idvWindow.getComponentGroups();
+                if (groups.size() == 0) {
+                    return;
+                }
+                int i = 0;
+                //a hack to remove the last group menu we created
+                while (i < menu.getItemCount()) {
+                    JMenuItem mi = menu.getItem(i);
+                    if (mi.getLabel().startsWith("Group:")) {
+                        menu.remove(mi);
+                        break;
+                    }
+                    i++;
+                }
 
-            for (IdvComponentGroup group : groups) {
-                List items = new ArrayList();
-                group.getPopupMenuItems(items);
-                JMenu groupMenu = new JMenu("Group: " + group.getName());
-                GuiUtils.makeMenu(groupMenu, items);
-                menu.insert(groupMenu, 0);
-            }
-        } else if (id.equals(MENU_WINDOWS)) {
-            menu.removeAll();
-            makeWindowsMenu(menu, idvWindow);
-        } else if (id.equals("file.newdata") || id.equals("data.newdata")) {
-            menu.removeAll();
-            GuiUtils.makeMenu(
-                menu,
-                getIdvChooserManager().makeChooserMenus(new ArrayList()));
-        } else if (id.equals("data.special")) {
-            menu.removeAll();
-            List menus = new ArrayList();
-            for (DataSourceDescriptor descriptor :
-                    getDataManager().getStandaloneDescriptors()) {
-                menus.add(GuiUtils.makeMenuItem(descriptor.getLabel(),
-                        getIdv(), "makeDataSource", descriptor));
-            }
-            GuiUtils.makeMenu(menu, menus);
-        } else if (id.equals(MENU_NEWVIEWS)) {
-            menu.removeAll();
-            makeViewStateMenu(menu);
-        } else if (id.equals(MENU_HISTORY)) {
-            historyMenuSelected(menu);
+                for (IdvComponentGroup group : groups) {
+                    List items = new ArrayList();
+                    group.getPopupMenuItems(items);
+                    JMenu groupMenu = new JMenu("Group: " + group.getName());
+                    GuiUtils.makeMenu(groupMenu, items);
+                    menu.insert(groupMenu, 0);
+                }
+                break;
+            case MENU_WINDOWS:
+                menu.removeAll();
+                makeWindowsMenu(menu, idvWindow);
+                break;
+            case "file.newdata":
+            case "data.newdata":
+                menu.removeAll();
+                GuiUtils.makeMenu(
+                        menu,
+                        getIdvChooserManager().makeChooserMenus(new ArrayList()));
+                break;
+            case "data.special":
+                menu.removeAll();
+                List menus = new ArrayList();
+                for (DataSourceDescriptor descriptor :
+                        getDataManager().getStandaloneDescriptors()) {
+                    menus.add(GuiUtils.makeMenuItem(descriptor.getLabel(),
+                            getIdv(), "makeDataSource", descriptor));
+                }
+                GuiUtils.makeMenu(menu, menus);
+                break;
+            case MENU_NEWVIEWS:
+                menu.removeAll();
+                makeViewStateMenu(menu);
+                break;
+            case MENU_HISTORY:
+                historyMenuSelected(menu);
 
-        } else if (id.equals(MENU_EDITFORMULAS)) {
-            editFormulasMenuSelected(menu);
-        } else if (id.equals(MENU_DELETEHISTORY)) {
-            deleteHistoryMenuSelected(menu);
-        } else if (id.equals(MENU_DELETEVIEWS)) {
-            menu.removeAll();
-            makeDeleteViewsMenu(menu);
-        } else if (id.equals(MENU_DISPLAYS)) {
-            menu.removeAll();
-            initializeDisplayMenu(menu);
-        } else if (id.equals(MENU_MAPS)) {
-            if (menu.getItemCount() == 0) {
-                processMapMenu(menu, false);
-            }
-        } else if (id.equals(MENU_LOCATIONS)) {
-            if (menu.getItemCount() == 0) {
-                Msg.addDontComponent(menu);
-                processStationMenu(menu, false);
-            }
-        } else if (id.equals(MENU_SPECIAL)) {
-            if (menu.getItemCount() == 0) {
-                processStandAloneMenu(menu, false);
-            }
-        } else if (id.equals(MENU_VIEW)) {
-            //            menu.removeAll();
-            //            initializeViewMenu(menu);
-        } else if (id.equals(MENU_DATA)) {
-            updateDataMenu(menu);
-        } else if (id.equals(MENU_BUNDLES)) {
-            menu.removeAll();
-            initializeBundleMenu(menu);
+                break;
+            case MENU_EDITFORMULAS:
+                editFormulasMenuSelected(menu);
+                break;
+            case MENU_DELETEHISTORY:
+                deleteHistoryMenuSelected(menu);
+                break;
+            case MENU_DELETEVIEWS:
+                menu.removeAll();
+                makeDeleteViewsMenu(menu);
+                break;
+            case MENU_DISPLAYS:
+                menu.removeAll();
+                initializeDisplayMenu(menu);
+                break;
+            case MENU_MAPS:
+                if (menu.getItemCount() == 0) {
+                    processMapMenu(menu, false);
+                }
+                break;
+            case MENU_LOCATIONS:
+                if (menu.getItemCount() == 0) {
+                    Msg.addDontComponent(menu);
+                    processStationMenu(menu, false);
+                }
+                break;
+            case MENU_SPECIAL:
+                if (menu.getItemCount() == 0) {
+                    processStandAloneMenu(menu, false);
+                }
+                break;
+            case MENU_VIEW:
+                //            menu.removeAll();
+                //            initializeViewMenu(menu);
+                break;
+            case MENU_DATA:
+                updateDataMenu(menu);
+                break;
+            case MENU_BUNDLES:
+                menu.removeAll();
+                initializeBundleMenu(menu);
+                break;
         }
     }
 
