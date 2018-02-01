@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.IntStream;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -126,14 +127,11 @@ public class BottomLegend extends IdvLegend {
             }
         };
         JComponent[] comps = new JComponent[] { legendPanel, mainContents };
-        for (int i = 0; i < comps.length; i++) {
-            if (comps[i] == null) {
-                continue;
-            }
+        IntStream.range(0, comps.length).filter(i -> comps[i] != null).forEach(i -> {
             comps[i].addKeyListener(keyListener);
             comps[i].addMouseListener(mouseListener);
             comps[i].setRequestFocusEnabled(true);
-        }
+        });
 
         return mainContents;
     }
@@ -165,7 +163,7 @@ public class BottomLegend extends IdvLegend {
     protected void fillLegendSafely() {
         legendPanel.removeAll();
         List controls = viewManager.getControls();
-        List comps    = new ArrayList();
+        List<JComponent> comps = new ArrayList<>();
         int  cnt      = 0;
         for (int i = controls.size() - 1; i >= 0; i--) {
             DisplayControl control = (DisplayControl) controls.get(i);
