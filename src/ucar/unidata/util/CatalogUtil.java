@@ -280,7 +280,7 @@ public class CatalogUtil {
 
 
     /**
-     * A utiliry to get the version from the catalog root.
+     * A utility to get the version from the catalog root.
      *
      *
      * @param node The xml node

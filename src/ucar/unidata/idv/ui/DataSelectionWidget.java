@@ -1518,7 +1518,7 @@ public class DataSelectionWidget {
         if (timesList == null) {
             return;
         }
-        timeOption = selectedObject.toString();
+        timeOption = selectedObject;
         if (selectedObject.equals(USE_DEFAULTTIMES)) {
             //selectIdx = 0;
             timesList.setVisible(true);
