@@ -1806,12 +1806,16 @@ public class IdvUIManager extends IdvManager {
      */
     protected void handleMenuDeSelected(String id, JMenu menu,
                                         IdvWindow idvWindow) {
-        if (id.equals(MENU_DISPLAYS)) {
-            menu.removeAll();
-        } else if (id.equals(MENU_BUNDLES)) {
-            menu.removeAll();
-        } else if (id.equals(MENU_DATA)) {
-            menu.removeAll();
+        switch (id) {
+            case MENU_DISPLAYS:
+                menu.removeAll();
+                break;
+            case MENU_BUNDLES:
+                menu.removeAll();
+                break;
+            case MENU_DATA:
+                menu.removeAll();
+                break;
         }
     }
 
@@ -5780,91 +5784,100 @@ public class IdvUIManager extends IdvManager {
             persistentCbxs.add(cbx);
             JComponent field     = null;
             JComponent fieldComp = null;
-            if (fieldType.equals(FIELDTYPE_TEXT)) {
-                String rowString = (String) operand.getProperty("rows");
-                if (rowString == null) {
-                    rowString = "1";
+            switch (fieldType) {
+                case FIELDTYPE_TEXT:
+                    String rowString = (String) operand.getProperty("rows");
+                    if (rowString == null) {
+                        rowString = "1";
+                    }
+                    int rows = new Integer(rowString).intValue();
+                    if (rows == 1) {
+                        field = new JTextField((dflt != null)
+                                ? dflt.toString()
+                                : "", 15);
+                    } else {
+                        field = new JTextArea((dflt != null)
+                                ? dflt.toString()
+                                : "", rows, 15);
+                        fieldComp = GuiUtils.makeScrollPane(field, 200, 100);
+                    }
+                    break;
+                case FIELDTYPE_BOOLEAN:
+                    field = new JCheckBox("", ((dflt != null)
+                            ? new Boolean(
+                            dflt.toString()).booleanValue()
+                            : true));
+                    break;
+                case FIELDTYPE_CHOICE: {
+                    String choices = (String) operand.getProperty("choices");
+                    if (choices == null) {
+                        throw new IllegalArgumentException(
+                                "No 'choices' attribute defined for operand: "
+                                        + operand);
+                    }
+                    List l = StringUtil.split(choices, ";", true, true);
+                    field = new JComboBox(new Vector(l));
+                    if ((dflt != null) && l.contains(dflt)) {
+                        ((JComboBox) field).setSelectedItem(dflt);
+                    }
+                    break;
                 }
-                int rows = new Integer(rowString).intValue();
-                if (rows == 1) {
-                    field = new JTextField((dflt != null)
-                                           ? dflt.toString()
-                                           : "", 15);
-                } else {
-                    field     = new JTextArea((dflt != null)
+                case FIELDTYPE_FILE:
+                    JTextField fileFld = new JTextField(((dflt != null)
                             ? dflt.toString()
-                            : "", rows, 15);
-                    fieldComp = GuiUtils.makeScrollPane(field, 200, 100);
-                }
-            } else if (fieldType.equals(FIELDTYPE_BOOLEAN)) {
-                field = new JCheckBox("", ((dflt != null)
-                                           ? new Boolean(
-                                           dflt.toString()).booleanValue()
-                                           : true));
-            } else if (fieldType.equals(FIELDTYPE_CHOICE)) {
-                String choices = (String) operand.getProperty("choices");
-                if (choices == null) {
-                    throw new IllegalArgumentException(
-                        "No 'choices' attribute defined for operand: "
-                        + operand);
-                }
-                List l = StringUtil.split(choices, ";", true, true);
-                field = new JComboBox(new Vector(l));
-                if ((dflt != null) && l.contains(dflt)) {
-                    ((JComboBox) field).setSelectedItem(dflt);
-                }
-            } else if (fieldType.equals(FIELDTYPE_FILE)) {
-                JTextField fileFld = new JTextField(((dflt != null)
-                        ? dflt.toString()
-                        : ""), 30);
-                field = fileFld;
-                String patterns = operand.getProperty("filepattern");
-                List   filters  = null;
-                if (patterns != null) {
-                    filters = new ArrayList();
-                    List toks = StringUtil.split(patterns, ";", true, true);
-                    for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
-                        String tok   = (String) toks.get(tokIdx);
-                        List subToks = StringUtil.split(tok, ":", true, true);
-                        if (subToks.size() == 2) {
-                            filters.add(
-                                new PatternFileFilter(
-                                    (String) subToks.get(0),
-                                    (String) subToks.get(1)));
-                        } else {
-                            filters.add(new PatternFileFilter(tok, tok));
+                            : ""), 30);
+                    field = fileFld;
+                    String patterns = operand.getProperty("filepattern");
+                    List filters = null;
+                    if (patterns != null) {
+                        filters = new ArrayList();
+                        List toks = StringUtil.split(patterns, ";", true, true);
+                        for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
+                            String tok = (String) toks.get(tokIdx);
+                            List subToks = StringUtil.split(tok, ":", true, true);
+                            if (subToks.size() == 2) {
+                                filters.add(
+                                        new PatternFileFilter(
+                                                (String) subToks.get(0),
+                                                (String) subToks.get(1)));
+                            } else {
+                                filters.add(new PatternFileFilter(tok, tok));
+                            }
                         }
                     }
-                }
-                fieldComp = GuiUtils.centerRight(GuiUtils.hfill(fileFld),
-                        GuiUtils.makeFileBrowseButton(fileFld, filters));
-            } else if (fieldType.equals(FIELDTYPE_LOCATION)) {
-                List l = ((dflt != null)
-                          ? StringUtil.split(dflt.toString(), ";", true, true)
-                          : (List) new ArrayList());
-                final LatLonWidget llw = new LatLonWidget();
-                field = llw;
-                if (l.size() == 2) {
-                    llw.setLat(Misc.decodeLatLon(l.get(0).toString()));
-                    llw.setLon(Misc.decodeLatLon(l.get(1).toString()));
-                }
-                final JButton centerPopupBtn =
-                    GuiUtils.getImageButton("/auxdata/ui/icons/Map16.gif",
-                                            getClass());
-                centerPopupBtn.setToolTipText("Center on current displays");
-                centerPopupBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        popupCenterMenu(centerPopupBtn, llw);
+                    fieldComp = GuiUtils.centerRight(GuiUtils.hfill(fileFld),
+                            GuiUtils.makeFileBrowseButton(fileFld, filters));
+                    break;
+                case FIELDTYPE_LOCATION: {
+                    List l = ((dflt != null)
+                            ? StringUtil.split(dflt.toString(), ";", true, true)
+                            : (List) new ArrayList());
+                    final LatLonWidget llw = new LatLonWidget();
+                    field = llw;
+                    if (l.size() == 2) {
+                        llw.setLat(Misc.decodeLatLon(l.get(0).toString()));
+                        llw.setLon(Misc.decodeLatLon(l.get(1).toString()));
                     }
-                });
-                JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
-                                             new Insets(0, 0, 0, 4));
-                fieldComp = GuiUtils.hbox(llw, centerPopup);
-            } else if (fieldType.equals(FIELDTYPE_AREA)) {
-                //TODO:
-            } else {
-                throw new IllegalArgumentException("Unknown type: "
-                        + fieldType + " for operand: " + operand);
+                    final JButton centerPopupBtn =
+                            GuiUtils.getImageButton("/auxdata/ui/icons/Map16.gif",
+                                    getClass());
+                    centerPopupBtn.setToolTipText("Center on current displays");
+                    centerPopupBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            popupCenterMenu(centerPopupBtn, llw);
+                        }
+                    });
+                    JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
+                            new Insets(0, 0, 0, 4));
+                    fieldComp = GuiUtils.hbox(llw, centerPopup);
+                    break;
+                }
+                case FIELDTYPE_AREA:
+                    //TODO:
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown type: "
+                            + fieldType + " for operand: " + operand);
             }
 
             fields.add(field);
