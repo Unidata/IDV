@@ -738,7 +738,7 @@ Since this is confusing and needs more work lets remove this for now
           icon="/ucar/unidata/idv/images/planview.png"
           label="Contours Over Constant Theta Surface"
           displaycategory="3D Theta Surface"
-          properties="multipleIsTopography=true">
+          properties="multipleIsTopography=true;is2D=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
@@ -748,7 +748,7 @@ Since this is confusing and needs more work lets remove this for now
           label="Color-Filled Contours Over Constant Theta Surface"
           doeslevels="true"
           displaycategory="3D Theta Surface"
-          properties="colorFill=true;multipleIsTopography=true">
+          properties="colorFill=true;multipleIsTopography=true;is2D=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
@@ -758,7 +758,7 @@ Since this is confusing and needs more work lets remove this for now
           doeslevels="true"
           label="Color-Shaded Image Over Constant Theta Surface"
           displaycategory="3D Theta Surface"
-          properties="smoothed=false;multipleIsTopography=true">
+          properties="smoothed=false;multipleIsTopography=true;is2D=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
   <control
@@ -769,7 +769,7 @@ Since this is confusing and needs more work lets remove this for now
           label="Vectors Over Theta Surface"
           doeslevels="true"
           displaycategory="Constant Theta Surface Flow Displays"
-          properties="multipleIsTopography=true" />
+          properties="multipleIsTopography=true;is2D=true;" />
   <control
           id="flowovertheta1"
           categories="*-isentropic3dv-*"
@@ -778,7 +778,7 @@ Since this is confusing and needs more work lets remove this for now
           label="Vectors Colored by Speed over Theta Surface"
           doeslevels="true"
           displaycategory="Constant Theta Surface Flow Displays"
-          properties="vectors=true;useSpeedForColor=true;multipleIsTopography=true" />
+          properties="vectors=true;useSpeedForColor=true;multipleIsTopography=true;is2D=true;" />
 <!--
   <control
      id="planviewcolorasz"

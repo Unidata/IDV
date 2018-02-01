@@ -126,6 +126,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
     /** level enabled */
     private boolean levelEnabled = false;
 
+    /** 2D enabled */
+    private boolean is2D = false;
+
     /** level enabled */
     private boolean ignoreVerticalDimension = false;
 
@@ -899,7 +902,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
             currentLevelAnimation = false;
             cycleLevelsCbx.setSelected(false);
         }
-
+        if(is2D){
+            levelEnabled = false;
+            currentLevelAnimation = false;
+            cycleLevelsCbx.setSelected(false);
+        }
         if (levelBox == null) {
             return;
         }
@@ -1479,7 +1486,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     public void getLegendLabels(List labels, int legendType) {
         super.getLegendLabels(labels, legendType);
         // TODO: - should this only be for side legends?
-        if (currentLevel != null) {
+        if (currentLevel != null && !is2D) {
             labels.add("Level: " + formatLevel(currentLevel));
         }
         /*
@@ -1714,7 +1721,23 @@ public abstract class PlanViewControl extends GridDisplayControl {
                && !getParameterIsTopography();
     }
 
+    /**
+     * Set the  property.
+     *
+     * @param v true if it is 2D
+     */
+    public void setIs2D(boolean v) {
+        is2D = v;
+    }
 
+    /**
+     * Get the property.
+     *
+     * @return true if this is 2D data
+     */
+    public boolean getIs2D( ) {
+        return is2D;
+    }
     /**
      * Set the text for the level readout in the control window.
      *
