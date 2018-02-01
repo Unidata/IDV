@@ -548,45 +548,52 @@ public class IdvXmlUi extends XmlUi {
         for (int i = 0; i < elements.getLength(); i++) {
             Element child        = (Element) elements.item(i);
             String  childTagName = child.getTagName();
-            if (childTagName.equals(IdvUIManager.COMP_MAPVIEW)
-                    || childTagName.equals(IdvUIManager.COMP_VIEW)) {
-                ViewManager viewManager = getViewManager(child);
-                compGroup.addComponent(new IdvComponentHolder(idv,
-                        viewManager));
-            } else if (childTagName.equals(
-                    IdvUIManager.COMP_COMPONENT_CHOOSERS)) {
-                IdvComponentHolder comp = new IdvComponentHolder(idv,
-                                              "choosers");
-                comp.setType(comp.TYPE_CHOOSERS);
-                comp.setName(XmlUtil.getAttribute(child, "name", "Choosers"));
-                compGroup.addComponent(comp);
-            } else if (childTagName.equals(
-                    IdvUIManager.COMP_COMPONENT_SKIN)) {
-                IdvComponentHolder comp = new IdvComponentHolder(idv,
-                                              XmlUtil.getAttribute(child,
-                                                  "url"));
-                comp.setType(comp.TYPE_SKIN);
-                comp.setName(XmlUtil.getAttribute(child, "name", "UI"));
-                compGroup.addComponent(comp);
-            } else if (childTagName.equals(
-                    IdvUIManager.COMP_COMPONENT_HTML)) {
-                String text = XmlUtil.getChildText(child);
-                text = new String(XmlUtil.decodeBase64(text.trim()));
-                ComponentHolder comp = new HtmlComponent("Html Text", text);
-                comp.setShowHeader(false);
-                comp.setName(XmlUtil.getAttribute(child, "name", "HTML"));
-                compGroup.addComponent(comp);
-            } else if (childTagName.equals(
-                    IdvUIManager.COMP_COMPONENT_GROUP)) {
-                IdvComponentGroup childCompGroup = makeComponentGroup(child);
-                compGroup.addComponent(childCompGroup);
-            } else if (childTagName.equals(IdvUIManager.COMP_DATASELECTOR)) {
-                compGroup.addComponent(new IdvComponentHolder(idv,
-                        idv.getIdvUIManager().createDataSelector(false,
-                            false)));
-            } else {
-                System.err.println("Unknwon component element:"
-                                   + XmlUtil.toString(child));
+            switch (childTagName) {
+                case IdvUIManager.COMP_MAPVIEW:
+                case IdvUIManager.COMP_VIEW:
+                    ViewManager viewManager = getViewManager(child);
+                    compGroup.addComponent(new IdvComponentHolder(idv,
+                            viewManager));
+                    break;
+                case IdvUIManager.COMP_COMPONENT_CHOOSERS: {
+                    IdvComponentHolder comp = new IdvComponentHolder(idv,
+                            "choosers");
+                    comp.setType(comp.TYPE_CHOOSERS);
+                    comp.setName(XmlUtil.getAttribute(child, "name", "Choosers"));
+                    compGroup.addComponent(comp);
+                    break;
+                }
+                case IdvUIManager.COMP_COMPONENT_SKIN: {
+                    IdvComponentHolder comp = new IdvComponentHolder(idv,
+                            XmlUtil.getAttribute(child,
+                                    "url"));
+                    comp.setType(comp.TYPE_SKIN);
+                    comp.setName(XmlUtil.getAttribute(child, "name", "UI"));
+                    compGroup.addComponent(comp);
+                    break;
+                }
+                case IdvUIManager.COMP_COMPONENT_HTML: {
+                    String text = XmlUtil.getChildText(child);
+                    text = new String(XmlUtil.decodeBase64(text.trim()));
+                    ComponentHolder comp = new HtmlComponent("Html Text", text);
+                    comp.setShowHeader(false);
+                    comp.setName(XmlUtil.getAttribute(child, "name", "HTML"));
+                    compGroup.addComponent(comp);
+                    break;
+                }
+                case IdvUIManager.COMP_COMPONENT_GROUP:
+                    IdvComponentGroup childCompGroup = makeComponentGroup(child);
+                    compGroup.addComponent(childCompGroup);
+                    break;
+                case IdvUIManager.COMP_DATASELECTOR:
+                    compGroup.addComponent(new IdvComponentHolder(idv,
+                            idv.getIdvUIManager().createDataSelector(false,
+                                    false)));
+                    break;
+                default:
+                    System.err.println("Unknwon component element:"
+                            + XmlUtil.toString(child));
+                    break;
             }
         }
         return compGroup;
