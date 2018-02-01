@@ -2914,18 +2914,25 @@ public class ImageGenerator extends IdvManager {
             if ((unit != null) && (unit.trim().length() > 0)) {
                 sleepString = sleepString.substring(0,
                         sleepString.length() - unit.length());
-                if (unit.equals("s")) {}
-                else if (unit.equals("seconds")) {}
-                else if (unit.equals("minutes")) {
-                    multiplier = 60 * 1000;
-                } else if (unit.equals("m")) {
-                    multiplier = 60 * 1000;
-                } else if (unit.equals("hours")) {
-                    multiplier = 60 * 60 * 1000;
-                } else if (unit.equals("h")) {
-                    multiplier = 60 * 60 * 1000;
-                } else {
-                    return error("Unknown sleep time unit:" + unit);
+                switch (unit) {
+                    case "s":
+                        break;
+                    case "seconds":
+                        break;
+                    case "minutes":
+                        multiplier = 60 * 1000;
+                        break;
+                    case "m":
+                        multiplier = 60 * 1000;
+                        break;
+                    case "hours":
+                        multiplier = 60 * 60 * 1000;
+                        break;
+                    case "h":
+                        multiplier = 60 * 60 * 1000;
+                        break;
+                    default:
+                        return error("Unknown sleep time unit:" + unit);
                 }
             }
             sleepTime = (long) (multiplier
