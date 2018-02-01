@@ -116,17 +116,9 @@ public abstract class DataSourceHolder {
     public IdvWindow doMakeFrame() {
         if (frame == null) {
             JButton newBtn = new JButton("Add New Data Source");
-            newBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    idv.showChooser();
-                }
-            });
+            newBtn.addActionListener(e -> idv.showChooser());
             JButton closeBtn = new JButton("Close");
-            closeBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doClose();
-                }
-            });
+            closeBtn.addActionListener(e -> doClose());
 
 
             JComponent extra = getButtons();

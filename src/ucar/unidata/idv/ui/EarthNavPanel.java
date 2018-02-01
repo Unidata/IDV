@@ -482,15 +482,13 @@ public class EarthNavPanel extends JPanel implements MouseListener,
      * @param theTimeStamp for multiple events
      */
     public void startRun(final Location location, final int theTimeStamp) {
-        Misc.run(new Runnable() {
-            public void run() {
-                while (true) {
-                    processLocation(pressed);
-                    Misc.sleep(100);
-                    if ((timeStamp != theTimeStamp)
-                            || (location != pressed)) {
-                        break;
-                    }
+        Misc.run(() -> {
+            while (true) {
+                processLocation(pressed);
+                Misc.sleep(100);
+                if ((timeStamp != theTimeStamp)
+                        || (location != pressed)) {
+                    break;
                 }
             }
         });

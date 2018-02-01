@@ -5613,7 +5613,7 @@ public class ImageGenerator extends IdvManager {
             int         y    = baseY + (int) rect.getHeight() / 2;
             int         leftX;
             if (insets.left == 0) {
-                leftX = 0 + delta;
+                leftX = delta;
             } else {
                 leftX = insets.left - (int) rect.getWidth() - delta;
             }

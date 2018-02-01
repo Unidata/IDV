@@ -389,17 +389,9 @@ public class FormulaDialog extends JFrame implements ActionListener {
         cbxToCdMap = new Hashtable();
 
         final JButton allOn = new JButton("All on");
-        allOn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                toggleAll(true);
-            }
-        });
+        allOn.addActionListener(ae -> toggleAll(true));
         final JButton allOff = new JButton("All off");
-        allOff.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                toggleAll(false);
-            }
-        });
+        allOff.addActionListener(ae -> toggleAll(false));
         for (int i = 0; i < controlDescriptors.size(); i++) {
             ControlDescriptor cd =
                 (ControlDescriptor) controlDescriptors.get(i);
@@ -448,12 +440,10 @@ public class FormulaDialog extends JFrame implements ActionListener {
         GuiUtils.buttonGroup(useAllBtn, useTheseBtn);
 
 
-        ActionListener radioBtnListener = new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                GuiUtils.enableTree(cdPanel, !useAllBtn.isSelected());
-                allOn.setEnabled( !useAllBtn.isSelected());
-                allOff.setEnabled( !useAllBtn.isSelected());
-            }
+        ActionListener radioBtnListener = ae -> {
+            GuiUtils.enableTree(cdPanel, !useAllBtn.isSelected());
+            allOn.setEnabled( !useAllBtn.isSelected());
+            allOff.setEnabled( !useAllBtn.isSelected());
         };
 
 
@@ -612,16 +602,14 @@ public class FormulaDialog extends JFrame implements ActionListener {
         //        advancedIconBtn.setBorder(BorderFactory.createEmptyBorder());
 
 
-        ActionListener advancedListener = new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                advancedOpen = !theBottomPanel.isVisible();
-                theBottomPanel.setVisible(advancedOpen);
-                checkAdvancedState(advancedBtn, advancedIconBtn);
-                int oldWidth = getSize().width;
-                pack();
-                setSize(oldWidth, getSize().height);
-                doLayout();
-            }
+        ActionListener advancedListener = ae -> {
+            advancedOpen = !theBottomPanel.isVisible();
+            theBottomPanel.setVisible(advancedOpen);
+            checkAdvancedState(advancedBtn, advancedIconBtn);
+            int oldWidth = getSize().width;
+            pack();
+            setSize(oldWidth, getSize().height);
+            doLayout();
         };
         checkAdvancedState(advancedBtn, advancedIconBtn);
         advancedBtn.addActionListener(advancedListener);
@@ -751,11 +739,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
         for (int i = 0; i < cats.size(); i++) {
             final String cat = (String) cats.get(i);
             JMenuItem    mi  = new JMenuItem(cat);
-            mi.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    GuiUtils.appendText(fld, cat, ";");
-                }
-            });
+            mi.addActionListener(ae -> GuiUtils.appendText(fld, cat, ";"));
             items.add(mi);
         }
         JMenu dummy = GuiUtils.makeMenu("", items);
@@ -961,11 +945,7 @@ public class FormulaDialog extends JFrame implements ActionListener {
             GuiUtils.buttonGroup(inheritButton, catButton);
 
             ActionListener listener;
-            inheritButton.addActionListener(listener = new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    checkEnabled();
-                }
-            });
+            inheritButton.addActionListener(listener = ae -> checkEnabled());
             catButton.addActionListener(listener);
             if (cat == null) {
                 cat = new DataCategory();

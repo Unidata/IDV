@@ -219,12 +219,8 @@ public class SideLegend extends IdvLegend {
                     "SIDELEGEND");
             if (legendPanel == null) {
                 JCheckBox    visCbx = control.doMakeVisibilityControl("");
-                ItemListener itemListener = new ItemListener() {
-                    public void itemStateChanged(ItemEvent event) {
-                        displayControlVisibilityChanged(control,
-                                event.getStateChange() == ItemEvent.SELECTED);
-                    }
-                };
+                ItemListener itemListener = event -> displayControlVisibilityChanged(control,
+                        event.getStateChange() == ItemEvent.SELECTED);
                 visCbx.addItemListener(itemListener);
                 visCbx.setBorder(BorderFactory.createEmptyBorder());
                 JComponent sideLegendLabel =
