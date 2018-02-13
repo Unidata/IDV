@@ -24,6 +24,13 @@ docs/javadoc
 # IntelliJ files
 #
 ide/intellij/
+/intelliJ/
+/intellij/
+*.ipr
+*.iml
+*.iws
+.idea/
+atlassian-ide-plugin.xml
 #
 # Eclipse files
 #
