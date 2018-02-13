@@ -93,7 +93,8 @@ import visad.VisADException;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 
-
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
@@ -833,17 +834,28 @@ public class GeoGridDataSource extends GridDataSource {
 
         for (int i = 0; i < categories.size(); i++) {
             List comps = (List) catMap.get(categories.get(i));
+            JPanel labelPanel = new JPanel(new BorderLayout());
+            JPanel leftLabelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            leftLabelPanel.add(new JLabel("Field Name"));
+            JPanel rightLabelPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            rightLabelPanel.add(new JLabel("Grid Size (Points)"));
+            labelPanel.add(leftLabelPanel, BorderLayout.WEST);
+            labelPanel.add(rightLabelPanel, BorderLayout.EAST);
+
             JPanel innerPanel = GuiUtils.doLayout(comps, 3, GuiUtils.WT_NYN,
                                     GuiUtils.WT_N);
+
             JScrollPane sp = new JScrollPane(GuiUtils.top(innerPanel));
             sp.setPreferredSize(new Dimension(500, 400));
-            JPanel top =
-                GuiUtils.right(GuiUtils.rLabel("Grid Size (Points)  "));
-            JComponent inner = GuiUtils.inset(GuiUtils.topCenter(top, sp), 5);
-            tab.addTab(categories.get(i).toString(), inner);
-            //            catComps.add();
-        }
 
+            // TJJ Nov 2015 - keep scrollpane and label panel separate so
+            // labels are always visible
+            JPanel spAndLabels = new JPanel(new BorderLayout());
+            spAndLabels.add(labelPanel, BorderLayout.NORTH);
+            spAndLabels.add(sp, BorderLayout.CENTER);
+            JComponent inner = GuiUtils.inset(GuiUtils.center(spAndLabels), 5);
+            tab.addTab(categories.get(i).toString(), inner);
+        }
 
         //        JComponent contents = GuiUtils.hbox(catComps);
         JComponent contents = tab;
