@@ -444,7 +444,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
           isdefault="true"
           isenduser="false"
           properties="requiresvolume=true"
-          formula="thetaSurface(D1, user_Theta0[default=310])">
+          formula="thetaSurface(D1, user_Theta[default=310])">
     <categories>
       <category
               value="inherit"
@@ -456,13 +456,13 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
-          id="thetaSurfaceAnalysis"
+          id="athetaSurfaceAnalysis"
           description="Potential Temperature IsoSurface Scalar Analysis(from %N1%)"
           label="Analysis on Potential Temperature Surface"
           isdefault="true"
           isenduser="false"
           properties="requiresvolume=true"
-          formula="thetaSurfaceA(D1, Parameter, user_Theta0[default=310])">
+          formula="thetaSurfaceA(D1, Parameter, user_Theta[default=310])">
     <categories>
       <category
               value="inherit"
@@ -476,13 +476,13 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
-          id="thetaSurfaceVAnalysis"
+          id="athetaSurfaceVAnalysis"
           description="Potential Temperature IsoSurface Vector Analysis(from %N1% &amp; %N2% &amp; %N3%)"
           label="Vector Analysis on Potential Temperature Surface"
           isdefault="true"
           isenduser="false"
           properties="requiresvolume=true"
-          formula="thetaSurfaceV(D1, D2, D3, user_Theta0[default=310])">
+          formula="thetaSurfaceV(D1, D2, D3, user_Theta[default=310])">
     <categories>
       <category
               value="inherit"
