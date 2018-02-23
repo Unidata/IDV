@@ -2443,7 +2443,7 @@ public class PointObFactory {
                     cdate = pf0.getObservationTimeAsCalendarDate();
 
                     double elt0 = 0.0;
-                    if (po.getAltitude() != po.getAltitude()) {
+                    if (po.getAltitude() != Float.NaN) {
                         elt0 = po.getAltitude();
                     }
                     elt = new EarthLocationLite(
