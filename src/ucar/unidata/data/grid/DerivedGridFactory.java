@@ -3577,6 +3577,114 @@ public class DerivedGridFactory {
         return pressureFF;
     }
 
+
+    /**
+     * This is not working, hope to do colored by and over topo at the same time
+     *
+     * @param grid1  with u, v, h
+     * @param grid2  other
+     * @return  grid of altitude
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl combineGrids1(FieldImpl grid1, FieldImpl grid2)
+            throws VisADException, RemoteException {
+        FieldImpl uv = getComponent(grid1, 0, true);
+        FieldImpl alt = getComponent(grid1, 1, true);
+        boolean copy = true;
+        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                (FlatField) grid2.getSample(0));;
+        FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
+        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(alt);
+
+        TupleType paramType = GridUtil.getParamType(grid2);
+        FunctionType rangeFT =
+                new FunctionType(((SetType) domainSet.getType()).getDomain(),
+                        paramType);
+
+        FieldImpl newFieldImpl = null;
+
+        if (GridUtil.isSequence(grid2) ) {
+
+            try {
+
+                Set sequenceSet = Util.getDomainSet(grid2);
+                int numSteps    = sequenceSet.getLength();
+                MathType sequenceType =
+                        ((SetType) sequenceSet.getType()).getDomain();
+
+                FieldImpl firstSample = (FieldImpl) grid2.getSample(0, false);
+                boolean      hasInnerSteps = GridUtil.isSequence(firstSample);
+
+                FunctionType newFieldType;
+                FunctionType innerFieldType = null;
+
+                if ( !(GridUtil.isSequence(firstSample))) {
+
+                    newFieldType = new FunctionType(sequenceType, rangeFT);
+
+                } else {
+
+                    hasInnerSteps = true;
+                    innerFieldType = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT);
+
+                    newFieldType = new FunctionType(sequenceType,
+                            innerFieldType);
+
+                }
+                newFieldImpl = new FieldImpl(newFieldType, sequenceSet);
+
+                // get each grid in turn; change domain;
+                // set result into new sequence
+                for (int i = 0; i < numSteps; i++) {
+                    FieldImpl data = (FieldImpl) grid2.getSample(i, false);
+                    float[][] dataAlt = convert2Darray((FlatField) alt.getSample(0), 0);
+                    //FieldImpl datap = (FieldImpl) hPI.getSample(i, false);
+
+                    FieldImpl fi;
+                    if (data.isMissing()) {
+                        fi = data;
+                    } else {
+
+                            float[][][] dataA = convert3Darray((FlatField) data, 0);
+                            int sizeX = domainSet.getLengths()[0];
+                            int sizeY = domainSet.getLengths()[1];
+                            float [][] newdata = new  float[1][sizeX*sizeY];
+                            // float [][] newdata0 = new  float[sizeY][sizeX];
+                            for (int jj = 0; jj < sizeY; jj++) {
+                                for (int ii = 0; ii < sizeX; ii++) {
+                                    newdata[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataAP[jj][ii], dataA[jj][ii],   dataAlt[jj][ii], isDecrese);
+                                    // newdata0[jj][ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0);
+                                }
+                            }
+                            fi = new FlatField(rangeFT, domainSet);
+                            ((FlatField) fi).setSamples(
+                                    newdata, false);
+
+                    }
+                    newFieldImpl.setSample(i, fi);
+                }
+            } catch (RemoteException re) {}
+        } else {  // single time
+            if ( !grid2.isMissing()) {
+                newFieldImpl = new FlatField(rangeFT, domainSet);
+                try {
+                    ((FlatField) newFieldImpl).setSamples(
+                            grid2.getFloats(copy), false);
+                } catch (RemoteException re) {}
+            } else {
+                newFieldImpl = grid2;
+            }
+        }
+
+        //return newFieldImpl;
+        return combineGrids(uv, newFieldImpl, alt);
+    }
     /**
      * Every data grid with pressure as the z coord can be used
      * to make a grid with altitude with the constant grid value
@@ -4250,6 +4358,34 @@ public class DerivedGridFactory {
         return newgrid;
     }
 
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     * @param ii _more_
+     *
+     *
+     * @return _more_
+     */
+    public static float[][] convert2Darray(FlatField grid, int ii) throws VisADException, RemoteException{
+        float[][]  samples = grid.getFloats(false);
+        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(grid);
+
+        int[]      lengths = domain.getLengths();
+        int sizeX = lengths[0];
+        int sizeY = lengths[1];
+
+        float [][] newgrid = new float[sizeY][sizeX];
+       // for (int k = 0; k < lengths[2]; k++) {
+            for (int j = 0; j < lengths[1]; j++) {
+                for (int i = 0; i < lengths[0]; i++) {
+                    newgrid[j][i] = samples[ii][  j * (sizeX) + i];
+                }
+            }
+      //  }
+
+        return newgrid;
+    }
     /**
      * Mask the values in a grid with the mask
      *
