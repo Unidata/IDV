@@ -449,7 +449,9 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <category
               value="inherit"
               append="Derived"
-              childidx="0"/>
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic2dv"/>
     </categories>
     <operands categories="GRID-3D-*;">
       <params p1="THETA"/>
