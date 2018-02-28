@@ -4297,6 +4297,9 @@ public class DerivedGridFactory {
 
         int idx = 0;
 
+        if(other.length == 1)
+            return other[0];
+
         if(isDec) {
             if( theta0 < theta[len-1] || theta0 > theta[0]) {
                 idx = 999;
@@ -4341,12 +4344,21 @@ public class DerivedGridFactory {
 
         int[]      lengths = domain.getLengths();
 
-        int sizeX = lengths[0];
-        int sizeY = lengths[1];
-        int sizeZ = lengths[2];
+        int sizeX = 1;
+        int sizeY = 1;
+        int sizeZ = 1;
+
+        if(lengths.length == 3){
+            sizeX = lengths[0];
+            sizeY = lengths[1];
+            sizeZ = lengths[2];
+        } else {
+            sizeX = lengths[0];
+            sizeY = lengths[1];
+        }
 
         float [][][] newgrid = new float[sizeY][sizeX][sizeZ];
-        for (int k = 0; k < lengths[2]; k++) {
+        for (int k = 0; k < sizeZ; k++) {
             for (int j = 0; j < lengths[1]; j++) {
                 for (int i = 0; i < lengths[0]; i++) {
 
