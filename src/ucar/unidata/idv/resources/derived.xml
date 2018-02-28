@@ -458,7 +458,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
-          id="athetaSurfaceAnalysis"
+          id="_thetaSurfaceAnalysis"
           description="Potential Temperature IsoSurface Scalar Analysis(from %N1%)"
           label="Analysis on Potential Temperature Surface"
           isdefault="true"
@@ -478,7 +478,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
-          id="athetaSurfaceVAnalysis"
+          id="_thetaSurfaceVAnalysis"
           description="Potential Temperature IsoSurface Vector Analysis(from %N1% &amp; %N2% &amp; %N3%)"
           label="Vector Analysis on Potential Temperature Surface"
           isdefault="true"
