@@ -574,6 +574,26 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
     }
 
     /**
+     * Add a topography map for the parameter at the specified index
+     *
+     * @param type  the RealType to use
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException Unable to set the ScalarMap
+     */
+    protected void addTopographyMap(RealType type)
+            throws VisADException, RemoteException {
+        NavigatedDisplay nd = getNavigatedDisplay();
+        if (nd == null) {
+            return;
+        }
+        if (topoType != null) {
+            nd.removeVerticalMap(topoType);
+        }
+        topoType = type;
+        nd.addVerticalMap(topoType);
+    }
+    /**
      * Deal with action event commands from the levels and contours buttons
      * made by this class.
      *
