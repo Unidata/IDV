@@ -2339,7 +2339,7 @@ public class PointObFactory {
                 ucar.unidata.geoloc.EarthLocation el = po.getLocation();
                 double elt0 = 0.0;
                 if (el.getAltitude() == el.getAltitude()) {
-                    elt0 = el.getAltitude();
+                    elt0 = el.getAltitude() + 50.0;
                 }
                 elt = new EarthLocationLite(
                         lat.cloneButValue(el.getLatitude()),
