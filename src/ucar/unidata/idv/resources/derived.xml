@@ -479,12 +479,12 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived>
   <derived
           id="_thetaSurfaceVAnalysis"
-          description="Potential Temperature IsoSurface Vector Analysis(from %N1% &amp; %N2% &amp; %N3%)"
+          description="Potential Temperature IsoSurface Vector Analysis(from %N1%)"
           label="Vector Analysis on Potential Temperature Surface"
           isdefault="true"
           isenduser="false"
           properties="requiresvolume=true"
-          formula="thetaSurfaceV(D1, D2, D3, user_Theta[default=310])">
+          formula="thetaSurfaceV(D1, vector, user_Theta[default=310])">
     <categories>
       <category
               value="inherit"
