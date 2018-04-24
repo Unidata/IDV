@@ -3820,6 +3820,23 @@ public class DerivedGridFactory {
      * to make a grid with altitude with the constant grid value
      *
      * @param theta   FlatField with pressure in grid domain
+     * @param vector  FlatField with pressure in grid domain
+     * @param theta0  constant value
+     * @return  grid of altitude
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl extractVectorGridOverThetaTopoSurface(FieldImpl theta, FieldImpl vector, float theta0)
+            throws VisADException, RemoteException {
+        return extractUVGridOverThetaTopoSurface(theta,  DerivedGridFactory.getUComponent(vector),
+                DerivedGridFactory.getVComponent(vector), theta0);
+    }
+    /**
+     * Every data grid with pressure as the z coord can be used
+     * to make a grid with altitude with the constant grid value
+     *
+     * @param theta   FlatField with pressure in grid domain
      * @param other1  FlatField with pressure in grid domain
      * @param other2  FlatField with pressure in grid domain
      * @param theta0  constant value
@@ -3828,7 +3845,7 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl extractGridOverThetaTopoSurface(FieldImpl theta, FieldImpl other1, FieldImpl other2, float theta0)
+    public static FieldImpl extractUVGridOverThetaTopoSurface(FieldImpl theta, FieldImpl other1, FieldImpl other2, float theta0)
             throws VisADException, RemoteException {
         boolean copy = true;
         FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
