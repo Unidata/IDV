@@ -30,15 +30,16 @@ argument -Dfoo=bar) -->
 
     </target>
 
-    <target name="hydrajar" depends="init" >
+    <target name="hydrajar" depends="hydra" >
         <property name="compiledir" value="${basedir}/build"/>
         <echo message="jar dest docs: ${jars_dest}"/>
         <echo message="compiledir: ${compiledir}"/>
         <jar
             basedir="${compiledir}"
             compress="true"
-            update="false"
+            update="yes"
             jarfile="${jars_dest}/hydra.jar">
+            <include name="edu/**/*.class"/>
         </jar>
 
     </target>
