@@ -72,7 +72,7 @@ import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 import visad.python.JPythonMethods;
 
-import ucar.unidata.data.hydra.Statistics;
+//import ucar.unidata.data.hydra.Statistics;
 
 public class StatsTable extends AbstractTableModel {
 
