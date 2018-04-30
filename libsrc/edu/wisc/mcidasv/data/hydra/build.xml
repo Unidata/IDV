@@ -38,7 +38,7 @@ argument -Dfoo=bar) -->
             basedir="${compiledir}"
             compress="true"
             update="yes"
-            jarfile="${jars_dest}/hydra.jar">
+            jarfile="${libsrc}/hydra.jar">
             <include name="edu/**/*.class"/>
         </jar>
 
