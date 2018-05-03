@@ -1,0 +1,82 @@
+<html>
+<head>
+    <title>Grid Isentropic Analysis</title>
+</head>
+
+<body>
+
+
+<div class="overview">
+    <p> Isentropic analysis is a common and effective way to diagnose horizontal and vertical motion of the atmosphere,
+        the combination of 3D visualization feature of the IDV and the isentropic analysis helps us better visualize the
+        dynamic and stability of weather phenomenons.<p>
+</div>
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]
+
+    <li> Load some gridded data.
+        <ul>
+            <li> [ht::openDataSourceChooser]
+            <li>In the [ht::dialog Data Chooser] tree click on the
+                [ht::command Files] node.
+            <li> Go to the grid data directory:  [ht::filename <%workshop.datadir%>/grids/].
+            <li> Select [ht::filename sample_eta_grid.nc]
+            <li> Press [ht::button Add Source]
+        </ul>
+
+    <li>Create a isentropic topography display
+        <ul>
+            <li>In the [ht::command Fields] panel open the [ht::param 3D grid] node and [ht::param Derived] node,
+                scroll down the [ht::param Derived] node and select [ht::param Potential Temperature IsoSurface].
+            <li>In the [ht::command Displays]  open [ht::display Constant Theta Surface Height Plan View] node, and
+                select [ht::display Isentropic Topography] and press
+                [ht::button Create Display]
+            <li>A dialog will pop up to allow you to set the isosurface value.  The default isosurface value is <b>310</b> (default).
+                Click the [ht::button OK] button to create the display.
+            <li>After creating the display you can adjust the data range for the selecting color table.
+        </ul>
+
+
+    <li>Create a plan view analysis on isentropic surface
+        <ul>
+            <li>In the [ht::command Fields] panel open the [ht::param 3D grid] node and [ht::param Derived] node,
+                scroll down the [ht::param Derived] node and select [ht::param Potential Temperature IsoSurface Scalar Analysis].
+            <li>In the [ht::command Displays]  open [ht::display 3D Theta Surface] node, and
+                select [ht::display Contours Over Constant Theta Surface] and press
+                [ht::button Create Display]
+            <li>Set the input of the isosurface value to <b>310.5</b>.
+            <li>After you click the [ht::button Ok] button, a dialog will pop up to allow you to select the
+                [ht::param Parameter] field.  From the dialog, expand the [ht::param 3D grid] node and select
+                the [ht::param Temperature@Isobaric surface] field and click the [ht::button OK] button.
+            <li>After creating the display you can adjust the contour interval and apply the smoothing to the resulting display.
+        </ul>
+
+    <li>Create a vector plan view analysis on isentropic surface
+        <ul>
+            <li>In the [ht::command Fields] panel open the [ht::param 3D grid] node and [ht::param Derived] node,
+                scroll down the [ht::param Derived] node and select [ht::param Potential Temperature IsoSurface Vector Analysis].
+            <li>In the [ht::command Displays]  open [ht::display Constant Theta Surface Flow Displays] node, and
+                select [ht::display Vectors Colored by Speed over Theta Surface] and press
+                [ht::button Create Display]
+            <li>Set the input of the isosurface value to <b>310.5</b>.
+            <li>After you click the [ht::button Ok] button, a dialog will pop up to allow you to select the
+                [ht::param voctor] field.  From the dialog, expand the [ht::param 3D grid] node and
+                the [ht::param Derived] node and select the [ht::param True Wind vectors] field and
+                click the [ht::button OK] button.
+            <li>After creating the display you can set the skip value to adjust the density of the resulting display.
+        </ul>
+
+    <li>Sample Image</li>
+
+    <table border="0">
+        <tr>
+            <td>[ht::cimg images/IsentropicAnalysis.gif]</td>
+        </tr>
+
+    </table>
+</ol>
+
+</body>
+</html>
