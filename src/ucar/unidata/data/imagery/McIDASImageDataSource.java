@@ -545,7 +545,7 @@ public class McIDASImageDataSource extends ImageDataSource {
                                       DataSelection.PROP_USEDEFAULTAREA);
         int dlMag = 0;
         int deMag = 0;
-        if ( !isProgressiveResolution) {
+        if ( !isProgressiveResolution && addeImageDataSelection != null) {
             dlMag =
                 addeImageDataSelection.getAdvancedPanel().getLineMagValue();
             // .lineMagLbl.getText().trim());

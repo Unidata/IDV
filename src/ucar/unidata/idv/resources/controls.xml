@@ -28,7 +28,7 @@ example:
  -->
   <control
      id="imagedisplay"
-     categories="IMAGE-*-*"
+     categories="IMAGE-*-*;;GRID-2D-*;"
      class="ucar.unidata.idv.control.ImagePlanViewControl"
      label="Image Display"
      icon="/ucar/unidata/idv/images/planview.png"
@@ -37,7 +37,16 @@ example:
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
 
-
+  <control
+    id="imagedisplayqqq"
+    categories="IMAGE-*-*;;GRID-2D-*;"
+    class="ucar.unidata.idv.control.ScatterDisplay"
+    label="Scatter Display"
+    icon="/ucar/unidata/idv/images/planview.png"
+    displaycategory="Imagery"
+    properties="windowVisible=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
 
   <control
      id="imagedisplayoverz"
@@ -815,7 +824,16 @@ Since this is confusing and needs more work lets remove this for now
           label="Color-Shaded Plan View"
           icon="/ucar/unidata/idv/images/planview.png"
           displaycategory="Constant Theta Surface Height Plan View"
-          properties="smoothed=false;is2D=true;">
+          properties="smoothed=false;is2D=true;"/>
+  <control
+          id="thetaplanviewcolor1"
+          categories="*-isentropic2dv-*"
+          class="ucar.unidata.idv.control.TopographyControl"
+          doeslevels="true"
+          label="Isentropic Topography"
+          icon="/ucar/unidata/idv/images/surface.png"
+          displaycategory="Constant Theta Surface Height Plan View"
+          properties="colorFill=true;smoothed=true;is2D=true;isRaster=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
 <!--

@@ -443,4 +443,7 @@ def thetaSurfaceA(grid, grid1, theta0):
   return DerivedGridFactory.extractGridOverThetaTopoSurface(grid, grid1, float(theta0))
 
 def thetaSurfaceV(gridt, gridu, gridv, theta0):
-  return DerivedGridFactory.extractGridOverThetaTopoSurface(gridt, gridu, gridv, float(theta0))
+  return DerivedGridFactory.extractUVGridOverThetaTopoSurface(gridt, gridu, gridv, float(theta0))
+
+def thetaSurfaceV(gridt, griduv, theta0):
+  return DerivedGridFactory.extractVectorGridOverThetaTopoSurface(gridt, griduv, float(theta0))
