@@ -1252,6 +1252,22 @@ public class IOUtil {
      */
     public static InputStream getInputStream(String filename, Class origin)
             throws FileNotFoundException, IOException {
+        return getInputStream(filename, origin, 0);
+    }
+
+    /**
+     * Get an input stream for the filename
+     *
+     * @param filename    name of file
+     * @param origin      relative origin point for file location
+     * @param tries        keeps track of the multiple URL fetches on a redirect
+     * @return  corresponding input stream
+     *
+     * @throws FileNotFoundException     couldn't find the file
+     * @throws IOException               problem opening stream
+     */
+    private static InputStream getInputStream(String filename, Class origin, int tries)
+            throws FileNotFoundException, IOException {
         try {
             URL url = getURL(filename, origin);
             if (url != null) {
@@ -1266,10 +1282,18 @@ public class IOUtil {
                         || response == HttpURLConnection.HTTP_MOVED_PERM
                         || response == HttpURLConnection.HTTP_SEE_OTHER) {
                         String newUrl = connection.getHeaderField("Location");
-                        connection = new URL(newUrl).openConnection();
-                        connection.setReadTimeout(30000); 
-                        connection.setAllowUserInteraction(true);
-                        huc = (HttpURLConnection) connection;
+                        //Don't follow too many redirects
+                        if(tries>10) {
+                            throw new IllegalArgumentException ("Too many nested URL fetches:" + filename);
+                        }
+                        //call this method recursively with the new URL
+                        return getInputStream(newUrl, origin, tries+1);
+                        /* 
+                           connection = new URL(newUrl).openConnection();
+                           connection.setReadTimeout(30000); 
+                           connection.setAllowUserInteraction(true);
+                           huc = (HttpURLConnection) connection;
+                        */
                     }
 
                     if (huc.getResponseCode() == 401) {
