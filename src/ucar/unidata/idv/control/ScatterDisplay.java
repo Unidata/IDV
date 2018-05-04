@@ -36,10 +36,12 @@ import org.slf4j.LoggerFactory;
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.control.ColorTableWidget;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.ui.colortable.ColorTableManager;
@@ -59,32 +61,7 @@ import ucar.visad.display.RGBDisplayable;
 import ucar.visad.display.RubberBandBox;
 import ucar.visad.display.XYDisplay;
 
-import visad.AxisScale;
-import visad.BaseColorControl;
-import visad.CellImpl;
-import visad.CoordinateSystem;
-import visad.Data;
-import visad.DelaunayCustom;
-import visad.DisplayEvent;
-import visad.DisplayListener;
-
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.FunctionType;
-import visad.Gridded2DSet;
-import visad.Gridded3DSet;
-import visad.Integer1DSet;
-import visad.Linear2DSet;
-import visad.LinearLatLonSet;
-import visad.MathType;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.SampledSet;
-import visad.ScalarMap;
-import visad.Set;
-import visad.SetType;
-import visad.UnionSet;
-import visad.VisADException;
+import visad.*;
 
 import visad.data.mcidas.BaseMapAdapter;
 
@@ -492,6 +469,9 @@ public class ScatterDisplay extends DisplayControlImpl {
         int idx = 0;
         if(dataSelectionX != null && dataSelectionX.getTimes() != null ){
             idx = dataSelectionX.getTimes().size() - 1;
+        } else if (getUsesTimeDriver() && dataChoiceX.getAllDateTimes() != null) {
+            idx = 0;
+
         } else if (dataSelectionX.getTimes() ==  null &&
                 dataChoiceX.getAllDateTimes() != null) {
             idx = dataChoiceX.getAllDateTimes().size() -1;
@@ -523,6 +503,8 @@ public class ScatterDisplay extends DisplayControlImpl {
         int idy = 0;
         if(dataSelectionY != null &&  dataSelectionY.getTimes() != null){
             idy = dataSelectionY.getTimes().size() - 1;
+        } else if (getUsesTimeDriver() && dataChoiceY.getAllDateTimes() != null) {
+            idy = 0;
         } else if (dataSelectionY.getTimes() == null &&
                 dataChoiceY.getAllDateTimes() != null) {
             idy = dataChoiceY.getAllDateTimes().size() - 1;
