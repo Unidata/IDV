@@ -506,6 +506,13 @@
          value="System"/>
     </resource>
     <resource
+           label="Mapes Collection"
+           location="%IDVPATH%/python/MapesCollection.py">
+          <property
+             name="category"
+             value="System"/>
+        </resource>
+    <resource
        label="Radar Diagnostics"
        location="%IDVPATH%/python/radar.py">
       <property
