@@ -1021,37 +1021,37 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived-->
   <derived description="Compute time derivative with a preferred time unit" formula="ddt(grid,preffered_time_unit[isuser=true,default=&quot;day&quot;,label=Preferred time unit, day, s])" id="ddt" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Sample a grid at times specified (ex: if a year is specified all times of that year are displayed)" formula="getSamplesAtTimes(grid,user_year[isuser=true,default=None,label=Year as yyyy],user_season[isuser=true,default=None,label=Season (ex: JJA)],user_mon[isuser=true,default=None,label=Mon of year as MM],user_day[isuser=true,default=None,label=Day of a month as dd],user_hour[isuser=true,default=None,label=Hour of day as hh],user_min[isuser=true,default=None,label=Minute of hour as mm],user_sec[isuser=true,default=None,label=Seconds as ss],user_ms[isuser=true,default=None,label=Millisecons as ms])" id="Sampled at Time" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Compute daily means" formula="createTimeMeans(grid,&quot;daily&quot;)" id="daily mean" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Compute monthly means" formula="CreateTimeMeans(grid,&quot;monthly&quot;)" id="monthly mean" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Compute yearly means" formula="createTimeMeans(grid,&quot;yearly&quot;)" id="yearly means" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Compute time means at specified time type" formula="createTimeMeans(grid,meanType[isuser=true,default=&quot;yearly&quot;,label=Time mean type as a string])" id="time mean" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
@@ -1063,25 +1063,25 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived>
   <derived description="Compute anomaly from daily means" formula="anomalyFromTimeMeans(grid,&quot;daily&quot;)" id="anomaly from daily mean" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Compute anomaly from monthly means" formula="anomalyFromTimeMeans(grid,&quot;monthly&quot;)" id="anomaly from monthly mean" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Compute anomaly from yearly means" formula="anomalyFromTimeMeans(grid,&quot;yearly&quot;)" id="anomaly from yearly means" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Compute anomaly from time means at specified time type" formula="anomalyFromTimeMeans(grid,meanType[isuser=true,default=&quot;yearly&quot;,label=Time mean type as a string])" id="anomaly from time mean" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
@@ -1190,7 +1190,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived>
   <derived description="Anomaly from Time Means" formula="anomalyFromTimeMeans(grid)" id="Anomaly from Time Means" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Time Steps"/>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
     </categories>
     <operands/>
   </derived>
