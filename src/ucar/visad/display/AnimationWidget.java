@@ -1081,14 +1081,12 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             shareValue();
         } else if (evt.getPropertyName().equals(Animation.ANI_SET)) {
             if (ignoreAnimationSetChange) {
-                ignoreAnimationSetChange = false;
                 return;
             }
             updateIndicatorInner((Set) evt.getNewValue(), true);
-            if(getAnimationSetInfo().getIsTimeDriver())
-                ignoreAnimationSetChange = true;
         }
     }
+
 
 
     /**
