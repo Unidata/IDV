@@ -3702,8 +3702,9 @@ public class DerivedGridFactory {
         FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
                 (FlatField) theta.getSample(0));;
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
@@ -3851,8 +3852,9 @@ public class DerivedGridFactory {
         FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
                 (FlatField) theta.getSample(0));;
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
@@ -4032,7 +4034,8 @@ public class DerivedGridFactory {
                 (FlatField) theta.getSample(0));;
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
+        boolean isDecrese = (dataAA[1][1][1] > dataAA[1][1][3])? true : false;
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
