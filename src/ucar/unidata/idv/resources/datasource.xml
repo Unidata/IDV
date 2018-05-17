@@ -548,6 +548,30 @@
      fileselection="true"
      doesmultiples="true"
      label="CDM netCDF Profiler files"/>
+
+  <datasource
+      id="glmEvent1.point"
+      factory="ucar.unidata.data.point.NetcdfPointDataSource"
+      ncmltemplate="/ucar/unidata/idv/resources/ncml/OR_GLM_EVENT.ncml"
+      doesmultiples="true"
+      fileselection="true"
+      label="GLM_EVENTS Data files"/>
+
+  <datasource
+      id="glmGroup1.point"
+      factory="ucar.unidata.data.point.NetcdfPointDataSource"
+      ncmltemplate="/ucar/unidata/idv/resources/ncml/OR_GLM_GROUP.ncml"
+      doesmultiples="true"
+      fileselection="true"
+      label="GLM_GROUPS Data files"/>
+
+  <datasource
+      id="glmflash1.point"
+      factory="ucar.unidata.data.point.NetcdfPointDataSource"
+      ncmltemplate="/ucar/unidata/idv/resources/ncml/OR_GLM_FLASH.ncml"
+      doesmultiples="true"
+      fileselection="true"
+      label="GLM_FLASHES Data files"/>
 <!--
   <datasource
      id="FILE.LEVEL2RADAR"
