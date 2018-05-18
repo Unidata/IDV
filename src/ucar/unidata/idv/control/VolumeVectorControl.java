@@ -211,15 +211,15 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 List             wsTime        = wdc.getAllDateTimes();
                 List             selectedTimes =
                     getDataSelection().getTimes();
-                    if(selectedTimes != null){
+                    /* if(selectedTimes != null){
                        int len = selectedTimes.size();
-                       if(usTime.get((int)selectedTimes.get(0)) != wsTime.get((int)selectedTimes.get(0)) ||
-                              usTime.get((int)selectedTimes.get(len-1)) != wsTime.get((int)selectedTimes.get(len-1)) )
+                       if(usTime.get((Integer) selectedTimes.get(0)) != wsTime.get((Integer)selectedTimes.get(0)) ||
+                              usTime.get((Integer)selectedTimes.get(len-1)) != wsTime.get((Integer)selectedTimes.get(len-1)) )
                        {
                            userErrorMessage("w grid selected times are different from u grid " );
                            return false;
                        }
-                   } else if(wdc.getSelectedDateTimes() != null){
+                   } else */ if(wdc.getSelectedDateTimes() != null){
                        selectedTimes = wdc.getSelectedDateTimes();
                        int len = selectedTimes.size();
                        if(usTime.get(0) != wsTime.get(0) ||
