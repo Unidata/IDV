@@ -286,7 +286,7 @@ example:
      displaycategory="GridTrajectory"
      properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
   <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-  <control
+  <!--control
           id="gridtrajectorycontrol0"
           categories="*-display:gridtrajectorycontrol00-*"
           class="ucar.unidata.idv.control.GridTrajectoryControlNew"
@@ -309,7 +309,7 @@ example:
           displaycategory="3D Grid Trajectory"
           properties="windowVisible=false;useSpeedForColor=true;withTopo=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-  </control>
+  </control-->
   <control
      id="gridtrajectorycontrol1"
      categories="*-display:gridtrajectorycontrol1-*"

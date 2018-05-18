@@ -678,7 +678,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
             categories="GRID-3D-*;"/>
     </operands>
   </derived>
-  <derived
+  <!--derived
           id="gridTrajectory00"
           description="Grid 3D Trajectory with Topo(from %N1% &amp; %N2%  &amp; %N3%)"
           label="Grid 3D Trajectory w Topo"
@@ -699,7 +699,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <paramgroup categories="GRID-3D-*;" name="u_v_w"/>
       <paramgroup categories="GRID-3D-*;" name="GridRelative_uvw"/>
     </operands>
-  </derived>
+  </derived-->
   <derived
         id="gridTrajectory"
         description="Grid 3D Trajectory (from %N1% &amp; %N2%  &amp; %N3%)"
