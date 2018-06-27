@@ -7776,6 +7776,7 @@ public class GridUtil {
             //float[] gnosti = newVals[np];
             float[] gnisti = getLevelSlice(samples[np], sizeX, sizeY, z);
             float[] gnosti = getLevelSlice(newVals[np], sizeX, sizeY, z);
+            kxd = sizeX;
             if (isCyclic) {
                 gnist = extendGrid(gnisti, nr, kxd, kyd);
                 gnost = new float[gnist.length];
@@ -7998,6 +7999,7 @@ public class GridUtil {
                     }
                 }
             }
+            njx = sizeX;
             if (isCyclic) {  // pad each side with idist the values
                 pslab = extendGrid(pslabi, idist, njx, niy);
                 work  = new float[pslab.length];
