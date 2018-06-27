@@ -7367,6 +7367,8 @@ public class GridUtil {
             //float[] gnoi = newVals[np];
             float[] gnii = getLevelSlice(samples[np], sizeX, sizeY, z);
             float[] gnoi = getLevelSlice(newVals[np], sizeX, sizeY, z);
+            // reset jgxmax for each level
+            jgxmax = sizeX;
             if (isCyclic) {
                 gni    = extendGrid(gnii, nr, jgxmax, jgymax);
                 gno    = new float[gni.length];
@@ -7529,6 +7531,8 @@ public class GridUtil {
             //float[] gnoi = newVals[np];
             float[] gnii = getLevelSlice(samples[np], sizeX, sizeY, z);
             float[] gnoi = getLevelSlice(newVals[np], sizeX, sizeY, z);
+            // reset jgxmax for each level
+            jgxmax = sizeX;
             if (isCyclic) {
                 gni    = extendGrid(gnii, nr, jgxmax, jgymax);
                 gno    = new float[gni.length];
