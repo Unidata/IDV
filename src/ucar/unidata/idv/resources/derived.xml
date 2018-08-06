@@ -202,6 +202,26 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
+          id="flowvectors3dT"
+          description="3D True Wind Vectors (from %N1% &amp; %N2% &amp; %N3%)"
+          label="3D True Wind Vectors"
+          isdefault="true"
+          isenduser="false"
+          formula="DerivedGridFactory.createTrueFlowVectors(D1, D2, D3)">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="flowvector3d"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <paramgroup name="u_v_w"/>
+      <paramgroup name="GridRelative_uvw"/>
+    </operands>
+  </derived>
+  <derived
      id="truewindvectors"
      description="True Wind vectors (from %N1% &amp; %N2%)"
      label="True Wind vectors"
