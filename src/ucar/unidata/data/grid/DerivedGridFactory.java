@@ -627,6 +627,59 @@ public class DerivedGridFactory {
         return createTrueFlowVectors(uGrid, vGrid);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param uGrid _more_
+     * @param vGrid _more_
+     * @param wGrid _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public static FieldImpl createTrueFlowVectors(FieldImpl uGrid,
+                                               FieldImpl vGrid, FieldImpl wGrid)
+            throws VisADException, RemoteException {
+        FieldImpl w;
+        final Unit rgUnit =
+                ((FlatField) wGrid.getSample(0)).getRangeUnits()[0][0];
+        if (Unit.canConvert(rgUnit, CommonUnits.METERS_PER_SECOND)) {
+            w = wGrid;
+        } else {
+            FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                    (FlatField) wGrid.getSample(0));
+            FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+            w = DerivedGridFactory.convertPressureVelocityToHeightVelocity(
+                    wGrid, hPI, null);
+
+            // choices.remove(new String("D3"));
+            //choices.put(new String("D3"), w);
+        }
+        SampledSet wDomain = GridUtil.getSpatialDomain(w);
+        if ( !wDomain.equals(GridUtil.getSpatialDomain(uGrid))) {
+            uGrid = GridUtil.resampleGrid(uGrid, wDomain);
+            vGrid = GridUtil.resampleGrid(vGrid, wDomain);
+        }
+
+        FieldImpl uvg = createTrueFlowVectors(uGrid, vGrid);
+        FieldImpl uuGrid = getUComponent(uvg);
+        FieldImpl vvGrid = getVComponent(uvg);
+
+        FieldImpl uvwGrid = combineGrids(new FieldImpl[] { uuGrid, vvGrid, w },
+                GridUtil.DEFAULT_SAMPLING_MODE,
+                GridUtil.DEFAULT_ERROR_MODE, true);
+        TupleType paramType = GridUtil.getParamType(uvwGrid);
+        RealType[] reals = Util.ensureUnit(paramType.getRealComponents(),
+                CommonUnit.meterPerSecond);
+        RealTupleType earthVectorType = new EarthVectorType(reals[0],
+                reals[1], reals[2]);
+
+        return GridUtil.setParamType(uvwGrid, earthVectorType,
+                false /* copy */);
+    }
     /**
      * Make a grid of true flow vectors from grid relative u and v
      * components.
