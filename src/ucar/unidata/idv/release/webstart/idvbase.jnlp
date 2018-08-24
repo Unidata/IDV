@@ -12,7 +12,7 @@
         <jar href="IDV/jython.jar"/>
         <jar href="IDV/local-visad.jar"/>
         <jar href="IDV/visad.jar"/>
-        <extension name="Java3D" href="http://www.unidata.ucar.edu/software/idv/java3d/java3d-latest.jnlp"/>
+        <extension name="Java3D" href="https://www.unidata.ucar.edu/software/idv/java3d/java3d-latest.jnlp"/>
    </resources> 
    <component-desc>
    </component-desc> 
