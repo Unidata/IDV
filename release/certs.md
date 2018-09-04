@@ -9,6 +9,17 @@ There are three scenarios for which the IDV needs certificates:
 3.  code-signing the IDV MacOS executable
 
 
+## Certificate Expiration Dates
+
+| Certificate            | Expiration Date   |
+|---------------------- |----------------- |
+| windows.p12            | May 30, 2020      |
+| Java WebStart Keystore | May 30, 2020      |
+| MacOS .p12             | December 17, 2019 |
+
+Note that IDV releases usually happen in the spring so think ahead.
+
+
 ## Webstart and Windows
 
 
