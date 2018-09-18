@@ -6,7 +6,7 @@
        <information> 
          <title>Integrated Data Viewer for Unidata Training Workshops </title> 
          <vendor>Unidata</vendor> 
-         <homepage href="https://www.unidata.ucar.edu/software/IDV/index.html"/> 
+         <homepage href="https://www.unidata.ucar.edu/software/idv/"/> 
          <description>2006 Workshop IDV</description> 
          <description kind="short">Version of the IDV for the IDV Training Workshop
         </description> 
