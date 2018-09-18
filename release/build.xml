@@ -654,7 +654,7 @@ line using: and -Dbasedir=/some/other/dir
         <copy overwrite="true"  file="${from}" tofile="${to}"/>
         <jar update="true" file="${to}">
             <manifest>
-                <attribute name="Codebase" value=" http://www.unidata.ucar.edu/software/idv"/>
+                <attribute name="Codebase" value=" https://www.unidata.ucar.edu/software/idv"/>
                 <attribute name="Permissions" value="all-permissions"/>
                 <attribute name="Trusted-Only" value="true"/>
             </manifest>

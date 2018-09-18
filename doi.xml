@@ -99,7 +99,7 @@
 		<p:relatedIdentifier relatedIdentifierType="URL"
 			relationType="HasPart">http://www.ssec.wisc.edu/~billh/visad.html</p:relatedIdentifier>
 		<p:relatedIdentifier relatedIdentifierType="URL"
-			relationType="HasPart">http://www.unidata.ucar.edu/software/thredds/current/netcdf-java/</p:relatedIdentifier>
+			relationType="HasPart">https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/</p:relatedIdentifier>
 		<p:relatedIdentifier relatedIdentifierType="URL"
 			relationType="IsPartOf">http://www.ssec.wisc.edu/mcidas/software/v/</p:relatedIdentifier>
 	</p:relatedIdentifiers>
