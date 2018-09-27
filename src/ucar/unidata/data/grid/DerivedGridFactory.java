@@ -2984,6 +2984,43 @@ public class DerivedGridFactory {
     }
 
     /**
+     * @param  geoPH  one grid or a time sequence of geo potential height
+     *                   with a spatial domain that includes pressure
+     *                   in vertical
+     *
+     * @return computed pressure grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createPressureField(FieldImpl geoPH)
+            throws VisADException, RemoteException {
+        Boolean   ensble = GridUtil.hasEnsemble(geoPH);
+        boolean   isSequence = GridUtil.isTimeSequence(geoPH);
+        FlatField sample     = (FlatField) ((isSequence)
+                ? geoPH.getSample(0)
+                : geoPH);
+        FunctionType newFFType =
+                new FunctionType(((FunctionType) sample.getType()).getDomain(),
+                        AirPressure.getRealType());
+        FlatField press  = null;
+        FieldImpl newPress   = null;
+        if (ensble) {
+            FieldImpl sample1 = (FieldImpl) geoPH.getSample(0);
+            newPress =
+                    createPressureGrid( sample1);
+        } else {
+            if (GridUtil.isTimeSequence(geoPH) == true) {
+                newPress = createPressureGrid(geoPH);
+            } else {
+                newPress = createPressureGrid(geoPH);
+            }
+        }
+
+        return newPress;
+
+    }
+    /**
      * Convert the pressure field to use AirPressure.getRealType as the
      * parameter type, converting to hPa.
      *
@@ -3630,6 +3667,87 @@ public class DerivedGridFactory {
         return pressureFF;
     }
 
+    /**
+     * Every data grid with pressure as the z coord can be used
+     * to make a grid with pressure with the grid values as well
+     *
+     * @param ff  FieldImpl with pressure in grid domain
+     * @return  grid of pressures
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createPressureGrid(FieldImpl ff)
+            throws VisADException, RemoteException {
+
+        // Make a flatfield of same size with pressure of each grid point
+        // the domain set
+        Gridded3DSet domainSet3D = (Gridded3DSet)GridUtil.getSpatialDomain(ff);
+        Set timeSet =  ff.getDomainSet();
+
+        int[]        lengths     = domainSet3D.getLengths();
+
+        // make a new range realtype
+        Unit[]   rangeUnits = null;
+        RealType presRT     = AirPressure.getRealType();
+
+        // get all the samples for the 3rd (Z) coordinate
+        float[][] pressures = new float[][] {
+            (float[]) domainSet3D.getSamples()[2].clone()
+        };
+
+        // get the domain of the FlatField's type and the units
+        RealTupleType RTT   = ((FunctionType) (ff.getType())).getDomain();
+        Unit[] setUnit = domainSet3D.getSetUnits();
+        Unit          zUnit = setUnit[2];
+
+        if (Unit.canConvert(zUnit, CommonUnits.MILLIBAR)) {  // z is pressure
+
+            /* TODO: figure out why we don't handle non-default unit */
+
+            // rangeUnits = new Unit[]{ domainSet3D.getSetUnits()[2] };
+            pressures = new float[][] {
+                presRT.getDefaultUnit().toThis(pressures[0],
+                        domainSet3D.getSetUnits()[2])
+            };
+            rangeUnits = new Unit[] { presRT.getDefaultUnit() };
+        } else if (Unit.canConvert(zUnit, CommonUnit.meter)) {
+
+            /*
+             * pressures = Set.doubleToFloat(
+             *   AirPressure.getStandardAtmosphereCS().fromReference(
+             *       Set.floatToDouble(pressures),
+             *       new Unit[]{ domainSet3D.getSetUnits()[2] }));
+             */
+            pressures = AirPressure.getStandardAtmosphereCS().fromReference(
+                pressures, new Unit[] { domainSet3D.getSetUnits()[2] });
+            rangeUnits = new Unit[] { presRT.getDefaultUnit() };
+        } else {
+            throw new VisADException(
+                "can't create pressure from grid domain");
+        }
+        FunctionType rangeFT =
+                new FunctionType(((SetType) domainSet3D.getType()).getDomain(),
+                        presRT);
+        // make new function domain -> pressure
+        FunctionType funct = new FunctionType(RTT, rangeFT);
+        FieldImpl pressureFI = null;
+        for (int i = 0; i < timeSet.getLength(); i++) {
+            FlatField pressureFF = new FlatField(rangeFT, domainSet3D);
+                 //   (CoordinateSystem[]) null,
+                 //   (Set[]) null, rangeUnits);
+            pressureFF.setSamples(pressures, false);
+            if (i == 0) {  // first time through
+                pressureFI = new FieldImpl(funct, timeSet);
+            }
+
+            pressureFI.setSample(i, pressureFF, false);
+
+        }
+
+        return pressureFI;
+    }
+
 
     /**
      * This is not working, hope to do colored by and over topo at the same time
@@ -3885,6 +4003,198 @@ public class DerivedGridFactory {
             throws VisADException, RemoteException {
         return extractUVGridOverThetaTopoSurface(theta,  DerivedGridFactory.getUComponent(vector),
                 DerivedGridFactory.getVComponent(vector), theta0);
+    }
+
+    /**
+     * We interpolate gridded data to the theta surface and then calc the advection
+     * and create 2d topo of the advection result
+     *
+     * @param theta   FlatField with pressure in grid domain
+     * @param vector  FlatField with pressure in grid domain
+     * @param other   FlatField to be advected
+     * @param theta0  constant value
+     * @return  grid of altitude
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl extractGridADVOverThetaTopoSurface(FieldImpl theta, FieldImpl vector, FieldImpl other, float theta0)
+            throws VisADException, RemoteException {
+        boolean copy = true;
+        FieldImpl uField = DerivedGridFactory.getUComponent(vector);
+        FieldImpl vField = DerivedGridFactory.getVComponent(vector);
+        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                (FlatField) theta.getSample(0));;
+        FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
+        float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
+        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
+        if ((domainSet.getDimension() != 3)) {
+            throw new VisADException("slice is not 3D ");
+        }
+        Gridded2DSet new2DDomainSet = GridUtil.makeDomain2D(domainSet);
+
+        TupleType paramType1 = GridUtil.getParamType(uField);
+        TupleType paramType2 = GridUtil.getParamType(vField);
+        TupleType paramTypeo = GridUtil.getParamType(other);
+        FunctionType rangeFT =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        Altitude.getRealTupleType());
+        FunctionType rangeFT1 =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        paramType1);
+        FunctionType rangeFT2 =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        paramType2);
+        FunctionType rangeFTo =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        paramTypeo);
+
+        FieldImpl newFieldImpl = null;
+        FieldImpl newFieldImpl1 = null;
+        FieldImpl newFieldImpl2 = null;
+        FieldImpl newFieldImplo = null;
+        FieldImpl advFieldImpl = null;
+        if (GridUtil.isSequence(theta) ) {
+            // could be (time -> (domain -> value))   or
+            //          (time -> (index -> (domain -> value)))  or
+            //          (index -> (domain -> value))
+            try {
+
+                Set sequenceSet = Util.getDomainSet(theta);
+                int numSteps    = sequenceSet.getLength();
+                MathType sequenceType =
+                        ((SetType) sequenceSet.getType()).getDomain();
+
+                FieldImpl firstSample = (FieldImpl) theta.getSample(0, false);
+                boolean      hasInnerSteps = GridUtil.isSequence(firstSample);
+
+                FunctionType newFieldType;
+                FunctionType innerFieldType = null;
+                FunctionType newFieldType1;
+                FunctionType innerFieldType1 = null;
+                FunctionType newFieldType2;
+                FunctionType innerFieldType2 = null;
+                FunctionType newFieldTypeo;
+                FunctionType innerFieldTypeo = null;
+
+                if ( !(GridUtil.isSequence(firstSample))) {
+                    newFieldType = new FunctionType(sequenceType, rangeFT);
+                    newFieldType1 = new FunctionType(sequenceType, rangeFT1);
+                    newFieldType2 = new FunctionType(sequenceType, rangeFT2);
+                    newFieldTypeo = new FunctionType(sequenceType, rangeFTo);
+                } else {
+
+                    hasInnerSteps = true;
+                    innerFieldType = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT);
+                    newFieldType = new FunctionType(sequenceType,
+                            innerFieldType);
+
+                    innerFieldType1 = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT1);
+                    newFieldType1 = new FunctionType(sequenceType,
+                            innerFieldType1);
+
+                    innerFieldType2 = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT2);
+                    newFieldType2 = new FunctionType(sequenceType,
+                            innerFieldType2);
+
+                    innerFieldTypeo = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFTo);
+                    newFieldTypeo = new FunctionType(sequenceType,
+                            innerFieldTypeo);
+
+                }
+                newFieldImpl = new FieldImpl(newFieldType, sequenceSet);
+                newFieldImpl1 = new FieldImpl(newFieldType1, sequenceSet);
+                newFieldImpl2 = new FieldImpl(newFieldType2, sequenceSet);
+                newFieldImplo = new FieldImpl(newFieldTypeo, sequenceSet);
+                // get each grid in turn; change domain;
+                // set result into new sequence
+                for (int i = 0; i < numSteps; i++) {
+                    FieldImpl data = (FieldImpl) theta.getSample(i, false);
+                    FieldImpl dataU = (FieldImpl) uField.getSample(i, false);
+                    FieldImpl dataV = (FieldImpl) vField.getSample(i, false);
+                    FieldImpl dataO = (FieldImpl) other.getSample(i, false);
+
+                    //FieldImpl datap = (FieldImpl) hPI.getSample(i, false);
+
+
+                    FieldImpl fi;
+                    FieldImpl fi1;
+                    FieldImpl fi2;
+                    FieldImpl fio;
+                    if (data.isMissing()) {
+                        fi = data;
+                        fi1 = dataU;
+                        fi2 = dataV;
+                        fio = dataO;
+                    } else {
+                        float[][][] dataA  = convert3Darray((FlatField) data, 0);
+                        float[][][] dataAU = convert3Darray((FlatField) dataU, 0);
+                        float[][][] dataAV = convert3Darray((FlatField) dataV, 0);
+                        float[][][] dataAO = convert3Darray((FlatField) dataO, 0);
+
+                        int sizeX = ((Gridded3DSet) domainSet).getLengths()[0];
+                        int sizeY = ((Gridded3DSet) domainSet).getLengths()[1];
+                        float [][] newdata = new  float[1][sizeX*sizeY];
+                        float [][] newdataU = new  float[1][sizeX*sizeY];
+                        float [][] newdataV = new  float[1][sizeX*sizeY];
+                        float [][] newdataO = new  float[1][sizeX*sizeY];
+
+                        for (int jj = 0; jj < sizeY; jj++) {
+                            for (int ii = 0; ii < sizeX; ii++) {
+                                newdata[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                newdataU[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii], dataAU[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                newdataV[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii], dataAV[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                newdataO[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii], dataAO[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                            }
+                        }
+
+                        fi = new FlatField(rangeFT, new2DDomainSet);
+                        fi1 = new FlatField(rangeFT1, new2DDomainSet);
+                        fi2 = new FlatField(rangeFT2, new2DDomainSet);
+                        fio = new FlatField(rangeFTo, new2DDomainSet);
+                        ((FlatField) fi).setSamples(
+                                newdata, false);
+                        ((FlatField) fi1).setSamples(
+                                newdataU, false);
+                        ((FlatField) fi2).setSamples(
+                                newdataV, false);
+                        ((FlatField) fio).setSamples(
+                                newdataO, false);
+
+                    }
+                    newFieldImpl.setSample(i, fi);
+                    newFieldImpl1.setSample(i, fi1);
+                    newFieldImpl2.setSample(i, fi2);
+                    newFieldImplo.setSample(i, fio);
+                }
+                advFieldImpl = createHorizontalAdvection(newFieldImplo, newFieldImpl1, newFieldImpl2);
+
+            } catch (RemoteException re) {}
+        } else {  // single time
+            if ( !theta.isMissing()) {
+                newFieldImpl = new FlatField(rangeFT, new2DDomainSet);
+                try {
+                    ((FlatField) newFieldImpl).setSamples(
+                            theta.getFloats(copy), false);
+                } catch (RemoteException re) {}
+            } else {
+                newFieldImpl = theta;
+            }
+        }
+
+        return create2DTopography(  advFieldImpl ,  newFieldImpl);
+        //return create2DTopography( createFlowVectors(newFieldImpl1, newFieldImpl2),   newFieldImpl);
+
     }
     /**
      * Every data grid with pressure as the z coord can be used
