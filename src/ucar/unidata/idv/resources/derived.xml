@@ -441,6 +441,23 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
+          id="pressure"
+          description="Pressure(from %N1%)"
+          label="Atmosphere Pressure"
+          isdefault="true"
+          isenduser="false"
+          formula="DerivedGridFactory.createPressureField (D1)">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="Z"/>
+    </operands>
+  </derived>
+  <derived
      id="theta"
      description="Potential Temperature (from %N1%)"
      label="Potential Temperature"
@@ -512,6 +529,27 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
               childidx="0"
               categoryidx="0"/>
       <category value="isentropic3dv"/>
+
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"/>
+    </operands>
+  </derived>
+  <derived
+          id="_thetaSurfaceAdvection"
+          description="Potential Temperature IsoSurface Advection (from %N1%)"
+          label="Advection Analysis on Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurfaceADV(D1, vector, other, user_Theta[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic3d"/>
 
     </categories>
     <operands categories="GRID-3D-*;">
