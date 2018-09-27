@@ -145,7 +145,7 @@ cp index.html.<version> index.html
 (If you have to redo the release, index.html will get overwritten.  That's why
 we make the edits in index.html.<version>)
 
-Open http://www.unidata.ucar.edu/software/idv/<release_dir> in a web browser.
+Open https://www.unidata.ucar.edu/software/idv/<release_dir> in a web browser.
 Test all the links to the docs.  Fix any broken links.
 
 ********************************************************************************
@@ -188,11 +188,11 @@ support-announce@unidata.ucar.edu
 
 Dear IDV User Community,
 
-IDV XXXX is now available for download <http://www.unidata.ucar.edu/downloads/idv/XXXXX/>.
+IDV XXXX is now available for download <https://www.unidata.ucar.edu/downloads/idv/XXXXX/>.
 
 [Info about the release]
 
-See the release notes <http://www.unidata.ucar.edu/software/idv/docs/userguide/ReleaseNotes.html>
+See the release notes <https://www.unidata.ucar.edu/software/idv/docs/userguide/ReleaseNotes.html>
 for a complete list of new features.
 
 Best Regards,
@@ -378,7 +378,7 @@ https://forums.oracle.com/forums/thread.jspa?messageID=9882107
 
 Unidata now host those jars here signed with our own certificate.
 
-http://www.unidata.ucar.edu/software/idv/java3d/java3d-latest.jnlp
+https://www.unidata.ucar.edu/software/idv/java3d/java3d-latest.jnlp
 
 Please note that when the certificates expire it will be necessary to resign those
 jars.
