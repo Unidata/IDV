@@ -556,7 +556,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <params p1="THETA"/>
     </operands>
   </derived>
-  <derived
+  <!--derived
      id="thetaP"
      description="Potential Temperature (from %N1% &amp; %N2%)"
      label="Potential Temperature"
@@ -572,7 +572,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories="GRID-3D-*;">
       <paramgroup name="temp_and_pressure"/>
     </operands>
-  </derived>
+  </derived-->
   <derived
      id="horizontaldivergence"
      description="Horizontal Divergence (from %N1% &amp; %N2%)"
