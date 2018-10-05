@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" location="./ecmf_2011032700_rh.nc">
+<netcdf xmlns="https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" location="./ecmf_2011032700_rh.nc">
   <dimension name="time" orgName="z" length="29" isUnlimited="true" />
 
   <variable name="Time" orgName="ForecastHour" shape="time" type="short">
