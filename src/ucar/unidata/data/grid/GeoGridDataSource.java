@@ -1198,6 +1198,8 @@ public class GeoGridDataSource extends GridDataSource {
             Trace.msg("GeoGridDataSource: opening file " + file);
             if (file.startsWith("http") && file.endsWith("entry.das")) {  // opendap from ramadda
                 file = DODSNetcdfFile.canonicalURL(file);
+            } else if(file.startsWith("http") && file.contains("/dods/")){
+                file = DODSNetcdfFile.canonicalURL(file);
             }
             GridDataset gds = GridDataset.open(file);
             return gds;
