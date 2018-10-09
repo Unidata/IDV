@@ -1639,7 +1639,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return http url resource base
      */
     public String getResourceUrlBase() {
-        return "http://www.unidata.ucar.edu/georesources";
+        return "https://www.unidata.ucar.edu/georesources";
     }
 
 
