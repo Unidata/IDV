@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1639,7 +1639,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
      * @return http url resource base
      */
     public String getResourceUrlBase() {
-        return "http://www.unidata.ucar.edu/georesources";
+        return "https://www.unidata.ucar.edu/georesources";
     }
 
 

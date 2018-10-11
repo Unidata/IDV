@@ -27,7 +27,7 @@ they essentially get it from their container type tag.
   </server>
   <server name="atm.ucar.edu" active="true">
     <group
-            names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+            names="RTIMAGES,BLIZZARD,RTGOESR,NPGOESR,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
             type="image"/>
     <group
             names="RTNEXRAD, NEXRALL"
@@ -60,6 +60,11 @@ they essentially get it from their container type tag.
     <group
        names="RTWXTEXT"
        type="wxtext"/>
+  </server>
+  <server name="lead.unidata.ucar.edu">
+    <group
+            names="RTGOESR,NPGOESR"
+            type="image"/>
   </server>
 <!--
   <server name="weather2.admin.niu.edu">

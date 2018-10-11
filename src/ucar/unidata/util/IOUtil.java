@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for Atmospheric Research
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for Atmospheric Research
  * Copyright 2010-2015 Jeff McWhirter
  * 
  * This library is free software; you can redistribute it and/or modify it
@@ -1358,6 +1358,22 @@ public class IOUtil {
      */
     public static InputStream getInputStream(String filename, Class origin)
             throws FileNotFoundException, IOException {
+        return getInputStream(filename, origin, 0);
+    }
+
+    /**
+     * Get an input stream for the filename
+     *
+     * @param filename    name of file
+     * @param origin      relative origin point for file location
+     * @param tries        keeps track of the multiple URL fetches on a redirect
+     * @return  corresponding input stream
+     *
+     * @throws FileNotFoundException     couldn't find the file
+     * @throws IOException               problem opening stream
+     */
+    private static InputStream getInputStream(String filename, Class origin, int tries)
+            throws FileNotFoundException, IOException {
         try {
             URL url = getURL(filename, origin);
             if (url != null) {
@@ -1368,8 +1384,29 @@ public class IOUtil {
                                      HTTP_TIMEOUT,
                                      MAX_REDIRECTS,
                                      HTTP_REDIRECT_STATUSES);
+ 
                 if (connection instanceof HttpURLConnection) {
                     HttpURLConnection huc = (HttpURLConnection) connection;
+                    int response = huc.getResponseCode();
+                    //Check for redirect
+                    if (response == HttpURLConnection.HTTP_MOVED_TEMP
+                        || response == HttpURLConnection.HTTP_MOVED_PERM
+                        || response == HttpURLConnection.HTTP_SEE_OTHER) {
+                        String newUrl = connection.getHeaderField("Location");
+                        //Don't follow too many redirects
+                        if(tries>10) {
+                            throw new IllegalArgumentException ("Too many nested URL fetches:" + filename);
+                        }
+                        //call this method recursively with the new URL
+                        return getInputStream(newUrl, origin, tries+1);
+                        /* 
+                           connection = new URL(newUrl).openConnection();
+                           connection.setReadTimeout(30000); 
+                           connection.setAllowUserInteraction(true);
+                           huc = (HttpURLConnection) connection;
+                        */
+                    }
+
                     if (huc.getResponseCode() == 401) {
                         String auth =
                             connection.getHeaderField("WWW-Authenticate");

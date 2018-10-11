@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -27,6 +27,7 @@ import ucar.unidata.data.grid.GridMath;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.Range;
 
+import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
@@ -1104,6 +1105,15 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     && useSpeedForColor) {
                 FieldImpl uFimpl = DerivedGridFactory.getUComponent(field);
                 FieldImpl vFimpl = DerivedGridFactory.getVComponent(field);
+
+                if(!GridUtil.getParamUnits(vFimpl)[0].isConvertible(CommonUnit.meterPerSecond)){
+                    if(GridUtil.getParamUnits(uFimpl).length == 2 &&
+                            GridUtil.getParamUnits(uFimpl)[0].isConvertible(CommonUnit.meterPerSecond) &&
+                            GridUtil.getParamUnits(uFimpl)[1].isConvertible(CommonUnit.meterPerSecond)){
+                        vFimpl = DerivedGridFactory.getVComponent(uFimpl);
+                        uFimpl = DerivedGridFactory.getUComponent(uFimpl);
+                    }
+                }
                 FieldImpl speedImpl =
                     DerivedGridFactory.createWindSpeed(uFimpl, vFimpl);
                 field = DerivedGridFactory.combineGrids(field, speedImpl);
@@ -1145,11 +1155,29 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 }
             } catch (VisADException ve) {}
         }
+
         setData((newParamType == null)
                 ? field
                 : GridUtil.setParamType(field, newParamType, false));
+
         setType(rtt);
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param topo _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
+    public void loadTopoData(FieldImpl topo)
+            throws VisADException, RemoteException {
+        if (flowControl != null) {
+            TrajectoryParams tparm = flowControl.getTrajectoryParams();
+            tparm.setTerrain(((GeoGridFlatField) topo.getSample(0)));
+        }
     }
 
     /**

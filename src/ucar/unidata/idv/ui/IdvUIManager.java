@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1694,86 +1694,104 @@ public class IdvUIManager extends IdvManager {
      */
     protected void handleMenuSelected(String id, JMenu menu,
                                       IdvWindow idvWindow) {
-        if (id.equals("file.new")) {
-            if (idvWindow == null) {
-                return;
-            }
-            List<IdvComponentGroup> groups = idvWindow.getComponentGroups();
-            if (groups.size() == 0) {
-                return;
-            }
-            int i = 0;
-            //a hack to remove the last group menu we created
-            while (i < menu.getItemCount()) {
-                JMenuItem mi = menu.getItem(i);
-                if (mi.getLabel().startsWith("Group:")) {
-                    menu.remove(mi);
-                    break;
+        switch (id) {
+            case "file.new":
+                if (idvWindow == null) {
+                    return;
                 }
-                i++;
-            }
+                List<IdvComponentGroup> groups = idvWindow.getComponentGroups();
+                if (groups.size() == 0) {
+                    return;
+                }
+                int i = 0;
+                //a hack to remove the last group menu we created
+                while (i < menu.getItemCount()) {
+                    JMenuItem mi = menu.getItem(i);
+                    if (mi.getLabel().startsWith("Group:")) {
+                        menu.remove(mi);
+                        break;
+                    }
+                    i++;
+                }
 
-            for (IdvComponentGroup group : groups) {
-                List items = new ArrayList();
-                group.getPopupMenuItems(items);
-                JMenu groupMenu = new JMenu("Group: " + group.getName());
-                GuiUtils.makeMenu(groupMenu, items);
-                menu.insert(groupMenu, 0);
-            }
-        } else if (id.equals(MENU_WINDOWS)) {
-            menu.removeAll();
-            makeWindowsMenu(menu, idvWindow);
-        } else if (id.equals("file.newdata") || id.equals("data.newdata")) {
-            menu.removeAll();
-            GuiUtils.makeMenu(
-                menu,
-                getIdvChooserManager().makeChooserMenus(new ArrayList()));
-        } else if (id.equals("data.special")) {
-            menu.removeAll();
-            List menus = new ArrayList();
-            for (DataSourceDescriptor descriptor :
-                    getDataManager().getStandaloneDescriptors()) {
-                menus.add(GuiUtils.makeMenuItem(descriptor.getLabel(),
-                        getIdv(), "makeDataSource", descriptor));
-            }
-            GuiUtils.makeMenu(menu, menus);
-        } else if (id.equals(MENU_NEWVIEWS)) {
-            menu.removeAll();
-            makeViewStateMenu(menu);
-        } else if (id.equals(MENU_HISTORY)) {
-            historyMenuSelected(menu);
+                for (IdvComponentGroup group : groups) {
+                    List items = new ArrayList();
+                    group.getPopupMenuItems(items);
+                    JMenu groupMenu = new JMenu("Group: " + group.getName());
+                    GuiUtils.makeMenu(groupMenu, items);
+                    menu.insert(groupMenu, 0);
+                }
+                break;
+            case MENU_WINDOWS:
+                menu.removeAll();
+                makeWindowsMenu(menu, idvWindow);
+                break;
+            case "file.newdata":
+            case "data.newdata":
+                menu.removeAll();
+                GuiUtils.makeMenu(
+                        menu,
+                        getIdvChooserManager().makeChooserMenus(new ArrayList()));
+                break;
+            case "data.special":
+                menu.removeAll();
+                List menus = new ArrayList();
+                for (DataSourceDescriptor descriptor :
+                        getDataManager().getStandaloneDescriptors()) {
+                    menus.add(GuiUtils.makeMenuItem(descriptor.getLabel(),
+                            getIdv(), "makeDataSource", descriptor));
+                }
+                GuiUtils.makeMenu(menu, menus);
+                break;
+            case MENU_NEWVIEWS:
+                menu.removeAll();
+                makeViewStateMenu(menu);
+                break;
+            case MENU_HISTORY:
+                historyMenuSelected(menu);
 
-        } else if (id.equals(MENU_EDITFORMULAS)) {
-            editFormulasMenuSelected(menu);
-        } else if (id.equals(MENU_DELETEHISTORY)) {
-            deleteHistoryMenuSelected(menu);
-        } else if (id.equals(MENU_DELETEVIEWS)) {
-            menu.removeAll();
-            makeDeleteViewsMenu(menu);
-        } else if (id.equals(MENU_DISPLAYS)) {
-            menu.removeAll();
-            initializeDisplayMenu(menu);
-        } else if (id.equals(MENU_MAPS)) {
-            if (menu.getItemCount() == 0) {
-                processMapMenu(menu, false);
-            }
-        } else if (id.equals(MENU_LOCATIONS)) {
-            if (menu.getItemCount() == 0) {
-                Msg.addDontComponent(menu);
-                processStationMenu(menu, false);
-            }
-        } else if (id.equals(MENU_SPECIAL)) {
-            if (menu.getItemCount() == 0) {
-                processStandAloneMenu(menu, false);
-            }
-        } else if (id.equals(MENU_VIEW)) {
-            //            menu.removeAll();
-            //            initializeViewMenu(menu);
-        } else if (id.equals(MENU_DATA)) {
-            updateDataMenu(menu);
-        } else if (id.equals(MENU_BUNDLES)) {
-            menu.removeAll();
-            initializeBundleMenu(menu);
+                break;
+            case MENU_EDITFORMULAS:
+                editFormulasMenuSelected(menu);
+                break;
+            case MENU_DELETEHISTORY:
+                deleteHistoryMenuSelected(menu);
+                break;
+            case MENU_DELETEVIEWS:
+                menu.removeAll();
+                makeDeleteViewsMenu(menu);
+                break;
+            case MENU_DISPLAYS:
+                menu.removeAll();
+                initializeDisplayMenu(menu);
+                break;
+            case MENU_MAPS:
+                if (menu.getItemCount() == 0) {
+                    processMapMenu(menu, false);
+                }
+                break;
+            case MENU_LOCATIONS:
+                if (menu.getItemCount() == 0) {
+                    Msg.addDontComponent(menu);
+                    processStationMenu(menu, false);
+                }
+                break;
+            case MENU_SPECIAL:
+                if (menu.getItemCount() == 0) {
+                    processStandAloneMenu(menu, false);
+                }
+                break;
+            case MENU_VIEW:
+                //            menu.removeAll();
+                //            initializeViewMenu(menu);
+                break;
+            case MENU_DATA:
+                updateDataMenu(menu);
+                break;
+            case MENU_BUNDLES:
+                menu.removeAll();
+                initializeBundleMenu(menu);
+                break;
         }
     }
 
@@ -1788,12 +1806,16 @@ public class IdvUIManager extends IdvManager {
      */
     protected void handleMenuDeSelected(String id, JMenu menu,
                                         IdvWindow idvWindow) {
-        if (id.equals(MENU_DISPLAYS)) {
-            menu.removeAll();
-        } else if (id.equals(MENU_BUNDLES)) {
-            menu.removeAll();
-        } else if (id.equals(MENU_DATA)) {
-            menu.removeAll();
+        switch (id) {
+            case MENU_DISPLAYS:
+                menu.removeAll();
+                break;
+            case MENU_BUNDLES:
+                menu.removeAll();
+                break;
+            case MENU_DATA:
+                menu.removeAll();
+                break;
         }
     }
 
@@ -5762,91 +5784,100 @@ public class IdvUIManager extends IdvManager {
             persistentCbxs.add(cbx);
             JComponent field     = null;
             JComponent fieldComp = null;
-            if (fieldType.equals(FIELDTYPE_TEXT)) {
-                String rowString = (String) operand.getProperty("rows");
-                if (rowString == null) {
-                    rowString = "1";
+            switch (fieldType) {
+                case FIELDTYPE_TEXT:
+                    String rowString = (String) operand.getProperty("rows");
+                    if (rowString == null) {
+                        rowString = "1";
+                    }
+                    int rows = new Integer(rowString).intValue();
+                    if (rows == 1) {
+                        field = new JTextField((dflt != null)
+                                ? dflt.toString()
+                                : "", 15);
+                    } else {
+                        field = new JTextArea((dflt != null)
+                                ? dflt.toString()
+                                : "", rows, 15);
+                        fieldComp = GuiUtils.makeScrollPane(field, 200, 100);
+                    }
+                    break;
+                case FIELDTYPE_BOOLEAN:
+                    field = new JCheckBox("", ((dflt != null)
+                            ? new Boolean(
+                            dflt.toString()).booleanValue()
+                            : true));
+                    break;
+                case FIELDTYPE_CHOICE: {
+                    String choices = (String) operand.getProperty("choices");
+                    if (choices == null) {
+                        throw new IllegalArgumentException(
+                                "No 'choices' attribute defined for operand: "
+                                        + operand);
+                    }
+                    List l = StringUtil.split(choices, ";", true, true);
+                    field = new JComboBox(new Vector(l));
+                    if ((dflt != null) && l.contains(dflt)) {
+                        ((JComboBox) field).setSelectedItem(dflt);
+                    }
+                    break;
                 }
-                int rows = new Integer(rowString).intValue();
-                if (rows == 1) {
-                    field = new JTextField((dflt != null)
-                                           ? dflt.toString()
-                                           : "", 15);
-                } else {
-                    field     = new JTextArea((dflt != null)
+                case FIELDTYPE_FILE:
+                    JTextField fileFld = new JTextField(((dflt != null)
                             ? dflt.toString()
-                            : "", rows, 15);
-                    fieldComp = GuiUtils.makeScrollPane(field, 200, 100);
-                }
-            } else if (fieldType.equals(FIELDTYPE_BOOLEAN)) {
-                field = new JCheckBox("", ((dflt != null)
-                                           ? new Boolean(
-                                           dflt.toString()).booleanValue()
-                                           : true));
-            } else if (fieldType.equals(FIELDTYPE_CHOICE)) {
-                String choices = (String) operand.getProperty("choices");
-                if (choices == null) {
-                    throw new IllegalArgumentException(
-                        "No 'choices' attribute defined for operand: "
-                        + operand);
-                }
-                List l = StringUtil.split(choices, ";", true, true);
-                field = new JComboBox(new Vector(l));
-                if ((dflt != null) && l.contains(dflt)) {
-                    ((JComboBox) field).setSelectedItem(dflt);
-                }
-            } else if (fieldType.equals(FIELDTYPE_FILE)) {
-                JTextField fileFld = new JTextField(((dflt != null)
-                        ? dflt.toString()
-                        : ""), 30);
-                field = fileFld;
-                String patterns = operand.getProperty("filepattern");
-                List   filters  = null;
-                if (patterns != null) {
-                    filters = new ArrayList();
-                    List toks = StringUtil.split(patterns, ";", true, true);
-                    for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
-                        String tok   = (String) toks.get(tokIdx);
-                        List subToks = StringUtil.split(tok, ":", true, true);
-                        if (subToks.size() == 2) {
-                            filters.add(
-                                new PatternFileFilter(
-                                    (String) subToks.get(0),
-                                    (String) subToks.get(1)));
-                        } else {
-                            filters.add(new PatternFileFilter(tok, tok));
+                            : ""), 30);
+                    field = fileFld;
+                    String patterns = operand.getProperty("filepattern");
+                    List filters = null;
+                    if (patterns != null) {
+                        filters = new ArrayList();
+                        List toks = StringUtil.split(patterns, ";", true, true);
+                        for (int tokIdx = 0; tokIdx < toks.size(); tokIdx++) {
+                            String tok = (String) toks.get(tokIdx);
+                            List subToks = StringUtil.split(tok, ":", true, true);
+                            if (subToks.size() == 2) {
+                                filters.add(
+                                        new PatternFileFilter(
+                                                (String) subToks.get(0),
+                                                (String) subToks.get(1)));
+                            } else {
+                                filters.add(new PatternFileFilter(tok, tok));
+                            }
                         }
                     }
-                }
-                fieldComp = GuiUtils.centerRight(GuiUtils.hfill(fileFld),
-                        GuiUtils.makeFileBrowseButton(fileFld, filters));
-            } else if (fieldType.equals(FIELDTYPE_LOCATION)) {
-                List l = ((dflt != null)
-                          ? StringUtil.split(dflt.toString(), ";", true, true)
-                          : (List) new ArrayList());
-                final LatLonWidget llw = new LatLonWidget();
-                field = llw;
-                if (l.size() == 2) {
-                    llw.setLat(Misc.decodeLatLon(l.get(0).toString()));
-                    llw.setLon(Misc.decodeLatLon(l.get(1).toString()));
-                }
-                final JButton centerPopupBtn =
-                    GuiUtils.getImageButton("/auxdata/ui/icons/Map16.gif",
-                                            getClass());
-                centerPopupBtn.setToolTipText("Center on current displays");
-                centerPopupBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        popupCenterMenu(centerPopupBtn, llw);
+                    fieldComp = GuiUtils.centerRight(GuiUtils.hfill(fileFld),
+                            GuiUtils.makeFileBrowseButton(fileFld, filters));
+                    break;
+                case FIELDTYPE_LOCATION: {
+                    List l = ((dflt != null)
+                            ? StringUtil.split(dflt.toString(), ";", true, true)
+                            : (List) new ArrayList());
+                    final LatLonWidget llw = new LatLonWidget();
+                    field = llw;
+                    if (l.size() == 2) {
+                        llw.setLat(Misc.decodeLatLon(l.get(0).toString()));
+                        llw.setLon(Misc.decodeLatLon(l.get(1).toString()));
                     }
-                });
-                JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
-                                             new Insets(0, 0, 0, 4));
-                fieldComp = GuiUtils.hbox(llw, centerPopup);
-            } else if (fieldType.equals(FIELDTYPE_AREA)) {
-                //TODO:
-            } else {
-                throw new IllegalArgumentException("Unknown type: "
-                        + fieldType + " for operand: " + operand);
+                    final JButton centerPopupBtn =
+                            GuiUtils.getImageButton("/auxdata/ui/icons/Map16.gif",
+                                    getClass());
+                    centerPopupBtn.setToolTipText("Center on current displays");
+                    centerPopupBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            popupCenterMenu(centerPopupBtn, llw);
+                        }
+                    });
+                    JComponent centerPopup = GuiUtils.inset(centerPopupBtn,
+                            new Insets(0, 0, 0, 4));
+                    fieldComp = GuiUtils.hbox(llw, centerPopup);
+                    break;
+                }
+                case FIELDTYPE_AREA:
+                    //TODO:
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown type: "
+                            + fieldType + " for operand: " + operand);
             }
 
             fields.add(field);
@@ -6275,7 +6306,7 @@ public class IdvUIManager extends IdvManager {
                 String[] results =
                     HttpFormEntry.doPost(
                         entriesToPost,
-                        "http://www.unidata.ucar.edu/support/requestSupport.jsp");
+                        "https://www.unidata.ucar.edu/support/requestSupport.jsp");
                 if (results[0] != null) {
                     GuiUtils.showHtmlDialog(
                         results[0], "Support Request Response - Error",

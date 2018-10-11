@@ -162,6 +162,7 @@
 <station idn="000334" id="LGX" name="Langley Hill" st="WA" co="US" lat="47:07:48" lon="-124:05:59" elev="76"/>
 <station idn="000379" id="OUN" name="Norman KOUN" st="OK" co="US" lat="35:14:09" lon="-97:27:43" elev="370"/>
 <station idn="000278" id="CRI" name="Norman KCRI" st="OK" co="US" lat="35:14:17" lon="-97:27:36" elev="394"/>
+<station idn="000701" id="KJK" name="Kunsan, Korea" co="KP" lat="35:55:27" lon="126:37:19" elev="78"/>
+<station idn="000702" id="KSG" name="Camp Humphreys, Korea" co="KP" lat="36:57:34" lon="127:01:05" elev="52"/>
+<station idn="000703" id="ODN" name="KADENA, Japan" co="JP" lat="26:18:07" lon="127:54:35" elev="66"/>
 </stationtable>
-
-        

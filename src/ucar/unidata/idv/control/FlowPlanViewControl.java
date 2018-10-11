@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -281,7 +281,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
             List              choices0 = ddc.getChoices();
 
-            if (choices0.size() == 3) {
+            if (choices0.size() == 3 && choices0.get(0) instanceof DirectDataChoice) {
                 DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
                 DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
                 DirectDataChoice wdc = (DirectDataChoice) choices0.get(2);

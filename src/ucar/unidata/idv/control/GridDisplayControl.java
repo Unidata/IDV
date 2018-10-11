@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -573,6 +573,26 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         nd.addVerticalMap(topoType);
     }
 
+    /**
+     * Add a topography map for the parameter at the specified index
+     *
+     * @param type  the RealType to use
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException Unable to set the ScalarMap
+     */
+    protected void addTopographyMap(RealType type)
+            throws VisADException, RemoteException {
+        NavigatedDisplay nd = getNavigatedDisplay();
+        if (nd == null) {
+            return;
+        }
+        if (topoType != null) {
+            nd.removeVerticalMap(topoType);
+        }
+        topoType = type;
+        nd.addVerticalMap(topoType);
+    }
     /**
      * Deal with action event commands from the levels and contours buttons
      * made by this class.

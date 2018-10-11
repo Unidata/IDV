@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -44,14 +44,7 @@ import ucar.visad.display.ScalarMapSet;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.ZSelector;
 
-import visad.Data;
-import visad.DisplayRealType;
-import visad.FieldImpl;
-import visad.Real;
-import visad.RealType;
-import visad.ScalarMap;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
@@ -125,6 +118,9 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
     /** level enabled */
     private boolean levelEnabled = false;
+
+    /** 2D enabled */
+    private boolean is2D = false;
 
     /** level enabled */
     private boolean ignoreVerticalDimension = false;
@@ -899,7 +895,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
             currentLevelAnimation = false;
             cycleLevelsCbx.setSelected(false);
         }
-
+        if(is2D){
+            levelEnabled = false;
+            currentLevelAnimation = false;
+            cycleLevelsCbx.setSelected(false);
+        }
         if (levelBox == null) {
             return;
         }
@@ -1388,10 +1388,28 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 retField = GridUtil.subset(retField, getSkipValue() + 1);
             }
             // apply smoothing
+            boolean isMTopo = getMultipleIsTopography();
             if (checkFlag(FLAG_SMOOTHING)
                     && !getSmoothingType().equals(LABEL_NONE)) {
+
                 retField = GridUtil.smooth(retField, getSmoothingType(),
                                            getSmoothingFactor());
+
+            }
+
+            if (isMTopo) {
+                try {
+                    MathType[] rt= (MathType[])(GridUtil.getParamType(retField).getComponents());
+                    RealType rt0;
+                    if(rt[1] instanceof RealTupleType){
+                        RealTupleType rtt = (RealTupleType)rt[1];
+                        rt0 = (RealType)rtt.getComponent(0);
+                    } else {
+                        rt0 = (RealType)rt[1];
+                    }
+
+                    addTopographyMap(rt0);
+                } catch (Exception e){}
             }
         }
         //System.out.println("slice for " + paramName + " = " + retField);
@@ -1433,7 +1451,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected boolean checkFlag(int f) {
         if (f == FLAG_SMOOTHING) {
-            return super.checkFlag(f) && !getMultipleIsTopography();
+            return super.checkFlag(f)  ;
         }
         return super.checkFlag(f);
     }
@@ -1479,7 +1497,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
     public void getLegendLabels(List labels, int legendType) {
         super.getLegendLabels(labels, legendType);
         // TODO: - should this only be for side legends?
-        if (currentLevel != null) {
+        if (currentLevel != null && !is2D) {
             labels.add("Level: " + formatLevel(currentLevel));
         }
         /*
@@ -1714,7 +1732,23 @@ public abstract class PlanViewControl extends GridDisplayControl {
                && !getParameterIsTopography();
     }
 
+    /**
+     * Set the  property.
+     *
+     * @param v true if it is 2D
+     */
+    public void setIs2D(boolean v) {
+        is2D = v;
+    }
 
+    /**
+     * Get the property.
+     *
+     * @return true if this is 2D data
+     */
+    public boolean getIs2D( ) {
+        return is2D;
+    }
     /**
      * Set the text for the level readout in the control window.
      *

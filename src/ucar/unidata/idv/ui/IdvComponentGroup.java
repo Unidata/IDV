@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -356,50 +356,61 @@ public class IdvComponentGroup extends ComponentGroup {
 
         try {
             ComponentHolder comp = null;
-            if (what.equals(IdvUIManager.COMP_MAPVIEW)) {
-                ViewManager vm = new MapViewManager(idv,
-                                     new ViewDescriptor(),
-                                     "showControlLegend=false");
-                idv.getVMManager().addViewManager(vm);
-                comp = new IdvComponentHolder(idv, vm);
-            } else if (what.equals(IdvUIManager.COMP_GLOBEVIEW)) {
-                MapViewManager vm = new MapViewManager(idv,
-                                        new ViewDescriptor(),
-                                        "showControlLegend=false");
-                vm.setUseGlobeDisplay(true);
-                idv.getVMManager().addViewManager(vm);
-                comp = new IdvComponentHolder(idv, vm);
-            } else if (what.equals(IdvUIManager.COMP_TRANSECTVIEW)) {
-                ViewManager vm = new TransectViewManager(idv,
-                                     new ViewDescriptor(),
-                                     "showControlLegend=false");
-                idv.getVMManager().addViewManager(vm);
-                comp = new IdvComponentHolder(idv, vm);
-            } else if (what.equals(IdvUIManager.COMP_COMPONENT_CHOOSERS)) {
-                comp = new IdvComponentHolder(idv, "choosers");
-                comp.setName("Data Choosers");
-                ((IdvComponentHolder) comp).setType(
-                    IdvComponentHolder.TYPE_CHOOSERS);
-            } else if (what.equals(IdvUIManager.COMP_DATASELECTOR)) {
-                comp = new IdvComponentHolder(idv,
-                        idv.getIdvUIManager().createDataSelector(false,
-                            false));
-            } else if (what.equals(IdvUIManager.COMP_COMPONENT_GROUP)) {
-                String name = GuiUtils.getInput("Enter name for tab group",
-                                  "Name: ", "Group");
-                if (name == null) {
-                    return;
+            switch (what) {
+                case IdvUIManager.COMP_MAPVIEW: {
+                    ViewManager vm = new MapViewManager(idv,
+                            new ViewDescriptor(),
+                            "showControlLegend=false");
+                    idv.getVMManager().addViewManager(vm);
+                    comp = new IdvComponentHolder(idv, vm);
+                    break;
                 }
-                IdvComponentGroup group = new IdvComponentGroup(idv, name);
-                group.setLayout(group.LAYOUT_TABS);
-                comp = group;
-            } else if (what.equals(IdvUIManager.COMP_COMPONENT_HTML)) {
-                String text = GuiUtils.getInput("Enter html", "Html: ", "");
-                if (text == null) {
-                    return;
+                case IdvUIManager.COMP_GLOBEVIEW: {
+                    MapViewManager vm = new MapViewManager(idv,
+                            new ViewDescriptor(),
+                            "showControlLegend=false");
+                    vm.setUseGlobeDisplay(true);
+                    idv.getVMManager().addViewManager(vm);
+                    comp = new IdvComponentHolder(idv, vm);
+                    break;
                 }
-                comp = new HtmlComponent("Html Text", text);
-                comp.setShowHeader(false);
+                case IdvUIManager.COMP_TRANSECTVIEW: {
+                    ViewManager vm = new TransectViewManager(idv,
+                            new ViewDescriptor(),
+                            "showControlLegend=false");
+                    idv.getVMManager().addViewManager(vm);
+                    comp = new IdvComponentHolder(idv, vm);
+                    break;
+                }
+                case IdvUIManager.COMP_COMPONENT_CHOOSERS:
+                    comp = new IdvComponentHolder(idv, "choosers");
+                    comp.setName("Data Choosers");
+                    ((IdvComponentHolder) comp).setType(
+                            IdvComponentHolder.TYPE_CHOOSERS);
+                    break;
+                case IdvUIManager.COMP_DATASELECTOR:
+                    comp = new IdvComponentHolder(idv,
+                            idv.getIdvUIManager().createDataSelector(false,
+                                    false));
+                    break;
+                case IdvUIManager.COMP_COMPONENT_GROUP:
+                    String name = GuiUtils.getInput("Enter name for tab group",
+                            "Name: ", "Group");
+                    if (name == null) {
+                        return;
+                    }
+                    IdvComponentGroup group = new IdvComponentGroup(idv, name);
+                    group.setLayout(group.LAYOUT_TABS);
+                    comp = group;
+                    break;
+                case IdvUIManager.COMP_COMPONENT_HTML:
+                    String text = GuiUtils.getInput("Enter html", "Html: ", "");
+                    if (text == null) {
+                        return;
+                    }
+                    comp = new HtmlComponent("Html Text", text);
+                    comp.setShowHeader(false);
+                    break;
             }
             if (comp != null) {
                 addComponent(comp);

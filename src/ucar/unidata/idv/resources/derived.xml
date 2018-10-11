@@ -202,6 +202,26 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
+          id="flowvectors3dT"
+          description="3D True Wind Vectors (from %N1% &amp; %N2% &amp; %N3%)"
+          label="3D True Wind Vectors"
+          isdefault="true"
+          isenduser="false"
+          formula="DerivedGridFactory.createTrueFlowVectors(D1, D2, D3)">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="flowvector3d"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <paramgroup name="u_v_w"/>
+      <paramgroup name="GridRelative_uvw"/>
+    </operands>
+  </derived>
+  <derived
      id="truewindvectors"
      description="True Wind vectors (from %N1% &amp; %N2%)"
      label="True Wind vectors"
@@ -421,6 +441,23 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
+          id="pressure"
+          description="Pressure(from %N1%)"
+          label="Atmosphere Pressure"
+          isdefault="true"
+          isenduser="false"
+          formula="DerivedGridFactory.createPressureField (D1)">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="Z"/>
+    </operands>
+  </derived>
+  <derived
      id="theta"
      description="Potential Temperature (from %N1%)"
      label="Potential Temperature"
@@ -438,6 +475,88 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
+          id="iso_theta_surface"
+          description="Potential Temperature IsoSurface(from %N1%)"
+          label="Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurface(D1, user_Theta[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic2dv"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"/>
+    </operands>
+  </derived>
+  <derived
+          id="_thetaSurfaceAnalysis"
+          description="Potential Temperature IsoSurface Scalar Analysis(from %N1%)"
+          label="Analysis on Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurfaceA(D1, Parameter, user_Theta[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic3d"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"/>
+    </operands>
+  </derived>
+  <derived
+          id="_thetaSurfaceVAnalysis"
+          description="Potential Temperature IsoSurface Vector Analysis(from %N1%)"
+          label="Vector Analysis on Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurfaceV(D1, vector, user_Theta[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic3dv"/>
+
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"/>
+    </operands>
+  </derived>
+  <derived
+          id="_thetaSurfaceAdvection"
+          description="Potential Temperature IsoSurface Advection (from %N1%)"
+          label="Advection Analysis on Potential Temperature Surface"
+          isdefault="true"
+          isenduser="false"
+          properties="requiresvolume=true"
+          formula="thetaSurfaceADV(D1, vector, other, user_Theta[default=310])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category value="isentropic3d"/>
+
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="THETA"/>
+    </operands>
+  </derived>
+  <!--derived
      id="thetaP"
      description="Potential Temperature (from %N1% &amp; %N2%)"
      label="Potential Temperature"
@@ -453,7 +572,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories="GRID-3D-*;">
       <paramgroup name="temp_and_pressure"/>
     </operands>
-  </derived>
+  </derived-->
   <derived
      id="horizontaldivergence"
      description="Horizontal Divergence (from %N1% &amp; %N2%)"
@@ -617,6 +736,28 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
             categories="GRID-3D-*;"/>
     </operands>
   </derived>
+  <!--derived
+          id="gridTrajectory00"
+          description="Grid 3D Trajectory with Topo(from %N1% &amp; %N2%  &amp; %N3%)"
+          label="Grid 3D Trajectory w Topo"
+          isenduser="true"
+          isdefault="true"
+          formula="DerivedGridFactory.createFlowVectorsNA(D1, D2, D3, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])">
+    <categories>
+      <category
+              value="inherit"
+              append="Derived"
+              childidx="0"
+              categoryidx="0"/>
+      <category display="true" value="Grids"/>
+      <category value="display:gridtrajectorycontrol00"/>
+    </categories>
+
+    <operands>
+      <paramgroup categories="GRID-3D-*;" name="u_v_w"/>
+      <paramgroup categories="GRID-3D-*;" name="GridRelative_uvw"/>
+    </operands>
+  </derived-->
   <derived
         id="gridTrajectory"
         description="Grid 3D Trajectory (from %N1% &amp; %N2%  &amp; %N3%)"
@@ -931,5 +1072,263 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
 
+  <!-- Adding derived from Mapes collection-->
+  <!--derived description="Vertical Transformation of %N2 onto %N1" formula="vertical_transform(D1[label=New Vertical Coordinate],D2[label=Grid to be Transformed],user_Isosurface_Value)" id="Vertical Transform" isdefault="false" isenduser="true">
+    <categories/>
+    <operands/>
+  </derived-->
+  <derived description="Compute time derivative with a preferred time unit" formula="ddt(grid,preffered_time_unit[isuser=true,default=&quot;day&quot;,label=Preferred time unit, day, s])" id="ddt" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Sample a grid at times specified (ex: if a year is specified all times of that year are displayed)" formula="getSamplesAtTimes(grid,user_year[isuser=true,default=None,label=Year as yyyy],user_season[isuser=true,default=None,label=Season (ex: JJA)],user_mon[isuser=true,default=None,label=Mon of year as MM],user_day[isuser=true,default=None,label=Day of a month as dd],user_hour[isuser=true,default=None,label=Hour of day as hh],user_min[isuser=true,default=None,label=Minute of hour as mm],user_sec[isuser=true,default=None,label=Seconds as ss],user_ms[isuser=true,default=None,label=Millisecons as ms])" id="Sampled at Time" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute daily means" formula="createTimeMeans(grid,&quot;daily&quot;)" id="daily mean" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute monthly means" formula="CreateTimeMeans(grid,&quot;monthly&quot;)" id="monthly mean" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute yearly means" formula="createTimeMeans(grid,&quot;yearly&quot;)" id="yearly means" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute time means at specified time type" formula="createTimeMeans(grid,meanType[isuser=true,default=&quot;yearly&quot;,label=Time mean type as a string])" id="time mean" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Change Unit of a parameter" formula="createNewUnit(grid,user_newUnitName[isUser=true,default=anystring,label=Create/Set to new unit name],user_multiplyfactor[isUser=true,default=1.0,label=Scale data by factor])" id="new unit" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute anomaly from daily means" formula="anomalyFromTimeMeans(grid,&quot;daily&quot;)" id="anomaly from daily mean" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute anomaly from monthly means" formula="anomalyFromTimeMeans(grid,&quot;monthly&quot;)" id="anomaly from monthly mean" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute anomaly from yearly means" formula="anomalyFromTimeMeans(grid,&quot;yearly&quot;)" id="anomaly from yearly means" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Compute anomaly from time means at specified time type" formula="anomalyFromTimeMeans(grid,meanType[isuser=true,default=&quot;yearly&quot;,label=Time mean type as a string])" id="anomaly from time mean" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <!--derived description="Process one field using cdo" formula="cdo(variable,user_cdo_options)" id="cdo_processor" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Process 2 fields using cdo" formula="cdo2(variable1,variable2,user_cdo_options)" id="cdo2_processor" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Correlation among two variables in time" formula="cdo_timecor(variable1,variable2)" id="cdo_timecorrelation" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:dataxs"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:colorxs"/>
+      <category value="display:contourxs"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:valuedisplay"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Covariance among two fields in time" formula="cdo_timcovar(variable1,variable2)" id="cdo_timcovar" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:colorxs"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:dataxs"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:contourxs"/>
+      <category value="display:valuedisplay"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Lowpass fft filter using cdo" formula="cdo_lowpass(variable,user_days_to_filter)" id="cdo_lowpass" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+      <category value="display:contourxs"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:colorxs"/>
+      <category value="display:imagedisplayoverz"/>
+      <category value="display:dataxs"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:imagecontroloverz"/>
+      <category value="display:imagedisplay"/>
+      <category value="display:imagesequence"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:imagecontrol"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Highpass fft filter using cdo" formula="cdo_highpass(variable,user_highpass_days)" id="cdo_highpass" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:imagesequence"/>
+      <category value="display:dataxs"/>
+      <category value="display:imagecontroloverz"/>
+      <category value="display:contourxs"/>
+      <category value="display:imagecontrol"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:colorxs"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:imagedisplay"/>
+      <category value="display:imagedisplayoverz"/>
+      <category value="display:planviewcontourfilled"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Bandpass fft filter using cdo" formula="cdo_bandpass(variable,user_minday,user_maxday)" id="cdo_bandpass" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+      <category value="display:imagecontrol"/>
+      <category value="display:valuedisplay"/>
+      <category value="display:imagedisplayoverz"/>
+      <category value="display:imagesequence"/>
+      <category value="display:contourxsfilled"/>
+      <category value="display:planviewcontour"/>
+      <category value="display:planviewcolor"/>
+      <category value="display:planviewcontourfilled"/>
+      <category value="display:contourxs"/>
+      <category value="display:colorxs"/>
+      <category value="display:dataxs"/>
+      <category value="display:imagedisplay"/>
+      <category value="display:imagecontroloverz"/>
+    </categories>
+    <operands/>
+  </derived-->
+  <derived description="Deviation from Lat Lon Area Average" formula="deviationXY(grid)" id="Deviation from area average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Anomaly from Time Means" formula="anomalyFromTimeMeans(grid)" id="Anomaly from Time Means" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Time Mean and Anomaly"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Rebin Grid" formula="rebin(grid,newGrid)" id="rebinned" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Deviation from Lat Lon Time Average" formula="deviationXYT(grid)" id="deviation from latlontime average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Vertical Average Weighted" formula="verticalWeightedAvg(grid)" id="weighted vertical average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Averages"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Vertical Derivative" formula="ddz(grid)" id="vertical derivative" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Basicmath"/>
+    </categories>
+    <operands/>
+  </derived>
+  <!--derived description="Subgrid fluxes using CDO 2 Variables at a Time" formula="cdoSubGrid(DerivedGridFactory.combineGrids(variable1,variable2),user_nlon,user_nlat)" id="subgrid fluxes using cdo 2 variables at a time" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Subgrid fluxes using CDO" formula="cdoSubGrid(variable,user_nlon,user_nlat)" id="subgrid fluxes using cdo" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
+    </categories>
+    <operands categories=""/>
+  </derived-->
+  <derived description="Multiply Grids" formula="mul(S1[label=Grid1],S2[label=Grid2],WA=1)" id="Multiply Grids" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Basicmath"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Divide Grids" formula="quo(S1[label=Grid1],S2[label=Grid2],WA=1)" id="Divide Grids" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Basicmath"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Modulo with a number" formula="grid_modulo(grid,user_number)" id="GRID MODULO" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-Basicmath"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
 
+  <derived description="Gaussian hor. smoothing" formula="smooth3d(S,&quot;gwfs&quot;, N[isuser=true,default=6])" id="Gaussian smoothing of scalar (S, N)" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-3D Scalar Field Horizontal Smoothing"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="9-point hor. smoothing" formula="smooth3d(S,&quot;sm9s&quot;)" id="9-point smoothing of scalar (S)" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-3D Scalar Field Horizontal Smoothing"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="circular hor. smoothing, in grid increments" formula="smooth3d(S, &quot;circ&quot;,D[isuser=true,default=2])" id="circular smoother (S, D)" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-3D Scalar Field Horizontal Smoothing"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Rectagular hor. smoothing, in grid increments" formula="smooth3d(S, &quot;rect&quot;,D[isuser=true,default=2])" id="rectangular smoother (S, D)" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-MapesCollection-3D Scalar Field Horizontal Smoothing"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
 </derived_parameters>

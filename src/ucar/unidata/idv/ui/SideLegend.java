@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -219,12 +219,8 @@ public class SideLegend extends IdvLegend {
                     "SIDELEGEND");
             if (legendPanel == null) {
                 JCheckBox    visCbx = control.doMakeVisibilityControl("");
-                ItemListener itemListener = new ItemListener() {
-                    public void itemStateChanged(ItemEvent event) {
-                        displayControlVisibilityChanged(control,
-                                event.getStateChange() == ItemEvent.SELECTED);
-                    }
-                };
+                ItemListener itemListener = event -> displayControlVisibilityChanged(control,
+                        event.getStateChange() == ItemEvent.SELECTED);
                 visCbx.addItemListener(itemListener);
                 visCbx.setBorder(BorderFactory.createEmptyBorder());
                 JComponent sideLegendLabel =

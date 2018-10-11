@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -626,6 +626,10 @@ public class AddeImageDataSource extends ImageDataSource {
                         minLat = bbox.getLatMin();
                         maxLon = bbox.getLonMax();
                         minLon = bbox.getLonMin();
+
+                        if(mapInfo.getMinLon() > 0 && mapInfo.getMaxLon() < 0 && maxLon > 0){
+                            maxLon = mapInfo.getMaxLon();
+                        }
 
                         descriptors =
                             geoSpaceSubsetD(geoSelection.getScreenBound(),

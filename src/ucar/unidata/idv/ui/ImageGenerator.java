@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1370,6 +1370,17 @@ public class ImageGenerator extends IdvManager {
         putProperty(applyMacros(node, ATTR_PROPERTY), (exists
                 ? "1"
                 : "0"));
+        return true;
+    }
+
+
+    /**
+     * make a beep
+     * @param node the isl xml node
+     * @return true
+     */
+    protected boolean processTagBeep(Element node) throws Throwable {
+        java.awt.Toolkit.getDefaultToolkit().beep();
         return true;
     }
 
@@ -2903,18 +2914,25 @@ public class ImageGenerator extends IdvManager {
             if ((unit != null) && (unit.trim().length() > 0)) {
                 sleepString = sleepString.substring(0,
                         sleepString.length() - unit.length());
-                if (unit.equals("s")) {}
-                else if (unit.equals("seconds")) {}
-                else if (unit.equals("minutes")) {
-                    multiplier = 60 * 1000;
-                } else if (unit.equals("m")) {
-                    multiplier = 60 * 1000;
-                } else if (unit.equals("hours")) {
-                    multiplier = 60 * 60 * 1000;
-                } else if (unit.equals("h")) {
-                    multiplier = 60 * 60 * 1000;
-                } else {
-                    return error("Unknown sleep time unit:" + unit);
+                switch (unit) {
+                    case "s":
+                        break;
+                    case "seconds":
+                        break;
+                    case "minutes":
+                        multiplier = 60 * 1000;
+                        break;
+                    case "m":
+                        multiplier = 60 * 1000;
+                        break;
+                    case "hours":
+                        multiplier = 60 * 60 * 1000;
+                        break;
+                    case "h":
+                        multiplier = 60 * 60 * 1000;
+                        break;
+                    default:
+                        return error("Unknown sleep time unit:" + unit);
                 }
             }
             sleepTime = (long) (multiplier
@@ -3548,17 +3566,21 @@ public class ImageGenerator extends IdvManager {
                                              VALUE_ASCENDING);
                 if (sort != null) {
                     if (sort.equals(VALUE_TIME)) {
-                        if (sortDir.equals(VALUE_ASCENDING)) {
-                            tmpFiles = Misc.toList(
-                                IOUtil.sortFilesOnAge(
-                                    IOUtil.toFiles(tmpFiles), false));
-                        } else if (sortDir.equals(VALUE_DESCENDING)) {
-                            tmpFiles = Misc.toList(
-                                IOUtil.sortFilesOnAge(
-                                    IOUtil.toFiles(tmpFiles), true));
-                        } else {
-                            System.err.println("unknown sort direction:"
-                                    + sortDir);
+                        switch (sortDir) {
+                            case VALUE_ASCENDING:
+                                tmpFiles = Misc.toList(
+                                        IOUtil.sortFilesOnAge(
+                                                IOUtil.toFiles(tmpFiles), false));
+                                break;
+                            case VALUE_DESCENDING:
+                                tmpFiles = Misc.toList(
+                                        IOUtil.sortFilesOnAge(
+                                                IOUtil.toFiles(tmpFiles), true));
+                                break;
+                            default:
+                                System.err.println("unknown sort direction:"
+                                        + sortDir);
+                                break;
                         }
                     } else {
                         System.err.println("unknown sort type:" + sort);
@@ -4446,8 +4468,9 @@ public class ImageGenerator extends IdvManager {
                             getIdv().getIdvUIManager(), 1000);
                     else
                         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
-                                getIdv().getIdvUIManager(), 0);
-                    lastImage       = viewManager.getMaster().getImage(false);
+                                getIdv().getIdvUIManager(), 100);
+                    
+                    lastImage = viewManager.captureIslImage(scriptingNode);
                     imageProperties = new Hashtable();
                     lastImage = processImage((BufferedImage) lastImage,
                                              loopFilename, scriptingNode,
@@ -4636,699 +4659,722 @@ public class ImageGenerator extends IdvManager {
             Element       child = (Element) elements.item(childIdx);
             String        tagName               = child.getTagName();
 
-            if (tagName.equals(TAG_RESIZE)) {
-                newImage = ImageUtils.toBufferedImage(resize(image, child));
-            } else if (tagName.equals(TAG_FILESET)) {
-                //ignore
-            } else if (tagName.equals(TAG_OUTPUT)) {
-                processTagOutput(child);
-            } else if (tagName.equals(TAG_DISPLAYLIST)) {
-                if (viewManager != null) {
-                    newImage = ImageUtils.toBufferedImage(image, true);
-                    Graphics g = newImage.getGraphics();
-                    String valign = applyMacros(child, ATTR_VALIGN,
-                                        VALUE_BOTTOM);
-                    Font font = getFont(child);
-                    if (XmlUtil.hasAttribute(child, ATTR_MATTEBG)) {
-                        int height =
-                            viewManager.paintDisplayList((Graphics2D) g,
-                                null, imageWidth, imageHeight,
-                                valign.equals(VALUE_BOTTOM), null, font);
+            switch (tagName) {
+                case TAG_RESIZE:
+                    newImage = ImageUtils.toBufferedImage(resize(image, child));
+                    break;
+                case TAG_FILESET:
+                    //ignore
+                    break;
+                case TAG_OUTPUT:
+                    processTagOutput(child);
+                    break;
+                case TAG_DISPLAYLIST:
+                    if (viewManager != null) {
+                        newImage = ImageUtils.toBufferedImage(image, true);
+                        Graphics g = newImage.getGraphics();
+                        String valign = applyMacros(child, ATTR_VALIGN,
+                                VALUE_BOTTOM);
+                        Font font = getFont(child);
+                        if (XmlUtil.hasAttribute(child, ATTR_MATTEBG)) {
+                            int height =
+                                    viewManager.paintDisplayList((Graphics2D) g,
+                                            null, imageWidth, imageHeight,
+                                            valign.equals(VALUE_BOTTOM), null, font);
 
-                        int top    = (valign.equals(VALUE_TOP)
-                                      ? height
-                                      : 0);
-                        int bottom = (valign.equals(VALUE_BOTTOM)
-                                      ? height
-                                      : 0);
-                        newImage = ImageUtils.matte(image, top, bottom, 0, 0,
-                                applyMacros(child, ATTR_MATTEBG,
+                            int top = (valign.equals(VALUE_TOP)
+                                    ? height
+                                    : 0);
+                            int bottom = (valign.equals(VALUE_BOTTOM)
+                                    ? height
+                                    : 0);
+                            newImage = ImageUtils.matte(image, top, bottom, 0, 0,
+                                    applyMacros(child, ATTR_MATTEBG,
                                             Color.white));
-                        g           = newImage.getGraphics();
-                        imageHeight += height;
-                    }
-
-                    Color c = applyMacros(child, ATTR_COLOR, (Color) null);
-                    viewManager.paintDisplayList((Graphics2D) g, null,
-                            imageWidth, imageHeight,
-                            valign.equals(VALUE_BOTTOM), c, font);
-                }
-            } else if (tagName.equals(TAG_COLORBAR)
-                       || tagName.equals(TAG_KML_COLORBAR)) {
-                // only do one colorbar if we are writing to kml
-                Integer index = (Integer) props.get(PROP_IMAGEINDEX);
-                if ((index != null) && (index.intValue() > 0)
-                        && tagName.equals(TAG_KML_COLORBAR)) {
-                    continue;
-                }
-
-                boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
-
-                List<DisplayControlImpl> controls =
-                    (List<DisplayControlImpl>) ((viewManager != null)
-                        ? viewManager.getControls()
-                        : new ArrayList());
-
-                if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
-                    DisplayControlImpl display = ((controls.size() > 0)
-                            ? findDisplayControl(XmlUtil.getAttribute(child,
-                                ATTR_DISPLAY), controls)
-                            : findDisplayControl(child));
-                    if (display == null) {
-                        error("Could not find display:"
-                              + XmlUtil.toString(node));
-                        return null;
-                    }
-                    controls = Misc.newList(display);
-                }
-
-                int    width    = applyMacros(child, ATTR_WIDTH, 150);
-                int    height   = applyMacros(child, ATTR_HEIGHT, 20);
-                int    ticks    = applyMacros(child, ATTR_TICKMARKS, 0);
-                double interval = applyMacros(child, ATTR_INTERVAL, -1.0);
-                String valuesStr = applyMacros(child, ATTR_VALUES,
-                                       (String) null);
-                Color c = applyMacros(child, ATTR_COLOR, Color.black);
-
-                Color lineColor = applyMacros(child, ATTR_LINECOLOR, c);
-
-                Rectangle imageRect = new Rectangle(0, 0, imageWidth,
-                                          imageHeight);
-
-                Point pp = ImageUtils.parsePoint(applyMacros(child,
-                               ATTR_PLACE, "ll,10,-10"), imageRect);
-                Point ap = ImageUtils.parsePoint(applyMacros(child,
-                               ATTR_ANCHOR, "ll"), new Rectangle(0, 0, width,
-                                   height));
-
-                String orientation = applyMacros(child, ATTR_ORIENTATION,
-                                         VALUE_BOTTOM);
-                boolean vertical = orientation.equals(VALUE_RIGHT)
-                                   || orientation.equals(VALUE_LEFT);
-                int     baseY       = pp.y - ap.y + (vertical
-                        ? 0
-                        : height);
-                int     baseX       = pp.x - ap.x;
-
-                List    colorTables = new ArrayList();
-                List    ranges      = new ArrayList();
-                List    units       = new ArrayList();
-
-                boolean forKml      = tagName.equals(TAG_KML_COLORBAR);
-
-                for (int i = 0; i < controls.size(); i++) {
-                    DisplayControlImpl control =
-                        (DisplayControlImpl) controls.get(i);
-                    ColorTable colorTable = control.getColorTable();
-                    if (colorTable == null) {
-                        continue;
-                    }
-                    Range range = control.getRangeForColorTable();
-                    //only do unique color tables
-                    Object[] key = { colorTable, range };
-                    if (seenColorTable.get(key) != null) {
-                        continue;
-                    }
-                    seenColorTable.put(key, key);
-                    colorTables.add(colorTable);
-                    ranges.add(range);
-                    units.add(control.getDisplayUnit());
-                }
-
-                for (int i = 0; i < colorTables.size(); i++) {
-                    ColorTable colorTable = (ColorTable) colorTables.get(i);
-                    Range      range      = (Range) ranges.get(i);
-                    Unit       unit       = (Unit) units.get(i);
-                    Image      imageToDrawIn;
-                    if (forKml) {
-                        if (vertical) {
-                            baseX = 0;
-                            baseY = 0;
-                        } else {
-                            baseX = 0;
-                            baseY = height;
+                            g = newImage.getGraphics();
+                            imageHeight += height;
                         }
-                        int space = applyMacros(child, ATTR_SPACE, (vertical
-                                ? width
-                                : height));
-                        imageToDrawIn = new BufferedImage(width + (vertical
-                                ? space
-                                : 0), height + (vertical
-                                ? 0
-                                : space), BufferedImage.TYPE_INT_RGB);
-                    } else {
-                        imageToDrawIn = newImage =
-                            ImageUtils.toBufferedImage(image);
+
+                        Color c = applyMacros(child, ATTR_COLOR, (Color) null);
+                        viewManager.paintDisplayList((Graphics2D) g, null,
+                                imageWidth, imageHeight,
+                                valign.equals(VALUE_BOTTOM), c, font);
                     }
-                    Graphics g = imageToDrawIn.getGraphics();
-                    if (forKml) {
-                        Color bgColor = applyMacros(child, ATTR_BACKGROUND,
-                                            Color.white);
-                        g.setColor(bgColor);
-                        g.fillRect(0, 0, imageToDrawIn.getWidth(null),
-                                   imageToDrawIn.getHeight(null));
+                    break;
+                case TAG_COLORBAR:
+                case TAG_KML_COLORBAR: {
+                    // only do one colorbar if we are writing to kml
+                    Integer index = (Integer) props.get(PROP_IMAGEINDEX);
+                    if ((index != null) && (index.intValue() > 0)
+                            && tagName.equals(TAG_KML_COLORBAR)) {
+                        continue;
                     }
-                    ColorPreview preview =
-                        new ColorPreview(
-                            new BaseRGBMap(colorTable.getNonAlphaTable()),
-                            (vertical
-                             ? width
-                             : height));
-                    if (vertical) {
-                        preview.setSize(new Dimension(height, width));
-                    } else {
-                        preview.setSize(new Dimension(width, height));
+
+                    boolean showLines = applyMacros(child, ATTR_SHOWLINES, false);
+
+                    List<DisplayControlImpl> controls =
+                            (List<DisplayControlImpl>) ((viewManager != null)
+                                    ? viewManager.getControls()
+                                    : new ArrayList());
+
+                    if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
+                        DisplayControlImpl display = ((controls.size() > 0)
+                                ? findDisplayControl(XmlUtil.getAttribute(child,
+                                ATTR_DISPLAY), controls)
+                                : findDisplayControl(child));
+                        if (display == null) {
+                            error("Could not find display:"
+                                    + XmlUtil.toString(node));
+                            return null;
+                        }
+                        controls = Misc.newList(display);
                     }
-                    Image previewImage = GuiUtils.getImage(preview);
-                    boolean includeAlpha = applyMacros(child, ATTR_TRANSPARENCY,
-                                               true);
-                    previewImage = ColorTableCanvas.getImage(colorTable,
-                            (vertical
-                             ? height
-                             : width), (vertical
+
+                    int width = applyMacros(child, ATTR_WIDTH, 150);
+                    int height = applyMacros(child, ATTR_HEIGHT, 20);
+                    int ticks = applyMacros(child, ATTR_TICKMARKS, 0);
+                    double interval = applyMacros(child, ATTR_INTERVAL, -1.0);
+                    String valuesStr = applyMacros(child, ATTR_VALUES,
+                            (String) null);
+                    Color c = applyMacros(child, ATTR_COLOR, Color.black);
+
+                    Color lineColor = applyMacros(child, ATTR_LINECOLOR, c);
+
+                    Rectangle imageRect = new Rectangle(0, 0, imageWidth,
+                            imageHeight);
+
+                    Point pp = ImageUtils.parsePoint(applyMacros(child,
+                            ATTR_PLACE, "ll,10,-10"), imageRect);
+                    Point ap = ImageUtils.parsePoint(applyMacros(child,
+                            ATTR_ANCHOR, "ll"), new Rectangle(0, 0, width,
+                            height));
+
+                    String orientation = applyMacros(child, ATTR_ORIENTATION,
+                            VALUE_BOTTOM);
+                    boolean vertical = orientation.equals(VALUE_RIGHT)
+                            || orientation.equals(VALUE_LEFT);
+                    int baseY = pp.y - ap.y + (vertical
+                            ? 0
+                            : height);
+                    int baseX = pp.x - ap.x;
+
+                    List colorTables = new ArrayList();
+                    List ranges = new ArrayList();
+                    List units = new ArrayList();
+
+                    boolean forKml = tagName.equals(TAG_KML_COLORBAR);
+
+                    for (int i = 0; i < controls.size(); i++) {
+                        DisplayControlImpl control =
+                                (DisplayControlImpl) controls.get(i);
+                        ColorTable colorTable = control.getColorTable();
+                        if (colorTable == null) {
+                            continue;
+                        }
+                        Range range = control.getRangeForColorTable();
+                        //only do unique color tables
+                        Object[] key = {colorTable, range};
+                        if (seenColorTable.get(key) != null) {
+                            continue;
+                        }
+                        seenColorTable.put(key, key);
+                        colorTables.add(colorTable);
+                        ranges.add(range);
+                        units.add(control.getDisplayUnit());
+                    }
+
+                    for (int i = 0; i < colorTables.size(); i++) {
+                        ColorTable colorTable = (ColorTable) colorTables.get(i);
+                        Range range = (Range) ranges.get(i);
+                        Unit unit = (Unit) units.get(i);
+                        Image imageToDrawIn;
+                        if (forKml) {
+                            if (vertical) {
+                                baseX = 0;
+                                baseY = 0;
+                            } else {
+                                baseX = 0;
+                                baseY = height;
+                            }
+                            int space = applyMacros(child, ATTR_SPACE, (vertical
+                                    ? width
+                                    : height));
+                            imageToDrawIn = new BufferedImage(width + (vertical
+                                    ? space
+                                    : 0), height + (vertical
+                                    ? 0
+                                    : space), BufferedImage.TYPE_INT_RGB);
+                        } else {
+                            imageToDrawIn = newImage =
+                                    ImageUtils.toBufferedImage(image);
+                        }
+                        Graphics g = imageToDrawIn.getGraphics();
+                        if (forKml) {
+                            Color bgColor = applyMacros(child, ATTR_BACKGROUND,
+                                    Color.white);
+                            g.setColor(bgColor);
+                            g.fillRect(0, 0, imageToDrawIn.getWidth(null),
+                                    imageToDrawIn.getHeight(null));
+                        }
+                        ColorPreview preview =
+                                new ColorPreview(
+                                        new BaseRGBMap(colorTable.getNonAlphaTable()),
+                                        (vertical
+                                                ? width
+                                                : height));
+                        if (vertical) {
+                            preview.setSize(new Dimension(height, width));
+                        } else {
+                            preview.setSize(new Dimension(width, height));
+                        }
+                        Image previewImage = GuiUtils.getImage(preview);
+                        boolean includeAlpha = applyMacros(child, ATTR_TRANSPARENCY,
+                                true);
+                        previewImage = ColorTableCanvas.getImage(colorTable,
+                                (vertical
+                                        ? height
+                                        : width), (vertical
                                         ? width
                                         : height), includeAlpha);
 
 
-                    if (vertical) {
-                        BufferedImage tmpImage =
-                            new BufferedImage(width, height,
-                                BufferedImage.TYPE_INT_RGB);
-
-                        BufferedImage tmpImagexxx =
-                            new BufferedImage(500, 500,
-                                BufferedImage.TYPE_INT_RGB);
-                        Graphics2D tmpG = (Graphics2D) tmpImage.getGraphics();
-                        tmpG.setColor(Color.red);
-                        tmpG.fillRect(0, 0, 1000, 1000);
-                        tmpG.rotate(Math.toRadians(90.0));
-                        tmpG.drawImage(previewImage, 0, 0 - width, null);
-                        previewImage = tmpImage;
-                    }
-                    if (forKml) {
-                        g.drawImage(previewImage, 0, 0, null);
-                    } else {
-                        g.drawImage(previewImage, baseX, (vertical
-                                ? baseY
-                                : baseY - height), null);
-                    }
-                    if (showLines) {
-                        g.setColor(lineColor);
-                        g.drawRect(baseX, (vertical
-                                           ? baseY
-                                           : baseY - height), width - 1,
-                                           height - (vertical
-                                ? 1
-                                : 0));
-                    }
-                    setFont(g, child);
-                    FontMetrics fm     = g.getFontMetrics();
-                    List        values = new ArrayList();
-                    String suffixFrequency = XmlUtil.getAttribute(child,
-                                                 ATTR_SUFFIXFREQUENCY,
-                                                 XmlUtil.getAttribute(child,
-                                                     ATTR_SHOWUNIT,
-                                                     "false")).toLowerCase();
-                    String unitDefault = ( !suffixFrequency.equals("false"))
-                                         ? " %unit%"
-                                         : "";
-                    String labelSuffix = applyMacros(child, ATTR_SUFFIX,
-                                             unitDefault);
-                    if (unit != null) {
-                        labelSuffix = labelSuffix.replace("%unit%",
-                                "" + unit);
-                    } else {
-                        labelSuffix = labelSuffix.replace("%unit%", "");
-                    }
-                    if (valuesStr != null) {
-                        double[] valueArray = Misc.parseDoubles(valuesStr,
-                                                  ",");
-                        for (int valueIdx = 0; valueIdx < valueArray.length;
-                                valueIdx++) {
-                            values.add(new Double(valueArray[valueIdx]));
-                        }
-                    } else if (ticks > 0) {
-                        int spacing = ((ticks == 1)
-                                       ? 0
-                                       : (vertical
-                                          ? height
-                                          : width) / (ticks - 1));
-                        for (int tickIdx = 0; tickIdx < ticks; tickIdx++) {
-                            double percent = ((ticks > 1)
-                                    ? (double) tickIdx / (double) (ticks - 1)
-                                    : 0.0);
-                            values.add(
-                                new Double(range.getValueOfPercent(percent)));
-                        }
-                    } else if (interval > 0) {
-                        double value = range.getMin();
-                        double max   = range.getMax();
-                        while (value <= max) {
-                            values.add(new Double(value));
-                            value += interval;
-                        }
-                    }
-                    for (int valueIdx = 0; valueIdx < values.size();
-                            valueIdx++) {
-                        double value =
-                            ((Double) values.get(valueIdx)).doubleValue();
-                        int x;
-                        int y;
                         if (vertical) {
+                            BufferedImage tmpImage =
+                                    new BufferedImage(width, height,
+                                            BufferedImage.TYPE_INT_RGB);
+
+                            BufferedImage tmpImagexxx =
+                                    new BufferedImage(500, 500,
+                                            BufferedImage.TYPE_INT_RGB);
+                            Graphics2D tmpG = (Graphics2D) tmpImage.getGraphics();
+                            tmpG.setColor(Color.red);
+                            tmpG.fillRect(0, 0, 1000, 1000);
+                            tmpG.rotate(Math.toRadians(90.0));
+                            tmpG.drawImage(previewImage, 0, 0 - width, null);
+                            previewImage = tmpImage;
+                        }
+                        if (forKml) {
+                            g.drawImage(previewImage, 0, 0, null);
+                        } else {
+                            g.drawImage(previewImage, baseX, (vertical
+                                    ? baseY
+                                    : baseY - height), null);
+                        }
+                        if (showLines) {
+                            g.setColor(lineColor);
+                            g.drawRect(baseX, (vertical
+                                            ? baseY
+                                            : baseY - height), width - 1,
+                                    height - (vertical
+                                            ? 1
+                                            : 0));
+                        }
+                        setFont(g, child);
+                        FontMetrics fm = g.getFontMetrics();
+                        List values = new ArrayList();
+                        String suffixFrequency = XmlUtil.getAttribute(child,
+                                ATTR_SUFFIXFREQUENCY,
+                                XmlUtil.getAttribute(child,
+                                        ATTR_SHOWUNIT,
+                                        "false")).toLowerCase();
+                        String unitDefault = (!suffixFrequency.equals("false"))
+                                ? " %unit%"
+                                : "";
+                        String labelSuffix = applyMacros(child, ATTR_SUFFIX,
+                                unitDefault);
+                        if (unit != null) {
+                            labelSuffix = labelSuffix.replace("%unit%",
+                                    "" + unit);
+                        } else {
+                            labelSuffix = labelSuffix.replace("%unit%", "");
+                        }
+                        if (valuesStr != null) {
+                            double[] valueArray = Misc.parseDoubles(valuesStr,
+                                    ",");
+                            for (int valueIdx = 0; valueIdx < valueArray.length;
+                                 valueIdx++) {
+                                values.add(new Double(valueArray[valueIdx]));
+                            }
+                        } else if (ticks > 0) {
+                            int spacing = ((ticks == 1)
+                                    ? 0
+                                    : (vertical
+                                    ? height
+                                    : width) / (ticks - 1));
+                            for (int tickIdx = 0; tickIdx < ticks; tickIdx++) {
+                                double percent = ((ticks > 1)
+                                        ? (double) tickIdx / (double) (ticks - 1)
+                                        : 0.0);
+                                values.add(
+                                        new Double(range.getValueOfPercent(percent)));
+                            }
+                        } else if (interval > 0) {
+                            double value = range.getMin();
+                            double max = range.getMax();
+                            while (value <= max) {
+                                values.add(new Double(value));
+                                value += interval;
+                            }
+                        }
+                        for (int valueIdx = 0; valueIdx < values.size();
+                             valueIdx++) {
+                            double value =
+                                    ((Double) values.get(valueIdx)).doubleValue();
+                            int x;
+                            int y;
+                            if (vertical) {
+                                if (orientation.equals(VALUE_RIGHT)) {
+                                    x = baseX + width;
+                                } else {
+                                    x = baseX;
+                                }
+                                y = baseY
+                                        + (int) (range.getPercent(value) * height);
+                                if (y > baseY + height) {
+                                    break;
+                                }
+                            } else {
+                                if (orientation.equals(VALUE_BOTTOM)) {
+                                    y = baseY;
+                                } else {
+                                    y = baseY - height;
+                                }
+
+                                if (range != null) {
+                                    x = baseX
+                                            + (int) (range.getPercent(value) * width);
+                                } else {
+                                    x = baseX;
+                                }
+
+                                if (x > baseX + width) {
+                                    break;
+                                }
+                            }
+                            String tickLabel =
+                                    getIdv().getDisplayConventions().format(value);
+                            if (suffixFrequency.equals(VALUE_LAST)
+                                    && (valueIdx == values.size() - 1)) {
+                                tickLabel += labelSuffix;
+                            } else if (suffixFrequency.equals(VALUE_FIRST)
+                                    && (valueIdx == 0)) {
+                                tickLabel += labelSuffix;
+                            } else if (suffixFrequency.equals(VALUE_ALL)
+                                    || suffixFrequency.equals("true")) {
+                                tickLabel += labelSuffix;
+                            }
+
+
+                            Rectangle2D rect = fm.getStringBounds(tickLabel, g);
+                            g.setColor(lineColor);
                             if (orientation.equals(VALUE_RIGHT)) {
-                                x = baseX + width;
+                                g.drawLine(x + 1, y, x, y);
+                                if (showLines) {
+                                    g.drawLine(x, y, x - width, y);
+                                }
+                            } else if (orientation.equals(VALUE_LEFT)) {
+                                g.drawLine(x - 1, y, x, y);
+                                if (showLines) {
+                                    g.drawLine(x, y, x + width, y);
+                                }
+                            } else if (orientation.equals(VALUE_BOTTOM)) {
+                                g.drawLine(x, y + 1, x, y);
+                                if (showLines) {
+                                    g.drawLine(x, y, x, y - height);
+                                }
                             } else {
-                                x = baseX;
+                                g.drawLine(x, y - 1, x, y);
+                                if (showLines) {
+                                    g.drawLine(x, y, x, y + height);
+                                }
                             }
-                            y = baseY
-                                + (int) (range.getPercent(value) * height);
-                            if (y > baseY + height) {
-                                break;
-                            }
-                        } else {
-                            if (orientation.equals(VALUE_BOTTOM)) {
-                                y = baseY;
+                            g.setColor(c);
+                            if (orientation.equals(VALUE_RIGHT)) {
+                                int yLoc = y + (int) (rect.getHeight() / 2) - 2;
+                                if (forKml) {
+                                    if (valueIdx == 0) {
+                                        yLoc = y + (int) (rect.getHeight()) - 2;
+                                    } else if (valueIdx == values.size() - 1) {
+                                        yLoc = y - (int) (rect.getHeight()) + 6;
+                                    }
+                                }
+                                g.drawString(tickLabel, x + 2, yLoc);
+                            } else if (orientation.equals(VALUE_LEFT)) {
+                                int xLoc = x - 2 - (int) rect.getWidth();
+                                g.drawString(tickLabel, xLoc,
+                                        y + (int) (rect.getHeight() / 2)
+                                                - 2);
+                            } else if (orientation.equals(VALUE_BOTTOM)) {
+                                int xLoc = x - (int) (rect.getWidth() / 2);
+                                if (forKml) {
+                                    if (valueIdx == 0) {
+                                        xLoc = x + 2;
+                                    } else if (valueIdx == values.size() - 1) {
+                                        xLoc = x - (int) rect.getWidth() + 2;
+                                    }
+                                }
+                                g.drawString(tickLabel, xLoc,
+                                        y + (int) rect.getHeight() + 2);
                             } else {
-                                y = baseY - height;
-                            }
-
-                            if (range != null) {
-                                x = baseX
-                                    + (int) (range.getPercent(value) * width);
-                            } else {
-                                x = baseX;
-                            }
-
-                            if (x > baseX + width) {
-                                break;
+                                g.drawString(tickLabel,
+                                        x - (int) (rect.getWidth() / 2),
+                                        y - 2);
                             }
                         }
-                        String tickLabel =
-                            getIdv().getDisplayConventions().format(value);
-                        if (suffixFrequency.equals(VALUE_LAST)
-                                && (valueIdx == values.size() - 1)) {
-                            tickLabel += labelSuffix;
-                        } else if (suffixFrequency.equals(VALUE_FIRST)
-                                   && (valueIdx == 0)) {
-                            tickLabel += labelSuffix;
-                        } else if (suffixFrequency.equals(VALUE_ALL)
-                                   || suffixFrequency.equals("true")) {
-                            tickLabel += labelSuffix;
-                        }
-
-
-                        Rectangle2D rect = fm.getStringBounds(tickLabel, g);
-                        g.setColor(lineColor);
-                        if (orientation.equals(VALUE_RIGHT)) {
-                            g.drawLine(x + 1, y, x, y);
-                            if (showLines) {
-                                g.drawLine(x, y, x - width, y);
-                            }
-                        } else if (orientation.equals(VALUE_LEFT)) {
-                            g.drawLine(x - 1, y, x, y);
-                            if (showLines) {
-                                g.drawLine(x, y, x + width, y);
-                            }
-                        } else if (orientation.equals(VALUE_BOTTOM)) {
-                            g.drawLine(x, y + 1, x, y);
-                            if (showLines) {
-                                g.drawLine(x, y, x, y - height);
-                            }
+                        if (vertical) {
+                            baseX += width + 30;
                         } else {
-                            g.drawLine(x, y - 1, x, y);
-                            if (showLines) {
-                                g.drawLine(x, y, x, y + height);
+                            baseY += height + 30;
+                        }
+                        if (forKml) {
+                            String tmpImageFile =
+                                    applyMacros(
+                                            child, ATTR_FILE,
+                                            getIdv().getStore().getTmpFile(
+                                                    "testcolorbar${viewindex}.png"));
+                            String template =
+                                    "<ScreenOverlay><name>${kml.name}</name><Icon><href>${icon}</href></Icon>\n"
+                                            + "<overlayXY x=\"${kml.overlayXY.x}\" y=\"${kml.overlayXY.y}\" xunits=\"${kml.overlayXY.xunits}\" yunits=\"${kml.overlayXY.yunits}\"/>\n"
+                                            + "<screenXY x=\"${kml.screenXY.x}\" y=\"${kml.screenXY.y}\" xunits=\"${kml.screenXY.xunits}\" yunits=\"${kml.screenXY.yunits}\"/>\n"
+                                            + "<size x=\"${kml.size.x}\" y=\"${kml.size.y}\" xunits=\"${kml.size.xunits}\" yunits=\"${kml.size.yunits}\"/>\n"
+                                            + "</ScreenOverlay>\n";
+                            String[] macros = {
+                                    "kml.name", "kml.overlayXY.x", "kml.overlayXY.y",
+                                    "kml.overlayXY.xunits", "kml.overlayXY.yunits",
+                                    "kml.screenXY.x", "kml.screenXY.y",
+                                    "kml.screenXY.xunits", "kml.screenXY.yunits",
+                                    "kml.size.x", "kml.size.y", "kml.size.xunits",
+                                    "kml.size.yunits"
+                            };
+                            String[] macroValues = {
+                                    "", "0", "1", "fraction", "fraction", "0", "1",
+                                    "fraction", "fraction", "-1", "-1", "pixels",
+                                    "pixels"
+                            };
+
+                            for (int macroIdx = 0; macroIdx < macros.length;
+                                 macroIdx++) {
+                                template =
+                                        template.replace("${" + macros[macroIdx]
+                                                + "}", applyMacros(child,
+                                                macros[macroIdx],
+                                                macroValues[macroIdx]));
                             }
+                            template = template.replace("${icon}",
+                                    IOUtil.getFileTail(tmpImageFile));
+                            imageProps.put("kml", template);
+                            List kmlFiles = (List) imageProps.get("kmlfiles");
+                            //TODO: Only do the first one for now
+                            if (kmlFiles == null) {
+                                kmlFiles = new ArrayList();
+                                imageProps.put("kmlfiles", kmlFiles);
+                            }
+                            kmlFiles.add(tmpImageFile);
+
+                            //                        System.out.println(template);
+                            ImageUtils.writeImageToFile(imageToDrawIn,
+                                    tmpImageFile);
+                        }
+                    }
+
+
+                    break;
+                }
+                case TAG_TRANSPARENT:
+                case TAG_BGTRANSPARENT: {
+                    Color c = null;
+                    if (tagName.equals(TAG_BGTRANSPARENT)) {
+                        c = viewManager.getBackground();
+                    } else {
+                        c = applyMacros(child, ATTR_COLOR, (Color) null);
+                    }
+                    //                System.err.println ("c:" + c);
+                    int[] redRange = {0, 0};
+                    int[] greenRange = {0, 0};
+                    int[] blueRange = {0, 0};
+                    if (c != null) {
+                        //                    System.err.println("got color");
+                        redRange[0] = redRange[1] = c.getRed();
+                        greenRange[0] = greenRange[1] = c.getGreen();
+                        blueRange[0] = blueRange[1] = c.getBlue();
+                    } else {
+                    }
+                    newImage = ImageUtils.makeColorTransparent(image, redRange,
+                            greenRange, blueRange);
+                    break;
+                }
+                case TAG_SHOW:
+                    JComponent contents = new JLabel(new ImageIcon(image));
+                    String message = applyMacros(child, ATTR_MESSAGE,
+                            (String) null);
+                    if (message != null) {
+                        contents = GuiUtils.topCenter(new JLabel(message),
+                                contents);
+                    }
+                    if (!GuiUtils.askOkCancel("Continue?", contents)) {
+                        throw new MyQuitException();
+                    }
+                    break;
+                case TAG_MATTE:
+                    newImage = doMatte(image, child, 0);
+                    break;
+                case TAG_LATLONLABELS:
+                    newImage = doLatLonLabels(child, viewManager, image,
+                            imageProps);
+                    break;
+                case TAG_WRITE:
+                    ImageUtils.writeImageToFile(
+                            image, getImageFileName(applyMacros(child, ATTR_FILE)));
+
+                    break;
+                case TAG_PUBLISH:
+                    getIdv().getPublishManager().publishIslImage(this, node,
+                            image);
+                    break;
+                case TAG_CLIP:
+                    int[] ul;
+                    int[] lr;
+                    if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
+                        //                    System.err.println("Clipping from display");
+                        DisplayControlImpl dc = findDisplayControl(child);
+                        if (dc == null) {
+                            throw new IllegalArgumentException(
+                                    "Could not find display:"
+                                            + XmlUtil.toString(node));
+                        }
+                        NavigatedDisplay display =
+                                (NavigatedDisplay) viewManager.getMaster();
+                        MapProjection mapProjection = dc.getDataProjection();
+                        Rectangle2D rect =
+                                mapProjection.getDefaultMapArea();
+                        LatLonPoint llplr =
+                                mapProjection.getLatLon(new double[][]{
+                                        {rect.getX() + rect.getWidth()},
+                                        {rect.getY() + rect.getHeight()}
+                                });
+                        LatLonPoint llpul =
+                                mapProjection.getLatLon(new double[][]{
+                                        {rect.getX()}, {rect.getY()}
+                                });
+                        EarthLocation ulEl = new EarthLocationTuple(llpul,
+                                new Real(RealType.Altitude, 0));
+                        EarthLocation lrEl = new EarthLocationTuple(llplr,
+                                new Real(RealType.Altitude, 0));
+                        ul = display.getScreenCoordinates(
+                                display.getSpatialCoordinates(ulEl, null));
+                        lr = display.getScreenCoordinates(
+                                display.getSpatialCoordinates(lrEl, null));
+                        //System.err.println("ul:" + ulEl + " lr:" + lrEl);
+                        if (ul[0] > lr[0]) {
+                            int tmp = ul[0];
+                            ul[0] = lr[0];
+                            lr[0] = tmp;
+                        }
+                        if (ul[1] > lr[1]) {
+                            int tmp = ul[1];
+                            ul[1] = lr[1];
+                            lr[1] = tmp;
+                        }
+                        imageProps.put(ATTR_NORTH,
+                                new Double(ulEl.getLatitude().getValue()));
+                        imageProps.put(
+                                ATTR_WEST,
+                                new Double(ulEl.getLongitude().getValue()));
+                        imageProps.put(ATTR_SOUTH,
+                                new Double(lrEl.getLatitude().getValue()));
+                        imageProps.put(
+                                ATTR_EAST,
+                                new Double(lrEl.getLongitude().getValue()));
+                    } else if ((viewManager != null)
+                            && XmlUtil.hasAttribute(child, ATTR_NORTH)) {
+                        NavigatedDisplay display =
+                                (NavigatedDisplay) viewManager.getMaster();
+                        EarthLocation el1 =
+                                DisplayControlImpl.makeEarthLocation(toDouble(child,
+                                        ATTR_NORTH), toDouble(child, ATTR_WEST), 0);
+                        EarthLocation el2 =
+                                DisplayControlImpl.makeEarthLocation(toDouble(child,
+                                        ATTR_SOUTH), toDouble(child, ATTR_EAST), 0);
+                        ul = display.getScreenCoordinates(
+                                display.getSpatialCoordinates(el1, null));
+                        lr = display.getScreenCoordinates(
+                                display.getSpatialCoordinates(el2, null));
+                        imageProps.put(ATTR_NORTH,
+                                new Double(el1.getLatitude().getValue()));
+                        imageProps.put(ATTR_WEST,
+                                new Double(el1.getLongitude().getValue()));
+                        imageProps.put(ATTR_SOUTH,
+                                new Double(el2.getLatitude().getValue()));
+                        imageProps.put(ATTR_EAST,
+                                new Double(el2.getLongitude().getValue()));
+                    } else if (XmlUtil.hasAttribute(child, ATTR_LEFT)) {
+                        ul = new int[]{
+                                (int) toDouble(child, ATTR_LEFT, imageWidth),
+                                (int) toDouble(child, ATTR_TOP, imageHeight)};
+                        lr = new int[]{
+                                (int) toDouble(child, ATTR_RIGHT, imageWidth),
+                                (int) toDouble(child, ATTR_BOTTOM, imageHeight)};
+                    } else if (viewManager != null) {
+                        //TODO: Clip on visad coordinates
+                        NavigatedDisplay display =
+                                (NavigatedDisplay) viewManager.getMaster();
+                        ul = display.getScreenCoordinates(new double[]{-1, 1,
+                                0});
+                        lr = display.getScreenCoordinates(new double[]{1, -1,
+                                0});
+                        int space = applyMacros(child, ATTR_SPACE, 0);
+                        int hspace = applyMacros(child, ATTR_HSPACE, space);
+                        int vspace = applyMacros(child, ATTR_VSPACE, space);
+                        ul[0] -= applyMacros(child, ATTR_SPACE_LEFT, hspace);
+                        ul[1] -= applyMacros(child, ATTR_SPACE_TOP, vspace);
+                        lr[0] += applyMacros(child, ATTR_SPACE_RIGHT, hspace);
+                        lr[1] += applyMacros(child, ATTR_SPACE_BOTTOM, vspace);
+                    } else {
+                        continue;
+                    }
+
+
+                    for (String attr :
+                            (List<String>) Misc.newList(ATTR_NORTH, ATTR_SOUTH,
+                                    ATTR_EAST, ATTR_WEST)) {
+                        String kmlAttr = "kml." + attr;
+                        if (XmlUtil.hasAttribute(child, kmlAttr)) {
+                            imageProps.put(attr,
+                                    new Double(applyMacros(child, kmlAttr,
+                                            0.0)));
+                        }
+                    }
+
+
+                    ul[0] = Math.max(0, ul[0]);
+                    ul[1] = Math.max(0, ul[1]);
+
+                    lr[0] = Math.min(lr[0], imageWidth);
+                    lr[1] = Math.min(lr[1], imageHeight);
+
+
+                    newImage = ImageUtils.clip(image, ul, lr);
+                    break;
+                case TAG_SPLIT: {
+                    shouldIterateChildren = false;
+                    int width = image.getWidth(null);
+                    int height = image.getHeight(null);
+                    int cols = applyMacros(child, ATTR_COLUMNS, 2);
+                    int rows = applyMacros(child, ATTR_ROWS, 2);
+                    String file = applyMacros(child, ATTR_FILE);
+                    int cnt = 0;
+                    int hSpace = width / cols;
+                    int vSpace = height / rows;
+                    for (int row = 0; row < rows; row++) {
+                        for (int col = 0; col < cols; col++) {
+                            pushProperties();
+                            Hashtable myprops = new Hashtable();
+                            putProperty("row", new Integer(row));
+                            putProperty("column", new Integer(col));
+                            putProperty("count", new Integer(++cnt));
+                            String realFile = applyMacros(file, myprops);
+                            Image splitImage = image.getSubimage(hSpace * col,
+                                    vSpace * row, hSpace, vSpace);
+                            processImage(ImageUtils.toBufferedImage(splitImage),
+                                    realFile, child, myprops, viewManager,
+                                    new Hashtable());
+                            popProperties();
+                        }
+                    }
+                    break;
+                }
+                case TAG_THUMBNAIL:
+                    shouldIterateChildren = false;
+                    BufferedImage thumbImage =
+                            ImageUtils.toBufferedImage(resize(image, child));
+                    String thumbFile = applyMacros(child, ATTR_FILE,
+                            (String) null);
+                    if (thumbFile == null) {
+                        thumbFile = IOUtil.stripExtension(filename) + "_thumb"
+                                + IOUtil.getFileExtension(filename);
+                    }
+                    processImage(thumbImage, thumbFile, child, null, viewManager,
+                            new Hashtable());
+                    break;
+                case TAG_KML:
+                    //NOOP
+                    break;
+                case TAG_KMZFILE:
+                    //NOOP
+                    break;
+                case TAG_OVERLAY: {
+                    double transparency = applyMacros(child, ATTR_TRANSPARENCY,
+                            0.0);
+                    Graphics2D g = (Graphics2D) image.getGraphics();
+                    String imagePath = applyMacros(child, ATTR_IMAGE,
+                            (String) null);
+
+                    Rectangle imageRect = new Rectangle(0, 0, imageWidth,
+                            imageHeight);
+                    Point pp = ImageUtils.parsePoint(applyMacros(child,
+                            ATTR_PLACE, "lr,-10,-10"), imageRect);
+                    String text = applyMacros(child, ATTR_TEXT, (String) null);
+                    Color bg = applyMacros(child, ATTR_BACKGROUND, (Color) null);
+                    if (text != null) {
+                        double angle = Math.toRadians(applyMacros(child,
+                                ATTR_ANGLE, 0.0));
+                        text = applyMacros(text);
+                        Color c = applyMacros(child, ATTR_COLOR, Color.white);
+                        if ((c != null) && (transparency > 0)) {
+                            c = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                                    ImageUtils.toAlpha(transparency));
+                        }
+                        //Color bg = applyMacros(child, ATTR_BACKGROUND,
+                        //                       (Color) null);
+                        if ((bg != null) && (transparency > 0)) {
+                            bg = new Color(bg.getRed(), bg.getGreen(),
+                                    bg.getBlue(),
+                                    ImageUtils.toAlpha(transparency));
+                        }
+                        setFont(g, child);
+                        FontMetrics fm = g.getFontMetrics();
+                        Rectangle2D rect = fm.getStringBounds(text, g);
+                        int width = (int) rect.getWidth();
+                        int height = (int) (rect.getHeight());
+
+                        Point ap = ImageUtils.parsePoint(applyMacros(child,
+                                ATTR_ANCHOR,
+                                "lr,-10,-10"), new Rectangle(0, 0, width,
+                                height));
+
+                        g.rotate(angle);
+
+                        if (bg != null) {
+                            g.setColor(bg);
+                            g.fillRect(pp.x - ap.x - 1, pp.y - ap.y - 1,
+                                    (int) width + 2, (int) height + 2);
                         }
                         g.setColor(c);
-                        if (orientation.equals(VALUE_RIGHT)) {
-                            int yLoc = y + (int) (rect.getHeight() / 2) - 2;
-                            if (forKml) {
-                                if (valueIdx == 0) {
-                                    yLoc = y + (int) (rect.getHeight()) - 2;
-                                } else if (valueIdx == values.size() - 1) {
-                                    yLoc = y - (int) (rect.getHeight()) + 6;
-                                }
+                        g.drawString(text, pp.x - ap.x, pp.y - ap.y + height);
+                    }
+
+                    if (imagePath != null) {
+                        Image overlay = ImageUtils.readImage(imagePath);
+                        if (overlay != null) {
+                            if (transparency > 0) {
+                                overlay = ImageUtils.setAlpha(overlay,
+                                        transparency);
                             }
-                            g.drawString(tickLabel, x + 2, yLoc);
-                        } else if (orientation.equals(VALUE_LEFT)) {
-                            int xLoc = x - 2 - (int) rect.getWidth();
-                            g.drawString(tickLabel, xLoc,
-                                         y + (int) (rect.getHeight() / 2)
-                                         - 2);
-                        } else if (orientation.equals(VALUE_BOTTOM)) {
-                            int xLoc = x - (int) (rect.getWidth() / 2);
-                            if (forKml) {
-                                if (valueIdx == 0) {
-                                    xLoc = x + 2;
-                                } else if (valueIdx == values.size() - 1) {
-                                    xLoc = x - (int) rect.getWidth() + 2;
-                                }
-                            }
-                            g.drawString(tickLabel, xLoc,
-                                         y + (int) rect.getHeight() + 2);
-                        } else {
-                            g.drawString(tickLabel,
-                                         x - (int) (rect.getWidth() / 2),
-                                         y - 2);
-                        }
-                    }
-                    if (vertical) {
-                        baseX += width + 30;
-                    } else {
-                        baseY += height + 30;
-                    }
-                    if (forKml) {
-                        String tmpImageFile =
-                            applyMacros(
-                                child, ATTR_FILE,
-                                getIdv().getStore().getTmpFile(
-                                    "testcolorbar${viewindex}.png"));
-                        String template =
-                            "<ScreenOverlay><name>${kml.name}</name><Icon><href>${icon}</href></Icon>\n"
-                            + "<overlayXY x=\"${kml.overlayXY.x}\" y=\"${kml.overlayXY.y}\" xunits=\"${kml.overlayXY.xunits}\" yunits=\"${kml.overlayXY.yunits}\"/>\n"
-                            + "<screenXY x=\"${kml.screenXY.x}\" y=\"${kml.screenXY.y}\" xunits=\"${kml.screenXY.xunits}\" yunits=\"${kml.screenXY.yunits}\"/>\n"
-                            + "<size x=\"${kml.size.x}\" y=\"${kml.size.y}\" xunits=\"${kml.size.xunits}\" yunits=\"${kml.size.yunits}\"/>\n"
-                            + "</ScreenOverlay>\n";
-                        String[] macros = {
-                            "kml.name", "kml.overlayXY.x", "kml.overlayXY.y",
-                            "kml.overlayXY.xunits", "kml.overlayXY.yunits",
-                            "kml.screenXY.x", "kml.screenXY.y",
-                            "kml.screenXY.xunits", "kml.screenXY.yunits",
-                            "kml.size.x", "kml.size.y", "kml.size.xunits",
-                            "kml.size.yunits"
-                        };
-                        String[] macroValues = {
-                            "", "0", "1", "fraction", "fraction", "0", "1",
-                            "fraction", "fraction", "-1", "-1", "pixels",
-                            "pixels"
-                        };
-
-                        for (int macroIdx = 0; macroIdx < macros.length;
-                                macroIdx++) {
-                            template =
-                                template.replace("${" + macros[macroIdx]
-                                    + "}", applyMacros(child,
-                                        macros[macroIdx],
-                                        macroValues[macroIdx]));
-                        }
-                        template = template.replace("${icon}",
-                                IOUtil.getFileTail(tmpImageFile));
-                        imageProps.put("kml", template);
-                        List kmlFiles = (List) imageProps.get("kmlfiles");
-                        //TODO: Only do the first one for now
-                        if (kmlFiles == null) {
-                            kmlFiles = new ArrayList();
-                            imageProps.put("kmlfiles", kmlFiles);
-                        }
-                        kmlFiles.add(tmpImageFile);
-
-                        //                        System.out.println(template);
-                        ImageUtils.writeImageToFile(imageToDrawIn,
-                                tmpImageFile);
-                    }
-                }
-
-
-            } else if (tagName.equals(TAG_TRANSPARENT)
-                       || tagName.equals(TAG_BGTRANSPARENT)) {
-                Color c = null;
-                if (tagName.equals(TAG_BGTRANSPARENT)) {
-                    c = viewManager.getBackground();
-                } else {
-                    c = applyMacros(child, ATTR_COLOR, (Color) null);
-                }
-                //                System.err.println ("c:" + c);
-                int[] redRange   = { 0, 0 };
-                int[] greenRange = { 0, 0 };
-                int[] blueRange  = { 0, 0 };
-                if (c != null) {
-                    //                    System.err.println("got color");
-                    redRange[0]   = redRange[1] = c.getRed();
-                    greenRange[0] = greenRange[1] = c.getGreen();
-                    blueRange[0]  = blueRange[1] = c.getBlue();
-                } else {}
-                newImage = ImageUtils.makeColorTransparent(image, redRange,
-                        greenRange, blueRange);
-            } else if (tagName.equals(TAG_SHOW)) {
-                JComponent contents = new JLabel(new ImageIcon(image));
-                String message = applyMacros(child, ATTR_MESSAGE,
-                                             (String) null);
-                if (message != null) {
-                    contents = GuiUtils.topCenter(new JLabel(message),
-                            contents);
-                }
-                if ( !GuiUtils.askOkCancel("Continue?", contents)) {
-                    throw new MyQuitException();
-                }
-            } else if (tagName.equals(TAG_MATTE)) {
-                newImage = doMatte(image, child, 0);
-            } else if (tagName.equals(TAG_LATLONLABELS)) {
-                newImage = doLatLonLabels(child, viewManager, image,
-                                          imageProps);
-            } else if (tagName.equals(TAG_WRITE)) {
-                ImageUtils.writeImageToFile(
-                    image, getImageFileName(applyMacros(child, ATTR_FILE)));
-
-            } else if (tagName.equals(TAG_PUBLISH)) {
-                getIdv().getPublishManager().publishIslImage(this, node,
-                        image);
-            } else if (tagName.equals(TAG_CLIP)) {
-                int[] ul;
-                int[] lr;
-                if (XmlUtil.hasAttribute(child, ATTR_DISPLAY)) {
-                    //                    System.err.println("Clipping from display");
-                    DisplayControlImpl dc = findDisplayControl(child);
-                    if (dc == null) {
-                        throw new IllegalArgumentException(
-                            "Could not find display:"
-                            + XmlUtil.toString(node));
-                    }
-                    NavigatedDisplay display =
-                        (NavigatedDisplay) viewManager.getMaster();
-                    MapProjection mapProjection = dc.getDataProjection();
-                    java.awt.geom.Rectangle2D rect =
-                        mapProjection.getDefaultMapArea();
-                    LatLonPoint llplr =
-                        mapProjection.getLatLon(new double[][] {
-                        { rect.getX() + rect.getWidth() },
-                        { rect.getY() + rect.getHeight() }
-                    });
-                    LatLonPoint llpul =
-                        mapProjection.getLatLon(new double[][] {
-                        { rect.getX() }, { rect.getY() }
-                    });
-                    EarthLocation ulEl = new EarthLocationTuple(llpul,
-                                             new Real(RealType.Altitude, 0));
-                    EarthLocation lrEl = new EarthLocationTuple(llplr,
-                                             new Real(RealType.Altitude, 0));
-                    ul = display.getScreenCoordinates(
-                        display.getSpatialCoordinates(ulEl, null));
-                    lr = display.getScreenCoordinates(
-                        display.getSpatialCoordinates(lrEl, null));
-                    //System.err.println("ul:" + ulEl + " lr:" + lrEl);
-                    if (ul[0] > lr[0]) {
-                        int tmp = ul[0];
-                        ul[0] = lr[0];
-                        lr[0] = tmp;
-                    }
-                    if (ul[1] > lr[1]) {
-                        int tmp = ul[1];
-                        ul[1] = lr[1];
-                        lr[1] = tmp;
-                    }
-                    imageProps.put(ATTR_NORTH,
-                                   new Double(ulEl.getLatitude().getValue()));
-                    imageProps.put(
-                        ATTR_WEST,
-                        new Double(ulEl.getLongitude().getValue()));
-                    imageProps.put(ATTR_SOUTH,
-                                   new Double(lrEl.getLatitude().getValue()));
-                    imageProps.put(
-                        ATTR_EAST,
-                        new Double(lrEl.getLongitude().getValue()));
-                } else if ((viewManager != null)
-                           && XmlUtil.hasAttribute(child, ATTR_NORTH)) {
-                    NavigatedDisplay display =
-                        (NavigatedDisplay) viewManager.getMaster();
-                    EarthLocation el1 =
-                        DisplayControlImpl.makeEarthLocation(toDouble(child,
-                            ATTR_NORTH), toDouble(child, ATTR_WEST), 0);
-                    EarthLocation el2 =
-                        DisplayControlImpl.makeEarthLocation(toDouble(child,
-                            ATTR_SOUTH), toDouble(child, ATTR_EAST), 0);
-                    ul = display.getScreenCoordinates(
-                        display.getSpatialCoordinates(el1, null));
-                    lr = display.getScreenCoordinates(
-                        display.getSpatialCoordinates(el2, null));
-                    imageProps.put(ATTR_NORTH,
-                                   new Double(el1.getLatitude().getValue()));
-                    imageProps.put(ATTR_WEST,
-                                   new Double(el1.getLongitude().getValue()));
-                    imageProps.put(ATTR_SOUTH,
-                                   new Double(el2.getLatitude().getValue()));
-                    imageProps.put(ATTR_EAST,
-                                   new Double(el2.getLongitude().getValue()));
-                } else if (XmlUtil.hasAttribute(child, ATTR_LEFT)) {
-                    ul = new int[] {
-                        (int) toDouble(child, ATTR_LEFT, imageWidth),
-                        (int) toDouble(child, ATTR_TOP, imageHeight) };
-                    lr = new int[] {
-                        (int) toDouble(child, ATTR_RIGHT, imageWidth),
-                        (int) toDouble(child, ATTR_BOTTOM, imageHeight) };
-                } else if (viewManager != null) {
-                    //TODO: Clip on visad coordinates
-                    NavigatedDisplay display =
-                        (NavigatedDisplay) viewManager.getMaster();
-                    ul = display.getScreenCoordinates(new double[] { -1, 1,
-                            0 });
-                    lr = display.getScreenCoordinates(new double[] { 1, -1,
-                            0 });
-                    int space  = applyMacros(child, ATTR_SPACE, 0);
-                    int hspace = applyMacros(child, ATTR_HSPACE, space);
-                    int vspace = applyMacros(child, ATTR_VSPACE, space);
-                    ul[0] -= applyMacros(child, ATTR_SPACE_LEFT, hspace);
-                    ul[1] -= applyMacros(child, ATTR_SPACE_TOP, vspace);
-                    lr[0] += applyMacros(child, ATTR_SPACE_RIGHT, hspace);
-                    lr[1] += applyMacros(child, ATTR_SPACE_BOTTOM, vspace);
-                } else {
-                    continue;
-                }
-
-
-                for (String attr :
-                        (List<String>) Misc.newList(ATTR_NORTH, ATTR_SOUTH,
-                            ATTR_EAST, ATTR_WEST)) {
-                    String kmlAttr = "kml." + attr;
-                    if (XmlUtil.hasAttribute(child, kmlAttr)) {
-                        imageProps.put(attr,
-                                       new Double(applyMacros(child, kmlAttr,
-                                           0.0)));
-                    }
-                }
-
-
-
-                ul[0]    = Math.max(0, ul[0]);
-                ul[1]    = Math.max(0, ul[1]);
-
-                lr[0]    = Math.min(lr[0], imageWidth);
-                lr[1]    = Math.min(lr[1], imageHeight);
-
-
-                newImage = ImageUtils.clip(image, ul, lr);
-            } else if (tagName.equals(TAG_SPLIT)) {
-                shouldIterateChildren = false;
-                int    width  = image.getWidth(null);
-                int    height = image.getHeight(null);
-                int    cols   = applyMacros(child, ATTR_COLUMNS, 2);
-                int    rows   = applyMacros(child, ATTR_ROWS, 2);
-                String file   = applyMacros(child, ATTR_FILE);
-                int    cnt    = 0;
-                int    hSpace = width / cols;
-                int    vSpace = height / rows;
-                for (int row = 0; row < rows; row++) {
-                    for (int col = 0; col < cols; col++) {
-                        pushProperties();
-                        Hashtable myprops = new Hashtable();
-                        putProperty("row", new Integer(row));
-                        putProperty("column", new Integer(col));
-                        putProperty("count", new Integer(++cnt));
-                        String realFile = applyMacros(file, myprops);
-                        Image splitImage = image.getSubimage(hSpace * col,
-                                               vSpace * row, hSpace, vSpace);
-                        processImage(ImageUtils.toBufferedImage(splitImage),
-                                     realFile, child, myprops, viewManager,
-                                     new Hashtable());
-                        popProperties();
-                    }
-                }
-            } else if (tagName.equals(TAG_THUMBNAIL)) {
-                shouldIterateChildren = false;
-                BufferedImage thumbImage =
-                    ImageUtils.toBufferedImage(resize(image, child));
-                String thumbFile = applyMacros(child, ATTR_FILE,
-                                       (String) null);
-                if (thumbFile == null) {
-                    thumbFile = IOUtil.stripExtension(filename) + "_thumb"
-                                + IOUtil.getFileExtension(filename);
-                }
-                processImage(thumbImage, thumbFile, child, null, viewManager,
-                             new Hashtable());
-            } else if (tagName.equals(TAG_KML)) {
-                //NOOP
-            } else if (tagName.equals(TAG_KMZFILE)) {
-                //NOOP
-            } else if (tagName.equals(TAG_OVERLAY)) {
-                double transparency = applyMacros(child, ATTR_TRANSPARENCY,
-                                          0.0);
-                Graphics2D g = (Graphics2D) image.getGraphics();
-                String imagePath = applyMacros(child, ATTR_IMAGE,
-                                       (String) null);
-
-                Rectangle imageRect = new Rectangle(0, 0, imageWidth,
-                                          imageHeight);
-                Point pp = ImageUtils.parsePoint(applyMacros(child,
-                               ATTR_PLACE, "lr,-10,-10"), imageRect);
-                String text = applyMacros(child, ATTR_TEXT, (String) null);
-                Color  bg = applyMacros(child, ATTR_BACKGROUND, (Color) null);
-                if (text != null) {
-                    double angle = Math.toRadians(applyMacros(child,
-                                       ATTR_ANGLE, 0.0));
-                    text = applyMacros(text);
-                    Color c = applyMacros(child, ATTR_COLOR, Color.white);
-                    if ((c != null) && (transparency > 0)) {
-                        c = new Color(c.getRed(), c.getGreen(), c.getBlue(),
-                                      ImageUtils.toAlpha(transparency));
-                    }
-                    //Color bg = applyMacros(child, ATTR_BACKGROUND,
-                    //                       (Color) null);
-                    if ((bg != null) && (transparency > 0)) {
-                        bg = new Color(bg.getRed(), bg.getGreen(),
-                                       bg.getBlue(),
-                                       ImageUtils.toAlpha(transparency));
-                    }
-                    setFont(g, child);
-                    FontMetrics fm     = g.getFontMetrics();
-                    Rectangle2D rect   = fm.getStringBounds(text, g);
-                    int         width  = (int) rect.getWidth();
-                    int         height = (int) (rect.getHeight());
-
-                    Point ap = ImageUtils.parsePoint(applyMacros(child,
-                                   ATTR_ANCHOR,
-                                   "lr,-10,-10"), new Rectangle(0, 0, width,
-                                       height));
-
-                    g.rotate(angle);
-
-                    if (bg != null) {
-                        g.setColor(bg);
-                        g.fillRect(pp.x - ap.x - 1, pp.y - ap.y - 1,
-                                   (int) width + 2, (int) height + 2);
-                    }
-                    g.setColor(c);
-                    g.drawString(text, pp.x - ap.x, pp.y - ap.y + height);
-                }
-
-                if (imagePath != null) {
-                    Image overlay = ImageUtils.readImage(imagePath);
-                    if (overlay != null) {
-                        if (transparency > 0) {
-                            overlay = ImageUtils.setAlpha(overlay,
-                                    transparency);
-                        }
-                        int width  = overlay.getWidth(null);
-                        int height = overlay.getHeight(null);
-                        Point ap = ImageUtils.parsePoint(applyMacros(child,
-                                       ATTR_ANCHOR,
-                                       "lr,-10,-10"), new Rectangle(0, 0,
-                                           width, height));
-                        g.drawImage(overlay, pp.x - ap.x, pp.y - ap.y, bg,
+                            int width = overlay.getWidth(null);
+                            int height = overlay.getHeight(null);
+                            Point ap = ImageUtils.parsePoint(applyMacros(child,
+                                    ATTR_ANCHOR,
+                                    "lr,-10,-10"), new Rectangle(0, 0,
+                                    width, height));
+                            g.drawImage(overlay, pp.x - ap.x, pp.y - ap.y, bg,
                                     null);
+                        }
                     }
+                    break;
                 }
-            } else {
-                error("Unknown tag:" + tagName);
+                default:
+                    error("Unknown tag:" + tagName);
+                    break;
             }
             if (newImage != null) {
                 String newFileName = applyMacros(child, ATTR_FILE,
@@ -5601,7 +5647,7 @@ public class ImageGenerator extends IdvManager {
             int         y    = baseY + (int) rect.getHeight() / 2;
             int         leftX;
             if (insets.left == 0) {
-                leftX = 0 + delta;
+                leftX = delta;
             } else {
                 leftX = insets.left - (int) rect.getWidth() - delta;
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -222,19 +222,17 @@ public class CursorReadoutWindow {
         }
 
         final String theReadout = readout;
-        GuiUtils.invokeInSwingThread(new Runnable() {
-            public void run() {
-                label.setText(theReadout);
-                window.getContentPane().removeAll();
-                JComponent wrapper = GuiUtils.inset(label,
-                                         new Insets(2, 5, 1, 5));
-                wrapper.setBorder(
-                    BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                window.getContentPane().add(wrapper);
-                window.pack();
-                setWindowLocation();
-                window.toFront();
-            }
+        GuiUtils.invokeInSwingThread(() -> {
+            label.setText(theReadout);
+            window.getContentPane().removeAll();
+            JComponent wrapper = GuiUtils.inset(label,
+                                     new Insets(2, 5, 1, 5));
+            wrapper.setBorder(
+                BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            window.getContentPane().add(wrapper);
+            window.pack();
+            setWindowLocation();
+            window.toFront();
         });
     }
 

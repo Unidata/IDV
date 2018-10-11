@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -99,6 +99,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
@@ -5926,7 +5927,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             PrinterJob printJob = PrinterJob.getPrinterJob();
 
             printJob.setPrintable(
-                ((DisplayImpl) getMaster().getDisplay()).getPrintable());
+                                  ((DisplayImpl) getMaster().getDisplay()).getPrintable());
 
             if ( !printJob.printDialog()) {
                 return;
@@ -6250,6 +6251,60 @@ public class ViewManager extends SharableImpl implements ActionListener,
     }
 
     /**
+     * Capture the image for for ISL. If scriptingNode has a capture attribute then capture the legend or
+     * the full window. Else just capture the display
+     *
+     * @param scriptingNode The ISL node
+     * @return The image
+     */
+    public BufferedImage captureIslImage(Element scriptingNode) throws Exception {
+        BufferedImage image;
+        //Check to see what should be captured
+        String capture = XmlUtil.getAttribute(scriptingNode,"capture",(String) null);
+        if(capture  == null) {
+            return  getMaster().getImage(false);
+        } else {
+            Component component = null;
+            toFront();
+            if(capture.equals("window")) 
+                component = getDisplayWindow().getComponent();
+            else if(capture.equals("legend")) 
+                component = getContents();
+            else
+                throw new IllegalArgumentException("Unknown image capture attribute:" + capture);
+            return makeMixedImage(component);
+            //            return makeBufferedImage(component, capture);
+        }
+    }
+
+
+
+    /**
+     * This creates an image from the given lightweight component and then looks for all of the
+     * heavyweight DisplayManager views and overlays those images on the main image
+     *
+     * @param component the component
+     * @return the image
+     */
+    private BufferedImage makeMixedImage(Component component)  throws Exception {
+        Point    baseLoc   = component.getLocationOnScreen();
+        Image mainImage = ImageUtils.getImage(component);
+        Graphics graphics = mainImage.getGraphics();
+        List<ViewManager> viewManagers = getDisplayWindow().getViewManagers();
+        List<Component> heavyWeightComponents = new ArrayList<Component>();
+        for(ViewManager vm: viewManagers) {
+            Component comp = vm.getMaster().getComponent();
+            Dimension             dim   = comp.getSize();
+            Point                 loc   = comp.getLocationOnScreen();
+            Image image =  vm.getMaster().getImage(false);
+            graphics.drawImage(image, loc.x-baseLoc.x, loc.y-baseLoc.y, null);
+        }
+        return ImageUtils.toBufferedImage(mainImage);
+    }
+
+
+
+    /**
      * Make buffered image.
      *
      * @param comp the component
@@ -6257,7 +6312,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * @return the buffered image
      * @throws AWTException the AWT exception
      */
-    private BufferedImage makeBufferedImage(Component comp,
+    public BufferedImage makeBufferedImage(Component comp,
                                             String whichComponent)
             throws AWTException {
         Dimension             dim   = comp.getSize();

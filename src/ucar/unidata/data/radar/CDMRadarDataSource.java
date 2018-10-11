@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -686,7 +686,20 @@ public class CDMRadarDataSource extends RadarDataSource {
      */
     protected RadarAdapter makeRadarAdapter(String source) throws Exception {
         CDMRadarAdapter adapter = new CDMRadarAdapter(this, source);
-
+        EarthLocation elf = adapter.getRadarStationInFile();
+        if(elf == null){
+            String sid = adapter.getStationID();
+            if (sid != null ) {
+                NamedStation rstation = null;
+              if(sid.length() == 4) {
+                  rstation = (NamedStation) getStations().get(sid.substring(1));
+              } else if(sid.length() == 3) {
+                  rstation = (NamedStation) getStations().get(sid);
+              }
+              if(rstation != null)
+                  adapter.setStationLocation(rstation.getNamedLocation());
+            }
+        }
         return adapter;
     }
 

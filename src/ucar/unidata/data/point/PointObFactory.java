@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -40,15 +40,16 @@ import ucar.nc2.dt.StationObsDataset;
 import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.CFPointObWriter;
 import ucar.nc2.dt.point.PointObVar;
-import ucar.nc2.ft.FeatureCollection;
-import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.NestedPointFeatureCollection;
-import ucar.nc2.ft.PointFeature;
-import ucar.nc2.ft.PointFeatureCollection;
-import ucar.nc2.ft.PointFeatureIterator;
+import ucar.nc2.ft.*;
 import ucar.nc2.ft.point.PointIteratorFiltered;
+import ucar.nc2.ft.point.StationFeature;
+import ucar.nc2.ft.point.StationFeatureImpl;
+import ucar.nc2.ft.point.StationTimeSeriesCollectionImpl;
+import ucar.nc2.ft.point.standard.StandardStationCollectionImpl;
+import ucar.nc2.time.CalendarDate;
 import ucar.nc2.units.DateRange;
 
+import ucar.nc2.units.DateUnit;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
@@ -2103,7 +2104,7 @@ public class PointObFactory {
                     "Can't handle point data with multiple collections");
         }
         FeatureCollection fc = collectionList.get(0);
-        PointFeatureCollection collection = null;
+        FeatureCollection collection = null;
         // System.out.println("llr = " + llr);
         DateRange dateRange = null;
         if (dateSelection != null) {
@@ -2127,8 +2128,14 @@ public class PointObFactory {
         if (fc instanceof PointFeatureCollection) {
             collection = (PointFeatureCollection) fc;
             if ((llr != null) || (dateRange != null)) {
-                collection = collection.subset(llr, dateRange);
+                collection = ((PointFeatureCollection)collection).subset(llr, dateRange);
             }
+        } else if (fc instanceof StandardStationCollectionImpl) {
+            collection = (StandardStationCollectionImpl) fc;
+            if ((llr != null) || (dateRange != null)) {
+                collection = ((StandardStationCollectionImpl)collection).flatten(llr, dateRange);
+            }
+
         } else if (fc instanceof NestedPointFeatureCollection) {
             NestedPointFeatureCollection npfc =
                     (NestedPointFeatureCollection) fc;
@@ -2321,10 +2328,10 @@ public class PointObFactory {
             tuples.add(tuple);
             times.add(new DateTime(0));
             elts.add(elt);
-        } else if(collection instanceof  PointFeatureCollection){
+        }  else if(collection instanceof  PointFeatureCollection){
             PointFeatureIterator dataIterator =
                     //collection.getPointFeatureIterator(-1);
-                    collection.getPointFeatureIterator(16384);
+                    ((PointFeatureCollection)collection).getPointFeatureIterator(16384);
             while (dataIterator.hasNext()) {
                 PointFeature po = (PointFeature) dataIterator.next();
                 iammissing = false;
@@ -2332,7 +2339,7 @@ public class PointObFactory {
                 ucar.unidata.geoloc.EarthLocation el = po.getLocation();
                 double elt0 = 0.0;
                 if (el.getAltitude() == el.getAltitude()) {
-                    elt0 = el.getAltitude();
+                    elt0 = el.getAltitude() + 50.0;
                 }
                 elt = new EarthLocationLite(
                         lat.cloneButValue(el.getLatitude()),
@@ -2418,7 +2425,113 @@ public class PointObFactory {
                     "found " + ismissing + "/" + missing
                             + " missing out of " + obIdx);
             dataIterator.finish();
-        } else {
+        } else if( collection instanceof  StandardStationCollectionImpl){
+            StandardStationCollectionImpl ssci = (StandardStationCollectionImpl)collection;
+           // PointFeatureCollectionIterator dataIterator =
+                    //collection.getPointFeatureIterator(-1);
+            //        ((StandardStationCollectionImpl)collection).getPointFeatureCollectionIterator(16384);
+
+            CalendarDate cdate = null;
+            while (ssci.hasNext()) {
+                StationTimeSeriesFeature po = (StationTimeSeriesFeature) ssci.next();
+                iammissing = false;
+                obIdx++;
+                // StationTimeSeriesFeature el = po..next();
+                PointFeatureIterator pf = po.getPointFeatureIterator(-1);
+                while (pf.hasNext()) {
+                    PointFeature pf0 = pf.next();
+                    cdate = pf0.getObservationTimeAsCalendarDate();
+
+                    double elt0 = 0.0;
+                    if (po.getAltitude() != Float.NaN) {
+                        elt0 = po.getAltitude();
+                    }
+                    elt = new EarthLocationLite(
+                            lat.cloneButValue(po.getLatitude()),
+                            lon.cloneButValue(po.getLongitude()),
+                            alt.cloneButValue(elt0));
+                    double[] realArray = new double[numReals];
+                    String[] stringArray = ((numStrings == 0)
+                            ? null
+                            : new String[numStrings]);
+
+                    // make the VisAD data object
+                    StructureData structure = pf0.getDataAll(); //po.getFeatureData();
+                    int stringCnt = 0;
+                    int realCnt = 0;
+                    if (needToAddStationId) {
+                        StationObsDatatype sod = (StationObsDatatype) po;
+                        stringArray[stringCnt++] = sod.getStation().getName();
+                    }
+                    boolean allMissing = true;
+
+                    // check for a missing flag
+                    member = structure.findMember(_isMissing);
+                    if (member != null) {
+                        value = structure.convertScalarInt(member);
+                        if (value == 1) {
+                            iammissing = true;
+                            ismissing++;
+                            missing++;
+                            continue;
+                        }
+                    }
+
+                    for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
+                        member =
+                                structure.findMember((String) shortNames[varIdx]);
+                        if (member == null) {
+                            continue;
+                        }
+                        if (!isVarNumeric[varIdx]) {
+                            svalue = structure.getScalarString(member);
+                            if (svalue.length() != 0) {
+                                allMissing = false;
+                            }
+                            stringArray[stringCnt++] = svalue;
+                        } else {
+                            value = structure.convertScalarFloat(member);
+                            if (value == value) {
+                                allMissing = false;
+                            }
+                            realArray[realCnt++] = value;
+                        }
+                    }
+                    /*
+                    if (allMissing  && !iammissing) {
+                        System.out.println("has all missing, but not iammissing: " + el);
+                    }
+                    */
+                    if (allMissing) {
+                        missing++;
+                        continue;
+                    }
+
+                    Tuple tuple = (allReals
+                            ? (Tuple) new DoubleTuple(
+                            (RealTupleType) allTupleType, realArray,
+                            allUnits)
+                            : new DoubleStringTuple(allTupleType,
+                            realArray, stringArray, allUnits));
+
+                    tuples.add(tuple);
+                    times.add(new DateTime(cdate.toDate()));
+                    elts.add(elt);
+
+                    if (obIdx % NUM == 0) {
+                        if (!JobManager.getManager().canContinue(loadId)) {
+                            LogUtil.message("");
+                            return null;
+                        }
+                        LogUtil.message("Read " + obIdx + " observations");
+                    }
+                }
+            }
+            Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
+                    "found " + ismissing + "/" + missing
+                            + " missing out of " + obIdx);
+           // po.finish();
+        }  else {
             NetcdfDataset netcdfDataset =
                     (NetcdfDataset) input.getNetcdfFile();
             List coords = netcdfDataset.getCoordinateAxes();

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -411,20 +411,24 @@ public class ToolbarEditor implements ActionListener {
         }
 
 
-        if (cmd.equals(CMD_REMOVEWRITABLE)) {
-            if ( !GuiUtils.showYesNoDialog(
-                    null,
-                    "Are you sure you want to remove any custom toolbar and revert to the system tolbar?",
-                    "Delete confirmation")) {
-                return;
-            }
-            resources.removeWritable();
-            twoListPanel.reinitialize(getAllActions(), getCurrentList());
-        } else if (cmd.equals(CMD_RELOAD)) {
-            twoListPanel.reload();
-        } else if (cmd.equals(CMD_ADDSPACE)) {
-            twoListPanel.insertEntry(new TwoFacedObject(SPACE,
-                    SPACE + (spaceCnt++)));
+        switch (cmd) {
+            case CMD_REMOVEWRITABLE:
+                if (!GuiUtils.showYesNoDialog(
+                        null,
+                        "Are you sure you want to remove any custom toolbar and revert to the system tolbar?",
+                        "Delete confirmation")) {
+                    return;
+                }
+                resources.removeWritable();
+                twoListPanel.reinitialize(getAllActions(), getCurrentList());
+                break;
+            case CMD_RELOAD:
+                twoListPanel.reload();
+                break;
+            case CMD_ADDSPACE:
+                twoListPanel.insertEntry(new TwoFacedObject(SPACE,
+                        SPACE + (spaceCnt++)));
+                break;
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1326,7 +1326,7 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
         List                      stns        = null;
 
         ds_location =
-            "http://motherlode.ucar.edu:9080/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
+            "https://thredds.ucar.edu/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
         dsc = TDSRadarDatasetCollection.factory("test", ds_location, errlog);
         System.out.println(" errs= " + errlog);
         stns = dsc.getStations();

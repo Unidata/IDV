@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -181,9 +181,11 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                    CoordinateSystem[] rangeCoordSysArray,
                                    Set[] rangeSets, Unit[] units)
             throws VisADException {
-        return new AreaImageFlatField(this, copy, type, domainSet,
+        AreaImageFlatField theClone = new AreaImageFlatField(this, copy, type, domainSet,
                                       rangeCoordSys, rangeCoordSysArray,
                                       rangeSets, units, readLabel);
+        theClone.startTime = this.startTime;
+        return theClone;
     }
 
 

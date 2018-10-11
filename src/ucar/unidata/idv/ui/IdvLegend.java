@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -206,15 +206,13 @@ public abstract class IdvLegend implements Removable {
                 GuiUtils.getImageButton("/auxdata/ui/icons/Export16.gif",
                                         getClass());
             setFloatToolTip();
-            floatBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    if (floatFrame != null) {
-                        viewManager.setLegendState(IdvLegend.this,
-                                STATE_DOCKED);
-                    } else {
-                        viewManager.setLegendState(IdvLegend.this,
-                                STATE_FLOAT);
-                    }
+            floatBtn.addActionListener(ae -> {
+                if (floatFrame != null) {
+                    viewManager.setLegendState(IdvLegend.this,
+                            STATE_DOCKED);
+                } else {
+                    viewManager.setLegendState(IdvLegend.this,
+                            STATE_FLOAT);
                 }
             });
         }
@@ -274,11 +272,7 @@ public abstract class IdvLegend implements Removable {
         if (viewManager == null) {
             return;
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fillLegendInner();
-            }
-        });
+        SwingUtilities.invokeLater(() -> fillLegendInner());
 
     }
 
@@ -317,13 +311,11 @@ public abstract class IdvLegend implements Removable {
     protected JButton makePropertiesButton(final DisplayControl control) {
         JButton propertiesBtn = GuiUtils.getImageButton(ICON_PROPERTIES);
         propertiesBtn.setToolTipText("Show or hide the control window");
-        propertiesBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    control.toggleWindow();
-                } catch (Exception exc) {
-                    viewManager.logException("Showing display", exc);
-                }
+        propertiesBtn.addActionListener(ae -> {
+            try {
+                control.toggleWindow();
+            } catch (Exception exc) {
+                viewManager.logException("Showing display", exc);
             }
         });
         //Set the bg to null so we pick up the container's bgcolor

@@ -1,7 +1,7 @@
 /*
  * $Id: ThreddsHandler.java,v 1.68 2007/07/09 22:59:58 jeffmc Exp $
  *
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -280,7 +280,7 @@ public class CatalogUtil {
 
 
     /**
-     * A utiliry to get the version from the catalog root.
+     * A utility to get the version from the catalog root.
      *
      *
      * @param node The xml node

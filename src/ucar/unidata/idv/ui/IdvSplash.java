@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -170,22 +170,20 @@ public class IdvSplash extends JWindow {
                 }
                 /*else*/
                 if (false && !playedOnce) {
-                    Misc.run(new Runnable() {
-                        public void run() {
-                            try {
-                                String audioFile =
-                                    idv.getStore().getTmpFile("splash.wav");
-                                IOUtil.writeTo(
-                                    IOUtil.getInputStream(
-                                        "/auxdata/ui/icons/test.gif"), new FileOutputStream(
-                                        audioFile));
-                                ucar.unidata.ui.AudioPlayer audioPlayer =
-                                    new ucar.unidata.ui.AudioPlayer();
-                                audioPlayer.setFile(audioFile);
-                                audioPlayer.startPlaying();
-                                playedOnce = true;
-                            } catch (Exception exc) {}
-                        }
+                    Misc.run(() -> {
+                        try {
+                            String audioFile =
+                                idv.getStore().getTmpFile("splash.wav");
+                            IOUtil.writeTo(
+                                IOUtil.getInputStream(
+                                    "/auxdata/ui/icons/test.gif"), new FileOutputStream(
+                                    audioFile));
+                            ucar.unidata.ui.AudioPlayer audioPlayer =
+                                new ucar.unidata.ui.AudioPlayer();
+                            audioPlayer.setFile(audioFile);
+                            audioPlayer.startPlaying();
+                            playedOnce = true;
+                        } catch (Exception exc) {}
                     });
                 }
 
@@ -243,11 +241,7 @@ public class IdvSplash extends JWindow {
 
 
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                System.exit(0);
-            }
-        });
+        cancelButton.addActionListener(ae -> System.exit(0));
 
         if ((splashTitle == null) || splashTitle.trim().equals("")) {
             String version = idv.getStateManager().getVersion();

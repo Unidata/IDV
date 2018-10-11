@@ -143,6 +143,12 @@ def horizontalAdvection(param, u, v):
   """ horizontal advection """
   return DerivedGridFactory.createHorizontalAdvection(param,u,v)
 
+def horizontalAdvection(param, vector):
+  """ horizontal advection """
+  u = DerivedGridFactory.getUComponent(vector)
+  v = DerivedGridFactory.getVComponent(vector)
+  return DerivedGridFactory.createHorizontalAdvection(param,u,v)
+
 def horizontalDivergence(param, u, v):
   """ horizontal flux divergence """
   return DerivedGridFactory.createHorizontalFluxDivergence(param,u,v)
@@ -435,3 +441,18 @@ def make2DFlowTraj(u,v,s,s0):
 
 def setLevel(grid, level, unit):
   return GridUtil.addLevelToGrid(grid, float(level), unit)
+
+def thetaSurface(grid, theta0):
+  return DerivedGridFactory.extractGridOverThetaTopoSurface(grid, float(theta0))
+
+def thetaSurfaceA(grid, grid1, theta0):
+  return DerivedGridFactory.extractGridOverThetaTopoSurface(grid, grid1, float(theta0))
+
+def thetaSurfaceV(gridt, gridu, gridv, theta0):
+  return DerivedGridFactory.extractUVGridOverThetaTopoSurface(gridt, gridu, gridv, float(theta0))
+
+def thetaSurfaceV(gridt, griduv, theta0):
+  return DerivedGridFactory.extractVectorGridOverThetaTopoSurface(gridt, griduv, float(theta0))
+
+def thetaSurfaceADV(gridt, griduv, other, theta0):
+  return DerivedGridFactory.extractGridADVOverThetaTopoSurface(gridt, griduv, other,float(theta0))

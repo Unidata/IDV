@@ -23,3 +23,12 @@ def combineRGB(red, green, blue):
   blue=GridUtil.setParamType(blue,makeRealType("blueimage"), 0)
   return DerivedGridFactory.combineGrids((red,green,blue),1)
 
+
+def combineRGB1(chP64,chP86,chP47):
+  """ GOES16/17 combine 3 images as an RGB image """
+  green =  0.45*chP64 + 0.45*chP47 + 0.1*chP86
+  red = GridUtil.setParamType(chP64,makeRealType("redimage"), 0)
+  blue = GridUtil.setParamType(chP47,makeRealType("blueimage"), 0)
+  grn = GridUtil.setParamType(green,makeRealType("greenimage"), 0)
+
+  return DerivedGridFactory.combineGrids((red,grn,blue),1)

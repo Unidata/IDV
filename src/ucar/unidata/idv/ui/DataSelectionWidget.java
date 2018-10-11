@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1518,45 +1518,50 @@ public class DataSelectionWidget {
         if (timesList == null) {
             return;
         }
-        timeOption = selectedObject.toString();
-        if (selectedObject.equals(USE_DEFAULTTIMES)) {
-            //selectIdx = 0;
-            timesList.setVisible(true);
-            timesList.setEnabled(false);
-            if (lastDataChoice != null) {
-                lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
-                                           false);
-            }
-        } else if (selectedObject.equals(USE_SELECTEDTIMES)) {
-            //selectIdx = 1;
-            timesList.setVisible(true);
-            timesList.setEnabled(true);
-            chooserDoTimeMatching = false;
-            if (lastDataChoice != null) {
-                lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
-                                           true);
-            }
-        } else if (selectedObject.equals(USE_DRIVERTIMES)) {
-            //selectIdx = 2;
-            timesList.setVisible(false);
-            timesList.setEnabled(false);
-            if (lastDataChoice != null) {
-                lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER,
-                                           true);
-                lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
-                                           false);
-            }
-        } else if (selectedObject.equals(AS_DRIVERTIMES)) {
-            //selectIdx = 1;
-            timesList.setVisible(true);
-            timesList.setEnabled(true);
-            chooserDoTimeMatching = false;
-            if (lastDataChoice != null) {
-                lastDataChoice.setProperty(DataSelection.PROP_ASTIMEDRIVER,
-                                           true);
-                lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
-                                           false);
-            }
+        timeOption = selectedObject;
+        switch (selectedObject) {
+            case USE_DEFAULTTIMES:
+                //selectIdx = 0;
+                timesList.setVisible(true);
+                timesList.setEnabled(false);
+                if (lastDataChoice != null) {
+                    lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
+                            false);
+                }
+                break;
+            case USE_SELECTEDTIMES:
+                //selectIdx = 1;
+                timesList.setVisible(true);
+                timesList.setEnabled(true);
+                chooserDoTimeMatching = false;
+                if (lastDataChoice != null) {
+                    lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
+                            true);
+                }
+                break;
+            case USE_DRIVERTIMES:
+                //selectIdx = 2;
+                timesList.setVisible(false);
+                timesList.setEnabled(false);
+                if (lastDataChoice != null) {
+                    lastDataChoice.setProperty(DataSelection.PROP_USESTIMEDRIVER,
+                            true);
+                    lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
+                            false);
+                }
+                break;
+            case AS_DRIVERTIMES:
+                //selectIdx = 1;
+                timesList.setVisible(true);
+                timesList.setEnabled(true);
+                chooserDoTimeMatching = false;
+                if (lastDataChoice != null) {
+                    lastDataChoice.setProperty(DataSelection.PROP_ASTIMEDRIVER,
+                            true);
+                    lastDataChoice.setProperty(DataSelection.PROP_TIMESUBSET,
+                            false);
+                }
+                break;
         }
     }
 

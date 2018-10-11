@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -1847,7 +1847,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     bounds = viewManager.getVisibleGeoBounds();
                 }
 
+                System.err.println("image sequence");
                 if (alternateComponent != null) {
+                    System.err.println("image sequence - alt");
                     GuiUtils.toFront(GuiUtils.getFrame(alternateComponent));
                     Misc.sleep(50);
                     ImageUtils.writeImageToFile(alternateComponent, path);
@@ -1870,7 +1872,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                         .getViewManagers()) {
                                 ViewManager vm = (ViewManager) o;
                                 vm.getAnimation().setAniValue(time);
-                                images.add(vm.getMaster().getImage(false));
+                                images.add(vm.captureIslImage(scriptingNode));
                             }
                             int cols = 2;
                             cols = XmlUtil.getAttribute(scriptingNode,
@@ -1879,7 +1881,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                                 images, 0, Color.BLACK, cols);
 
                         } else {
-                            image = viewManager.getMaster().getImage(false);
+                            image = viewManager.captureIslImage(scriptingNode);
                         }
                         Hashtable props = new Hashtable();
 

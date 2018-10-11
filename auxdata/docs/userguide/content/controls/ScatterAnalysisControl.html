@@ -1,0 +1,80 @@
+{Scatter Analysis Controls}
+
+{
+
+The Scatter Analysis controls are used to create a scatter plot within IDV. The scatter controls show three different panels:
+
+[ht::cimg images/ScatterAnalysisControl.gif]
+
+
+
+<p>
+The plot on the first panel on the left represents the first field selected in the <strong>Field Selector</strong>,
+the panel in the middle represents the second field which is selected through the Field Selector window, and
+the panel on the right is the scatter analysis of the two fields. The first field selected is represented on the
+X-axis (abscissa) and the second field selected represents the Y-axis (ordinate). The X-axis is selected in
+the <strong>Field Selector</strong> - the channel selected in the lower right <strong>Channels</strong> tab
+will be used as the X-axis.
+<p>
+Regions can be subsetted in any of the three panels, and the equivalent points will also be selected in the
+other two panels. For example, if a box is drawn in panel 1, the same box will be drawn in panel 2, and the
+points in these boxes will be colored the same in panel 3, the scatter analysis. To draw a box, select a Box
+radio icon and a color and use Shift+left-click and drag to select a region. Any enclosed shape can be drawn
+by selecting the Curve radio button and a color and using left-click and drag in any panel to select a region.
+A user is allowed one box and one curve per color in the scatter analysis (panel 3), and one box and one curve
+for the images (panels 1 and 2). To remove a region that has been subsetted, double-click on the color of the
+region to remove next to the Box/Curve radio buttons.
+
+<p>
+Right-click on the color bar below the images to open the <a href="../tools/ColorTableEditor.html">Color Table Editor</a>,
+change the range, select other color tables, etc.
+
+<p>
+Under the scatter analysis, there is a <strong>Background Color</strong> option that allows for setting the background
+color of the scatter analysis.  This defaults to black.  When white is selected, the background will be come white and
+the scatter plot axes and labels will change to black.
+
+<p>
+To the right of the Box/Curve options, there is a
+<img src="images/ComputeStatistics.gif" width="140" height="26" alt="Compute Statistics button"align="absmiddle"> button.
+Clicking this button will Scatter Statistics window that will list statistical information about the data as a whole,
+as well as the regions of the data that were subsetted with a box/curve. The values in the white columns are computed
+for the image as a whole, and the values in the colored columns are computed for the area of the respective box/curve.
+
+<div class="images"><img src="images/StatisticsOutput.gif" width="786" height="312" alt="Image 2: HYDRA Scatter Statistics Window"><br>
+<p>
+
+
+}
+
+
+{{Maximum} {Lists the maximum numerical value of the field within the boundaries of the
+    entire image or a subsetted region.}}
+{{Minimum} {Lists the minimum numerical value of the field within the boundaries of the
+    entire image or a subsetted region.}}
+{{Number of points} {Lists the total number of points within the boundaries of the entire
+    image or a subsetted region.}}
+{{Mean} {Lists the mean numerical value of the field within the boundaries of the entire
+    image or a subsetted region.}}
+{{Median} { Lists the median numerical value of the field within the boundaries of the entire
+    image or a subsetted region.}}
+{{Variance} {Lists the variance of the field within the boundaries of the entire image or
+    a subsetted region.}}
+{{Kurtosis} { Lists the kurtosis value of the field within the boundaries of the entire
+    image or a subsetted region.}}
+{{Std Dev} { Lists the standard deviation of the field within the boundaries of the entire
+    image or a subsetted region.}}
+{{Correlation} {Lists the correlation between the numerical values of the two fields within the
+    boundaries of the entire image or a subsetted region.}}
+{{Difference Maximum} { Lists the maximum difference in the numerical values of the fields
+    on a pixel-by-pixel basis.}}
+{{Difference Minimum} { Lists the minimum difference in the numerical values of the fields
+    on a pixel-by-pixel basis.}}
+{{Difference Mean} { Lists the mean difference in the numerical values of the fields on a
+    pixel-by-pixel basis.}}
+{{Area \[km^2\]} {Lists the area, in square kilometers, of the subsetted regions.}}
+{{Save As CSV} {Saves this statistical data as a Comma-Separated Values (CSV) file (*.csv).}}
+
+
+
+

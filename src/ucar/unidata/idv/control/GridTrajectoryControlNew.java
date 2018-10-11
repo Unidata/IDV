@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
@@ -251,6 +251,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
     /** _more_ */
     private boolean coloredByAnother = false;
 
+    /** _more_ */
+    private boolean withTopo = false;
+
+    /** _more_ */
+    private boolean is2D = false;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -296,6 +301,41 @@ public class GridTrajectoryControlNew extends DrawingControl {
         return useSpeedForColor;
     }
 
+    /**
+     * _more_
+     *
+     * @param yesno _more_
+     */
+    public void setWithTopo(boolean yesno) {
+        withTopo = yesno;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getWithTopo() {
+        return withTopo;
+    }
+
+    /**
+     * _more_
+     *
+     * @param yesno _more_
+     */
+    public void setIs2D(boolean yesno) {
+        is2D = yesno;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIs2D() {
+        return is2D;
+    }
 
     /**
      * Class MyTrackControl _more_
@@ -367,7 +407,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                                       "Ribbon",
                                                                       "Cylinder",
                                                                       "Deform Ribbon",
-                                                                        "Point"};
+                                                                      "Point" };
 
         /** types of smoothing functions */
         private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
@@ -390,7 +430,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
         /** _more_ */
         GridTrajectoryControlNew gtc;
 
+        /** _more_ */
         boolean is2D = false;
+
+        /** _more_ */
+        Data topoData = null;
 
         /**
          * Default constructor; does nothing.
@@ -442,7 +486,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if (dataChoice instanceof DerivedDataChoice) {
                 DerivedDataChoice ddc      = (DerivedDataChoice) dataChoice;
                 List              choices0 = ddc.getChoices();
-                if(choices0.size() == 1) { // colored by another param
+                if (choices0.size() == 1) {  // colored by another param
                     ddc      = (DerivedDataChoice) choices0.get(0);
                     choices0 = ddc.getChoices();
                 }
@@ -477,7 +521,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                             return false;
                         }
                     }
-                } else if(choices0.size() == 2) {
+                } else if (choices0.size() == 2) {
                     is2D = true;
                 }
             }
@@ -515,7 +559,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             //myDisplay.setForward(!gtc.backwardTrajectory);
             //DataSelection ds = getDataSelection();
             DataSelection tmpSelection =
-                    new DataSelection(gtc.getDataSelection());
+                new DataSelection(gtc.getDataSelection());
             tmpSelection.setFromLevel(null);
             tmpSelection.setToLevel(null);
             dataChoice.setDataSelection(tmpSelection);
@@ -533,6 +577,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
             return true;
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public String getLineWidthWidgetLabel() {
             return "Line Width/Point Size";
         }
@@ -561,11 +610,12 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     false);
 
             if (useSpeedForColor || coloredByAnother) {
-                if(coloredByAnother) {
-                    if(is2D)
+                if (coloredByAnother) {
+                    if (is2D) {
                         colorIndex = 2;
-                    else
+                    } else {
                         colorIndex = 3;
+                    }
                 }
                 addAttributedDisplayable(planDisplay, FLAG_COLORTABLE);
                 addAttributedDisplayable(planDisplay, FLAG_LINEWIDTH);
@@ -785,19 +835,28 @@ public class GridTrajectoryControlNew extends DrawingControl {
             tmpSelection.setToLevel(null);
             DataChoice wchoice = null;
 
-            if(coloredByAnother){
-                DerivedDataChoice derivedDataChoice = ((DerivedDataChoice) ((DerivedDataChoice) choice).getChoices().get(
-                        0));
-                if(is2D)
-                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(0));
-                else
-                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(2));
-            } else if(is2D){
-                wchoice = ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
-                        0));
+            is2D = gtc.is2D;
+            if (coloredByAnother) {
+                DerivedDataChoice derivedDataChoice =
+                    ((DerivedDataChoice) ((DerivedDataChoice) choice).getChoices()
+                    .get(0));
+                if (is2D) {
+                    wchoice =
+                        ((DataChoice) (derivedDataChoice).getChoices().get(
+                            0));
+                } else {
+                    wchoice =
+                        ((DataChoice) (derivedDataChoice).getChoices().get(
+                            2));
+                }
+            } else if (is2D) {
+                wchoice =
+                    ((DataChoice) ((DerivedDataChoice) choice).getChoices()
+                    .get(0));
             } else {
-                wchoice = ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
-                        2));
+                wchoice =
+                    ((DataChoice) ((DerivedDataChoice) choice).getChoices()
+                    .get(2));
             }
             List     levelsList = wchoice.getAllLevels(tmpSelection);
             Object[] levels     = null;
@@ -810,10 +869,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 levels = getGridDataInstance().getLevels();
             }
 
-            if(levels != null)
+            if (levels != null) {
                 setLevels(levels);
-            else
+            } else {
                 is2D = true;
+            }
             myDisplay = (FlowDisplayable) createPlanDisplay();
             myDisplay.setActive(false);
             myDisplay.setUseSpeedForColor(useSpeedForColor);
@@ -825,7 +885,15 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 colorIndex = 3;
             }
 
-            loadVolumeData();
+            //loadVolumeData();
+
+            if (gtc.withTopo) {
+                // topoData = (FieldImpl) getTOPOdata(wchoice);
+                DataChoice topoChoice =
+                    ((DataChoice) ((DerivedDataChoice) choice).getChoices()
+                    .get(3));
+                topoData = topoChoice.getData(wchoice.getDataSelection());
+            }
 
             if (useSpeedForColor || coloredByAnother) {
                 setFlowColorRange();
@@ -1345,9 +1413,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if (useSpeedForColor) {
                 return "windSpeed";
             } else if (coloredByAnother) {
-                if(getGridDataInstance()==null)
+                if (getGridDataInstance() == null) {
                     return "ColoredByAnother";
-                String pname = getGridDataInstance().getRealTypeName(colorIndex);
+                }
+                String pname =
+                    getGridDataInstance().getRealTypeName(colorIndex);
                 int eidx = pname.indexOf("[unit");
                 return pname.substring(0, eidx);
             } else {
@@ -1369,8 +1439,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if (useSpeedForColor) {
                 return flowRange;
             } else if (coloredByAnother) {
-                if(getGridDataInstance() == null)
+                if (getGridDataInstance() == null) {
                     return null;
+                }
                 return getGridDataInstance().getRanges()[colorIndex];
             } else {
                 return super.getInitialRange();
@@ -1437,7 +1508,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 setTrajFormType(gtc.getTrackFormType());
                 try {
                     setRange(gtc.getRange());
-                } catch (Exception ee){}
+                } catch (Exception ee) {}
                 if (trajFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
@@ -1469,6 +1540,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
         /**
          * _more_
          *
+         *
+         * @return _more_
          * @throws RemoteException _more_
          * @throws VisADException _more_
          */
@@ -1528,6 +1601,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 return super.getColorTable();
             }
         }
+
         /**
          * _more_
          *
@@ -1558,19 +1632,27 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             DataChoice wchoice = null;
 
-            if(coloredByAnother){
-                DerivedDataChoice derivedDataChoice = ((DerivedDataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
-                        0));
-                if(is2D)
-                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(0));
-                else
-                    wchoice = ((DataChoice) (derivedDataChoice).getChoices().get(2));
-            } else if( is2D ){
-                wchoice = ((DataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
-                        0));
+            if (coloredByAnother) {
+                DerivedDataChoice derivedDataChoice =
+                    ((DerivedDataChoice) ((DerivedDataChoice) datachoice).getChoices()
+                    .get(0));
+                if (is2D) {
+                    wchoice =
+                        ((DataChoice) (derivedDataChoice).getChoices().get(
+                            0));
+                } else {
+                    wchoice =
+                        ((DataChoice) (derivedDataChoice).getChoices().get(
+                            2));
+                }
+            } else if (is2D) {
+                wchoice =
+                    ((DataChoice) ((DerivedDataChoice) datachoice).getChoices()
+                    .get(0));
             } else {
-                wchoice = ((DataChoice) ((DerivedDataChoice) datachoice).getChoices().get(
-                        2));
+                wchoice =
+                    ((DataChoice) ((DerivedDataChoice) datachoice).getChoices()
+                    .get(2));
             }
             List     levelsList = wchoice.getAllLevels(tmpSelection);
             Object[] levels     = null;
@@ -1851,7 +1933,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 && (currentLevel == null)) {
             currentLevel = levels[0];
         }
-        if (levels != null && fromLevel == null) {
+        if ((levels != null) && (fromLevel == null)) {
             int len = levels.length;
             if (((Real) levels[0]).getValue()
                     < ((Real) levels[len - 1]).getValue()) {
@@ -1860,14 +1942,16 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 fromLevel = levels[0];
             }
         }
-        if(levels != null)
+        if (levels != null) {
             setLevels(levels, fromLevel);
+        }
 
         // the control for the track
         setDisplayActive();
-
-        gridTrackControl.myDisplay =
-            (FlowDisplayable) gridTrackControl.createPlanDisplay();
+        if (gridTrackControl.myDisplay == null) {
+            gridTrackControl.myDisplay =
+                (FlowDisplayable) gridTrackControl.createPlanDisplay();
+        }
         setLineWidth(gridTrackControl.getLineWidth());
         addDisplayable(gridTrackControl.myDisplay, getAttributeFlags());
 
@@ -1987,7 +2071,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 setLevel(bundleLevel);
                 levelBox.setSelectedItem(bundleLevel);
             }
-            if(backwardTrajectory){
+            if (backwardTrajectory) {
                 backwardCbx.doClick();
             }
             newUnit = getDisplayUnit();
@@ -2230,11 +2314,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             Real    alt      = null;
             // if(zunit.getIdentifier().length() == 0) {
-            if(currentLevel != null)
+            if (currentLevel != null) {
                 alt = GridUtil.getAltitude(
-                    domainSet, (Real) ((TwoFacedObject) currentLevel).getId());
-            else
+                    domainSet,
+                    (Real) ((TwoFacedObject) currentLevel).getId());
+            } else {
                 alt = new Real(0.0);
+            }
             float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
                                     domain2D, alt, getSkipValue());
             float[][] setLocs = cs.toReference(geoVals);
@@ -2246,8 +2332,12 @@ public class GridTrajectoryControlNew extends DrawingControl {
         } else {
             gridTrackControl.myDisplay.setStartPoints(null, null);
         }
+        if (withTopo) {
+            gridTrackControl.myDisplay.loadTopoData(
+                (FieldImpl) gridTrackControl.topoData);
+        }
         //gridTrackControl.loadVolumeData();
-        gridTrackControl.myDisplay.setForward(!backwardCbx.isSelected());
+        gridTrackControl.myDisplay.setForward( !backwardCbx.isSelected());
         gridTrackControl.myDisplay.setArrowHead(
             gridTrackControl.getArrowHead());
         Range range = gridTrackControl.getGridDataInstance().getRange(
@@ -2320,8 +2410,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         if (currentCmd.getLabel().equals(
                 GlyphCreatorCommand.CMD_SYMBOL.getLabel())
-                || (glyphs != null && glyphs.size() > 0
-                && (glyphs.get(0) instanceof SymbolGlyph))) {
+                || ((glyphs != null) && (glyphs.size() > 0)
+                    && (glyphs.get(0) instanceof SymbolGlyph))) {
             int       pointNum = glyphs.size();
 
             float[][] points   = new float[3][pointNum];
@@ -2599,8 +2689,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
             alt = GridUtil.getAltitude(
                 domainSet, (Real) ((TwoFacedObject) currentLevel).getId());
         } catch (Exception e) {}
-        if(alt == null)
+        if (alt == null) {
             return 0.0;
+        }
         return alt.getValue();
     }
 

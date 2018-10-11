@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -482,15 +482,13 @@ public class EarthNavPanel extends JPanel implements MouseListener,
      * @param theTimeStamp for multiple events
      */
     public void startRun(final Location location, final int theTimeStamp) {
-        Misc.run(new Runnable() {
-            public void run() {
-                while (true) {
-                    processLocation(pressed);
-                    Misc.sleep(100);
-                    if ((timeStamp != theTimeStamp)
-                            || (location != pressed)) {
-                        break;
-                    }
+        Misc.run(() -> {
+            while (true) {
+                processLocation(pressed);
+                Misc.sleep(100);
+                if ((timeStamp != theTimeStamp)
+                        || (location != pressed)) {
+                    break;
                 }
             }
         });

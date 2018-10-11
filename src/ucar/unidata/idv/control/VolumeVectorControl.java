@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -144,10 +144,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** labels for trajectory form */
     private final static String[] trajFormLabels = new String[] { "Line",
-            "Ribbon", "Cylinder", "Deform Ribbon" };
+            "Ribbon", "Cylinder", "Deform Ribbon", "Point"};
 
     /** types of smoothing functions */
-    private final static int[] trajForm = new int[] { 0, 1, 2, 3 };
+    private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
 
     /** vector/traj length component */
     JComponent trajFormComponent;
@@ -211,15 +211,15 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 List             wsTime        = wdc.getAllDateTimes();
                 List             selectedTimes =
                     getDataSelection().getTimes();
-                    if(selectedTimes != null){
+                    /* if(selectedTimes != null){
                        int len = selectedTimes.size();
-                       if(usTime.get((int)selectedTimes.get(0)) != wsTime.get((int)selectedTimes.get(0)) ||
-                              usTime.get((int)selectedTimes.get(len-1)) != wsTime.get((int)selectedTimes.get(len-1)) )
+                       if(usTime.get((Integer) selectedTimes.get(0)) != wsTime.get((Integer)selectedTimes.get(0)) ||
+                              usTime.get((Integer)selectedTimes.get(len-1)) != wsTime.get((Integer)selectedTimes.get(len-1)) )
                        {
                            userErrorMessage("w grid selected times are different from u grid " );
                            return false;
                        }
-                   } else if(wdc.getSelectedDateTimes() != null){
+                   } else */ if(wdc.getSelectedDateTimes() != null){
                        selectedTimes = wdc.getSelectedDateTimes();
                        int len = selectedTimes.size();
                        if(usTime.get(0) != wsTime.get(0) ||
@@ -687,6 +687,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** level selection box */
     private JComboBox levelBox;
+
+    /** level selection box */
+    private JComboBox levelBoxEnd;
 
     /** current level */
     protected Object currentLevel;
@@ -1481,7 +1484,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     public void setLineWidth(int width)
             throws RemoteException, VisADException {
         if (isTrajectories && (getGridDisplay() != null)) {
-            if (trajFormType == 2) {
+            if (trajFormType == 4) {
+                setPointSize(width * 1.0f);
+            } else if (trajFormType == 2) {
                 getGridDisplay().setTrajWidth(width * 0.01f);
             } else if ((trajFormType == 1) || (trajFormType == 3)) {
                 getGridDisplay().setRibbonWidth(width);

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -7147,9 +7147,9 @@ public class GridUtil {
                                    int filterLevel)
             throws VisADException {
 
-        if (GridUtil.isVolume(slice)) {
-            throw new VisADException("Grid must be a 2D slice");
-        }
+        //if (GridUtil.isVolume(slice)) {
+        //    throw new VisADException("Grid must be a 2D slice");
+        //}
         if ( !isValidSmoother(type)) {
             return slice;
         }
@@ -7276,6 +7276,31 @@ public class GridUtil {
 
     }
 
+    private static float[] getLevelSlice(float[] values, int sizeX, int sizeY, int levelIndex) {
+         float[] levelValues = new float[sizeX*sizeY];
+         int k = 0;
+         for (int i = 0; i < sizeY; i++) {
+             for (int j = 0; j < sizeX; j++) {
+               int offset = levelIndex*sizeX*sizeY + i*sizeX + j;
+               levelValues[k] = values[offset];
+               k++;
+             }
+         }
+         return levelValues;
+    }
+        
+    private static void setLevelSlice(float[] values, float[] levelValues, int sizeX, int sizeY, int levelIndex) {
+         int k = 0;
+         for (int i = 0; i < sizeY; i++) {
+             for (int j = 0; j < sizeX; j++) {
+                 int offset = levelIndex*sizeX*sizeY + i*sizeX + j;
+                 values[offset] = levelValues[k];
+                 k++;
+             }
+         }
+    }
+        
+
     /**
      * Apply a 5 point smoothing function to the grid.  Adapted from
      * GEMPAK dfsm5s.c
@@ -7295,6 +7320,7 @@ public class GridUtil {
         int   jgymin, jgymax, jgxmin, jgxmax, kxd;
         int   ii, ip1, im1, jp1, jm1, ier, zero;
         float wt, wt4, dip1, dim1, djp1, djm1, dsum, wsum;
+        int sizeX, sizeY, sizeZ;
 
         /*
          * Set filter weight.
@@ -7317,6 +7343,12 @@ public class GridUtil {
         kxd    = jgxmax;
         jgymin = 1;
         jgymax = lengths[1];
+        sizeX = jgxmax;
+        sizeY = jgymax;
+        sizeZ = 1;
+        if (lengths.length > 2) {
+            sizeZ = lengths[2];
+        }
         int       kyd       = jgymax;
         int       numParams = samples.length;
         float[]   highs     = domain.getHi();
@@ -7328,10 +7360,15 @@ public class GridUtil {
         for (int np = 0; np < numParams; np++) {
             //float[] gni = samples[np];
             //float[] gno = newVals[np];
+          for (int z = 0; z < sizeZ; z++) {
             float[] gni;
             float[] gno;
-            float[] gnii = samples[np];
-            float[] gnoi = newVals[np];
+            //float[] gnii = samples[np];
+            //float[] gnoi = newVals[np];
+            float[] gnii = getLevelSlice(samples[np], sizeX, sizeY, z);
+            float[] gnoi = getLevelSlice(newVals[np], sizeX, sizeY, z);
+            // reset jgxmax for each level
+            jgxmax = sizeX;
             if (isCyclic) {
                 gni    = extendGrid(gnii, nr, jgxmax, jgymax);
                 gno    = new float[gni.length];
@@ -7411,6 +7448,8 @@ public class GridUtil {
                     }
                 }
             }
+            setLevelSlice(newVals[np], gnoi, sizeX, sizeY, z);
+          }
         }
         newField.setSamples(newVals, false);
 
@@ -7438,6 +7477,7 @@ public class GridUtil {
         int   i, j, ii, ip1, im1, jp1, jm1, imjm, ipjm, imjp, ipjp, ier, zero;
         float dsum, wsum, wt, wtc, wt4;
         float dip1, dim1, djp1, djm1, dimjm, dipjm, dimjp, dipjp;
+        int sizeX, sizeY, sizeZ;
 
         /*
          * Set filter weight for Diamond points weight
@@ -7470,6 +7510,12 @@ public class GridUtil {
         jgymin = 1;
         jgymax = lengths[1];
         kyd    = jgymax;
+        sizeX = jgxmax;
+        sizeY = jgymax;
+        sizeZ = 1;
+        if (lengths.length > 2) {
+            sizeZ = lengths[2];
+        }
         int       numParams = samples.length;
         float[]   highs     = domain.getHi();
         float[]   lows      = domain.getLow();
@@ -7478,10 +7524,15 @@ public class GridUtil {
         int       nr        = 9;
 
         for (int np = 0; np < numParams; np++) {
+          for (int z = 0; z < sizeZ; z++) {
             float[] gni;
             float[] gno;
-            float[] gnii = samples[np];
-            float[] gnoi = newVals[np];
+            //float[] gnii = samples[np];
+            //float[] gnoi = newVals[np];
+            float[] gnii = getLevelSlice(samples[np], sizeX, sizeY, z);
+            float[] gnoi = getLevelSlice(newVals[np], sizeX, sizeY, z);
+            // reset jgxmax for each level
+            jgxmax = sizeX;
             if (isCyclic) {
                 gni    = extendGrid(gnii, nr, jgxmax, jgymax);
                 gno    = new float[gni.length];
@@ -7637,6 +7688,8 @@ public class GridUtil {
                     }
                 }
             }
+            setLevelSlice(newVals[np], gnoi, sizeX, sizeY, z);
+          }
         }
         newField.setSamples(newVals, false);
 
@@ -7670,6 +7723,7 @@ public class GridUtil {
         float[]   gnnw, gnist, gnost;
         float     sgma, sumw, sumf, sig2, aa, x, y;
         float[][] w = new float[MAXWTS][MAXWTS];
+        int sizeX, sizeY, sizeZ;
 
         nwl = filterLevel;
 
@@ -7704,6 +7758,12 @@ public class GridUtil {
         int[]      lengths = domain.getLengths();
         kxd = lengths[0];
         kyd = lengths[1];
+        sizeX = kxd;
+        sizeY = kyd;
+        sizeZ = 1;
+        if (lengths.length > 2) {
+            sizeZ = lengths[2];
+        }
         float[]   highs     = domain.getHi();
         float[]   lows      = domain.getLow();
         boolean   isCyclic  = lows[0] == highs[0] % 360.f;
@@ -7711,8 +7771,12 @@ public class GridUtil {
         float[][] newVals   = newField.getFloats(false);
 
         for (int np = 0; np < numParams; np++) {
-            float[] gnisti = samples[np];
-            float[] gnosti = newVals[np];
+          for (int z = 0; z < sizeZ; z++) {
+            //float[] gnisti = samples[np];
+            //float[] gnosti = newVals[np];
+            float[] gnisti = getLevelSlice(samples[np], sizeX, sizeY, z);
+            float[] gnosti = getLevelSlice(newVals[np], sizeX, sizeY, z);
+            kxd = sizeX;
             if (isCyclic) {
                 gnist = extendGrid(gnisti, nr, kxd, kyd);
                 gnost = new float[gnist.length];
@@ -7795,6 +7859,8 @@ public class GridUtil {
                     }
                 }
             }
+            setLevelSlice(newVals[np], gnosti, sizeX, sizeY ,z);
+          }
         }
         newField.setSamples(newVals, false);
 
@@ -7850,6 +7916,7 @@ public class GridUtil {
         //float[][] fprint = new float[MAXWTS][MAXWTS];
         float[] pslab, work;
         int     index, psindex;
+        int sizeX, sizeY, sizeZ;
 
         idist = radius;
         if (idist == 0) {
@@ -7870,6 +7937,12 @@ public class GridUtil {
         int[]      lengths = domain.getLengths();
         njx = lengths[0];
         niy = lengths[1];
+        sizeX = njx;
+        sizeY = niy;
+        sizeZ = 1;
+        if (lengths.length > 2) {
+            sizeZ = lengths[2];
+        }
         float[]   highs     = domain.getHi();
         float[]   lows      = domain.getLow();
         boolean   isCyclic  = lows[0] == highs[0] % 360.f;
@@ -7877,8 +7950,11 @@ public class GridUtil {
         float[][] newValues = newField.getFloats(false);
 
         for (int np = 0; np < numParams; np++) {
-            float[] pslabi = samples[np];
-            float[] worki  = newValues[np];
+          for (int z = 0; z < sizeZ; z++)  {
+            //float[] pslabi = samples[np];
+            //float[] worki  = newValues[np];
+            float[] pslabi = getLevelSlice(samples[np], sizeX, sizeY, z);
+            float[] worki  = getLevelSlice(newValues[np], sizeX, sizeY, z);
 
             if (type.equals(SMOOTH_CRESSMAN)) {  // Cressman function
                 for (int i = 0; i < nfp; i++) {
@@ -7923,6 +7999,7 @@ public class GridUtil {
                     }
                 }
             }
+            njx = sizeX;
             if (isCyclic) {  // pad each side with idist the values
                 pslab = extendGrid(pslabi, idist, njx, niy);
                 work  = new float[pslab.length];
@@ -7969,7 +8046,11 @@ public class GridUtil {
                         worki[m++] = work[index];
                     }
                 }
+            } else {
+                
             }
+            setLevelSlice(newValues[np], worki, sizeX, sizeY, z );
+          }
         }
         newField.setSamples(newValues, false);
 

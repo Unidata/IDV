@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Unidata Program Center/University Corporation for
+ * Copyright 1997-2018 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  * 
@@ -116,17 +116,9 @@ public abstract class DataSourceHolder {
     public IdvWindow doMakeFrame() {
         if (frame == null) {
             JButton newBtn = new JButton("Add New Data Source");
-            newBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    idv.showChooser();
-                }
-            });
+            newBtn.addActionListener(e -> idv.showChooser());
             JButton closeBtn = new JButton("Close");
-            closeBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doClose();
-                }
-            });
+            closeBtn.addActionListener(e -> doClose());
 
 
             JComponent extra = getButtons();

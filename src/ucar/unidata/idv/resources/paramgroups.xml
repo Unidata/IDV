@@ -101,5 +101,18 @@
     <params p1="UREL" p2="VREL" p3="W"/>
     <params p1="U" p2="V" p3="WREL"/>
   </paramgroup>
-
+  <paramgroup name="THETA_U_V">
+    <params
+            p1="THETA"
+            p2="UREL"
+            p3="VREL"/>
+    <params
+            p1="THETA"
+            p2="GridRelative_u"
+            p3="GridRelative_v"/>
+    <params
+            p1="THETA"
+            p2="U"
+            p3="V"/>
+  </paramgroup>
 </paramgroups>
