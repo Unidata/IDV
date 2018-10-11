@@ -627,6 +627,10 @@ public class AddeImageDataSource extends ImageDataSource {
                         maxLon = bbox.getLonMax();
                         minLon = bbox.getLonMin();
 
+                        if(mapInfo.getMinLon() > 0 && mapInfo.getMaxLon() < 0 && maxLon > 0){
+                            maxLon = mapInfo.getMaxLon();
+                        }
+
                         descriptors =
                             geoSpaceSubsetD(geoSelection.getScreenBound(),
                                             unitStr, eMag, lMag, baseAnav,

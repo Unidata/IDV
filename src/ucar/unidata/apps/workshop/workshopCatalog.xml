@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog name="IDV Workshop Data" version="1.0"
-xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
-xmlns:xlink="http://www.w3.org/1999/xlink">
+xmlns="https://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+xmlns:xlink="https://www.w3.org/1999/xlink">
 
-<service name="ncdods" serviceType="OPENDAP" base="http://thredds.ucar.edu/thredds/dodsC/" />
+<service name="ncdods" serviceType="OPENDAP" base="https://thredds.ucar.edu/thredds/dodsC/" />
 
     <dataset name="Case Studies">
-    <catalogRef xlink:title="Data for Comet Case Study 039" xlink:href="http://thredds.ucar.edu/thredds/catalog/casestudies/ccs039Catalog.xml"/>
+    <catalogRef xlink:title="Data for Comet Case Study 039" xlink:href="https://thredds.ucar.edu/thredds/catalog/casestudies/ccs039Catalog.xml"/>
     </dataset>
 
     <dataset name="Sample Data">
@@ -31,5 +31,5 @@ xmlns:xlink="http://www.w3.org/1999/xlink">
     </dataset>
 
 
-    <catalogRef xlink:title="Main IDV Catalog" xlink:href="http://www.unidata.ucar.edu/georesources/idvcatalog.xml"/>
+    <catalogRef xlink:title="Main IDV Catalog" xlink:href="https://www.unidata.ucar.edu/georesources/idvcatalog.xml"/>
 </catalog>

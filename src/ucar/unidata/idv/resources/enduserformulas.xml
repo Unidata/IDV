@@ -488,6 +488,14 @@
     <operands/>
   </derived>
 
+  <derived description="GOES 16/17 Three Color (RGB) Image" formula="combineRGB1(Channel0p64, Channel0p86, Channel0p47)" id="goes16/17threeColorImage" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Imagery"/>
+      <category value="display:imagecontrol"/>
+    </categories>
+    <operands/>
+  </derived>
+
   <derived
      description="3D Map"
      formula="make3DMap(MapData, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"

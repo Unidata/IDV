@@ -935,6 +935,7 @@ public class GeoGridDataSource extends GridDataSource {
         NetcdfFileWriter ncFileWriter = null;
         try {
             ncFileWriter = NetcdfFileWriter.createNew(Version.netcdf3, path);
+            ncFileWriter.setLargeFile(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1155,7 +1156,7 @@ public class GeoGridDataSource extends GridDataSource {
             StringBuffer sb       = new StringBuffer();
             sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             sb.append(
-                "<netcdf xmlns=\"http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2\">\n");
+                "<netcdf xmlns=\"https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2\">\n");
             sb.append("<aggregation type=\"joinExisting\" dimName=\""
                       + timeName + "\" timeUnitsChange=\"true\">\n");
             for (int i = 0; i < sources.size(); i++) {
@@ -1196,6 +1197,8 @@ public class GeoGridDataSource extends GridDataSource {
             file = convertSourceFile(file);
             Trace.msg("GeoGridDataSource: opening file " + file);
             if (file.startsWith("http") && file.endsWith("entry.das")) {  // opendap from ramadda
+                file = DODSNetcdfFile.canonicalURL(file);
+            } else if(file.startsWith("http") && file.contains("/dods/")){
                 file = DODSNetcdfFile.canonicalURL(file);
             }
             GridDataset gds = GridDataset.open(file);

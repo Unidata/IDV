@@ -11,24 +11,19 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 5.3 release.
+The items below reflect changes since the 5.4 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem q="Java Version 1.8" id="jv18">
-  <p>
-    Migrated the IDV to Java 8 u51. Because of a Windows 10 related bug on some older Intel hardware,
-    the latest version of Java will not be deploying with the IDV.
-  </p>
-</faqitem>
+
 <faqitem q="Latest netCDF-Java Version" id="nj465">
 
   <p>
     The version of the netCDF-Java library currently distributed with the IDV is
-    the 4.6.10. This is a bug fix release.  See
-    the <a href="http://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds6">
+    the 4.6.11. This is a bug fix release.  See
+    the <a href="https://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds7">
       netCDF-Java Library</a> for a more details information.
   </p>
 </faqitem>
@@ -37,50 +32,69 @@ The items below reflect changes since the 5.3 release.
 <faqitem cat="Display Changes"></faqitem>
 
 
-<faqitem q="Grid 3D Trajectories" id="g3trajectory">
+<faqitem q="Isentropic Analysis" id="isentropicana">
   <p>
-    The new grid 3D trajectory is based on the VisAD library enhancements. The
-    Grid 3D trajectory includes 3D Grid Trajectory, 3D Grid
-    Trajectory colored by speed, and Trajectory colored by another parameter. By default, the initial area of 3D
-    trajectory is the whole domain of the dataset, and the user could choose one of the option: points,
-    closed polygon, and rectangle to setup the initial area.
+    For synoptic scale motions, isentropic surfaces are material surfaces. Atmospheric variables tend
+    to be better correlated along an isentropic surface upstream/downstream.
+    In a 3D visualization space, the new 3D isentropic analysis makes it intuitive to diagnose horizontal
+    and vertical motion of the atmosphere, and helps us better understand the dynamic
+    and stability of weather phenomenons.
   </p>
 </faqitem>
 
-<faqitem q="Grid 3D Trajectory Types" id="g3dttypes">
+<faqitem q="Scatter Analysis" id="scatterplot">
   <p>
-    In addition to the traditional line trajectory display, ribbon, cylinder, deform ribbon and point are
-    added as new trajectory display types in this release.
+    The IDV constructs scatterplots to illustrate different types of direction and strength of relationships of
+    different weather parameters, where the values of one variable are along X axis and the values of the second variable
+    are along the Y axis. The new scatter analysis is used to create a scatter plot to study the relationships
+    between two 2D parameters. A Scatter analysis also provides statistical information about the data as a whole,
+    as well as the subset regions of the data.
+
   </p>
 </faqitem>
 
-
-<faqitem cat="ISL Changes"></faqitem>
-
-<faqitem q="Changing the bounding box in ISL" id="islarea">
+<faqitem q="GOES-16 GLM Display" id="goesGLM">
   <p>
-    The new attribute of ISL bundle tag will load an existing bundle and change the
-    coverage region dynamically.
+    The GLM L2 product consists of geo-located and time-stamped events, groups, and flashes, with
+    associated calibrated optical amplitudes (in units of Joules). The IDV has three new data source types:
+    GLM EVENT Data files, GLM GROUP Data files, and GLM FLASH Data file to view these three GLM products.
   </p>
 </faqitem>
 
-<faqitem q="Changing driver times in ISL" id="isltime">
+<faqitem q="Grid 3D Surface Smoothing" id="g3dsmooth">
   <p>
-    The new attribute of ISL bundle tag will load an existing bundle and change the
-    driver times of the bundle.
+    IDV extands the all 2D horizontal smoothing types to 3D gridded parameters. The smoothing is now available
+    on 3D displays like isosurfaces of gridded dataset and level2 radar dataset.
   </p>
 </faqitem>
 
-<faqitem q="Saving a ZIDV in ISL" id="zidvisl">
+<faqitem q="Authentication logic upgraded" id="authlogic">
   <p>
-     The new attribute of ISL export tag will save the display area data in the zidv bundle file
-    in an offscreen mode.
+    IDV advances its authentication logic to handle the password changed and/or input wrong password.
   </p>
 </faqitem>
 
-<faqitem q="Loading a remote catalog URL" id="islurl">
+<faqitem cat="Jython Changes"></faqitem>
+
+
+
+<faqitem q="Basic Grid Math" id="mapesbasicmath">
   <p>
-    The new ISL loadcatalog tag will load a remote catalog URL.
+    A collection of Utilites from Mapes IDV collection performs a series of basic grid divide, multiply,
+    modulo, and vertical derivative.
+  </p>
+</faqitem>
+
+<faqitem q="3D Scalar Field Horizontal Smoothing" id="mapessmth">
+  <p>
+    A collection of Utilites from Mapes IDV collection applies a series of horizontal smoothing on 3D field.
+  </p>
+</faqitem>
+
+<faqitem q="Time Mean and Anomaly" id="mapestimema">
+  <p>
+    A collection of Utilites from Mapes IDV collection calculates a series of daily, monthly, yearly mean
+    and anomaly.
   </p>
 </faqitem>
 
@@ -92,11 +106,8 @@ The items below reflect changes since the 5.3 release.
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
-  We fixed a few bugs associated with the time matching in this release. One of
-  the bug is the excessive loading of data in the bundle when there is a derived
-  of derived parameters. The another bug fixed is in the 3D grid trajectory
-  display in which the time subset information not correctly saved in the
-  bundle.
+  We fixed a long time bug associated with the CAPE/CIN calculation in this release. Another
+  bug fixed is to handle the redirect of the http urls.
 </faqitem>
 
 <faqitem q="Known Problems" id="problems">

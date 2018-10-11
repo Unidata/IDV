@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ncml:netcdf xmlns:ncml="https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" location="%location%">
+    <ncml:remove name="number_of_groups" type="dimension" />
+    <ncml:remove name="number_of_flashes" type="dimension" />
+
+    <ncml:attribute name="Conventions" value="CF-1.6" />
+    <ncml:attribute name="featureType" value="point" />
+
+    <ncml:remove name="group_id" type="variable" />
+    <ncml:remove name="group_time_offset" type="variable" />
+    <ncml:remove name="group_lat" type="variable" />
+    <ncml:remove name="group_lon" type="variable" />
+    <ncml:remove name="group_area" type="variable" />
+    <ncml:remove name="group_energy" type="variable" />
+    <ncml:remove name="group_parent_flash_id" type="variable" />
+    <ncml:remove name="group_quality_flag" type="variable" />
+    <ncml:remove name="flash_id" type="variable" />
+    <ncml:remove name="flash_time_offset_of_first_event" type="variable" />
+    <ncml:remove name="flash_time_offset_of_last_event" type="variable" />
+    <ncml:remove name="flash_lat" type="variable" />
+    <ncml:remove name="flash_lon" type="variable" />
+    <ncml:remove name="flash_area" type="variable" />
+    <ncml:remove name="flash_energy" type="variable" />
+    <ncml:remove name="flash_quality_flag" type="variable" />
+    <ncml:remove name="product_time" type="variable" />
+
+    <ncml:variable name="event_energy" shape="number_of_events" type="short">
+        <ncml:attribute name="coordinates" value="event_time_offset event_lat event_lon" />
+    </ncml:variable>
+
+
+</ncml:netcdf>

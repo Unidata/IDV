@@ -28,7 +28,7 @@ example:
  -->
   <control
      id="imagedisplay"
-     categories="IMAGE-*-*"
+     categories="IMAGE-*-*;;GRID-2D-*;"
      class="ucar.unidata.idv.control.ImagePlanViewControl"
      label="Image Display"
      icon="/ucar/unidata/idv/images/planview.png"
@@ -37,7 +37,16 @@ example:
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
 
-
+  <control
+    id="imagedisplayqqq"
+    categories="IMAGE-*-*;;GRID-2D-*;"
+    class="ucar.unidata.idv.control.ScatterDisplay"
+    label="Scatter Display"
+    icon="/ucar/unidata/idv/images/planview.png"
+    displaycategory="Imagery"
+    properties="windowVisible=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
 
   <control
      id="imagedisplayoverz"
@@ -277,7 +286,7 @@ example:
      displaycategory="GridTrajectory"
      properties="windowVisible=false;useTrackTimes=true;timeDeclutterEnabled=true;"/>
   <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-  <control
+  <!--control
           id="gridtrajectorycontrol0"
           categories="*-display:gridtrajectorycontrol00-*"
           class="ucar.unidata.idv.control.GridTrajectoryControlNew"
@@ -300,7 +309,7 @@ example:
           displaycategory="3D Grid Trajectory"
           properties="windowVisible=false;useSpeedForColor=true;withTopo=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-  </control>
+  </control-->
   <control
      id="gridtrajectorycontrol1"
      categories="*-display:gridtrajectorycontrol1-*"
@@ -779,6 +788,54 @@ Since this is confusing and needs more work lets remove this for now
           doeslevels="true"
           displaycategory="Constant Theta Surface Flow Displays"
           properties="vectors=true;useSpeedForColor=true;multipleIsTopography=true;is2D=true;" />
+
+  <!-- control
+          id="flowovertheta2"
+          categories="*-isentropic3dv-*"
+          class="ucar.unidata.idv.control.FlowPlanViewControl"
+          description="Flow vectors Colored By Parameter"
+          label="Vectors Colored by Parameter over Theta Surface"
+          code="DerivedGridFactory.combineGrids1(D1, Other_Parameter)"
+          displaycategory="Constant Theta Surface Flow Displays"
+          properties="vectors=true;coloredByAnother=true;multipleIsTopography=true;is2D=true;" /-->
+  <control
+          id="thetaplanviewcontour"
+          categories="*-isentropic2dv-*"
+          class="ucar.unidata.idv.control.ContourPlanViewControl"
+          doeslevels="false"
+          icon="/ucar/unidata/idv/images/planviewcontour.png"
+          label="Contour Plan View"
+          displaycategory="Constant Theta Surface Height Plan View"
+          properties="is2D=true;" />
+  <control
+          id="thetaplanviewcontourfilled"
+          categories="*-isentropic2dv-*"
+          class="ucar.unidata.idv.control.ContourPlanViewControl"
+          label="Color-Filled Contour Plan View"
+          doeslevels="true"
+          icon="/ucar/unidata/idv/images/planview.png"
+          displaycategory="Constant Theta Surface Height Plan View"
+          properties="colorFill=true;is2D=true;"/>
+  <control
+          id="thetaplanviewcolor"
+          categories="*-isentropic2dv-*"
+          class="ucar.unidata.idv.control.ColorPlanViewControl"
+          doeslevels="true"
+          label="Color-Shaded Plan View"
+          icon="/ucar/unidata/idv/images/planview.png"
+          displaycategory="Constant Theta Surface Height Plan View"
+          properties="smoothed=false;is2D=true;"/>
+  <control
+          id="thetaplanviewcolor1"
+          categories="*-isentropic2dv-*"
+          class="ucar.unidata.idv.control.TopographyControl"
+          doeslevels="true"
+          label="Isentropic Topography"
+          icon="/ucar/unidata/idv/images/surface.png"
+          displaycategory="Constant Theta Surface Height Plan View"
+          properties="colorFill=true;smoothed=true;is2D=true;isRaster=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
 <!--
   <control
      id="planviewcolorasz"

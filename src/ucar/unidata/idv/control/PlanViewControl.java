@@ -44,14 +44,7 @@ import ucar.visad.display.ScalarMapSet;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.ZSelector;
 
-import visad.Data;
-import visad.DisplayRealType;
-import visad.FieldImpl;
-import visad.Real;
-import visad.RealType;
-import visad.ScalarMap;
-import visad.Unit;
-import visad.VisADException;
+import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
@@ -1395,10 +1388,28 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 retField = GridUtil.subset(retField, getSkipValue() + 1);
             }
             // apply smoothing
+            boolean isMTopo = getMultipleIsTopography();
             if (checkFlag(FLAG_SMOOTHING)
                     && !getSmoothingType().equals(LABEL_NONE)) {
+
                 retField = GridUtil.smooth(retField, getSmoothingType(),
                                            getSmoothingFactor());
+
+            }
+
+            if (isMTopo) {
+                try {
+                    MathType[] rt= (MathType[])(GridUtil.getParamType(retField).getComponents());
+                    RealType rt0;
+                    if(rt[1] instanceof RealTupleType){
+                        RealTupleType rtt = (RealTupleType)rt[1];
+                        rt0 = (RealType)rtt.getComponent(0);
+                    } else {
+                        rt0 = (RealType)rt[1];
+                    }
+
+                    addTopographyMap(rt0);
+                } catch (Exception e){}
             }
         }
         //System.out.println("slice for " + paramName + " = " + retField);
@@ -1440,7 +1451,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected boolean checkFlag(int f) {
         if (f == FLAG_SMOOTHING) {
-            return super.checkFlag(f) && !getMultipleIsTopography();
+            return super.checkFlag(f)  ;
         }
         return super.checkFlag(f);
     }

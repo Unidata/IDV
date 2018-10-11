@@ -6306,7 +6306,7 @@ public class IdvUIManager extends IdvManager {
                 String[] results =
                     HttpFormEntry.doPost(
                         entriesToPost,
-                        "http://www.unidata.ucar.edu/support/requestSupport.jsp");
+                        "https://www.unidata.ucar.edu/support/requestSupport.jsp");
                 if (results[0] != null) {
                     GuiUtils.showHtmlDialog(
                         results[0], "Support Request Response - Error",

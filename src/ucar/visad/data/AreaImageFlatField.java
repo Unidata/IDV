@@ -181,9 +181,11 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
                                    CoordinateSystem[] rangeCoordSysArray,
                                    Set[] rangeSets, Unit[] units)
             throws VisADException {
-        return new AreaImageFlatField(this, copy, type, domainSet,
+        AreaImageFlatField theClone = new AreaImageFlatField(this, copy, type, domainSet,
                                       rangeCoordSys, rangeCoordSysArray,
                                       rangeSets, units, readLabel);
+        theClone.startTime = this.startTime;
+        return theClone;
     }
 
 

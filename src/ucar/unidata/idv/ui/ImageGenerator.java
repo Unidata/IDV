@@ -4468,7 +4468,7 @@ public class ImageGenerator extends IdvManager {
                             getIdv().getIdvUIManager(), 1000);
                     else
                         getIdv().getIdvUIManager().waitUntilDisplaysAreDone(
-                                getIdv().getIdvUIManager(), 0);
+                                getIdv().getIdvUIManager(), 100);
                     
                     lastImage = viewManager.captureIslImage(scriptingNode);
                     imageProperties = new Hashtable();

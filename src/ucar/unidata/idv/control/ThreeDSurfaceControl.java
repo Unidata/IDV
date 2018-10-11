@@ -27,6 +27,7 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.grid.GridDataInstance;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.ControlContext;
 
 import ucar.unidata.idv.DisplayConventions;
@@ -79,6 +80,12 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
     /** Property for sharing isosurface value */
     public static final String SHARE_SURFACEVALUE =
         "ThreeDSurfaceControl.SHARE_FIELDSURFACEVALUE";
+
+    /** old smoothing type */
+    private String OldSmoothingType = LABEL_NONE;
+
+    /** old smoothing factor */
+    private int OldSmoothingFactor = 0;
 
     /**
      * Property for sharing transparency. Deprecated since
@@ -162,12 +169,12 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
             //and the display unit
             addDisplayable(myDisplay,
                            FLAG_COLORTABLE | FLAG_DATACONTROL
-                           | FLAG_COLORUNIT | FLAG_DISPLAYUNIT);
+                           | FLAG_COLORUNIT | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
         } else {
             //If just one field then just the color unit
             addDisplayable(myDisplay,
                            FLAG_COLORTABLE | FLAG_DATACONTROL
-                           | FLAG_DISPLAYUNIT);
+                           | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
         }
 
         return true;
@@ -359,6 +366,33 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
 
     }
 
+    /**
+     *  Use the value of the smoothing type and weight to subset the data.
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
+     */
+    protected void applySmoothing() throws VisADException, RemoteException {
+        if (checkFlag(FLAG_SMOOTHING)) {
+            if (myDisplay != null) {
+                if ( !getSmoothingType().equalsIgnoreCase(LABEL_NONE)
+                        || !OldSmoothingType.equalsIgnoreCase(LABEL_NONE)) {
+                    if ( !getSmoothingType().equals(OldSmoothingType)
+                            || (getSmoothingFactor() != OldSmoothingFactor)) {
+                        OldSmoothingType   = getSmoothingType();
+                        OldSmoothingFactor = getSmoothingFactor();
+                        try {
+                            FieldImpl sdata = GridUtil.smooth(getGrid(getGridDataInstance()), getSmoothingType(),
+                                           getSmoothingFactor());
+                            myDisplay.setGrid3D(sdata);
+                        } catch (Exception ve) {
+                            logException("applySmoothing", ve);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Make the gui. Align it left

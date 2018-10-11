@@ -149,6 +149,8 @@ argument -Dfoo=bar) -->
 
         <unjar src="${libsrc}/slf4j-api-1.7.12.jar" dest="${tmpjardir}"/>
         <unjar src="${libsrc}/slf4j-jdk14-1.7.12.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/commons-math3-3.6.1.jar" dest="${tmpjardir}"/>
+        <unjar src="${libsrc}/hydra.jar" dest="${tmpjardir}"/>
         <jar
             basedir="${tmpjardir}"
             compress="true"
@@ -182,6 +184,9 @@ argument -Dfoo=bar) -->
     <target name="plugins" depends="simplejar, workshopjar" >
     </target>
 
+    <target name="hydrajar" depends="init" >
+        <ant antfile="${libsrc}/edu/wisc/mcidasv/data/hydra/build.xml" target="jar" />
+    </target>
 
     <target name="simplejar" depends="init" >
         <ant antfile="${sourcedir}/ucar/unidata/apps/simple/build.xml" target="jar" />
@@ -661,6 +666,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>
             <include name="ucar/**/*.xml"/>
+            <include name="ucar/**/*.ncml"/>
 
             <include name="ucar/**/*.rbi"/>
             <include name="ucar/**/*.html"/>
@@ -735,6 +741,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>
             <include name="ucar/**/*.xml"/>
+            <include name="ucar/**/*.ncml"/>
             <include name="ucar/**/*.html"/>
             <include name="ucar/**/*.rbi"/>
             <include name="ucar/**/*.defaults"/>
@@ -792,6 +799,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
              <fileset dir="${sourcedir}">
                   <include name="ucar/**/*.properties"/>
                   <include name="ucar/**/*.xml"/>
+                  <include name="ucar/**/*.ncml"/>
                   <include name="ucar/**/*.rbi"/>
                   <include name="ucar/**/*.defaults"/>
                   <include name="ucar/**/*.txt"/>
