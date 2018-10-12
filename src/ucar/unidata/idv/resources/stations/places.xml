@@ -40,14 +40,14 @@
 
 
   <stationtable
-     name="Magnitude 2.5+  in last 7 days"
+     name="Magnitude 1.0+ in last 7 days"
      category="Earth/Earthquakes"
-     href="https://earthquake.usgs.gov/eqcenter/recenteqsww/catalogs/eqs7day-M2.5.xml"/>
+     href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_week_age.kml"/>
 
   <stationtable
-     name="Magnitude 5+ in last 7 days"
+     name="Magnitude 4.5+ in last 7 days"
      category="Earth/Earthquakes"
-     href="https://earthquake.usgs.gov/eqcenter/recenteqsww/catalogs/eqs7day-M5.xml"/>
+     href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week_age.kml"/>
 
   <stationtable
      name="Glaciers with images"
