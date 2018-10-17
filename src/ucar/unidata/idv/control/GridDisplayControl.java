@@ -26,6 +26,9 @@ import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.geoloc.ProjectionRect;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.ContourInfo;
@@ -42,10 +45,12 @@ import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.MapProjection;
+import visad.georef.TrivialMapProjection;
 
 
 import java.awt.event.ActionEvent;
 
+import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
@@ -691,7 +696,17 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
             FieldImpl data = getGridDataInstance().getGrid(false);
             if (data != null) {
                 try {
+                    double [][] xy = null;
                     mp = GridUtil.getNavigation((FieldImpl) data);
+                    RealTupleType type = mp.getReference();
+                    if(mp instanceof TrivialMapProjection) {
+                        if (type.getComponent(0).equals(RealType.Longitude) &&
+                                type.getComponent(1).equals(RealType.Latitude) &&
+                                mp.getDefaultMapArea().getX() > 180.0) {
+                            Rectangle2D bounds = normalizeRectangle((mp.getDefaultMapArea()));
+                            mp = new TrivialMapProjection(mp.getReference(), bounds);
+                        }
+                    }
                 } catch (Exception e) {
                     mp = null;
                 }
@@ -701,6 +716,23 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
         return (mp != null)
                ? mp
                : super.getDataProjection();
+    }
+
+    public Rectangle2D normalizeRectangle( Rectangle2D bb) {
+
+
+        if ((bb == null) ) {
+            return bb;
+        }
+        float x = (float)bb.getX();
+        float y = (float)bb.getY();
+        float width = (float)bb.getWidth();
+        float height = (float)bb.getHeight();
+
+        double normalizedMinLon = LatLonPointImpl.lonNormal(x);
+
+
+        return new Rectangle2D.Float((float)normalizedMinLon,y,width,height);
     }
 
     /**
