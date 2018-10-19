@@ -925,6 +925,22 @@ public class GeoGridDataSource extends GridDataSource {
                 zStride = geoSubset.getZStride();
             }
         }
+
+        if(dateRange == null) {
+            List times = getTimesFromDataSelection(getDataSelection(),
+                    (DataChoice) getDataChoices().get(0));
+            try {
+                if ((getDataSelection() != null) && !times.isEmpty()) {
+                    CalendarDateTime t0 =
+                            new CalendarDateTime((DateTime) times.get(0));
+                    CalendarDate dt0 = t0.getCalendarDate();
+                    CalendarDateTime t1 =
+                            new CalendarDateTime((DateTime) times.get(times.size() - 1));
+                    CalendarDate dt1 = t1.getCalendarDate();
+                    dateRange = CalendarDateRange.of(dt0, dt1);
+                }
+            } catch (Exception e) {}
+        }
         // if geoSubset is null or no bbx
         //if (llr == null) {
           //  llr = dataset.getBoundingBox();
