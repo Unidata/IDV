@@ -322,6 +322,18 @@ example:
      properties="windowVisible=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
+  <!--control
+      id="gridtrajectorycontrol1-1"
+      categories="*-display:gridtrajectorycontrol1-*"
+      class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+      canstandalone="false"
+      doeslevels="true"
+      description="3-D Trajectory"
+      label="3D Grid Streamline"
+      displaycategory="3D Grid Trajectory"
+      properties="windowVisible=false;isStreamline=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control-->
   <control
       id="gridtrajectorycontrol2"
       categories="*-display:gridtrajectorycontrol1-*"
@@ -334,6 +346,18 @@ example:
       properties="windowVisible=false;useSpeedForColor=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
+  <!--control
+      id="gridtrajectorycontrol2-1"
+      categories="*-display:gridtrajectorycontrol1-*"
+      class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+      canstandalone="false"
+      doeslevels="true"
+      description="3-D Trajectory"
+      label="3D Grid Streamline Colored by Speed"
+      displaycategory="3D Grid Trajectory"
+      properties="windowVisible=false;useSpeedForColor=true;isStreamline=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control-->
   <control
       id="gridtrajectorycontrol3"
       categories="*-display:gridtrajectorycontrol1-*"
@@ -347,6 +371,19 @@ example:
       properties="windowVisible=false;coloredByAnother=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
+  <!--control
+      id="gridtrajectorycontrol3-1"
+      categories="*-display:gridtrajectorycontrol1-*"
+      class="ucar.unidata.idv.control.GridTrajectoryControlNew"
+      canstandalone="false"
+      doeslevels="true"
+      description="3-D Trajectory"
+      label="Streamline Colored by Another Parameter"
+      displaycategory="3D Grid Trajectory"
+      code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
+      properties="windowVisible=false;coloredByAnother=true;isStreamline=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control-->
   <control
           id="gridtrajectorycontrol11"
           categories="*-display:gridtrajectorycontrol11-*"
@@ -1467,48 +1504,105 @@ Example of how to make an image movie control with a fixed table of contents
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
     <control
-            id="vectorvolumerender"
-            categories="*-flowvector3d-*"
-            class="ucar.unidata.idv.control.VolumeVectorControl"
-            description="3-D vector Volume"
-            label="3D Volume Vector"
-            icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="3D Flow Displays">
-        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+      id="vectorvolumerender"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D vector Volume"
+      label="3D Volume Vector"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays">
+      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
     <control
-            id="vectorvolumerender1"
-            categories="*-flowvector3d-*"
-            class="ucar.unidata.idv.control.VolumeVectorControl"
-            description="3-D vector Volume Colored by Speed"
-            label="3D Volume Vector Colored by Speed"
-            icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="3D Flow Displays"
-            properties="vectors=true;useSpeedForColor=true;">
-        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+      id="vectorvolumerender1"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D vector Volume Colored by Speed"
+      label="3D Volume Vector Colored by Speed"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="vectors=true;useSpeedForColor=true;">
+      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
     <control
-            id="vectorvolumerender2"
-            categories="*-flowvector3d-*"
-            class="ucar.unidata.idv.control.VolumeVectorControl"
-            description="3-D vector Volume Colored by Another Parameter"
-            code="DerivedGridFactory.combineGridsN(D1, Other_Parameter)"
-            label="3D Volume Vector Colored by Another Paramter"
-            icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="3D Flow Displays"
-            properties="vectors=true;coloredByAnother=true;">
-        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+      id="vectorvolumerender2"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D vector Volume Colored by Another Parameter"
+      code="DerivedGridFactory.combineGridsN(D1, Other_Parameter)"
+      label="3D Volume Vector Colored by Another Paramter"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="vectors=true;coloredByAnother=true;">
+      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
     <control
-            id="volumeTrajectoryrender"
-            categories="*-flowvector3d-*"
-            class="ucar.unidata.idv.control.VolumeVectorControl"
-            description="3-D Volume Trajectory"
-            label="3D Volume Trajectory"
-            icon="/ucar/unidata/idv/images/volume.png"
-            displaycategory="3D Flow Displays"
-            properties="trajectories=true;">
-        <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+      id="volumeTrajectoryrender"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D Volume Trajectory"
+      label="3D Volume Trajectory"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="trajectories=true;">
+      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    <control
+      id="volumeTrajectoryrender1"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D Volume Trajectory Colored by Speed"
+      label="3D Volume Trajectory Colored by Speed"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="trajectories=true;useSpeedForColor=true;">
+      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    <control
+      id="volumeTrajectoryrender2"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D Volume Trajectory Colored by Another Parameter"
+      code="DerivedGridFactory.combineGridsN(D1, Other_Parameter)"
+      label="3D Volume Trajectory Colored by Another Paramter"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="trajectories=true;coloredByAnother=true;">
+      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    <control
+      id="volumeStreamlinerender"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D Volume Streamline"
+      label="3D Volume Streamline"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="streamline=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    <control
+      id="volumeStreamlinerender1"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D Streamline Volume"
+      label="3D Volume Streamline Colored by Speed"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="streamline=true;useSpeedForColor=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+    </control>
+    <control
+      id="volumeStreamlinerender2"
+      categories="*-flowvector3d-*"
+      class="ucar.unidata.idv.control.VolumeVectorControl"
+      description="3-D Volume Streamline Colored by Another Parameter"
+      code="DerivedGridFactory.combineGridsN(D1, Other_Parameter)"
+      label="3D Volume Streamline Colored by Another Paramter"
+      icon="/ucar/unidata/idv/images/volume.png"
+      displaycategory="3D Flow Displays"
+      properties="streamline=true;coloredByAnother=true;">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
   <control
      id="gridtablecontrol"
