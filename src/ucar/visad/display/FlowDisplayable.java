@@ -449,8 +449,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setInterpolationMethod(TrajectoryParams.InterpolationMethod.None);
                     tparm.setTimeStepScaleFactor(trajOffset);
                     //tparm.setNumIntrpPts(smoothFactor);
+                    flowControl.enableTrajectory(true, tparm);
+                } else {
+                    flowControl.enableTrajectory(isTrajectories, tparm);
                 }
-                flowControl.enableTrajectory(isTrajectories, tparm);
+
             } catch (VisADException ve) {
                 ve.printStackTrace();
             } catch (RemoteException re) {
