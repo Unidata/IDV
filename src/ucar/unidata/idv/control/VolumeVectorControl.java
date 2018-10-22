@@ -82,6 +82,21 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /** _more_ */
     JComponent trajSkipComponent;
 
+    /** _more_ */
+    JComponent streamLSkipComponent;
+
+    /** a component to change the traj size */
+    ValueSliderWidget streamLLengthWidget;
+
+    /** vector/traj length component */
+    JComponent streamLLengthComponent;
+
+    /** _more_ */
+    JComponent smoothComponent;
+
+    /** _more_ */
+    ValueSliderWidget smoothWidget;
+
     /** a component to change the skip */
     ValueSliderWidget skipFactorWidget;
 
@@ -93,6 +108,12 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** trajectory button */
     private JRadioButton trajectoryBtn;
+
+    /** trajectory button */
+    private JRadioButton streamlineBtn;
+
+    /** _more_ */
+    boolean isStreamLine = false;
 
     /** _more_ */
     boolean isVectors = true;
@@ -112,6 +133,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /** arrow */
     boolean arrowHead = false;
 
+    /** arrow */
+    boolean arrowHeadL = false;
+
     /** a scale factor */
     protected final float scaleFactor = 0.02f;
 
@@ -123,6 +147,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** a traj offset value */
     float trajOffsetValue = 4.0f;
+
+    /** a traj offset value */
+    float streamLOffsetValue = 4.0f;
 
     /** slider components */
     private JComponent[] widthSliderComps;
@@ -149,6 +176,13 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /** types of smoothing functions */
     private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
 
+    /** labels for trajectory form */
+    private final static String[] streamLFormLabels = new String[] { "Line",
+            "Ribbon", "Cylinder", "Deform Ribbon", "Point"};
+
+    /** types of smoothing functions */
+    private final static int[] streamLForm = new int[] { 0, 1, 2, 3, 4 };
+
     /** vector/traj length component */
     JComponent trajFormComponent;
 
@@ -161,11 +195,29 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /** start level */
     private int trajSkipLevels = 0;
 
+    /** vector/traj length component */
+    JComponent streamLFormComponent;
+
+    /** default type */
+    private Integer streamLFormType = new Integer(0);
+
+    /** start level */
+    private int streamLStartLevel = 0;
+
     /** _more_ */
     private Range flowColorRange;
 
     /** _more_ */
     private int skipValueZ = 1;
+
+    /** _more_ */
+    JCheckBox arrowCbx ;
+
+    /** _more_ */
+    JCheckBox arrowCbxL;
+
+    /** _more_ */
+    int smoothFactor = 10;
 
     /**
      * Default constructor; does nothing.
@@ -237,10 +289,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             public void actionPerformed(ActionEvent e) {
                 if (getOkToFireEvents()) {
                     TwoFacedObject select =
-                        (TwoFacedObject) ((JComboBox) e.getSource())
-                            .getSelectedItem();
+                            (TwoFacedObject) ((JComboBox) e.getSource())
+                                    .getSelectedItem();
                     int selectIdx =
-                        ((JComboBox) e.getSource()).getSelectedIndex();
+                            ((JComboBox) e.getSource()).getSelectedIndex();
 
                     if ((select != null) && isTrajectories) {
                         int ct = ((JComboBox) e.getSource()).getItemCount();
@@ -248,6 +300,29 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                             setTrajStartLevel(select, 0);
                         } else {
                             setTrajStartLevel(select, selectIdx);
+                        }
+
+                    }
+                }
+            }
+        });
+
+        slevelBox = doMakeLevelControl(null);
+        slevelBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (getOkToFireEvents()) {
+                    TwoFacedObject select =
+                            (TwoFacedObject) ((JComboBox) e.getSource())
+                                    .getSelectedItem();
+                    int selectIdx =
+                            ((JComboBox) e.getSource()).getSelectedIndex();
+
+                    if ((select != null) && isStreamLine) {
+                        int ct = ((JComboBox) e.getSource()).getItemCount();
+                        if (select.toString().equals("All Levels")) {
+                            setStreamLStartLevel(select, 0);
+                        } else {
+                            setStreamLStartLevel(select, selectIdx);
                         }
 
                     }
@@ -296,6 +371,18 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         }
         planDisplay.setAutoScale(autoSize);
         planDisplay.setUseSpeedForColor(useSpeedForColor);
+        if(isStreamLine){
+            //since streamline is part of trajectory
+            planDisplay.setStreamline(isStreamLine);
+            planDisplay.setIsTrajectories(true);
+            planDisplay.setTrojectoriesEnabled(true,
+                    arrowHeadSizeValue, false);
+        } else {
+            planDisplay.setStreamline(isStreamLine);
+            planDisplay.setTrojectoriesEnabled(isTrajectories,
+                    arrowHeadSizeValue, false);
+        }
+
         planDisplay.setTrojectoriesEnabled(isTrajectories,
                                            arrowHeadSizeValue, false);
 
@@ -344,7 +431,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         addRemovable(barbSizeWidget);
 
         JCheckBox autoSizeCbx = new JCheckBox("Autosize", autoSize);
-        JCheckBox arrowCbx    = new JCheckBox("Arrow", arrowHead);
+        arrowCbx    = new JCheckBox("Arrow", arrowHead);
+        arrowCbxL    = new JCheckBox("Arrow", arrowHeadL);
         autoSizeCbx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 autoSize = ((JCheckBox) e.getSource()).isSelected();
@@ -364,6 +452,17 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             }
         });
 
+        arrowCbxL.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                arrowHeadL = ((JCheckBox) e.getSource()).isSelected();
+                if (arrowHeadL) {
+                    getGridDisplay().setArrowHead(arrowHeadL);
+                } else {
+                    getGridDisplay().setArrowHead(arrowHeadL);
+                }
+                getGridDisplay().resetTrojectories();
+            }
+        });
         sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Size: "),
                                       barbSizeWidget.getContents(false),
                                       autoSizeCbx);
@@ -375,10 +474,20 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             trajLengthWidget = new ValueSliderWidget(this, 1, 21,
                     "trajOffset", "LengthOffset");
 
+            streamLLengthWidget = new ValueSliderWidget(this, 1, 21,
+                    "streamLOffset", "LengthOffset");
+
+            smoothWidget = new ValueSliderWidget(this, 11, 31,
+                    "smoothFactor", "smoothFactor");
+
             List<TwoFacedObject> trajFormList =
                 TwoFacedObject.createList(trajForm, trajFormLabels);
+            List<TwoFacedObject> streamLFormList =
+                    TwoFacedObject.createList(streamLForm, streamLFormLabels);
             JComboBox trajFormBox = new JComboBox();
+            JComboBox streamLFormBox = new JComboBox();
             GuiUtils.setListData(trajFormBox, trajFormList);
+            GuiUtils.setListData(streamLFormBox, streamLFormList);
             trajFormBox.setSelectedItem(
                 TwoFacedObject.findId(getTrajFormType(), trajFormList));
             trajFormBox.addActionListener(new ActionListener() {
@@ -387,6 +496,16 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                         (TwoFacedObject) ((JComboBox) e.getSource())
                             .getSelectedItem();
                     setTrajFormType(select.getId().hashCode());
+                }
+            });
+            streamLFormBox.setSelectedItem(
+                    TwoFacedObject.findId(getStreamLFormType(), streamLFormList));
+            streamLFormBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    TwoFacedObject select =
+                            (TwoFacedObject) ((JComboBox) e.getSource())
+                                    .getSelectedItem();
+                    setStreamLFormType(select.getId().hashCode());
                 }
             });
             trajFormComponent =
@@ -404,16 +523,41 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
             trajectoryBtn = new JRadioButton("Trajectories:", isTrajectories);
 
+            streamLFormComponent =
+                    GuiUtils.hbox(GuiUtils.rLabel("Streamline Form: "),
+                            GuiUtils.filler(), streamLFormBox,
+                            GuiUtils.filler());
+
+            streamLLengthComponent =
+                    GuiUtils.hbox(GuiUtils.rLabel("Length Offset: "),
+                            streamLLengthWidget.getContents(false), arrowCbxL);
+
+            smoothComponent = GuiUtils.hbox(GuiUtils.rLabel("Smooth Factor: "),
+                    smoothWidget.getContents(false));
+
+            streamLSkipComponent =
+                    GuiUtils.hbox(GuiUtils.rLabel("Streamline Start Level: "),
+                            GuiUtils.filler(), slevelBox);
+
+            streamlineBtn = new JRadioButton("Streamlines:", isStreamLine);
+
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
                     if (source == trajectoryBtn) {
                         isTrajectories = true;
                         isVectors      = false;
+                        isStreamLine   = false;
+                        trajStartLevel = 0;
+                    } else if (source == streamlineBtn) {
+                        isStreamLine   = true;
+                        isTrajectories = false;
+                        isVectors      = false;
                         trajStartLevel = 0;
                     } else {
                         isVectors      = true;
                         isTrajectories = false;
+                        isStreamLine   = false;
                         levelBox.setSelectedIndex(levelBox.getItemCount()
                                 - 1);
                     }
@@ -421,9 +565,13 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 }
             };
 
+
+
+
             vectorBtn.addActionListener(listener);
             trajectoryBtn.addActionListener(listener);
-            GuiUtils.buttonGroup(vectorBtn, trajectoryBtn);
+            streamlineBtn.addActionListener(listener);
+            GuiUtils.buttonGroup(vectorBtn, trajectoryBtn, streamlineBtn);
 
 
             Insets spacer = new Insets(0, 30, 0, 0);
@@ -443,6 +591,18 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                                                     trajLengthComponent,
                                                     spacer), GuiUtils.inset(
                                                         trajSkipComponent,
+                                                        spacer)))), GuiUtils.left(
+                                GuiUtils.vbox(
+                                        streamlineBtn,
+                                        GuiUtils.vbox(
+                                                GuiUtils.inset(
+                                                        streamLFormComponent,
+                                                        spacer), GuiUtils.inset(
+                                                        streamLLengthComponent,
+                                                        spacer), GuiUtils.inset(
+                                                        smoothComponent,
+                                                        spacer), GuiUtils.inset(
+                                                        streamLSkipComponent,
                                                         spacer)))));
             JLabel showLabel = GuiUtils.rLabel("Show:");
             showLabel.setVerticalTextPosition(JLabel.TOP);
@@ -473,6 +633,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 GuiUtils.left(skipFactorWidgetZ.getContents(false))));
 
         enableTrajLengthBox();
+        enableStreamLLengthBox();
         enableVectorBox();
 
         List timeL = getDataSelection().getTimes();
@@ -486,10 +647,35 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         if ((timeL != null) && (timeL.size() < 4)) {
             GuiUtils.enableTree(trajectoryBtn, false);
         }
+        if ((timeL != null) && (timeL.size() < 2)) {
+            GuiUtils.enableTree(streamlineBtn, false);
+        }
 
         super.getControlWidgets(controlWidgets);
 
 
+    }
+
+    public int getSmoothFactor() {
+        return smoothFactor;
+    }
+
+    public void setSmoothFactor(int f) {
+        smoothFactor = f;
+        if (getGridDisplay() != null) {
+            try {
+                getGridDisplay().setSmoothFactor(f);
+                getGridDisplay().setStreamline(true);
+                getGridDisplay().resetTrojectories();
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
+
+        }
+
+        if (smoothWidget != null) {
+            smoothWidget.setValue(f);
+        }
     }
 
     /**
@@ -547,9 +733,18 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
             getGridDisplay().setTrajStartLevel(trajStartLevel);
             getGridDisplay().setIsTrajectories(isTrajectories);
-            getGridDisplay().setTrojectoriesEnabled(isTrajectories,
-                    arrowHeadSizeValue, false);
+            getGridDisplay().setStreamline(isStreamLine);
+            if(isStreamLine){
+                //since streamline is part of trajectory
+                getGridDisplay().setIsTrajectories(true);
+                getGridDisplay().setTrojectoriesEnabled(true,
+                        arrowHeadSizeValue, false);
+            } else {
+                getGridDisplay().setTrojectoriesEnabled(isTrajectories,
+                        arrowHeadSizeValue, false);
+            }
             enableTrajLengthBox();
+            enableStreamLLengthBox();
             enableVectorBox();
         }
         if (trajectoryBtn != null) {
@@ -560,7 +755,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     }
 
     /**
-     * enable the barb size box
+     * enable the barb   box
      */
     private void enableTrajLengthBox() {
         if (trajLengthComponent != null) {
@@ -570,9 +765,21 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             GuiUtils.enableTree(levelBox, isTrajectories);
         }
     }
+    /**
+     * enable the streamline   box
+     */
+    private void enableStreamLLengthBox() {
+        if (streamLLengthComponent != null) {
+            GuiUtils.enableTree(streamLLengthComponent, isStreamLine);
+            GuiUtils.enableTree(streamLFormComponent, isStreamLine);
+            GuiUtils.enableTree(streamLSkipComponent, isStreamLine);
+            GuiUtils.enableTree(smoothComponent, isStreamLine);
+            GuiUtils.enableTree(slevelBox, isStreamLine);
+        }
+    }
 
     /**
-     * enable the barb size box
+     * enable the vector   box
      */
     private void enableVectorBox() {
         if (sizeComponent != null) {
@@ -689,6 +896,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     private JComboBox levelBox;
 
     /** level selection box */
+    private JComboBox slevelBox;
+
+    /** level selection box */
     private JComboBox levelBoxEnd;
 
     /** current level */
@@ -707,23 +917,28 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
         setOkToFireEvents(false);
 
-        if (levelBox == null) {
+        if (levelBox == null || slevelBox == null) {
             return;
         }
         levelBox.setEnabled(false);
+        slevelBox.setEnabled(false);
         Object[] all = formatLevels(levels);
 
         GuiUtils.setListData(levelBox, formatLevels(levels));
+        GuiUtils.setListData(slevelBox, formatLevels(levels));
 
         int len = (levels.length - 1) / (skipValueZ + 1) + 2;
 
         currentLevel   = all[len - 1];
         trajStartLevel = 0;
+        streamLStartLevel = 0;
 
         levelBox.setSelectedItem(getLabeledReal(currentLevel));
+        slevelBox.setSelectedItem(getLabeledReal(currentLevel));
 
         setOkToFireEvents(true);
         levelBox.setEnabled(true);
+        slevelBox.setEnabled(true);
     }
 
     /**
@@ -806,7 +1021,41 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             }
         }
     }
+    /**
+     * _more_
+     *
+     * @param arrow _more_
+     */
+    public void setArrowHead(boolean arrow) {
+        arrowHead = arrow;
+    }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getArrowHead() {
+        return arrowHead;
+    }
+
+    /**
+     * _more_
+     *
+     * @param arrow _more_
+     */
+    public void setArrowHeadL(boolean arrow) {
+        arrowHeadL = arrow;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getArrowHeadL() {
+        return arrowHeadL;
+    }
     /**
      * _more_
      *
@@ -1153,6 +1402,11 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         return trajOffsetValue;
     }
 
+
+    public float getStreamLOffset() {
+        return streamLOffsetValue;
+    }
+
     /**
      * _more_
      *
@@ -1183,6 +1437,28 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         }
     }
 
+    public void setStreamLOffset(float f) {
+        streamLOffsetValue = f;
+        if (getGridDisplay() != null) {
+            try {
+                getGridDisplay().setTrajOffset(trajOffsetValue);
+                getGridDisplay().resetTrojectories();
+                if (arrowHead) {
+                    getGridDisplay().setArrowHead(arrowHead);
+                } else {
+                    getGridDisplay().setArrowHead(arrowHead);
+                }
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
+
+        }
+
+        if (streamLLengthWidget != null) {
+            streamLLengthWidget.setValue(f);
+        }
+    }
+
     /**
      * _more_
      *
@@ -1191,6 +1467,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     public void setTrajectories(boolean v) {
         isTrajectories = v;
         isVectors      = !v;
+        isStreamLine   = !v;
         setStreamlines();
     }
 
@@ -1202,9 +1479,21 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     public void setVectors(boolean v) {
         isTrajectories = !v;
         isVectors      = v;
+        isStreamLine   = !v;
         setStreamlines();
     }
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     */
+    public void setStreamline(boolean v) {
+        isTrajectories = !v;
+        isVectors      = !v;
+        isStreamLine   = v;
+        setStreamlines();
+    }
     /**
      * _more_
      *
@@ -1214,6 +1503,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         return trajFormType;
     }
 
+    public Integer getStreamLFormType() {
+        return streamLFormType;
+    }
     /**
      * _more_
      *
@@ -1226,6 +1518,24 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             if (getGridDisplay() != null) {
                 try {
                     getGridDisplay().setTrajFormType(trajForm.intValue());
+                    //getGridDisplay().resetTrojectories();
+                    getGridDisplay().setArrowHead(arrowHead);
+                    //getGridDisplay().resetTrojectories();
+                    setLineWidth(super.getLineWidth());
+                } catch (Exception ex) {
+                    logException("setFlowScale: ", ex);
+                }
+
+            }
+        }
+    }
+    public void setStreamLFormType(Integer streamLForm) {
+        streamLFormType = streamLForm;
+
+        if (isStreamLine) {
+            if (getGridDisplay() != null) {
+                try {
+                    getGridDisplay().setTrajFormType(streamLForm.intValue());
                     //getGridDisplay().resetTrojectories();
                     getGridDisplay().setArrowHead(arrowHead);
                     //getGridDisplay().resetTrojectories();
@@ -1269,7 +1579,30 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     }
 
+    public void setStreamLStartLevel(Object startLevel, int idx) {
+        streamLStartLevel = idx;
+        currentLevel   = startLevel;
+        int ct = slevelBox.getItemCount();
+        if (ct == 1) {
+            ct = 2;
+        }
+        //if(skipFactorWidgetZ != null)
+        //    skipFactorWidgetZ.setValue(ct-1);
+        if (getGridDisplay() != null) {
+            try {
+                getGridDisplay().setTrajStartLevel(idx);
+                if(((TwoFacedObject)startLevel).getLabel().equals("All Levels"))
+                    getGridDisplay().setZskip(1);
+                else
+                    getGridDisplay().setZskip(ct - 1);
+                getGridDisplay().resetTrojectories();
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
 
+        }
+
+    }
     /**
      * _more_
      *
@@ -1437,15 +1770,25 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         if (skipFactorWidgetZ != null) {
             skipFactorWidgetZ.setValue(value);
         }
-        applySkipFactor();
 
-        setLevels(null);
+        if(getControlContext() != null){
+            applySkipFactor();
+            setLevels(null);
+        }
+
         doShare(SHARE_SKIPVALUE + "Z", new Integer(skipValueZ));
 
         FlowDisplayable fd = getGridDisplay();
         if (fd != null) {
-            String tt = levelBox.getSelectedItem().toString();
-            int    ct = levelBox.getItemCount();
+            int ct;
+            String tt;
+            if(isStreamLine) {
+                tt = slevelBox.getSelectedItem().toString();
+                ct = slevelBox.getItemCount();
+            } else {
+                tt = levelBox.getSelectedItem().toString();
+                ct = levelBox.getItemCount();
+            }
             if (tt.equals("All Levels")) {
                 getGridDisplay().setZskip(1);
             } else {
@@ -1529,6 +1872,25 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public boolean getIsStreamline() {
+        return isStreamLine;
+    }
+
+    /**
+     * _more_
+     *
+     * @param isStreamLine _more_
+     */
+    public void setIsStreamline(boolean isStreamLine) {
+        this.isStreamLine = isStreamLine;
+    }
+
+
+    /**
+     * _more_
+     *
      * @param vc _more_
      * @param properties _more_
      */
@@ -1537,6 +1899,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                                        Hashtable properties) {
         super.initAfterUnPersistence(vc, properties);
         if (isTrajectories) {
+            if(trajectoryBtn == null)
+                doMakeWidgetComponent();
             trajectoryBtn.doClick();
             setTrajFormType(getTrajFormType());
             int width = super.getLineWidth();
@@ -1546,13 +1910,39 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
                     getGridDisplay().setRibbonWidth(width);
                 }
+                if(arrowHead){
+                    getGridDisplay().setArrowHead(true);
+                    arrowCbx.setSelected(arrowHead);
+                }
+            }
+
+            getGridDisplay().resetTrojectories();
+        } else if (isStreamLine) {
+            if(streamlineBtn == null)
+                doMakeWidgetComponent();
+            streamlineBtn.doClick();
+
+            setStreamLFormType(getStreamLFormType());
+            int width = super.getLineWidth();
+            if (isStreamLine && (getGridDisplay() != null)) {
+                if (trajFormType == 2) {
+                    getGridDisplay().setTrajWidth(width * 0.01f);
+                } else if ((streamLFormType == 1) || (streamLFormType == 3)) {
+                    getGridDisplay().setRibbonWidth(width);
+                }
+                if(arrowHeadL){
+                    getGridDisplay().setArrowHead(true);
+                    arrowCbxL.setSelected(arrowHeadL);
+                }
             }
 
             getGridDisplay().resetTrojectories();
         } else {
+            if(vectorBtn == null)
+                doMakeWidgetComponent();
             vectorBtn.doClick();
         }
-
-        skipFactorWidgetZ.setValue(getSkipValueZ());
+        if(skipFactorWidgetZ != null)
+            skipFactorWidgetZ.setValue(getSkipValueZ());
     }
 }
