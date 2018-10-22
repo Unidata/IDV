@@ -84,6 +84,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     private float trajOffset = 4.0f;
 
     /** _more_ */
+    private int smoothFactor = 20;
+
+    /** _more_ */
     private float trajWidth = 0.01f;
 
     /** _more_ */
@@ -115,6 +118,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
     /** _more_ */
     private boolean isRefresh = false;
+
+    /** _more_ */
+    private boolean streamline = false;
 
     /** flag for whether wind is cartesian (u,v) or polar (spd,dir) */
     private boolean isCartesian = true;
@@ -334,6 +340,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     } else {
                         rlen = (td[0][1] - td[0][0]) * numTimes;
                         tlen = (td[0][1] - td[0][0]) * trajOffset;
+                        if(streamline)
+                            rlen = (td[0][1] - td[0][0]);
                     }
                     arrowHead     = markerOn;
                     arrowHeadSize = mSize;
@@ -352,6 +360,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setDirectionFlag(forward);
                     if (isTrajectories) {
                         tparm.setCachingEnabled(false);
+                    }
+                    if(streamline) {
+                        tparm.setTrajVisibilityTimeWindow(rlen);
+                        tparm.setManualIntrpPts(true);
+                        tparm.setMethod(TrajectoryParams.Method.Euler);
+                        tparm.setInterpolationMethod(TrajectoryParams.InterpolationMethod.None);
+                        tparm.setTimeStepScaleFactor(trajOffset);
+                        tparm.setNumIntrpPts(smoothFactor);
                     }
                     flowControl.enableTrajectory(enable, tparm);
                 }
@@ -376,6 +392,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     }
 
     /**
+     * _more_
+     *
+     * @param streamline _more_
+     */
+    public void setStreamline(boolean streamline) {
+        this.streamline = streamline;
+    }
+    /**
      * resets trajectory parms
      *
      */
@@ -396,6 +420,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 } else {
                     rlen = (td[0][1] - td[0][0]) * numTimes;
                     tlen = (td[0][1] - td[0][0]) * trajOffset;
+                if(streamline)
+                    rlen = (td[0][1] - td[0][0]);
                 }
 
                 TrajectoryParams tparm = flowControl.getTrajectoryParams();
@@ -408,6 +434,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 tparm.setCylinderWidth(trajWidth);
                 tparm.setRibbonWidthFactor(ribbonWidth);
                 tparm.setStartSkip(t);
+                tparm.setNumIntrpPts(smoothFactor);
                 tparm.setZStartIndex(trajStartLevel);
                 tparm.setZStartSkip(zskip);
                 tparm.setStartPoints(trajStartPointType, trajStartPoints);
@@ -415,6 +442,14 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 //if(isTrajectories)
                 tparm.setCachingEnabled(false);
                 //flowControl.setTrajectoryParams(tparm);
+                if(streamline) {
+                    tparm.setTrajVisibilityTimeWindow(rlen);
+                    tparm.setManualIntrpPts(true);
+                    tparm.setMethod(TrajectoryParams.Method.Euler);
+                    tparm.setInterpolationMethod(TrajectoryParams.InterpolationMethod.None);
+                    tparm.setTimeStepScaleFactor(trajOffset);
+                    //tparm.setNumIntrpPts(smoothFactor);
+                }
                 flowControl.enableTrajectory(isTrajectories, tparm);
             } catch (VisADException ve) {
                 ve.printStackTrace();
@@ -570,6 +605,15 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
      */
     public void setTrajOffset(float offset) {
         trajOffset = offset;
+    }
+
+    /**
+     * _more_
+     *
+     * @param factor _more_
+     */
+    public void setSmoothFactor(int factor) {
+        smoothFactor = factor;
     }
 
     /**
@@ -915,7 +959,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                                                   adjustFlow);
                                                   flowControl.setBarbOrientation(
                                                   barborientation);
-                                                  if (isTrajectories) {
+                                                  if (isTrajectories || streamline) {
                                                       resetTrojectories();
                                                   }
                                                   adjustScale(flowscale);
