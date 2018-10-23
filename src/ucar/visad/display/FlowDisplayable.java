@@ -93,7 +93,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     private float ribbonWidth = 1f;
 
     /** _more_ */
-    private int zskip = 1;
+    private int zskip = 0;
 
     /** _more_ */
     private float vectorLength = 2.0f;
