@@ -208,7 +208,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     private Range flowColorRange;
 
     /** _more_ */
-    private int skipValueZ = 1;
+    private int skipValueZ = 0;
 
     /** _more_ */
     JCheckBox arrowCbx ;
