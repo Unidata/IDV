@@ -696,7 +696,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             int    ct = levelBox.getItemCount();
             String tt = levelBox.getSelectedItem().toString();
             if (tt.equals("All Levels")) {
-                getGridDisplay().setZskip(1);
+                getGridDisplay().setZskip(0);
             } else {
                 getGridDisplay().setZskip(ct - 1);
             }
@@ -1567,7 +1567,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             try {
                 getGridDisplay().setTrajStartLevel(idx);
                 if(((TwoFacedObject)startLevel).getLabel().equals("All Levels"))
-                    getGridDisplay().setZskip(1);
+                    getGridDisplay().setZskip(0);
                 else
                     getGridDisplay().setZskip(ct - 1);
                 getGridDisplay().resetTrojectories();
@@ -1592,7 +1592,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             try {
                 getGridDisplay().setTrajStartLevel(idx);
                 if(((TwoFacedObject)startLevel).getLabel().equals("All Levels"))
-                    getGridDisplay().setZskip(1);
+                    getGridDisplay().setZskip(0);
                 else
                     getGridDisplay().setZskip(ct - 1);
                 getGridDisplay().resetTrojectories();
