@@ -155,7 +155,7 @@ they essentially get it from their container type tag.
        type="image"/>
   </server>
   -->
-  <server name="satepsanone.nesdis.noaa.gov">
+  <server description="satepsanone.nesdis.noaa" name="140.90.213.161">
     <group
        names="PUB"
        type="image"/>
