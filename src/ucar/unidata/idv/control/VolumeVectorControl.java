@@ -736,12 +736,26 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             getGridDisplay().setStreamline(isStreamLine);
             if(isStreamLine){
                 //since streamline is part of trajectory
+                getGridDisplay().setTrajFormType(getStreamLFormType());
                 getGridDisplay().setIsTrajectories(true);
+                getGridDisplay().setTrajStartLevel(streamLStartLevel);
+                getGridDisplay().setTrajOffset(getStreamLOffset());
+                if(arrowHeadL){
+                    getGridDisplay().setArrowHead(true);
+                    arrowCbxL.setSelected(arrowHeadL);
+                }
                 getGridDisplay().setTrojectoriesEnabled(true,
-                        arrowHeadSizeValue, false);
+                        arrowHeadL, arrowHeadSizeValue, false);
             } else {
+                getGridDisplay().setTrajFormType(getTrajFormType());
+                getGridDisplay().setTrajStartLevel(trajStartLevel);
+                getGridDisplay().setTrajOffset(getTrajOffset());
+                if(arrowHead){
+                    getGridDisplay().setArrowHead(true);
+                    arrowCbx.setSelected(arrowHead);
+                }
                 getGridDisplay().setTrojectoriesEnabled(isTrajectories,
-                        arrowHeadSizeValue, false);
+                        arrowHead, arrowHeadSizeValue, false);
             }
             enableTrajLengthBox();
             enableStreamLLengthBox();
@@ -1503,6 +1517,12 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         return trajFormType;
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Integer getStreamLFormType() {
         return streamLFormType;
     }
@@ -1529,6 +1549,12 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             }
         }
     }
+
+    /**
+     * _more_
+     *
+     * @param streamLForm _more_
+     */
     public void setStreamLFormType(Integer streamLForm) {
         streamLFormType = streamLForm;
 
@@ -1579,6 +1605,12 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     }
 
+    /**
+     * _more_
+     *
+     * @param startLevel _more_
+     * @param idx _more_
+     */
     public void setStreamLStartLevel(Object startLevel, int idx) {
         streamLStartLevel = idx;
         currentLevel   = startLevel;
