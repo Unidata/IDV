@@ -4414,16 +4414,13 @@ public class ImageGenerator extends IdvManager {
             debug("No views to capture");
         }
         pushProperties();
-        String animationIdx = XmlUtil.getAttribute(scriptingNode, ATTR_ANIMATION_INDEX);
+        String animationIdx = XmlUtil.getAttribute(scriptingNode, ATTR_ANIMATION_INDEX, "-1");
         //If there are no time indices specified then add a -1 to the list
         List<Integer> indices = null;
         if(animationIdx.startsWith("$")){
             indices = StringUtil.parseIntegerListString(applyMacros(animationIdx));
         } else {
-            indices = StringUtil.parseIntegerListString(
-                    XmlUtil.getAttribute(
-                            scriptingNode, ATTR_ANIMATION_INDEX,
-                            "-1"));
+            indices = StringUtil.parseIntegerListString(animationIdx);
         }
 
         int idx = 0;
