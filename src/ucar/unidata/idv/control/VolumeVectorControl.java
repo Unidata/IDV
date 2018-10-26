@@ -178,10 +178,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** labels for trajectory form */
     private final static String[] streamLFormLabels = new String[] { "Line",
-            "Ribbon", "Cylinder", "Deform Ribbon", "Point"};
+            "Ribbon", "Cylinder"};
 
     /** types of smoothing functions */
-    private final static int[] streamLForm = new int[] { 0, 1, 2, 3, 4 };
+    private final static int[] streamLForm = new int[] { 0, 1, 2};
 
     /** vector/traj length component */
     JComponent trajFormComponent;
@@ -1826,7 +1826,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
      */
     public void setLineWidth(int width)
             throws RemoteException, VisADException {
-        if (isTrajectories && (getGridDisplay() != null)) {
+        if ((isTrajectories || isStreamLine) && (getGridDisplay() != null)) {
             if (trajFormType == 4) {
                 setPointSize(width * 1.0f);
             } else if (trajFormType == 2) {
