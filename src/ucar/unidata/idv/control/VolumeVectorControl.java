@@ -219,6 +219,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /** _more_ */
     int smoothFactor = 10;
 
+    boolean fromBundle = false;
+
     /**
      * Default constructor; does nothing.
      */
@@ -448,7 +450,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 } else {
                     getGridDisplay().setArrowHead(arrowHead);
                 }
-                getGridDisplay().resetTrojectories();
+                if(!fromBundle)
+                    getGridDisplay().resetTrojectories();
             }
         });
 
@@ -460,7 +463,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 } else {
                     getGridDisplay().setArrowHead(arrowHeadL);
                 }
-                getGridDisplay().resetTrojectories();
+                if(!fromBundle)
+                    getGridDisplay().resetTrojectories();
             }
         });
         sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Size: "),
@@ -561,7 +565,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                         levelBox.setSelectedIndex(levelBox.getItemCount()
                                 - 1);
                     }
-                    setStreamlines();
+                    if(!fromBundle)
+                        setStreamlines();
                 }
             };
 
@@ -826,7 +831,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     protected void applySkipFactor() {
         try {
             showWaitCursor();
-            loadVolumeData();
+            if(!fromBundle)
+                loadVolumeData();
         } catch (Exception exc) {
             logException("loading volume data", exc);
         } finally {
@@ -1563,7 +1569,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 try {
                     getGridDisplay().setTrajFormType(streamLForm.intValue());
                     //getGridDisplay().resetTrojectories();
-                    getGridDisplay().setArrowHead(arrowHead);
+                    getGridDisplay().setArrowHead(arrowHeadL);
                     //getGridDisplay().resetTrojectories();
                     setLineWidth(super.getLineWidth());
                 } catch (Exception ex) {
@@ -1866,8 +1872,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             } else if ((trajFormType == 1) || (trajFormType == 3)) {
                 getGridDisplay().setRibbonWidth(width);
             }
-
-            getGridDisplay().resetTrojectories();
+            if(!fromBundle)
+                getGridDisplay().resetTrojectories();
         }
 
         super.setLineWidth(width);
@@ -1929,14 +1935,16 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     @Override
     public void initAfterUnPersistence(ControlContext vc,
                                        Hashtable properties) {
+        fromBundle = true;
         super.initAfterUnPersistence(vc, properties);
         if (isTrajectories) {
             if(trajectoryBtn == null)
                 doMakeWidgetComponent();
             trajectoryBtn.doClick();
-            setTrajFormType(getTrajFormType());
+            //setTrajFormType(getTrajFormType());
             int width = super.getLineWidth();
             if (isTrajectories && (getGridDisplay() != null)) {
+                getGridDisplay().setTrajFormType(trajFormType);
                 if (trajFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
@@ -1953,11 +1961,11 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             if(streamlineBtn == null)
                 doMakeWidgetComponent();
             streamlineBtn.doClick();
-
-            setStreamLFormType(getStreamLFormType());
+            //setStreamLFormType(getStreamLFormType());
             int width = super.getLineWidth();
             if (isStreamLine && (getGridDisplay() != null)) {
-                if (trajFormType == 2) {
+                getGridDisplay().setTrajFormType(streamLFormType);
+                if (streamLFormType == 2) {
                     getGridDisplay().setTrajWidth(width * 0.01f);
                 } else if ((streamLFormType == 1) || (streamLFormType == 3)) {
                     getGridDisplay().setRibbonWidth(width);
@@ -1976,5 +1984,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         }
         if(skipFactorWidgetZ != null)
             skipFactorWidgetZ.setValue(getSkipValueZ());
+
+        fromBundle = false;
     }
 }
