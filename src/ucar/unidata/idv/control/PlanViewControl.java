@@ -1183,10 +1183,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
                         getDataSelection().getGeoSelection(true);
                 getViewManager().setProjectionFromData(false);
                 try {
-                    Rectangle2D bbox = nd.getLatLonBox();
+                    //Rectangle2D bbox = nd.getLatLonBox();
                     Rectangle2D sbox = nd.getScreenBounds();
+                    GeoLocationInfo ginfo = new GeoLocationInfo(newBounds);
+                    geoSelection.setBoundingBox(ginfo);
                     geoSelection.setScreenBound(sbox);
-                    geoSelection.setLatLonRect(bbox);
+                    //geoSelection.setLatLonRect(bbox);
                     geoSelection.setUseViewBounds(true);
                     getDataSelection().setGeoSelection(geoSelection);
 
@@ -1196,13 +1198,12 @@ public abstract class PlanViewControl extends GridDisplayControl {
                 } catch (Exception e) {}
                 ;
             }
-            ViewManager vm = ((PlanViewControl) this).defaultViewManager;
-            if(vm instanceof MapViewManager && useDataProjection) {
-                setProjectionInView((MapViewManager)vm, false, false);
-            }
+          //  ViewManager vm = ((PlanViewControl) this).defaultViewManager;
+         //   if(vm instanceof MapViewManager && useDataProjection) {
+         //       setProjectionInView((MapViewManager)vm, false, false);
+         //   }
         } catch (Exception e){}
     }
-
     /**
      * Load data at the level specified.  Uses the working grid.
      *
