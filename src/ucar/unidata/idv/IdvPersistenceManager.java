@@ -3744,7 +3744,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                     if(baseGeoSelection == null) {
                         baseGeoSelection = dataSource.getDataSelection().getGeoSelection();
                     }
-                    dataSource.getDataSelection().setGeoSelection(overrideGeoSelection);
+                    GeoSelection ogeoselection = new GeoSelection(overrideGeoSelection);
+                    dataSource.getDataSelection().setGeoSelection(ogeoselection);
                 }
 
                 if ((overrideEnsMembers != null)
