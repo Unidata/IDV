@@ -360,6 +360,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setDirectionFlag(forward);
                     if (isTrajectories) {
                         tparm.setCachingEnabled(false);
+                        tparm.setMethod(TrajectoryParams.Method.HySplit);
+                        tparm.setTimeStepScaleFactor(1.0);
+                        tparm.setInterpolationMethod(TrajectoryParams.InterpolationMethod.Cubic);
                     }
                     if(streamline) {
                         tparm.setTrajVisibilityTimeWindow(rlen);
@@ -451,6 +454,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     //tparm.setNumIntrpPts(smoothFactor);
                     flowControl.enableTrajectory(true, tparm);
                 } else {
+                    tparm.setMethod(TrajectoryParams.Method.HySplit);
+                    tparm.setTimeStepScaleFactor(1.0);
+                    tparm.setInterpolationMethod(TrajectoryParams.InterpolationMethod.Cubic);
                     flowControl.enableTrajectory(isTrajectories, tparm);
                 }
 
