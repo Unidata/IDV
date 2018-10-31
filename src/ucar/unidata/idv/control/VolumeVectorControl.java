@@ -1440,12 +1440,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         if (getGridDisplay() != null) {
             try {
                 getGridDisplay().setTrajOffset(trajOffsetValue);
+                getGridDisplay().setArrowHead(arrowHead);
                 getGridDisplay().resetTrojectories();
-                if (arrowHead) {
-                    getGridDisplay().setArrowHead(arrowHead);
-                } else {
-                    getGridDisplay().setArrowHead(arrowHead);
-                }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
@@ -1462,12 +1458,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         if (getGridDisplay() != null) {
             try {
                 getGridDisplay().setTrajOffset(trajOffsetValue);
+                getGridDisplay().setArrowHead(arrowHeadL);
                 getGridDisplay().resetTrojectories();
-                if (arrowHead) {
-                    getGridDisplay().setArrowHead(arrowHead);
-                } else {
-                    getGridDisplay().setArrowHead(arrowHead);
-                }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
