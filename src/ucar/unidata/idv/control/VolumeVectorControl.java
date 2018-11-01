@@ -265,6 +265,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 List             wsTime        = wdc.getAllDateTimes();
                 List             selectedTimes =
                     getDataSelection().getTimes();
+                if(selectedTimes.size() < 4) {
+                    userErrorMessage("Minumum selected times need to be 4 for trajectory calculation" );
+                    return false;
+                }
                     /* if(selectedTimes != null){
                        int len = selectedTimes.size();
                        if(usTime.get((Integer) selectedTimes.get(0)) != wsTime.get((Integer)selectedTimes.get(0)) ||
@@ -878,15 +882,15 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             levelsList = wchoice.getAllLevels(tmpSelection);
         }
         //List     levelsList = wchoice.getAllLevels(tmpSelection);
-        Object[] levels     = null;
-        if ((levelsList != null) && (levelsList.size() > 0)) {
+        Object[] levels     = getGridDataInstance().getLevels();
+        if (levels == null && (levelsList != null) && (levelsList.size() > 0)) {
             levels =
                 (Object[]) levelsList.toArray(new Object[levelsList.size()]);
         }
 
-        if (levels == null) {
-            levels = getGridDataInstance().getLevels();
-        }
+        //if (levels == null) {
+        //    levels = getGridDataInstance().getLevels();
+        //}
 
 
         setLevels(levels);
