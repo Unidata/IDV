@@ -322,7 +322,7 @@ example:
      properties="windowVisible=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-  <!--control
+  <control
       id="gridtrajectorycontrol1-1"
       categories="*-display:gridtrajectorycontrol1-*"
       class="ucar.unidata.idv.control.GridTrajectoryControlNew"
@@ -333,7 +333,7 @@ example:
       displaycategory="3D Grid Trajectory"
       properties="windowVisible=false;isStreamline=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-  </control-->
+  </control>
   <control
       id="gridtrajectorycontrol2"
       categories="*-display:gridtrajectorycontrol1-*"
@@ -346,7 +346,7 @@ example:
       properties="windowVisible=false;useSpeedForColor=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-  <!--control
+  <control
       id="gridtrajectorycontrol2-1"
       categories="*-display:gridtrajectorycontrol1-*"
       class="ucar.unidata.idv.control.GridTrajectoryControlNew"
@@ -357,7 +357,7 @@ example:
       displaycategory="3D Grid Trajectory"
       properties="windowVisible=false;useSpeedForColor=true;isStreamline=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-  </control-->
+  </control>
   <control
       id="gridtrajectorycontrol3"
       categories="*-display:gridtrajectorycontrol1-*"
@@ -371,7 +371,7 @@ example:
       properties="windowVisible=false;coloredByAnother=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
-  <!--control
+  <control
       id="gridtrajectorycontrol3-1"
       categories="*-display:gridtrajectorycontrol1-*"
       class="ucar.unidata.idv.control.GridTrajectoryControlNew"
@@ -383,7 +383,7 @@ example:
       code="DerivedGridFactory.combineGrids(D1, Other_Parameter)"
       properties="windowVisible=false;coloredByAnother=true;isStreamline=true;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
-  </control-->
+  </control>
   <control
           id="gridtrajectorycontrol11"
           categories="*-display:gridtrajectorycontrol11-*"
