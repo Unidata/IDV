@@ -684,8 +684,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
             //DataSelection ds = getDataSelection();
             DataSelection tmpSelection =
                 new DataSelection(gtc.getDataSelection());
-            tmpSelection.setFromLevel(null);
-            tmpSelection.setToLevel(null);
+            //tmpSelection.setFromLevel(null);
+            //tmpSelection.setToLevel(null);
             dataChoice.setDataSelection(tmpSelection);
 
             //updateDataSelection(ds);
@@ -2133,7 +2133,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         //tmpSelection.setToLevel(null);
 
 
-        Object[] levels = gridTrackControl.getLevels();
+        Object[] levels = gridTrackControl.getGridDataInstance().getLevels();
         Linear3DSet g3dset = (Linear3DSet)gridTrackControl.getGridDataInstance().getDomainSet3D();
 
         if (currentLevel == null) {
