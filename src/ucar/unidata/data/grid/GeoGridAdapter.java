@@ -1392,6 +1392,8 @@ public class GeoGridAdapter {
             CoordinateAxis1DTime   timeAxis = geoSys.getTimeAxis1D();
             int[]                  times;
 
+            if(timeAxis == null && geoSys.getRunTimeAxis() != null)
+                timeAxis = geoSys.getRunTimeAxis();
             List<CalendarDateTime> datetimes = null;
             if (timeAxis != null) {
                 datetimes = DataUtil.makeDateTimes(timeAxis);

@@ -33,11 +33,7 @@ import ucar.nc2.Group;
 import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
-import ucar.nc2.dataset.CoordinateAxis;
-import ucar.nc2.dataset.CoordinateAxis1D;
-import ucar.nc2.dataset.CoordinateAxis1DTime;
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dataset.VariableEnhanced;
+import ucar.nc2.dataset.*;
 import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.CFGridWriter2;
@@ -1306,8 +1302,17 @@ public class GeoGridDataSource extends GridDataSource {
                 continue;
             }
             CoordinateAxis1DTime tAxis    = gcs.getTimeAxis1D();
-            List                 geoTimes = getGeoGridTimes(tAxis);
+            if(tAxis == null){
+                //CoordinateAxis t0Axis = gcs.getTimeAxis();
+                CoordinateAxis1DTime trAxis = gcs.getRunTimeAxis();
+                if(trAxis != null){
+                    tAxis = trAxis;
+                }
+            }
+
+            List geoTimes = getGeoGridTimes(tAxis);
             uniqueTimes.addAll(geoTimes);
+
         }
 
         if ( !uniqueTimes.isEmpty()) {
@@ -2097,9 +2102,13 @@ public class GeoGridDataSource extends GridDataSource {
         List  allTimes    = null;
         if (times != null) {
             timeIndices = new int[times.size()];
-            allTimes =
-                getGeoGridTimes((CoordinateAxis1DTime) geoGrid
-                    .getCoordinateSystem().getTimeAxis1D());
+            if(geoGrid.getCoordinateSystem().getTimeAxis1D() == null &&
+                    geoGrid.getCoordinateSystem().getRunTimeAxis() != null)
+                allTimes = getGeoGridTimes((CoordinateAxis1DTime) geoGrid
+                    .getCoordinateSystem().getRunTimeAxis());
+            else
+                allTimes = getGeoGridTimes((CoordinateAxis1DTime) geoGrid
+                        .getCoordinateSystem().getTimeAxis1D());
             int numTimes = allTimes.size();
             if (holdsIndices(times)) {
                 for (int i = 0; i < times.size(); i++) {
@@ -2407,7 +2416,10 @@ public class GeoGridDataSource extends GridDataSource {
             }
 
             CoordinateAxis1DTime tAxis    = gcs.getTimeAxis1D();
+            if(tAxis == null && gcs.getRunTimeAxis() != null)
+                tAxis = gcs.getRunTimeAxis();
             List                 geoTimes = getGeoGridTimes(tAxis);
+
             timeMap.put(parmName, geoTimes);
 
             //            List indexList = Misc.getIndexList(geoTimes, allTimes);
