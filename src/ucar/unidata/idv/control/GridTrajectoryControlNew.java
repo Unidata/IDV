@@ -35,6 +35,7 @@ import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.ControlContext;
+import ucar.unidata.idv.MapViewManager;
 import ucar.unidata.idv.control.drawing.*;
 import ucar.unidata.ui.FineLineBorder;
 
@@ -125,13 +126,33 @@ public class GridTrajectoryControlNew extends DrawingControl {
     private JComboBox levelBox;
 
     /** _more_ */
+    private JComboBox levelxBox;
+
+
+    /** _more_ */
+    private JComboBox levelyBox;
+
+
+    /** _more_ */
     private JLabel levelLabel;
 
     /** _more_ */
     protected Object currentLevel;
 
     /** _more_ */
+    protected Object currentLevelx;
+
+    /** _more_ */
+    protected Object currentLevely;
+
+    /** _more_ */
     protected Object bundleLevel = null;
+
+    /** _more_ */
+    protected Object bundleLevelx = null;
+
+    /** _more_ */
+    protected Object bundleLevely = null;
 
     /** _more_ */
     protected Object[] currentLevels;
@@ -204,6 +225,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
     float trackOffsetValue = 4.0f;
 
     /** _more_ */
+    int smoothFactorValue = 10;
+
+    /** _more_ */
     Color trackColor = Color.red;
 
     /** _more_ */
@@ -249,6 +273,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
     private boolean useSpeedForColor = false;
 
     /** _more_ */
+    private boolean isStreamline = false;
+
+    /** _more_ */
     private boolean coloredByAnother = false;
 
     /** _more_ */
@@ -256,6 +283,26 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
     /** _more_ */
     private boolean is2D = false;
+
+    /** xy button */
+    private JRadioButton XYBtn;
+
+    /** yz button */
+    private JRadioButton YZBtn;
+
+    /** yz button */
+    private JRadioButton XZBtn;
+
+    /** XY component */
+    boolean isXY = false;
+
+    /** YZ component */
+    boolean isYZ = false;
+
+    /** XZ component */
+    boolean isXZ = false;
+
+
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -306,6 +353,25 @@ public class GridTrajectoryControlNew extends DrawingControl {
      *
      * @param yesno _more_
      */
+    public void setIsStreamline(boolean yesno) {
+        isStreamline = yesno;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsStreamline() {
+        return isStreamline;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param yesno _more_
+     */
     public void setWithTopo(boolean yesno) {
         withTopo = yesno;
     }
@@ -338,6 +404,48 @@ public class GridTrajectoryControlNew extends DrawingControl {
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsXY() {
+        return isXY;
+    }
+    /**
+     * _more_
+     */
+    public void setIsXY(boolean isxy) {
+        isXY = isxy;
+    }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsXZ() {
+        return isXZ;
+    }
+    /**
+     * _more_
+     */
+    public void setIsXZ(boolean isxz) {
+        isXZ = isxz;
+    }
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsYZ() {
+        return isYZ;
+    }
+    /**
+     * _more_
+     */
+    public void setIsYZ(boolean isyz) {
+        isYZ = isyz;
+    }
+    /**
      * Class MyTrackControl _more_
      *
      *
@@ -361,7 +469,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
         JComponent trajLengthComponent;
 
         /** _more_ */
-        JComponent trajSkipComponent;
+        JComponent smoothComponent;
+
+        /** _more_ */
+        ValueSliderWidget smoothWidget;
+
+        /** _more_ */
+        int smoothFactor = 10;
 
         /** a component to change the skip */
         int skipFactor = 0;
@@ -397,20 +511,23 @@ public class GridTrajectoryControlNew extends DrawingControl {
         private boolean useSpeedForColor = false;
 
         /** _more_ */
+        private boolean isStreamline = false;
+
+        /** _more_ */
         private boolean coloredByAnother = false;
 
         /** _more_ */
         private int colorIndex = -1;
 
         /** labels for trajectory form */
-        private final static String[] trajFormLabels = new String[] { "Line",
-                                                                      "Ribbon",
-                                                                      "Cylinder",
-                                                                      "Deform Ribbon",
-                                                                      "Point" };
+        private  String[] trajFormLabels = new String[] { "Line",
+                                                          "Ribbon",
+                                                          "Cylinder",
+                                                          "Deform Ribbon",
+                                                          "Point" };
 
         /** types of smoothing functions */
-        private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
+        private  int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
 
         /** vector/traj length component */
         JComponent trajFormComponent;
@@ -447,10 +564,17 @@ public class GridTrajectoryControlNew extends DrawingControl {
             this.gtc         = gtc;
             useSpeedForColor = gtc.getUseSpeedForColor();
             coloredByAnother = gtc.getColoredByAnother();
+            isStreamline = gtc.getIsStreamline();
             if (useSpeedForColor || coloredByAnother) {
                 setAttributeFlags(FLAG_LINEWIDTH | FLAG_COLORTABLE);
             } else {
                 setAttributeFlags(FLAG_LINEWIDTH | FLAG_COLOR);
+            }
+            if(isStreamline){
+                trajFormLabels = new String[] { "Line",
+                        "Ribbon",
+                        "Cylinder"};
+                trajForm = new int[] { 0, 1, 2};
             }
         }
 
@@ -606,6 +730,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             planDisplay.set3DFlow(true);
 
             planDisplay.setUseSpeedForColor(useSpeedForColor);
+            planDisplay.setStreamline(isStreamline);
             planDisplay.setTrojectoriesEnabled(true, arrowHeadSizeValue,
                     false);
 
@@ -674,6 +799,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
                 trajLengthWidget = new ValueSliderWidget(this, 1, 21,
                         "trajOffset", "LengthOffset");
+                smoothWidget = new ValueSliderWidget(this, 11, 31,
+                        "smoothFactor", "smoothFactor");
 
                 List<TwoFacedObject> trajFormList =
                     TwoFacedObject.createList(trajForm, trajFormLabels);
@@ -689,13 +816,20 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                 setTrajFormType(select.getId().hashCode());
                             }
                         });
+                String formLabel;
+                if(isStreamline)
+                    formLabel = "Streamline Form: ";
+                else
+                    formLabel = "Trajectory Form: ";
                 trajFormComponent =
-                    GuiUtils.hbox(GuiUtils.rLabel("Trajectory Form: "),
+                    GuiUtils.hbox(GuiUtils.rLabel(formLabel),
                                   GuiUtils.filler(), trajFormBox,
                                   GuiUtils.filler());
+
                 controlWidgets.add(new WrapperWidget(this,
-                        GuiUtils.rLabel("Trajectory Form: "),
+                        GuiUtils.rLabel(formLabel),
                         GuiUtils.left(trajFormBox)));
+
 
                 trajLengthComponent =
                     GuiUtils.hbox(GuiUtils.rLabel("Length Offset: "),
@@ -707,6 +841,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
                         GuiUtils.left(
                             GuiUtils.hbox(trajLengthWidget.getContents(false),
                                           arrowCbx))));
+                if(isStreamline){
+                    smoothComponent = GuiUtils.hbox(GuiUtils.rLabel("Smooth Factor: "),
+                            smoothWidget.getContents(false));
+                    controlWidgets.add(new WrapperWidget(this,
+                            GuiUtils.rLabel("Line Smooth Factor: "),
+                            GuiUtils.left(smoothWidget.getContents(false))));
+                }
 
             }
 
@@ -859,15 +1000,16 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     .get(2));
             }
             List     levelsList = wchoice.getAllLevels(tmpSelection);
-            Object[] levels     = null;
-            if ((levelsList != null) && (levelsList.size() > 0)) {
+            Object[] levels     = getGridDataInstance().getLevels();
+            Linear3DSet gridded3DSet = (Linear3DSet)getGridDataInstance().getDomainSet3D();
+            if ( levels == null && (levelsList != null) && (levelsList.size() > 0)) {
                 levels = (Object[]) levelsList.toArray(
                     new Object[levelsList.size()]);
             }
 
-            if (levels == null) {
-                levels = getGridDataInstance().getLevels();
-            }
+           // if (levels == null) {
+            //    levels = getGridDataInstance().getLevels();
+            //}
 
             if (levels != null) {
                 setLevels(levels);
@@ -1061,7 +1203,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
         }
 
 
-
+        protected boolean shouldAddControlListener() {
+            return true;
+        }
 
         /**
          * Set the flow range.
@@ -1095,7 +1239,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
         protected Container doMakeContents()
                 throws VisADException, RemoteException {
 
-            return GuiUtils.left(doMakeWidgetComponent());
+            //return GuiUtils.left(doMakeWidgetComponent());
+            return doMakeWidgetComponent();
         }
 
 
@@ -1207,6 +1352,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                         gtc.setTrackOffsetValue(f);
                     }
                     getGridDisplay().setTrajOffset(trajOffsetValue);
+                    getGridDisplay().setStreamline(isStreamline);
                     getGridDisplay().resetTrojectories();
                 } catch (Exception ex) {
                     logException("setFlowScale: ", ex);
@@ -1219,7 +1365,43 @@ public class GridTrajectoryControlNew extends DrawingControl {
             }
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public int getSmoothFactor() {
+            return smoothFactor;
+        }
 
+        /**
+         * _more_
+         *
+         *
+         * @param f _more_
+         * @return _more_
+         */
+
+        public void setSmoothFactor(int f) {
+            smoothFactor = f;
+            if (getGridDisplay() != null) {
+                try {
+                    if (gtc != null) {
+                        gtc.setSmoothFactorValue(f);
+                    }
+                    getGridDisplay().setSmoothFactor(f);
+                    getGridDisplay().setStreamline(isStreamline);
+                    getGridDisplay().resetTrojectories();
+                } catch (Exception ex) {
+                    logException("setFlowScale: ", ex);
+                }
+
+            }
+
+            if (smoothWidget != null) {
+                smoothWidget.setValue(f);
+            }
+        }
 
         /**
          * _more_
@@ -1888,6 +2070,35 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                            }
                                        }
                                    });
+        levelxBox = doMakeLevelControl(0, "cmd.setLevelsX");
+        levelxBox.addActionListener(new ActionListener() {
+            public void actionPerformed(
+                    ActionEvent event) {
+                String cmd =
+                        event.getActionCommand();
+                if (cmd.equals("cmd.setLevelsX")) {
+                    TwoFacedObject select =
+                            (TwoFacedObject) ((JComboBox) event.getSource()).getSelectedItem();
+                    setLevelx(select);
+
+                }
+            }
+        });
+        levelyBox = doMakeLevelControl(0, "cmd.setLevelsY");
+        levelyBox.addActionListener(new ActionListener() {
+            public void actionPerformed(
+                    ActionEvent event) {
+                String cmd =
+                        event.getActionCommand();
+                if (cmd.equals("cmd.setLevelsY")) {
+                    TwoFacedObject select =
+                            (TwoFacedObject) ((JComboBox) event.getSource()).getSelectedItem();
+                    setLevely(select);
+
+                }
+            }
+        });
+
         ImageIcon upIcon =
             GuiUtils.getImageIcon(
                 "/ucar/unidata/idv/control/images/LevelUp.gif");
@@ -1923,7 +2134,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
 
         Object[] levels = gridTrackControl.getLevels();
-
+        Linear3DSet g3dset = (Linear3DSet)gridTrackControl.getGridDataInstance().getDomainSet3D();
 
         if (currentLevel == null) {
             currentLevel = fromLevel;  //getDataSelection().getFromLevel();
@@ -1931,9 +2142,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
         if ((levels != null)
                 && (levels.length > 0)
                 && (currentLevel == null)) {
-            currentLevel = levels[0];
+            currentLevel = levels[levels.length - 1];
         }
-        if ((levels != null) && (fromLevel == null)) {
+        if ((levels != null)) {
             int len = levels.length;
             if (((Real) levels[0]).getValue()
                     < ((Real) levels[len - 1]).getValue()) {
@@ -1942,8 +2153,21 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 fromLevel = levels[0];
             }
         }
+
+        MapProjection mapProjection = getDataProjectionForMenu();
+        if (mapProjection != null) {
+            MapViewManager mvm = getMapViewManager();
+            if (mvm != null) {
+                mvm.setMapProjection(
+                        mapProjection, true,
+                        getDisplayConventions().getMapProjectionLabel(
+                                mapProjection, this), true);
+            }
+        }
         if (levels != null) {
             setLevels(levels, fromLevel);
+            setLevelsX(g3dset.getX().getLengthX());
+            setLevelsY(g3dset.getY().getLengthX());
         }
 
         // the control for the track
@@ -1960,7 +2184,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
         gridTrackControl.addDisplayable(gridTrackControl.myDisplay,
                                         getAttributeFlags());
         // return setData(dataChoice);
-        createTrjBtn = new JButton("Create Trajectory");
+        if(isStreamline)
+            createTrjBtn = new JButton("Create Streamline");
+        else
+            createTrjBtn = new JButton("Create Trajectory");
         createTrjBtn.addActionListener(this);
         createTrjBtn.setActionCommand(CMD_createTrj);
         createTrjBtn.addActionListener(new ActionListener() {
@@ -1989,21 +2216,114 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                        });
 
         controlPane = new JPanel();
-        controlPane.setPreferredSize(new Dimension(300, 280));
+        controlPane.setPreferredSize(new Dimension(500, 350));
 
+        if(!isBundle)
+            isXY = true;
         return true;
 
 
     }
 
+    /**
+     * _more_
+     */
+    public void initDone() {
 
-    @Override
-    public synchronized void dataChanged() {
-        try {
-            //removeAllGlyphs();
-            //initData();
-        } catch (Exception e) {}
+        super.initDone();
 
+        MapProjection mapProjection = gridTrackControl.getDataProjection();
+        if (mapProjection != null) {
+            MapViewManager mvm = getMapViewManager();
+            if (mvm != null) {
+                mvm.setMapProjection(
+                        mapProjection, true,
+                        getDisplayConventions().getMapProjectionLabel(
+                                mapProjection, this), true);
+            }
+        }
+    }
+
+    /**
+     * @param len _more_
+     * @param cmd _more_
+     */
+    public JComboBox doMakeLevelControl(int len, String cmd ) {
+        JComboBox box;
+        if (len > 0) {
+            Object[] tfoList = new Object[len];
+            for (int i = 0; i < len; i++) {
+                tfoList[i] = getLabeledReal(i);
+            }
+            box = new JComboBox(formatLevels(tfoList));
+        } else {
+            box = new JComboBox();
+        }
+        box.addActionListener(this);
+        box.setEditable(true);
+        box.setActionCommand(cmd);
+        return box;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param xlen _more_
+     */
+    public void setLevelsX(int xlen) {
+
+        setOkToFireEvents(false);
+
+        if (levelxBox == null) {
+            return;
+        }
+        levelxBox.setEnabled(false);
+
+
+        Object[] tfoList = new Object[xlen];
+        for (int i = 0; i < xlen; i++) {
+            tfoList[i] = getLabeledReal(new Real(i));
+        }
+
+        GuiUtils.setListData(levelxBox, tfoList);
+
+        Object currentLevelX = tfoList[0];
+
+                 levelxBox.setSelectedItem(getLabeledReal(currentLevelX));
+
+        setOkToFireEvents(true);
+        levelxBox.setEnabled(true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param ylen _more_
+     */
+    public void setLevelsY(int ylen) {
+
+        setOkToFireEvents(false);
+
+        if (levelyBox == null) {
+            return;
+        }
+        levelyBox.setEnabled(false);
+
+
+        Object[] tfoList = new Object[ylen];
+        for (int i = 0; i < ylen; i++) {
+            tfoList[i] = getLabeledReal(new Real(i));
+        }
+
+        GuiUtils.setListData(levelyBox, tfoList);
+
+        Object currentLevelX = tfoList[0];
+
+        levelyBox.setSelectedItem(getLabeledReal(currentLevelX));
+
+        setOkToFireEvents(true);
+        levelyBox.setEnabled(true);
     }
 
     /**
@@ -2070,6 +2390,18 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     && !currentLevel.equals(bundleLevel)) {
                 setLevel(bundleLevel);
                 levelBox.setSelectedItem(bundleLevel);
+            }
+            if ((currentLevelx != null)
+                    && (bundleLevelx != null)
+                    && !currentLevelx.equals(bundleLevelx)) {
+                setLevelx(bundleLevelx);
+                levelxBox.setSelectedItem(bundleLevelx);
+            }
+            if ((currentLevely != null)
+                    && (bundleLevely != null)
+                    && !currentLevely.equals(bundleLevely)) {
+                setLevely(bundleLevely);
+                levelyBox.setSelectedItem(bundleLevely);
             }
             if (backwardTrajectory) {
                 backwardCbx.doClick();
@@ -2143,6 +2475,27 @@ public class GridTrajectoryControlNew extends DrawingControl {
     }
 
     /**
+     * _more_
+     *
+     * @param r _more_
+     */
+    public void setLevelx(Object r) {
+        // if ( !createTrjBtnClicked) {
+        currentLevelx = r;
+        // }
+    }
+
+    /**
+     * _more_
+     *
+     * @param r _more_
+     */
+    public void setLevely(Object r) {
+        // if ( !createTrjBtnClicked) {
+        currentLevely = r;
+        // }
+    }
+    /**
      * move up/down levels by the delta
      *
      * @param delta   delta between levels
@@ -2178,7 +2531,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
      * @return the label
      */
     public String getLevelsLabel() {
-        return "Trajectory Start Level:";
+        if(isStreamline)
+            return "Streamline Start Surface:";
+        else
+            return "Trajectory Start Surface:";
     }
 
 
@@ -2288,46 +2644,152 @@ public class GridTrajectoryControlNew extends DrawingControl {
      */
     void createTrajectoryControl()
             throws VisADException, RemoteException, Exception {
+        GriddedSet domainSet =
+                (GriddedSet) gridTrackControl.getGridDataInstance()
+                        .getSpatialDomain();
 
+        CoordinateSystem cs =
+                getNavigatedDisplay().getDisplayCoordinateSystem();
+        MapProjectionDisplay mpd =
+                (MapProjectionDisplay) getNavigatedDisplay();
         Object slevel = levelBox.getSelectedItem();
         int    idx    = levelBox.getSelectedIndex();
         gridTrackControl.loadVolumeData();
-        gridTrackControl.setTrajStartLevel(slevel, idx);
+        if(isXY) { //set start level
+            //gridTrackControl.setTrajStartLevel(slevel, idx);
+            int ct = levelBox.getSelectedIndex();
+            gridTrackControl.myDisplay.setTrajStartLevel(idx);
+            gridTrackControl.myDisplay.setZskip(ct);
+
+        }
         //
         if ( !hiddenBtn.isSelected() || (glyphs.size() > 0)) {
-            GriddedSet domainSet =
-                (GriddedSet) gridTrackControl.getGridDataInstance()
-                .getSpatialDomain();
             SampledSet domain2D =
-                GridUtil.makeDomain2D((GriddedSet) domainSet);
-            CoordinateSystem cs =
-                getNavigatedDisplay().getDisplayCoordinateSystem();
-            MapProjectionDisplay mpd =
-                (MapProjectionDisplay) getNavigatedDisplay();
+                    GridUtil.makeDomain2D((GriddedSet) domainSet);
             boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
-            int     latIndex = isLatLon
-                               ? 0
-                               : 1;
-            int     lonIndex = isLatLon
-                               ? 1
-                               : 0;
+            int latIndex = isLatLon
+                    ? 0
+                    : 1;
+            int lonIndex = isLatLon
+                    ? 1
+                    : 0;
 
-            Real    alt      = null;
+            Real alt = null;
             // if(zunit.getIdentifier().length() == 0) {
             if (currentLevel != null) {
                 alt = GridUtil.getAltitude(
-                    domainSet,
-                    (Real) ((TwoFacedObject) currentLevel).getId());
+                        domainSet,
+                        (Real) ((TwoFacedObject) currentLevel).getId());
             } else {
                 alt = new Real(0.0);
             }
             float[][] geoVals = getEarthLocationPoints(latIndex, lonIndex,
-                                    domain2D, alt, getSkipValue());
+                    domain2D, alt, getSkipValue());
             float[][] setLocs = cs.toReference(geoVals);
             setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
-
             RealTupleType types = cs.getReference();
             gridTrackControl.myDisplay.setStartPoints(types, setLocs);
+        } else if(isYZ) {
+            float[][] domainLatLonAlt = GridUtil.getEarthLocationPoints(domainSet);
+            boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
+            int latIndex = isLatLon
+                    ? 1
+                    : 0;
+            int lonIndex = isLatLon
+                    ? 0
+                    : 1;
+
+            int numX = domainSet.getLengths()[lonIndex];
+            int numY = domainSet.getLengths()[latIndex];
+            int numXY = numX * numY;
+            int numP  = numY * domainSet.getLengths()[2];
+            float[][] geoVals = new float[3][numP];
+            int xIndex = levelxBox.getSelectedIndex();
+            for(int k = 0; k < domainSet.getLengths()[2]; k++){
+                for (int j = 0; j < numY; j++){
+                    int ii = k * (numXY) + j * (numX - 1) + j + xIndex;
+                    int jj = k * (numY) + j;
+                    geoVals[0][jj] = domainLatLonAlt[0][ii];
+                    geoVals[1][jj] = domainLatLonAlt[1][ii];
+                    geoVals[2][jj] = domainLatLonAlt[2][ii];
+                }
+            }
+
+            if (getSkipValue() > 0) {
+                int skipFactor = getSkipValue();
+                int       onum   = numP / (skipFactor + 1) + 1;
+                float[][] points0 = new float[3][onum];
+                for (int i = 0, j = 0; (i < onum)
+                        && (j < numP);
+                     i++, j = i * (skipFactor + 1)) {
+                    points0[0][i] = geoVals[0][j];
+                    points0[1][i] = geoVals[1][j];
+                    points0[2][i] = geoVals[2][j];
+                }
+                setCurrentCommand(CMD_SELECT);
+                hiddenBtn.doClick();
+
+                float[][] setLocs = cs.toReference(points0);
+                setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                RealTupleType types = cs.getReference();
+                gridTrackControl.myDisplay.setStartPoints(types, setLocs);
+            } else {
+                float[][] setLocs = cs.toReference(geoVals);
+                setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                RealTupleType types = cs.getReference();
+                gridTrackControl.myDisplay.setStartPoints(types, setLocs);
+            }
+
+        }else if(isXZ) {
+            float[][] domainLatLonAlt = GridUtil.getEarthLocationPoints(domainSet);
+            boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
+            int latIndex = isLatLon
+                    ? 1
+                    : 0;
+            int lonIndex = isLatLon
+                    ? 0
+                    : 1;
+
+            int numX = domainSet.getLengths()[lonIndex];
+            int numY = domainSet.getLengths()[latIndex];
+            int numXY = numX * numY;
+            int numP  = numX * domainSet.getLengths()[2];
+            float[][] geoVals = new float[3][numP];
+            int yIndex = levelyBox.getSelectedIndex();
+            for(int k = 0; k < domainSet.getLengths()[2]; k++){
+                for (int j = 0; j < numX; j++){
+                    int ii = k * (numXY) + j + numX * yIndex;
+                    int jj = k * (numX) + j;
+                    geoVals[0][jj] = domainLatLonAlt[0][ii];
+                    geoVals[1][jj] = domainLatLonAlt[1][ii];
+                    geoVals[2][jj] = domainLatLonAlt[2][ii];
+                }
+            }
+
+            if (getSkipValue() > 0) {
+                int skipFactor = getSkipValue();
+                int       onum   = numP / (skipFactor + 1) + 1;
+                float[][] points0 = new float[3][onum];
+                for (int i = 0, j = 0; (i < onum)
+                        && (j < numP);
+                     i++, j = i * (skipFactor + 1)) {
+                    points0[0][i] = geoVals[0][j];
+                    points0[1][i] = geoVals[1][j];
+                    points0[2][i] = geoVals[2][j];
+                }
+                setCurrentCommand(CMD_SELECT);
+                hiddenBtn.doClick();
+
+                float[][] setLocs = cs.toReference(points0);
+                setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                RealTupleType types = cs.getReference();
+                gridTrackControl.myDisplay.setStartPoints(types, setLocs);
+            } else {
+                float[][] setLocs = cs.toReference(geoVals);
+                setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                RealTupleType types = cs.getReference();
+                gridTrackControl.myDisplay.setStartPoints(types, setLocs);
+            }
 
         } else {
             gridTrackControl.myDisplay.setStartPoints(null, null);
@@ -2509,11 +2971,12 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
     protected Container doMakeContents()
             throws VisADException, RemoteException {
-        JTabbedPane tabbedPane = new JTabbedPane();
+        //JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.add("Controls", doMakeControlsPanel());
+        //tabbedPane.add("Controls", doMakeControlsPanel());
 
-        return GuiUtils.centerBottom(tabbedPane, new JLabel(""));
+        return GuiUtils.leftCenter( doMakeControlsPanel(), new JLabel("") );
+       // return  tabbedPane;
     }
 
 
@@ -2528,11 +2991,15 @@ public class GridTrajectoryControlNew extends DrawingControl {
         addControlWidgets(widgets);
         //super.setCurrentCommand(CMD_SELECT);
         GuiUtils.tmpInsets = new Insets(4, 4, 0, 4);
+        GuiUtils.tmpFill   = GridBagConstraints.HORIZONTAL;
         JPanel comps = GuiUtils.doLayout(widgets, 2, GuiUtils.WT_NY,
-                                         GuiUtils.WT_N);
+                GuiUtils.WT_NN);
+
+        Dimension ds = controlPane.getPreferredSize();
+        comps.setPreferredSize(ds);
+        return GuiUtils.topCenter(comps, controlPane);
 
 
-        return GuiUtils.vbox(comps, controlPane);
 
         /* test */
     }
@@ -2552,10 +3019,68 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                                    levelUpDown }, 2,
                                                                        GuiUtils.WT_N,
                                                                        GuiUtils.WT_N);
+        JPanel xSelector = GuiUtils.doLayout(new Component[] { levelxBox}, 1,
+                                                                    GuiUtils.WT_N,
+                                                                    GuiUtils.WT_N);
+        JPanel ySelector = GuiUtils.doLayout(new Component[] { levelyBox}, 1,
+                                                                    GuiUtils.WT_N,
+                                                                    GuiUtils.WT_N);
+        XYBtn = new JRadioButton("XY Plane:", isXY);
+        YZBtn = new JRadioButton("YZ Plane:", isYZ);
+        XZBtn = new JRadioButton("XZ Plane:", isXZ);
+        Insets spacer = new Insets(0, 30, 0, 0);
+        JComponent rightComp1 =
+                GuiUtils.vbox(
+                        GuiUtils.left(
+                                GuiUtils.vbox(
+                                        XYBtn,
+                                        GuiUtils.inset(
+                                                levelSelector, spacer))), GuiUtils.left(
+                                GuiUtils.vbox(
+                                        YZBtn,
+                                        GuiUtils.inset(
+                                                xSelector, spacer))), GuiUtils.left(
+                                GuiUtils.vbox(
+                                        XZBtn,
+                                        GuiUtils.inset(
+                                                ySelector, spacer) )));
+        ActionListener listener1 = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JRadioButton source = (JRadioButton) e.getSource();
+                if (source == XYBtn) {
+                    isXY = true;
+                    isYZ = false;
+                    isXZ = false;
+                    levelBox.setSelectedIndex(levelBox.getItemCount()
+                            - 1);
+                    //trajStartLevel = 0;
+                } else if (source == YZBtn) {
+                    isYZ = true;
+                    isXZ = false;
+                    isXY = false;
+                    //levelxBox.setSelectedIndex(levelxBox.getItemCount());
+                    removeAllGlyphs();
+                    //trajStartLevel = 0;
+                } else if (source == XZBtn){
+                    isXZ = true;
+                    isXY = false;
+                    isYZ = false;
+                    //levelyBox.setSelectedIndex(levelyBox.getItemCount());
+                    removeAllGlyphs();
+                }
+                enableInitAreaWidget();
+               // if(!fromBundle)
+               //     setStreamlines();
+            }
+        };
+        XYBtn.addActionListener(listener1);
+        YZBtn.addActionListener(listener1);
+        XZBtn.addActionListener(listener1);
+        GuiUtils.buttonGroup(XYBtn, YZBtn, XZBtn);
 
         JComponent widgets0 = GuiUtils.formLayout(new Component[] {
                                   levelLabel,
-                                  GuiUtils.left(levelSelector) });
+                                  GuiUtils.left(rightComp1) });
         JButton unloadBtn =
             GuiUtils.makeImageButton("/auxdata/ui/icons/Cut16.gif", this,
                                      "removeAllGlyphs");
@@ -2649,29 +3174,68 @@ public class GridTrajectoryControlNew extends DrawingControl {
             "display the backward trajectory of air parcel");
         backwardCbx.setSelected(false);
 
-        JLabel showLabel = GuiUtils.rLabel("Trajectory Initial Area:");
+        String initialLabel;
+
+
         JLabel removeLabel =
             GuiUtils.rLabel("Remove Trajectory Initial Area:");
-        showLabel.setVerticalTextPosition(JLabel.TOP);
 
-        widgets.add(GuiUtils.topLeft(GuiUtils.topCenterBottom(widgets0,
-                GuiUtils.topCenterBottom(
-                    GuiUtils.leftRight(GuiUtils.top(GuiUtils.inset(showLabel,
-                            new Insets(10, 0, 0, 0))),
-                                       GuiUtils.top(rightComp)),
-                    GuiUtils.top(
-                        GuiUtils.hbox(
-                            GuiUtils.rLabel("Initial Area Skip Factor:  "),
-                            skipFactorWidget.getContents(false))),
-                    GuiUtils.top(GuiUtils.hbox(GuiUtils.rLabel("Backward trajectory:"),
-                            GuiUtils.left(backwardCbx)))),
-                GuiUtils.leftRight(
-                    GuiUtils.inset(GuiUtils.wrap(createTrjBtn),
-                                   2),
-                    GuiUtils.right(unloadBtn)))));
+        if(isStreamline) {
+            widgets.add(GuiUtils.rLabel(levelLabel.getText()));
+            widgets.add(rightComp1);
+
+            widgets.add(GuiUtils.rLabel("Streamline Initial Area:"));
+            widgets.add(rightComp);
+
+            widgets.add(GuiUtils.rLabel("Initial Area Skip Factor:  "));
+            widgets.add(skipFactorWidget.getContents(false));
+
+            widgets.add(GuiUtils.right(new JLabel("")));
+
+            widgets.add(GuiUtils.hbox(createTrjBtn, GuiUtils.inset(
+                    unloadBtn, spacer) ));
+
+        }
+        else {
+            widgets.add(GuiUtils.rLabel(levelLabel.getText()));
+            widgets.add(rightComp1);
+
+            widgets.add(GuiUtils.rLabel("Trajectory Initial Area:"));
+            widgets.add(rightComp);
+
+            widgets.add(GuiUtils.rLabel("Initial Area Skip Factor:  "));
+            widgets.add(skipFactorWidget.getContents(false));
+
+            widgets.add(GuiUtils.rLabel("Backward trajectory:"));
+            widgets.add(backwardCbx);
+
+            widgets.add(GuiUtils.right(new JLabel("")));
+
+            widgets.add(GuiUtils.hbox(createTrjBtn, GuiUtils.inset(
+                    unloadBtn, spacer) ));
 
 
+        }
 
+        if (isXY) {
+            XYBtn.setSelected(isXY);
+        }
+
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private void enableInitAreaWidget() {
+        if (pointsBtn != null) {
+            GuiUtils.enableTree(pointsBtn, isXY);
+            GuiUtils.enableTree(closePolygonBtn, isXY);
+            GuiUtils.enableTree(rectangleBtn, isXY);
+            GuiUtils.enableTree(levelBox, isXY);
+        }
     }
 
     /**
@@ -2871,6 +3435,43 @@ public class GridTrajectoryControlNew extends DrawingControl {
     /**
      * _more_
      *
+     * @param lvl _more_
+     */
+    public void setCurrentLevelx(Object lvl) {
+        currentLevelx = lvl;
+        bundleLevelx  = lvl;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Object getCurrentLevelx() {
+        return currentLevelx;
+    }
+
+    /**
+     * _more_
+     *
+     * @param lvl _more_
+     */
+    public void setCurrentLevely(Object lvl) {
+        currentLevely = lvl;
+        bundleLevely  = lvl;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Object getCurrentLevely() {
+        return currentLevely;
+    }
+    /**
+     * _more_
+     *
      * @return _more_
      */
     public DrawingCommand getCurrentCmd() {
@@ -2937,6 +3538,25 @@ public class GridTrajectoryControlNew extends DrawingControl {
         trackOffsetValue = ah;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getSmoothFactorValue() {
+        return smoothFactorValue;
+    }
+
+    /**
+     * _more_
+     *
+     *
+     * @param ah _more_
+     * @return _more_
+     */
+    public void setSmoothFactorValue(int ah) {
+        smoothFactorValue = ah;
+    }
     /**
      * _more_
      *
