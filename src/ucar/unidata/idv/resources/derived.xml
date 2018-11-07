@@ -187,6 +187,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
      label="3D Flow Vectors"
      isdefault="true" 
      isenduser="false"
+     properties="requiresvolume=true"
      formula="DerivedGridFactory.createFlowVectorsN(D1, D2, D3)">
     <categories>
       <category
@@ -764,6 +765,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
         label="Grid 3D Trajectory"
         isenduser="true"
         isdefault="true"
+        properties="requiresvolume=true"
         formula="DerivedGridFactory.createFlowVectorsN(D1, D2, D3)">
   <categories>
     <category
