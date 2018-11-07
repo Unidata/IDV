@@ -265,7 +265,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 List             wsTime        = wdc.getAllDateTimes();
                 List             selectedTimes =
                     getDataSelection().getTimes();
-                if(selectedTimes.size() < 4) {
+                if(selectedTimes != null && selectedTimes.size() < 4) {
+                    userErrorMessage("Minumum selected times need to be 4 for trajectory calculation" );
+                    return false;
+                } else if (usTime != null && usTime.size() < 4) {
                     userErrorMessage("Minumum selected times need to be 4 for trajectory calculation" );
                     return false;
                 }
