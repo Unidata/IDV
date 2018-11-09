@@ -12604,7 +12604,11 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
        @param newBounds  The relocated bounds of the datasource
      */
     public void relocateDisplay(LatLonRect originalBounds, LatLonRect newBounds, boolean useDataProjection) {
+        if(dataSelection == null)
+            getDataSelection();
         GeoSelection gs = dataSelection.getGeoSelection();
+        if(gs == null)
+            gs = new GeoSelection();
         GeoLocationInfo ginfo = new GeoLocationInfo(newBounds);
         gs.setBoundingBox(ginfo);
         NavigatedDisplay navDisplay = getNavigatedDisplay();
