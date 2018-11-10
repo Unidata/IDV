@@ -1213,14 +1213,14 @@ public class AddeImageDataSource extends ImageDataSource {
 
             //elems
             latlon[1][0] = (float) minLon;
-            latlon[0][0] = (float) centerLLP.getLatitude();
+            latlon[0][0] = (float) maxLat; //centerLLP.getLatitude();
             ulLinEle = this.acs.fromReference(latlon);  //baseAnav.toLinEle(latlon);
             if ((ulLinEle[0][0] < 0) || (ulLinEle[0][0] != ulLinEle[0][0])) {
                 ulLinEle[0][0] = 0;
             }
 
             latlon[1][0] = (float) maxLon;
-            latlon[0][0] = (float) centerLLP.getLatitude();
+            latlon[0][0] = (float) minLat; //centerLLP.getLatitude();
             lrLinEle = this.acs.fromReference(latlon);  //baseAnav.toLinEle(latlon);
             if ((lrLinEle[0][0] < 0) || (lrLinEle[0][0] != lrLinEle[0][0])) {
                 int en = dsep.getDirectory().getDirectoryBlock()[9];
