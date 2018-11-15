@@ -1001,7 +1001,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             }
             List     levelsList = wchoice.getAllLevels(tmpSelection);
             Object[] levels     = getGridDataInstance().getLevels();
-            Linear3DSet gridded3DSet = (Linear3DSet)getGridDataInstance().getDomainSet3D();
+           // Linear3DSet gridded3DSet = (Linear3DSet)getGridDataInstance().getDomainSet3D();
             if ( levels == null && (levelsList != null) && (levelsList.size() > 0)) {
                 levels = (Object[]) levelsList.toArray(
                     new Object[levelsList.size()]);
@@ -2134,7 +2134,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
 
         Object[] levels = gridTrackControl.getGridDataInstance().getLevels();
-        Linear3DSet g3dset = (Linear3DSet)gridTrackControl.getGridDataInstance().getDomainSet3D();
+        Gridded3DSet g3dset = gridTrackControl.getGridDataInstance().getDomainSet3D();
 
         if (currentLevel == null) {
             currentLevel = fromLevel;  //getDataSelection().getFromLevel();
@@ -2166,8 +2166,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
         }
         if (levels != null) {
             setLevels(levels, fromLevel);
-            setLevelsX(g3dset.getX().getLengthX());
-            setLevelsY(g3dset.getY().getLengthX());
+            if(g3dset instanceof Linear3DSet) {
+                setLevelsX(((Linear3DSet) g3dset).getX().getLength());
+                setLevelsY(((Linear3DSet) g3dset).getY().getLength());
+            } else {
+                setLevelsX(g3dset.getLength(0));
+                setLevelsY(g3dset.getLength(1));
+            }
         }
 
         // the control for the track
