@@ -57,19 +57,6 @@ import java.util.zip.ZipOutputStream;
  */
 public class IOUtil {
 
-    /** Maximum number of HTTP redirects to follow. */
-    public static final int MAX_REDIRECTS = 5;
-
-    /**
-     * Elements within this array are considered {@literal "valid redirect"}
-     * status codes.
-     */
-    public static final int[] HTTP_REDIRECT_STATUSES =
-        { 301, 302, 303, 307, 308 };
-
-    /** HTTP connection timeout (milliseconds). */
-    public static final int HTTP_TIMEOUT = 30000;
-
     /** Holds the filename/urls that we have checked if they are html */
     private static Hashtable isHtmlCache = new Hashtable();
 
@@ -602,104 +589,11 @@ public class IOUtil {
      * @throws Exception _more_
      */
     public static String readContents(URL url) throws Exception {
-        URLConnection connection = getUrlConnection(url.toExternalForm());
+        URLConnection connection = url.openConnection();
         InputStream   is         = connection.getInputStream();
         return readContents(is);
     }
 
-    /**
-     * Attempt to create a {@link URLConnection} to the given {@code url}.
-     *
-     * <p>This method <i>will</i> follow redirects, and will use
-     * {@link #HTTP_TIMEOUT}, {@link #MAX_REDIRECTS}, and
-     * {@link #HTTP_REDIRECT_STATUSES} as default values to pass to
-     * {@link #getUrlConnection(String, boolean, boolean, int, int, int[])}.
-     * </p>
-     *
-     * @param url Request URL.
-     *
-     * @return Connection to {@code url}.
-     *
-     * @throws IOException if there were any I/O errors while trying to
-     *                     connect.
-     *
-     * @see #HTTP_TIMEOUT
-     * @see #MAX_REDIRECTS
-     * @see #HTTP_REDIRECT_STATUSES
-     */
-    public static URLConnection getUrlConnection(String url)
-        throws IOException
-    {
-        return getUrlConnection(url,
-                                true,
-                                true,
-                                HTTP_TIMEOUT,
-                                MAX_REDIRECTS,
-                                HTTP_REDIRECT_STATUSES);
-    }
-    
-    /**
-     * Attempt to create a {@link URLConnection} to the given {@code url}.
-     *
-     * <p>If {@code followRedirects} is {@code true}, the maximum number of
-     * redirects is controlled via {@link #MAX_REDIRECTS}.
-     * If {@code followRedirects} is {@code false}, the method, predictably,
-     * will not follow any redirects.</p>
-     *
-     * @param url Request URL.
-     * @param allowUserInteraction Passed to {@link URLConnection#setAllowUserInteraction(boolean)}.
-     * @param followRedirects Whether or not HTTP redirect codes should be
-     *                        followed.
-     * @param timeout HTTP connection timeout (milliseconds).
-     * @param maxRedirects Maximum number of redirects to follow.
-     * @param redirectStatuses Status codes that are considered HTTP
-     *                         redirects.
-     *
-     * @return Connection to {@code url}.
-     *
-     * @throws IOException if there were any I/O errors while trying to
-     *                     connect.
-     */
-    public static URLConnection getUrlConnection(String url,
-                                                 boolean allowUserInteraction,
-                                                 boolean followRedirects,
-                                                 int timeout,
-                                                 int maxRedirects,
-                                                 int[] redirectStatuses)
-        throws IOException
-    {
-        URL from = new URL(url);
-        URLConnection connection = from.openConnection();
-        connection.setAllowUserInteraction(allowUserInteraction);
-        connection.setConnectTimeout(timeout);
-        if (connection instanceof HttpURLConnection) {
-            HttpURLConnection huc = (HttpURLConnection)connection;
-            int redirects = 0;
-            while (followRedirects && (redirects++ < maxRedirects)) {
-                int status = huc.getResponseCode();
-                // previously used ((status >= 300) && (status <= 399))
-                if (Arrays.binarySearch(redirectStatuses, status) >= 0) {
-                    String newUrl = huc.getHeaderField("Location");
-                    if ((newUrl != null) && !newUrl.isEmpty()) {
-                        boolean oldAllowUserInteraction =
-                            connection.getAllowUserInteraction();
-                        from = new URL(newUrl);
-                        connection = from.openConnection();
-                        connection.setAllowUserInteraction(oldAllowUserInteraction);
-                        connection.setConnectTimeout(timeout);
-                        huc = (HttpURLConnection)connection;
-                        continue;
-                    }
-                    // not much to be done if the server didn't provide a
-                    // location header. See the end of the following:
-                    // https://www.eff.org/https-everywhere/faq#why-use-a-whitelist-of-sites-that-support-https-why-cant-you-try-to-use-https-for-every-last-site-and-only-fall-back-to-http-if-it-isnt-available
-                }
-                // either we had a problem or we've arrived at the destination
-                break;
-            }
-        }
-        return connection;
-    }
 
     /**
      * Write to the file from the URL stream
@@ -715,7 +609,7 @@ public class IOUtil {
      */
     public static long writeTo(URL from, File file, Object loadId)
             throws IOException {
-        URLConnection    connection = getUrlConnection(from.toExternalForm());
+        URLConnection    connection = from.openConnection();
         InputStream      is         = connection.getInputStream();
         int              length     = connection.getContentLength();
         long             numBytes   = -1;
@@ -890,7 +784,7 @@ public class IOUtil {
                                             ? (URL) obj
                                             : getURL(obj.toString(),
                                                 IOUtil.class));
-                URLConnection connection = getUrlConnection(url.toExternalForm());
+                URLConnection connection = url.openConnection();
                 try {
                     from   = connection.getInputStream();
                     length = connection.getContentLength();
@@ -1291,7 +1185,7 @@ public class IOUtil {
         if (ext.equals(".php") && isHttpProtocol(filenameOrUrl)) {
             try {
                 URL           url        = new URL(originalUrl);
-                URLConnection connection = getUrlConnection(url.toExternalForm());
+                URLConnection connection = url.openConnection();
                 String        type       = connection.getContentType();
                 return (type.indexOf("text/html") >= 0);
             } catch (Exception exc) {}
@@ -1377,14 +1271,9 @@ public class IOUtil {
         try {
             URL url = getURL(filename, origin);
             if (url != null) {
-                URLConnection connection =
-                    getUrlConnection(url.toExternalForm(),
-                                     true,
-                                     true,
-                                     HTTP_TIMEOUT,
-                                     MAX_REDIRECTS,
-                                     HTTP_REDIRECT_STATUSES);
- 
+                URLConnection connection = url.openConnection();
+                connection.setReadTimeout(30000);
+                connection.setAllowUserInteraction(true);
                 if (connection instanceof HttpURLConnection) {
                     HttpURLConnection huc = (HttpURLConnection) connection;
                     int response = huc.getResponseCode();
@@ -1415,7 +1304,7 @@ public class IOUtil {
 
                                 while (true) {
                                     url        = new URL(url.toString());
-                                    connection = getUrlConnection(url.toExternalForm());
+                                    connection = url.openConnection();
                                     huc = (HttpURLConnection) connection;
                                     String host = url.getHost();
                                     UserInfo userInfo =
@@ -1446,7 +1335,8 @@ public class IOUtil {
                 return connection.getInputStream();
             }
         } catch (Exception exc) {
-            throw new IOException("Could not load resource:" + filename, exc);
+            throw new IOException("Could not load resource:" + filename
+                                  + " error:" + exc);
         }
         throw new FileNotFoundException("Could not load resource:"
                                         + filename);
@@ -1519,7 +1409,7 @@ public class IOUtil {
             try {
                 String encodedUrl = StringUtil.replace(filename, " ", "%20");
                 URL           dataUrl    = new URL(encodedUrl);
-                URLConnection connection = getUrlConnection(dataUrl.toExternalForm());
+                URLConnection connection = dataUrl.openConnection();
                 s = connection.getInputStream();
             } catch (Exception exc) {}
         }
@@ -1751,13 +1641,9 @@ public class IOUtil {
      */
     public static String readContents(String contentName, Class origin)
             throws FileNotFoundException, IOException {
-        InputStream s;
-        if (isHttpProtocol(contentName)) {
-            URLConnection connection = getUrlConnection(contentName);
-            s = connection.getInputStream();
-        } else {
-            s = IOUtil.getInputStream(contentName, origin);
-        }
+        //If a bad url then try it as a file
+
+        InputStream s = IOUtil.getInputStream(contentName, origin);
         if (s == null) {
             return null;
         }
