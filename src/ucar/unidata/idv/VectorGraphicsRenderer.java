@@ -231,6 +231,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
         if(dim.height == 0 || dim.width == 0){
             Dimension dimd = viewManager.getIdv().getStateManager().getViewSize();
             dim = dimd;
+
         }
         BufferedImage bimage   = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D    graphics = (Graphics2D) bimage.getGraphics();
