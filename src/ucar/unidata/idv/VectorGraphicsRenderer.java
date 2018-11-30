@@ -281,7 +281,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
 
             // Now,  turn off rasters and turn on all non-raster
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                control.toggleVisibilityForVectorGraphicsRendering(DisplayControl.RASTERMODE_SHOWNONRASTER); //RASTERMODE_SHOWALL
+                control.toggleVisibilityForVectorGraphicsRendering(DisplayControl.RASTERMODE_SHOWALL); //RASTERMODE_SHOWALL
             }
 
             if (wasShowingWireframe) {
@@ -296,12 +296,12 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
 
             // Render the scene graph
             SceneGraphRenderer renderer = new SceneGraphRenderer();
-            //Collada3DRenderer rendererC = new Collada3DRenderer();
+            Collada3DRenderer rendererC = new Collada3DRenderer();
             DisplayImpl        display  = (DisplayImpl) viewManager.getMaster().getDisplay();
             boolean            is3D     = !viewManager.getDisplayRenderer().getMode2D();
 
-           // rendererC.setTransformToScreenCoords(is3D);
-           // rendererC.plot(graphics, display, viewManager.getDisplayCoordinateSystem(), dim.width, dim.height, image);
+            rendererC.setTransformToScreenCoords(is3D);
+            rendererC.plot(graphics, display, viewManager.getDisplayCoordinateSystem(), dim.width, dim.height, image);
             renderer.setTransformToScreenCoords(is3D);
             renderer.plot(graphics, display, viewManager.getDisplayCoordinateSystem(), dim.width, dim.height);
 
