@@ -293,7 +293,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
             }
 
             Misc.sleep(500);
-//test
+
             // Render the scene graph
             SceneGraphRenderer renderer = new SceneGraphRenderer();
             //Collada3DRenderer rendererC = new Collada3DRenderer();
