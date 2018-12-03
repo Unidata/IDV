@@ -281,7 +281,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
 
             // Now,  turn off rasters and turn on all non-raster
             for (DisplayControl control : (List<DisplayControl>) onDisplays) {
-                control.toggleVisibilityForVectorGraphicsRendering(DisplayControl.RASTERMODE_SHOWALL); //RASTERMODE_SHOWALL
+                control.toggleVisibilityForVectorGraphicsRendering(DisplayControl.RASTERMODE_SHOWNONRASTER);
             }
 
             if (wasShowingWireframe) {
