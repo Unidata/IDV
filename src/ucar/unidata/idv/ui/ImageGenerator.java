@@ -2800,7 +2800,7 @@ public class ImageGenerator extends IdvManager {
             return error("Could not find if expression");
         }
         expr = expr.trim();
-        boolean result = getInterpreter().eval(expr).toString().equals("1");
+        boolean result = getInterpreter().eval(expr).toString().equals("True");
 
         Element thenNode      = XmlUtil.findChild(node, TAG_THEN);
         Element elseNode      = XmlUtil.findChild(node, TAG_ELSE);
