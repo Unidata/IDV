@@ -874,12 +874,13 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
 <!--
+-->
   <control
      id="planviewcolorasz"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ColorPlanViewControl"
      doeslevels="true"
-     label="Color-Shaded Image As Topography"
+     label="Color-Shaded Parameter As Topography"
      code="makeTopographyFromField(D1)"
      displaycategory="3D Surface"
      properties="smoothed=false;multipleIsTopography=true">
@@ -891,7 +892,7 @@ Since this is confusing and needs more work lets remove this for now
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
      doeslevels="true"
-     label="Contours As Topography"
+     label="Contoured Parameter As Topography"
      code="makeTopographyFromField(D1)"
      displaycategory="3D Surface"
      properties="multipleIsTopography=true">
@@ -902,7 +903,7 @@ Since this is confusing and needs more work lets remove this for now
      id="planviewcontourfilledasz"
      categories="GRID-2D-*;GRID-3D-*"
      class="ucar.unidata.idv.control.ContourPlanViewControl"
-     label="Color-Filled Contour As Topography"
+     label="Color-Filled Contoured Parameter As Topography"
      code="makeTopographyFromField(D1)"
      doeslevels="true"
      displaycategory="3D Surface"
@@ -919,8 +920,8 @@ Since this is confusing and needs more work lets remove this for now
      code="makeTopographyFromField(D1)"
      displaycategory="3D Surface"
      properties="smoothed=false;use3D=false;allowSmoothing=false;multipleIsTopography=true"/>
--->
 
+<!--
   <control
      id="planviewcolorastopo"
      categories="GRID-2D-*;GRID-3D-*"
@@ -962,7 +963,7 @@ Since this is confusing and needs more work lets remove this for now
      label="Radar Sweep as Topography"
      displaycategory="3D Surface"
      properties="smoothed=false;use3D=false;allowSmoothing=false;parameterIsTopography=true"/>
-
+-->
   <control
      id="imagecontroloverz"
      categories="RGBIMAGE"
