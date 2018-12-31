@@ -2779,6 +2779,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
                 getDataSelection().putProperty("centerPosition", llpi);
                 dataChanged();
+                saveProjection();
             } catch (Exception e) {}
             ;
         }
@@ -12736,6 +12737,16 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         if (dataSelection != null) {
             dataSelection.getGeoSelection(true).setUseViewBounds(useDR);
         }
+    }
+
+    /**
+     * When relocate display through ISL or RBB it will be good to save the projection
+     * otherwise, the home button will bring the view back to original view
+     * @param
+     */
+    public void saveProjection(){
+        NavigatedDisplay navDisplay = getNavigatedDisplay();
+        navDisplay.getDisplay().getProjectionControl().saveProjection();
     }
 
 }

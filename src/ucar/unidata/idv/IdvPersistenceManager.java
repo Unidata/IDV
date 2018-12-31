@@ -4025,6 +4025,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                         }
                         else
                             dc.relocateDisplay(baseLLR, newLLR, false);
+
+                        if(controlIdx == (newControls.size()-1))
+                            dc.saveProjection();
+
                     }
 
                 }
