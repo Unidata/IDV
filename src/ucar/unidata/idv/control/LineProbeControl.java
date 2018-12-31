@@ -659,7 +659,7 @@ public abstract class LineProbeControl extends GridDisplayControl {
                     //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
                     LatLonRect newLLR = navDisplay.getLatLonRect();
 
-                    if(!newLLR.containedIn(baseLLR)) {
+                    if(baseLLR != null && !newLLR.containedIn(baseLLR)) {
                         GeoSelection gs = dataSelection.getGeoSelection();
                         GeoLocationInfo ginfo = new GeoLocationInfo(newLLR);
                         gs.setBoundingBox(ginfo);
@@ -703,13 +703,13 @@ public abstract class LineProbeControl extends GridDisplayControl {
         //doUpdateRegion = false;
 
         double deltaLat = newBounds.getLatMax() - newBounds.getLatMin();
-        double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
+       // double deltaLon = newBounds.getLonMax() - newBounds.getLonMin();
 
         //TODO: move the end points by the delta
         //It isn't just a matter of shifting by the delta as the bbox may have been resized and not just translated
         LatLonPointImpl lowerLeft = newBounds.getLowerLeftPoint();
         double          nlat = lowerLeft.getLatitude() + deltaLat * latRatio;
-        double          nlon = lowerLeft.getLongitude() + deltaLon * lonRatio;
+        double          nlon = newBounds.getCenterLon();
         double          nalt      = 0.0;
 
         try {
