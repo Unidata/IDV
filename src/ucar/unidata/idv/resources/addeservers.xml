@@ -38,7 +38,7 @@ they essentially get it from their container type tag.
   </server>
   <server name="adde.ssec.wisc.edu" active="true">
     <group
-            names="RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+            names="RTGOESR,NPGOESR,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
             type="image"/>
     <group
             names="RTNEXRAD, NEXRALL"
