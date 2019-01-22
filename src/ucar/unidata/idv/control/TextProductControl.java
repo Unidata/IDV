@@ -20,55 +20,62 @@
 
 package ucar.unidata.idv.control;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.regex.Pattern;
 
-
-import ucar.unidata.collab.Sharable;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.JTextComponent;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import ucar.unidata.data.DataChoice;
-
 import ucar.unidata.data.text.Product;
 import ucar.unidata.data.text.ProductGroup;
 import ucar.unidata.data.text.ProductType;
 import ucar.unidata.data.text.TextProductDataSource;
-
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
 import ucar.unidata.ui.TextSearcher;
-
 import ucar.unidata.util.Cache;
 import ucar.unidata.util.DateSelection;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import visad.*;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import java.net.URL;
-
-import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-
-
-import java.util.regex.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.tree.*;
-
-
-
+import visad.DateTime;
+import visad.Real;
+import visad.VisADException;
 
 /**
  * Class to display weather text
@@ -188,7 +195,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             try {
                 String content =
                     IOUtil.readContents(
-                        "http://www.crh.noaa.gov/glossary.php?word=" + url,
+                        "https://forecast.weather.gov/glossary.php?word=" + url,
                         getClass());
                 int idx = content.indexOf("<html");
                 if (idx >= 0) {
@@ -205,9 +212,9 @@ public class TextProductControl extends StationLocationControl implements Hyperl
                 pane.setEditable(false);
                 pane.setContentType("text/html");
                 pane.setText(content);
-                pane.setPreferredSize(new Dimension(200, 150));
+                pane.setPreferredSize(new Dimension(500, 250));
                 JLabel lbl = new JLabel(content);
-                GuiUtils.showOkDialog(null, "Definition:" + url, pane, null);
+                GuiUtils.showOkDialog(null, "Definition: " + url, pane, null);
 
             } catch (Exception exc) {
                 logException("Could not fetch definition", exc);
