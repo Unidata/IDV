@@ -814,7 +814,12 @@ public class LogUtil {
      */
     public static void printException(LogCategory log_, String xmsg,
                                       Throwable exc) {
-        printException(log_, xmsg, exc, (File) null);
+        if(!LogUtil.getInteractiveMode()) {
+            System.err.println(xmsg);
+           // return;
+        }
+        else
+            printException(log_, xmsg, exc, (File) null);
     }
 
 
