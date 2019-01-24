@@ -524,10 +524,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                           "Ribbon",
                                                           "Cylinder",
                                                           "Deform Ribbon",
-                                                          "Point" };
+                                                          "Point", "Tracer", "Tracer Point" };
 
         /** types of smoothing functions */
-        private  int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
+        private  int[] trajForm = new int[] { 0, 1, 2, 3, 4, 5, 6};
 
         /** vector/traj length component */
         JComponent trajFormComponent;
@@ -2668,7 +2668,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         }
         //
-        if ( !hiddenBtn.isSelected() || (glyphs.size() > 0)) {
+        if ( (!hiddenBtn.isSelected() || (glyphs.size() > 0)) &&
+                !(isYZ || isXZ)) {
             SampledSet domain2D =
                     GridUtil.makeDomain2D((GriddedSet) domainSet);
             boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
