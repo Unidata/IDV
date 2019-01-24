@@ -2668,8 +2668,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         }
         //
-        if ( (!hiddenBtn.isSelected() || (glyphs.size() > 0)) &&
-                !(isYZ || isXZ)) {
+        if ( !hiddenBtn.isSelected() && (glyphs.size() > 0) &&
+                isXY) {
             SampledSet domain2D =
                     GridUtil.makeDomain2D((GriddedSet) domainSet);
             boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
