@@ -20,6 +20,10 @@ Note: you can also add a type="data|display|favorite" in the bundle tag
      name="Satellite Displays"
      url="https://www.unidata.ucar.edu/software/idv/resources/bundles/samples/satellite.xidv"/>
 
+  <bundle
+      category="Samples"
+      name="Hurricane Displays"
+      url="https://www.unidata.ucar.edu/software/idv/resources/bundles/samples/hmichael.xidv"/>
 
   <bundle
      category="Samples > NAM211"
