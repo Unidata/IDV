@@ -874,7 +874,7 @@ Since this is confusing and needs more work lets remove this for now
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
 <!--
--->
+
   <control
      id="planviewcolorasz"
      categories="GRID-2D-*;GRID-3D-*"
@@ -883,7 +883,7 @@ Since this is confusing and needs more work lets remove this for now
      label="Color-Shaded Parameter As Topography"
      code="makeTopographyFromField(D1)"
      displaycategory="3D Surface"
-     properties="smoothed=false;multipleIsTopography=true">
+     properties="parameterIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -921,7 +921,7 @@ Since this is confusing and needs more work lets remove this for now
      displaycategory="3D Surface"
      properties="smoothed=false;use3D=false;allowSmoothing=false;multipleIsTopography=true"/>
 
-<!--
+-->
   <control
      id="planviewcolorastopo"
      categories="GRID-2D-*;GRID-3D-*"
@@ -929,7 +929,7 @@ Since this is confusing and needs more work lets remove this for now
      doeslevels="true"
      label="Color-Shaded Parameter As Topography"
      displaycategory="3D Surface"
-     properties="smoothed=false;parameterIsTopography=true">
+     properties="smoothed=true;parameterIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
 
@@ -940,7 +940,7 @@ Since this is confusing and needs more work lets remove this for now
      doeslevels="true"
      label="Contoured Parameter As Topography"
      displaycategory="3D Surface"
-     properties="parameterIsTopography=true">
+     properties="smoothed=true;parameterIsTopography=true">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
     
@@ -951,19 +951,19 @@ Since this is confusing and needs more work lets remove this for now
      label="Color-Filled Contoured Parameter As Topography"
      doeslevels="true"
      displaycategory="3D Surface"
-     properties="colorFill=true;parameterIsTopography=true">
+     properties="smoothed=true;colorFill=true;parameterIsTopography=true">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
-
-  <control
-     id="radarsweepastopo"
-     categories="SWEEP-2D-*"
-     doeslevels="true"
-     class="ucar.unidata.idv.control.RadarSweepControl"
-     label="Radar Sweep as Topography"
-     displaycategory="3D Surface"
-     properties="smoothed=false;use3D=false;allowSmoothing=false;parameterIsTopography=true"/>
--->
+  <!--
+    <control
+       id="radarsweepastopo"
+       categories="SWEEP-2D-*"
+       doeslevels="true"
+       class="ucar.unidata.idv.control.RadarSweepControl"
+       label="Radar Sweep as Topography"
+       displaycategory="3D Surface"
+       properties="smoothed=false;use3D=false;allowSmoothing=false;parameterIsTopography=true"/>
+  -->
   <control
      id="imagecontroloverz"
      categories="RGBIMAGE"
