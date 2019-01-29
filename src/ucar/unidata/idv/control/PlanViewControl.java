@@ -37,12 +37,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
 import ucar.visad.Util;
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.Grid2DDisplayable;
-import ucar.visad.display.GridDisplayable;
-import ucar.visad.display.ScalarMapSet;
-import ucar.visad.display.SelectorDisplayable;
-import ucar.visad.display.ZSelector;
+import ucar.visad.display.*;
 
 import visad.*;
 
@@ -774,6 +769,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
             mapSet.remove(parameterTopoMap);
         }
         RealType paramTopoType = getGridDataInstance().getRealType(0);
+        if(getPlanDisplay() instanceof Grid2DDisplayable)
+            paramTopoType = ((Grid2DDisplayable) getPlanDisplay()).getRGBRealType();
+        else if(getPlanDisplay() instanceof Contour2DDisplayable)
+            paramTopoType = ((Contour2DDisplayable) getPlanDisplay()).getRGBRealType();
         parameterTopoMap = new ScalarMap(paramTopoType, vertType);
         parameterTopoMap.setOverrideUnit(getDisplayUnit());
         if (verticalRange != null) {
@@ -1435,6 +1434,11 @@ public abstract class PlanViewControl extends GridDisplayControl {
                         try {
                             getGridDisplayable().loadData(
                                 getSliceForDisplay(currentSlice));
+                            if (getParameterIsTopography()) {
+                                try {
+                                    addParameterTopographyMap();
+                                } catch (Exception e){}
+                            }
                         } catch (Exception ve) {
                             logException("applySmoothing", ve);
                         }
