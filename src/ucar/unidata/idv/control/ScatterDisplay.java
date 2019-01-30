@@ -44,11 +44,9 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.control.ColorTableWidget;
 import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.colortable.ColorTableManager;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Range;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.MapProjectionDisplayJ3D;
 
@@ -120,14 +118,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -222,9 +213,6 @@ public class ScatterDisplay extends DisplayControlImpl {
     JComponent ctwCompY;
 
     /** _more_ */
-    ColorTableWidget ctw;
-
-    /** _more_ */
     int n_selectors = 3;
 
     /** _more_ */
@@ -290,6 +278,10 @@ public class ScatterDisplay extends DisplayControlImpl {
     /** _more_ */
     boolean selectByCurve = false;
 
+
+    JMenu viewMenu = null;
+
+    Component[] threeComps = null;
     /**
      * Construct a ScatterDisplay 
      */
@@ -434,18 +426,18 @@ public class ScatterDisplay extends DisplayControlImpl {
             new ImageControl(
                 (HydraRGBDisplayable) dspMasterX.getDisplayables(0),
                 getDisplayConventions());
-        ctw = new ColorTableWidget(dCntrl, ColorTableManager.getManager(),
+        ColorTableWidget ctw1 = new ColorTableWidget(dCntrl, ColorTableManager.getManager(),
                                    clrTableX, rangeX);
-        ctwCompX   = ctw.getLegendPanel(BOTTOM_LEGEND);
-        dCntrl.ctw = ctw;
+        ctwCompX   = ctw1.getLegendPanel(BOTTOM_LEGEND);
+        dCntrl.ctw = ctw1;
 
         dCntrl = new ImageControl(
             (HydraRGBDisplayable) dspMasterY.getDisplayables(0),
             getDisplayConventions());
-        ctw = new ColorTableWidget(dCntrl, ColorTableManager.getManager(),
+        ctw1 = new ColorTableWidget(dCntrl, ColorTableManager.getManager(),
                                    clrTableY, rangeY);
-        ctwCompY   = ctw.getLegendPanel(BOTTOM_LEGEND);
-        dCntrl.ctw = ctw;
+        ctwCompY   = ctw1.getLegendPanel(BOTTOM_LEGEND);
+        dCntrl.ctw = ctw1;
 
         return true;
 
@@ -602,16 +594,21 @@ public class ScatterDisplay extends DisplayControlImpl {
     public void initDone() {
 
         try {
-            DisplayMaster master = makeScatterDisplay();
+            scatterMaster = makeScatterDisplay();
+            scatterMaster.draw();
             for (int k = 0; k < n_selectors; k++) {
-                scatterBoxSelectors.add(new ScatterBoxSelector(master,
+                scatterBoxSelectors.add(new ScatterBoxSelector(scatterMaster,
                         selectorColors[k],
                         (float) k));
-                scatterCurveSelectors.add(new ScatterCurveSelector(master,
+                scatterCurveSelectors.add(new ScatterCurveSelector(scatterMaster,
                         selectorColors[k],
                         (float) k));
             }
-            master.draw();
+
+            threeComps[0] = dspMasterX.getComponent();
+            threeComps[1] = dspMasterY.getComponent();
+            threeComps[2] = scatterMaster.getComponent();
+            container.repaint();
 
             for (int k = 0; k < n_selectors; k++) {
                 SubsetRubberBandBox X_subsetBox =
@@ -898,24 +895,24 @@ public class ScatterDisplay extends DisplayControlImpl {
     public Container doMakeContents() {
         JPanel      pane  = new JPanel(new GridLayout(1, 3));
 
-        Component[] comps = new Component[] { null, null, null };
-        comps[0] = dspMasterX.getComponent();
-        comps[1] = dspMasterY.getComponent();
-        comps[2] = getScatterTabComponent();
+        threeComps = new Component[] { null, null, null };
+        threeComps[0] = dspMasterX.getComponent();
+        threeComps[1] = dspMasterY.getComponent();
+        threeComps[2] = getScatterTabComponent();
 
         JPanel panelX = new JPanel(new BorderLayout());
         panelX.setBorder(new EmptyBorder(4, 4, 4, 4));
-        panelX.add(comps[0], BorderLayout.CENTER);
+        panelX.add(threeComps[0], BorderLayout.CENTER);
         panelX.add(ctwCompX, BorderLayout.SOUTH);
 
         JPanel panelY = new JPanel(new BorderLayout());
         panelY.setBorder(new EmptyBorder(4, 4, 4, 4));
-        panelY.add(comps[1], BorderLayout.CENTER);
+        panelY.add(threeComps[1], BorderLayout.CENTER);
         panelY.add(ctwCompY, BorderLayout.SOUTH);
 
         JPanel panelS = new JPanel(new BorderLayout());
         panelS.setBorder(new EmptyBorder(4, 4, 4, 4));
-        panelS.add(comps[2], BorderLayout.CENTER);
+        panelS.add(threeComps[2], BorderLayout.CENTER);
 
         pane.add(panelX);
         pane.add(panelY);
@@ -2546,6 +2543,61 @@ public class ScatterDisplay extends DisplayControlImpl {
             }
         }
         return isLL;
+    }
+
+    protected void getViewMenuItems1(List menus, boolean forMenuBar) {
+        super.getViewMenuItems(menus, forMenuBar);
+
+        if (forMenuBar) {
+            JMenu svMenu = makeViewMenu();
+            svMenu.setText("Sounding Chart");
+            menus.add(svMenu);
+
+        }
+    }
+
+    public JMenu makeViewMenu() {
+        ViewManager vm = new ViewManager();
+        vm.setShowControlLegend(false);
+        JMenu viewMenu = GuiUtils.makeDynamicMenu("View", vm,
+                "firstInitializeViewMenu");
+
+        viewMenu.setMnemonic(GuiUtils.charToKeyCode("V"));
+
+        if (this.viewMenu == null) {
+            this.viewMenu = viewMenu;
+        }
+
+        return viewMenu;
+    }
+
+    protected void getSaveMenuItems(List items, boolean forMenuBar) {
+        super.getSaveMenuItems(items, forMenuBar);
+
+        items.add(GuiUtils.makeMenuItem("Save Scatter Display ...",
+                this,
+                "saveImage"));
+
+
+    }
+
+    public void saveImage() {
+        JComboBox publishCbx =
+                this.getIdv().getPublishManager().getSelector("nc.export");
+        String filename = FileManager.getWriteFile(FileManager.FILTER_IMAGE,
+                FileManager.SUFFIX_JPG, ((publishCbx != null)
+                        ? GuiUtils.top(publishCbx)
+                        : null));
+        if (filename == null) {
+            return;
+        }
+        try {
+            ImageUtils.writeImageToFile(container, filename);
+            this.getIdv().getPublishManager().publishContent(filename,
+                    null, publishCbx);
+        } catch (Exception exc) {
+            LogUtil.logException("Capturing image", exc);
+        }
     }
 
 }
