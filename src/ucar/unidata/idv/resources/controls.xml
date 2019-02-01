@@ -955,6 +955,7 @@ Since this is confusing and needs more work lets remove this for now
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
     </control>
   <!--
+  -->
     <control
        id="radarsweepastopo"
        categories="SWEEP-2D-*"
@@ -963,7 +964,7 @@ Since this is confusing and needs more work lets remove this for now
        label="Radar Sweep as Topography"
        displaycategory="3D Surface"
        properties="smoothed=false;use3D=false;allowSmoothing=false;parameterIsTopography=true"/>
-  -->
+
   <control
      id="imagecontroloverz"
      categories="RGBIMAGE"
