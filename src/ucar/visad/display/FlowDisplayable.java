@@ -348,6 +348,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     TrajectoryParams tparm =
                         flowControl.getTrajectoryParams();
                     tparm.setTrajectoryForm(trajFormType);
+                    if(trajFormType == 6 || trajFormType == 5) {
+                        tparm.setTracerStreamingEnabled(true);
+                    } else {
+                        tparm.setTracerStreamingEnabled(false);
+                    }
                     tparm.setMarkerSize(mSize);
                     tparm.setTrajRefreshInterval(rlen);
                     tparm.setTrajVisibilityTimeWindow(tlen);
@@ -430,6 +435,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 TrajectoryParams tparm = flowControl.getTrajectoryParams();
                 int              t     = tparm.getStartSkip();
                 tparm.setTrajectoryForm(trajFormType);
+                if(trajFormType == 6 || trajFormType == 5) {
+                    tparm.setTracerStreamingEnabled(true);
+                } else {
+                    tparm.setTracerStreamingEnabled(false);
+                }
                 tparm.setMarkerSize(arrowHeadSize);
                 tparm.setTrajRefreshInterval(rlen);
                 tparm.setTrajVisibilityTimeWindow(tlen);
