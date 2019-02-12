@@ -20,6 +20,8 @@
     <ncml:remove name="group_quality_flag" type="variable" />
     <ncml:remove name="product_time" type="variable" />
     <ncml:remove name="flash_time_offset_of_last_event" type="variable" />
+    <ncml:remove name="flash_frame_time_offset_of_first_event" type="variable" />
+    <ncml:remove name="flash_frame_time_offset_of_last_event" type="variable" />
 
     <ncml:variable name="flash_area" shape="number_of_flashes" type="short">
         <ncml:attribute name="coordinates" value="flash_time_offset_of_first_event flash_lat flash_lon" />
