@@ -13,6 +13,9 @@
   <ncml:remove name="flash_id" type="variable" />
   <ncml:remove name="flash_time_offset_of_first_event" type="variable" />
   <ncml:remove name="flash_time_offset_of_last_event" type="variable" />
+  <ncml:remove name="flash_frame_time_offset_of_first_event" type="variable" />
+  <ncml:remove name="flash_frame_time_offset_of_last_event" type="variable" />
+  <ncml:remove name="group_frame_time_offset" type="variable" />
   <ncml:remove name="flash_lat" type="variable" />
   <ncml:remove name="flash_lon" type="variable" />
   <ncml:remove name="flash_area" type="variable" />
