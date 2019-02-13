@@ -1024,11 +1024,12 @@ public class PointObFactory {
                 realTypes.add(windChillType);
                 realTypes.add(heatIndexType);
             }
-            if (allReals) {
+            if (allReals && realTypes.size() > 0) {
                 tupleType = new RealTupleType(
                         (RealType[]) realTypes.toArray(
                                 new RealType[realTypes.size()]));
             } else {
+                if(realTypes.size() > 0)
                 tupleType = DoubleStringTuple.makeTupleType(realTypes,
                         textTypes);
             }
@@ -1125,7 +1126,7 @@ public class PointObFactory {
                     speed = ((Real) ob.getComponent(speedIndex)).getValue(Speed.MILES_PER_HOUR);
                 }
                 // now make data
-                if (allReals) {
+                if (allReals && tupleType != null) {
                     double[] obValues = ((RealTuple) ob).getValues();
                     double[] realValues = new double[numDouble];
                     for (int j = 0; j < numNotRequired; j++) {
