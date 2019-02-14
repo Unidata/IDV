@@ -24,10 +24,7 @@ package ucar.unidata.idv.control;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataTimeRange;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.data.point.PointDataInstance;
-import ucar.unidata.data.point.PointDataSource;
-import ucar.unidata.data.point.PointOb;
-import ucar.unidata.data.point.PointObFactory;
+import ucar.unidata.data.point.*;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.gis.SpatialGrid;
 import ucar.unidata.idv.ControlContext;
@@ -493,6 +490,11 @@ public class StationModelControl extends ObsDisplayControl {
         addDisplayable(timesHolder);
         lastViewBounds = null;
 
+        String stationModelScale =
+                (String) dataChoice.getProperty(AddePointDataSource.PROP_STATIONMODELSCALE);
+        if(stationModelScale != null){
+            setDisplayableScale(Float.parseFloat(stationModelScale));
+        }
         setScaleOnDisplayable();
 
         getControlContext().getStationModelManager()
