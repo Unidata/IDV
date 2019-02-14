@@ -168,13 +168,11 @@ public final class AddeUtil {
                float timeInc =
                        ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
                                new Float(1))).floatValue();
-
+               url = url.replaceAll("MAX=99999", "MAX=999999");
+               url = url.replaceAll("POS=1", "POS=ALL");
                String[] times = makeRelativeTimesGLM(timeIndices, timeInc);
                for (int i = 0; i < times.length; i++) {
-                   url = url.replaceAll("MAX=99999", "MAX=999999");
-                   url = url.replaceAll("POS=1", "POS=ALL");
                    String newUrl = url.replaceAll(RELATIVE_TIME, times[i]);
-
                    //   System.err.println ("url:" + newUrl);
                    urls.add(newUrl);
                }
@@ -259,6 +257,8 @@ public final class AddeUtil {
 
         GregorianCalendar utcCalendar =
                 new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+        url = url.replaceAll("MAX=99999", "MAX=999999");
+        url = url.replaceAll("POS=1", "POS=ALL");
         for (DateTime dt : absTimes) {
             try {
                 CalendarDateTime cdt = new CalendarDateTime(dt);
@@ -284,10 +284,7 @@ public final class AddeUtil {
             times = times + newHour0 + StringUtil.padZero(newMin0, 2) + "00" +
                     " " + newHour + StringUtil.padZero(newMin, 2) + "00";
             System.out.println(times);
-
             String daytime = makeDateUrl(thisDate0, thisDate, times);
-            url = url.replaceAll("MAX=99999", "MAX=999999");
-            url = url.replaceAll("POS=1", "POS=ALL");
             urls.add(replaceDateTime(url, daytime));
 
         }
