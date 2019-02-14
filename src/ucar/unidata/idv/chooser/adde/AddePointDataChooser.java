@@ -295,8 +295,17 @@ public class AddePointDataChooser extends AddeChooser {
         //        }
         relTimeIncComp = GuiUtils.hbox(new JLabel("Increment: "),
                                        relTimeIncBox,
-                                       GuiUtils.lLabel(" hours"));
+                                       GuiUtils.lLabel(getRelTimeIncLabel()));
         return GuiUtils.left(relTimeIncComp);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getRelTimeIncLabel() {
+        return " hours";
     }
 
     /**
