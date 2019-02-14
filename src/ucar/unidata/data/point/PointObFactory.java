@@ -893,11 +893,17 @@ public class PointObFactory {
 
             // check for time fields (DAY & TIME or DATE & HMS)
             int dayIndex = type.getIndex("DAY");
-            if(dayIndex == -1)
+            if(dayIndex == -1) {
                 dayIndex = type.getIndex("DAY[unit:]");
+                if(dayIndex == -1)
+                    dayIndex = type.getIndex("DAY[unit:null]");
+            }
             int timeIndex = type.getIndex("TIME");
-            if(timeIndex == -1)
+            if(timeIndex == -1) {
                 timeIndex = type.getIndex("TIME[unit:]");
+                if(timeIndex == -1)
+                    timeIndex = type.getIndex("TIME[unit:null]");
+            }
             int dateIndex = type.getIndex("DATE");
             int hmsIndex = type.getIndex("HMS");
             boolean hasDayTime = ((dayIndex != -1) && (timeIndex != -1));
