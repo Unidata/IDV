@@ -117,7 +117,7 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
      * @return name of default station model
      */
     public String getDefaultStationModel() {
-        return "flash";
+        return "location";
     }
 
     /**
@@ -589,7 +589,7 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
      * @return _more_
      */
     public String getRequestUrl() {
-        StringBuffer request = getGroupUrl(REQ_POINTDATA, getGroup());
+        StringBuffer request = getGroupUrl("point", getGroup());
         appendKeyValue(request, PROP_DESCR, getDescriptor());
         appendRequestSelectClause(request);
         appendKeyValue(request, PROP_NUM, "all");
