@@ -26,6 +26,7 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.visad.UtcDate;
 
+import ucar.visad.data.CalendarDateTime;
 import visad.DateTime;
 import visad.VisADException;
 
@@ -144,23 +145,51 @@ public final class AddeUtil {
                 }
             }
         }
+        java.util.Hashtable  htable = datasource.getProperties();
+        String checkglm = "";
+        if(htable != null)
+            checkglm = (String) datasource.getProperties()
+                        .get(ucar.unidata.idv.chooser.adde.AddeChooser
+                                .DATA_NAME_KEY);
         if (driverTimes != null) {
             urls.addAll(makeDriverTimesUrls(url, datasource,
                                             (List) driverTimes));
         } else if (absTimes != null) {
-            urls.addAll(makeAbsoluteTimesUrls(url, datasource, absTimes));
-        } else if (url.indexOf(RELATIVE_TIME) >= 0) {
-
-            float timeInc =
-                ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
-                    new Float(1))).floatValue();
-
-            String[] times = makeRelativeTimes(timeIndices, timeInc);
-            for (int i = 0; i < times.length; i++) {
-                String newUrl = url.replaceAll(RELATIVE_TIME, times[i]);
-                //   System.err.println ("url:" + newUrl);
-                urls.add(newUrl);
+            if(checkglm.contains("GLM Lightning Data")) {
+                float timeInc =
+                        ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
+                                new Float(1))).floatValue();
+                urls.addAll(makeAbsoluteTimesUrlsGLM(url, datasource, absTimes, timeInc));
+            } else {
+                urls.addAll(makeAbsoluteTimesUrls(url, datasource, absTimes));
             }
+        } else if (url.indexOf(RELATIVE_TIME) >= 0 ) {
+           if(checkglm.contains("GLM Lightning Data")){
+               float timeInc =
+                       ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
+                               new Float(1))).floatValue();
+
+               String[] times = makeRelativeTimesGLM(timeIndices, timeInc);
+               for (int i = 0; i < times.length; i++) {
+                   url = url.replaceAll("MAX=99999", "MAX=999999");
+                   url = url.replaceAll("POS=1", "POS=ALL");
+                   String newUrl = url.replaceAll(RELATIVE_TIME, times[i]);
+
+                   //   System.err.println ("url:" + newUrl);
+                   urls.add(newUrl);
+               }
+           } else {
+               float timeInc =
+                       ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
+                               new Float(1))).floatValue();
+
+               String[] times = makeRelativeTimes(timeIndices, timeInc);
+               for (int i = 0; i < times.length; i++) {
+                   String newUrl = url.replaceAll(RELATIVE_TIME, times[i]);
+                   //   System.err.println ("url:" + newUrl);
+                   urls.add(newUrl);
+               }
+           }
 
         } else {
             urls.add(url);
@@ -209,6 +238,62 @@ public final class AddeUtil {
         return urls;
     }
 
+    /**
+     * Make URLs that correspond to the absolute list of (timedriver) times
+     *
+     * @param url   the ADDE URL
+     * @param datasource the datasource
+     * @param absTimes    the list of absolute times
+     * @param timInc    in hour
+     *
+     * @return the list of URLs
+     */
+    private static List<String> makeAbsoluteTimesUrlsGLM(String url,
+                                  DataSourceImpl datasource, List<DateTime> absTimes, float timInc) {
+        List<String> urls = new ArrayList<String>();
+        if ((absTimes == null) || absTimes.isEmpty()) {
+            urls.add(url);
+        }
+        timInc = timInc * 60.0f;
+        Collections.sort(absTimes);
+
+        GregorianCalendar utcCalendar =
+                new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+        for (DateTime dt : absTimes) {
+            try {
+                CalendarDateTime cdt = new CalendarDateTime(dt);
+                utcCalendar.setTime(cdt.getCalendarDate().toDate());
+            } catch (Exception e){}
+
+            int    newMin   = utcCalendar.get(utcCalendar.MINUTE);
+            int    newHour  = utcCalendar.get(utcCalendar.HOUR_OF_DAY);
+            int    newDay   = utcCalendar.get(utcCalendar.DAY_OF_YEAR);
+            int    newYear  = utcCalendar.get(utcCalendar.YEAR);
+            String thisDate = "" + newYear + StringUtil.padZero(newDay, 3);
+
+            utcCalendar.add(utcCalendar.MINUTE,  -(int)timInc);
+            int    newMin0   = utcCalendar.get(utcCalendar.MINUTE);
+            int    newHour0  = utcCalendar.get(utcCalendar.HOUR_OF_DAY);
+            int    newDay0   = utcCalendar.get(utcCalendar.DAY_OF_YEAR);
+            int    newYear0  = utcCalendar.get(utcCalendar.YEAR);
+            String thisDate0 = "" + newYear0 + StringUtil.padZero(newDay0, 3);
+            //Do we have a new day
+
+            String times       = "";
+
+            times = times + newHour0 + StringUtil.padZero(newMin0, 2) + "00" +
+                    " " + newHour + StringUtil.padZero(newMin, 2) + "00";
+            System.out.println(times);
+
+            String daytime = makeDateUrl(thisDate0, thisDate, times);
+            url = url.replaceAll("MAX=99999", "MAX=999999");
+            url = url.replaceAll("POS=1", "POS=ALL");
+            urls.add(replaceDateTime(url, daytime));
+
+        }
+
+        return urls;
+    }
     /**
      * Replace the date/time in the url with the new one
      * @param url  the url to munge
@@ -366,6 +451,89 @@ public final class AddeUtil {
 
     }
 
+    /**
+     * Make the relative times
+     *
+     * @param timeIndices array of time indices
+     * @param timeInc    time increment (hours)
+     *
+     * @return ADDE time select clause
+     */
+    public static String[] makeRelativeTimesGLM(int[] timeIndices,
+                                             float timeInc) {
+
+        GregorianCalendar utcCalendar =
+                new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+        String currentDate = null;
+        String times       = null;
+        List   timesList   = new ArrayList();
+
+        Date   now         = new Date();
+        int    minInc      = (int) ((timeInc) * 60);
+        int    minutes     = minInc % 60;
+        int    hours       = minInc / 60;
+        utcCalendar.setTime(now);
+        int curHour = utcCalendar.get(utcCalendar.HOUR_OF_DAY);
+        int curMin  = utcCalendar.get(utcCalendar.MINUTE);
+        // normalize for time inc
+        //        int diff = curHour- (curHour / timeInc) * timeInc;
+        /*
+        int diff = curHour % hourInc;
+        //        System.err.println("cur hour:" + curHour + " diff:" + diff);
+        utcCalendar.add(utcCalendar.HOUR_OF_DAY, -diff);
+        */
+        int hdiff = (hours == 0)
+                ? 0
+                : curHour % hours;
+        int mdiff = (minutes == 0)
+                ? curMin
+                : curMin % minutes;
+        // System.err.println("cur hour:" + curHour + " diff:" + hdiff);
+        // System.err.println("cur min:" + curMin + " diff:" + mdiff);
+        utcCalendar.add(utcCalendar.HOUR_OF_DAY, -hdiff);
+        utcCalendar.add(utcCalendar.MINUTE, -mdiff);
+       // utcCalendar.add(utcCalendar.MINUTE,  - minInc);
+        for (int i = 0; i < timeIndices.length; i++)
+        {
+            //Go back timeIndices*increment hours
+            //utcCalendar.add(utcCalendar.HOUR_OF_DAY,
+            //                -timeIndices[i] * hourInc);
+            utcCalendar.add(utcCalendar.MINUTE, -timeIndices[i] * minInc);
+            int    newMin   = utcCalendar.get(utcCalendar.MINUTE);
+            int    newHour  = utcCalendar.get(utcCalendar.HOUR_OF_DAY);
+            int    newDay   = utcCalendar.get(utcCalendar.DAY_OF_YEAR);
+            int    newYear  = utcCalendar.get(utcCalendar.YEAR);
+            String thisDate = "" + newYear + StringUtil.padZero(newDay, 3);
+
+            utcCalendar.add(utcCalendar.MINUTE,  - minInc);
+            int    newMin0   = utcCalendar.get(utcCalendar.MINUTE);
+            int    newHour0  = utcCalendar.get(utcCalendar.HOUR_OF_DAY);
+            int    newDay0   = utcCalendar.get(utcCalendar.DAY_OF_YEAR);
+            int    newYear0  = utcCalendar.get(utcCalendar.YEAR);
+            String thisDate0 = "" + newYear0 + StringUtil.padZero(newDay0, 3);
+            //Do we have a new day
+
+            times       = "";
+
+            //Append the time
+            if (times.length() > 0) {
+                times = times + ",";
+            }
+            times = times + newHour0 + StringUtil.padZero(newMin0, 2) + "00" +
+                    " " + newHour + StringUtil.padZero(newMin, 2) + "00";
+            System.out.println(times);
+            timesList.add(makeDateUrl(thisDate0, thisDate, times));
+            utcCalendar.add(utcCalendar.MINUTE,  minInc + timeIndices[i] * minInc);
+        }
+
+        //add the last one to the list
+       // if (currentDate != null) {
+        //    timesList.add(makeDateUrl(currentDate, times));
+       // }
+
+        return (String[]) timesList.toArray(new String[timesList.size()]);
+
+    }
 
     /**
      * Assemble the dttm part of the url
@@ -387,6 +555,25 @@ public final class AddeUtil {
         return sb.toString();
     }
 
+    /**
+     * Assemble the dttm part of the url
+     *
+     * @param day the day
+     * @param times list of times
+     *
+     * @return the dttm part of the url
+     */
+    private static String makeDateUrl(String day, String day1, String times) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("DAY ");
+        sb.append(day);
+        sb.append(" ");
+        sb.append(day1);
+        sb.append(";TIME ");
+        sb.append(times);
+        //        System.err.println("time:" + sb);
+        return sb.toString();
+    }
 
     /**
      * Main method for testing
