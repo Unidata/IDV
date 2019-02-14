@@ -70,6 +70,8 @@ public class AddePointDataSource extends PointDataSource {
     /** urls with time in them */
     private DataSelection timeDriverSelection;
 
+    static double  increment = 0.0;
+
     /**
      * Default contstructor.
      *
@@ -110,6 +112,18 @@ public class AddePointDataSource extends PointDataSource {
                         .DATASET_NAME_KEY);
             if (possible != null) {
                 name = possible;
+            }
+            String checkglm =
+                    (String) properties
+                            .get(ucar.unidata.idv.chooser.adde.AddeChooser
+                                    .DATA_NAME_KEY);
+            if(checkglm != null && checkglm.contains("GLM Lightning Data")){
+                Double relT =  (Double) properties
+                        .get("relative time increment");
+                if(relT != null ){
+                    double reltime = (double)(relT * 60.0);
+                    increment = reltime;
+                }
             }
         }
         return name;
@@ -239,7 +253,8 @@ public class AddePointDataSource extends PointDataSource {
                 temp.setSelectClause("");
             }
             temp.setMaxNumber(1);
-            temp.setPosition("0");  // might have to change this to ALL
+            if(!choice.getDescription().contains("Lightning"))
+                temp.setPosition("0");  // might have to change this to ALL
         } else {
             //System.out.println("original select clause = " + source);
             if (source.indexOf(AddeUtil.LATLON_BOX) >= 0) {
@@ -433,12 +448,16 @@ public class AddePointDataSource extends PointDataSource {
                                                false, true);
                     Trace.call1("AddePointDataSource.pda ctor");
                     Data data = pda.getData();
+                    System.out.println("size of ll data " + ((FieldImpl) data).getLength());
                     Trace.call2("AddePointDataSource.pda ctor");
                     if (sampleIt) {
                         checkForNeededParams((FieldImpl) data);
                     }
 
                     Trace.call1("AddePointDataSource.makePointObsFromField");
+                    if(increment != 0.0 && getBinWidth() == 0.0){
+                        setBinWidth(increment);
+                    }
                     obs = PointObFactory.makePointObsFromField(
                         (FieldImpl) data, getBinRoundTo(), getBinWidth());
                     Trace.call2("AddePointDataSource.makePointObsFromField");
