@@ -122,6 +122,9 @@ public abstract class PointDataSource extends FilesDataSource {
     public static final String PROP_STATIONMODELNAME =
         "prop.stationmodelname";
 
+    public static final String PROP_STATIONMODELSCALE =
+            "prop.stationmodelscale";
+
     /** Identifier for station data */
     public static final String STATION_DATA = "Station Data";
 
@@ -897,10 +900,14 @@ public abstract class PointDataSource extends FilesDataSource {
             return;
         }
         String stationModelName = (String) getProperty(PROP_STATIONMODELNAME);
+        String stationModelScale = (String) getProperty(PROP_STATIONMODELSCALE);
         Hashtable properties    = Misc.newHashtable(DataChoice.PROP_ICON,
                                    "/auxdata/ui/icons/Placemark16.gif");
         if (stationModelName != null) {
             properties.put(PROP_STATIONMODELNAME, stationModelName);
+        }
+        if (stationModelScale != null) {
+            properties.put(PROP_STATIONMODELSCALE, stationModelScale);
         }
         if ( !getDefaultLevels().isEmpty()) {
             properties.put(DataSelection.PROP_DEFAULT_LEVELS,
