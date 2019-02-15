@@ -673,13 +673,15 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
             String       source               = getRequestUrl();
             // make properties Hashtable to hand the station name
             // to the AddeProfilerDataSource
+            source = source.replaceAll("group", "GROUP");
             Hashtable ht = new Hashtable();
             getDataSourceProperties(ht);
             ht.put(DataSelection.PROP_CHOOSERTIMEMATCHING,
                     getDoTimeDrivers());
             ht.put(AddePointDataSource.PROP_STATIONMODELNAME,
                     selectedStationModel.getName());
-            ht.put(DATASET_NAME_KEY, getDatasetName());
+            ht.put(DATASET_NAME_KEY, getDatasetName() + "/" + getDescriptor());
+            //ht.put(DATASET_NAME_KEY, getDatasetName());
             ht.put(DATA_NAME_KEY, getDataName());
             ht.put(AddeUtil.RELATIVE_TIME_INCREMENT,
                     new Double(getRelativeTimeIncrement()/60.0));
