@@ -21,6 +21,7 @@
 package ucar.unidata.data;
 
 
+import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
@@ -283,6 +284,7 @@ public final class AddeUtil {
 
             times = times + newHour0 + StringUtil.padZero(newMin0, 2) + "00" +
                     " " + newHour + StringUtil.padZero(newMin, 2) + "00";
+            LogUtil.consoleMessage(times);
             System.out.println(times);
             String daytime = makeDateUrl(thisDate0, thisDate, times);
             urls.add(replaceDateTime(url, daytime));
@@ -519,6 +521,7 @@ public final class AddeUtil {
             times = times + newHour0 + StringUtil.padZero(newMin0, 2) + "00" +
                     " " + newHour + StringUtil.padZero(newMin, 2) + "00";
             System.out.println(times);
+            LogUtil.consoleMessage(times);
             timesList.add(makeDateUrl(thisDate0, thisDate, times));
             utcCalendar.add(utcCalendar.MINUTE,  minInc + timeIndices[i] * minInc);
         }
