@@ -254,8 +254,18 @@ public class JythonManager extends IdvManager implements ActionListener {
                 //}
             }
             IOUtil.makeDir(pythonLibDir);
-            InputStream is = IOUtil.getInputStream("/jythonlib.jar",
-                                 getClass());
+            InputStream is = null;
+            //First try the top-level path for the jar
+            try {
+                is = IOUtil.getInputStream("/jythonlib.jar",getClass());
+            }  catch(Exception exc) {
+                try {
+                    //If its not in the top-level path try the /lib dir
+                    is = IOUtil.getInputStream("/lib/jythonlib.jar",getClass());
+                }  catch(Exception exc2) {
+                    throw exc2;
+                }
+            }
             ZipInputStream zin = new ZipInputStream(is);
             ZipEntry       ze  = null;
             while ((ze = zin.getNextEntry()) != null) {
