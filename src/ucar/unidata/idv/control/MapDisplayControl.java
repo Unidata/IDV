@@ -858,6 +858,9 @@ public class MapDisplayControl extends DisplayControlImpl {
      * @return true if a map was selected and added
      */
     protected boolean selectMap() {
+        if (!LogUtil.getInteractiveMode()) {
+            return false;
+        }
 
         final JPanel colorButton =
             new GuiUtils.ColorSwatch(DEFAULT_MAP_COLOR, "Set Map Line Color");
@@ -910,7 +913,7 @@ public class MapDisplayControl extends DisplayControlImpl {
                 GuiUtils.rLabel("Line width: "), GuiUtils.left(widthBox)
             }, 2, GuiUtils.WT_NY, GuiUtils.WT_N);
             if ( !GuiUtils.showOkCancelDialog(null, "Add a map",
-                    GuiUtils.inset(panel, 4), null)) {
+                                              GuiUtils.inset(panel, 4), null)) {
                 return false;
             }
             String filename = fileFld.getText().trim();

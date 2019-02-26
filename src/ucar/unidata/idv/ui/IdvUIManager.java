@@ -4929,10 +4929,15 @@ public class IdvUIManager extends IdvManager {
      * @return List of UI skins to create
      */
     private List<String> getInitialSkins() {
-        return StringUtil.split(
+        //Run the skins through the getResourcePath in case there are any %USERPATH% macros
+        List<String> temp = StringUtil.split(
             getStateManager().getProperty("idv.ui.initskins", ""), ";", true,
             true);
-
+        List<String> skins = new ArrayList<String>();
+        for(String skin: temp) {
+            skins.add(getResourceManager().getResourcePath(skin));
+        }
+        return skins;
     }
 
 

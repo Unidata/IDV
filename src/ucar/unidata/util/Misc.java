@@ -2069,7 +2069,10 @@ public class Misc {
         try {
             // hack to also accept lower case e for exponent
             value = value.replace("e", "E");
-            return formatter.parse(value).doubleValue();
+            //jeffmc: added this to prevent thread conflicts in calls to decodeLatLon
+            synchronized(formatter) {
+                return formatter.parse(value).doubleValue();
+            }
         } catch (ParseException pe) {
             throw new NumberFormatException(pe.getMessage());
         }
