@@ -996,6 +996,13 @@ Since this is confusing and needs more work lets remove this for now
      label="Vertical Profile"
      displaycategory="Probes"
      properties="windowVisible=true;showThumbNail=true"/>
+  <control
+    id="vprofile1"
+    categories="GRID-3D-*;*-flowvector-*"
+    class="ucar.unidata.idv.control.VerticalProfileControl"
+    label="Vertical Profile (Pressure)"
+    displaycategory="Probes"
+    properties="windowVisible=true;showThumbNail=true;altCoord=pressure;"/>
 
   <control
      id="stationmodelcontrol"
