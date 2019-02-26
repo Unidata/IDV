@@ -51,6 +51,7 @@ import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 import ucar.unidata.util.TwoFacedObject;
 
+import ucar.visad.quantities.CommonUnits;
 import visad.*;
 
 import java.awt.*;
@@ -176,6 +177,8 @@ public class VerticalProfileChart extends XYChartManager {
             if(altUnit != null && paramIdx == 0 &&!(altUnit.equals(CommonUnit.meter))) {
                 String     dlabel = "Altitude " + "[" + altUnit + "]";
                 domainAxis = new NumberAxis(dlabel);
+                if(altUnit.isConvertible(CommonUnits.HECTOPASCAL))
+                    domainAxis.setInverted(true);
             }
         }
 
