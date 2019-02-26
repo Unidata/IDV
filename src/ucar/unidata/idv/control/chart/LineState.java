@@ -1260,7 +1260,14 @@ public class LineState {
         return useVerticalPosition;
     }
 
-
+    /**
+     *  Get the unit.
+     *
+     *  @return The unit
+     */
+    public Unit getUnit(){
+        return unit;
+    }
 }
 
 
