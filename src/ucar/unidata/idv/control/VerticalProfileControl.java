@@ -23,10 +23,7 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataInstance;
-import ucar.unidata.data.GeoLocationInfo;
-import ucar.unidata.data.GeoSelection;
+import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
@@ -126,6 +123,8 @@ public class VerticalProfileControl extends LineProbeControl {
 
     /** _more_ */
     private Unit altUnit = null;
+
+    private String altCoord = HEIGHT_COORD;
 
     /**
      * Default constructor; set attribute flags
@@ -509,11 +508,14 @@ public class VerticalProfileControl extends LineProbeControl {
                     info.getDataInstance().getRawUnit(0));
         }
         info.setUnit(vpUnit);
-        if (altUnit == null) {
+        if (altUnit == null && altCoord.equals(PRESSURE_COORD)) {
+            info.setAltitudeUnit(CommonUnits.HECTOPASCAL);
+            altUnit = CommonUnits.HECTOPASCAL;
+        } else if(altUnit == null){
             info.setAltitudeUnit(CommonUnit.meter);
         }
         Range vpRange = info.getLineState().getRange();
-
+        LineState lstate = info.getLineState();
         if (vpRange == null) {
             vpRange = getDisplayConventions().getParamRange(name, vpUnit);
             if (vpRange == null) {
@@ -525,6 +527,12 @@ public class VerticalProfileControl extends LineProbeControl {
                             u), vpUnit.toThis(vpRange.getMax(), u));
                 }
             }
+            info.getLineState().setRange(vpRange);
+        } else if(vpRange != null && !(lstate.getUnit().equals(vpUnit))) {
+            Unit u = lstate.getUnit();
+            vpRange = new Range(vpUnit.toThis(vpRange.getMin(),
+                    u), vpUnit.toThis(vpRange.getMax(), u));
+                   // vpRange = info.getDataInstance().getRange(0);
             info.getLineState().setRange(vpRange);
         }
 
@@ -583,8 +591,11 @@ public class VerticalProfileControl extends LineProbeControl {
                                           getDisplayConventions().selectUnit(
                                               getVPInfo(row).getUnit(), null);
                                       if (newUnit != null) {
-                                          getVPInfo(row).setUnit(newUnit);
+                                          VerticalProfileInfo vpi = getVPInfo(row);
+                                          vpi.setUnit(newUnit);
+
                                           try {
+                                              initializeVerticalProfileInfo(vpi);
                                               doMoveProbe();
                                           } catch (Exception exc) {
                                               logException(
@@ -663,8 +674,11 @@ public class VerticalProfileControl extends LineProbeControl {
                     vUnit = cs.getReferenceUnits()[2];
                 }
                 float[] alts = domainVals[2];
-                if (altUnit != null) {
-                    alts = altUnit.toThis(alts, vUnit);
+                if (altUnit != null && altUnit.isConvertible(CommonUnits.HECTOPASCAL)) {
+                    CoordinateSystem pressToHeightCS =
+                            DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
+                    float[][] hvals = pressToHeightCS.fromReference(new float[][]{alts});
+                    alts = hvals[0];  //altUnit.toThis(alts, vUnit);
                 } else if ( !vUnit.equals(CommonUnit.meter)) {
                     alts = CommonUnit.meter.toThis(alts, vUnit);
                 }
@@ -938,6 +952,24 @@ public class VerticalProfileControl extends LineProbeControl {
      */
     public void setAltUnit(Unit unit) {
         altUnit = unit;
+    }
+
+    /**
+     * _more_
+     *
+     * @param cname _more_
+     */
+    public void setAltCoord(String cname) {
+        altCoord = cname;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getAltCoord() {
+        return altCoord;
     }
 
     /**
