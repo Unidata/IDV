@@ -88,6 +88,12 @@ public abstract class LineProbeControl extends GridDisplayControl {
     public static final String SHARE_PROFILE =
         "LineProbeControl.SHARE_PROFILE";
 
+    /** profile sharing property */
+    public static final String PRESSURE_COORD = "pressure";
+
+    /** profile sharing property */
+    public static final String HEIGHT_COORD = "height";
+
     /** the line probe */
     private LineProbe probe;
 
