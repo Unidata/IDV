@@ -21,6 +21,8 @@
 package ucar.unidata.idv.control;
 
 
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
 import org.python.core.*;
 
 
@@ -30,24 +32,12 @@ import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.idv.ControlContext;
-import ucar.unidata.idv.ControlDescriptor;
-import ucar.unidata.idv.DisplayConventions;
-
-import ucar.unidata.idv.IdvConstants;
-
-import ucar.unidata.idv.IntegratedDataViewer;
+import ucar.unidata.idv.*;
 
 
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-
+import ucar.unidata.util.*;
 
 
 import ucar.unidata.xml.XmlUtil;
@@ -238,6 +228,9 @@ public class JythonControl extends GridDisplayControl {
     /** What should we do when the user has chosen new data choices */
     private String newDataCallBack = null;
 
+    /* property for input jythoncode */
+    private String jythonCodeURL = null;
+
     /**
      * Ctor
      */
@@ -266,7 +259,11 @@ public class JythonControl extends GridDisplayControl {
                 dataCategories = StringUtil.join("\n", l);
             }
         }
-
+        if(jythonCode == null && jythonCodeURL != null) {
+            jythonCode = IOUtil.readContents(
+                    jythonCodeURL, "");
+        }
+        //System.out.println(jythonCode);
         setContents(doMakeContents());
         return true;
     }
@@ -277,10 +274,57 @@ public class JythonControl extends GridDisplayControl {
     public void initDone() {
         super.initDone();
         execJython("handleInit");
-        probeMoved();
+        try {
+            setTimesForAnimation();
+            //loadProfile(getPosition());
+            probeMoved();
+        } catch (Exception exc) {
+            logException("initDone", exc);
+        }
+
     }
 
+    /**
+     * init set animation time
+     */
+    private void setTimesForAnimation()
+            throws VisADException, RemoteException {
+        Set myTimes = calculateTimeSet();
+        if (myTimes == null) {
+            return;
+        }
+        getAnimationWidget().setBaseTimes(myTimes);
+    }
 
+    /**
+     * init cal animation time
+     */
+    private Set calculateTimeSet() {
+        List choices = getDataChoices();
+        if (choices.isEmpty()) {
+            return null;
+        }
+        Set newSet = null;
+        for (int i = 0; i < choices.size(); i++) {
+            try {
+                //VerticalProfileInfo info         = getVPInfo(i);
+                GridDataInstance dataInstance = (GridDataInstance)getDataInstance();
+                Set set = GridUtil.getTimeSet(dataInstance.getGrid());
+                //System.out.println("di.timeset["+i+"] = " + set);
+                if (set != null) {
+                    if (newSet == null) {
+                        newSet = set;
+                    } else {
+                        newSet = newSet.merge1DSets(set);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        //System.out.println("merged time set = " + newSet);
+        return newSet;
+    }
 
 
     /**
@@ -427,11 +471,24 @@ public class JythonControl extends GridDisplayControl {
      * @param value     variable value
      */
     public void setVar(Object varName, Object value) {
-        jythonVars.put(varName, value);
+        if(varName.equals("chart") && jythonVars.get(varName) == null) {
+            jythonVars.put(varName, value);
+        } else if(!varName.equals("chart") && !value.toString().contains("FlatField  missing\n")) {
+            jythonVars.put(varName, value);
+        }
     }
 
 
-
+    public void fixRange(){
+        JFreeChart chart = (JFreeChart)jythonVars.get("chart");
+        Range x =(Range)jythonVars.get("XRange");
+        Range y =(Range)jythonVars.get("YRange");
+        ValueAxis xa = chart.getXYPlot().getDomainAxis();
+        ValueAxis ya = chart.getXYPlot().getRangeAxis();
+        //xa.setRange(x);
+        chart.getXYPlot().setRangeAxis(ya);
+        chart.getXYPlot().setDomainAxis(xa);
+    }
 
     /**
      * Make a Jython procedure with one variable.
@@ -757,8 +814,13 @@ public class JythonControl extends GridDisplayControl {
      */
     public Real getAnimationTime() throws RemoteException, VisADException {
         Animation animation = getViewAnimation();
-        if (animation != null) {
+        if (animation != null && animation.getAniValue() != null) {
             return animation.getAniValue();
+        } else {
+            animation = getInternalAnimation(null);
+            if(animation != null) {
+                return animation.getAniValue();
+            }
         }
         return null;
     }
@@ -1781,6 +1843,21 @@ public class JythonControl extends GridDisplayControl {
         return jythonCode;
     }
 
+    /**
+     * Set the JythonCode property.
+     *
+     * @param value The new value for JythonCode
+     */
+    public void setJythonCodeURL(String value) {
+        jythonCodeURL = value;
+    }
 
-
+    /**
+     * Get the JythonCode property.
+     *
+     * @return The JythonCode
+     */
+    public String getJythonCodeURL() {
+        return jythonCodeURL;
+    }
 }
