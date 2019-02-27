@@ -65,7 +65,7 @@ example:
   <control
      id="imagedisplayastopo"
      categories="IMAGE-*-*"
-     class="ucar.unidata.idv.control.ImagePlanViewControl"
+     class="ucar.unidata.idv.control.ColorPlanViewControl"
      label="Image As Topography"
      displaycategory="Imagery"
      properties="windowVisible=true;parameterIsTopography=true">
@@ -1633,5 +1633,40 @@ Example of how to make an image movie control with a fixed table of contents
      displaycategory="General"
      properties="windowVisible=true;expandedInTabs=true"/>
 
+    <control
+            id="jythoncontrol_verticalprofile"
+            description="Vertical Profile"
+            class="ucar.unidata.idv.control.JythonControl"
+            label="Vertical Profile"
+            displaycategory="Mapes-Collection"
+            categories="GRID-3D-*"
+            canstandalone="false"
+            properties="displayName=Vertical Profile;windowVisible=true;probeType=vertical;developerMode=false;
+                        jythonCodeURL=/ucar/unidata/idv/resources/python/verticalProfile.py;">
+    </control>
+
+  <control
+          id="jythoncontrol_multi-verticalprofile"
+          description="Multi-Variable Vertical Profile"
+          class="ucar.unidata.idv.control.JythonControl"
+          label="Multi-Variable Vertical Profile"
+          displaycategory="Mapes-Collection"
+          categories="GRID-3D-*"
+          canstandalone="false"
+          properties="displayName=Multi-Variable Vertical Profile;windowVisible=true;probeType=vertical;developerMode=false;
+                        jythonCodeURL=/ucar/unidata/idv/resources/python/multiVariableVerticalProfile.py">
+  </control>
+
+  <control
+          id="jythoncontrol_verticalcrossection"
+          description="Vertical Crossection"
+          class="ucar.unidata.idv.control.JythonControl"
+          label="Vertical Crossection"
+          displaycategory="Mapes-Collection"
+          categories="GRID-3D-*"
+          canstandalone="false"
+          properties="displayName=Crossection;windowVisible=true;probeType=transect;developerMode=false;
+                        jythonCodeURL=/ucar/unidata/idv/resources/python/verticalCrossSection.py">
+  </control>
 
 </controls>
