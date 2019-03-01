@@ -133,7 +133,22 @@ If using the tree panel you can define components that are displayed when a cate
        class="ucar.unidata.idv.chooser.adde.AddeImageChooser"/>
   </panel>
 
-
+  <panel
+          title="GLM"
+          category="Under Development"
+          layout="border"
+          tabtooltip="For accessing satellite GLM lightning Mapper"
+          mnemonic="I">
+    <chooser
+            id="chooser.lightning"
+            title="Lightning"
+            menutitle="Lightning Strikes"
+            helppath="idv.data.choosers.lightningchooser"
+            showdetails="true"
+            includeNavComp="true"
+            class="ucar.unidata.idv.chooser.adde.AddeGLMDataChooser"
+            showserver="true"/>
+  </panel>
 
 
   <panel
@@ -203,15 +218,16 @@ If using the tree panel you can define components that are displayed when a cate
          title="Lightning"
          menutitle="Lightning Strikes"
          helppath="idv.data.choosers.lightningchooser"
-         class="ucar.unidata.idv.chooser.adde.AddeLightningDataChooser"
-         showserver="true"/>
-      <chooser
-         id="chooser.cdmpoint"
-         title="TDS Point Obs"
-         menutitle="Remote Point Obs"
-         helppath="idv.data.choosers.tdspointobchooser"
-         class="ucar.unidata.idv.chooser.TDSPointObsChooser"
-         showserver="false"/>
+         class="ucar.unidata.idv.chooser.adde.AddeGLMDataChooser"
+         showserver="true"/> -->
+      <!--
+          <chooser
+             id="chooser.cdmpoint"
+             title="TDS Point Obs"
+             menutitle="Remote Point Obs"
+             helppath="idv.data.choosers.tdspointobchooser"
+             class="ucar.unidata.idv.chooser.TDSPointObsChooser"
+             showserver="false"/>
 -->
 
       </tabbedpane>
