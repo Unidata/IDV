@@ -41,6 +41,7 @@ from org.jfree.data.xy import XYSeriesCollection;
 from org.jfree.ui import  Layer
 from org.jfree.chart.renderer import LookupPaintScale
 from java.lang import Math
+from ucar.unidata.util import GuiUtils
 #This gets called when the JythonControl is first created.
 def handleInit (displayControl):
 	exampleInit(displayControl);
@@ -71,6 +72,14 @@ def exampleInit (displayControl):
         panl.setVisible(True)
         displayControl.setVar('panl',panl)
 	jp=JPanel()
+
+	if len(displayControl.getAnimationTimes())==0:
+		aniWidget    = displayControl.getAnimationWidget().getContents(False);
+		bottomPanel = GuiUtils.right(aniWidget);
+		bottomPanel = GuiUtils.inset(bottomPanel, 5)
+		displayControl.setVar('bottomPanel',bottomPanel)
+
+	panl=GuiUtils.centerBottom(panl,bottomPanel)
 	jp.add(panl)
 	displayControl.setJythonComponent (jp)
         #Save state with the setVar/getVar methods on the display
@@ -78,7 +87,8 @@ def exampleInit (displayControl):
 	#You can also set a component in the legend
 	legendComp = JLabel("vertical Crosssection");
 	displayControl.setLegendComponent (legendComp);
-        displayControl.setVar("ctw","None")
+	displayControl.setVar("ctw","None")
+
 #This gets called when there is data that has been loaded
 def exampleData (displayControl):
 	#The getDataList method returns a list of the data, one per data choice
