@@ -32,39 +32,38 @@ The items below reflect changes since the 5.4 release.
 <faqitem cat="Display Changes"></faqitem>
 
 
-<faqitem q="Isentropic Analysis" id="isentropicana">
+<faqitem q="Isentropic Advection" id="isentropicadv">
   <p>
-    For synoptic scale motions, isentropic surfaces are material surfaces. Atmospheric variables tend
-    to be better correlated along an isentropic surface upstream/downstream.
-    In a 3D visualization space, the new 3D isentropic analysis makes it intuitive to diagnose horizontal
-    and vertical motion of the atmosphere, and helps us better understand the dynamic
-    and stability of weather phenomenons.
+    For synoptic scale motions, atmospheric variables tend to be better correlated along an isentropic
+    surface upstream/downstream. In a 3D space, the new grid 3D isentropic advection derived
+    parameter interpolates advection from isobaric coordinate into the isentropic space and creates
+    3D Theta Surface advection displays.
   </p>
 </faqitem>
 
-<faqitem q="Scatter Analysis" id="scatterplot">
-  <p>
-    The IDV constructs scatterplots to illustrate different types of direction and strength of relationships of
-    different weather parameters, where the values of one variable are along X axis and the values of the second variable
-    are along the Y axis. The new scatter analysis is used to create a scatter plot to study the relationships
-    between two 2D parameters. A Scatter analysis also provides statistical information about the data as a whole,
-    as well as the subset regions of the data.
-
-  </p>
-</faqitem>
-
-<faqitem q="GOES-16 GLM Display" id="goesGLM">
+<faqitem q="GLM ADDE Chooser" id="glmAddeChooser">
   <p>
     The GLM L2 product consists of geo-located and time-stamped events, groups, and flashes, with
-    associated calibrated optical amplitudes (in units of Joules). The IDV has three new data source types:
-    GLM EVENT Data files, GLM GROUP Data files, and GLM FLASH Data file to view these three GLM products.
+    associated calibrated optical amplitudes (in units of Joules). The IDV has a new data chooser
+    to access three GLM source types: Geostationary Lightning Mapper EVENT, GROUP, and FLASH Data
+    through the ADDE data server.
   </p>
 </faqitem>
 
-<faqitem q="Grid 3D Surface Smoothing" id="g3dsmooth">
+<faqitem q="3D Trajectory Display Update" id="trajectoryUpdate">
   <p>
-    IDV extands the all 2D horizontal smoothing types to 3D gridded parameters. The smoothing is now available
-    on 3D displays like isosurfaces of gridded dataset and level2 radar dataset.
+    The grid 3D trajectory display includes new display types: Tracer and Tracer Point. The initial
+    area of the 3D Grid Trajectory can be set at XZ or YZ plane, and controlled by the data index
+    in the X or Y direction.
+
+  </p>
+</faqitem>
+
+<faqitem q="Vertical Profile in Pressure Axis" id="pressureAzis">
+  <p>
+    New vertical profile display using pressure as its Y axis to emphasize information in the lower levels and
+    to understanding tropical convection - moisture interactions mainly concentrated in lower atmosphere.
+
   </p>
 </faqitem>
 
