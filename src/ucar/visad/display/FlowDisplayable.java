@@ -83,6 +83,8 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** _more_ */
     private float trajOffset = 4.0f;
 
+    //private float tracerSize = 1.0f;
+
     /** _more_ */
     private int smoothFactor = 20;
 
@@ -103,6 +105,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
 
     /** _more_ */
     private float arrowHeadSize = 1.0f;
+
+    /** _more_ */
+    private int tracerType = 7;
 
     /** streamline density factor */
     private float streamlineDensity = 1.f;
@@ -348,8 +353,9 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     TrajectoryParams tparm =
                         flowControl.getTrajectoryParams();
                     tparm.setTrajectoryForm(trajFormType);
-                    if(trajFormType == 6 || trajFormType == 5) {
+                    if( trajFormType == 5) {
                         tparm.setTracerStreamingEnabled(true);
+                        tparm.setTracerType(tracerType);
                     } else {
                         tparm.setTracerStreamingEnabled(false);
                     }
@@ -435,11 +441,13 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 TrajectoryParams tparm = flowControl.getTrajectoryParams();
                 int              t     = tparm.getStartSkip();
                 tparm.setTrajectoryForm(trajFormType);
-                if(trajFormType == 6 || trajFormType == 5) {
+                if(trajFormType == 5) {
                     tparm.setTracerStreamingEnabled(true);
+                    tparm.setTracerType(tracerType);
                 } else {
                     tparm.setTracerStreamingEnabled(false);
                 }
+
                 tparm.setMarkerSize(arrowHeadSize);
                 tparm.setTrajRefreshInterval(rlen);
                 tparm.setTrajVisibilityTimeWindow(tlen);
@@ -606,7 +614,19 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         }
     }
 
-
+    /**
+     * _more_
+     *
+     * @param type _more_
+     */
+    public void setTracerType(int type) {
+        tracerType = type;
+        if (flowControl != null) {
+            try {
+                flowControl.setArrowScale(arrowHeadSize);
+            } catch (Exception e) {}
+        }
+    }
     /**
      * _more_
      *
@@ -626,6 +646,11 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         trajOffset = offset;
     }
 
+
+    public void setTracerSize(float size) {
+        //tracerSize = size;
+        arrowHeadSize = size;
+    }
     /**
      * _more_
      *
