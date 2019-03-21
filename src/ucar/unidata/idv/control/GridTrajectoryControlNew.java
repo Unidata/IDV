@@ -870,6 +870,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                 if(select.getLabel() == "Line") {
                                     isLine = true;
                                 } else {
+                                    arrowCbx.setSelected(false);
                                     isLine = false;
                                 };
                                 enableTracerCompnoentBox();
