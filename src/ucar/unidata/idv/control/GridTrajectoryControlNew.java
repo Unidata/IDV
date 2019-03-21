@@ -817,6 +817,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                    getGridDisplay().setTracerType(7);
                                                    getGridDisplay().setArrowHead(
                                                    arrowHead);
+                                                   tracerFormBox.setSelectedIndex(1);
                                                } else {
                                                    getGridDisplay().setArrowHead(
                                                    arrowHead);
