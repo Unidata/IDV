@@ -814,6 +814,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                arrowHead =
                                                ((JCheckBox) e.getSource()).isSelected();
                                                if (arrowHead) {
+                                                   getGridDisplay().setTracerType(7);
                                                    getGridDisplay().setArrowHead(
                                                    arrowHead);
                                                } else {
