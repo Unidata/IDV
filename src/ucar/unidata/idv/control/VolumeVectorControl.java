@@ -265,12 +265,14 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 List             wsTime        = wdc.getAllDateTimes();
                 List             selectedTimes =
                     getDataSelection().getTimes();
-                if(selectedTimes != null && selectedTimes.size() < 4) {
-                    userErrorMessage("Minumum selected times need to be 4 for trajectory calculation" );
-                    return false;
-                } else if (usTime != null && usTime.size() < 4) {
-                    userErrorMessage("Minumum selected times need to be 4 for trajectory calculation" );
-                    return false;
+                if(isStreamLine || isTrajectories) {
+                    if (selectedTimes != null && selectedTimes.size() < 4) {
+                        userErrorMessage("Minumum selected times need to be 4 for trajectory calculation");
+                        return false;
+                    } else if (usTime != null && usTime.size() < 4) {
+                        userErrorMessage("Minumum selected times need to be 4 for trajectory calculation");
+                        return false;
+                    }
                 }
                     /* if(selectedTimes != null){
                        int len = selectedTimes.size();
@@ -659,7 +661,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         if ((timeL != null) && (timeL.size() < 4)) {
             GuiUtils.enableTree(trajectoryBtn, false);
         }
-        if ((timeL != null) && (timeL.size() < 2)) {
+        if ((timeL != null) && (timeL.size() < 4)) {
             GuiUtils.enableTree(streamlineBtn, false);
         }
 
