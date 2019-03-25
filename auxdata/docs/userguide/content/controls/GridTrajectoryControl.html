@@ -10,13 +10,28 @@ or 3D trajectory, a TrackControl panel is appended to this control.
 [ht::cimg images/GridTrajectoryControlGui2.png]
 }
 
-[ug::levels]
+{{XY Plane} {
+When the XY Plane is selected, user can click on the Levels box to see a pull down menu of the native grid levels.
+Click on one level value to reset the trajectory start surface to that level. The plan level in use is shown in the
+data's native altitude units. The Levels box is editable. Click in the box, enter a value and hit return to set your own value.
+}}
+
+{{YZ Plane} {
+When the YZ Plane is selected, user can click on the index box to see a pull down menu of the native grid index in X direction.
+Click on one index value to reset the trajectory start surface to that index surface.
+}}
+
+{{YZ Plane} {
+When the XZ Plane is selected, user can click on the Index box to see a pull down menu of the native grid index in Y direction.
+Click on one index value to reset the trajectory start surface to that index surface.
+}}
 
 {{Points} {
-This is an option for the initializing the trajectory initial area. When the control is first created, it is the default
-option. Every time the user left-clicks on the view window, a marker is placed to mark a initial point. After the trajectory
-is created, the default is unchecked and the user needs to specify one of the options for next initialization. When the
-user changes the initial option, the display of the initial area and the trajectory on the view window will be removed.
+This is an option for the initializing the trajectory initial area when the start surface is on XY Plane. When the control
+is first created, it is the default option. Every time the user left-clicks on the view window, a marker is placed to mark
+a initial point. After the trajectory is created, the default is unchecked and the user needs to specify one of the options
+for next initialization. When the user changes the initial option, the display of the initial area and the trajectory on the
+view window will be removed.
 }}
 
 {{ClosePolygon} {
@@ -49,8 +64,17 @@ Click on the button that displays the name of the trajectory form to show a popu
 trajectory display type: Line, Ribbon, Cyinder, Deform Ribbon, and Point.
 }}
 
+{{Tracer Type} {
+If the trajectory form is TRACER then this popup menu will be enable to allow user to change the
+tracer type: Sphere, Dot, and Arrow.
+}}
+
 {{Length Offset} {
 This slider allows you to set the length of the displayed trajectory line. Or type a new value into the text field.
+}}
+
+{{Arrow} {
+If the trajectory form is LINE then the Arrow and Arrow Scale widgets will be enable to allow user to select this option.
 }}
 
 [ug::colortable]
