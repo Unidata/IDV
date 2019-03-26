@@ -2855,7 +2855,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             //gridTrackControl.setTrajStartLevel(slevel, idx);
             int ct = levelBox.getSelectedIndex();
             gridTrackControl.myDisplay.setTrajStartLevel(idx);
-            gridTrackControl.myDisplay.setZskip(ct);
+            gridTrackControl.myDisplay.setZskip(levelBox.getItemCount());
 
         }
         //
