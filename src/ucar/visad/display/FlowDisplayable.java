@@ -83,8 +83,6 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
     /** _more_ */
     private float trajOffset = 4.0f;
 
-    //private float tracerSize = 1.0f;
-
     /** _more_ */
     private int smoothFactor = 20;
 
@@ -648,11 +646,6 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
         trajOffset = offset;
     }
 
-
-    public void setTracerSize(float size) {
-        //tracerSize = size;
-        arrowHeadSize = size;
-    }
     /**
      * _more_
      *
