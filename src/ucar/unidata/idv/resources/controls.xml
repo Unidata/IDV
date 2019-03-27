@@ -678,6 +678,18 @@ Since this is confusing and needs more work lets remove this for now
     properties="multipleIsTopography=true" />
 
   <control
+    id="planviewflow111"
+    categories="*-flowvector-*"
+    class="ucar.unidata.idv.control.FlowPlanViewControl"
+    label="Vector Colored by Speed Over Topography"
+    doeslevels="true"
+    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
+    displaycategory="3D Surface"
+    properties="vectors=true;useSpeedForColor=true;multipleIsTopography=true">
+    <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
+  </control>
+
+  <control
     id="barbsoverz" 
     categories="*-flowvector-*" 
     class="ucar.unidata.idv.control.FlowPlanViewControl" 
@@ -686,7 +698,15 @@ Since this is confusing and needs more work lets remove this for now
     code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
     displaycategory="3D Surface"
     properties="multipleIsTopography=true;windbarbs=true" />
-
+  <control
+    id="barbsoverz11"
+    categories="*-flowvector-*"
+    class="ucar.unidata.idv.control.FlowPlanViewControl"
+    label="Wind Barbs Colored by Speed Over Topography"
+    doeslevels="true"
+    code="DerivedGridFactory.create2DTopography(D1, Topography[categories=param:ALTITUDE;param:Elevation;param:Z])"
+    displaycategory="3D Surface"
+    properties="multipleIsTopography=true;windbarbs=true;useSpeedForColor=true" />
   <control
     id="streamlinesoverz" 
     categories="*-flowvector-*" 
@@ -1271,7 +1291,7 @@ Since this is confusing and needs more work lets remove this for now
      categories="GIS-SHAPEFILE"
      class="ucar.unidata.idv.control.ShapefileControl"
      canstandalone="false"
-     label="Map Display"
+     label="GIS Map Display"
      displaycategory="GIS"
      properties="windowVisible=false;">
     <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
