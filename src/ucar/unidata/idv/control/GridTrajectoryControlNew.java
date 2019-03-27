@@ -225,9 +225,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
     float trackOffsetValue = 4.0f;
 
     /** _more_ */
-    float tracerSizeValue = 1.0f;
-
-    /** _more_ */
     int tracerType = 7;
 
     /** _more_ */
@@ -499,13 +496,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
         float flowScaleValue = 4.0f;
 
         /** a traj offset value */
-        float arrowHeadSizeValue = 1.0f;
+        float arrowHeadSizeValue = 0.5f;
 
         /** a traj offset value */
         float trajOffsetValue = 4.0f;
-
-        /** _more_ */
-        float tracerSizeValue = 1.0f;
 
         /** _more_ */
         int tracerTypeValue = 8;
@@ -579,7 +573,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         JComboBox tracerFormBox = null;
 
         /** _more_ */
-        JComboBox tracerSizeBox = null;
+        //JComboBox tracerSizeBox = null;
 
         /** a component to change the vector arrow head size */
         JComboBox vectorAHSizeBox;
@@ -806,7 +800,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             //super.getControlWidgets(controlWidgets);
 
-            arrowCbx = new JCheckBox("", arrowHead);
+            arrowCbx = new JCheckBox(" Arrow", arrowHead);
 
             arrowCbx.addActionListener(new ActionListener() {
                                            public void actionPerformed(
@@ -846,11 +840,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 JComboBox trajFormBox = new JComboBox();
                 tracerFormBox = new JComboBox();
 
-                tracerSizeBox = new JComboBox(new String[] { "1.0", "1.5", "2.0",
-                        "2.5", "3.0" , "4", "5"});
-                tracerSizeBox.setToolTipText("Set the tracer size");
-                tracerSizeBox.setMaximumSize(new Dimension(30, 16));
-                tracerSizeBox.setEditable(true);
+
                 GuiUtils.setListData(trajFormBox, trajFormList);
                 GuiUtils.setListData(tracerFormBox, tracerFormList);
 
@@ -888,15 +878,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     }
                 });
 
-                tracerSizeBox.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        String item = (String)((JComboBox) e.getSource()).getSelectedItem();
-                        float selectsize = Float.parseFloat(item);
-                        setTracerSize(selectsize);
-
-                        enableTracerCompnoentBox();
-                    }
-                });
                 String formLabel;
                 String tracerformLabel = "Tracer Type: ";
                 String tracersizeLabel = "Tracer Size: ";
@@ -915,7 +896,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
                 controlWidgets.add(new WrapperWidget(this,
                         GuiUtils.rLabel(tracerformLabel),
-                        GuiUtils.leftCenterRight(tracerFormBox, GuiUtils.rLabel(tracersizeLabel), tracerSizeBox)));
+                        GuiUtils.left(tracerFormBox )));
 
                 trajLengthComponent =
                     GuiUtils.hbox(GuiUtils.rLabel("Length Offset: "),
@@ -925,10 +906,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 //Insets spacer = new Insets(0, 30, 0, 0);
                 controlWidgets.add(new WrapperWidget(this,
                         GuiUtils.rLabel("Length Offset: "),
-                        GuiUtils.left(trajLengthWidget.getContents(false))));
-
-                vectorAHSizeBox = new JComboBox(new String[] { "1.0", "1.5", "2.0",
-                        "2.5", "3.0" , "4", "5"});
+                        GuiUtils.left(
+                                GuiUtils.hbox(trajLengthWidget.getContents(false),
+                                        arrowCbx))));
+                vectorAHSizeBox = new JComboBox(new String[] { "0.5", "1.0", "1.5", "2.0",
+                        "2.5", "3.0" , "4"});
                 vectorAHSizeBox.setToolTipText("Set the tracer size");
                 vectorAHSizeBox.setMaximumSize(new Dimension(30, 16));
                 vectorAHSizeBox.setEditable(true);
@@ -942,8 +924,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     }
                 });
                 controlWidgets.add(new WrapperWidget(this,
-                        GuiUtils.rLabel("Arrow: "),
-                        GuiUtils.leftCenterRight(arrowCbx, GuiUtils.rLabel("Arrow Scale: "), vectorAHSizeBox)));
+                        GuiUtils.rLabel("Arrow/Tracer Size: "),
+                        GuiUtils.left(vectorAHSizeBox)));
 
                 if(isStreamline){
                     smoothComponent = GuiUtils.hbox(GuiUtils.rLabel("Smooth Factor: "),
@@ -1022,12 +1004,12 @@ public class GridTrajectoryControlNew extends DrawingControl {
         }
 
         private void enableTracerCompnoentBox() {
-            GuiUtils.enableTree(tracerSizeBox, isTracer);
+            GuiUtils.enableTree(vectorAHSizeBox, isTracer|isLine);
             GuiUtils.enableTree(tracerFormBox, isTracer);
         }
 
         private void enableArrowCompnoentBox() {
-            GuiUtils.enableTree(vectorAHSizeBox, isLine);
+            GuiUtils.enableTree(vectorAHSizeBox, isLine|isTracer);
             GuiUtils.enableTree(arrowCbx, isLine);
         }
         /**
@@ -1450,9 +1432,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
             return trajOffsetValue;
         }
 
-        public float getTracerSize() {
-            return tracerSizeValue;
-        }
 
         /**
          * _more_
@@ -1487,28 +1466,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
          * _more_
          *
          *
-         * @param f _more_
+         * @param  type
          * @return _more_
          */
-        public void setTracerSize(float f) {
-            tracerSizeValue = f;
-            if (getGridDisplay() != null) {
-                try {
-                    if (gtc != null) {
-                        gtc.setTracerSizeValue(f);
-                    }
-                    getGridDisplay().setTracerType(tracerTypeValue);
-                    getGridDisplay().setTracerSize(tracerSizeValue);
-                    getGridDisplay().setStreamline(isStreamline);
-                    getGridDisplay().resetTrojectories();
-                } catch (Exception ex) {
-                    logException("setFlowScale: ", ex);
-                }
-
-            }
-
-
-        }
 
 
         public void setTracerType(int type) {
@@ -1519,7 +1479,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                         gtc.setTracerType(type);
                     }
                     getGridDisplay().setTracerType(type);
-                    getGridDisplay().setTracerSize(tracerSizeValue);
+                    getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
                     getGridDisplay().setStreamline(isStreamline);
                     getGridDisplay().resetTrojectories();
                 } catch (Exception ex) {
@@ -1537,7 +1497,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 try {
                     getGridDisplay().setTrajOffset(trajOffsetValue);
                     getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
-                    if (trajFormType == TrajectoryParams.LINE) {
+                    if (trajFormType == TrajectoryParams.LINE ||
+                            trajFormType == TrajectoryParams.TRACER) {
                         getGridDisplay().resetTrojectories();
                     }
                 } catch (Exception ex) {
@@ -1618,6 +1579,11 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     getGridDisplay().setTrajFormType(trajForm.intValue());
                     //getGridDisplay().resetTrojectories();
                     getGridDisplay().setArrowHead(arrowHead);
+                    getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
+                    if(trajForm.intValue() == 0){
+                        getGridDisplay().setTracerType(7);
+                        tracerFormBox.setSelectedIndex(1);
+                    }
                     getGridDisplay().resetTrojectories();
                     //setLineWidth(super.getLineWidth());
                 } catch (Exception ex) {
@@ -2612,7 +2578,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 gridTrackControl.setLineWidth(getTrackLineWidth());
                 gridTrackControl.setTrajOffset(getTrackOffsetValue());
                 gridTrackControl.setColor(getTrackColor());
-                gridTrackControl.setTracerSize(getTracerSizeValue());
                 //gridTrackControl.setColorScaleInfo(getColorScaleInfo());
                 gridTrackControl.setColorTable(getTrjColorTable());
                 doMakeColorScales();
@@ -3724,14 +3689,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         return trackOffsetValue;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public float getTracerSizeValue() {
-        return tracerSizeValue;
-    }
+
     /**
      * _more_
      *
@@ -3742,14 +3700,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
     public void setTrackOffsetValue(float ah) {
         trackOffsetValue = ah;
     }
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public void setTracerSizeValue(float ah) {
-        tracerSizeValue = ah;
-    }
+
     /**
      * _more_
      *
