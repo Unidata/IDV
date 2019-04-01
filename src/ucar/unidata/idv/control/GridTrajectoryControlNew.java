@@ -81,6 +81,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.Action;
 
+import static ucar.unidata.data.grid.GridUtil.makeDomain2D;
 
 
 /**
@@ -114,13 +115,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
     /** _more_ */
     DataChoice dataChoice;
-
-
-    /** _more_ */
-    private JButton levelUpBtn;
-
-    /** _more_ */
-    private JButton levelDownBtn;
 
     /** _more_ */
     private JComboBox levelBox;
@@ -2255,29 +2249,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
             }
         });
 
-        ImageIcon upIcon =
-            GuiUtils.getImageIcon(
-                "/ucar/unidata/idv/control/images/LevelUp.gif");
-        levelUpBtn = new JButton(upIcon);
-        levelUpBtn.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        levelUpBtn.addActionListener(new ActionListener() {
-                                         public void actionPerformed(
-                                         ActionEvent ae) {
-                                             moveUpDown(-1);
-                                         }
-                                     });
-
-        ImageIcon downIcon =
-            GuiUtils.getImageIcon(
-                "/ucar/unidata/idv/control/images/LevelDown.gif");
-        levelDownBtn = new JButton(downIcon);
-        levelDownBtn.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        levelDownBtn.addActionListener(new ActionListener() {
-                                           public void actionPerformed(
-                                           ActionEvent event) {
-                                               moveUpDown(1);
-                                           }
-                                       });
 
         //        levelLabel = GuiUtils.rLabel("<html><u>L</u>evels:");
         levelLabel = GuiUtils.rLabel(getLevelsLabel());
@@ -2291,6 +2262,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         Object[] levels = gridTrackControl.getGridDataInstance().getLevels();
         Gridded3DSet g3dset = gridTrackControl.getGridDataInstance().getDomainSet3D();
+        SampledSet sampleset = gridTrackControl.getGridDataInstance().getSpatialDomain();
+        Gridded2DSet g2dset = null;
 
         if (currentLevel == null) {
             currentLevel = fromLevel;  //getDataSelection().getFromLevel();
@@ -2308,6 +2281,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
             } else {
                 fromLevel = levels[0];
             }
+        } else if(sampleset != null && sampleset.getManifoldDimension() == 2){
+            g2dset = GridUtil.makeDomain2D((GriddedSet) sampleset);
         }
 
         MapProjection mapProjection = getDataProjectionForMenu();
@@ -2329,6 +2304,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 setLevelsX(g3dset.getLength(0));
                 setLevelsY(g3dset.getLength(1));
             }
+        } else if(g2dset != null) {
+            setLevelsX(g2dset.getLength(0));
+            setLevelsY(g2dset.getLength(1));
         }
 
         // the control for the track
@@ -2606,8 +2584,6 @@ public class GridTrajectoryControlNew extends DrawingControl {
             return;
         }
         levelBox.setEnabled(levelEnabled);
-        levelUpBtn.setEnabled(levelEnabled);
-        levelDownBtn.setEnabled(levelEnabled);
         levelLabel.setEnabled(levelEnabled);
 
 
@@ -2827,7 +2803,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         if ( !hiddenBtn.isSelected() && (glyphs.size() > 0) &&
                 isXY) {
             SampledSet domain2D =
-                    GridUtil.makeDomain2D((GriddedSet) domainSet);
+                    makeDomain2D((GriddedSet) domainSet);
             boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
             int latIndex = isLatLon
                     ? 0
@@ -2864,16 +2840,30 @@ public class GridTrajectoryControlNew extends DrawingControl {
             int numX = domainSet.getLengths()[lonIndex];
             int numY = domainSet.getLengths()[latIndex];
             int numXY = numX * numY;
-            int numP  = numY * domainSet.getLengths()[2];
+            int numP;
+            if(is2D){
+                numP = numY;
+            } else {
+                numP = numY * domainSet.getLengths()[2];
+            }
             float[][] geoVals = new float[3][numP];
             int xIndex = levelxBox.getSelectedIndex();
-            for(int k = 0; k < domainSet.getLengths()[2]; k++){
-                for (int j = 0; j < numY; j++){
-                    int ii = k * (numXY) + j * (numX - 1) + j + xIndex;
-                    int jj = k * (numY) + j;
-                    geoVals[0][jj] = domainLatLonAlt[0][ii];
-                    geoVals[1][jj] = domainLatLonAlt[1][ii];
-                    geoVals[2][jj] = domainLatLonAlt[2][ii];
+            if(is2D){
+                for (int j = 0; j < numY; j++) {
+                    int ii = j * (numX - 1) + j + xIndex;
+                    geoVals[0][j] = domainLatLonAlt[0][ii];
+                    geoVals[1][j] = domainLatLonAlt[1][ii];
+                    geoVals[2][j] = domainLatLonAlt[2][ii];
+                }
+            } else {
+                for (int k = 0; k < domainSet.getLengths()[2]; k++) {
+                    for (int j = 0; j < numY; j++) {
+                        int ii = k * (numXY) + j * (numX - 1) + j + xIndex;
+                        int jj = k * (numY) + j;
+                        geoVals[0][jj] = domainLatLonAlt[0][ii];
+                        geoVals[1][jj] = domainLatLonAlt[1][ii];
+                        geoVals[2][jj] = domainLatLonAlt[2][ii];
+                    }
                 }
             }
 
@@ -2915,16 +2905,31 @@ public class GridTrajectoryControlNew extends DrawingControl {
             int numX = domainSet.getLengths()[lonIndex];
             int numY = domainSet.getLengths()[latIndex];
             int numXY = numX * numY;
-            int numP  = numX * domainSet.getLengths()[2];
+            int numP;
+            if(is2D){
+                numP = numX;
+            } else {
+                numP = numX * domainSet.getLengths()[2];
+            }
             float[][] geoVals = new float[3][numP];
             int yIndex = levelyBox.getSelectedIndex();
-            for(int k = 0; k < domainSet.getLengths()[2]; k++){
-                for (int j = 0; j < numX; j++){
-                    int ii = k * (numXY) + j + numX * yIndex;
-                    int jj = k * (numX) + j;
-                    geoVals[0][jj] = domainLatLonAlt[0][ii];
-                    geoVals[1][jj] = domainLatLonAlt[1][ii];
-                    geoVals[2][jj] = domainLatLonAlt[2][ii];
+            if(is2D){
+                for (int j = 0; j < numX; j++) {
+                    int ii =  j + numX * yIndex;
+                    geoVals[0][j] = domainLatLonAlt[0][ii];
+                    geoVals[1][j] = domainLatLonAlt[1][ii];
+                    geoVals[2][j] = domainLatLonAlt[2][ii];
+                }
+
+            } else {
+                for (int k = 0; k < domainSet.getLengths()[2]; k++) {
+                    for (int j = 0; j < numX; j++) {
+                        int ii = k * (numXY) + j + numX * yIndex;
+                        int jj = k * (numX) + j;
+                        geoVals[0][jj] = domainLatLonAlt[0][ii];
+                        geoVals[1][jj] = domainLatLonAlt[1][ii];
+                        geoVals[2][jj] = domainLatLonAlt[2][ii];
+                    }
                 }
             }
 
@@ -3173,12 +3178,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
      */
     protected void addControlWidgets(List widgets) {
 
-        JPanel levelUpDown = GuiUtils.doLayout(new Component[] { levelUpBtn,
-                                                                 levelDownBtn }, 1,
-                                                                     GuiUtils.WT_N,
-                                                                     GuiUtils.WT_N);
-        JPanel levelSelector = GuiUtils.doLayout(new Component[] { levelBox,
-                                                                   levelUpDown }, 2,
+        JPanel levelSelector = GuiUtils.doLayout(new Component[] { levelBox}, 2,
                                                                        GuiUtils.WT_N,
                                                                        GuiUtils.WT_N);
         JPanel xSelector = GuiUtils.doLayout(new Component[] { levelxBox}, 1,
@@ -3235,6 +3235,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                //     setStreamlines();
             }
         };
+        enableInitPlaneWidget();
         XYBtn.addActionListener(listener1);
         YZBtn.addActionListener(listener1);
         XZBtn.addActionListener(listener1);
@@ -3397,6 +3398,21 @@ public class GridTrajectoryControlNew extends DrawingControl {
             GuiUtils.enableTree(closePolygonBtn, isXY);
             GuiUtils.enableTree(rectangleBtn, isXY);
             GuiUtils.enableTree(levelBox, isXY);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private void enableInitPlaneWidget() {
+        if (is2D) {
+           // GuiUtils.enableTree(YZBtn, !is2D);
+           // GuiUtils.enableTree(XZBtn, !is2D);
+            GuiUtils.enableTree(levelBox, !is2D);
+         //   GuiUtils.enableTree(levelxBox, !is2D);
+         //   GuiUtils.enableTree(levelyBox, !is2D);
         }
     }
 
