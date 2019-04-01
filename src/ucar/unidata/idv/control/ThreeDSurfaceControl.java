@@ -286,6 +286,18 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         return true;
     }
 
+    /**
+     * This reset data api need to apply smoothing, otherwise, no more smoothing
+     *
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    VisAD problem
+     */
+    protected void resetData() throws VisADException, RemoteException {
+        super.resetData();
+        OldSmoothingType = LABEL_NONE;
+        applySmoothing();
+    }
+
     /** slider components */
     private JComponent[] sliderComps;
 
