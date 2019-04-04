@@ -490,10 +490,12 @@ public class StationModelControl extends ObsDisplayControl {
         addDisplayable(timesHolder);
         lastViewBounds = null;
 
-        String stationModelScale =
-                (String) dataChoice.getProperty(AddePointDataSource.PROP_STATIONMODELSCALE);
-        if(stationModelScale != null){
-            setDisplayableScale(Float.parseFloat(stationModelScale));
+        if(dataChoice != null) {
+            String stationModelScale =
+                    (String) dataChoice.getProperty(AddePointDataSource.PROP_STATIONMODELSCALE);
+            if (stationModelScale != null) {
+                setDisplayableScale(Float.parseFloat(stationModelScale));
+            }
         }
         setScaleOnDisplayable();
 
