@@ -525,13 +525,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                           "Cylinder",
                                                           "Deform Ribbon",
                                                           "Point", "Tracer" };
-        private  String[] tracerFormLabels = new String[] { "Sphere",
-                "Arrow", "Dot"};
+        private  String[] tracerFormLabels = new String[] {
+                "Arrow", "Sphere","Dot"};
 
         /** types of smoothing functions */
         private  int[] trajForm = new int[] { 0, 1, 2, 3, 4, 5};
 
-        private  int[] tracerForm = new int[] { 8, 7, 9};
+        private  int[] tracerForm = new int[] { 7, 8, 9};
 
         /** vector/traj length component */
         JComponent trajFormComponent;
@@ -805,7 +805,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                                    getGridDisplay().setTracerType(7);
                                                    getGridDisplay().setArrowHead(
                                                    arrowHead);
-                                                   tracerFormBox.setSelectedIndex(1);
+                                                   tracerFormBox.setSelectedIndex(0);
                                                } else {
                                                    getGridDisplay().setArrowHead(
                                                    arrowHead);
@@ -2305,6 +2305,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 setLevelsY(g3dset.getLength(1));
             }
         } else if(g2dset != null) {
+            if(fromLevel != null){
+                setLevels(new Object[]{fromLevel}, fromLevel);
+            }
             setLevelsX(g2dset.getLength(0));
             setLevelsY(g2dset.getLength(1));
         }
