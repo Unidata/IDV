@@ -2984,6 +2984,39 @@ public class DerivedGridFactory {
     }
 
     /**
+     *
+     * @param  temperFI  one grid or a time sequence of grids of temperature
+     *                   with a spatial domain that includes pressure
+     *                   in vertical
+     *
+     * @return computed Saturation Equ potential temperature grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createSatEquivalentPotentialTemperature(FieldImpl temperFI)
+            throws VisADException, RemoteException {
+        Boolean   ensble = GridUtil.hasEnsemble(temperFI);
+
+        FlatField press  = null;
+        if (ensble) {
+            FieldImpl sample1 = (FieldImpl) temperFI.getSample(0);
+            press =
+                    createPressureGridFromDomain((FlatField) sample1.getSample(0,
+                            false));
+        } else {
+            if (GridUtil.isTimeSequence(temperFI) == true) {
+                press = createPressureGridFromDomain(
+                        (FlatField) temperFI.getSample(0));
+            } else {
+                press = createPressureGridFromDomain((FlatField) temperFI);
+            }
+        }
+        return createSatEquivalentPotentialTemperature(temperFI, press);
+
+    }
+
+    /**
      * @param  geoPH  one grid or a time sequence of geo potential height
      *                   with a spatial domain that includes pressure
      *                   in vertical
@@ -3195,6 +3228,128 @@ public class DerivedGridFactory {
 
     }  // end make potential temperature fieldimpl
 
+    /**
+     * Make a FieldImpl of Saturation equivalent potential temperature values for series of times
+     *
+     * @param  temperFI  grid or time sequence of grids of temperature
+     * @param  pressFI   grid or time sequence of grids of pressure
+     *
+     * @return computed potential temperature grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createSatEquivalentPotentialTemperature(FieldImpl temperFI,
+                                                       FieldImpl pressFI)
+            throws VisADException, RemoteException {
+
+        boolean TisSequence = (GridUtil.isTimeSequence(temperFI));
+        boolean PisSequence = (GridUtil.isTimeSequence(pressFI));
+        if ( !GridUtil.getParamType(pressFI).equals(
+                AirPressure.getRealTupleType())) {
+            pressFI = convertToAirPressure(pressFI);
+        }
+        FieldImpl thetaFI = null;
+
+        if (TisSequence) {
+
+            // Implementation:  have to take the raw data FieldImpl
+            // apart, make a potential temperature FlatField by FlatField,
+            // and put all back together again into a new theta FieldImpl
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample to domainSet of tempFI.  If they are the same, this
+            // should be a no-op
+            if ((timeSet.getLength() > 1) && (PisSequence == true)) {
+                pressFI = (FieldImpl) pressFI.resample(timeSet);
+            }
+            Boolean      ensble    = GridUtil.hasEnsemble(temperFI);
+
+            TupleType    rangeType = null;
+            FunctionType innerType = null;
+            // compute each theta FlatField in turn; load in FieldImpl
+
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) ((PisSequence == true)
+                            ? pressFI.getSample(i)
+                            : pressFI);
+
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerField1 =
+                                (FlatField) sample1.getSample(j, false);
+                        FlatField innerField2 = (FlatField) ((PisSequence
+                                == true)
+                                ? (FlatField) sample2.getSample(j, false)
+                                : sample2);
+
+                        if ((innerField1 == null) || (innerField2 == null)) {
+                            continue;
+                        }
+                        FlatField innerdivFF =
+                                (FlatField) SaturationEquivalentPotentialTemperature.create(
+                                        innerField2, innerField1);
+
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                    DataUtility.getDomainType(ensDomain),
+                                    innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (thetaFI == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeSet.getType()).getDomain(),
+                                        funcFF.getType());
+                        thetaFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    thetaFI.setSample(i, funcFF, false);
+                } else {
+                    FlatField thetaFF =
+                            (FlatField) SaturationEquivalentPotentialTemperature.create((PisSequence
+                                    == true)
+                                    ? pressFI.getSample(i)
+                                    : pressFI, (FlatField) temperFI.getSample(i));
+
+                    if (i == 0) {  // first time through
+                        FunctionType functionType =
+                                new FunctionType(
+                                        ((FunctionType) temperFI.getType()).getDomain(),
+                                        thetaFF.getType());
+
+                        // ((FunctionType)temperFI.getType()).getDomain() = "Time"
+                        // make the new FieldImpl for theta  (but as yet empty of data)
+                        thetaFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    thetaFI.setSample(i, thetaFF, false);
+                }
+            }
+        } else {
+
+            // make FlatField  of saturation vapor pressure from temp
+            thetaFI = (FlatField) SaturationEquivalentPotentialTemperature.create(temperFI,
+                    (PisSequence == true)
+                            ? pressFI.getSample(0)
+                            : pressFI);
+        }  // end single time
+
+        return thetaFI;
+
+    }
     /**
      * Make a FieldImpl of isentropic potential vorticity
      *
