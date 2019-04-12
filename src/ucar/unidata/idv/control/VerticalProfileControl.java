@@ -181,7 +181,21 @@ public class VerticalProfileControl extends LineProbeControl {
         try {
             setTimesForAnimation();
             //loadProfile(getPosition());
-            doMoveProbe();
+            if(getDataChoices().get(0).toString().startsWith("Conserved Sounding")){
+                ((DataChoice)(getDataChoices().get(0))).setName("theta");
+                ((DataChoice)(getDataChoices().get(0))).setId("theta");
+                doMoveProbe();
+
+                List cdcs =
+                        ((DerivedDataChoice) getDataChoices().get(0)).getChoices();
+                DataChoice dc1 = (DataChoice)cdcs.get(1);
+                addNewData(Misc.newList(dc1));
+                DataChoice dc2 = (DataChoice)cdcs.get(2);
+                addNewData(Misc.newList(dc2));
+            } else {
+                doMoveProbe();
+            }
+
         } catch (Exception exc) {
             logException("initDone", exc);
         }

@@ -37,6 +37,8 @@ import org.jfree.data.xy.*;
 import org.jfree.ui.*;
 
 import ucar.unidata.data.DataAlias;
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DerivedDataChoice;
 import ucar.unidata.data.grid.GridUtil;
 
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -88,6 +90,9 @@ public class VerticalProfileChart extends XYChartManager {
 
     /** profile */
     List profiles;
+
+    /* new sounding option */
+    boolean isConservedSounding = false;
 
     /**
      * Default ctor
@@ -221,8 +226,13 @@ public class VerticalProfileChart extends XYChartManager {
         }
 
         synchronized (MUTEX) {
-            if(domainAxis == null)
-                chartHolder.add(dataset, rangeAxis, renderer, side);
+            if(domainAxis == null) {
+                if(isConservedSounding)
+                    chartHolder.add(dataset, renderer, side);
+                else
+                    chartHolder.add(dataset, rangeAxis, renderer, side);
+
+            }
             else
                 chartHolder.add(dataset, rangeAxis, domainAxis, renderer, side);
         }
@@ -258,6 +268,11 @@ public class VerticalProfileChart extends XYChartManager {
             throws VisADException, RemoteException {
         profiles = vpInfos;
         updateCharts();
+        VerticalProfileInfo vpi = (VerticalProfileInfo)profiles.get(0);
+        DataChoice dc = vpi.getDataInstance().getDataChoice();
+        if(dc instanceof DerivedDataChoice && dc.toString().startsWith("Conserved Sounding") ){
+            isConservedSounding = true;
+        }
     }
 
     /**
