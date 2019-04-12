@@ -267,6 +267,28 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
+      id="conservedSounding"
+      description="Conserved Sounding (from %N1% &amp; %N2% &amp; %N3%)"
+      label="Conserved Sounding"
+      isdefault="true"
+      isenduser="false"
+      formula="DerivedGridFactory.combineGrids(D1, D2, D3)">
+    <categories>
+      <category
+      value="inherit"
+      childidx="0"
+      append="Derived"
+      categoryidx="0"/>
+      <category value="CONSERV-VAR"/>
+    </categories>
+    <operands>
+      <params categories="GRID-3D-*;"
+      p1="THETA"
+      p2="THETAE"
+      p3="THETAESAT"/>
+    </operands>
+  </derived>
+  <derived
      id="mixingratio"
      description="Mixing ratio (from %N1% &amp; %N2%)"
      label="Mixing ratio"
@@ -470,6 +492,23 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
          value="inherit"
          append="Derived"
          childidx="0"/>
+    </categories>
+    <operands categories="GRID-3D-*;">
+      <params p1="TEMP"/>
+    </operands>
+  </derived>
+  <derived
+      id="thetaesat"
+      description="Sat' Equiv' Potential Temperature (from %N1%)"
+      label="Potential Temperature"
+      isdefault="true"
+      isenduser="false"
+      formula="DerivedGridFactory.createSatEquivalentPotentialTemperature (D1)">
+    <categories>
+      <category
+      value="inherit"
+      append="Derived"
+      childidx="0"/>
     </categories>
     <operands categories="GRID-3D-*;">
       <params p1="TEMP"/>

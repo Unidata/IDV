@@ -26,6 +26,10 @@ The label is used  (if defined) for  the AliasEditor gui.
      label="Equivalent Potential Temperature"
      aliases="THTE_.*,thetae"/>
   <alias
+     name="THETAESAT"
+     label="Sat' Equivalent Potential Temperature"
+     aliases="THTE_.*,thetaesat"/>
+  <alias
      name="DEWPOINT"
      label="Dewpoint"
      aliases="dewpoint,Dewpoint,Dew-point_temperature_isobaric,Dew-point_temperature_pressure,DEWPOINT,dp,dp_0,dp_1,TD_tenths,TD,dpdk,dew_point_temperature,Dew_point_temperature,DWPK_PRES,DWPC,DWPF,DWPK,DPT_2maboveground,Dew_point_temperature_height_above_ground,Dew-point_temperature_height_above_ground,Dew-point_temperature_surface"/>
