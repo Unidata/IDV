@@ -1017,13 +1017,19 @@ Since this is confusing and needs more work lets remove this for now
      displaycategory="Probes"
      properties="windowVisible=true;showThumbNail=true"/>
   <control
-    id="vprofile1"
-    categories="GRID-3D-*;*-flowvector-*"
-    class="ucar.unidata.idv.control.VerticalProfileControl"
-    label="Vertical Profile (Pressure)"
-    displaycategory="Probes"
-    properties="windowVisible=true;showThumbNail=true;altCoord=pressure;"/>
-
+     id="vprofile1"
+     categories="GRID-3D-*;*-flowvector-*"
+     class="ucar.unidata.idv.control.VerticalProfileControl"
+     label="Vertical Profile (Pressure)"
+     displaycategory="Probes"
+     properties="windowVisible=true;showThumbNail=true;altCoord=pressure;"/>
+  <control
+     id="vprofile2"
+     categories="CONSERV-VAR"
+     class="ucar.unidata.idv.control.VerticalProfileControl"
+     label="Conserved Variables Sounding (Pressure)"
+     displaycategory="Probes"
+     properties="windowVisible=true;showThumbNail=true;altCoord=pressure;"/>
   <control
      id="stationmodelcontrol"
      categories="POINT;StationPlot;PointPlot"
