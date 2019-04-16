@@ -180,8 +180,9 @@ public class VerticalProfileControl extends LineProbeControl {
         super.initDone();
         try {
             setTimesForAnimation();
+            boolean isBundle = getIdv().getStateManager().isLoadingXml();
             //loadProfile(getPosition());
-            if(getDataChoices().get(0).toString().startsWith("Conserved Sounding")){
+            if(!isBundle && getDataChoices().get(0).toString().startsWith("Conserved Sounding")){
                 ((DataChoice)(getDataChoices().get(0))).setName("theta");
                 ((DataChoice)(getDataChoices().get(0))).setId("theta");
                 doMoveProbe();
@@ -542,7 +543,7 @@ public class VerticalProfileControl extends LineProbeControl {
                 }
             }
             info.getLineState().setRange(vpRange);
-        } else if(vpRange != null && !(lstate.getUnit().equals(vpUnit))) {
+        } else if(vpRange != null && (lstate.getUnit() != null) && !(lstate.getUnit().equals(vpUnit))) {
             Unit u = lstate.getUnit();
             vpRange = new Range(vpUnit.toThis(vpRange.getMin(),
                     u), vpUnit.toThis(vpRange.getMax(), u));

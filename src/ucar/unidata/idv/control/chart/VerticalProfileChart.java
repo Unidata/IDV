@@ -482,5 +482,13 @@ public class VerticalProfileChart extends XYChartManager {
     public XYDataset getDummyDataset() {
         return new XYSeriesCollection();
     }
+
+    public boolean getIsConservedSounding(){
+        return isConservedSounding;
+    }
+
+    public void setIsConservedSounding(boolean isConservedSounding){
+        this.isConservedSounding = isConservedSounding;
+    }
 }
 
