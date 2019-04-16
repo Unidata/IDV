@@ -3238,7 +3238,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                //     setStreamlines();
             }
         };
-        enableInitPlaneWidget();
+        //enableInitPlaneWidget();
         XYBtn.addActionListener(listener1);
         YZBtn.addActionListener(listener1);
         XZBtn.addActionListener(listener1);
