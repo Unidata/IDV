@@ -853,6 +853,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                 };
                                 if(select.getLabel() == "Line") {
                                     isLine = true;
+                                    arrowCbx.setSelected(arrowHead);
                                 } else {
                                     arrowCbx.setSelected(false);
                                     isLine = false;
