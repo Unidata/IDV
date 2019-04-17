@@ -1576,7 +1576,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
                     if(trajForm.intValue() == 0){
                         getGridDisplay().setTracerType(7);
-                        tracerFormBox.setSelectedIndex(1);
+                        tracerFormBox.setSelectedIndex(0);
                     }
                     getGridDisplay().resetTrojectories();
                     //setLineWidth(super.getLineWidth());
