@@ -1577,7 +1577,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
                     if(trajForm.intValue() == 0){
                         getGridDisplay().setTracerType(7);
-                        tracerFormBox.setSelectedIndex(0);
+                        if(tracerFormBox != null)
+                            tracerFormBox.setSelectedIndex(0);
                     }
                     getGridDisplay().resetTrojectories();
                     //setLineWidth(super.getLineWidth());
@@ -2804,7 +2805,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
         }
         //
-        if ( !hiddenBtn.isSelected() && (glyphs.size() > 0) &&
+        if ( (!hiddenBtn.isSelected() || isBundle) && (glyphs.size() > 0) &&
                 isXY) {
             SampledSet domain2D =
                     makeDomain2D((GriddedSet) domainSet);
