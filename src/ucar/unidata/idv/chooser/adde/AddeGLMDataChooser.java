@@ -709,6 +709,8 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
         setDoTimeDrivers(false);
     }
 
-
+    protected String getDefaultDisplayType() {
+        return null;  //"imagedisplay";
+    }
 
 }
