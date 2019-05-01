@@ -792,6 +792,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** flag for sharing */
     private boolean wasSharing;
 
+    /** flag for animation update */
+    boolean isAnimationUpdated = false;
+
     /**
      * We keep the window bounds around for persisting/unpersisting
      * this ViewManager.
@@ -4872,16 +4875,21 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                             Util.makeDates(
                                                 animationWidget.getTimes())));
                                 }
-
+                                if ((aniInfo != null)
+                                        && !aniInfo.getAnimationSetInfo()
+                                            .equals(animationInfo
+                                                .getAnimationSetInfo())) {
+                                    isAnimationUpdated = false;
+                                    animationInfo.setAnimationSetInfo(
+                                        aniInfo.getAnimationSetInfo());
+                                }
                                 if ((aniInfo != null) && aniInfo
                                         .getAnimationSetInfo()
                                         .getActive() && aniInfo
                                         .getAnimationSetInfo()
-                                        .getIsTimeDriver() && !timesArray
-                                        .equals(animationWidget.getTimesArray())) {
+                                        .getIsTimeDriver() && !isAnimationUpdated) {
                                     animationDriverChanged();
-                                    timesArray = animationWidget.getTimesArray();
-
+                                    isAnimationUpdated = true;
                                 }
                             }
                         } catch (Exception exp) {
