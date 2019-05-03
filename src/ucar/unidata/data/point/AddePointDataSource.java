@@ -451,7 +451,7 @@ public class AddePointDataSource extends PointDataSource {
                     Data data = pda.getData();
                     String message = "size of ll data " + ((FieldImpl) data).getLength();
                     LogUtil.consoleMessage(message);
-                    System.out.println(message);
+                    //System.out.println(message);
                     Trace.call2("AddePointDataSource.pda ctor");
                     if (sampleIt) {
                         checkForNeededParams((FieldImpl) data);
