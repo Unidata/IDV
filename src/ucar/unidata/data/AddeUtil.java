@@ -423,8 +423,8 @@ public final class AddeUtil {
         try {
             List<DateTime> matches = DataUtil.selectTimesFromList(alltimes,
                     driverTimes);
-            System.out.println( driverTimes.toString());
-            System.out.println( matches.toString());
+           // System.out.println( driverTimes.toString());
+           // System.out.println( matches.toString());
             urls.addAll(makeAbsoluteTimesUrlsGLM(url, datasource, matches, timeInc));
         } catch (Exception e) {}
         return urls;
