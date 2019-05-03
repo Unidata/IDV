@@ -793,7 +793,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     private boolean wasSharing;
 
     /** flag for animation update */
-    boolean isAnimationUpdated = false;
+    protected long lastTimePolled = 0;
 
     /**
      * We keep the window bounds around for persisting/unpersisting
@@ -4869,27 +4869,28 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                 }
                             } else if (evt.getPropertyName().equals(
                                     Animation.ANI_SET)) {
+                               // System.out.println(Arrays.toString(animationWidget.getTimesArray()));
                                 if (animationTimeline != null) {
                                     animationTimeline.setDatedThings(
                                         DatedObject.wrap(
                                             Util.makeDates(
                                                 animationWidget.getTimes())));
+                                  //  System.out.println("TTTT\n");
                                 }
-                                if ((aniInfo != null)
-                                        && !aniInfo.getAnimationSetInfo()
-                                            .equals(animationInfo
-                                                .getAnimationSetInfo())) {
-                                    isAnimationUpdated = false;
-                                    animationInfo.setAnimationSetInfo(
-                                        aniInfo.getAnimationSetInfo());
-                                }
+
                                 if ((aniInfo != null) && aniInfo
                                         .getAnimationSetInfo()
                                         .getActive() && aniInfo
                                         .getAnimationSetInfo()
-                                        .getIsTimeDriver() && !isAnimationUpdated) {
-                                    animationDriverChanged();
-                                    isAnimationUpdated = true;
+                                        .getIsTimeDriver() && !timesArray
+                                        .equals(animationWidget.getTimesArray())) {
+                                    long tt = (int)(aniInfo.getAnimationSetInfo().getPollMinutes()*60* 1000);
+                                    if((System.currentTimeMillis() - lastTimePolled) >= tt) {
+                                        animationDriverChanged();
+                                        lastTimePolled = System.currentTimeMillis();
+                                    }
+                                    timesArray = animationWidget.getTimesArray();
+
                                 }
                             }
                         } catch (Exception exp) {
