@@ -32,14 +32,7 @@ import visad.DateTime;
 import visad.VisADException;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TimeZone;
-import java.util.TreeSet;
+import java.util.*;
 
 
 /**
@@ -153,8 +146,13 @@ public final class AddeUtil {
                         .get(ucar.unidata.idv.chooser.adde.AddeChooser
                                 .DATA_NAME_KEY);
         if (driverTimes != null) {
-            urls.addAll(makeDriverTimesUrls(url, datasource,
-                                            (List) driverTimes));
+            if(checkglm.contains("GLM Lightning Data")) {
+                urls.addAll(makeGLMDriverTimesUrls(url, datasource,
+                        (List) driverTimes));
+            } else {
+                urls.addAll(makeDriverTimesUrls(url, datasource,
+                        (List) driverTimes));
+            }
         } else if (absTimes != null) {
             if(checkglm.contains("GLM Lightning Data")) {
                 float timeInc =
@@ -366,6 +364,68 @@ public final class AddeUtil {
             List<DateTime> matches = DataUtil.selectTimesFromList(alltimes,
                                          driverTimes);
             urls.addAll(makeAbsoluteTimesUrls(url, datasource, matches));
+        } catch (Exception e) {}
+        return urls;
+    }
+
+    /**
+     * Make URLs that correspond to the absolute list of (timedriver) times
+     *
+     * @param url   the ADDE URL
+     * @param datasource the datasource
+     * @param driverTimes the list of times
+     *
+     * @return the list of URLs
+     */
+    private static List<String> makeGLMDriverTimesUrls(String url,
+                    DataSourceImpl datasource, List<DateTime> driverTimes) {
+        List<String> urls = new ArrayList<String>();
+        if ((driverTimes == null) || driverTimes.isEmpty()) {
+            urls.add(url);
+        }
+        Collections.sort(driverTimes);
+        String day  = null;
+        String time = null;
+        // Loop through all the days and create
+        // a list of potential times based on the interval.  Then pass
+        // that to DataUtil.selectTimesFromList for consistency
+        // Get a list of unique dates
+        SortedSet<String> uniqueDays =
+                Collections.synchronizedSortedSet(new TreeSet<String>());
+        for (DateTime dt : driverTimes) {
+            String theDay = UtcDate.getYMD(dt);
+            uniqueDays.add(theDay);
+        }
+        // now build a list of possible times
+        float timeInc =
+                ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
+                        new Float(1))).floatValue();
+        int            numTimes = (int) (24 / timeInc);
+        List<DateTime> alltimes = new ArrayList<DateTime>();
+        for (String today : uniqueDays) {
+            for (int i = 0; i < numTimes; i++) {
+                float hours   = i * timeInc;
+                int   hour    = (int) hours;
+                int   minutes = (int) ((hours - hour) * 60);
+                String dateString = today + " " + StringUtil.padZero(hour, 2)
+                        + ":" + StringUtil.padZero(minutes, 2)
+                        + ":00";
+                try {
+                    DateTime dt = UtcDate.createDateTime(dateString,
+                            "yyyy-MM-dd HH:mm:ss");
+                    alltimes.add(dt);
+                } catch (VisADException ve) {
+                    System.err.println("Unable to parse date string: "
+                            + dateString);
+                }
+            }
+        }
+        try {
+            List<DateTime> matches = DataUtil.selectTimesFromList(alltimes,
+                    driverTimes);
+            System.out.println( driverTimes.toString());
+            System.out.println( matches.toString());
+            urls.addAll(makeAbsoluteTimesUrlsGLM(url, datasource, matches, timeInc));
         } catch (Exception e) {}
         return urls;
     }
