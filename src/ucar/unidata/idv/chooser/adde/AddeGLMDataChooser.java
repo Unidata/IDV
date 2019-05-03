@@ -307,9 +307,12 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
             utcCalendar.add(utcCalendar.MINUTE, -minB);
             int    sec   = utcCalendar.get(utcCalendar.SECOND);
             utcCalendar.add(utcCalendar.SECOND, -sec);
-            for (int i = 0; i < numTimes; i++) {
+            try {
+                DateTime dt = new DateTime(utcCalendar.getTime());
+                uniqueTimes.add(dt);
+            } catch (Exception e) {}
+            for (int i = 1; i < numTimes; i++) {
                 utcCalendar.add(utcCalendar.MINUTE, -((int)min));
-
                // int hour = McIDASUtil.mcDoubleToPackedInteger(i * min/60.f);
                 try {
                     DateTime dt = new DateTime(utcCalendar.getTime());
