@@ -283,7 +283,7 @@ public final class AddeUtil {
             times = times + newHour0 + StringUtil.padZero(newMin0, 2) + "00" +
                     " " + newHour + StringUtil.padZero(newMin, 2) + "00";
             LogUtil.consoleMessage(times);
-            System.out.println(times);
+            //System.out.println(times);
             String daytime = makeDateUrl(thisDate0, thisDate, times);
             urls.add(replaceDateTime(url, daytime));
 
