@@ -4120,6 +4120,17 @@ public class StationModelControl extends ObsDisplayControl {
         return selectedObLocation;
     }
 
+    /**
+     *  somehow the dateselection is not updated, in GLM drived by time driver
+     */
+    public synchronized void dataChanged() {
+        try {
+            updateDataSelection(getDataSelection());
+        } catch (Exception exc) {
+            logException("dataChanged", exc);
+        }
+        super.dataChanged();
 
+    }
 
 }
