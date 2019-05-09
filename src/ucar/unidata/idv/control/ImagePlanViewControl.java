@@ -112,7 +112,8 @@ public class ImagePlanViewControl extends PlanViewControl {
 
             // MH: just add a dummy component to this tab for now..
             //            don't init histogram until the tab is clicked.
-            tab.add("Histogram", getHistogramTabComponent());
+            if(!(this.datachoice instanceof DerivedDataChoice))
+                tab.add("Histogram", getHistogramTabComponent());
 
             return tab;
         } catch (Exception exc) {
