@@ -4885,7 +4885,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                         .getIsTimeDriver() && !timesArray
                                         .equals(animationWidget.getTimesArray())) {
                                     long tt = (int)(aniInfo.getAnimationSetInfo().getPollMinutes()*60* 1000);
-                                    if((System.currentTimeMillis() - lastTimePolled) >= tt) {
+                                    if((System.currentTimeMillis() - lastTimePolled) >= (tt * 0.8)) {
                                         animationDriverChanged();
                                         lastTimePolled = System.currentTimeMillis();
                                     }
