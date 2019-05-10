@@ -115,6 +115,8 @@ public final class AddeUtil {
             driverTimes = subset.getTimeDriverTimes();
             subTimes    = subset.getTimes();
         }
+       // if(driverTimes != null)
+        //    System.out.println( driverTimes.toString());
         if (driverTimes == null) {                            // have abs or relative times
             List allTimes = datasource.getAllDateTimes();
             if ((allTimes != null) && !allTimes.isEmpty()) {  // have times
@@ -400,28 +402,43 @@ public final class AddeUtil {
         float timeInc =
                 ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
                         new Float(1))).floatValue();
+        // only show 24 hours
         int            numTimes = (int) (24 / timeInc);
-        List<DateTime> alltimes = new ArrayList<DateTime>();
-        for (String today : uniqueDays) {
-            for (int i = 0; i < numTimes; i++) {
-                float hours   = i * timeInc;
-                int   hour    = (int) hours;
-                int   minutes = (int) ((hours - hour) * 60);
-                String dateString = today + " " + StringUtil.padZero(hour, 2)
-                        + ":" + StringUtil.padZero(minutes, 2)
-                        + ":00";
+
+        List<DateTime>  uniqueTimes = new ArrayList<DateTime>();
+
+        try {
+            GregorianCalendar utcCalendar =
+                    new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+            Date   now         = new Date();
+            utcCalendar.setTime(now);
+            int min = (int)(timeInc * 60);
+            int minB = 2; //back 2 minutes from current time
+            utcCalendar.add(utcCalendar.MINUTE, -minB);
+            int    sec   = utcCalendar.get(utcCalendar.SECOND);
+            utcCalendar.add(utcCalendar.SECOND, -sec);
+            try {
+                DateTime dt = new DateTime(utcCalendar.getTime());
+                uniqueTimes.add(dt);
+            } catch (Exception e) {}
+
+            for (int i = 1; i < numTimes; i++) {
+                utcCalendar.add(utcCalendar.MINUTE, -min);
+                // int hour = McIDASUtil.mcDoubleToPackedInteger(i * min/60.f);
                 try {
-                    DateTime dt = UtcDate.createDateTime(dateString,
-                            "yyyy-MM-dd HH:mm:ss");
-                    alltimes.add(dt);
-                } catch (VisADException ve) {
-                    System.err.println("Unable to parse date string: "
-                            + dateString);
-                }
+                    DateTime dt = new DateTime(utcCalendar.getTime());
+                    uniqueTimes.add(dt);
+                } catch (Exception e) {}
             }
+
+            //System.out.println(
+            //       "found " + uniqueTimes.size() + " unique times");
+        } catch (Exception excp) {
+
+
         }
         try {
-            List<DateTime> matches = DataUtil.selectTimesFromList(alltimes,
+            List<DateTime> matches = DataUtil.selectTimesFromList(uniqueTimes,
                     driverTimes);
            // System.out.println( driverTimes.toString());
            // System.out.println( matches.toString());
