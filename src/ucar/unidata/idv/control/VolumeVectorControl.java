@@ -219,8 +219,14 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /** _more_ */
     int smoothFactor = 10;
 
+    /** _more_ */
     boolean fromBundle = false;
 
+    /** a component to change the vector arrow head size */
+    ValueSliderWidget vectorAHSizeWidget;
+
+    /** _more_ */
+    boolean isLine = true;
     /**
      * Default constructor; does nothing.
      */
@@ -260,7 +266,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             if (choices0.size() == 3) {
                 DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
                 DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
-                DirectDataChoice wdc = (DirectDataChoice) choices0.get(2);
+
+                DataChoice wdc = (DataChoice) choices0.get(2);
                 List             usTime        = udc.getAllDateTimes();
                 List             wsTime        = wdc.getAllDateTimes();
                 List             selectedTimes =
@@ -509,8 +516,18 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                         (TwoFacedObject) ((JComboBox) e.getSource())
                             .getSelectedItem();
                     setTrajFormType(select.getId().hashCode());
+                    if(select.getLabel() == "Line") {
+                        isLine = true;
+                        arrowCbx.setSelected(arrowHead);
+                    } else {
+                        arrowCbx.setSelected(false);
+                        isLine = false;
+                    };
+                    enableArrowCompnoentBox();
                 }
             });
+
+            enableArrowCompnoentBox();
             streamLFormBox.setSelectedItem(
                     TwoFacedObject.findId(getStreamLFormType(), streamLFormList));
             streamLFormBox.addActionListener(new ActionListener() {
@@ -636,6 +653,13 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                     new WrapperWidget(
                             this, GuiUtils.rLabel("Start Level:"),
                             GuiUtils.left(levelBox)));  */
+        vectorAHSizeWidget = new ValueSliderWidget(this, 0, 40,
+                "ArrowHeadSize", "Arrow Head Size", 10.0f);
+
+        controlWidgets.add(
+                new WrapperWidget(
+                        this, GuiUtils.rLabel("Arrow Scale: "),
+                        vectorAHSizeWidget.getContents(false)));
 
         controlWidgets.add(
             new WrapperWidget(
@@ -780,6 +804,49 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             trajectoryBtn.setSelected(isTrajectories);
         }
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param
+     */
+    private void enableArrowCompnoentBox() {
+        //GuiUtils.enableTree(vectorAHSizeBox, isLine);
+        GuiUtils.enableTree(arrowCbx, isLine);
+    }
+
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
+    public void setArrowHeadSize(float f) {
+        arrowHeadSizeValue = f;
+        if (getGridDisplay() != null) {
+            try {
+                getGridDisplay().setTrajOffset(getTrajOffset());
+                getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
+                if (isTrajectories ) {
+                    getGridDisplay().resetTrojectories();
+                }
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
+
+        }
+
+        if (vectorAHSizeWidget != null) {
+            vectorAHSizeWidget.setValue(f);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     */
+    public float getArrowHeadSize() {
+        return arrowHeadSizeValue;
     }
 
     /**
@@ -1982,6 +2049,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             if(vectorBtn == null)
                 doMakeWidgetComponent();
             vectorBtn.doClick();
+            setFlowScale(flowScaleValue);
+            setArrowHeadSize(arrowHeadSizeValue);
         }
         if(skipFactorWidgetZ != null)
             skipFactorWidgetZ.setValue(getSkipValueZ());
