@@ -922,6 +922,11 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
 
+        if(getProperties().get(PROP_TIMESTRIKE) != null){
+            Object tstrike = getProperties().get(PROP_TIMESTRIKE);
+            timeStride = ((Integer)tstrike).intValue();
+        }
+
         if(dateRange == null) {
             List times = getTimesFromDataSelection(getDataSelection(),
                     (DataChoice) getDataChoices().get(0));
