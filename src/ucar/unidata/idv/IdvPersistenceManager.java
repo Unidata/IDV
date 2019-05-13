@@ -29,6 +29,7 @@ import ucar.unidata.data.DataManager;
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceResults;
 import ucar.unidata.data.GeoSelection;
+import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.data.grid.GridDataSource;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.control.DisplayControlImpl;
@@ -2258,6 +2259,13 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         final JRadioButton defaultRB =
             new JRadioButton("Save All Displayed Data", true);
         final JRadioButton selectRB = new JRadioButton("Save Selected Data");
+        Vector tCnt2 = new Vector();
+
+        for (int i = 1; i <= 25; i++) {
+            tCnt2.add(new Integer(i));
+        }
+
+        JComboBox timeStrikeFld = new JComboBox(tCnt2);
         ButtonGroup        dataBG   = new ButtonGroup();
         dataBG.add(defaultRB);
         dataBG.add(selectRB);
@@ -2370,7 +2378,10 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         }
 
         JPanel panel = LayoutUtil.topCenterBottom(defaultRB,
-                           GuiUtils.filler(), GuiUtils.vbox(comps));
+                GuiUtils.hbox(
+                        new JLabel("Time Strike for Gridded Data: "), timeStrikeFld),
+                GuiUtils.vbox(comps));
+
         if ( !GuiUtils.askOkCancel("Save Data", panel)) {
             return null;
         }
@@ -2384,6 +2395,11 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             dsc.dataSource.setDefaultSave(defaultRB.isSelected());
 
             if (dsc.cbx.isSelected() || defaultRB.isSelected()) {
+                if(dsc.dataSource instanceof GeoGridDataSource){
+                    if(timeStrikeFld.getSelectedItem() != null)
+                        ((GeoGridDataSource) dsc.dataSource).getProperties()
+                                .put(DataSource.PROP_TIMESTRIKE, timeStrikeFld.getSelectedItem());
+                }
                 List files = dsc.dataSource.saveDataToLocalDisk(false,
                                  IOUtil.joinDir(dir, "data_" + i));
                 if (files == null) {
