@@ -90,7 +90,7 @@ public interface DataSource {
     public static final String PROP_GEOLOCATION = "geolocation";
 
     /** The time property */
-    public static final String PROP_TIMESTRIKE = "timestrike";
+    public static final String PROP_TIMESTRIDE = "timestride";
 
     /** The property for display properties */
     public static final String PROP_DISPLAYPROPERTIES = "displayproperties";
