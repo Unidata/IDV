@@ -922,8 +922,8 @@ public class GeoGridDataSource extends GridDataSource {
             }
         }
 
-        if(getProperties().get(PROP_TIMESTRIKE) != null){
-            Object tstrike = getProperties().get(PROP_TIMESTRIKE);
+        if(getProperties().get(PROP_TIMESTRIDE) != null){
+            Object tstrike = getProperties().get(PROP_TIMESTRIDE);
             timeStride = ((Integer)tstrike).intValue();
         }
 
