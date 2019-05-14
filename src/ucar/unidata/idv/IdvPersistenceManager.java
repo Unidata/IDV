@@ -2265,7 +2265,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
             tCnt2.add(new Integer(i));
         }
 
-        JComboBox timeStrikeFld = new JComboBox(tCnt2);
+        JComboBox timeStrideFld = new JComboBox(tCnt2);
         ButtonGroup        dataBG   = new ButtonGroup();
         dataBG.add(defaultRB);
         dataBG.add(selectRB);
@@ -2379,7 +2379,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
         JPanel panel = LayoutUtil.topCenterBottom(defaultRB,
                 GuiUtils.hbox(
-                        new JLabel("Time Strike for Gridded Data: "), timeStrikeFld),
+                        new JLabel("Time Stride for Gridded Data: "), timeStrideFld),
                 GuiUtils.vbox(comps));
 
         if ( !GuiUtils.askOkCancel("Save Data", panel)) {
@@ -2396,9 +2396,9 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
 
             if (dsc.cbx.isSelected() || defaultRB.isSelected()) {
                 if(dsc.dataSource instanceof GeoGridDataSource){
-                    if(timeStrikeFld.getSelectedItem() != null)
+                    if(timeStrideFld.getSelectedItem() != null)
                         ((GeoGridDataSource) dsc.dataSource).getProperties()
-                                .put(DataSource.PROP_TIMESTRIKE, timeStrikeFld.getSelectedItem());
+                                .put(DataSource.PROP_TIMESTRIDE, timeStrideFld.getSelectedItem());
                 }
                 List files = dsc.dataSource.saveDataToLocalDisk(false,
                                  IOUtil.joinDir(dir, "data_" + i));
