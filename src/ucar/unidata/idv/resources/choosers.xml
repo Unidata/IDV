@@ -135,7 +135,7 @@ If using the tree panel you can define components that are displayed when a cate
 
   <panel
           title="GLM"
-          category="Under Development"
+          category="Sat &amp; Radar"
           layout="border"
           tabtooltip="For accessing satellite GLM lightning Mapper"
           mnemonic="I">
