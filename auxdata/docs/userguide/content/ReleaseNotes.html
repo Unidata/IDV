@@ -22,8 +22,8 @@ The items below reflect changes since the 5.4 release.
 
   <p>
     The version of the netCDF-Java library currently distributed with the IDV is
-    the 4.6.11. This is a bug fix release.  See
-    the <a href="https://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds7">
+    the 4.6.13. This is a bug fix release.  See
+    the <a href="https://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds8">
       netCDF-Java Library</a> for a more details information.
   </p>
 </faqitem>
@@ -54,17 +54,17 @@ The items below reflect changes since the 5.4 release.
 
 <faqitem q="GLM ADDE Chooser" id="glmAddeChooser">
   <p>
-    The GLM L2 product consists of geo-located and time-stamped events, groups, and flashes, with
+    The GLM Level2 products consist of geo-located and time-stamped events, groups, and flashes, with
     associated calibrated optical amplitudes (in units of Joules). The IDV has a new data chooser
     to access three GLM source types: Geostationary Lightning Mapper EVENT, GROUP, and FLASH Data
-    through the ADDE data server. The GLM data queries can be performed on the relative times or absolute
-    times.
+    through the ADDE data server. The GLM data queries can be performed on the relative times, absolute
+    times, and time driver times
   </p>
 </faqitem>
 
 <faqitem q="3D Streamline Display" id="streamline3d">
   <p>
-    Streamlines are an instantaneous tangent to the velocity vector of the flow  and a snapshot of
+    Streamlines are a group of curves that instantaneous tangent to the velocity vector of the flow and a snapshot of
     the flow field at some particular time. In the IDV 3D space, streamline display provides the
     direction in which a massless fluid element will travel at any point in time. 3D streamline display
     type is available for both derived parameters: Grid 3D Trajectory and 3D Flow Vectors, and the initial
@@ -77,7 +77,6 @@ The items below reflect changes since the 5.4 release.
     The grid 3D trajectory display includes two new display types: Tracer and Tracer Point. The initial
     area of the 3D Grid Trajectory can be set at XZ or YZ plane, and controlled by the data index
     in the X or Y direction.
-
   </p>
 </faqitem>
 
@@ -122,7 +121,7 @@ The items below reflect changes since the 5.4 release.
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
-  We fixed a long time bug associated with the CAPE/CIN calculation in this release. Another
+  We fixed a bug associated with the excessive data loading in this release. Another
   bug fixed is to handle the redirect of the http urls.
 </faqitem>
 
