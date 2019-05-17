@@ -120,7 +120,7 @@ public class AddePointDataSource extends PointDataSource {
             if(checkglm != null && checkglm.contains("GLM Lightning Data")){
                 Double relT =  (Double) properties
                         .get("relative time increment");
-                properties.put(AddePointDataSource.PROP_STATIONMODELSCALE, "0.2");
+                properties.put(AddePointDataSource.PROP_STATIONMODELSCALE, "0.5");
                 if(relT != null ){
                     double reltime = (double)(relT * 60.0);
                     increment = reltime;
