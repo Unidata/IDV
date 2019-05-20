@@ -7336,7 +7336,13 @@ public class GridUtil {
         FlatField newField = (FlatField) GridUtil.setParamType(slice,
                                  rangeType, true);
         float[][]  samples = slice.getFloats(false);
-        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        GriddedSet domain  = null;
+
+        if(GridUtil.getSpatialDomain(slice) instanceof GriddedSet)
+            domain = (GriddedSet)GridUtil.getSpatialDomain(slice);
+        else
+            return null;
+
         int[]      lengths = domain.getLengths();
         jgxmin = 1;
         jgxmax = lengths[0];
@@ -7502,7 +7508,12 @@ public class GridUtil {
         FlatField newField = (FlatField) GridUtil.setParamType(slice,
                                  rangeType, true);
         float[][]  samples = slice.getFloats(false);
-        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        GriddedSet domain  = null;
+
+        if(GridUtil.getSpatialDomain(slice) instanceof GriddedSet)
+            domain = (GriddedSet)GridUtil.getSpatialDomain(slice);
+        else
+            return null;
         int[]      lengths = domain.getLengths();
         jgxmin = 1;
         jgxmax = lengths[0];
@@ -7754,7 +7765,12 @@ public class GridUtil {
         FlatField newField = (FlatField) GridUtil.setParamType(slice,
                                  rangeType, true);
         float[][]  samples = slice.getFloats(false);
-        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        GriddedSet domain  = null;
+
+        if(GridUtil.getSpatialDomain(slice) instanceof GriddedSet)
+            domain = (GriddedSet)GridUtil.getSpatialDomain(slice);
+        else
+            return null;
         int[]      lengths = domain.getLengths();
         kxd = lengths[0];
         kyd = lengths[1];
@@ -7933,7 +7949,12 @@ public class GridUtil {
         FlatField newField = (FlatField) GridUtil.setParamType(slice,
                                  rangeType, true);
         float[][]  samples = slice.getFloats(false);
-        GriddedSet domain  = (GriddedSet) GridUtil.getSpatialDomain(slice);
+        GriddedSet domain  = null;
+
+        if(GridUtil.getSpatialDomain(slice) instanceof GriddedSet)
+            domain = (GriddedSet)GridUtil.getSpatialDomain(slice);
+        else
+            return null;
         int[]      lengths = domain.getLengths();
         njx = lengths[0];
         niy = lengths[1];
