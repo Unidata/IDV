@@ -2335,7 +2335,37 @@ public class DerivedGridFactory {
 
         return (FlatField) advgrid.negate();
     }
+    /**
+     * Make the FieldImpl of dewpoint temperature scalar values;
+     * possibly for sequence of times
+     *
+     * @param temperFI grid of air temperature
+     * @param rhFI     grid of relative humidity
+     * @return dewpoint grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createConservedSounding(FieldImpl temperFI, FieldImpl rhFI)
+            throws VisADException, RemoteException {
 
+        FieldImpl soundingFI = null;
+        FieldImpl theta = null;
+        FieldImpl thetae = null;
+        FieldImpl thetaesat = null;
+        FieldImpl ffi = null;
+
+        try {
+            //dewp = DerivedGridFactory.createDewpoint(temperature, rh);
+            theta = DerivedGridFactory.createPotentialTemperature(temperFI);
+            thetae = DerivedGridFactory.createEquivalentPotentialTemperature(temperFI, rhFI);
+            thetaesat = DerivedGridFactory.createSatEquivalentPotentialTemperature(temperFI);
+            soundingFI = DerivedGridFactory.combineGrids(theta, thetae, thetaesat);
+        } catch (Exception e){}
+
+
+        return DerivedGridFactory.combineGrids(theta, thetae, thetaesat);
+    }
     /**
      * Make the FieldImpl of dewpoint temperature scalar values;
      * possibly for sequence of times
