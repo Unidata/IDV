@@ -5346,7 +5346,7 @@
               </property>
               <property name="ParamIds">
                 <array class="string" length="1">
-                  <string><![CDATA[LIGHTNING]]></string>
+                  <string><![CDATA[LIGHTNING,ENGY]]></string>
                 </array>
               </property>
               <property name="ParamDescs">
@@ -5561,7 +5561,7 @@
                           </property>
                           <property name="ParamIds">
                               <array class="string" length="1">
-                                  <string><![CDATA[LIGHTNING]]></string>
+                                  <string><![CDATA[LIGHTNING,ENGY]]></string>
                               </array>
                           </property>
                           <property name="ParamDescs">
@@ -6768,7 +6768,7 @@
               </property>
               <property name="ParamIds">
                 <array class="string" length="1">
-                  <string><![CDATA[LIGHTNING]]></string>
+                  <string><![CDATA[LIGHTNING,ENGY]]></string>
                 </array>
               </property>
               <property name="ParamDescs">
