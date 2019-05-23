@@ -5131,7 +5131,7 @@
               </property>
               <property name="ParamIds">
                 <array class="string" length="1">
-                  <string><![CDATA[SGNL]]></string>
+                  <string><![CDATA[SGNL,ENGY]]></string>
                 </array>
               </property>
               <property name="ParamDescs">
@@ -5232,7 +5232,7 @@
                 </object>
               </property>
               <property name="ColorParam">
-                <string><![CDATA[SGNL]]></string>
+                <string><![CDATA[SGNL,ENGY]]></string>
               </property>
               <property name="ColorMappings">
                 <object class="java.util.ArrayList">
@@ -5447,7 +5447,7 @@
                 </object>
               </property>
               <property name="ColorParam">
-                <string><![CDATA[SGNL]]></string>
+                <string><![CDATA[SGNL,ENGY]]></string>
               </property>
               <property name="ColorMappings">
                 <object class="java.util.ArrayList">
@@ -6553,7 +6553,7 @@
               </property>
               <property name="ParamIds">
                 <array class="string" length="1">
-                  <string><![CDATA[SGNL]]></string>
+                  <string><![CDATA[SGNL,ENGY]]></string>
                 </array>
               </property>
               <property name="ParamDescs">
@@ -6654,7 +6654,7 @@
                 </object>
               </property>
               <property name="ColorParam">
-                <string><![CDATA[SGNL]]></string>
+                <string><![CDATA[SGNL,ENGY]]></string>
               </property>
               <property name="ColorMappings">
                 <object class="java.util.ArrayList">
@@ -6869,7 +6869,7 @@
                 </object>
               </property>
               <property name="ColorParam">
-                <string><![CDATA[SGNL]]></string>
+                <string><![CDATA[SGNL,ENGY]]></string>
               </property>
               <property name="ColorMappings">
                 <object class="java.util.ArrayList">
