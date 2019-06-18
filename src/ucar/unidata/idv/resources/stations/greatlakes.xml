@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stationtables>
+    <stationtable name="Great Lakes" category="US">
+        <station name="Lake Superior" lat="48" lon="-87.6" elev="0"/>
+        <station name="Lake Michigan" lat="43.7" lon="-87.1" elev="0"/>
+        <station name="Lake Huron" lat="45" lon="-82.7" elev="0"/>
+        <station name="Lake Erie" lat="42" lon="-82" elev="0"/>
+        <station name="Lake Ontario" lat="43.5" lon="-78" elev="0"/>
+    </stationtable>
+</stationtables>

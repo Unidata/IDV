@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<stationtables>
+    <stationtable name="Countries" category="World">
+        <station name="Aruba" lat="12.52088038" lon="-69.98267711" elev="0"/>
+        <station name="Afghanistan" lat="33.83523073" lon="66.00473366" elev="0"/>
+        <station name="Angola" lat="-12.29336054" lon="17.53736768" elev="0"/>
+        <station name="Anguilla" lat="18.2239595" lon="-63.06498927" elev="0"/>
+        <station name="Albania" lat="41.14244989" lon="20.04983396" elev="0"/>
+        <station name="Aland" lat="60.21488688" lon="19.95328768" elev="0"/>
+        <station name="Andorra" lat="42.54229102" lon="1.56054378" elev="0"/>
+        <station name="United Arab Emirates" lat="23.90528188" lon="54.3001671" elev="0"/>
+        <station name="Argentina" lat="-35.3813488" lon="-65.17980692" elev="0"/>
+        <station name="Armenia" lat="40.28952569" lon="44.92993276" elev="0"/>
+        <station name="American Samoa" lat="-14.30445997" lon="-170.7180258" elev="0"/>
+        <station name="Antarctica" lat="-80.50857913" lon="19.92108951" elev="0"/>
+        <station name="Ashmore and Cartier Islands" lat="-12.42993164" lon="123.5838379" elev="0"/>
+        <station name="French Southern and Antarctic Lands" lat="-49.24895485" lon="69.22666758" elev="0"/>
+        <station name="Antigua and Barbuda" lat="17.2774996" lon="-61.79469343" elev="0"/>
+        <station name="Australia" lat="-25.73288704" lon="134.4910001" elev="0"/>
+        <station name="Austria" lat="47.58549439" lon="14.1264761" elev="0"/>
+        <station name="Azerbaijan" lat="40.28827235" lon="47.54599879" elev="0"/>
+        <station name="Burundi" lat="-3.35939666" lon="29.87512156" elev="0"/>
+        <station name="Belgium" lat="50.63981576" lon="4.64065114" elev="0"/>
+        <station name="Benin" lat="9.6417597" lon="2.32785254" elev="0"/>
+        <station name="Burkina Faso" lat="12.26953846" lon="-1.75456601" elev="0"/>
+        <station name="Bangladesh" lat="23.86731158" lon="90.23812743" elev="0"/>
+        <station name="Bulgaria" lat="42.76890318" lon="25.21552909" elev="0"/>
+        <station name="Bahrain" lat="26.04205135" lon="50.54196932" elev="0"/>
+        <station name="Canada" lat="61.36206324" lon="-98.30777028" elev="0"/>
+        <station name="The Bahamas" lat="24.29036702" lon="-76.62843038" elev="0"/>
+        <station name="Bosnia and Herzegovina" lat="44.17450125" lon="17.76876733" elev="0"/>
+        <station name="Saint Barthelemy" lat="17.89880451" lon="-62.84067779" elev="0"/>
+        <station name="Belarus" lat="53.53131377" lon="28.03209307" elev="0"/>
+        <station name="Belize" lat="17.20027509" lon="-88.71010486" elev="0"/>
+        <station name="Bermuda" lat="32.31367802" lon="-64.7545589" elev="0"/>
+        <station name="Bolivia" lat="-16.70814787" lon="-64.68538645" elev="0"/>
+        <station name="Brazil" lat="-10.78777702" lon="-53.09783113" elev="0"/>
+        <station name="Barbados" lat="13.18145428" lon="-59.559797" elev="0"/>
+        <station name="Brunei" lat="4.51968958" lon="114.7220304" elev="0"/>
+        <station name="Bhutan" lat="27.41106589" lon="90.40188155" elev="0"/>
+        <station name="Botswana" lat="-22.18403213" lon="23.79853368" elev="0"/>
+        <station name="Central African Republic" lat="6.56823297" lon="20.46826831" elev="0"/>
+        <station name="Switzerland" lat="46.79785878" lon="8.20867471" elev="0"/>
+        <station name="Chile" lat="-37.73070989" lon="-71.38256213" elev="0"/>
+        <station name="China" lat="36.56176546" lon="103.8190735" elev="0"/>
+        <station name="Ivory Coast" lat="7.6284262" lon="-5.5692157" elev="0"/>
+        <station name="Cameroon" lat="5.69109849" lon="12.73964156" elev="0"/>
+        <station name="Democratic Republic of the Congo" lat="-2.87746289" lon="23.64396107" elev="0"/>
+        <station name="Republic of Congo" lat="-0.83787463" lon="15.21965762" elev="0"/>
+        <station name="Cook Islands" lat="-21.21927288" lon="-159.7872422" elev="0"/>
+        <station name="Colombia" lat="3.91383431" lon="-73.08114582" elev="0"/>
+        <station name="Comoros" lat="-11.87783444" lon="43.68253968" elev="0"/>
+        <station name="Cape Verde" lat="15.95523324" lon="-23.9598882" elev="0"/>
+        <station name="Costa Rica" lat="9.97634464" lon="-84.19208768" elev="0"/>
+        <station name="Cuba" lat="21.62289528" lon="-79.01605384" elev="0"/>
+        <station name="Curacao" lat="12.19551675" lon="-68.97119369" elev="0"/>
+        <station name="Cayman Islands" lat="19.42896497" lon="-80.91213321" elev="0"/>
+        <station name="Northern Cyprus" lat="35.26277486" lon="33.5684813" elev="0"/>
+        <station name="Cyprus" lat="34.91667211" lon="33.0060022" elev="0"/>
+        <station name="Czech Republic" lat="49.73341233" lon="15.31240163" elev="0"/>
+        <station name="Germany" lat="51.10698181" lon="10.38578051" elev="0"/>
+        <station name="Djibouti" lat="11.74871806" lon="42.5606754" elev="0"/>
+        <station name="Dominica" lat="15.4394702" lon="-61.357726" elev="0"/>
+        <station name="Denmark" lat="55.98125296" lon="10.02800992" elev="0"/>
+        <station name="Dominican Republic" lat="18.89433082" lon="-70.50568896" elev="0"/>
+        <station name="Algeria" lat="28.15893849" lon="2.61732301" elev="0"/>
+        <station name="Ecuador" lat="-1.42381612" lon="-78.75201922" elev="0"/>
+        <station name="Egypt" lat="26.49593311" lon="29.86190099" elev="0"/>
+        <station name="Eritrea" lat="15.36186618" lon="38.84617011" elev="0"/>
+        <station name="Spain" lat="40.24448698" lon="-3.64755047" elev="0"/>
+        <station name="Estonia" lat="58.67192972" lon="25.54248537" elev="0"/>
+        <station name="Ethiopia" lat="8.62278679" lon="39.60080098" elev="0"/>
+        <station name="Finland" lat="64.49884603" lon="26.2746656" elev="0"/>
+        <station name="Fiji" lat="-17.42858032" lon="165.4519543" elev="0"/>
+        <station name="Falkland Islands" lat="-51.74483954" lon="-59.35238956" elev="0"/>
+        <station name="France" lat="46.9" lon="2.5" elev="0"/>
+        <station name="Faroe Islands" lat="62.05385403" lon="-6.88095423" elev="0"/>
+        <station name="Federated States of Micronesia" lat="7.45246814" lon="153.2394379" elev="0"/>
+        <station name="Gabon" lat="-0.58660025" lon="11.7886287" elev="0"/>
+        <station name="United Kingdom" lat="54.12387156" lon="-2.86563164" elev="0"/>
+        <station name="Georgia" lat="42.16855755" lon="43.50780252" elev="0"/>
+        <station name="Guernsey" lat="49.46809761" lon="-2.57239064" elev="0"/>
+        <station name="Ghana" lat="7.95345644" lon="-1.21676566" elev="0"/>
+        <station name="Guinea" lat="10.43621593" lon="-10.94066612" elev="0"/>
+        <station name="Gambia" lat="13.44965244" lon="-15.39601295" elev="0"/>
+        <station name="Guinea Bissau" lat="12.04744948" lon="-14.94972445" elev="0"/>
+        <station name="Equatorial Guinea" lat="1.70555135" lon="10.34137924" elev="0"/>
+        <station name="Greece" lat="39.07469623" lon="22.95555794" elev="0"/>
+        <station name="Grenada" lat="12.11725044" lon="-61.68220189" elev="0"/>
+        <station name="Greenland" lat="74.71051289" lon="-41.34191127" elev="0"/>
+        <station name="Guatemala" lat="15.69403664" lon="-90.36482009" elev="0"/>
+        <station name="Guam" lat="13.44165626" lon="144.7679102" elev="0"/>
+        <station name="Guyana" lat="4.79378034" lon="-58.98202459" elev="0"/>
+        <station name="Hong Kong S.A.R." lat="22.39827737" lon="114.1138045" elev="0"/>
+        <station name="Heard Island and McDonald Islands" lat="-53.08724656" lon="73.5205171" elev="0"/>
+        <station name="Honduras" lat="14.82688165" lon="-86.6151661" elev="0"/>
+        <station name="Croatia" lat="45.08047631" lon="16.40412899" elev="0"/>
+        <station name="Haiti" lat="18.93502563" lon="-72.68527509" elev="0"/>
+        <station name="Hungary" lat="47.16277506" lon="19.39559116" elev="0"/>
+        <station name="Indonesia" lat="-2.21505456" lon="117.2401137" elev="0"/>
+        <station name="Isle of Man" lat="54.22418911" lon="-4.53873952" elev="0"/>
+        <station name="India" lat="22.88578212" lon="79.6119761" elev="0"/>
+        <station name="Indian Ocean Territories" lat="-10.6478515" lon="104.851898" elev="0"/>
+        <station name="British Indian Ocean Territory" lat="-7.33059751" lon="72.44541229" elev="0"/>
+        <station name="Ireland" lat="53.1754487" lon="-8.13793569" elev="0"/>
+        <station name="Iran" lat="32.57503292" lon="54.27407004" elev="0"/>
+        <station name="Iraq" lat="33.03970582" lon="43.74353149" elev="0"/>
+        <station name="Iceland" lat="64.99575386" lon="-18.57396167" elev="0"/>
+        <station name="Israel" lat="31.46110101" lon="35.00444693" elev="0"/>
+        <station name="Italy" lat="42.79662641" lon="12.07001339" elev="0"/>
+        <station name="Jamaica" lat="18.15694878" lon="-77.31482593" elev="0"/>
+        <station name="Jersey" lat="49.21837377" lon="-2.12689938" elev="0"/>
+        <station name="Jordan" lat="31.24579091" lon="36.77136104" elev="0"/>
+        <station name="Japan" lat="37.59230135" lon="138.0308956" elev="0"/>
+        <station name="Siachen Glacier" lat="35.39236325" lon="77.18011865" elev="0"/>
+        <station name="Kazakhstan" lat="48.15688067" lon="67.29149357" elev="0"/>
+        <station name="Kenya" lat="0.59988022" lon="37.79593973" elev="0"/>
+        <station name="Kyrgyzstan" lat="41.46221943" lon="74.54165513" elev="0"/>
+        <station name="Cambodia" lat="12.72004786" lon="104.9069433" elev="0"/>
+        <station name="Kiribati" lat="0.86001503" lon="-45.61110513" elev="0"/>
+        <station name="Saint Kitts and Nevis" lat="17.2645995" lon="-62.68755265" elev="0"/>
+        <station name="South Korea" lat="36.38523983" lon="127.8391609" elev="0"/>
+        <station name="Kosovo" lat="42.57078707" lon="20.87249811" elev="0"/>
+        <station name="Kuwait" lat="29.33431262" lon="47.58700459" elev="0"/>
+        <station name="Laos" lat="18.50217433" lon="103.7377241" elev="0"/>
+        <station name="Lebanon" lat="33.92306631" lon="35.88016072" elev="0"/>
+        <station name="Liberia" lat="6.45278492" lon="-9.32207573" elev="0"/>
+        <station name="Libya" lat="27.03094495" lon="18.00866169" elev="0"/>
+        <station name="Saint Lucia" lat="13.89479481" lon="-60.96969923" elev="0"/>
+        <station name="Liechtenstein" lat="47.13665835" lon="9.53574312" elev="0"/>
+        <station name="Sri Lanka" lat="7.61266509" lon="80.70108238" elev="0"/>
+        <station name="Lesotho" lat="-29.58003188" lon="28.22723131" elev="0"/>
+        <station name="Lithuania" lat="55.32610984" lon="23.88719355" elev="0"/>
+        <station name="Luxembourg" lat="49.76725361" lon="6.07182201" elev="0"/>
+        <station name="Latvia" lat="56.85085163" lon="24.91235983" elev="0"/>
+        <station name="Macao S.A.R" lat="22.22311688" lon="113.5093212" elev="0"/>
+        <station name="Saint Martin" lat="18.08888611" lon="-63.05972851" elev="0"/>
+        <station name="Morocco" lat="29.83762955" lon="-8.45615795" elev="0"/>
+        <station name="Monaco" lat="43.75274627" lon="7.40627677" elev="0"/>
+        <station name="Moldova" lat="47.19498804" lon="28.45673372" elev="0"/>
+        <station name="Madagascar" lat="-19.37189587" lon="46.70473674" elev="0"/>
+        <station name="Maldives" lat="3.7287092" lon="73.45713004" elev="0"/>
+        <station name="Mexico" lat="23.94753724" lon="-102.5234517" elev="0"/>
+        <station name="Marshall Islands" lat="7.00376358" lon="170.3397612" elev="0"/>
+        <station name="Macedonia" lat="41.59530893" lon="21.68211346" elev="0"/>
+        <station name="Mali" lat="17.34581581" lon="-3.54269065" elev="0"/>
+        <station name="Malta" lat="35.92149632" lon="14.40523316" elev="0"/>
+        <station name="Myanmar" lat="21.18566599" lon="96.48843321" elev="0"/>
+        <station name="Montenegro" lat="42.78890259" lon="19.23883939" elev="0"/>
+        <station name="Mongolia" lat="46.82681544" lon="103.0529977" elev="0"/>
+        <station name="Northern Mariana Islands" lat="15.82927563" lon="145.6196965" elev="0"/>
+        <station name="Mozambique" lat="-17.27381643" lon="35.53367543" elev="0"/>
+        <station name="Mauritania" lat="20.25736706" lon="-10.34779815" elev="0"/>
+        <station name="Montserrat" lat="16.73941406" lon="-62.18518546" elev="0"/>
+        <station name="Mauritius" lat="-20.27768704" lon="57.57120551" elev="0"/>
+        <station name="Malawi" lat="-13.21808088" lon="34.28935599" elev="0"/>
+        <station name="Malaysia" lat="3.78986846" lon="109.6976228" elev="0"/>
+        <station name="Namibia" lat="-22.13032568" lon="17.20963567" elev="0"/>
+        <station name="New Caledonia" lat="-21.29991806" lon="165.6849237" elev="0"/>
+        <station name="Niger" lat="17.41912493" lon="9.38545882" elev="0"/>
+        <station name="Norfolk Island" lat="-29.0514609" lon="167.9492168" elev="0"/>
+        <station name="Nigeria" lat="9.59411452" lon="8.08943895" elev="0"/>
+        <station name="Nicaragua" lat="12.84709429" lon="-85.0305297" elev="0"/>
+        <station name="Niue" lat="-19.04945708" lon="-169.8699468" elev="0"/>
+        <station name="Netherlands" lat="52.1007899" lon="5.28144793" elev="0"/>
+        <station name="Norway" lat="68.75015572" lon="15.34834656" elev="0"/>
+        <station name="Nepal" lat="28.24891365" lon="83.9158264" elev="0"/>
+        <station name="Nauru" lat="-0.51912639" lon="166.9325682" elev="0"/>
+        <station name="New Zealand" lat="-41.81113557" lon="171.4849235" elev="0"/>
+        <station name="Oman" lat="20.60515333" lon="56.09166155" elev="0"/>
+        <station name="Pakistan" lat="29.9497515" lon="69.33957937" elev="0"/>
+        <station name="Panama" lat="8.51750797" lon="-80.11915156" elev="0"/>
+        <station name="Pitcairn Islands" lat="-24.36500535" lon="-128.317042" elev="0"/>
+        <station name="Peru" lat="-9.15280381" lon="-74.38242685" elev="0"/>
+        <station name="Philippines" lat="11.77536778" lon="122.8839325" elev="0"/>
+        <station name="Palau" lat="7.28742784" lon="134.4080797" elev="0"/>
+        <station name="Papua New Guinea" lat="-6.46416646" lon="145.2074475" elev="0"/>
+        <station name="Poland" lat="52.12759564" lon="19.39012835" elev="0"/>
+        <station name="Puerto Rico" lat="18.22813055" lon="-66.47307604" elev="0"/>
+        <station name="North Korea" lat="40.15350311" lon="127.1924797" elev="0"/>
+        <station name="Portugal" lat="39.59550671" lon="-8.50104361" elev="0"/>
+        <station name="Paraguay" lat="-23.22823913" lon="-58.40013703" elev="0"/>
+        <station name="Palestine" lat="31.91613893" lon="35.19628705" elev="0"/>
+        <station name="French Polynesia" lat="-14.72227409" lon="-144.9049439" elev="0"/>
+        <station name="Qatar" lat="25.30601188" lon="51.18479632" elev="0"/>
+        <station name="Romania" lat="45.85243127" lon="24.97293039" elev="0"/>
+        <station name="Russia" lat="61.98052209" lon="96.68656112" elev="0"/>
+        <station name="Rwanda" lat="-1.99033832" lon="29.91988515" elev="0"/>
+        <station name="Western Sahara" lat="24.22956739" lon="-12.21982755" elev="0"/>
+        <station name="Saudi Arabia" lat="24.12245841" lon="44.53686271" elev="0"/>
+        <station name="Sudan" lat="15.99035669" lon="29.94046812" elev="0"/>
+        <station name="South Sudan" lat="7.30877945" lon="30.24790002" elev="0"/>
+        <station name="Senegal" lat="14.36624173" lon="-14.4734924" elev="0"/>
+        <station name="Singapore" lat="1.35876087" lon="103.8172559" elev="0"/>
+        <station name="South Georgia and South Sandwich Islands" lat="-54.46488248" lon="-36.43318388" elev="0"/>
+        <station name="Saint Helena" lat="-12.40355951" lon="-9.54779416" elev="0"/>
+        <station name="Solomon Islands" lat="-8.92178022" lon="159.6328767" elev="0"/>
+        <station name="Sierra Leone" lat="8.56329593" lon="-11.79271247" elev="0"/>
+        <station name="El Salvador" lat="13.73943744" lon="-88.87164469" elev="0"/>
+        <station name="San Marino" lat="43.94186747" lon="12.45922334" elev="0"/>
+        <station name="Somaliland" lat="9.73345496" lon="46.25198395" elev="0"/>
+        <station name="Somalia" lat="4.75062876" lon="45.70714487" elev="0"/>
+        <station name="Saint Pierre and Miquelon" lat="46.91918789" lon="-56.30319779" elev="0"/>
+        <station name="Republic of Serbia" lat="44.2215032" lon="20.78958334" elev="0"/>
+        <station name="Sao Tome and Principe" lat="0.44391445" lon="6.72429658" elev="0"/>
+        <station name="Suriname" lat="4.13055413" lon="-55.9123457" elev="0"/>
+        <station name="Slovakia" lat="48.70547528" lon="19.47905218" elev="0"/>
+        <station name="Slovenia" lat="46.11554772" lon="14.80444238" elev="0"/>
+        <station name="Sweden" lat="62.77966519" lon="16.74558049" elev="0"/>
+        <station name="Swaziland" lat="-26.55843045" lon="31.4819369" elev="0"/>
+        <station name="Sint Maarten" lat="18.05081728" lon="-63.05713363" elev="0"/>
+        <station name="Seychelles" lat="-4.66099094" lon="55.47603279" elev="0"/>
+        <station name="Syria" lat="35.02547389" lon="38.50788204" elev="0"/>
+        <station name="Turks and Caicos Islands" lat="21.83047572" lon="-71.97387881" elev="0"/>
+        <station name="Chad" lat="15.33333758" lon="18.64492513" elev="0"/>
+        <station name="Togo" lat="8.52531356" lon="0.96232845" elev="0"/>
+        <station name="Thailand" lat="15.11815794" lon="101.0028813" elev="0"/>
+        <station name="Tajikistan" lat="38.5304539" lon="71.01362631" elev="0"/>
+        <station name="Turkmenistan" lat="39.11554137" lon="59.37100021" elev="0"/>
+        <station name="East Timor" lat="-8.82889162" lon="125.8443898" elev="0"/>
+        <station name="Tonga" lat="-20.42843174" lon="-174.8098734" elev="0"/>
+        <station name="Trinidad and Tobago" lat="10.45733408" lon="-61.26567923" elev="0"/>
+        <station name="Tunisia" lat="34.11956246" lon="9.55288359" elev="0"/>
+        <station name="Turkey" lat="39.0616029" lon="35.16895346" elev="0"/>
+        <station name="Taiwan" lat="23.7539928" lon="120.9542728" elev="0"/>
+        <station name="United Republic of Tanzania" lat="-6.27565408" lon="34.81309981" elev="0"/>
+        <station name="Uganda" lat="1.27469299" lon="32.36907971" elev="0"/>
+        <station name="Ukraine" lat="48.99656673" lon="31.38326469" elev="0"/>
+        <station name="Uruguay" lat="-32.79951534" lon="-56.01807053" elev="0"/>
+        <station name="United States of America" lat="39.2" lon="-95.3" elev="0"/>
+        <station name="Uzbekistan" lat="41.75554225" lon="63.14001528" elev="0"/>
+        <station name="Vatican" lat="41.90174985" lon="12.43387177" elev="0"/>
+        <station name="Saint Vincent and the Grenadines" lat="13.22472269" lon="-61.20129695" elev="0"/>
+        <station name="Venezuela" lat="7.12422421" lon="-66.18184123" elev="0"/>
+        <station name="British Virgin Islands" lat="18.52585755" lon="-64.47146992" elev="0"/>
+        <station name="United States Virgin Islands" lat="17.95500624" lon="-64.80301538" elev="0"/>
+        <station name="Vietnam" lat="16.6460167" lon="106.299147" elev="0"/>
+        <station name="Vanuatu" lat="-16.22640909" lon="167.6864464" elev="0"/>
+        <station name="Wallis and Futuna" lat="-13.88737039" lon="-177.3483483" elev="0"/>
+        <station name="Samoa" lat="-13.75324346" lon="-172.1648506" elev="0"/>
+        <station name="Yemen" lat="15.90928005" lon="47.58676189" elev="0"/>
+        <station name="South Africa" lat="-29.00034095" lon="25.08390093" elev="0"/>
+        <station name="Zambia" lat="-13.45824152" lon="27.77475946" elev="0"/>
+        <station name="Zimbabwe" lat="-19.00420419" lon="29.8514412" elev="0"/>
+    </stationtable>
+</stationtables>
