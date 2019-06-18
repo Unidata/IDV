@@ -340,6 +340,8 @@
        location="%IDVPATH%/stations/nexradstns.xml"
        type="radar"/>
     <resource location="%IDVPATH%/stations/statelocations.xml"/>
+    <resource location="%IDVPATH%/stations/greatlakes.xml"/>
+    <resource location="%IDVPATH%/stations/countries.xml"/>
   </resources>
 
 <!-- The list of help tip xml files   -->
