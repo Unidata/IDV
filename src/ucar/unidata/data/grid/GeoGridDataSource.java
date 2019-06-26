@@ -1218,6 +1218,9 @@ public class GeoGridDataSource extends GridDataSource {
             } else if(file.startsWith("http") && file.contains("/dods/")){
                 file = DODSNetcdfFile.canonicalURL(file);
             }
+            if (file.contains(":443")) {
+                file = file.replace(":443","");
+            }
             GridDataset gds = GridDataset.open(file);
             return gds;
         } catch (java.io.FileNotFoundException fnfe) {
