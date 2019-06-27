@@ -89,7 +89,7 @@ import java.util.zip.ZipInputStream;
  * @author IDV Development Team
  * @version $Revision: 1.11 $
  */
-public abstract class KmlInfo {
+public abstract class KmlInfo extends DirectDataChoice{
 
     /** xml tag */
     public static final String TAG_LINESTRING = "LineString";
