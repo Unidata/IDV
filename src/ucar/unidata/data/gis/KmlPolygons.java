@@ -95,6 +95,8 @@ public class KmlPolygons extends KmlInfo {
 
     /** xml tag */
     public static final String TAG_LINEARRING = "LinearRing";
+    
+    public String color = "";
 
 
     /**
@@ -108,9 +110,15 @@ public class KmlPolygons extends KmlInfo {
      *
      * @param node node
      * @param displayCategory the category of display
+     * @param color the color of the polygon
      */
-    public KmlPolygons(Element node, String displayCategory) {
+    public KmlPolygons(Element node, String displayCategory, String color) {
         super(node, displayCategory, "xgrf");
+       	this.color = color;
+        
+       	if (this.color == null || this.color == "") {
+        	this.color = "255,0,0";
+        }
     }
 
 
@@ -133,23 +141,23 @@ public class KmlPolygons extends KmlInfo {
         Element linestringNode = 
             (Element) XmlUtil.findChild(node, KmlDataSource.TAG_LINESTRING);
         if (linestringNode != null) {
-            processPolygonNode(linestringNode, sb);
+            processPolygonNode(linestringNode, sb, color);
         } else   if (multiGeometryNode != null) {
             NodeList children = XmlUtil.getElements(multiGeometryNode);
             for (int childIdx = 0; childIdx < children.getLength();
                     childIdx++) {
                 Element child = (Element) children.item(childIdx);
                 if (child.getTagName().equals(TAG_POLYGON)) {
-                    processPolygonNode(child, sb);
+                    processPolygonNode(child, sb, color);
                 }
             }
         } else {
             Element polygonNode = (Element) XmlUtil.findChild(node,
                                       TAG_POLYGON);
             if (polygonNode != null) {
-                processPolygonNode(polygonNode, sb);
+                processPolygonNode(polygonNode, sb, color);
             } else {
-                processPolygonNode(node, sb);
+                processPolygonNode(node, sb, color);
             }
         }
 
@@ -164,11 +172,24 @@ public class KmlPolygons extends KmlInfo {
      *
      * @param node xml node
      * @param sb for writing
+     * @param color for drawing
      */
-    private void processPolygonNode(Element node, StringBuffer sb) {
-        String attrs = XmlUtil.attrs("smooth", "false", "filled", "false",
-                                     "color", "255,0,0", "coordtype",
-                                     "LATLONALT");
+    private void processPolygonNode(Element node, StringBuffer sb, String color) {
+    	
+    	String altitudeMode = XmlUtil.getChildText(XmlUtil.findChild(node,
+                "altitudeMode"));
+    	String attrs;
+    	if (altitudeMode.contentEquals("clampToGround"))
+    	{
+    		attrs = XmlUtil.attrs("smooth", "false", "filled", "false",
+                    "color", color, "coordtype", "LATLON");
+    	}
+    	else
+    	{
+    		attrs = XmlUtil.attrs("smooth", "false", "filled", "false",
+                    "color", color, "coordtype", "LATLONALT");
+    	}
+    	
         sb.append("<polygon " + attrs);
 
         sb.append("points=\"");

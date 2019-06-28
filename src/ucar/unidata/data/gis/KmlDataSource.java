@@ -146,6 +146,9 @@ public class KmlDataSource extends FilesDataSource {
 
     /** kml tag id */
     public static final String TAG_NAME = "name";
+    
+    /** kml tag id */
+    public static final String TAG_STYLEURL = "styleUrl";
 
 
     /** mapping of id to kml node */
@@ -578,6 +581,8 @@ public class KmlDataSource extends FilesDataSource {
 
 
         List dataChoices = getDataChoices();
+        CompositeDataChoice dc0 = (CompositeDataChoice) dataChoices.get(0);
+        List dataChoices0 = dc0.getDataChoices();
         for (int i = 0; i < dataChoices.size(); i++) {
             DataChoice dc = (DataChoice) dataChoices.get(i);
             if (dc instanceof CompositeDataChoice) {
@@ -745,8 +750,8 @@ public class KmlDataSource extends FilesDataSource {
             }
             CompositeDataChoice newParentDataChoice =
                 new CompositeDataChoice(
-                    this, "", folderName, folderName,
-                    Misc.newList(DataCategory.NONE_CATEGORY));
+                    this, "All Warnings", folderName, folderName,
+                    Misc.newList(DataCategory.XGRF_CATEGORY));
             addDataChoice(newParentDataChoice, parentDataChoice);
 
             if (folderName != null) {
@@ -866,8 +871,54 @@ public class KmlDataSource extends FilesDataSource {
             Element multiGeometryNode = (Element) XmlUtil.findChild(node,
                                             TAG_MULTIGEOMETRY);
             if (multiGeometryNode != null) {
-                //                addDataChoice(new KmlPolygons(node, displayCategory));
-            } else {}
+            	String displayCategory = StringUtil.join("-", currentDisplayCategories);
+                NodeList children = XmlUtil.getElements(node);
+                
+                String type = XmlUtil.getChildText(XmlUtil.findChild(node, TAG_STYLEURL));
+	            
+            	String color = "";
+                if(type.equals("#TO")) {
+                    color = "255,0,0"; //red
+                } else if(type.equals("#SV")) {
+                    color = "255,255,0"; //yellow
+                } else if(type.equals("#FF")) {
+                    color = "0,255,0"; //green
+                }
+
+                addDataChoice(new KmlPolygons(node, displayCategory, color));
+                for (int i = 0; i < children.getLength(); i++) {
+                	Element child = (Element) children.item(i);
+                	String name = XmlUtil.getChildText(XmlUtil.findChild(child, TAG_NAME));
+                	System.out.println("\t\tText: " + name);
+                	// String displayCategory = StringUtil.join("-", currentDisplayCategories);
+                	if (name != null) {
+                		if (displayCategory.length() > 0) {
+
+                            displayCategory = displayCategory + "-" + name;
+                        } else {
+                            displayCategory = name;
+                        }
+                    } 
+                    
+                    type = XmlUtil.getChildText(XmlUtil.findChild(child, TAG_STYLEURL));
+    	            
+                	color = "";
+                    if(type.equals("#TO")) {
+                        color = "255,0,0"; //red
+                    } else if(type.equals("#SV")) {
+                        color = "255,255,0"; //yellow
+                    } else if(type.equals("#FF")) {
+                        color = "0,255,0"; //green
+                    }
+                                    
+                    addDataChoice(new KmlPolygons(child, displayCategory, color));
+
+                }
+            } 
+            else 
+            {
+            	System.err.println("MultiGeometry must include Polygon");
+            }
         } else {
             //      System.err.println("Unknown tag:" + tagName);
         }
@@ -916,6 +967,26 @@ public class KmlDataSource extends FilesDataSource {
         //For legacy bundles
         if (tmp instanceof KmlInfo) {
             kmlInfo = (KmlInfo) tmp;
+        } else if(dataChoice instanceof  CompositeDataChoice && tmp instanceof String
+        		&& (((String) tmp).contains("All Warning"))) {
+        	CompositeDataChoice cdc = (CompositeDataChoice)dataChoice;
+        	List ddcs = cdc.getDataChoices();
+        	List pdata = new ArrayList();
+        	for(int i = 0; i < ddcs.size(); i++) {
+        		DataChoice dc = (DataChoice) ddcs.get(i);
+        		pdata.add(getDataInner(dc, category, dataSelection, requestProperties));
+        	}
+        	
+        	StringBuffer sb = new StringBuffer("<shapes>\n");
+        	for(int j = 0; j < pdata.size();j++) {
+        		visad.Text vt = (visad.Text)pdata.get(j);
+        		String ttt = vt.toString();
+        		ttt = ttt.replace("<shapes>\n", "");
+        		ttt = ttt.replace("</shapes>", "");
+        		sb = sb.append(ttt);
+        	}
+        	sb.append("</shapes>");
+        	return new visad.Text(sb.toString());
         } else {
             KmlId  id   = (KmlId) tmp;
             Object node = idToNode.get(id);
@@ -931,7 +1002,23 @@ public class KmlDataSource extends FilesDataSource {
                 kmlInfo = new KmlPhotoOverlay((Element) node, "",
                         id.getDocUrl());
             } else if (id.isShapes()) {
-                kmlInfo = new KmlPolygons((Element) node, "");
+            	String type = XmlUtil.getChildText(XmlUtil.findChild((Element) node, TAG_STYLEURL));
+            	
+                String color = "";
+                if(type.equals("#TO"))
+                {
+                	color = "255,0,0"; //red
+                }
+                else if(type.equals("#SV"))
+                {
+                	color = "255,255,0"; //yellow
+                }
+                else if(type.equals("#FF"))
+                {
+                        color = "0,255,0"; //green
+                }
+
+                kmlInfo = new KmlPolygons((Element) node, "", color);
             } else {
                 throw new BadDataException("Unknown KML node type "
                                            + id.getType());
