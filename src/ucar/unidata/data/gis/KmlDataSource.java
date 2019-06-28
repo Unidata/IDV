@@ -748,10 +748,12 @@ public class KmlDataSource extends FilesDataSource {
             if (folderName == null) {
                 folderName = "Folder";
             }
+
             CompositeDataChoice newParentDataChoice =
                 new CompositeDataChoice(
-                    this, "All Warnings", folderName, folderName,
+                    this, "All Warning", folderName, folderName,
                     Misc.newList(DataCategory.XGRF_CATEGORY));
+            newParentDataChoice.setProperty("KMLWARNING", folderName);
             addDataChoice(newParentDataChoice, parentDataChoice);
 
             if (folderName != null) {
@@ -976,7 +978,7 @@ public class KmlDataSource extends FilesDataSource {
         		DataChoice dc = (DataChoice) ddcs.get(i);
         		pdata.add(getDataInner(dc, category, dataSelection, requestProperties));
         	}
-        	
+
         	StringBuffer sb = new StringBuffer("<shapes>\n");
         	for(int j = 0; j < pdata.size();j++) {
         		visad.Text vt = (visad.Text)pdata.get(j);
