@@ -40,6 +40,7 @@ import ucar.unidata.idv.control.drawing.PolyGlyph;
 import ucar.unidata.idv.control.drawing.ShapeGlyph;
 import ucar.unidata.idv.control.drawing.SymbolGlyph;
 import ucar.unidata.idv.control.drawing.TextGlyph;
+import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.FineLineBorder;
 import ucar.unidata.util.ColorTable;
 import ucar.unidata.util.FileManager;
@@ -330,7 +331,7 @@ public class DrawingControl extends DisplayControlImpl {
     /** the autoscroll counter */
     private int autoScrollCnt = 0;
 
-
+    protected DataChoice datachoice = null;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -412,6 +413,7 @@ public class DrawingControl extends DisplayControlImpl {
         getViewAnimation();
         checkGlyphTimes();
         if (dataChoice != null) {
+            this.datachoice = dataChoice;
             Data data = dataChoice.getData(null);
             if (data != null) {
                 editable    = false;
@@ -3016,6 +3018,34 @@ public class DrawingControl extends DisplayControlImpl {
         return frontDisplay;
     }
 
+    /**
+     * Add any macro name/value pairs.
+     *
+     *
+     * @param template The template to use
+     * @param patterns The macro names
+     * @param values The macro values
+     */
+    protected void addLabelMacros(String template, List patterns,
+                                  List values) {
+        super.addLabelMacros(template, patterns, values);
+        if(datachoice != null) {
+            String magStr = (String) datachoice.getProperty("KMLWARNING");
+            if(magStr != null)
+            setExtraLabelTemplate(MACRO_LONGNAME);
+        }
+    }
 
-
+    /**
+     * Get the default display list template for this control.  Subclasses can override
+     * @return the default template
+     */
+    protected String getDefaultDisplayListTemplate() {
+        if(datachoice != null) {
+            String magStr = (String) datachoice.getProperty("KMLWARNING");
+            if(magStr != null)
+                return MACRO_SHORTNAME + " - " + MACRO_LONGNAME ;
+        }
+        return super.getDefaultDisplayListTemplate();
+    }
 }
