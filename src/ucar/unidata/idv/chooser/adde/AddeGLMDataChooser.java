@@ -90,7 +90,7 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
 
 
     /** box for the relative time */
-    private JComboBox relTimeIncBox;
+   // private JComboBox relTimeIncBox;
 
     /** box for the relative time */
     private JComponent relTimeIncComp;
@@ -387,7 +387,17 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
         readTimes();
         updateStatus();
     }
-
+    /**
+     * _more_
+     */
+    protected boolean getGoodToGo() {
+        //  if(!super.getGoodToGo()) return false;
+        if (getDoAbsoluteTimes()) {
+            return getHaveAbsoluteTimesSelected();
+        } else {
+            return canReadTimes() ;
+        }
+    }
     /**
      * Update labels, enable widgets, etc.
      */
@@ -405,7 +415,8 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
      * _more_
      */
     protected void enableWidgets() {
-        boolean descriptorState = ((getState() == STATE_CONNECTED)
+        boolean descriptorState = ( ( getState() == STATE_CONNECTED ||
+                getState() == STATE_CONNECTING)
                                    && canReadTimes());
         if (drivercbx != null) {
             drivercbx.setSelected(false);
@@ -418,7 +429,10 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
 
         getRelativeTimesChooser().setEnabled( !getDoAbsoluteTimes()
                                              && descriptorState);
-
+        if(descriptorComboBox.getItemCount() > 0)
+            GuiUtils.enableTree(descriptorComboBox, true);
+        else
+            GuiUtils.enableTree(descriptorComboBox, false);
         revalidate();
     }
 
@@ -474,6 +488,7 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
     public void handleConnect() throws Exception {
         setState(STATE_CONNECTING);
         connectToServer();
+        setState(STATE_CONNECTED);
         updateStatus();
     }
 
