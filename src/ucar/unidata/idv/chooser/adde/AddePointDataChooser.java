@@ -103,7 +103,7 @@ public class AddePointDataChooser extends AddeChooser {
     public static String SELECTED_LEVEL = "selected level";
 
     /** box for the relative time */
-    private JComboBox relTimeIncBox;
+    protected JComboBox relTimeIncBox;
 
     /** box for the relative time */
     private JComponent relTimeIncComp;
@@ -152,8 +152,11 @@ public class AddePointDataChooser extends AddeChooser {
             public void actionPerformed(ActionEvent a) {
                 setState(STATE_UNCONNECTED);
                 String currentType = dataTypes.getSelectedItem().toString();
+                String currentName = getDataName();
                 if (currentType.indexOf(SYNOPTIC) >= 0) {
                     setRelativeTimeIncrement(3);
+                } else if(currentName != null && currentName.contains("GLM Lightning Data")) {
+                    setRelativeTimeIncrement(5);
                 } else {
                     setRelativeTimeIncrement(1);
                 }
