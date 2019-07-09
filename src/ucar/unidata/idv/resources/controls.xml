@@ -845,6 +845,24 @@ Since this is confusing and needs more work lets remove this for now
           doeslevels="true"
           displaycategory="Constant Theta Surface Flow Displays"
           properties="vectors=true;useSpeedForColor=true;multipleIsTopography=true;is2D=true;" />
+  <control
+          id="flowoverthetawb"
+          categories="*-isentropic3dv-*"
+          class="ucar.unidata.idv.control.FlowPlanViewControl"
+          description="Flow vectors Over Theta Surface"
+          label="Wind Barbs Over Theta Surface"
+          doeslevels="true"
+          displaycategory="Constant Theta Surface Flow Displays"
+          properties="multipleIsTopography=true;is2D=true;windbarbs=true;" />
+  <control
+          id="flowoverthetawb1"
+          categories="*-isentropic3dv-*"
+          class="ucar.unidata.idv.control.FlowPlanViewControl"
+          description="Flow vectors Colored by Speed"
+          label="Wind Barbs Colored by Speed over Theta Surface"
+          doeslevels="true"
+          displaycategory="Constant Theta Surface Flow Displays"
+          properties="vectors=true;useSpeedForColor=true;multipleIsTopography=true;is2D=true;windbarbs=true;" />
 
   <!-- control
           id="flowovertheta2"
