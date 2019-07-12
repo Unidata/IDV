@@ -249,7 +249,7 @@ public class McVHistogramWrapper extends HistogramWrapper {
                     plot = chartPanel.getChart().getXYPlot();
                 }
 
-                double [] newactualValues = removeMissingValues(actualValues);
+                double [] newactualValues = removeMissing(actualValues);
                 plot.setRenderer(paramIdx, renderer);
                 Color c = wrapper.getColor(paramIdx);
                 domainAxis.setLabelPaint(c);
@@ -323,6 +323,29 @@ public class McVHistogramWrapper extends HistogramWrapper {
             outSamples[j++] = ((Double)d).doubleValue();
         }
         return outSamples;
+    }
+
+    private double[] removeMissing(double[] vals) {
+        int num = vals.length;
+        int cnt = 0;
+        int[] good = new int[num];
+        for (int k = 0; k < num; k++) {
+            if (!(Double.isNaN(vals[k]))) {
+                good[cnt] = k;
+                cnt++;
+            }
+        }
+
+        if (cnt == num) {
+            return vals;
+        }
+
+        double[] newVals = new double[cnt];
+        for (int k = 0; k < cnt; k++) {
+            newVals[k] = vals[good[k]];
+        }
+
+        return newVals;
     }
     /**
      * Modify the low and high values of the domain axis.
