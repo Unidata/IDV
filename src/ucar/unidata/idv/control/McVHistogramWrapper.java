@@ -21,7 +21,6 @@
 package ucar.unidata.idv.control;
 
 
-import com.sun.tools.javac.util.ArrayUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.axis.NumberAxis;
