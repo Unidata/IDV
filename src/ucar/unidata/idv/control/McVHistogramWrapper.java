@@ -21,6 +21,7 @@
 package ucar.unidata.idv.control;
 
 
+import com.sun.tools.javac.util.ArrayUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.axis.NumberAxis;
@@ -248,6 +249,8 @@ public class McVHistogramWrapper extends HistogramWrapper {
                 if ((plot == null) && (chartPanel != null)) {
                     plot = chartPanel.getChart().getXYPlot();
                 }
+
+                double [] newactualValues = removeMissingValues(actualValues);
                 plot.setRenderer(paramIdx, renderer);
                 Color c = wrapper.getColor(paramIdx);
                 domainAxis.setLabelPaint(c);
@@ -256,9 +259,10 @@ public class McVHistogramWrapper extends HistogramWrapper {
                 MyHistogramDataset dataset = new MyHistogramDataset();
                 dataset.setType(HistogramType.FREQUENCY);
                 dataset.addSeries(dataChoice.getName() + " [" + unit + ']',
-                                  actualValues, getBins());
+                        newactualValues, getBins());
                 samples      = null;
                 actualValues = null;
+                newactualValues = null;
                 plot.setDomainAxis(paramIdx, domainAxis, false);
                 plot.mapDatasetToDomainAxis(paramIdx, paramIdx);
                 plot.setDataset(paramIdx, dataset);
@@ -306,6 +310,21 @@ public class McVHistogramWrapper extends HistogramWrapper {
         }
     }
 
+    private double[] removeMissingValues(double[] samples) {
+        ArrayList newSamples = new ArrayList();
+        double [] outSamples = null;
+        for (int i = 0; i < samples.length; i++) {
+            if ( !Double.isNaN(samples[i])) {
+                newSamples.add(samples[i]);
+            }
+        }
+        outSamples = new double[newSamples.size()];
+        int j = 0;
+        for(Object d : newSamples){
+            outSamples[j++] = ((Double)d).doubleValue();
+        }
+        return outSamples;
+    }
     /**
      * Modify the low and high values of the domain axis.
      *
