@@ -179,7 +179,10 @@ public class KmlDataSource extends FilesDataSource {
     /** holds schemas */
     private Hashtable schemas;
 
+    private DataSourceDescriptor descriptor = null;
 
+    private static String DEFAULT_PATH =
+            "https://www.weather.gov/source/crh/shapefiles/warnings.kml";
     /**
      * Dummy constructor so this object can get unpersisted.
      */
@@ -200,6 +203,7 @@ public class KmlDataSource extends FilesDataSource {
             throws VisADException {
         super(descriptor, Misc.newList(kmlUrl), "KML data source", kmlUrl,
               properties);
+        this.descriptor = descriptor;
         setName("KML: " + IOUtil.stripExtension(IOUtil.getFileTail(kmlUrl)));
         initKmlDataSource();
     }
@@ -379,7 +383,12 @@ public class KmlDataSource extends FilesDataSource {
             return;
         }
         try {
-            root = parseKml(getFilePath());
+            if(getFilePath().length() == 0 && descriptor != null
+                    && descriptor.getId().equals("weather.warning")){
+                root = parseKml(DEFAULT_PATH);
+            } else {
+                root = parseKml(getFilePath());
+            }
             if (root == null) {
                 setInError(true, "Could not find kml file");
             }
