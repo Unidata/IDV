@@ -21,19 +21,13 @@
 package ucar.unidata.data.gis;
 
 
+import org.python.icu.text.SimpleDateFormat;
 import org.w3c.dom.*;
 
 import ucar.unidata.data.*;
 
 
-import ucar.unidata.util.CacheManager;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.JobManager;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.Trace;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.CoordinateFormat;
 
 import ucar.unidata.xml.XmlUtil;
@@ -56,8 +50,10 @@ import java.util.ArrayList;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.*;
 
+import static ucar.unidata.data.gis.KmlInfo.TAG_DESCRIPTION;
 
 
 /**
@@ -764,6 +760,17 @@ public class KmlDataSource extends FilesDataSource {
             for (int i = 0; i < children.getLength(); i++) {
                 Element child        = (Element) children.item(i);
                 String  childTagName = child.getTagName();
+                String dateTimePattern = "yyyy/MM/dd hh:nn:ss";
+                DateTime dts = null;
+                String descrip = XmlUtil.getChildText(XmlUtil.findChild(node,
+                        TAG_DESCRIPTION));
+                if(descrip != null){
+                    //System.out.println(descrip);
+                    DatePattern  dp  = new DatePattern(dateTimePattern);
+                    if (dp.match(descrip)) {
+                        dts = dp.getDateTime();
+                    }
+                }
                 tmp = (String) schemas.get(childTagName);
                 if (tmp != null) {
                     childTagName = tmp;
@@ -798,10 +805,14 @@ public class KmlDataSource extends FilesDataSource {
 
                         List categories =
                             Misc.newList(DataCategory.XGRF_CATEGORY);
+                        Hashtable properties = new Hashtable();
+                        if(dts != null)
+                            properties.put("timeObj", dts);
+
                         newParentDataChoice.addDataChoice(
                             new DirectDataChoice(
                                 this, id, name, name, categories,
-                                (Hashtable) null));
+                                properties));
                     } else {
                         if (pointNodes == null) {
                             pointNodes = new ArrayList();
@@ -964,6 +975,9 @@ public class KmlDataSource extends FilesDataSource {
             requestProperties = new Hashtable();
         }
         Object  tmp     = dataChoice.getId();
+        DateTime dt = null;
+        Hashtable dcproperties  = dataChoice.getProperties();
+        dt = (DateTime) dcproperties.get("timeObj");
 
         KmlInfo kmlInfo = null;
         //For legacy bundles
@@ -1019,8 +1033,10 @@ public class KmlDataSource extends FilesDataSource {
                 {
                         color = "0,255,0"; //green
                 }
-
-                kmlInfo = new KmlPolygons((Element) node, "", color);
+                if(dt != null)
+                    kmlInfo = new KmlPolygons((Element) node, "", color, dt);
+                else
+                    kmlInfo = new KmlPolygons((Element) node, "", color);
             } else {
                 throw new BadDataException("Unknown KML node type "
                                            + id.getType());

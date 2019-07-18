@@ -41,6 +41,7 @@ import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlUtil;
 
 //import ucar.visad.FrontDrawer;
+import ucar.visad.Util;
 import ucar.visad.display.*;
 
 
@@ -343,7 +344,10 @@ public class PolyGlyph extends LineGlyph {
             exc.printStackTrace();
         }
 
-        if (lineDisplayable != null) {
+        if (lineDisplayable != null && getTimeValues() != null &&
+                getTimeValues().size()>0) {
+            lineDisplayable.setData(getTimeField(theData));
+        } else if (lineDisplayable != null) {
             lineDisplayable.setData(theData);
         }
         super.updateLocation();
@@ -521,6 +525,69 @@ public class PolyGlyph extends LineGlyph {
         return closed;
     }
 
+    /**
+     * Make a field maps all of the time values to the given data as the range
+     *
+     * @param data The range
+     *
+     * @return time field
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected Data getTimeField(Data data)
+            throws VisADException, RemoteException {
+        return Util.makeTimeRangeField(data, (false
+                ? getTimeValues()
+                : new ArrayList()));
+    }
+
+    /**
+     * utility to set the animation set on the displayable
+     *
+     * @param d displayable
+     * @param timeValues times
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected static void setAnimationSet(Displayable d, List timeValues)
+            throws VisADException, RemoteException {
+        List animationSet = null;
+        if ((timeValues != null)  ) {
+            DateTime startTime = (DateTime) timeValues.get(0);
+            DateTime endTime   = (DateTime) timeValues.get(timeValues.size()-1);
+            double newTime = startTime.getValue()
+                    + (endTime.getValue() - startTime.getValue())
+                    / timeValues.size();
+            animationSet = new ArrayList();
+            animationSet.add(new DateTime(newTime, startTime.getUnit()));
+        }
+        d.setOverrideAnimationSet(animationSet);
+    }
+
+    /**
+     * Do the final initialization
+     *
+     * @return Successful
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected boolean initFinalInner()
+            throws VisADException, RemoteException {
+        if ( !super.initFinalInner()) {
+            return false;
+        }
+
+        if(lineDisplayable != null && getTimeValues() != null &&
+                getTimeValues().size() > 0) {
+            setCoordType(COORD_LATLON);
+            setAnimationSet(lineDisplayable, getTimeValues());
+        }
+
+        return true;
+    }
 
 
 }

@@ -98,6 +98,7 @@ public class KmlPolygons extends KmlInfo {
     
     public String color = "";
 
+    public DateTime dateTime = null;
 
     /**
      * ctor
@@ -121,6 +122,23 @@ public class KmlPolygons extends KmlInfo {
         }
     }
 
+    /**
+     * ctor
+     *
+     * @param node node
+     * @param displayCategory the category of display
+     * @param color the color of the polygon
+     * @param dateTime the time of the polygon
+     */
+    public KmlPolygons(Element node, String displayCategory, String color, DateTime dateTime) {
+        super(node, displayCategory, "xgrf");
+        this.color = color;
+        this.dateTime = dateTime;
+
+        if (this.color == null || this.color == "") {
+            this.color = "255,0,0";
+        }
+    }
 
     /**
      * Create the data
@@ -175,7 +193,7 @@ public class KmlPolygons extends KmlInfo {
      * @param color for drawing
      */
     private void processPolygonNode(Element node, StringBuffer sb, String color) {
-    	
+
     	String altitudeMode = XmlUtil.getChildText(XmlUtil.findChild(node,
                 "altitudeMode"));
     	String attrs;
@@ -189,9 +207,13 @@ public class KmlPolygons extends KmlInfo {
     		attrs = XmlUtil.attrs("smooth", "false", "filled", "false",
                     "color", color, "coordtype", "LATLONALT");
     	}
-    	
-        sb.append("<polygon " + attrs);
 
+        if(dateTime != null) {
+            sb.append("<polygon " + "timeformat=\"yyyy-MM-dd HH:mm:ss\" " + "times=" +
+                    "\"" + dateTime.toString()   + "\"" + attrs);
+        } else {
+            sb.append("<polygon " + attrs);
+        }
         sb.append("points=\"");
         Element coordNode = XmlUtil.findDescendantFromPath(node,
                                 TAG_OUTERBOUNDARYIS + "." + TAG_LINEARRING
