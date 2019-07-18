@@ -332,6 +332,13 @@
   </datasource>
 
   <datasource
+          id="WEATHER.WARNING"
+          fileselection="true"
+          standalone="true"
+          factory="ucar.unidata.data.gis.KmlDataSource"
+          label="NWS Hazard Warning (from server)"/>
+
+  <datasource
      id="STORM.ATCF"
      fileselection="true"
      standalone="true"
