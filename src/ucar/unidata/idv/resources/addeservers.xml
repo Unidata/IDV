@@ -16,7 +16,7 @@ they essentially get it from their container type tag.
 
   <server name="adde.ucar.edu" active="true">
     <group
-       names="RTGOESR,RTGOESS,NPGOESR,NPGOESS,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+       names="RTGOESR,RTGOESS,NPGOESR,NPGOESS,L2GOESR,L2GOESS,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
        type="image"/>
     <group
        names="RTNEXRAD, NEXRALL"
@@ -30,7 +30,7 @@ they essentially get it from their container type tag.
   </server>
   <server name="atm.ucar.edu" active="true">
     <group
-            names="RTGOESR,RTGOESS,NPGOESR,NPGOESS,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+            names="RTGOESR,RTGOESS,NPGOESR,NPGOESS,L2GOESR,L2GOESS,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
             type="image"/>
     <group
             names="RTNEXRAD, NEXRALL"
