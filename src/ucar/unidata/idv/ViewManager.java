@@ -1186,6 +1186,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         fullContents = GuiUtils.leftCenter(leftNav, centerPanelWrapper);
         fullContents.setBorder(getContentsBorder());
         fillLegends();
+        //setFullScreen();
     }
 
     /**
@@ -7260,6 +7261,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
         return getProjectionControl().getMatrix();
     }
 
+    /**
+     * Get the display matrix array
+     *
+     * @return display matrix
+     */
+    public double[] getDisplayInitMatrix() {
+        return initMatrix;
+    }
     /**
      * Toggle the animation string visibility.
      * @param visible  true to make it visible
