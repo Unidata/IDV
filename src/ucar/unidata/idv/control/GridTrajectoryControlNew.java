@@ -34,8 +34,7 @@ import ucar.unidata.data.grid.GridTrajectory;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.LatLonPointImpl;
-import ucar.unidata.idv.ControlContext;
-import ucar.unidata.idv.MapViewManager;
+import ucar.unidata.idv.*;
 import ucar.unidata.idv.control.drawing.*;
 import ucar.unidata.ui.FineLineBorder;
 
@@ -1838,7 +1837,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
 
             setTrajFormType(gtc.getTrackFormType());
             int width = super.getLineWidth();
-            if (getGridDisplay() != null) {
+
+            if (myDisplay != null) {
                 setTrajFormType(gtc.getTrackFormType());
                 try {
                     setRange(gtc.getRange());
@@ -1850,10 +1850,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 }
                 setArrowHead(gtc.getTrackArrowHead());
                 getGridDisplay().setArrowHead(gtc.getTrackArrowHead());
-
+                getGridDisplay().resetTrojectories();
             }
 
-            getGridDisplay().resetTrojectories();
+
         }
 
         /**
@@ -2525,6 +2525,12 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                        List preSelectedDataChoices) {
 
         super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
+        if(!getIdv().getInteractiveMode()) {
+            try {
+                doMakeContents();
+            } catch (Exception ee) {
+            }
+        }
 
         if (createTrjBtnClicked) {
             //if ((getGlyphs() != null) && (glyphs.size() > 0)) {
@@ -2552,6 +2558,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
             }
             newUnit = getDisplayUnit();
             gridTrackControl.initAfterUnPersistence(vc, properties);
+            double[] oldVM =  gridTrackControl.getViewManager().getDisplayInitMatrix();
             createTrjBtn.doClick();
 
             // gridTrackControl.setDataTimeRange(getTrjDataTimeRange());
@@ -2561,10 +2568,14 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 gridTrackControl.setLineWidth(getTrackLineWidth());
                 gridTrackControl.setTrajOffset(getTrackOffsetValue());
                 gridTrackControl.setColor(getTrackColor());
+                gridTrackControl.setSmoothFactor(getSmoothFactorValue());
+                gridTrackControl.setArrowHead(getTrackArrowHead());
+                //gridTrackControl.setColor(getTrackColor());
                 //gridTrackControl.setColorScaleInfo(getColorScaleInfo());
                 gridTrackControl.setColorTable(getTrjColorTable());
                 doMakeColorScales();
                 bundleColorRange = getTrjColorRange();
+                gridTrackControl.getViewManager().setDisplayMatrix(oldVM);
             } catch (Exception ee) {}
 
             // }
