@@ -5107,6 +5107,18 @@ public class IdvUIManager extends IdvManager {
      * @param dataSource The new data source
      */
     public void addDataSource(DataSource dataSource) {
+        if(dataSourceHolders.size() == 0 && !getIdv().getInteractiveMode()) {
+            DataSelector selector =
+                    //If its in its  own window we do the normal vertical orientation
+                    //Else we do a hor. orientation
+                    new DataSelector(getIdv(), false,
+                            getIdv().getProperty(PROP_SHOWFORMULAS, true)
+                                    ? getIdv().getJythonManager()
+                                    .getDescriptorDataSource()
+                                    : null);
+            dataSourceHolders.add(selector);
+        }
+
         for (int i = 0; i < dataSourceHolders.size(); i++) {
             ((DataSourceHolder) dataSourceHolders.get(i)).addDataSource(
                 dataSource);
