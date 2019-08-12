@@ -1752,6 +1752,9 @@ public class GridTrajectoryControlNew extends DrawingControl {
                 String pname =
                     getGridDataInstance().getRealTypeName(colorIndex);
                 int eidx = pname.indexOf("[unit");
+                if(eidx == -1) {
+                    eidx =  pname.lastIndexOf("_");
+                }
                 return pname.substring(0, eidx);
             } else {
                 return super.getColorParamName();
