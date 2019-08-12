@@ -179,6 +179,8 @@ import javax.swing.event.ChangeListener;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3f;
 
+import static ucar.unidata.idv.IdvPersistenceManager.BUNDLES_DATA;
+
 
 //import org.apache.batik.svggen.SVGGraphics2D;
 
@@ -4887,6 +4889,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                         .equals(animationWidget.getTimesArray())) {
                                     long tt = (int)(aniInfo.getAnimationSetInfo().getPollMinutes()*60* 1000);
                                     if((System.currentTimeMillis() - lastTimePolled) >= (tt * 0.8)) {
+                                        animationDriverChanged();
+                                        lastTimePolled = System.currentTimeMillis();
+                                    } else if(aniInfo.resetToEnd() || aniInfo.resetToBeginning()){
                                         animationDriverChanged();
                                         lastTimePolled = System.currentTimeMillis();
                                     }
