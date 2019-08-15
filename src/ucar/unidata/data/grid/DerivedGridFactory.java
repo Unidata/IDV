@@ -2360,7 +2360,7 @@ public class DerivedGridFactory {
             theta = DerivedGridFactory.createPotentialTemperature(temperFI);
             thetae = DerivedGridFactory.createEquivalentPotentialTemperature(temperFI, rhFI);
             thetaesat = DerivedGridFactory.createSatEquivalentPotentialTemperature(temperFI);
-            soundingFI = DerivedGridFactory.combineGrids(theta, thetae, thetaesat);
+            //soundingFI = DerivedGridFactory.combineGrids(theta, thetae, thetaesat);
         } catch (Exception e){}
 
 
@@ -2678,6 +2678,44 @@ public class DerivedGridFactory {
         return createRelativeHumidity(temperFI, mixingRatioFI, false);
     }
 
+    /**
+     * Make a FieldImpl of Relative Humidity; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     *
+     * @param temperFI grid of air temperature
+     * @param specificFI grid of specific humidity
+     *
+     * @return grid computed Relative Humidity result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createRelativeHumidityFromSpecificHumidity(FieldImpl temperFI,
+                                                   FieldImpl specificFI)
+            throws VisADException, RemoteException {
+        return createRelativeHumidity(temperFI, specificFI, true);
+    }
+
+    /**
+     * Make a FieldImpl of Equivalent Potential Temperature; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     * @param temperFI grid of air temperature
+     * @param specificFI     grid of specific humidity
+     *
+     * @return grid computed mixing ratio result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createEPTFromSpecificHumidity(
+            FieldImpl temperFI, FieldImpl specificFI)
+            throws VisADException, RemoteException {
+        FieldImpl rhFI = createRelativeHumidityFromSpecificHumidity(temperFI,
+                specificFI);
+        return createEquivalentPotentialTemperature(temperFI, rhFI);
+    }
     /**
      * Make a FieldImpl of Relative Humidity; usually in 3d grids
      * in a time series (at one or more times).
