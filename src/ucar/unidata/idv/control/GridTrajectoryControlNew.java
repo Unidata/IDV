@@ -2856,8 +2856,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     ? 0
                     : 1;
 
-            int numX = domainSet.getLengths()[lonIndex];
-            int numY = domainSet.getLengths()[latIndex];
+            int numX = domainSet.getLengths()[0];
+            int numY = domainSet.getLengths()[1];
             int numXY = numX * numY;
             int numP;
             if(is2D){
@@ -2870,8 +2870,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if(is2D){
                 for (int j = 0; j < numY; j++) {
                     int ii = j * (numX - 1) + j + xIndex;
-                    geoVals[0][j] = domainLatLonAlt[0][ii];
-                    geoVals[1][j] = domainLatLonAlt[1][ii];
+                    geoVals[0][j] = domainLatLonAlt[lonIndex][ii];
+                    geoVals[1][j] = domainLatLonAlt[latIndex][ii];
                     geoVals[2][j] = domainLatLonAlt[2][ii];
                 }
             } else {
@@ -2879,8 +2879,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     for (int j = 0; j < numY; j++) {
                         int ii = k * (numXY) + j * (numX - 1) + j + xIndex;
                         int jj = k * (numY) + j;
-                        geoVals[0][jj] = domainLatLonAlt[0][ii];
-                        geoVals[1][jj] = domainLatLonAlt[1][ii];
+                        geoVals[0][jj] = domainLatLonAlt[lonIndex][ii];
+                        geoVals[1][jj] = domainLatLonAlt[latIndex][ii];
                         geoVals[2][jj] = domainLatLonAlt[2][ii];
                     }
                 }
@@ -2921,8 +2921,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     ? 0
                     : 1;
 
-            int numX = domainSet.getLengths()[lonIndex];
-            int numY = domainSet.getLengths()[latIndex];
+            int numX = domainSet.getLengths()[0];
+            int numY = domainSet.getLengths()[1];
             int numXY = numX * numY;
             int numP;
             if(is2D){
@@ -2935,8 +2935,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
             if(is2D){
                 for (int j = 0; j < numX; j++) {
                     int ii =  j + numX * yIndex;
-                    geoVals[0][j] = domainLatLonAlt[0][ii];
-                    geoVals[1][j] = domainLatLonAlt[1][ii];
+                    geoVals[0][j] = domainLatLonAlt[lonIndex][ii];
+                    geoVals[1][j] = domainLatLonAlt[latIndex][ii];
                     geoVals[2][j] = domainLatLonAlt[2][ii];
                 }
 
@@ -2945,8 +2945,8 @@ public class GridTrajectoryControlNew extends DrawingControl {
                     for (int j = 0; j < numX; j++) {
                         int ii = k * (numXY) + j + numX * yIndex;
                         int jj = k * (numX) + j;
-                        geoVals[0][jj] = domainLatLonAlt[0][ii];
-                        geoVals[1][jj] = domainLatLonAlt[1][ii];
+                        geoVals[0][jj] = domainLatLonAlt[lonIndex][ii];
+                        geoVals[1][jj] = domainLatLonAlt[latIndex][ii];
                         geoVals[2][jj] = domainLatLonAlt[2][ii];
                     }
                 }
