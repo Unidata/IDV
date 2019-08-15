@@ -659,6 +659,20 @@ public class LayoutUtil extends MenuUtil {
     /**
      * Layout the given components vertically.
      *
+     * @param c1 Component 1
+     * @param c2 Component 2
+     * @param c3 Component 3
+     * @param c4 Component 4
+     * @return The new container of the components.
+     */
+    public static JPanel vbox(Component c1, Component c2, Component c3,
+                              Component c4, Component c5) {
+        return vbox(toList(new Object[]{c1, c2, c3, c4, c5}));
+    }
+
+    /**
+     * Layout the given components vertically.
+     *
      * @param components The components
      * @return The new container of the components.
      */
