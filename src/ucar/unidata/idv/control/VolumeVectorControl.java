@@ -1,18 +1,18 @@
 /*
- * Copyright 1997-2019 Unidata Program Center/University Corporation for
+ * Copyright 1997-2017 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -21,12 +21,14 @@
 package ucar.unidata.idv.control;
 
 
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DerivedDataChoice;
-import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.*;
+import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.ControlContext;
+import ucar.unidata.idv.control.drawing.DrawingGlyph;
+import ucar.unidata.idv.control.drawing.GlyphCreatorCommand;
+import ucar.unidata.idv.control.drawing.SymbolGlyph;
 import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 
@@ -35,6 +37,8 @@ import ucar.visad.display.DisplayableData;
 import ucar.visad.display.FlowDisplayable;
 import ucar.visad.display.WindBarbDisplayable;
 import ucar.visad.display.ZSelector;
+
+import ucar.visad.quantities.CommonUnits;
 
 import visad.*;
 
@@ -83,7 +87,13 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     JComponent trajSkipComponent;
 
     /** _more_ */
+    JComponent trajSkipComponentE;
+
+    /** _more_ */
     JComponent streamLSkipComponent;
+
+    /** _more_ */
+    JComponent streamLSkipComponentE;
 
     /** a component to change the traj size */
     ValueSliderWidget streamLLengthWidget;
@@ -171,17 +181,21 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** labels for trajectory form */
     private final static String[] trajFormLabels = new String[] { "Line",
-            "Ribbon", "Cylinder", "Deform Ribbon", "Point"};
+                                                                  "Ribbon",
+                                                                  "Cylinder",
+                                                                  "Deform Ribbon",
+                                                                  "Point" };
 
     /** types of smoothing functions */
     private final static int[] trajForm = new int[] { 0, 1, 2, 3, 4 };
 
     /** labels for trajectory form */
     private final static String[] streamLFormLabels = new String[] { "Line",
-            "Ribbon", "Cylinder"};
+                                                                     "Ribbon",
+                                                                     "Cylinder" };
 
     /** types of smoothing functions */
-    private final static int[] streamLForm = new int[] { 0, 1, 2};
+    private final static int[] streamLForm = new int[] { 0, 1, 2 };
 
     /** vector/traj length component */
     JComponent trajFormComponent;
@@ -191,6 +205,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** start level */
     private int trajStartLevel = 0;
+
+    /** _more_ */
+    private int trajEndLevel = 0;
 
     /** start level */
     private int trajSkipLevels = 0;
@@ -203,6 +220,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** start level */
     private int streamLStartLevel = 0;
+
+    /** end level */
+    private int streamLEndLevel = 0;
 
     /** _more_ */
     private Range flowColorRange;
@@ -227,6 +247,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     /** _more_ */
     boolean isLine = true;
+
     /**
      * Default constructor; does nothing.
      */
@@ -267,86 +288,139 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 DirectDataChoice udc = (DirectDataChoice) choices0.get(0);
                 DirectDataChoice vdc = (DirectDataChoice) choices0.get(1);
 
-                DataChoice wdc = (DataChoice) choices0.get(2);
+                DataChoice       wdc           = (DataChoice) choices0.get(2);
                 List             usTime        = udc.getAllDateTimes();
                 List             wsTime        = wdc.getAllDateTimes();
                 List             selectedTimes =
                     getDataSelection().getTimes();
-                if(isStreamLine || isTrajectories) {
-                    if (selectedTimes != null && selectedTimes.size() < 4) {
-                        userErrorMessage("Minumum selected times need to be 4 for trajectory calculation");
+                if (isStreamLine || isTrajectories) {
+                    if ((selectedTimes != null)
+                            && (selectedTimes.size() < 4)) {
+                        userErrorMessage(
+                            "Minumum selected times need to be 4 for trajectory calculation");
                         return false;
-                    } else if (usTime != null && usTime.size() < 4) {
-                        userErrorMessage("Minumum selected times need to be 4 for trajectory calculation");
+                    } else if ((usTime != null) && (usTime.size() < 4)) {
+                        userErrorMessage(
+                            "Minumum selected times need to be 4 for trajectory calculation");
                         return false;
                     }
                 }
-                    /* if(selectedTimes != null){
-                       int len = selectedTimes.size();
-                       if(usTime.get((Integer) selectedTimes.get(0)) != wsTime.get((Integer)selectedTimes.get(0)) ||
-                              usTime.get((Integer)selectedTimes.get(len-1)) != wsTime.get((Integer)selectedTimes.get(len-1)) )
-                       {
-                           userErrorMessage("w grid selected times are different from u grid " );
-                           return false;
-                       }
-                   } else */ if(wdc.getSelectedDateTimes() != null){
-                       selectedTimes = wdc.getSelectedDateTimes();
-                       int len = selectedTimes.size();
-                       if(usTime.get(0) != wsTime.get(0) ||
-                               usTime.get(len-1) != wsTime.get(len-1) )
-                       {
-                           userErrorMessage("w grid selected times are different from u grid " );
-                           return false;
-                       }
+                /* if(selectedTimes != null){
+                   int len = selectedTimes.size();
+                   if(usTime.get((Integer) selectedTimes.get(0)) != wsTime.get((Integer)selectedTimes.get(0)) ||
+                          usTime.get((Integer)selectedTimes.get(len-1)) != wsTime.get((Integer)selectedTimes.get(len-1)) )
+                   {
+                       userErrorMessage("w grid selected times are different from u grid " );
+                       return false;
                    }
+               } else */
+                if (wdc.getSelectedDateTimes() != null) {
+                    selectedTimes = wdc.getSelectedDateTimes();
+                    int len = selectedTimes.size();
+                    if ((usTime.get(0) != wsTime.get(0))
+                            || (usTime.get(len - 1) != wsTime.get(len - 1))) {
+                        userErrorMessage(
+                            "w grid selected times are different from u grid ");
+                        return false;
+                    }
+                }
             }
         }
 
         levelBox = doMakeLevelControl(null);
         levelBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (getOkToFireEvents()) {
-                    TwoFacedObject select =
-                            (TwoFacedObject) ((JComboBox) e.getSource())
-                                    .getSelectedItem();
-                    int selectIdx =
-                            ((JComboBox) e.getSource()).getSelectedIndex();
+                                       public void actionPerformed(
+                                       ActionEvent e) {
+                                           if (getOkToFireEvents()) {
+                                               TwoFacedObject select =
+                                                   (TwoFacedObject) ((JComboBox) e.getSource()).getSelectedItem();
+                                               int selectIdx =
+                                                   ((JComboBox) e.getSource()).getSelectedIndex();
 
-                    if ((select != null) && isTrajectories) {
-                        int ct = ((JComboBox) e.getSource()).getItemCount();
-                        if (select.toString().equals("All Levels")) {
-                            setTrajStartLevel(select, 0);
-                        } else {
-                            setTrajStartLevel(select, selectIdx);
-                        }
+                                               if ((select != null)
+                                                       && isTrajectories) {
+                                                   int ct =
+                                                       ((JComboBox) e.getSource()).getItemCount();
+                                                   if (
+                                                   select.toString().equals(
+                                                       "All Levels")) {
+                                                       setTrajStartLevel(
+                                                       select, 0);
+                                                   } else {
+                                                       setTrajStartLevel(
+                                                       select, selectIdx);
+                                                   }
+                                               }
+                                           }
+                                       }
+                                   });
 
-                    }
-                }
-            }
-        });
+        levelBoxEnd = doMakeLevelControl(null);
+        levelBoxEnd.addActionListener(new ActionListener() {
+                                          public void actionPerformed(
+                                          ActionEvent e) {
+                                              if (getOkToFireEvents()) {
+                                                  TwoFacedObject select =
+                                                      (TwoFacedObject) ((JComboBox) e.getSource()).getSelectedItem();
+                                                  int selectIdx =
+                                                      ((JComboBox) e.getSource()).getSelectedIndex();
+
+                                                  if ((select != null)
+                                                          && isTrajectories) {
+                                                      setTrajEndLevel(select,
+                                                      selectIdx);
+                                                  }
+                                              }
+                                          }
+                                      });
 
         slevelBox = doMakeLevelControl(null);
         slevelBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (getOkToFireEvents()) {
-                    TwoFacedObject select =
-                            (TwoFacedObject) ((JComboBox) e.getSource())
-                                    .getSelectedItem();
-                    int selectIdx =
-                            ((JComboBox) e.getSource()).getSelectedIndex();
+                                        public void actionPerformed(
+                                        ActionEvent e) {
+                                            if (getOkToFireEvents()) {
+                                                TwoFacedObject select =
+                                                    (TwoFacedObject) ((JComboBox) e.getSource()).getSelectedItem();
+                                                int selectIdx =
+                                                    ((JComboBox) e.getSource()).getSelectedIndex();
 
-                    if ((select != null) && isStreamLine) {
-                        int ct = ((JComboBox) e.getSource()).getItemCount();
-                        if (select.toString().equals("All Levels")) {
-                            setStreamLStartLevel(select, 0);
-                        } else {
-                            setStreamLStartLevel(select, selectIdx);
-                        }
+                                                if ((select != null)
+                                                        && isStreamLine) {
+                                                    int ct =
+                                                        ((JComboBox) e.getSource()).getItemCount();
+                                                    if (
+                                                    select.toString().equals(
+                                                        "All Levels")) {
+                                                        setStreamLStartLevel(
+                                                        select, 0);
+                                                    } else {
+                                                        setStreamLStartLevel(
+                                                        select, selectIdx);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
 
-                    }
-                }
-            }
-        });
+        slevelBoxEnd = doMakeLevelControl(null);
+        slevelBoxEnd.addActionListener(new ActionListener() {
+                                           public void actionPerformed(
+                                           ActionEvent e) {
+                                               if (getOkToFireEvents()) {
+                                                   TwoFacedObject select =
+                                                       (TwoFacedObject) ((JComboBox) e.getSource()).getSelectedItem();
+                                                   int selectIdx =
+                                                       ((JComboBox) e.getSource()).getSelectedIndex();
+
+                                                   if ((select != null)
+                                                           && isStreamLine) {
+                                                       setStreamLEndLevel(
+                                                       select, selectIdx);
+                                                   }
+                                               }
+                                           }
+                                       });
+
         myDisplay = (FlowDisplayable) createPlanDisplay();
 
         myDisplay.setPointSize(getPointSize());
@@ -389,12 +463,12 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         }
         planDisplay.setAutoScale(autoSize);
         planDisplay.setUseSpeedForColor(useSpeedForColor);
-        if(isStreamLine){
+        if (isStreamLine) {
             //since streamline is part of trajectory
             planDisplay.setStreamline(isStreamLine);
             planDisplay.setIsTrajectories(true);
-            planDisplay.setTrojectoriesEnabled(true,
-                    arrowHeadSizeValue, false);
+            planDisplay.setTrojectoriesEnabled(true, arrowHeadSizeValue,
+                    false);
         } else {
             planDisplay.setStreamline(isStreamLine);
             planDisplay.setTrojectoriesEnabled(isTrajectories,
@@ -449,40 +523,53 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         addRemovable(barbSizeWidget);
 
         JCheckBox autoSizeCbx = new JCheckBox("Autosize", autoSize);
-        arrowCbx    = new JCheckBox("Arrow", arrowHead);
-        arrowCbxL    = new JCheckBox("Arrow", arrowHeadL);
+        arrowCbx  = new JCheckBox("Arrow", arrowHead);
+        arrowCbxL = new JCheckBox("Arrow", arrowHeadL);
         autoSizeCbx.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                autoSize = ((JCheckBox) e.getSource()).isSelected();
-                getGridDisplay().setAutoScale(autoSize);
-            }
-        });
+                                          public void actionPerformed(
+                                          ActionEvent e) {
+                                              autoSize =
+                                              ((JCheckBox) e.getSource()).isSelected();
+                                              getGridDisplay().setAutoScale(
+                                              autoSize);
+                                          }
+                                      });
 
         arrowCbx.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                arrowHead = ((JCheckBox) e.getSource()).isSelected();
-                if (arrowHead) {
-                    getGridDisplay().setArrowHead(arrowHead);
-                } else {
-                    getGridDisplay().setArrowHead(arrowHead);
-                }
-                if(!fromBundle)
-                    getGridDisplay().resetTrojectories();
-            }
-        });
+                                       public void actionPerformed(
+                                       ActionEvent e) {
+                                           arrowHead =
+                                           ((JCheckBox) e.getSource()).isSelected();
+                                           if (arrowHead) {
+                                               getGridDisplay().setArrowHead(
+                                               arrowHead);
+                                           } else {
+                                               getGridDisplay().setArrowHead(
+                                               arrowHead);
+                                           }
+                                           if ( !fromBundle) {
+                                               getGridDisplay().resetTrojectories();
+                                           }
+                                       }
+                                   });
 
         arrowCbxL.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                arrowHeadL = ((JCheckBox) e.getSource()).isSelected();
-                if (arrowHeadL) {
-                    getGridDisplay().setArrowHead(arrowHeadL);
-                } else {
-                    getGridDisplay().setArrowHead(arrowHeadL);
-                }
-                if(!fromBundle)
-                    getGridDisplay().resetTrojectories();
-            }
-        });
+                                        public void actionPerformed(
+                                        ActionEvent e) {
+                                            arrowHeadL =
+                                            ((JCheckBox) e.getSource()).isSelected();
+                                            if (arrowHeadL) {
+                                                getGridDisplay().setArrowHead(
+                                                arrowHeadL);
+                                            } else {
+                                                getGridDisplay().setArrowHead(
+                                                arrowHeadL);
+                                            }
+                                            if ( !fromBundle) {
+                                                getGridDisplay().resetTrojectories();
+                                            }
+                                        }
+                                    });
         sizeComponent = GuiUtils.hbox(GuiUtils.rLabel("Size: "),
                                       barbSizeWidget.getContents(false),
                                       autoSizeCbx);
@@ -503,41 +590,42 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             List<TwoFacedObject> trajFormList =
                 TwoFacedObject.createList(trajForm, trajFormLabels);
             List<TwoFacedObject> streamLFormList =
-                    TwoFacedObject.createList(streamLForm, streamLFormLabels);
-            JComboBox trajFormBox = new JComboBox();
+                TwoFacedObject.createList(streamLForm, streamLFormLabels);
+            JComboBox trajFormBox    = new JComboBox();
             JComboBox streamLFormBox = new JComboBox();
             GuiUtils.setListData(trajFormBox, trajFormList);
             GuiUtils.setListData(streamLFormBox, streamLFormList);
             trajFormBox.setSelectedItem(
-                TwoFacedObject.findId(getTrajFormType(), trajFormList));
+                TwoFacedObject.findId(getTrajFormType(),
+                                      trajFormList));
             trajFormBox.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    TwoFacedObject select =
-                        (TwoFacedObject) ((JComboBox) e.getSource())
-                            .getSelectedItem();
-                    setTrajFormType(select.getId().hashCode());
-                    if(select.getLabel() == "Line") {
-                        isLine = true;
-                        arrowCbx.setSelected(arrowHead);
-                    } else {
-                        arrowCbx.setSelected(false);
-                        isLine = false;
-                    };
-                    enableArrowCompnoentBox();
-                }
-            });
+                        public void actionPerformed(ActionEvent e) {
+                            TwoFacedObject select =
+                                (TwoFacedObject) ((JComboBox) e.getSource()).getSelectedItem();
+                            setTrajFormType(select.getId().hashCode());
+                            if (select.getLabel() == "Line") {
+                                isLine = true;
+                                arrowCbx.setSelected(arrowHead);
+                            } else {
+                                arrowCbx.setSelected(false);
+                                isLine = false;
+                            }
+                            ;
+                            enableArrowCompnoentBox();
+                        }
+                    });
 
             enableArrowCompnoentBox();
             streamLFormBox.setSelectedItem(
-                    TwoFacedObject.findId(getStreamLFormType(), streamLFormList));
+                TwoFacedObject.findId(getStreamLFormType(),
+                                      streamLFormList));
             streamLFormBox.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    TwoFacedObject select =
-                            (TwoFacedObject) ((JComboBox) e.getSource())
-                                    .getSelectedItem();
-                    setStreamLFormType(select.getId().hashCode());
-                }
-            });
+                        public void actionPerformed(ActionEvent e) {
+                            TwoFacedObject select =
+                                (TwoFacedObject) ((JComboBox) e.getSource()).getSelectedItem();
+                            setStreamLFormType(select.getId().hashCode());
+                        }
+                    });
             trajFormComponent =
                 GuiUtils.hbox(GuiUtils.rLabel("Trajectory Form: "),
                               GuiUtils.filler(), trajFormBox,
@@ -551,48 +639,66 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 GuiUtils.hbox(GuiUtils.rLabel("Trajectory Start Level: "),
                               GuiUtils.filler(), levelBox);
 
+            trajSkipComponentE =
+                GuiUtils.hbox(GuiUtils.rLabel("Trajectory End Level: "),
+                              GuiUtils.filler(), levelBoxEnd);
+
             trajectoryBtn = new JRadioButton("Trajectories:", isTrajectories);
 
             streamLFormComponent =
-                    GuiUtils.hbox(GuiUtils.rLabel("Streamline Form: "),
-                            GuiUtils.filler(), streamLFormBox,
-                            GuiUtils.filler());
+                GuiUtils.hbox(GuiUtils.rLabel("Streamline Form: "),
+                              GuiUtils.filler(), streamLFormBox,
+                              GuiUtils.filler());
 
             streamLLengthComponent =
-                    GuiUtils.hbox(GuiUtils.rLabel("Length Offset: "),
-                            streamLLengthWidget.getContents(false), arrowCbxL);
+                GuiUtils.hbox(GuiUtils.rLabel("Length Offset: "),
+                              streamLLengthWidget.getContents(false),
+                              arrowCbxL);
 
-            smoothComponent = GuiUtils.hbox(GuiUtils.rLabel("Smooth Factor: "),
-                    smoothWidget.getContents(false));
+            smoothComponent =
+                GuiUtils.hbox(GuiUtils.rLabel("Smooth Factor: "),
+                              smoothWidget.getContents(false));
 
             streamLSkipComponent =
-                    GuiUtils.hbox(GuiUtils.rLabel("Streamline Start Level: "),
-                            GuiUtils.filler(), slevelBox);
+                GuiUtils.hbox(GuiUtils.rLabel("Streamline Start Level: "),
+                              GuiUtils.filler(), slevelBox);
+            streamLSkipComponentE =
+                GuiUtils.hbox(GuiUtils.rLabel("Streamline End Level: "),
+                              GuiUtils.filler(), slevelBoxEnd);
 
             streamlineBtn = new JRadioButton("Streamlines:", isStreamLine);
 
             ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JRadioButton source = (JRadioButton) e.getSource();
+
                     if (source == trajectoryBtn) {
                         isTrajectories = true;
                         isVectors      = false;
                         isStreamLine   = false;
-                        trajStartLevel = 0;
+                        if ( !fromBundle) {
+                            setStreamlines();
+                            levelBoxEnd.setSelectedIndex(getTrajEndLevel());
+                        }
                     } else if (source == streamlineBtn) {
                         isStreamLine   = true;
                         isTrajectories = false;
                         isVectors      = false;
-                        trajStartLevel = 0;
+                        if ( !fromBundle) {
+                            setStreamlines();
+                            slevelBoxEnd.setSelectedIndex(
+                                getStreamLEndLevel());
+                        }
                     } else {
                         isVectors      = true;
                         isTrajectories = false;
                         isStreamLine   = false;
-                        levelBox.setSelectedIndex(levelBox.getItemCount()
-                                - 1);
+                        if ( !fromBundle) {
+                            setStreamlines();
+                        }
+                        // levelBox.setSelectedIndex(levelBox.getItemCount()
+                        //         - 1);
                     }
-                    if(!fromBundle)
-                        setStreamlines();
                 }
             };
 
@@ -607,44 +713,49 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
             Insets spacer = new Insets(0, 30, 0, 0);
             JComponent rightComp =
-                GuiUtils.vbox(
-                    GuiUtils.left(
-                        GuiUtils.vbox(
-                            vectorBtn,
-                            GuiUtils.inset(
-                                sizeComponent, spacer))), GuiUtils.left(
-                                    GuiUtils.vbox(
-                                        trajectoryBtn,
-                                        GuiUtils.vbox(
-                                            GuiUtils.inset(
-                                                trajFormComponent,
-                                                spacer), GuiUtils.inset(
-                                                    trajLengthComponent,
-                                                    spacer), GuiUtils.inset(
-                                                        trajSkipComponent,
-                                                        spacer)))), GuiUtils.left(
-                                GuiUtils.vbox(
-                                        streamlineBtn,
-                                        GuiUtils.vbox(
-                                                GuiUtils.inset(
-                                                        streamLFormComponent,
-                                                        spacer), GuiUtils.inset(
-                                                        streamLLengthComponent,
-                                                        spacer), GuiUtils.inset(
-                                                        smoothComponent,
-                                                        spacer), GuiUtils.inset(
-                                                        streamLSkipComponent,
-                                                        spacer)))));
+                GuiUtils.vbox(GuiUtils.left(GuiUtils.vbox(vectorBtn,
+                                                          GuiUtils.inset(
+                                                              sizeComponent,
+                                                                      spacer))), GuiUtils.left(
+                                                                          GuiUtils.vbox(
+                                                                              trajectoryBtn,
+                                                                                      GuiUtils.vbox(
+                                                                                          GuiUtils.inset(
+                                                                                              trajFormComponent,
+                                                                                                      spacer),
+                                                                                                  GuiUtils.inset(
+                                                                                                      trajLengthComponent,
+                                                                                                              spacer),
+                                                                                                  GuiUtils.inset(
+                                                                                                      trajSkipComponent,
+                                                                                                              spacer),
+                                                                                                  GuiUtils.inset(
+                                                                                                      trajSkipComponentE,
+                                                                                                              spacer)))), GuiUtils.left(
+                                                                                                                  GuiUtils.vbox(
+                                                                                                                      streamlineBtn,
+                                                                                                                              GuiUtils.vbox(
+                                                                                                                                  GuiUtils.inset(
+                                                                                                                                      streamLFormComponent,
+                                                                                                                                              spacer),
+                                                                                                                                          GuiUtils.inset(
+                                                                                                                                              streamLLengthComponent,
+                                                                                                                                                      spacer),
+                                                                                                                                          GuiUtils.inset(
+                                                                                                                                              smoothComponent,
+                                                                                                                                                      spacer),
+                                                                                                                                          GuiUtils.inset(
+                                                                                                                                              streamLSkipComponent,
+                                                                                                                                                      spacer),
+                                                                                                                                          GuiUtils.inset(
+                                                                                                                                              streamLSkipComponentE,
+                                                                                                                                                      spacer)))));
             JLabel showLabel = GuiUtils.rLabel("Show:");
             showLabel.setVerticalTextPosition(JLabel.TOP);
-            controlWidgets.add(
-                new WrapperWidget(
-                    this,
-                    GuiUtils.top(
-                        GuiUtils.inset(
-                            showLabel,
-                            new Insets(10, 0, 0, 0))), GuiUtils.left(
-                                GuiUtils.top(rightComp))));
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.top(GuiUtils.inset(showLabel,
+                            new Insets(10, 0, 0, 0))),
+                    GuiUtils.left(GuiUtils.top(rightComp))));
 
 
         }
@@ -656,19 +767,21 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         vectorAHSizeWidget = new ValueSliderWidget(this, 0, 40,
                 "ArrowHeadSize", "Arrow Head Size", 10.0f);
 
-        controlWidgets.add(
-                new WrapperWidget(
-                        this, GuiUtils.rLabel("Arrow Scale: "),
-                        vectorAHSizeWidget.getContents(false)));
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Arrow Scale: "),
+                                             vectorAHSizeWidget.getContents(
+                                             false)));
 
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("XY Skip:"),
-                GuiUtils.left(skipFactorWidget.getContents(false))));
-        controlWidgets.add(
-            new WrapperWidget(
-                this, GuiUtils.rLabel("Z Skip:"),
-                GuiUtils.left(skipFactorWidgetZ.getContents(false))));
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("XY Skip:"),
+                                             GuiUtils.left(
+                                             skipFactorWidget.getContents(
+                                                 false))));
+        controlWidgets.add(new WrapperWidget(this,
+                                             GuiUtils.rLabel("Z Skip:"),
+                                             GuiUtils.left(
+                                             skipFactorWidgetZ.getContents(
+                                                 false))));
 
         enableTrajLengthBox();
         enableStreamLLengthBox();
@@ -694,10 +807,20 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getSmoothFactor() {
         return smoothFactor;
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
     public void setSmoothFactor(int f) {
         smoothFactor = f;
         if (getGridDisplay() != null) {
@@ -738,57 +861,28 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             } else {
                 getGridDisplay().setZskip(ct - 1);
             }
-         /*   if (isTrajectories) {
-                try {
-                    GriddedSet domainSet = (GriddedSet) getGridDataInstance().getSpatialDomain();
-                    CoordinateSystem cs = getNavigatedDisplay().getDisplayCoordinateSystem();
-                    GriddedSet domainSet1 = makeLinearGrid(domainSet, cs);
-                    int sizeX = domainSet1.getLength(0);
-                    int sizeY = domainSet1.getLength(1);
-                    // float[][] setLocs = domainSet1.getSamples(false);
-                    float[][] setLocs = new float[3][3];
 
 
-                    setLocs[0][0] = -0.5f;
-                    setLocs[0][1] = 0;
-                    setLocs[0][2] = 0.5f;
-                    setLocs[1][0] = -0.5f;
-                    setLocs[1][1] = 0;
-                    setLocs[1][2] = 0.5f;
-                    setLocs[2][0] = 0;
-                    setLocs[2][1] = 0;
-                    setLocs[2][2] = 0;
-
-                   // float[][] setLocs1 = cs.toReference(setLocs);
-                    RealTupleType types = cs.getReference();
-                   // FlatField flowFlat = (FlatField) getGridDataInstance().getGrid().getSample(0);
-                  //  float[][] flowValues = flowFlat.getFloats();
-                  //  float[][] stp = setStartPointsFromDomain2D(0, 1, setLocs1, sizeX, sizeY, 2, flowValues, 0.001f);
-                    myDisplay.setStartPoints(types, setLocs);
-                    myDisplay.setStartLevel(1);
-                } catch (Exception e){}
-            } */
-
-            getGridDisplay().setTrajStartLevel(trajStartLevel);
+            //getGridDisplay().setTrajStartLevel(trajStartLevel);
             getGridDisplay().setIsTrajectories(isTrajectories);
             getGridDisplay().setStreamline(isStreamLine);
-            if(isStreamLine){
+            if (isStreamLine) {
                 //since streamline is part of trajectory
                 getGridDisplay().setTrajFormType(getStreamLFormType());
                 getGridDisplay().setIsTrajectories(true);
                 getGridDisplay().setTrajStartLevel(streamLStartLevel);
                 getGridDisplay().setTrajOffset(getStreamLOffset());
-                if(arrowHeadL){
+                if (arrowHeadL) {
                     getGridDisplay().setArrowHead(true);
                     arrowCbxL.setSelected(arrowHeadL);
                 }
-                getGridDisplay().setTrojectoriesEnabled(true,
-                        arrowHeadL, arrowHeadSizeValue, false);
+                getGridDisplay().setTrojectoriesEnabled(true, arrowHeadL,
+                        arrowHeadSizeValue, false);
             } else {
                 getGridDisplay().setTrajFormType(getTrajFormType());
                 getGridDisplay().setTrajStartLevel(trajStartLevel);
                 getGridDisplay().setTrajOffset(getTrajOffset());
-                if(arrowHead){
+                if (arrowHead) {
                     getGridDisplay().setArrowHead(true);
                     arrowCbx.setSelected(arrowHead);
                 }
@@ -827,7 +921,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             try {
                 getGridDisplay().setTrajOffset(getTrajOffset());
                 getGridDisplay().setArrowHeadSize(arrowHeadSizeValue);
-                if (isTrajectories ) {
+                if (isTrajectories) {
                     getGridDisplay().resetTrojectories();
                 }
             } catch (Exception ex) {
@@ -844,6 +938,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /**
      * _more_
      *
+     *
+     * @return _more_
      */
     public float getArrowHeadSize() {
         return arrowHeadSizeValue;
@@ -857,9 +953,12 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             GuiUtils.enableTree(trajLengthComponent, isTrajectories);
             GuiUtils.enableTree(trajFormComponent, isTrajectories);
             GuiUtils.enableTree(trajSkipComponent, isTrajectories);
+            GuiUtils.enableTree(trajSkipComponentE, isTrajectories);
             GuiUtils.enableTree(levelBox, isTrajectories);
+            GuiUtils.enableTree(levelBoxEnd, isTrajectories);
         }
     }
+
     /**
      * enable the streamline   box
      */
@@ -868,8 +967,10 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             GuiUtils.enableTree(streamLLengthComponent, isStreamLine);
             GuiUtils.enableTree(streamLFormComponent, isStreamLine);
             GuiUtils.enableTree(streamLSkipComponent, isStreamLine);
+            GuiUtils.enableTree(streamLSkipComponentE, isStreamLine);
             GuiUtils.enableTree(smoothComponent, isStreamLine);
             GuiUtils.enableTree(slevelBox, isStreamLine);
+            GuiUtils.enableTree(slevelBoxEnd, isStreamLine);
         }
     }
 
@@ -907,8 +1008,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     protected void applySkipFactor() {
         try {
             showWaitCursor();
-            if(!fromBundle)
+            if ( !fromBundle) {
                 loadVolumeData();
+            }
         } catch (Exception exc) {
             logException("loading volume data", exc);
         } finally {
@@ -938,24 +1040,26 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         tmpSelection.setFromLevel(null);
         tmpSelection.setToLevel(null);
         List cchoices = ((DerivedDataChoice) choice).getChoices();
-        List     levelsList;
-        if(cchoices.size() == 2) { //colored by other
+        List levelsList;
+        if (cchoices.size() == 2) {  //colored by other
             DataChoice uvwchoice =
-                    ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
-                            0));
+                ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                    0));
             DataChoice wchoice =
-            ((DataChoice) ((DerivedDataChoice) uvwchoice).getChoices().get(
-                    2));
+                ((DataChoice) ((DerivedDataChoice) uvwchoice).getChoices()
+                .get(2));
             levelsList = wchoice.getAllLevels(tmpSelection);
         } else {
             DataChoice wchoice =
-                    ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
-                            2));
+                ((DataChoice) ((DerivedDataChoice) choice).getChoices().get(
+                    2));
             levelsList = wchoice.getAllLevels(tmpSelection);
         }
         //List     levelsList = wchoice.getAllLevels(tmpSelection);
-        Object[] levels     = getGridDataInstance().getLevels();
-        if (levels == null && (levelsList != null) && (levelsList.size() > 0)) {
+        Object[] levels = getGridDataInstance().getLevels();
+        if ((levels == null)
+                && (levelsList != null)
+                && (levelsList.size() > 0)) {
             levels =
                 (Object[]) levelsList.toArray(new Object[levelsList.size()]);
         }
@@ -995,6 +1099,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     private JComboBox slevelBox;
 
     /** level selection box */
+    private JComboBox slevelBoxEnd;
+
+    /** level selection box */
     private JComboBox levelBoxEnd;
 
     /** current level */
@@ -1013,28 +1120,63 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
         setOkToFireEvents(false);
 
-        if (levelBox == null || slevelBox == null) {
+        if ((levelBox == null) || (slevelBox == null)) {
             return;
         }
         levelBox.setEnabled(false);
+        levelBoxEnd.setEnabled(false);
         slevelBox.setEnabled(false);
+        slevelBoxEnd.setEnabled(false);
+
         Object[] all = formatLevels(levels);
 
         GuiUtils.setListData(levelBox, formatLevels(levels));
+        GuiUtils.setListData(levelBoxEnd, formatLevels(levels));
         GuiUtils.setListData(slevelBox, formatLevels(levels));
+        GuiUtils.setListData(slevelBoxEnd, formatLevels(levels));
 
         int len = (levels.length - 1) / (skipValueZ + 1) + 2;
 
-        currentLevel   = all[len - 1];
-        trajStartLevel = 0;
-        streamLStartLevel = 0;
+        if ( !fromBundle) {
+            currentLevel = all[len - 1];
+        }
+        trajStartLevel    = getTrajStartLevel();
+        streamLStartLevel = getStreamLStartLevel();
 
-        levelBox.setSelectedItem(getLabeledReal(currentLevel));
-        slevelBox.setSelectedItem(getLabeledReal(currentLevel));
+        if (currentLevel == null) {
+            levelBox.setSelectedItem(getLabeledReal(all[levels.length]));
+            slevelBox.setSelectedItem(getLabeledReal(all[levels.length]));
+        } else {
+            levelBox.setSelectedItem(getLabeledReal(currentLevel));
+            slevelBox.setSelectedItem(getLabeledReal(currentLevel));
+        }
+        if ((currentLevel != null)
+                && ((TwoFacedObject) currentLevel).getLabel().equals(
+                    "All Levels")) {
+            slevelBoxEnd.setSelectedItem(getLabeledReal(currentLevel));
+        } else if (currentLevel == null) {
+            slevelBoxEnd.setSelectedItem(getLabeledReal(all[levels.length]));
+        } else {
+            slevelBoxEnd.setSelectedItem(
+                getLabeledReal(all[getStreamLEndLevel()]));
+        }
+
+        if ((currentLevel != null)
+                && ((TwoFacedObject) currentLevel).getLabel().equals(
+                    "All Levels")) {
+            levelBoxEnd.setSelectedItem(getLabeledReal(currentLevel));
+        } else if (currentLevel == null) {
+            levelBoxEnd.setSelectedItem(getLabeledReal(all[levels.length]));
+        } else {
+            levelBoxEnd.setSelectedItem(
+                getLabeledReal(all[getTrajEndLevel()]));
+        }
 
         setOkToFireEvents(true);
         levelBox.setEnabled(true);
+        levelBoxEnd.setEnabled(true);
         slevelBox.setEnabled(true);
+        slevelBoxEnd.setEnabled(true);
     }
 
     /**
@@ -1101,7 +1243,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                         }
                     }
 
-                    if ( !useSpeedForColor && !coloredByAnother
+                    if ( !useSpeedForColor
+                            && !coloredByAnother
                             && !Double.isInfinite(max)
                             && !Double.isInfinite(min)) {
                         max = Math.max(max, -min);
@@ -1117,6 +1260,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             }
         }
     }
+
     /**
      * _more_
      *
@@ -1152,6 +1296,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     public boolean getArrowHeadL() {
         return arrowHeadL;
     }
+
     /**
      * _more_
      *
@@ -1499,6 +1644,11 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public float getStreamLOffset() {
         return streamLOffsetValue;
     }
@@ -1529,6 +1679,11 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
     public void setStreamLOffset(float f) {
         streamLOffsetValue = f;
         if (getGridDisplay() != null) {
@@ -1582,6 +1737,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         isStreamLine   = v;
         setStreamlines();
     }
+
     /**
      * _more_
      *
@@ -1600,6 +1756,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     public Integer getStreamLFormType() {
         return streamLFormType;
     }
+
     /**
      * _more_
      *
@@ -1657,20 +1814,30 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     public void setTrajStartLevel(Object startLevel, int idx) {
         trajStartLevel = idx;
         currentLevel   = startLevel;
-        int ct = levelBox.getItemCount();
+        int    ct       = levelBox.getItemCount();
+        Object endLevel = levelBoxEnd.getSelectedItem();
+        int    jdx      = levelBoxEnd.getSelectedIndex();
         if (ct == 1) {
             ct = 2;
         }
         //if(skipFactorWidgetZ != null)
         //    skipFactorWidgetZ.setValue(ct-1);
-        if (getGridDisplay() != null) {
+        if ((getGridDisplay() != null) && !fromBundle) {
             try {
                 getGridDisplay().setTrajStartLevel(idx);
-                if(((TwoFacedObject)startLevel).getLabel().equals("All Levels"))
+                if (((TwoFacedObject) startLevel).getLabel().equals(
+                        "All Levels")) {
+                    getGridDisplay().setStartPoints(null, null);
                     getGridDisplay().setZskip(0);
-                else
+                    getGridDisplay().resetTrojectories();
+                } else if (idx == jdx) {
+                    getGridDisplay().setStartPoints(null, null);
                     getGridDisplay().setZskip(ct - 1);
-                getGridDisplay().resetTrojectories();
+                    getGridDisplay().resetTrojectories();
+                } else if ( !((TwoFacedObject) endLevel).getLabel().equals(
+                        "All Levels")) {
+                    levelBoxEnd.setSelectedIndex(jdx);
+                }
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
@@ -1682,26 +1849,110 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     /**
      * _more_
      *
-     * @param startLevel _more_
+     * @param endLevel _more_
      * @param idx _more_
      */
-    public void setStreamLStartLevel(Object startLevel, int idx) {
-        streamLStartLevel = idx;
-        currentLevel   = startLevel;
-        int ct = slevelBox.getItemCount();
+    public void setTrajEndLevel(Object endLevel, int idx) {
+
+        trajEndLevel = idx;
+        //currentLevel   = endLevel;
+        int bt = levelBoxEnd.getItemCount();
+        int ct = levelBox.getItemCount();
         if (ct == 1) {
             ct = 2;
         }
+        if (bt == 1) {
+            bt = 2;
+        }
+        int jdx = levelBox.getSelectedIndex();
         //if(skipFactorWidgetZ != null)
         //    skipFactorWidgetZ.setValue(ct-1);
         if (getGridDisplay() != null) {
             try {
-                getGridDisplay().setTrajStartLevel(idx);
-                if(((TwoFacedObject)startLevel).getLabel().equals("All Levels"))
+                if (((TwoFacedObject) endLevel).getLabel().equals(
+                        "All Levels")
+                        || ((TwoFacedObject) currentLevel).getLabel().equals(
+                            "All Levels")) {
+                    getGridDisplay().setTrajStartLevel(0);
+                    getGridDisplay().setStartPoints(null, null);
                     getGridDisplay().setZskip(0);
-                else
+                    getGridDisplay().resetTrojectories();
+                } else if (idx == jdx) {
+                    getGridDisplay().setTrajStartLevel(idx);
+                    getGridDisplay().setStartPoints(null, null);
                     getGridDisplay().setZskip(ct - 1);
-                getGridDisplay().resetTrojectories();
+                    getGridDisplay().resetTrojectories();
+                } else {
+                    GriddedSet domainSet =
+                        (GriddedSet) getGridDataInstance().getSpatialDomain();
+
+                    CoordinateSystem cs =
+                        getNavigatedDisplay().getDisplayCoordinateSystem();
+                    float[][] domainLatLonAlt =
+                        GridUtil.getEarthLocationPoints(domainSet);
+                    MapProjectionDisplay mpd =
+                        (MapProjectionDisplay) getNavigatedDisplay();
+                    boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
+                    int     latIndex = isLatLon
+                                       ? 1
+                                       : 0;
+                    int     lonIndex = isLatLon
+                                       ? 0
+                                       : 1;
+
+                    int     numX     = domainSet.getLengths()[lonIndex];
+                    int     numY     = domainSet.getLengths()[latIndex];
+                    int     numXY    = numX * numY;
+                    int     startZ   = (idx > jdx)
+                                       ? jdx
+                                       : idx;
+                    int     endZ     = (idx > jdx)
+                                       ? idx
+                                       : jdx;
+                    int     numP;
+
+                    numP = numXY * (endZ - startZ + 1);
+
+                    float[][] geoVals = new float[3][numP];
+
+                    for (int k = startZ; k <= endZ; k++) {
+                        for (int j = 0; j < numXY; j++) {
+                            int ii = k * (numXY) + j;
+                            int jj = ii - numXY * startZ;
+                            geoVals[0][jj] = domainLatLonAlt[lonIndex][ii];
+                            geoVals[1][jj] = domainLatLonAlt[latIndex][ii];
+                            geoVals[2][jj] = domainLatLonAlt[2][ii];
+                        }
+                    }
+
+
+                    if (getSkipValue() > 0) {
+                        int       skipFactor = getSkipValue();
+                        int       onum       = numP / (skipFactor + 1) + 1;
+                        float[][] points0    = new float[3][onum];
+                        for (int i = 0, j = 0; (i < onum)
+                                               && (j < numP);
+                                i++, j = i * (skipFactor + 1)) {
+                            points0[0][i] = geoVals[0][j];
+                            points0[1][i] = geoVals[1][j];
+                            points0[2][i] = geoVals[2][j];
+                        }
+
+
+                        float[][] setLocs = cs.toReference(points0);
+                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                        RealTupleType types = cs.getReference();
+                        getGridDisplay().setStartPoints(types, setLocs);
+                    } else {
+                        float[][] setLocs = cs.toReference(geoVals);
+                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                        RealTupleType types = cs.getReference();
+                        getGridDisplay().setStartPoints(types, setLocs);
+                    }
+                    //getGridDisplay().setZskip(ct - 1);
+                    getGridDisplay().resetTrojectories();
+                }
+
             } catch (Exception ex) {
                 logException("setFlowScale: ", ex);
             }
@@ -1709,6 +1960,255 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         }
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @param startLevel _more_
+     * @param idx _more_
+     */
+    public void setStreamLStartLevel(Object startLevel, int idx) {
+        streamLStartLevel = idx;
+        currentLevel      = startLevel;
+        int    ct       = slevelBox.getItemCount();
+        Object endLevel = slevelBoxEnd.getSelectedItem();
+        int    jdx      = slevelBoxEnd.getSelectedIndex();
+        if (ct == 1) {
+            ct = 2;
+        }
+
+        //if(skipFactorWidgetZ != null)
+        //    skipFactorWidgetZ.setValue(ct-1);
+        if ((getGridDisplay() != null) && !fromBundle) {
+            try {
+                getGridDisplay().setTrajStartLevel(idx);
+                if (((TwoFacedObject) startLevel).getLabel().equals(
+                        "All Levels")) {
+                    getGridDisplay().setStartPoints(null, null);
+                    getGridDisplay().setZskip(0);
+                    getGridDisplay().resetTrojectories();
+                } else if (idx == jdx) {
+                    getGridDisplay().setStartPoints(null, null);
+                    getGridDisplay().setZskip(ct - 1);
+                    getGridDisplay().resetTrojectories();
+                } else if ( !((TwoFacedObject) endLevel).getLabel().equals(
+                        "All Levels")) {
+                    slevelBoxEnd.setSelectedIndex(jdx);
+                }
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
+
+        }
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getStreamLStartLevel() {
+        return streamLStartLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @param startLevel _more_
+     */
+    public void setStreamLStartLevel(int startLevel) {
+        this.streamLStartLevel = startLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getStreamLEndLevel() {
+        return streamLEndLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @param endLevel _more_
+     */
+    public void setStreamLEndLevel(int endLevel) {
+        this.streamLEndLevel = endLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Object getCurrentLevel() {
+        return currentLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @param object _more_
+     */
+    public void setCurrentLevel(Object object) {
+        currentLevel = object;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getTrajStartLevel() {
+        return trajStartLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @param startLevel _more_
+     */
+    public void setTrajStartLevel(int startLevel) {
+        this.trajStartLevel = startLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getTrajEndLevel() {
+        return trajEndLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @param endLevel _more_
+     */
+    public void setTrajEndLevel(int endLevel) {
+        this.trajEndLevel = endLevel;
+    }
+
+    /**
+     * _more_
+     *
+     * @param endLevel _more_
+     * @param idx _more_
+     */
+    public void setStreamLEndLevel(Object endLevel, int idx) {
+
+        streamLEndLevel = idx;
+        //currentLevel   = endLevel;
+        int bt = slevelBoxEnd.getItemCount();
+        int ct = slevelBox.getItemCount();
+        if (ct == 1) {
+            ct = 2;
+        }
+        if (bt == 1) {
+            bt = 2;
+        }
+        int jdx = slevelBox.getSelectedIndex();
+        //if(skipFactorWidgetZ != null)
+        //    skipFactorWidgetZ.setValue(ct-1);
+        if (getGridDisplay() != null) {
+            try {
+                if (((TwoFacedObject) endLevel).getLabel().equals(
+                        "All Levels")
+                        || ((TwoFacedObject) currentLevel).getLabel().equals(
+                            "All Levels")) {
+                    getGridDisplay().setTrajStartLevel(0);
+                    getGridDisplay().setStartPoints(null, null);
+                    getGridDisplay().setZskip(0);
+                    getGridDisplay().resetTrojectories();
+                } else if (idx == jdx) {
+                    getGridDisplay().setTrajStartLevel(idx);
+                    getGridDisplay().setStartPoints(null, null);
+                    getGridDisplay().setZskip(ct - 1);
+                    getGridDisplay().resetTrojectories();
+                } else {
+                    GriddedSet domainSet =
+                        (GriddedSet) getGridDataInstance().getSpatialDomain();
+
+                    CoordinateSystem cs =
+                        getNavigatedDisplay().getDisplayCoordinateSystem();
+                    float[][] domainLatLonAlt =
+                        GridUtil.getEarthLocationPoints(domainSet);
+                    MapProjectionDisplay mpd =
+                        (MapProjectionDisplay) getNavigatedDisplay();
+                    boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
+                    int     latIndex = isLatLon
+                                       ? 1
+                                       : 0;
+                    int     lonIndex = isLatLon
+                                       ? 0
+                                       : 1;
+
+                    int     numX     = domainSet.getLengths()[lonIndex];
+                    int     numY     = domainSet.getLengths()[latIndex];
+                    int     numXY    = numX * numY;
+                    int     startZ   = (idx > jdx)
+                                       ? jdx
+                                       : idx;
+                    int     endZ     = (idx > jdx)
+                                       ? idx
+                                       : jdx;
+                    int     numP;
+
+                    numP = numXY * (endZ - startZ + 1);
+
+                    float[][] geoVals = new float[3][numP];
+
+                    for (int k = startZ; k <= endZ; k++) {
+                        for (int j = 0; j < numXY; j++) {
+                            int ii = k * (numXY) + j;
+                            int jj = ii - numXY * startZ;
+                            geoVals[0][jj] = domainLatLonAlt[lonIndex][ii];
+                            geoVals[1][jj] = domainLatLonAlt[latIndex][ii];
+                            geoVals[2][jj] = domainLatLonAlt[2][ii];
+                        }
+                    }
+
+
+                    if (getSkipValue() > 0) {
+                        int       skipFactor = getSkipValue();
+                        int       onum       = numP / (skipFactor + 1) + 1;
+                        float[][] points0    = new float[3][onum];
+                        for (int i = 0, j = 0; (i < onum)
+                                               && (j < numP);
+                                i++, j = i * (skipFactor + 1)) {
+                            points0[0][i] = geoVals[0][j];
+                            points0[1][i] = geoVals[1][j];
+                            points0[2][i] = geoVals[2][j];
+                        }
+
+
+                        float[][] setLocs = cs.toReference(points0);
+                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                        RealTupleType types = cs.getReference();
+                        getGridDisplay().setStartPoints(types, setLocs);
+                    } else {
+                        float[][] setLocs = cs.toReference(geoVals);
+                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                        RealTupleType types = cs.getReference();
+                        getGridDisplay().setStartPoints(types, setLocs);
+                    }
+                    //getGridDisplay().setZskip(ct - 1);
+                    getGridDisplay().resetTrojectories();
+                }
+
+            } catch (Exception ex) {
+                logException("setFlowScale: ", ex);
+            }
+
+        }
+
+    }
+
     /**
      * _more_
      *
@@ -1877,7 +2377,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             skipFactorWidgetZ.setValue(value);
         }
 
-        if(getControlContext() != null){
+        if (getControlContext() != null) {
             applySkipFactor();
             setLevels(null);
         }
@@ -1886,9 +2386,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
 
         FlowDisplayable fd = getGridDisplay();
         if (fd != null) {
-            int ct;
+            int    ct;
             String tt;
-            if(isStreamLine) {
+            if (isStreamLine) {
                 tt = slevelBox.getSelectedItem().toString();
                 ct = slevelBox.getItemCount();
             } else {
@@ -1940,8 +2440,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             } else if ((trajFormType == 1) || (trajFormType == 3)) {
                 getGridDisplay().setRibbonWidth(width);
             }
-            if(!fromBundle)
+            if ( !fromBundle) {
                 getGridDisplay().resetTrojectories();
+            }
         }
 
         super.setLineWidth(width);
@@ -2006,8 +2507,9 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         fromBundle = true;
         super.initAfterUnPersistence(vc, properties);
         if (isTrajectories) {
-            if(trajectoryBtn == null)
+            if (trajectoryBtn == null) {
                 doMakeWidgetComponent();
+            }
             trajectoryBtn.doClick();
             //setTrajFormType(getTrajFormType());
             int width = super.getLineWidth();
@@ -2018,16 +2520,17 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 } else if ((trajFormType == 1) || (trajFormType == 3)) {
                     getGridDisplay().setRibbonWidth(width);
                 }
-                if(arrowHead){
+                if (arrowHead) {
                     getGridDisplay().setArrowHead(true);
                     arrowCbx.setSelected(arrowHead);
                 }
+                levelBoxEnd.setSelectedIndex(getTrajEndLevel());
             }
-
-            getGridDisplay().resetTrojectories();
+            //getGridDisplay().resetTrojectories();
         } else if (isStreamLine) {
-            if(streamlineBtn == null)
+            if (streamlineBtn == null) {
                 doMakeWidgetComponent();
+            }
             streamlineBtn.doClick();
             //setStreamLFormType(getStreamLFormType());
             int width = super.getLineWidth();
@@ -2038,23 +2541,37 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                 } else if ((streamLFormType == 1) || (streamLFormType == 3)) {
                     getGridDisplay().setRibbonWidth(width);
                 }
-                if(arrowHeadL){
+                if (arrowHeadL) {
                     getGridDisplay().setArrowHead(true);
                     arrowCbxL.setSelected(arrowHeadL);
                 }
+                if ((currentLevel != null)
+                        && ((TwoFacedObject) currentLevel).getLabel().equals(
+                            "All Levels")) {
+                    slevelBox.setSelectedItem(currentLevel);
+                } else if (currentLevel == null) {
+                    int len = slevelBoxEnd.getItemCount();
+                    slevelBox.setSelectedIndex(len - 1);
+                } else {
+                    slevelBox.setSelectedIndex(getStreamLStartLevel());
+                }
+                slevelBoxEnd.setSelectedIndex(getStreamLEndLevel());
             }
 
-            getGridDisplay().resetTrojectories();
+            //getGridDisplay().resetTrojectories();
         } else {
-            if(vectorBtn == null)
+            if (vectorBtn == null) {
                 doMakeWidgetComponent();
+            }
             vectorBtn.doClick();
             setFlowScale(flowScaleValue);
             setArrowHeadSize(arrowHeadSizeValue);
         }
-        if(skipFactorWidgetZ != null)
+        if (skipFactorWidgetZ != null) {
             skipFactorWidgetZ.setValue(getSkipValueZ());
+        }
 
         fromBundle = false;
     }
+
 }
