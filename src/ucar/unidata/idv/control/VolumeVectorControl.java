@@ -678,7 +678,12 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                         isStreamLine   = false;
                         if ( !fromBundle) {
                             setStreamlines();
-                            levelBoxEnd.setSelectedIndex(getTrajEndLevel());
+                            if(getTrajEndLevel() == 0) {
+                                Object ob = levelBoxEnd.getSelectedItem();
+                                levelBoxEnd.setSelectedItem(ob);
+                            }
+                            else
+                                levelBoxEnd.setSelectedIndex(getTrajEndLevel());
                         }
                     } else if (source == streamlineBtn) {
                         isStreamLine   = true;
@@ -686,8 +691,13 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                         isVectors      = false;
                         if ( !fromBundle) {
                             setStreamlines();
-                            slevelBoxEnd.setSelectedIndex(
-                                getStreamLEndLevel());
+                            if(getTrajEndLevel() == 0) {
+                                Object ob = slevelBoxEnd.getSelectedItem();
+                                slevelBoxEnd.setSelectedItem(ob);
+                            }
+                            else
+                                slevelBoxEnd.setSelectedIndex(
+                                    getStreamLEndLevel());
                         }
                     } else {
                         isVectors      = true;
