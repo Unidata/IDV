@@ -368,6 +368,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                     tparm.setStartPoints(trajStartPointType, trajStartPoints);
                     tparm.setZStartSkip(zskip);
                     tparm.setDirectionFlag(forward);
+                    tparm.setConserveColor(true);
                     if (isTrajectories) {
                         tparm.setCachingEnabled(false);
                         tparm.setMethod(TrajectoryParams.Method.HySplit);
@@ -438,6 +439,7 @@ public class FlowDisplayable extends RGBDisplayable  /*DisplayableData*/
                 }
 
                 TrajectoryParams tparm = flowControl.getTrajectoryParams();
+                tparm.setConserveColor(true);
                 int              t     = tparm.getStartSkip();
                 tparm.setTrajectoryForm(trajFormType);
                 tparm.setTracerType(tracerType);
