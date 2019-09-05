@@ -21,6 +21,7 @@
 package ucar.unidata.data;
 
 
+import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -410,7 +411,9 @@ public final class AddeUtil {
         try {
             GregorianCalendar utcCalendar =
                     new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-            Date   now         = new Date();
+            Date   now         = DateUtil.parse(driverTimes.get(driverTimes.size()-1).toString());
+            if(now == null)
+                now = new Date();
             utcCalendar.setTime(now);
             int min = (int)(timeInc * 60);
             int minB = 2; //back 2 minutes from current time
