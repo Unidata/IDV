@@ -2899,5 +2899,191 @@ public class GridMath {
         return fi;
     }
 
+    /**
+     * Calculate Helicity to the time steps of the given grid at each level.
+     *
+     * @param gridu   u component grid
+     * @param gridv   v component grid
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl calculateHelicity(FieldImpl gridu,FieldImpl gridv)
+            throws VisADException {
+        FieldImpl newField = null;
+        try {
+            if (GridUtil.isTimeSequence(gridu)) {
+                Set          timeDomain = gridu.getDomainSet();
+                TupleType    rangeType  = null;
+                Gridded2DSet newDomain  = null;
+                for (int timeStepIdx = 0;
+                     timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
+                    FieldImpl sample =
+                            (FieldImpl) gridu.getSample(timeStepIdx);
+                    FieldImpl sample1 =
+                            (FieldImpl) gridv.getSample(timeStepIdx);
+                    if (sample == null) {
+                        continue;
+                    }
+                    FieldImpl funcFF = null;
+                    if ( !GridUtil.isSequence(sample)) {
+                        funcFF =
+                                calculateHelicityFF((FlatField) sample,(FlatField) sample1,
+                                         rangeType, newDomain);
+                    } else {  // ensembles & such
+                        Trace.call1(
+                                "GridMath.applyFunctionOverLevels inner sequence");
+                        Set ensDomain = sample.getDomainSet();
+                        for (int j = 0; j < ensDomain.getLength(); j++) {
+                            FlatField innerField =
+                                    (FlatField) sample.getSample(j, false);
+                            FlatField innerField1 =
+                                    (FlatField) sample1.getSample(j, false);
+                            if (innerField == null) {
+                                continue;
+                            }
+                            FlatField innerFuncFF =
+                                    calculateHelicityFF(innerField,innerField1,
+                                             rangeType, newDomain);
+                            if (innerFuncFF == null) {
+                                continue;
+                            }
+                            if (rangeType == null) {
+                                rangeType =
+                                        GridUtil.getParamType(innerFuncFF);
+                            }
+                            if (newDomain == null) {
+                                newDomain =
+                                        (Gridded2DSet) GridUtil.getSpatialDomain(
+                                                innerFuncFF);
+                            }
+                            if (funcFF == null) {
+                                FunctionType innerType =
+                                        new FunctionType(
+                                                DataUtility.getDomainType(ensDomain),
+                                                innerFuncFF.getType());
+                                funcFF = new FieldImpl(innerType, ensDomain);
+                            }
+                            funcFF.setSample(j, innerFuncFF, false);
+                        }
+                        Trace.call1(
+                                "GridMath.applyFunctionOverLevels inner sequence");
+                    }
+                    if (funcFF == null) {
+                        continue;
+                    }
+                    if (rangeType == null) {
+                        rangeType = GridUtil.getParamType(funcFF);
+                    }
+                    if (newDomain == null) {
+                        newDomain =
+                                (Gridded2DSet) GridUtil.getSpatialDomain(funcFF);
+                    }
 
+                    if (newField == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeDomain.getType()).getDomain(),
+                                        funcFF.getType());
+                        newField = new FieldImpl(newFieldType, timeDomain);
+                    }
+                    newField.setSample(timeStepIdx, funcFF, false);
+                }
+            } else {
+                newField = calculateHelicityFF((FlatField) gridu, (FlatField) gridv,
+                        null, null);
+            }
+            return newField;
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverLevels");
+        }
+
+    }
+
+
+    /**
+     * Calculate Helicity to a single time step of a grid
+     *
+     * @param gridu   u component grid
+     * @param gridv   v component grid
+     * @param newRangeType   the new range type.  if null, create
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    private static FlatField calculateHelicityFF(FlatField gridu, FlatField gridv,
+                                                      TupleType newRangeType, Gridded2DSet newDomain)
+            throws VisADException {
+
+        if (newRangeType == null) {
+            Unit[][] uu = gridu.getRangeUnits();
+            Unit[][] vu = gridu.getRangeUnits();
+            DerivedUnit dunit = (DerivedUnit)uu[0][0];
+            DerivedUnit dunit1 = (DerivedUnit)vu[0][0];
+            newRangeType = new RealTupleType(DataUtil.makeRealType("helicity",
+                    dunit.multiply(dunit1)));
+        }
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(gridu);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[][] samples   = gridu.getFloats(false);
+            float[][] samples1   = gridv.getFloats(false);
+            float[][] newValues = new float[samples.length][sizeX * sizeY];
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+                float[] paramVals1 = samples1[np];
+                float[] newVals   = newValues[np];
+                for (int j = 0; j < sizeY; j++) {
+                    for (int i = 0; i < sizeX; i++) {
+                        int   numNonMissing = 0;
+                        float result        = Float.NaN;
+                        for (int k = 0; k < (sizeZ-1); k++) {
+                            int   index = k * sizeX * sizeY + j * sizeX + i;
+                            int   index1 = (k+1) * sizeX * sizeY + j * sizeX + i;
+                            float value = paramVals[index1] * paramVals1[index] -
+                                    paramVals[index] * paramVals1[index1] ;
+                            if (value != value) {
+                                continue;
+                            }
+                            if (result != result && value > 0) {  // first non-missing
+                                result = value;
+                                numNonMissing++;
+                            } else {
+                                if (value > 0) {
+                                    result += value;
+                                    numNonMissing++;
+                                }
+                            }
+                        }
+
+                        int newindex = j * sizeX + i;
+                        newVals[newindex] = result;
+                    }
+                }
+            }
+            if (newDomain == null) {
+                newDomain = GridUtil.makeDomain2D(domainSet);
+            }
+            FunctionType newFT =
+                    new FunctionType(((SetType) newDomain.getType()).getDomain(),
+                            newRangeType);
+            newField = new FlatField(newFT, newDomain);
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
 }
