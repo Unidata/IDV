@@ -702,3 +702,6 @@ def EllrodIndex(u, v, z, top, bottom, unit):
   EI = mul(noUnit(VWS), add(noUnit(DEF), noUnit(DIV)))
   return setLevel(EI, top, unit)
 
+def SurfaceWindAngle(u, v, w, z, unit="m"):
+  angle = DerivedGridFactory.createSurfaceWindAngle(u,v,w,z,unit)
+  return angle
