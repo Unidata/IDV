@@ -6048,4 +6048,54 @@ public class DerivedGridFactory {
         return dailyAnom;
     }
 
+    /**
+     * Calculate the surface wind angle at certain level
+     *
+     * @param gridu  wind
+     * @param gridv  wind
+     * @param gridw  wind
+     *
+     * @return  the angle
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl createSurfaceWindAngle(FieldImpl gridu, FieldImpl gridv,FieldImpl gridw,
+                                                  double value1, String lUnit)
+            throws VisADException, RemoteException {
+        RealType levelType = RealType.Generic;
+        Unit levelUnit = Util.parseUnit(lUnit);
+
+        if (levelUnit != null) {
+            if (Unit.canConvert(levelUnit, CommonUnits.HECTOPASCAL)) {
+                levelType = AirPressure.getRealType();
+            } else if (Unit.canConvert(levelUnit, CommonUnit.meter)) {
+                levelType = RealType.Altitude;
+            } else {  // TODO:  figure out something better
+                levelUnit = null;
+            }
+        }
+        FieldImpl gridwz  =convertPressureVelocityToHeightVelocity(
+                gridw);
+        Real      level1 = (levelUnit != null)
+                ? new Real(levelType, value1, levelUnit)
+                : new Real(levelType, value1);
+
+        FieldImpl first  =
+                GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(gridu,
+                        level1), false);
+        FieldImpl second =
+                GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(gridv,
+                        level1), false);
+        FieldImpl horizontalSpeed = createWindSpeed(first, second);
+
+        FieldImpl verticalSpeed  =
+                GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(gridwz,
+                        level1), false);
+
+        FieldImpl result = createVectorDirection(verticalSpeed, horizontalSpeed);
+
+        return GridUtil.addLevelToGrid(result, value1, lUnit);
+    }
+
+
 }
