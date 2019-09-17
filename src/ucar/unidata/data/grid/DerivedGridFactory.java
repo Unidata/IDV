@@ -6054,7 +6054,7 @@ public class DerivedGridFactory {
      * @param gridu  wind
      * @param gridv  wind
      * @param gridw  wind
-     *
+     
      * @return  the angle
      *
      * @throws VisADException bad input or problem creating fields
