@@ -2908,7 +2908,7 @@ public class GridMath {
      *
      * @throws VisADException  On badness
      */
-    public static FieldImpl calculateHelicity(FieldImpl gridu,FieldImpl gridv)
+    public static FieldImpl calculateHelicity(FieldImpl gridu,FieldImpl gridv, float ux, float vy)
             throws VisADException {
         FieldImpl newField = null;
         try {
@@ -2927,6 +2927,8 @@ public class GridMath {
                     }
                     FieldImpl funcFF = null;
                     if ( !GridUtil.isSequence(sample)) {
+                        sample = (FlatField) sample.subtract(new Real(ux));
+                        sample1 = (FlatField) sample1.subtract(new Real(vy));
                         funcFF =
                                 calculateHelicityFF((FlatField) sample,(FlatField) sample1,
                                          rangeType, newDomain);
@@ -2942,6 +2944,8 @@ public class GridMath {
                             if (innerField == null) {
                                 continue;
                             }
+                            innerField = (FlatField)innerField.subtract(new Real(ux));
+                            innerField1 = (FlatField)innerField1.subtract(new Real(vy));
                             FlatField innerFuncFF =
                                     calculateHelicityFF(innerField,innerField1,
                                              rangeType, newDomain);
@@ -2990,6 +2994,8 @@ public class GridMath {
                     newField.setSample(timeStepIdx, funcFF, false);
                 }
             } else {
+                gridu = (FlatField) gridu.subtract(new Real(ux));
+                gridv = (FlatField) gridv.subtract(new Real(vy));
                 newField = calculateHelicityFF((FlatField) gridu, (FlatField) gridv,
                         null, null);
             }
