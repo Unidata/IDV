@@ -34,6 +34,7 @@ import ucar.nc2.ft.ProfileFeature;
 import ucar.nc2.ft.StationProfileFeature;
 import ucar.nc2.ft.StationProfileFeatureCollection;
 
+import ucar.unidata.data.DataAlias;
 import ucar.unidata.util.LogUtil;
 
 import ucar.visad.quantities.CommonUnits;
@@ -41,6 +42,7 @@ import ucar.visad.quantities.GeopotentialAltitude;
 
 import visad.CommonUnit;
 import visad.DateTime;
+import visad.SI;
 import visad.VisADException;
 
 import java.beans.PropertyVetoException;
@@ -199,24 +201,50 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
      */
     private SoundingLevelData mandatoryLevels(final StructureData data) {
         SoundingLevelData sl = new SoundingLevelData();
-        sl.pressure    = (data.findMember(PRES) == null)
-                         ? null
-                         : data.getScalarFloat(data.findMember(PRES));
-        sl.temperature = (data.findMember(TEMP) == null)
-                         ? null
-                         : data.getScalarFloat(data.findMember(TEMP));
-        sl.dewpoint    = (data.findMember(DWPT) == null)
-                         ? null
-                         : data.getScalarFloat(data.findMember(DWPT));
-        sl.speed       = (data.findMember(SPED) == null)
-                         ? null
-                         : data.getScalarFloat(data.findMember(SPED));
-        sl.direction   = (data.findMember(DRCT) == null)
-                         ? null
-                         : data.getScalarFloat(data.findMember(DRCT));
-        sl.height      = (data.findMember(HGHT) == null)
-                         ? null
-                         : data.getScalarFloat(data.findMember(HGHT));
+        if(data.findMember(PRES) != null) {
+            sl.pressure = (data.findMember(PRES) == null)
+                    ? null
+                    : data.getScalarFloat(data.findMember(PRES));
+            sl.temperature = (data.findMember(TEMP) == null)
+                    ? null
+                    : data.getScalarFloat(data.findMember(TEMP));
+            sl.dewpoint = (data.findMember(DWPT) == null)
+                    ? null
+                    : data.getScalarFloat(data.findMember(DWPT));
+            sl.speed = (data.findMember(SPED) == null)
+                    ? null
+                    : data.getScalarFloat(data.findMember(SPED));
+            sl.direction = (data.findMember(DRCT) == null)
+                    ? null
+                    : data.getScalarFloat(data.findMember(DRCT));
+            sl.height = (data.findMember(HGHT) == null)
+                    ? null
+                    : data.getScalarFloat(data.findMember(HGHT));
+        } else {
+            List<Member> smembers = data.getMembers();
+            int size = smembers.size();
+
+            for(int i = 0; i < size; i++){
+                    Member member = smembers.get(i);
+                    String  name      = member.getName();
+                    String  canonical = DataAlias.aliasToCanonical(name);
+                    if (canonical == null) {
+                        continue;
+                    }
+                    if (canonical.equals("PRESSURE")) {
+                        sl.pressure = data.getScalarFloat( member);
+                    } else if (canonical.equals("TEMP")) {
+                        sl.temperature = data.getScalarFloat( member);
+                    } else if (canonical.equals("DEWPOINT")) {
+                        sl.dewpoint = data.getScalarFloat( member);
+                    } else if (canonical.equals("SPEED")) {
+                        sl.speed = data.getScalarFloat( member);
+                    } else if (canonical.equals("DIR")) {
+                        sl.direction = data.getScalarFloat( member);
+                    }
+            }
+
+        }
         return sl;
     }
 
@@ -494,12 +522,20 @@ public class CDMStationProfileAdapter extends SoundingAdapterImpl implements Sou
 
         RAOB r = sound.getRAOB();
         try {
-            r.setMandatoryPressureProfile(
-                CommonUnits.MILLIBAR, pressures, CommonUnits.CELSIUS, temps,
-                CommonUnits.CELSIUS, dewpts, CommonUnit.meterPerSecond,
-                speeds, CommonUnit.degree, dirs,
-                GeopotentialAltitude.getGeopotentialUnit(CommonUnit.meter),
-                heights);
+            if(temps[0] > 200 && dewpts[0] > 200)
+                r.setMandatoryPressureProfile(
+                    CommonUnits.MILLIBAR, pressures, SI.kelvin, temps,
+                        SI.kelvin, dewpts, CommonUnit.meterPerSecond,
+                    speeds, CommonUnit.degree, dirs,
+                    GeopotentialAltitude.getGeopotentialUnit(CommonUnit.meter),
+                    heights);
+            else
+                r.setMandatoryPressureProfile(
+                        CommonUnits.MILLIBAR, pressures, CommonUnits.CELSIUS, temps,
+                        CommonUnits.CELSIUS, dewpts, CommonUnit.meterPerSecond,
+                        speeds, CommonUnit.degree, dirs,
+                        GeopotentialAltitude.getGeopotentialUnit(CommonUnit.meter),
+                        heights);
         } catch (VisADException | RemoteException | PropertyVetoException e) {
             System.err.println("Error:");
             e.printStackTrace();
