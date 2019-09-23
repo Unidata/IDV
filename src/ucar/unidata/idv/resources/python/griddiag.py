@@ -705,3 +705,6 @@ def EllrodIndex(u, v, z, top, bottom, unit):
 def SurfaceWindAngle(u, v, w, z, unit="m"):
   angle = DerivedGridFactory.createSurfaceWindAngle(u,v,w,z,unit)
   return angle
+
+def StormRelativeHelicity(u, v, ux=0, vy=0):
+  return GridMath.calculateHelicity(u ,v, ux, vy)
