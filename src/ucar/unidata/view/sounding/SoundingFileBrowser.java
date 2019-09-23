@@ -21,6 +21,9 @@
 package ucar.unidata.view.sounding;
 
 
+import ucar.nc2.constants.FeatureType;
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
+import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.unidata.beans.NonVetoableProperty;
 import ucar.unidata.beans.Property;
 import ucar.unidata.beans.PropertySet;
@@ -46,6 +49,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 
 import java.io.File;
+import java.util.Formatter;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -63,7 +67,7 @@ public class SoundingFileBrowser {
 
     /** PatternFileFilter for upper air netCDF files */
     public static final PatternFileFilter FILTER_NC =
-        new PatternFileFilter(".*ua\\.nc$,Upperair.*\\.nc$",
+        new PatternFileFilter(".*ua\\.nc$,Upperair.*\\.nc$,.*\\.nc$",
                               "netCDF Upper Air files (*ua.nc)");
 
     /** PatternFileFilter for CMA upper air files */
@@ -171,7 +175,13 @@ public class SoundingFileBrowser {
         }
         SoundingAdapter adapter = null;
         try {
-            if (selectedFile.toString().endsWith(".gem")) {
+            Formatter log = new Formatter();
+            FeatureDatasetPoint dataset =
+                    (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+                            FeatureType.STATION_PROFILE, selectedFile.toString(), null, log);
+            if(dataset != null){
+                adapter = new CDMStationProfileAdapter(selectedFile);
+            } else if (selectedFile.toString().endsWith(".gem")) {
                 adapter = new CDMStationProfileAdapter(selectedFile);
             } else {
                 adapter = new NetcdfSoundingAdapter(selectedFile);
