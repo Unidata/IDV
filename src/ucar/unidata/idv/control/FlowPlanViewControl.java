@@ -23,7 +23,7 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.*;
-import ucar.unidata.data.grid.GridTrajectory;
+import ucar.unidata.data.grid.DerivedGridFactory;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.*;
 
@@ -187,6 +187,11 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     /** _more_ */
     private Range flowColorRange;
 
+    /** Macro for the max wind speed  */
+    public static final String MACRO_MAXSPEED = "%maxspeed%";
+
+    /** Macro for the min wind speed */
+    String maxspeedString = null;
     /**
      * Create a new FlowPlanViewControl; set attribute flags
      */
@@ -1579,5 +1584,102 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
 
         super.setLineWidth(width);
     }
+
+    /**
+     * Add any macro name/label pairs
+     *
+     * @param names List of macro names
+     * @param labels List of macro labels
+     */
+    protected void getMacroNames(List names, List labels) {
+        super.getMacroNames(names, labels);
+        names.addAll(Misc.newList(MACRO_MAXSPEED));
+        labels.addAll(Misc.newList("Max Speed"));
+
+    }
+
+    /**
+     * Add any macro name/value pairs.
+     *
+     *
+     * @param template template
+     * @param patterns The macro names
+     * @param values The macro values
+     */
+    protected void addLabelMacros(String template, List patterns,
+                                  List values) {
+        super.addLabelMacros(template, patterns, values);
+        patterns.add(MACRO_MAXSPEED);
+
+        if (currentLevel == null) {
+            values.add("");
+        } else {
+            try {
+                if(maxspeedString == null) {
+                    FieldImpl ff = (FieldImpl) currentSlice.getSample(0);
+                    Range[] a = getSpeedRange(ff);
+                    maxspeedString = "" + getDisplayConventions().format(a[0].max) + getDisplayUnit();
+                }
+                values.add(maxspeedString);
+
+            } catch (Exception e){}
+        }
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param ff _more_
+     * @return range _more_
+     */
+    public Range[] getSpeedRange(FieldImpl ff){
+        Range [] a = null;
+
+        try {
+            FlatField uGrid = (FlatField)DerivedGridFactory.getUComponent(ff);
+            FlatField vGrid = (FlatField)DerivedGridFactory.getVComponent(ff);
+            FlatField wsgridFI =
+                    (FlatField) (uGrid.multiply(uGrid)).add((vGrid.multiply(vGrid))).sqrt();
+
+            a = GridUtil.getMinMax(wsgridFI);
+        } catch (Exception e){}
+
+        return a;
+    }
+
+    /**
+     * _more_
+     *
+     * @param time _more_
+     */
+    protected void timeChanged(Real time) {
+        try {
+            super.timeChanged(time);
+
+            String dlTemplate = getDisplayListTemplate();
+            if (dlTemplate.contains(MACRO_MAXSPEED)) {
+
+                List<DateTime> dlist = GridUtil.getDateTimeList(currentSlice);
+                int index = dlist.indexOf((DateTime) time);
+                FieldImpl ff = (FieldImpl) currentSlice.getSample(index);
+                Range[] a = getSpeedRange(ff);
+
+                if (index >= 0) {
+                    try {
+                        maxspeedString = "" + getDisplayConventions().format(a[0].max) + getDisplayUnit();
+                    } catch (Exception ve) {}
+                }
+
+                //System.out.println(maxspeedString + "\n");
+                updateDisplayList();
+            }
+
+        } catch (Exception ex) {
+            logException("timeValueChanged", ex);
+        }
+
+    }
+
 
 }
