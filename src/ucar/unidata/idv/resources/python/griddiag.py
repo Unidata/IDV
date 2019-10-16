@@ -706,5 +706,8 @@ def SurfaceWindAngle(u, v, w, z, unit="m"):
   angle = DerivedGridFactory.createSurfaceWindAngle(u,v,w,z,unit)
   return angle
 
-def StormRelativeHelicity(u, v, ux=0, vy=0):
-  return GridMath.calculateHelicity(u ,v, ux, vy)
+def StormRelativeHelicity(u, v, bottom, top, ux=0, vy=0):
+  """ calculate helicity in pressure coordinate
+      bottom and top in meter
+  """
+  return GridMath.calculateHelicity(u ,v, bottom, top, ux, vy)
