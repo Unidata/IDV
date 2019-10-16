@@ -480,6 +480,20 @@
          value="System"/>
     </resource>
     <resource
+       label="ABI Functions"
+       location="%IDVPATH%/python/ABIFunctions.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
+       label="AHI Functions"
+       location="%IDVPATH%/python/AHIFunctions.py">
+      <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
        label="Shell Utilities"
        location="%IDVPATH%/python/shell.py">
       <property
