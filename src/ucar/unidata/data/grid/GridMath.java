@@ -23,10 +23,13 @@ package ucar.unidata.data.grid;
 
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
 import ucar.visad.Util;
 
+import ucar.visad.quantities.AirPressure;
+import ucar.visad.quantities.CommonUnits;
 import visad.*;
 
 import visad.georef.MapProjection;
@@ -2904,11 +2907,13 @@ public class GridMath {
      *
      * @param gridu   u component grid
      * @param gridv   v component grid
+     * @param bottom   in meter
+     * @param top   in meter
      * @return the new field
      *
      * @throws VisADException  On badness
      */
-    public static FieldImpl calculateHelicity(FieldImpl gridu,FieldImpl gridv, float ux, float vy)
+    public static FieldImpl calculateHelicity(FieldImpl gridu,FieldImpl gridv, float bottom, float top, float ux, float vy)
             throws VisADException {
         FieldImpl newField = null;
         try {
@@ -2926,6 +2931,43 @@ public class GridMath {
                         continue;
                     }
                     FieldImpl funcFF = null;
+                    // cal pressure-weighted mean wind
+                    float pinc = 250;
+                    if(ux == 0.f && vy == 0.f){
+                        double usum = 0.0f;
+                        double vsum = 0.0f;
+                        double psum = 0.0f;
+                        FieldImpl agridu = GridMath.applyFunctionToLevels(gridu, "average");
+                        FieldImpl agridv = GridMath.applyFunctionToLevels(gridv, "average");
+                        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                                (FlatField) gridu.getSample(0));
+                        int n = (int)((top - bottom)/pinc);
+                        for (int i = 0; i < n; i++ ){
+                            float plevel = bottom + pinc * i;
+                            Unit unit = Util.parseUnit("meter");
+                            Real altt = new Real(RealType.Altitude, plevel, unit);
+
+                            FieldImpl agridu0 = GridUtil.sliceAtLevel(agridu, altt);
+                            FieldImpl agridv0 = GridUtil.sliceAtLevel(agridv, altt);
+                            FieldImpl pFI0 = GridUtil.sliceAtLevel(pFI, altt);
+
+                            Range [] ur = GridUtil.fieldMinMax((FlatField) agridu0.getSample(0));
+                            Range [] vr = GridUtil.fieldMinMax((FlatField) agridv0.getSample(0));
+                            Range [] pr = GridUtil.fieldMinMax((FlatField) pFI0);
+                            if(ur[0].max < 100 && vr[0].max < 100) {
+                                usum = usum + ur[0].max * plevel;
+                                vsum = vsum + vr[0].max * plevel;
+                                psum = psum + pr[0].max;
+                            }
+                            System.out.println("U, V = " + ur[0].max + "m/s  " + vr[0].max + "m/s  " + pr[0].max);
+                        }
+
+                        ux =(float)(usum/psum);
+                        vy =(float)(vsum/psum);
+
+                        System.out.println("U, V " + ux + "m/s  " + vy + "m/s  " + psum);
+
+                    }
                     if ( !GridUtil.isSequence(sample)) {
                         sample = (FlatField) sample.subtract(new Real(ux));
                         sample1 = (FlatField) sample1.subtract(new Real(vy));
