@@ -2959,13 +2959,13 @@ public class GridMath {
                                 vsum = vsum + vr[0].max * plevel;
                                 psum = psum + pr[0].max;
                             }
-                            System.out.println("U, V = " + ur[0].max + "m/s  " + vr[0].max + "m/s  " + pr[0].max);
+                            // System.out.println("U, V = " + ur[0].max + "m/s  " + vr[0].max + "m/s  " + pr[0].max);
                         }
 
                         ux =(float)(usum/psum);
                         vy =(float)(vsum/psum);
 
-                        System.out.println("U, V " + ux + "m/s  " + vy + "m/s  " + psum);
+                       // System.out.println("U, V " + ux + "m/s  " + vy + "m/s  " + psum);
 
                     }
                     if ( !GridUtil.isSequence(sample)) {
