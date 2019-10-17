@@ -8,7 +8,7 @@ gen::setIndexFile   main.index
 
 ##Where is the userguide located at
 ##TODO: Set this to point to the right place
-set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
+set ::workshopDocroot https://www.unidata.ucar.edu/software/idv
 set ::userguideRoot $::workshopDocroot/docs/userguide
 
 ##The page title
@@ -98,7 +98,7 @@ proc gen::hook::parseArgs {argv arg i} {
         set ::workshopTitle {Joint AAP/ICTP IDV Workshop}
         gen::define flag_regionalworkshop 
         gen::defineMacro {<%idv.version%>} {3.0}
-        set ::workshopDocroot http://www.unidata.ucar.edu/software/idv
+        set ::workshopDocroot https://www.unidata.ucar.edu/software/idv
         set ::workshopHome {~}
         gen::defineMacro {<%workshop.installdir%>} "$::workshopHome"
         gen::defineMacro {<%workshop.homedir%>} $::workshopHome
