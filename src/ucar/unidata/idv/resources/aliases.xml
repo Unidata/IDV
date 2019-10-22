@@ -173,4 +173,54 @@ The label is used  (if defined) for  the AliasEditor gui.
      name="WREL"
      aliases="GridRelative_w, omega, Vertical_velocity_pressure,Vertical_velocity_pressure_isobaric,Pressure_vertical_velocity"
      label="Grid Relative W component of wind" />
+  <alias aliases="Optical_Depth_Land_And_Ocean" label="AerosolOpticalDepth_MOD04" name="AOD_MOD04"/>
+  <alias aliases="Cloud_Optical_Thickness" label="CloudOpticalThickness_MOD06" name="COT_MOD06"/>
+  <alias aliases="radiances.*" label="Radiance" name="Radiance"/>
+  <alias aliases="EV_1KM_Emissive.*" label="Radiance" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_rad_b01.*" label="RadianceVIZ" name="RadianceVIZ"/>
+  <alias aliases=".*ABI_rad_b02.*" label="RadianceVIZ" name="RadianceVIZ"/>
+  <alias aliases=".*ABI_rad_b03.*" label="RadianceVIZ" name="RadianceVIZ"/>
+  <alias aliases=".*ABI_rad_b04.*" label="RadianceVIZ" name="RadianceVIZ"/>
+  <alias aliases=".*ABI_rad_b05.*" label="RadianceVIZ" name="RadianceVIZ"/>
+  <alias aliases=".*ABI_tb_b06.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b07.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b08.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b09.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b10.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b11.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b12.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b13.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b14.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b15.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*ABI_tb_b16.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*BrightnessTemp.*" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases=".*_Band.*_TEMP" label="BrightnessTemp" name="BrightnessTemp"/>
+  <alias aliases="Total_Attenuated_Backscatter_532" label="TotalAttenuatedBackscatter_532" name="TAB_532"/>
+  <alias aliases="7_Band16_.*" label="HydrometeorClassification" name="HydrometeorClassification"/>
+  <alias aliases="HT, .*_Band3_CTH" label="ABI L2 Cloud Top Height" name="ABI_L2_ACHA"/>
+  <alias aliases="AOD, .*_Band22_AOD" label="ABI L2 Aerosol Optical Depth" name="ABI_L2_AOD"/>
+  <alias aliases="Phase, .*_Band5_CTPH" label="ABI L2 Cloud Top Phase" name="ABI_L2_ACTP"/>
+  <alias aliases="BCM, .*_Band1_CMSK" label="ABI L2 Clear Sky Mask" name="ABI_L2_CSM"/>
+  <alias aliases="TEMP, .*_Band4_CTT" label="ABI L2 Cloud Top Temperature" name="ABI_L2_ACHT"/>
+  <alias aliases="LST, .*_Band18_LST" label="ABI L2 Land Surface Temperature" name="ABI_L2_LST"/>
+  <alias aliases="FSC, .*_Band23_FSC" label="ABI L2 Fractional Snow Cover" name="ABI_L2_FSC"/>
+  <alias aliases="SST, .*_Band25_SST, SST_QF" label="ABI L2 Sea Surface Temperature" name="ABI_L2_SST"/>
+  <alias aliases="TPW, .*_Band13_TPW" label="ABI L2 Total Precipitable Water" name="ABI_L2_TPW"/>
+  <alias aliases="PSD, .*_Band7_CPS, CPS_QF" label="ABI L2 Cloud Particle Size" name="ABI_L2_CPS"/>
+  <alias aliases="PRES, .*_Band2_CTPR" label="ABI L2 Cloud Top Pressure" name="ABI_L2_CTP"/>
+  <alias aliases="COD, .*_Band6_COD" label="ABI L2 Cloud Optical Depth" name="ABI_L2_COD"/>
+  <alias aliases="CAPE, .*_Band9_CAPE" label="ABI L2 DSI CAPE" name="ABI_L2_CAPE"/>
+  <alias aliases="LI, .*_Band8_LI" label="ABI L2 DSI LI" name="ABI_L2_LI"/>
+  <alias aliases="SI, .*_Band11_SI" label="ABI L2 DSI SI" name="ABI_L2_SI"/>
+  <alias aliases="TT, .*_Band10_TT" label="ABI L2 DSI TT" name="ABI_L2_TT"/>
+  <alias aliases="KI, .*_Band12_KI" label="ABI L2 DSI KI" name="ABI_L2_KI"/>
+  <alias aliases="Area, .*_Band14_FARA" label="ABI L2 Fire Area" name="ABI_L2_FDC_AREA"/>
+  <alias aliases="Temp, .*_Band15_FT" label="ABI L2 Fire Temperature" name="ABI_L2_FDC_Temp"/>
+  <alias aliases="Power, .*_Band17_FPWR" label="ABI L2 Fire Radiative Power" name="ABI_L2_FDC_Power"/>
+  <alias aliases="VAH,.*_Band26_VAH,ACH_QF" label="ABI L2 VAA Ash Cloud Height" name="ABI_L2_VAA_Height"/>
+  <alias aliases="VAML,.*_Band27_VAML,AML_QF" label="ABI L2 Volcanic Ash Mass Loading" name="ABI_L2_VAA_Mass"/>
+  <alias aliases="Mask, 18.*_Band16_FMSK" label="ABI L2 Fire Mask" name="ABI_L2_FDC_Mask"/>
+  <alias aliases="Aerosol, .*_Band19_ARSL" label="ABI L2 Aerosol Detection - Aerosol" name="ABI_L2_ADP_Aerosol"/>
+  <alias aliases="Smoke, *._Band20_SMOK" label="ABI L2 Aerosol Detection - Smoke" name="ABI_L2_ADP_Smoke"/>
+  <alias aliases="Dust, .*_Band21_DUST" label="ABI L2 Aerosol Detection - Dust" name="ABI_L2_ADP_Dust"/>
 </aliases>
