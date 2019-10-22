@@ -425,4 +425,43 @@ specified  -->
      ci_min="0.0"
      ci_max="22000.0"
      unit="m"/>
+
+    <param ci_base="0.0" ci_interval="5.0" ci_max="60.0" ci_min="55.0" ci_width="1" name="ABI_L2_ACHT" range_max="-109.0" range_min="55.0" table="Cloud Top Temperature" unit="celsius"/>
+    <param ci_base="-1.0" ci_interval="0.5" ci_max="7.0" ci_min="-1.0" ci_width="1" name="ABI_L2_ACTP" range_max="6.5" range_min="-0.5" table="Cloud Top Phase"/>
+    <param ci_base="0.0" ci_interval="10000.0" ci_max="100000.0" ci_min="0.0" ci_width="1" name="ABI_L2_VAA_Height" range_max="98000.0" range_min="0.0" table="Volcanic Ash Cloud Height" unit="ft"/>
+    <param ci_base="0.0" ci_interval="0.5" ci_max="5.0" ci_min="0.0" ci_width="1" name="ABI_L2_TPW" range_max="2.5" range_min="0.0" table="Total Precipitable Water" unit="in"/>
+    <param ci_base="0.0" ci_interval="5.0" ci_max="45.0" ci_min="-10.0" ci_width="1" name="ABI_L2_SST" range_max="35.0" range_min="-5.0" table="Sea Surface Temperature" unit="celsius"/>
+    <param ci_base="0.0" ci_interval="0.25" ci_max="5.0" ci_min="0.0" ci_width="1" name="RRQPE" range_max="3.0" range_min="0.0" table="Rain Rate QPF Estimate" unit="in h-1"/>
+    <param ci_base="0.0" ci_interval="10.0" ci_max="130.0" ci_min="-30.0" ci_width="1" name="ABI_L2_LST" range_max="110.0" range_min="-10.0" table="Land Surface Temperature" unit="Fahrenheit"/>
+    <param ci_base="0.0" ci_interval="100.0" ci_max="1100.0" ci_min="0.0" ci_width="1" name="ABI_L2_FDC_Power" range_max="1000.0" range_min="0.0" table="Fire Radiative Power" unit="MW"/>
+    <param ci_base="0.0" ci_interval="100.0" ci_max="1300.0" ci_min="400.0" ci_width="1" name="ABI_L2_FDC_Temp" range_max="1200.0" range_min="400.0" table="Fire Temperature" unit="K"/>
+    <param ci_base="0.0" ci_interval="500000.0" ci_max="5000000.0" ci_min="0.0" ci_width="1" name="ABI_L2_FDC_AREA" range_max="4000000.0" range_min="0.0" table="Fire Area" unit="m2"/>
+    <param ci_base="0.0" ci_interval="5.0" ci_max="45.0" ci_min="0.0" ci_width="1" name="ABI_L2_KI" range_max="40.0" range_min="0.0" table="K-Index" unit="K"/>
+    <param ci_base="0.0" ci_interval="5.0" ci_max="35.0" ci_min="-35.0" ci_width="1" name="ABI_L2_SI" range_max="30.0" range_min="-30.0" table="Showalter Index" unit="K"/>
+    <param ci_base="0.0" ci_interval="5.0" ci_max="60.0" ci_min="-60.0" ci_width="1" name="ABI_L2_TT" range_max="60.0" range_min="-60.0" table="Total Totals" unit="K"/>
+    <param ci_base="0.0" ci_interval="1000.0" ci_max="8000.0" ci_min="0.0" ci_width="1" name="ABI_L2_CAPE" range_max="5000.0" range_min="0.0" table="CAPE" unit="Joules/kg"/>
+    <param ci_base="0.0" ci_interval="2.0" ci_max="22.0" ci_min="-15.0" ci_width="1" name="ABI_L2_LI" range_max="20.0" range_min="-10.0" table="LI" unit="K"/>
+    <param ci_base="0.0" ci_interval="10.0" ci_max="120.0" ci_min="-10.0" ci_width="1" name="ABI_L2_CPS" range_max="100.0" range_min="0.0" table="Cloud Particle Size" unit="um"/>
+    <param ci_base="0.0" ci_interval="10.0" ci_max="100.0" ci_min="0.0" ci_width="1" name="ABI_L2_COD" range_max="100.0" range_min="0.0" table="Cloud Optical Depth" unit="percent*100"/>
+    <param ci_base="-0.5" ci_interval="0.5" ci_max="2.5" ci_min="-0.5" ci_width="1" name="ABI_L2_CSM" range_max="2.5" range_min="-0.5" table="Clear Sky Mask" unit="percent*100"/>
+    <param ci_base="0.0" ci_interval="5000.0" ci_max="65000.0" ci_min="0.0" ci_width="1" name="ABI_L2_ACHA" range_max="65000.0" range_min="0.0" table="L2 Cloud Top Height" unit="ft"/>
+    <param ci_base="0.0" ci_interval="100.0" ci_max="1100.0" ci_min="0.0" ci_width="1" name="ABI_L2_CTP" range_max="1100.0" range_min="0.0" table="Cloud Top Pressure" unit="hPa"/>
+    <param ci_base="0.0" ci_interval="0.1" ci_max="1.0" ci_min="0.0" ci_width="1" name="ABI_L2_AOD" range_max="1.0" range_min="0.0" table="L2 Aerosol Optical Depth" unit="percent*100"/>
+    <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="0.0" ci_width="1" name="ABI_L2_FSC" range_max="1.0" range_min="0.0" table="Fractional Snow Cover"/>
+    <param ci_base="0.0" ci_interval="20.0" ci_max="340.0" ci_min="0.0" ci_width="1" name="ABI_L2_VAA_Mass" range_max="50.0" range_min="0.0" table="Volcanic Ash Mass Loading" unit="t km-2"/>
+    <param ci_base="0.0" ci_interval="35.0" ci_max="280.0" ci_min="0.0" ci_width="1" name="ABI_L2_FDC_Mask" range_max="245.0" range_min="0.0" table="Fire Mask"/>
+    <param name="ABI_L2_ADP_Aerosol" range_max="1.0" range_min="0.0" table="Aerosol Detection - Aerosol"/>
+    <param name="ABI_L2_ADP_Smoke" range_max="1.0" range_min="0.0" table="Aerosol Detection - Smoke"/>
+    <param name="ABI_L2_ADP_Dust" range_max="1.0" range_min="0.0" table="Aerosol Detection - Dust"/>
+    <param ci_base="0.0" ci_interval="5.0" ci_max="100.0" ci_min="0.0" ci_width="1" name=".*_Band24_QPE" range_max="99.0" range_min="0.0" table="Rain Rate QPF Estimate" unit="mm h-1"/>
+    <!-- end inq2679 -->
+
+    <!-- bob inq 2836 -->
+    <param ci_base="-30.0" ci_interval="30.0" ci_max="270.0" ci_min="-60.0" ci_width="1" name="abinightfog" range_max="16.0" range_min="-16.0" table="ABI Fog" unit="K"/>
+    <param ci_base="-28.0" ci_interval="4.0" ci_max="8.0" ci_min="-32.0" ci_width="1" name="abisplitwindow" range_max="-11.0" range_min="3.4" table="Enhanced Echo Tops" unit="K"/>
+    <param ci_base="-16.0" ci_interval="4.0" ci_max="16.0" ci_min="-20.0" ci_width="1" name="abisplitcloudphase" range_max="25.0" range_min="-10.0" table="truncated gridded data" unit="K"/>
+    <param name="abisplitsnow" table="truncated gridded data"/>
+    <param ci_base="-28.0" ci_interval="4.0" ci_max="8.0" ci_min="-32.0" ci_width="1" name="abisplitwatervapor" range_max="5.0" range_min="-32.0" table="truncated gridded data" unit="K"/>
+    <param ci_base="-42.0" ci_interval="7.0" ci_max="28.0" ci_min="-49.0" ci_width="1" name="abisplitozone" range_max="5.0" range_min="-45.0" table="truncated gridded data" unit="K"/>
+    <!-- end inq 2836 -->
 </params>
