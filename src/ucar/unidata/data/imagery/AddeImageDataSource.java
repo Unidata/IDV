@@ -425,19 +425,21 @@ public class AddeImageDataSource extends ImageDataSource {
             subset.getProperty(DataSelection.PROP_PROGRESSIVERESOLUTION,
                                true);
 
-        if (fromBundle && !isProgressiveResolution) {
-            dlMag = getLineMag();
-            deMag = getEleMag();
-            addeImageDataSelection.getAdvancedPanel().setLineMagSlider(dlMag);
-            addeImageDataSelection.getAdvancedPanel().setElementMagSlider(
-                deMag);
-        } else if ( !isProgressiveResolution) {
-            dlMag =
-                addeImageDataSelection.getAdvancedPanel().getLineMagValue();
-                   // .lineMagLbl.getText().trim());
-            deMag =
-                addeImageDataSelection.getAdvancedPanel().getElementMagValue();
-                  //  .elementMagLbl.getText().trim());
+        if (addeImageDataSelection != null) {
+            if (fromBundle && !isProgressiveResolution) {
+                dlMag = getLineMag();
+                deMag = getEleMag();
+                addeImageDataSelection.getAdvancedPanel().setLineMagSlider(dlMag);
+                addeImageDataSelection.getAdvancedPanel().setElementMagSlider(
+                        deMag);
+            } else if (!isProgressiveResolution) {
+                dlMag =
+                        addeImageDataSelection.getAdvancedPanel().getLineMagValue();
+                // .lineMagLbl.getText().trim());
+                deMag =
+                        addeImageDataSelection.getAdvancedPanel().getElementMagValue();
+                //  .elementMagLbl.getText().trim());
+            }
         }
 
 
@@ -1553,6 +1555,11 @@ public class AddeImageDataSource extends ImageDataSource {
             if ((dataChoice.getId() instanceof BandInfo)
                     && (allBandDirs != null)) {
                 id = (BandInfo) dataChoice.getId();
+            } else if (dataChoice instanceof DerivedDataChoice ) {
+                Hashtable cdc = ((DerivedDataChoice) dataChoice).getUserSelectedChoices();
+                DataChoice dataChoice1 = (DataChoice) cdc.get("D1");
+                id = (BandInfo) dataChoice1.getId();
+              //  return;
             } else {
                 return;
             }
