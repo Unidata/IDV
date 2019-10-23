@@ -35,6 +35,7 @@ import ucar.unidata.geoloc.projection.*;
 
 import ucar.unidata.gis.mcidasmap.McidasMap;
 
+import ucar.unidata.idv.IdvObjectStore;
 import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
 import ucar.unidata.idv.chooser.TimesChooser;
@@ -649,18 +650,39 @@ public class AddeChooser extends TimesChooser {
         }
     }
 
-
+    /**
+     * Return either the user's last selected server and group for a given
+     * ADDE chooser, or check {@code idv.properties} if no selection exists.
+     *
+     * @return Array of two strings. First value is the server, and the second
+     *         is the group. {@code null} signifies that there was no
+     *         {@literal "last"} selection as well as no default selection.
+     */
+    protected String[] getDefaultServerSelection() {
+        String id = getId();
+        String stateProp = PREF_SERVERSTATE + '.' + id;
+        IdvObjectStore store = getIdv().getStore();
+        String[] serverState = (String[])store.get(stateProp);
+        if (serverState == null) {
+            String serverProp = "idv.defaultselection." + id + ".server";
+            String groupProp = "idv.defaultselection." + id + ".group";
+            String server = (String)store.get(serverProp);
+            String group = (String)store.get(groupProp);
+            if ((server != null) && (group != null)) {
+                serverState = new String[] { server, group };
+            }
+        }
+        return serverState;
+    }
 
     /**
      * Load any saved server state
      */
-    private void loadServerState() {
+    protected void loadServerState() {
         if (addeServers == null) {
             return;
         }
-        String id = getId();
-        String[] serverState =
-            (String[]) getIdv().getStore().get(PREF_SERVERSTATE + "." + id);
+        String[] serverState = getDefaultServerSelection();
         if (serverState == null) {
             return;
         }

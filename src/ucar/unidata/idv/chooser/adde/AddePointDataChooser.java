@@ -144,10 +144,23 @@ public class AddePointDataChooser extends AddeChooser {
             }
         }
 
-
+        // handle ADDE groups
+        TwoFacedObject selected = null;
+        TwoFacedObject[] defaultDatasets = getDefaultDatasets();
+        String[] serverState = getDefaultServerSelection();
+        if (serverState != null) {
+            // if we have a default selection, search for it within
+            // defaultDatasets and use that as the selection if a match was
+            // found.
+            for (TwoFacedObject dataset : defaultDatasets) {
+                if (String.valueOf(dataset.getId()).startsWith(serverState[1])) {
+                    selected = dataset;
+                    break;
+                }
+            }
+        }
         dataTypes =
-            GuiUtils.getEditableBox(Misc.toList(getDefaultDatasets()), null);
-
+            GuiUtils.getEditableBox(Misc.toList(defaultDatasets), selected);
         dataTypes.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent a) {
                 setState(STATE_UNCONNECTED);
@@ -162,6 +175,8 @@ public class AddePointDataChooser extends AddeChooser {
                 }
             }
         });
+        // end ADDE group handling
+
         if (canDoLevels()) {
             levelBox = GuiUtils.getEditableBox(getLevels(), null);
         }
@@ -205,9 +220,7 @@ public class AddePointDataChooser extends AddeChooser {
 
 
     /**
-     * Load in an ADDE point data set based on the
-     * <code>PropertyChangeEvent<code>.
-     *
+     * Load in an ADDE point data set based on the {@code PropertyChangeEvent}.
      */
     public void doLoadInThread() {
         showWaitCursor();
@@ -681,7 +694,15 @@ public class AddePointDataChooser extends AddeChooser {
         super.handleConnectionError(excp);
     }
 
-
+    /**
+     * Overridden to return {@link AddeServer#TYPE_POINT} for this chooser and
+     * its subclasses.
+     * 
+     * @return {@link AddeServer#TYPE_POINT}
+     */
+    @Override protected String getGroupType() {
+        return AddeServer.TYPE_POINT;
+    }
 
 
 
