@@ -1615,12 +1615,16 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
             values.add("");
         } else {
             try {
-                if(maxspeedString == null) {
+                if(maxspeedString == null && currentSlice != null) {
                     FieldImpl ff = (FieldImpl) currentSlice.getSample(0);
                     Range[] a = getSpeedRange(ff);
                     maxspeedString = "" + getDisplayConventions().format(a[0].max) + getDisplayUnit();
+                    values.add(maxspeedString);
+                } else if(currentSlice == null){
+                    values.add("");
+                } else if(maxspeedString != null) {
+                    values.add(maxspeedString);
                 }
-                values.add(maxspeedString);
 
             } catch (Exception e){}
         }
