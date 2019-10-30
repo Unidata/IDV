@@ -171,7 +171,7 @@ def ABIFireTemperatureRGB(b5A, b6A, b7T):
     # blu = band5; 0% to 75% rescalled to 0 to 255; gamma 1.0
     red = 255*(rescale(b7T, 273.15, 333.15, 0, 1)**2.5)
     grn = rescale(b6A, 0, 100, 0, 255)
-    blu = rescale(b5A, 0, 70, 0, 255)
+    blu = rescale(b5A, 0, 75, 0, 255)
     return combineRGB(red, grn, blu)
 
 # ABI Dust RGB
