@@ -25,16 +25,11 @@ import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaDirectoryList;
 import edu.wisc.ssec.mcidas.AreaFileException;
 
-import ucar.unidata.data.CompositeDataChoice;
-import ucar.unidata.data.DataCategory;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSourceDescriptor;
-import ucar.unidata.data.DataSourceImpl;
-import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.*;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IdvConstants;
 import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.control.ImageControl;
 import ucar.unidata.idv.control.ImagePlanViewControl;
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.IOUtil;
@@ -138,7 +133,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
 
     List descriptorsToUse;
 
-
+    private boolean isZidv = false;
     /**
      *  The parameterless constructor for unpersisting.
      */
@@ -299,6 +294,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
         super.initAfterUnpersistence();
         List tmp = getTmpPaths();
         if (tmp != null) {
+            isZidv = true;
             imageList = new ArrayList();
             for (int i = 0; i < tmp.size(); i++) {
                 imageList.add(new AddeImageDescriptor(tmp.get(i).toString()));
@@ -399,6 +395,41 @@ public abstract class ImageDataSource extends DataSourceImpl {
             }
         }
 
+        for (int i = 0; i < displays.size(); i++) {
+            DisplayControl dci = (DisplayControl)displays.get(i);
+            if(!(dci instanceof ImageControl)) {
+                continue;
+            }
+            List dataChoices = dci.getDataChoices();
+            if (dataChoices == null) {
+                continue;
+            }
+            List finalOnes = new ArrayList();
+            for (int j = 0; j < dataChoices.size(); j++) {
+                DataChoice dc = (DataChoice)dataChoices.get(j);
+                if(dc instanceof DerivedDataChoice){
+                    Hashtable hdc = ((DerivedDataChoice) dataChoices.get(j)).getUserSelectedChoices();
+                    finalOnes.add(hdc);
+                }
+            }
+            for (int dcIdx = 0; dcIdx < finalOnes.size(); dcIdx++) {
+                Hashtable hd = (Hashtable)finalOnes.get(dcIdx);
+                ArrayList aList = new ArrayList(hd.values());
+                for(int ii = 0; ii < aList.size(); ii++) {
+                    DataChoice dc = (DataChoice) aList.get(ii);
+                    if (!(dc instanceof DirectDataChoice)) {
+                        continue;
+                    }
+                    DirectDataChoice ddc = (DirectDataChoice) dc;
+                    List<AddeImageDescriptor> dList = (List) ddc.getProperty("descriptorsToSave");
+                    if (dList != null) {
+                        for (AddeImageDescriptor descriptor : dList) {
+                            descriptorsToSave.add(descriptor);
+                        }
+                    }
+                }
+            }
+        }
         List urls     = new ArrayList();
         List suffixes = new ArrayList();
         SimpleDateFormat sdf = new SimpleDateFormat("_"
@@ -1620,6 +1651,8 @@ public abstract class ImageDataSource extends DataSourceImpl {
                 return imageList;
             }
         }
+        BandInfo bandInfo = (BandInfo) dataChoice.getId();
+        int bnum = bandInfo.getBandNumber();
         for (Iterator iter = times.iterator(); iter.hasNext(); ) {
             Object              time  = iter.next();
             AddeImageDescriptor found = null;
@@ -1638,7 +1671,13 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         }
 
                     } else {
-                        if (aid.getImageTime().equals(time)) {
+                        int bbnum = aid.getDirectory().getBands()[0];
+                        if(isZidv) { //zidv
+                            if(aid.getImageTime().equals(time) && bbnum == bnum){
+                                found = aid;
+                                break;
+                            }
+                        } else if (aid.getImageTime().equals(time)) {
                             found = aid;
                             break;
                         }
