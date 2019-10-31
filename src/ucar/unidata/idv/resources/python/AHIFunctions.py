@@ -38,7 +38,7 @@ def AHIAirmassRGB(b8T, b10T, b12T, b13T):
     blu = rescale(b8T, 243, 208, 0, 255)
     return combineRGB(red, grn, blu)
 
-# AHI Ash RGB
+# AHI Ash  RGB
 def AHIAshRGB(b11T, b13T, b15T):
     # red = band15 - band13; -4K to 2K rescaled to 0 to 255
     # grn = band13 - band11; -4K to 5K rescaled to 0 to 255
