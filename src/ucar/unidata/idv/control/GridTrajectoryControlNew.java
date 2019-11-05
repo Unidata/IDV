@@ -2373,6 +2373,48 @@ public class GridTrajectoryControlNew extends DrawingControl {
     }
 
     /**
+     * Call the api when reset the datachoice
+     * such as time driver times changed
+     *
+     * @param dataChoice the DataChoice of the moment.
+     * @return true if everything is okay
+     *
+     * @throws RemoteException When bad things happen
+     * @throws VisADException When bad things happen
+     */
+
+    public boolean reInit(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+        super.init((DataChoice) null);
+        gridTrackControl = new MyTrajectoryControl(this);
+
+        dataSelection1 = getDataSelection();
+        dataChoice.setDataSelection(dataSelection1);
+        this.dataChoice                 = dataChoice;
+        gridTrackControl.controlContext = getControlContext();
+
+        gridTrackControl.setUsesTimeDriver(this.getUsesTimeDriver());
+        gridTrackControl.updateDataSelection(dataSelection1);
+        gridTrackControl.init(dataChoice);
+
+        //updateDataSelection(dataSelection1);
+        gridTrackControl.controlContext = getControlContext();
+
+        initDisplayUnit();
+
+        // the control for the track
+        setDisplayActive();
+
+        addDisplayable(gridTrackControl.myDisplay, getAttributeFlags());
+
+        gridTrackControl.addDisplayable(gridTrackControl.myDisplay,
+                getAttributeFlags());
+
+
+        return true;
+
+    }
+    /**
      * _more_
      */
     public void initDone() {
@@ -3939,6 +3981,47 @@ public class GridTrajectoryControlNew extends DrawingControl {
         }
         return gridDataInstance;
 
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected void resetData() throws VisADException, RemoteException {
+        DataSelection ds = super.updateDataSelection(getDataSelection());
+        DataChoice dataChoice = getDataChoice();
+        if (dataChoice != null) {
+            Data data = dataChoice.getData(ds);
+            if (data != null) {
+                processData(data);
+            }
+        }
+
+        while (controlPane.getComponentCount() > 0) {
+            controlPane.remove(0);
+            controlPane.setVisible(false);
+            if (gridTrackControl.myDisplay != null) {
+                gridTrackControl.myDisplay.setData(DUMMY_DATA);
+
+            }
+            createTrjBtnClicked = false;
+        }
+
+        reInit(dataChoice);
+
+        try {
+            gridTrackControl.setTrajFormType(getTrackFormType());
+            gridTrackControl.setLineWidth(getTrackLineWidth());
+            gridTrackControl.setTrajOffset(getTrackOffsetValue());
+            gridTrackControl.setColor(getTrackColor());
+            gridTrackControl.setSmoothFactor(getSmoothFactorValue());
+            gridTrackControl.setArrowHead(getTrackArrowHead());
+
+            //gridTrackControl.getViewManager().setDisplayMatrix(oldVM);
+        } catch (Exception ee) {}
+
+        createTrjBtn.doClick();
     }
 
 }
