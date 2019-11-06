@@ -1283,7 +1283,19 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived-->
   <derived description="Deviation from Lat Lon Area Average" formula="deviationXY(grid)" id="Deviation from area average" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection"/>
+      <category display="true" value="Grids-Deviation"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Deviation from Zonal Average" formula="deviationX(grid)" id="Deviation from zonal average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Deviation"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Deviation from Meridional Average" formula="deviationY(grid)" id="Deviation from meridional average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Deviation"/>
     </categories>
     <operands/>
   </derived>
@@ -1301,13 +1313,25 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
   </derived>
   <derived description="Deviation from Lat Lon Time Average" formula="deviationXYT(grid)" id="deviation from latlontime average" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection"/>
+      <category display="true" value="Grids-Deviation"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Vertical Average Weighted" formula="verticalWeightedAvg(grid)" id="weighted vertical average" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-MapesCollection-Averages"/>
+      <category display="true" value="Grids-Averages"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Zonal Average" formula="zonalAverage(grid)" id="zonal average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Averages"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Meridional Average" formula="meridionalAverage(grid)" id="meridional average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Averages"/>
     </categories>
     <operands/>
   </derived>
