@@ -338,11 +338,31 @@ def xyAreaAverage(grid):
   oldtype=GridUtil.getParamType(grid)
   xyAavg=xsum(ysum(grid*areaWeights(grid)))
   return GridUtil.setParamType(xyAavg,oldtype,0)
+def zonalAverage(grid):
+  """ Computes Zonal Average of a grid and returns a grid with the
+      averaged value at all grid points.
+  """
+  return GridMath.applyFunctionToAxis(grid,GridMath.FUNC_AVERAGE, GridMath.AXIS_X)
+def meridionalAverage(grid):
+  """ Computes Meridional Average of a grid and returns a grid with the
+      averaged value at all grid points.
+  """
+  return GridMath.applyFunctionToAxis(grid,GridMath.FUNC_AVERAGE, GridMath.AXIS_Y)
 def deviationXY(grid):
   """ Computes deviation from grid grid area average value of a grid
       and returns a grid with deviation from the area averaged value.
   """
   return sub(grid,xyAreaAverage(grid))
+def deviationX(grid):
+  """ Computes deviation from grid zonal average value of a grid
+      and returns a grid with deviation from the averaged value.
+  """
+  return sub(grid,zonalAverage(grid))
+def deviationY(grid):
+  """ Computes deviation from grid meridional average value of a grid
+      and returns a grid with deviation from the averaged value.
+  """
+  return sub(grid,meridionalAverage(grid))
 def anomalyFromTimeMeans(grid):
   """ Computes deviation from time mean at each grid point.
   """
