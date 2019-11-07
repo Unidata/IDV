@@ -1281,7 +1281,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands/>
   </derived-->
-  <derived description="Deviation from Lat Lon Area Average" formula="deviationXY(grid)" id="Deviation from area average" isdefault="false" isenduser="true">
+  <derived description="Grid2D Deviation from Lat Lon Area Average" formula="deviationXY(grid)" id="Deviation from area average" isdefault="false" isenduser="true">
   <categories>
     <category display="true" value="Grids-Deviation"/>
   </categories>
@@ -1317,9 +1317,15 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands/>
   </derived>
-  <derived description="Deviation from Lat Lon Time Average" formula="deviationXYT(grid)" id="deviation from latlontime average" isdefault="false" isenduser="true">
+  <derived description="Grid2D Deviation from Lat Lon Time Average" formula="deviationXYT(grid)" id="deviation from latlontime average" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Deviation"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Grid2D Area Average" formula="xyAreaAverage(grid)" id="Grid2D Area Average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Averages"/>
     </categories>
     <operands/>
   </derived>
@@ -1342,8 +1348,20 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands/>
   </derived>
   <derived description="Meridional Average" formula="meridionalAverage(grid)" id="meridional average" isdefault="false" isenduser="true">
+  <categories>
+    <category display="true" value="Grids-Averages"/>
+  </categories>
+  <operands/>
+  </derived>
+  <derived description="Vertical Integral of a 3D grid" formula="verticalIntegral(grid)" id="vertical integral" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="Grids-Averages"/>
+      <category display="true" value="Grids-Integral"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Vertical Integral of a 3D grid" formula="verticalIntegral(grid)" id="vertical integral" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Integral"/>
     </categories>
     <operands/>
   </derived>
