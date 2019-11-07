@@ -338,6 +338,11 @@ def xyAreaAverage(grid):
   oldtype=GridUtil.getParamType(grid)
   xyAavg=xsum(ysum(grid*areaWeights(grid)))
   return GridUtil.setParamType(xyAavg,oldtype,0)
+def levelsAverage(grid):
+  """ Computes layer Average of a grid and returns a grid with the
+      averaged value at all grid points.
+  """
+  return GridMath.applyFunctionToLevels(grid,GridMath.FUNC_AVERAGE)
 def zonalAverage(grid):
   """ Computes Zonal Average of a grid and returns a grid with the
       averaged value at all grid points.
@@ -353,6 +358,11 @@ def deviationXY(grid):
       and returns a grid with deviation from the area averaged value.
   """
   return sub(grid,xyAreaAverage(grid))
+def deviationZ(grid):
+  """ Computes deviation from grid xy average value of a grid
+      and returns a grid with deviation from the averaged value.
+  """
+  return sub(grid,levelsAverage(grid))
 def deviationX(grid):
   """ Computes deviation from grid zonal average value of a grid
       and returns a grid with deviation from the averaged value.
