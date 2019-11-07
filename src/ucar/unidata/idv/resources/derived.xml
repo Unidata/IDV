@@ -1282,6 +1282,12 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands/>
   </derived-->
   <derived description="Deviation from Lat Lon Area Average" formula="deviationXY(grid)" id="Deviation from area average" isdefault="false" isenduser="true">
+  <categories>
+    <category display="true" value="Grids-Deviation"/>
+  </categories>
+  <operands/>
+  </derived>
+  <derived description="Deviation from level Average" formula="deviationZ(grid)" id="Deviation from level average" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Deviation"/>
     </categories>
@@ -1318,6 +1324,12 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands/>
   </derived>
   <derived description="Vertical Average Weighted" formula="verticalWeightedAvg(grid)" id="weighted vertical average" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Averages"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Levels Average" formula="levelsAverage(grid)" id="levels average" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Averages"/>
     </categories>
