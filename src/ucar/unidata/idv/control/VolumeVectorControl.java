@@ -1920,45 +1920,29 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                                        ? idx
                                        : jdx;
                     int     numP;
+                    int     numXY0 = numXY;
+                    if(getSkipValue() > 0)
+                        numXY0 = numXY / (getSkipValue() + 1) + 1;
 
-                    numP = numXY * (endZ - startZ + 1);
+                    numP = numXY0 * (endZ - startZ + 1);
 
                     float[][] geoVals = new float[3][numP];
-
-                    for (int k = startZ; k <= endZ; k++) {
-                        for (int j = 0; j < numXY; j++) {
-                            int ii = k * (numXY) + j;
-                            int jj = ii - numXY * startZ;
+                    int       skipFactor = getSkipValue();
+                    int jj = 0;
+                    for (int k = startZ; k <= endZ; k = k + 1 ) {
+                        for (int j = 0; j < numXY; j = j + 1 + skipFactor) {
+                            int ii = k * (numXY) * (getSkipValueZ() + 1)+ j;
                             geoVals[0][jj] = domainLatLonAlt[lonIndex][ii];
                             geoVals[1][jj] = domainLatLonAlt[latIndex][ii];
                             geoVals[2][jj] = domainLatLonAlt[2][ii];
+                            jj = jj + 1;
                         }
                     }
 
-
-                    if (getSkipValue() > 0) {
-                        int       skipFactor = getSkipValue();
-                        int       onum       = numP / (skipFactor + 1) + 1;
-                        float[][] points0    = new float[3][onum];
-                        for (int i = 0, j = 0; (i < onum)
-                                               && (j < numP);
-                                i++, j = i * (skipFactor + 1)) {
-                            points0[0][i] = geoVals[0][j];
-                            points0[1][i] = geoVals[1][j];
-                            points0[2][i] = geoVals[2][j];
-                        }
-
-
-                        float[][] setLocs = cs.toReference(points0);
-                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
-                        RealTupleType types = cs.getReference();
-                        getGridDisplay().setStartPoints(types, setLocs);
-                    } else {
-                        float[][] setLocs = cs.toReference(geoVals);
-                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
-                        RealTupleType types = cs.getReference();
-                        getGridDisplay().setStartPoints(types, setLocs);
-                    }
+                    float[][] setLocs = cs.toReference(geoVals);
+                    setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                    RealTupleType types = cs.getReference();
+                    getGridDisplay().setStartPoints(types, setLocs);
                     //getGridDisplay().setZskip(ct - 1);
                     getGridDisplay().resetTrojectories();
                 }
@@ -2167,47 +2151,36 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
                     int     endZ     = (idx > jdx)
                                        ? idx
                                        : jdx;
-                    int     numP;
 
-                    numP = numXY * (endZ - startZ + 1);
+                    int     numP;
+                    int     numXY0 = numXY;
+                    if(getSkipValue() > 0)
+                        numXY0 = numXY / (getSkipValue() + 1) + 1;
+
+              /*      if(getSkipValueZ() > 0)
+                        numZ = numZ / (getSkipValueZ() + 1) + 1; */
+
+                    numP = numXY0 * (endZ - startZ + 1);
 
                     float[][] geoVals = new float[3][numP];
-
-                    for (int k = startZ; k <= endZ; k++) {
-                        for (int j = 0; j < numXY; j++) {
-                            int ii = k * (numXY) + j;
-                            int jj = ii - numXY * startZ;
+                    int       skipFactor = getSkipValue();
+                    int jj = 0;
+                    for (int k = startZ; k <= endZ; k = k + 1 ) {
+                        for (int j = 0; j < numXY; j = j + 1 + skipFactor) {
+                            int ii = k * (numXY) * (getSkipValueZ() + 1)+ j;
                             geoVals[0][jj] = domainLatLonAlt[lonIndex][ii];
                             geoVals[1][jj] = domainLatLonAlt[latIndex][ii];
                             geoVals[2][jj] = domainLatLonAlt[2][ii];
+                            jj = jj + 1;
                         }
                     }
 
+                    float[][] setLocs = cs.toReference(geoVals);
+                    setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
+                    RealTupleType types = cs.getReference();
+                    getGridDisplay().setStartPoints(types, setLocs);
 
-                    if (getSkipValue() > 0) {
-                        int       skipFactor = getSkipValue();
-                        int       onum       = numP / (skipFactor + 1) + 1;
-                        float[][] points0    = new float[3][onum];
-                        for (int i = 0, j = 0; (i < onum)
-                                               && (j < numP);
-                                i++, j = i * (skipFactor + 1)) {
-                            points0[0][i] = geoVals[0][j];
-                            points0[1][i] = geoVals[1][j];
-                            points0[2][i] = geoVals[2][j];
-                        }
-
-
-                        float[][] setLocs = cs.toReference(points0);
-                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
-                        RealTupleType types = cs.getReference();
-                        getGridDisplay().setStartPoints(types, setLocs);
-                    } else {
-                        float[][] setLocs = cs.toReference(geoVals);
-                        setLocs[2] = mpd.scaleVerticalValues(setLocs[2]);
-                        RealTupleType types = cs.getReference();
-                        getGridDisplay().setStartPoints(types, setLocs);
-                    }
-                    //getGridDisplay().setZskip(ct - 1);
+                  //  getGridDisplay().setZskip(ct - 1);
                     getGridDisplay().resetTrojectories();
                 }
 
