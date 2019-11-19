@@ -586,8 +586,8 @@ public class KmlDataSource extends FilesDataSource {
 
 
         List dataChoices = getDataChoices();
-        CompositeDataChoice dc0 = (CompositeDataChoice) dataChoices.get(0);
-        List dataChoices0 = dc0.getDataChoices();
+       // CompositeDataChoice dc0 = (CompositeDataChoice) dataChoices.get(0);
+       // List dataChoices0 = dc0.getDataChoices();
         for (int i = 0; i < dataChoices.size(); i++) {
             DataChoice dc = (DataChoice) dataChoices.get(i);
             if (dc instanceof CompositeDataChoice) {
