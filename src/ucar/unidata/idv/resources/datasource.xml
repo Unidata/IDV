@@ -30,7 +30,12 @@
      patterns="\.ta$"
      factory="ucar.unidata.data.sounding.RaobDataSource"
      label="RAOB Soundings"/>
-
+  <datasource
+     id="RAOB.CDM"
+     fileselection="true"
+     patterns="\.nc$"
+     factory="ucar.unidata.data.sounding.CDMProfileDataSource"
+     label="CDM RAOB Soundings"/>
   <datasource
      id="ADDE.POINT"
      factory="ucar.unidata.data.point.AddePointDataSource"
