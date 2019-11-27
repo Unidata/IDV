@@ -143,6 +143,11 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
         XMLEntityResolver jaxp = new XMLEntityResolver(true);
         builder = jaxp.getSAXBuilder();
 
+        //from tommy Jasmin to keep bundles working
+        if (dsc_location != null) {
+            dsc_location = dsc_location.replace("http:", "https:");
+        }
+
         try {
             doc = builder.build(dsc_location);
         } catch (JDOMException e) {
