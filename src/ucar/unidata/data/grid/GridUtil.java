@@ -25,6 +25,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
 import ucar.ma2.DataType;
@@ -46,6 +48,10 @@ import ucar.unidata.geoloc.projection.LambertConformal;
 import ucar.unidata.geoloc.projection.Mercator;
 import ucar.unidata.geoloc.projection.Stereographic;
 import ucar.unidata.geoloc.projection.VerticalPerspectiveView;
+import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.idv.control.DrawingControl;
+import ucar.unidata.idv.control.drawing.DrawingGlyph;
+import ucar.unidata.idv.control.drawing.PolyGlyph;
 import ucar.unidata.util.FileManager;
 import ucar.unidata.util.JobManager;
 import ucar.unidata.util.LogUtil;
@@ -54,6 +60,7 @@ import ucar.unidata.util.Parameter;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
 
+import ucar.unidata.xml.XmlUtil;
 import ucar.visad.GeoUtils;
 import ucar.visad.ProjectionCoordinateSystem;
 import ucar.visad.Util;
@@ -111,13 +118,7 @@ import visad.data.CachedFlatField;
 import visad.data.DataRange;
 import visad.data.mcidas.AREACoordinateSystem;
 
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationLite;
-import visad.georef.LatLonPoint;
-import visad.georef.LatLonTuple;
-import visad.georef.MapProjection;
-import visad.georef.NavigatedCoordinateSystem;
-import visad.georef.TrivialMapProjection;
+import visad.georef.*;
 
 import visad.util.DataUtility;
 
@@ -140,6 +141,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import static ucar.unidata.util.LogUtil.logException;
 
 
 /**
@@ -6139,6 +6142,156 @@ public class GridUtil {
     }
 
     /**
+     * extract grid along polygon and write out to an Excel spreadsheet
+     *
+     * @param grid grid  to write
+     * @param filename  filename
+     *
+     * @throws Exception  problem writing grid
+     */
+    public static void writeGridAtPolygonToXls(FieldImpl grid, String filename, String fxgrfName)
+            throws Exception {
+
+        List<DrawingGlyph> glyphList = read(fxgrfName);
+        PolyGlyph polyGlyph = (PolyGlyph)glyphList.get(0);
+
+        List points = polyGlyph.getPoints();
+        Object loadId =
+                JobManager.getManager().startLoad("Writing grid to xls", true);
+        try {
+            HSSFWorkbook    wb = new HSSFWorkbook();
+            HSSFRow         row;
+            int             sheetIdx = -1;
+            List<HSSFSheet> sheets   = new ArrayList<HSSFSheet>();
+            OutputStream fileOut =
+                    new BufferedOutputStream(new FileOutputStream(filename),
+                            1000000);
+
+            int             MAXROWS    = 65000;
+            List<DateTime>  times      = new ArrayList<DateTime>();
+            List<Real> fields     = new ArrayList<Real>();
+
+            float[][]       domainVals = null;
+            int             colOffset  = 2;
+            int             rowCnt = -1;
+            int             sheetCnt = -1;
+            HSSFSheet       sheet = null;
+
+            if (isTimeSequence(grid)) {
+                // TODO:  handle calendars
+                SampledSet          timeSet    =
+                        (SampledSet) getTimeSet(grid);
+                double[][]          timeValues = timeSet.getDoubles(false);
+                Unit                timeUnit   = timeSet.getSetUnits()[0];
+                int                 numTimes   = timeSet.getLength();
+                CalendarDateTimeSet cdt        = null;
+                for(int j = 0; j < points.size(); j++) {
+
+                    EarthLocation el =  (EarthLocationTuple)points.get(j);
+                    FieldImpl gridf = sample(grid, el);
+                    if (numTimes > 1) {
+                        cdt = (CalendarDateTimeSet) timeSet;
+                        for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
+                            CalendarDateTime cdti =
+                                    new CalendarDateTime(timeValues[0][timeIdx],
+                                            cdt.getCalendar());
+                            JobManager.getManager().setDialogLabel1(loadId,
+                                    "Writing grid time:" + (timeIdx + 1) + "/"
+                                            + numTimes);
+                            Real ff = (Real) gridf.getSample(timeIdx);
+                            if (ff == null) {
+                                continue;
+                            }
+                            if (sheets.size() == 0) {
+                                boolean latFirst = true;
+                                int     numRows  = points.size() ;
+                                rowCnt = -1;
+                                for (int rowIdx = 0; rowIdx < numRows; rowIdx++) {
+                                    EarthLocation ell =  (EarthLocationTuple)points.get(rowIdx);
+                                    if ((rowCnt >= MAXROWS) || (rowCnt == -1)) {
+                                        sheets.add(sheet = wb.createSheet());
+                                        row = sheet.createRow(0);
+                                        row.createCell((short) 0).setCellValue(latFirst
+                                                ? "Latitude"
+                                                : "Longitude");
+                                        row.createCell((short) 1).setCellValue(latFirst
+                                                ? "Longitude"
+                                                : "Latitude");
+                                        row.createCell((short) 2).setCellValue(
+                                                "Altitude");
+                                        colOffset = 3;
+
+                                        rowCnt = 0;
+                                    }
+                                    row = sheet.createRow(rowCnt + 1);
+                                    row.createCell((short) 0).setCellValue(
+                                            ell.getLatitude().getValue());
+                                    row.createCell((short) 1).setCellValue(
+                                            ell.getLongitude().getValue());
+                                    row.createCell((short) 2).setCellValue(
+                                            ell.getAltitude().getValue());
+
+                                    rowCnt++;
+                                }
+                                rowCnt   = -1;
+                                sheetCnt = -1;
+                                sheet    = null;
+                            }
+
+
+                                if ((rowCnt == -1) || (rowCnt >= MAXROWS)) {
+                                    rowCnt = 0;
+                                    sheetCnt++;
+                                    sheet = (HSSFSheet) sheets.get(sheetCnt);
+                                    row   = sheet.getRow(0);
+                                    if (cdti != null) {
+                                        row.createCell((short) (colOffset
+                                                + timeIdx)).setCellValue(cdti.toString());
+                                    }
+                                }
+                                row = sheet.getRow(1 + j);
+                                row.createCell(
+                                        (short) (colOffset + timeIdx)).setCellValue(
+                                        (ff).getValue());
+                                rowCnt++;
+
+                            sheetCnt = -1;
+                            rowCnt   = -1;
+                        }
+                    } else {
+                        RealTuple ss = ((SingletonSet) timeSet).getData();
+                        if (ss != null) {
+                            visad.Data[] vdata = ss.getComponents();
+                            JobManager.getManager().setDialogLabel1(loadId,
+                                    "Writing grid time:" + 1 + "/" + numTimes);
+                            Real ff = (Real) gridf.getSample(0);
+                            if (ff != null) {
+                                times.add((CalendarDateTime) vdata[0]);
+                                fields.add(ff);
+                            }
+                        }
+                    }
+                }
+
+            } else {
+                System.err.println("Could not find any grid fields to write");
+            }
+
+
+            JobManager.getManager().setDialogLabel1(loadId,
+                    "Writing spreadsheet");
+            wb.write(fileOut);
+            fileOut.close();
+        } catch (Exception exc) {
+            LogUtil.logException("Writing grid to xls file: " + filename,
+                    exc);
+        } finally {
+            JobManager.getManager().stopLoad(loadId);
+        }
+
+    }
+
+    /**
      * Write grid out to a netCDF CF compliant file
      *
      * @param grid grid  to write
@@ -8555,6 +8708,57 @@ public class GridUtil {
                                       double epsilon) {
         return visad.util.Util.isApproximatelyEqual(first + 360., last,
                 epsilon);
+    }
+
+    /**
+     * respond to the read data call and return list of Glyph
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public static List<DrawingGlyph> read(String filename) {
+        List<DrawingGlyph> lglyph = null;
+        try {
+
+            Element root = XmlUtil.getRoot(filename, Class.class);
+            lglyph = parseXml(root, false);
+        } catch (Exception exc) {
+            logException("Importing drawing", exc);
+        }
+
+        return lglyph;
+    }
+
+    /**
+     * Process the glyph xml with only polygon glyph.
+     *
+     * @param root Root of the xml dom
+     * @param initialXml Did this come from the data choice or from an import
+     *
+     * @throws RemoteException When bad things happen
+     * @throws VisADException When bad things happen
+     */
+    public static List parseXml(Element root, boolean initialXml)
+            throws VisADException, RemoteException {
+        List glyphList = new ArrayList();
+        NodeList elements = XmlUtil.getElements(root);
+        //Only set the usetimesinanimation when we are newly created
+
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element      child = (Element) elements.item(i);
+            DrawingGlyph glyph = null;
+            if (child.getTagName().equals(DrawingGlyph.TAG_POLYGON)) {
+                glyph = new PolyGlyph();
+            }   else {
+                System.err.println("Unknown shape tag:" + child.getTagName());
+            }
+
+            if (glyph != null) {
+                glyph.initFromXml(null, child);
+                glyphList.add(glyph);
+            }
+        }
+        return glyphList;
     }
 
 }
