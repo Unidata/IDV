@@ -610,7 +610,11 @@ public abstract class DrawingGlyph {
         if ((coordType == COORD_XY) || (coordType == COORD_LATLON)) {
             stride = 2;
         }
-        double fixedAlt = getFixedAltitude();
+        double fixedAlt;
+        if(control != null)
+            fixedAlt = getFixedAltitude();
+        else
+            fixedAlt = 0.0;
         points = new ArrayList();
         for (int i = 0; i < pointStrings.size(); i += stride) {
             double lat = Misc.decodeLatLon(pointStrings.get(i).toString());
