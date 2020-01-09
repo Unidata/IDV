@@ -23,6 +23,7 @@ package ucar.unidata.data.grid;
 
 import ucar.unidata.data.DataUtil;
 
+import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.Range;
@@ -2474,6 +2475,175 @@ public class DerivedGridFactory {
 
         return dewpointFI;
     }  // end createDewpoint()
+
+    /**
+     * Make the FieldImpl of heatindex scalar values;
+     * possibly for sequence of times
+     *
+     * @param temperFI grid of air temperature
+     * @param rhFI     grid of relative humidity
+     * @return dewpoint grid
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createHeatIndex(FieldImpl temperFI, FieldImpl rhFI)
+            throws VisADException, RemoteException {
+
+        Unit newunit = Util.parseUnit("Fahrenheit");
+        RealType newType = Util.makeRealType("tempFahren", newunit);
+        FieldImpl temperFI0 = GridUtil.setParamType(temperFI, newType, false);
+
+
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI0)
+                              && GridUtil.isTimeSequence(rhFI));
+        FieldImpl heatIndexFI = null;
+
+        if (isSequence) {
+
+            // Implementation:  have to take the raw data FieldImpl
+            // apart, make a dew point FlatField by FlatField,
+            // and put all back together again into a new depwoint FieldImpl
+            Set timeSet = temperFI0.getDomainSet();
+
+            // resample to domainSet of tempFI.  If they are the same, this
+            // should be a no-op
+            if (timeSet.getLength() > 1) {
+                rhFI = (FieldImpl) rhFI.resample(timeSet);
+            }
+
+            Boolean ensble = (GridUtil.hasEnsemble(temperFI0)
+                              && GridUtil.hasEnsemble(rhFI));
+            TupleType    rangeType = null;
+            FunctionType innerType = null;
+            // compute each dewpoint FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI0.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) rhFI.getSample(i);
+
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerField1 =
+                            (FlatField) sample1.getSample(j, false);
+                        FlatField innerField2 =
+                            (FlatField) sample2.getSample(j, false);
+
+                        if ((innerField1 == null) || (innerField2 == null)) {
+                            continue;
+                        }
+                        FlatField innerdivFF =
+                                makeHeatindexFromTAndRH(innerField1, innerField2);
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                DataUtility.getDomainType(ensDomain),
+                                innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+
+
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (heatIndexFI == null) {
+                        FunctionType newFieldType =
+                            new FunctionType(
+                                ((SetType) timeSet.getType()).getDomain(),
+                                funcFF.getType());
+                        heatIndexFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    heatIndexFI.setSample(i, funcFF, false);
+                } else {
+
+                    FlatField dewptFF =
+                            makeHeatindexFromTAndRH(
+                            (FlatField) temperFI0.getSample(i),
+                            (FlatField) rhFI.getSample(i));
+
+                    if (i == 0) {  // first time through
+                        FunctionType functionType =
+                            new FunctionType(
+                                ((FunctionType) temperFI0.getType()).getDomain(),
+                                dewptFF.getType());
+
+                        // make the new FieldImpl for dewpoint
+                        // (but as yet empty of data)
+                        heatIndexFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    heatIndexFI.setSample(i, dewptFF, false);
+                }
+            }  // end isSequence
+        } else {
+
+            // make FlatField  of saturation vapor pressure from temp
+            heatIndexFI = makeHeatindexFromTAndRH((FlatField) temperFI0,
+                    (FlatField) rhFI);
+        }  // end single time
+
+        return heatIndexFI;
+    }  // end createHeatIndex()
+
+    /**
+     * Make heatindex from two FlatFields
+     *
+     * @param temp   temperature flat field
+     * @param rh     relative humidity flat field
+     * @return  grid of heatindex
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    private static FlatField makeHeatindexFromTAndRH(FlatField temp,
+                                                     FlatField rh)
+            throws VisADException, RemoteException {
+
+        Unit      percentUnit = CommonUnits.PERCENT;
+        TupleType rangeType =
+                GridUtil.makeNewParamType(GridUtil.getParamType(temp),
+                        "_mask");
+        FunctionType newType = new FunctionType(DataUtility.getDomainType(temp),
+                rangeType);
+
+        FlatField esFF  = new FlatField(newType, temp.getDomainSet());
+        Unit         rUnit       = rh.getRangeUnits()[0][0];
+
+        if ((rUnit == null) || !(rUnit.isConvertible(percentUnit))) {
+
+            Range[] range = GridUtil.fieldMinMax(rh);
+            if ((range[0].max <= 1.1) && (range[0].min > 0)) {
+                //it is fraction
+                rh = (FlatField) rh.__mul__(100.0);
+
+            }
+            RealType rt = GridUtil.getParamType(rh).getRealComponents()[0];
+            RealType newType1 = Util.makeRealType(rt.getName(), percentUnit);
+
+            rh = (FlatField) GridUtil.setParamType(rh, newType1);
+
+        }
+        float[][] tempValues = temp.getFloats(false);
+        float[][] rhValues = rh.getFloats(false);
+        float[][] heatIdxValues =
+                new float[tempValues.length][tempValues[0].length];
+
+        for (int i = 0; i < tempValues.length; i++) {
+            for (int j = 0; j < tempValues[0].length; j++) {
+                heatIdxValues[i][j] = (float) PointObFactory.heatIndex(tempValues[i][j], rhValues[i][j]);
+            }
+        }
+
+        esFF.setSamples(heatIdxValues, false);;
+
+        return esFF;
+    }
 
     /**
      * Make dewpoint from two FlatFields
