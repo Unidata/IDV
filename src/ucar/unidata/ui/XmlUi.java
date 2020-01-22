@@ -1,7 +1,7 @@
 /**
  * $Id: XmlUi.java,v 1.62 2007/08/06 17:04:03 jeffmc Exp $
  *
- * Copyright  1997-2019 Unidata Program Center/University Corporation for
+ * Copyright  1997-2020 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

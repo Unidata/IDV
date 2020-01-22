@@ -1,7 +1,7 @@
 /*
  * $Id: PolyGlyph.java,v 1.44 2007/04/16 20:53:47 jeffmc Exp $
  *
- * Copyright  1997-2019 Unidata Program Center/University Corporation for
+ * Copyright  1997-2020 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

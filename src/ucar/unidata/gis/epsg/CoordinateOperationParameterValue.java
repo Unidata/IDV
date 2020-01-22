@@ -2,7 +2,7 @@
 // $Id: CoordinateOperationParameterValue.java,v 1.8 2005/03/10 18:38:33 jeffmc Exp $
 
 /*
- * Copyright 1997-2019 Unidata Program Center/University Corporation for
+ * Copyright 1997-2020 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

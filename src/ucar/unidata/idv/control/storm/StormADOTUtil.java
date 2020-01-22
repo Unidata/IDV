@@ -1,7 +1,7 @@
 /*
  * $Id: IDV-Style.xjs,v 1.1 2006/05/03 21:43:47 dmurray Exp $
  *
- * Copyright 1997-2019 Unidata Program Center/University Corporation for
+ * Copyright 1997-2020 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

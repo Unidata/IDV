@@ -1,7 +1,7 @@
 /*
  * $Id: PersistentObject.java,v 1.7 2007/07/06 20:45:32 jeffmc Exp $
  *
- * Copyright  1997-2019 Unidata Program Center/University Corporation for
+ * Copyright  1997-2020 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

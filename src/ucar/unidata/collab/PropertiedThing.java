@@ -1,7 +1,7 @@
 /*
  * $Id: PropertiedThing.java,v 1.1 2005/10/20 20:47:33 jeffmc Exp $
  *
- * Copyright 1997-2019 Unidata Program Center/University Corporation for
+ * Copyright 1997-2020 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
