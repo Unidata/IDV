@@ -122,6 +122,41 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
             new ConstantMap(1.0, Display.MissingTransparent) });
     }
 
+    /**
+     * Constructs from a name for the Displayable and the type of the
+     * RGB parameter.
+     *
+     * @param name              The name for the displayable.
+     * @param colorPalette      The color palette
+     * @param doAlpha           true to map to RGBA
+     * @throws VisADException   VisAD failure.
+     * @throws RemoteException  Java RMI failure.
+     */
+    public ImageRGBDisplayable(String name, float[][] colorPalette, boolean doAlpha, FieldImpl field)
+            throws VisADException, RemoteException {
+        super(name);
+        this.doAlpha = doAlpha;
+        if (doAlpha) {
+            mapType   = Display.RGBA;
+            colorMaps = new ScalarMap[] { null, null, null, null };
+        }
+
+        addConstantMaps(new ConstantMap[] {
+                new ConstantMap(GraphicsModeControl.SUM_COLOR_MODE,
+                        Display.ColorMode),
+                new ConstantMap(1.0, Display.MissingTransparent) });
+
+
+        if (field != null) {
+            TupleType     tt       = GridUtil.getParamType(field);
+            RealTupleType ffldType = new RealTupleType(tt.getRealComponents());
+
+            if ((getColorTupleType() == null)
+                    || !ffldType.equals(getColorTupleType())) {
+                setColorTupleType(ffldType);
+            }
+        }
+    }
 
     /**
      * Constructs from another instance.  The following attributes are set from
