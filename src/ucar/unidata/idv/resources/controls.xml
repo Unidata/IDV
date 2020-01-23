@@ -131,6 +131,14 @@ example:
      properties="">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
+
+  <control
+     id="rgbcomposite"
+     categories="RGBC"
+     class="ucar.unidata.idv.control.RGBCompositeControl"
+     description="RGB Composite"
+     label="RGB Composite"
+     displaycategory="Imagery"/>
   <control
      id="radarsweep2d"
      categories="SWEEP-*-*;RADAR-*"
