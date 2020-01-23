@@ -95,7 +95,7 @@ public class DataManager {
                 throw (RuntimeException) e;
             }
         }
-        try {
+    /*    try {
             String handlers =
                 System.getProperty("java.protocol.handler.pkgs");
             String newProperty = null;
@@ -114,7 +114,7 @@ public class DataManager {
         } catch (Exception e) {
             System.out.println(
                 "Unable to set System Property: java.protocol.handler.pkgs");
-        }
+        } */
     }
 
     /** logging category */
