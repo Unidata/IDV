@@ -90,10 +90,10 @@
          mnemonic="O"/>
     </menu>
     <separator/>
-    <menu
+    <!--menu
        label="History"
        id="menu.history"
-       mnemonic="H"/>
+       mnemonic="H"/-->
     <separator/>
     <menuitem
        label="Exit"
@@ -242,6 +242,19 @@
          tooltip="View all resource"
          action="action:edit.resources"/>
    </menu>
+    <menu
+        id="history"
+        label="History"
+        mnemonic="H">
+        <menu
+            label="Data Source:"
+            id="menu.history.file"
+            mnemonic="S"/>
+        <menu
+            label="Bundles:"
+            id="menu.history.bundle"
+            mnemonic="S"/>
+    </menu>
   <menu
      id="help"
      label="Help"
