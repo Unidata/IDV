@@ -341,6 +341,11 @@ def writeGridToXls(grid,filename='grid.xls'):
     GridUtil.writeGridToXls(grid,filename)
     return grid
 
+def writeGridToXlsAtPolygon(grid,filename='grid.xls', filename1='point.xgrf'):
+    """Write out the grid data to an excel spreadsheet"""
+    GridUtil.writeGridAtPolygonToXls(grid,filename, filename1)
+    return grid
+
 def exportGridToNetcdf(grid,filename='grid.nc'):
     """Write out the grid data to CF compliant netCDF file"""
     GridUtil.exportGridToNetcdf(grid,filename)
@@ -456,3 +461,6 @@ def thetaSurfaceV(gridt, griduv, theta0):
 
 def thetaSurfaceADV(gridt, griduv, other, theta0):
   return DerivedGridFactory.extractGridADVOverThetaTopoSurface(gridt, griduv, other,float(theta0))
+
+def heatIndex(gridtemp, gridrh):
+  return DerivedGridFactory.createHeatIndex(gridtemp, gridrh)
