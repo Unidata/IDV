@@ -394,6 +394,9 @@ public class IdvUIManager extends IdvManager {
      */
     public static final String MENU_HISTORY = "menu.history";
 
+    public static final String MENU_HISTORY_FILE = "menu.history.file";
+
+    public static final String MENU_HISTORY_BUNDLE = "menu.history.bundle";
 
     /**
      *  The identifier of the "Deletehistory" menu held in the xml file that defines
@@ -1749,7 +1752,12 @@ public class IdvUIManager extends IdvManager {
                 break;
             case MENU_HISTORY:
                 historyMenuSelected(menu);
-
+                break;
+            case MENU_HISTORY_FILE:
+                historyMenuSelectedV(menu, "DataSourceHistory");
+                break;
+            case MENU_HISTORY_BUNDLE:
+                historyMenuSelectedV(menu, "ucar.unidata.idv.FileHistory");
                 break;
             case MENU_EDITFORMULAS:
                 editFormulasMenuSelected(menu);
@@ -2467,6 +2475,45 @@ public class IdvUIManager extends IdvManager {
         }
     }
 
+    /**
+     * User just clicked on the file-history menu. Add in the items
+     *
+     * @param fileMenu The menu to fill
+     */
+    public void historyMenuSelectedV(JMenu fileMenu, String type) {
+        fileMenu.removeAll();
+        //Make sure we read in the preference list  of past files
+        List historyList = getIdv().getHistory();
+        if ((historyList != null) && (historyList.size() > 0)) {
+            for (int i = 0; i < historyList.size(); i++) {
+                //the triple list holds (type, name, id, properties);
+                History   history = (History) historyList.get(i);
+                if(history.getClass().toString().contains(type)) {
+                    JMenuItem mi = new JMenuItem(history.toString());
+                    fileMenu.add(mi);
+                    mi.addActionListener(new ObjectListener(history) {
+                        public void actionPerformed(ActionEvent ae) {
+                            Misc.run(new Runnable() {
+                                public void run() {
+                                    try {
+                                        showWaitCursor();
+                                        ((History) theObject).process(getIdv());
+                                        showNormalCursor();
+                                    } catch (Throwable exc) {
+                                        logException(
+                                                "Creating data source from history",
+                                                exc);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        } else {
+            fileMenu.add(new JMenuItem("No Files"));
+        }
+    }
 
 
 
