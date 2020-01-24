@@ -1444,7 +1444,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
-      <category value="ABI RGBs"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_TruCol"/>
@@ -1455,6 +1455,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_Airmass"/>
@@ -1464,6 +1465,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_SO2"/>
@@ -1473,6 +1475,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_DayCloudPhase"/>
@@ -1482,6 +1485,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_ASH"/>
@@ -1491,6 +1495,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_DayLandCloud"/>
@@ -1500,6 +1505,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_DayLandCloudFire"/>
@@ -1509,6 +1515,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_NightMicrophysics"/>
@@ -1518,6 +1525,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_SimpleWaterVapor"/>
@@ -1532,7 +1540,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <category value="display:planviewcontour"/>
       <category value="display:planviewcolor"/>
       <category value="display:valuedisplay"/>
-      <category value="display:imagesequence"/>
     </categories>
     <operands categories="">
       <params categories="" p1="186_Band12_TEMP" p2="186_Band13_TEMP"/>
@@ -1545,7 +1552,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI Channel Differences"/>
       <category value="display:planviewcontour"/>
-      <category value="display:imagesequence"/>
       <category value="display:imagedisplay"/>
       <category value="display:imagedisplayoverz"/>
       <category value="display:planviewcontourfilled"/>
@@ -1566,7 +1572,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <category value="display:valuedisplay"/>
       <category value="display:planviewcontourfilled"/>
       <category value="display:imagedisplayoverz"/>
-      <category value="display:imagesequence"/>
       <category value="display:imagedisplay"/>
       <category value="display:planviewcolor"/>
     </categories>
@@ -1584,7 +1589,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <category value="display:planviewcontour"/>
       <category value="display:imagedisplayoverz"/>
       <category value="display:imagedisplay"/>
-      <category value="display:imagesequence"/>
       <category value="display:valuedisplay"/>
       <category value="display:planviewcontourfilled"/>
     </categories>
@@ -1602,7 +1606,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <category value="display:planviewcontourfilled"/>
       <category value="display:valuedisplay"/>
       <category value="display:imagedisplayoverz"/>
-      <category value="display:imagesequence"/>
       <category value="display:planviewcolor"/>
       <category value="display:imagedisplay"/>
     </categories>
@@ -1617,7 +1620,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI Channel Differences"/>
       <category value="display:planviewcolor"/>
-      <category value="display:imagesequence"/>
       <category value="display:planviewcontourfilled"/>
       <category value="display:imagedisplayoverz"/>
       <category value="display:imagedisplay"/>
@@ -1635,6 +1637,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands>
       <paramgroup name="ABI_RGB_DaySnowFog"/>
@@ -1644,6 +1647,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands>
       <paramgroup name="ABI_RGB_DayCloudConvection"/>
@@ -1653,6 +1657,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands>
       <paramgroup name="ABI_RGB_FireTemperature"/>
@@ -1662,6 +1667,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands>
       <paramgroup name="ABI_RGB_Dust"/>
@@ -1671,6 +1677,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands>
       <paramgroup name="ABI_RGB_DifferentialWaterVapor"/>
@@ -1680,6 +1687,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="ABI_RGB_DayConvection"/>
@@ -1689,6 +1697,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="AHI_RGB_Airmass"/>
@@ -1698,6 +1707,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="AHI_RGB_Ash"/>
@@ -1707,6 +1717,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="AHI_RGB_DayConvectiveStorm"/>
@@ -1716,6 +1727,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="AHI_RGB_Dust"/>
@@ -1725,6 +1737,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="AHI_RGB_NaturalColor"/>
@@ -1734,6 +1747,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="AHI_RGB_NightMicrophysics"/>
@@ -1743,6 +1757,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
       <category value="display:imagecontrol"/>
+      <category value="display:rgbcomposite"/>
     </categories>
     <operands categories="">
       <paramgroup categories="" name="AHI_RGB_TrueColor"/>
