@@ -1217,6 +1217,8 @@ public class GeoGridDataSource extends GridDataSource {
                 file = DODSNetcdfFile.canonicalURL(file);
             } else if(file.startsWith("http") && file.contains("/dods/")){
                 file = DODSNetcdfFile.canonicalURL(file);
+            } else if(file.startsWith("dods:") && file.endsWith("ncml")){
+                file = file.replace("dods:","https:");
             }
             if (file.contains(":443")) {
                 file = file.replace(":443","");
