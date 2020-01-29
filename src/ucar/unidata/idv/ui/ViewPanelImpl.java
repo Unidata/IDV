@@ -347,11 +347,14 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         }
         //For now cheat a little with the cast
         ((DisplayControlImpl) control).setMakeWindow(false);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                addControlTabInThread(control, forceShow);
-            }
-        });
+         addControlTabInThread(control, forceShow);
+        /* try {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    addControlTabInThread(control, forceShow);
+                }
+            });
+        } catch (Exception ee){} */
     }
 
 
