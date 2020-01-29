@@ -2410,6 +2410,45 @@ public class ColorTableDefaults {
     private static String[] ATD_Names = { "ATD-Scook", "ATD-Reflectivity",
                                           "ATD-Velocity", "ATD-Wild" };
 
+    /**
+     * Convert a AWIPS II {@literal ".cmap"} file to an IDV {@link ColorTable}
+     * and add the new color table to the {@link ColorTableManager}.
+     *
+     * @param name Name to use in the color table manager.
+     * @param category Category of the color table.
+     * @param file Path to AWIPS II {@literal ".cmap"} file.
+     *
+     * @return Either a {@link List} containing the newly created
+     *         {@code ColorTable} or {@code null} if the conversion failed.
+     */
+    public static List makeAwips2ColorTables(String name, String category,
+                                             String file)
+    {
+        String xpath = "//color";
+        // yes, I should be using "List<Color> ....", but some IDV methods
+        // expect ArrayList (for no good reason)
+        ArrayList<Color> colors = new ArrayList<>(512);
+        for (Element e : XmlUtil.elements(file, xpath)) {
+            float r = Float.valueOf(e.getAttribute("r"));
+            float g = Float.valueOf(e.getAttribute("g"));
+            float b = Float.valueOf(e.getAttribute("b"));
+            float a = Float.valueOf(e.getAttribute("a"));
 
+            // some files will have alpha values of "3.0"; we just clamp these
+            // to 1.0.
+            if (a > 1.0) {
+                a = 1.0f;
+            }
+
+            colors.add(new Color(r, g, b, a));
+        }
+
+        List<ColorTable> newColorTable = null;
+        if (!colors.isEmpty()) {
+            newColorTable = new ArrayList<>(1);
+            newColorTable.add(makeColorTable(name, category, colors));
+        }
+        return newColorTable;
+    }
 
 }
