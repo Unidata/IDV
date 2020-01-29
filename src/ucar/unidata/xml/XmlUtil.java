@@ -48,18 +48,18 @@ import java.io.InputStream;
 import java.security.SignatureException;
 
 
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 
 import javax.xml.parsers.*;
-
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 
 /**
@@ -80,6 +80,8 @@ public abstract class XmlUtil {
      */
     public static final String TAG_WILDCARD = "*";
 
+    private static final Map<String, XPathExpression> pathMap =
+            new ConcurrentHashMap<>();
     /**
      *  Dummy ctor for doclint.
      */
@@ -2659,8 +2661,93 @@ public abstract class XmlUtil {
         return result;
     }
 
+    /**
+     * _more_
+     *
+     * @param xmlFile _more_
+     * @param xPath _more_
+     */
+    public static ElementListIterator elements(final String xmlFile, final String xPath) {
+
+        return new ElementListIterator(eval(xmlFile, xPath));
+    }
+
+    /**
+     * _more_
+     *
+     * @param xmlFile _more_
+     * @param xPath _more_
+     */
+    public static NodeList eval(final String xmlFile, final String xPath) {
+        try {
+            return (NodeList)expr(xPath).evaluate(loadXml(xmlFile), XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException("Error evaluation xpath", e);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param xmlFile _more_
+     */
+    public static Document loadXml(final String xmlFile) {
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(false);
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            return builder.parse(xmlFile);
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading XML file: "+e.getMessage(), e);
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param xPath _more_
+     */
+    public static XPathExpression expr(String xPath) {
 
 
+        XPathExpression expr = pathMap.get(xPath);
+        if (expr == null) {
+            try {
+                expr = XPathFactory.newInstance().newXPath().compile(xPath);
+                pathMap.put(xPath, expr);
+            } catch (XPathExpressionException e) {
+                throw new RuntimeException("Error compiling xpath", e);
+            }
+        }
+        return expr;
+    }
 
+    /**
+     * _more_
+     */
+    public static class ElementListIterator implements Iterable<Element>, Iterator<Element> {
+        private final NodeList nodeList;
+        private int index = 0;
 
+        public ElementListIterator(final NodeList nodeList) {
+            this.nodeList = nodeList;
+        }
+
+        public Iterator<Element> iterator() {
+            return this;
+        }
+
+        public boolean hasNext() {
+            return index < nodeList.getLength();
+        }
+
+        public Element next() {
+            return (Element)nodeList.item(index++);
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+    }
 }
