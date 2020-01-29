@@ -154,7 +154,9 @@ public class ColorTableManager extends ResourceManager {
     //    public static final PatternFileFilter FILTER_CWC =
     //        new PatternFileFilter(".+\\.cwc", "CWC color table (*.cwc)");
 
-
+    /** File filter used for AWIPS II {@literal ".cmap"} color tables.*/
+    public static final PatternFileFilter FILTER_AWIPS2 =
+            new PatternFileFilter(".+\\.cmap", "AWIPS II color table (*.cmap)", ".cmap");
 
 
     /**
@@ -213,7 +215,7 @@ public class ColorTableManager extends ResourceManager {
      */
     public List getReadFileFilters() {
         List filters = Misc.newList(FILTER_IDV, FILTER_GEM, FILTER_MCI);
-        filters.addAll(Misc.newList(FILTER_PAL, FILTER_ACT));
+        filters.addAll(Misc.newList(FILTER_PAL, FILTER_ACT, FILTER_AWIPS2));
         return filters;
     }
 
@@ -611,6 +613,8 @@ public class ColorTableManager extends ResourceManager {
         } else if (suffix.endsWith(".rgb")) {
             cts.addAll(ColorTableDefaults.makeRgbColorTables(name, cat,
                     file));
+        } else if (suffix.endsWith(".cmap")) {
+            cts.addAll(ColorTableDefaults.makeAwips2ColorTables(name, cat, file));
         } else {
             return null;
         }
