@@ -1618,8 +1618,12 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
                 if(maxspeedString == null && currentSlice != null) {
                     FieldImpl ff = (FieldImpl) currentSlice.getSample(0);
                     Range[] a = getSpeedRange(ff);
-                    maxspeedString = "" + getDisplayConventions().format(a[0].max) + getDisplayUnit();
-                    values.add(maxspeedString);
+                    if(a == null)
+                        values.add("");
+                    else {
+                        maxspeedString = "" + getDisplayConventions().format(a[0].max) + getDisplayUnit();
+                        values.add(maxspeedString);
+                    }
                 } else if(currentSlice == null){
                     values.add("");
                 } else if(maxspeedString != null) {
