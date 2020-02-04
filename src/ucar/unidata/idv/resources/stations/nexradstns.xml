@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<stationtable name="NEXRAD Sites" category="Weather">
+<stationtable name="NEXRAD Sites" type="radar" category="Weather">
 <station idn="000525" id="APD" name="Fairbanks/Pedro Dome" st="AK" co="US" lat="65:02:06" lon="-147:30:06" elev="790"/>
 <station idn="000346" id="AEC" name="Fairbanks/Nome" st="AK" co="US" lat="64:30:41" lon="-165:17:42" elev="16"/>
 <station idn="000553" id="ACG" name="Juneau/Sitka" st="AK" co="US" lat="56:51:10" lon="-135:31:45" elev="63"/>
