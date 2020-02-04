@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 5.5 release.
+The items below reflect changes since the 5.6 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -22,7 +22,7 @@ The items below reflect changes since the 5.5 release.
 
   <p>
     The version of the netCDF-Java library currently distributed with the IDV is
-    the 4.6.13. This is a bug fix release.  See
+    the 4.6.15. This is a bug fix release.  See
     the <a href="https://www.unidata.ucar.edu/blogs/news/entry/netcdf-java-library-and-tds8">
       netCDF-Java Library</a> for a more details information.
   </p>
@@ -43,49 +43,25 @@ The items below reflect changes since the 5.5 release.
 <faqitem cat="Display Changes"></faqitem>
 
 
-<faqitem q="Isentropic Advection" id="isentropicadv">
+<faqitem q="Color Tables" id="colorTableA">
   <p>
-    For synoptic scale motions, atmospheric variables tend to be better correlated along an isentropic
-    surface upstream/downstream. In a 3D space, the new grid 3D isentropic advection derived
-    parameter interpolates advection from isobaric coordinate into the isentropic space and creates
-    3D theta surface advection displays.
+    New enhanced color tables have been added in this version, including AWIPS color tables and Satellite products customized
+    color tables.
   </p>
 </faqitem>
 
-<faqitem q="GLM ADDE Chooser" id="glmAddeChooser">
+<faqitem q="NWS Hazard Warning Shapefile" id="warningshapfile">
   <p>
-    The GLM Level2 products consist of geo-located and time-stamped events, groups, and flashes, with
-    associated calibrated optical amplitudes (in units of Joules). A GLM ADDE data chooser has been developed
-    to access three GLM source types: Geostationary Lightning Mapper EVENT, GROUP, and FLASH Data
-    through the ADDE data server. The GLM data queries can be performed on the relative times, absolute
-    times, and time driver times
+    NWS Tornado, Severe Thunderstorm, Flash Flood and Special Marine Warning KML files were supported in this release,
+    and its remote https site were added in the list of Data > Special data list.
   </p>
 </faqitem>
 
-<faqitem q="3D Streamline Display" id="streamline3d">
+<faqitem q="CDM Profile data type" id="cdmprofiletype">
   <p>
-    Streamlines are a group of curves that instantaneous tangent to the velocity vector of the flow and a snapshot of
-    the flow field at some particular time. In the IDV 3D space, streamline display provides the
-    direction in which a massless fluid element will travel at any point in time. 3D streamline display
-    type is available for both derived parameters: Grid 3D Trajectory and 3D Flow Vectors, and the initial
-    area of the 3D streamlines can be a 2D surface or a 3D volume.
-  </p>
-</faqitem>
-
-<faqitem q="3D Trajectory Display Update" id="trajectoryUpdate">
-  <p>
-    The grid 3D trajectory display includes three new display types: Tracer Arrow, Tracer Sphere and Tracer Dot.
-    The initial area of the 3D Grid Trajectory can also be set at XZ or YZ plane, and controlled by the data index
-    in the X or Y direction.
-  </p>
-</faqitem>
-
-<faqitem q="Vertical Profile in Pressure Axis" id="pressureAzis">
-  <p>
-    New vertical profile display that uses pressure as its Y axis to emphasize information in the lower level atmoshpere and
-    to understanding tropical convection - moisture interactions mainly concentrated in lower atmosphere. A new derived
-    variable: Conserved Sounding (from theta, thetae and sat thetae), and its associated display Conserved Variable
-    Sounding (Pressure) has been added to the derived parameter list of gridded dataset.
+    Common Data Model profile feature data is a set of data points along a vertical line, inlcluding a collection of
+    a time series of profile features at named locations. CDM Profile data can be loaded in the Data Choosers:
+    RAOB > Soundings Local.
   </p>
 </faqitem>
 
@@ -93,32 +69,23 @@ The items below reflect changes since the 5.5 release.
 <faqitem cat="Jython Changes"></faqitem>
 
 
-
-<faqitem q="Basic Grid Math" id="mapesbasicmath">
+<faqitem q="ABI and AHI Formulas" id="abiahiformulas">
   <p>
-    A collection of utilities from Mapes IDV collection performs a series of basic grid divide, multiply,
-    modulo, and vertical derivative.
+    Added a series of formulas specific to ABI (Advanced Baseline Imager), AHI (Advanced Himawari Imager) and MSG (Meteosat-8 through 11)to create
+    displays of RGB and band subtraction products.  These formulas can be found in the Field Selector under Formulas > Satellite.
+    Also, derived fields for these products will be automatically added to the Field Selector when the multi bands ABI data source
+    is loaded that includes bands required to create the product.
   </p>
 </faqitem>
 
-<faqitem q="3D Scalar Field Horizontal Smoothing" id="mapessmth">
+<faqitem q="Grid Diagnostics Formulas" id="mapessmth">
   <p>
-    A collection of utilities from Mapes IDV collection applies a series of horizontal smoothing on 3D field.
+    Added a variety of formulas specific to gridded datasource to calculate Saturation Equivalent Potential Temperature,
+    Heat Index,  Helicity,  Ellrod Index, LP Index, and Richardson number.
   </p>
 </faqitem>
 
-<faqitem q="Time Mean and Anomaly" id="mapestimema">
-  <p>
-    A collection of utilities from Mapes IDV collection calculates a series of daily, monthly, yearly mean
-    and anomaly.
-  </p>
-</faqitem>
 
-  <faqitem q="Publishing to the RAMADDA" id="islpub">
-    <p>
-      The new ISL publish tag will publish a file to RAMADDA server.
-    </p>
-  </faqitem>
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
 <faqitem q="Bug Fixes" id="bugfix">
