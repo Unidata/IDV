@@ -1461,7 +1461,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <paramgroup categories="" name="ABI_RGB_Airmass"/>
     </operands>
   </derived>
-  <derived description="ABI SO2 RGB" formula="ABISo2RGB(D1[label=Band 8T], D2[label=Band 10T], D3[label=Band 12T], D4[label=Band 13T])" id="abiso2" isdefault="true" isenduser="true">
+  <derived description="ABI SO2 RGB" formula="ABISo2RGB(D1[label=Band 9T], D2[label=Band 10T], D3[label=Band 11T], D4[label=Band 13T])" id="abiso2" isdefault="true" isenduser="true">
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
@@ -1501,7 +1501,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
       <paramgroup categories="" name="ABI_RGB_DayLandCloud"/>
     </operands>
   </derived>
-  <derived description="ABI Day Land Cloud Fire RGB" formula="ABIDayLandCloudFireRGB(D1[label=Band 2A], D2[label=Band 3A], D3[label=Band 5A])" id="abidaylandcloudfire" isdefault="true" isenduser="true">
+  <derived description="ABI Day Land Cloud Fire RGB" formula="ABIDayLandCloudFireRGB(D1[label=Band 2A], D2[label=Band 3A], D3[label=Band 6A])" id="abidaylandcloudfire" isdefault="true" isenduser="true">
     <categories>
       <category display="true" value="Satellite-ABI RGBs"/>
       <category value="display:imagecontrol"/>
