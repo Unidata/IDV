@@ -61,17 +61,18 @@ example:
   </control>
 
 
-<!--  THIS DOESN'T WORK, but could be cool if it was made to
+<!--  THIS DOESN'T WORK, but could be cool if it was made to-->
   <control
      id="imagedisplayastopo"
      categories="IMAGE-*-*"
      class="ucar.unidata.idv.control.ColorPlanViewControl"
      label="Image As Topography"
+     code="makeTopographyFromField(D1)"
      displaycategory="Imagery"
-     properties="windowVisible=true;parameterIsTopography=true">
+     properties="windowVisible=true;parameterIsTopography=true;smoothed=true;">
      <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager"/>
   </control>
--->
+
 
   <control
      id="imagesequence"
