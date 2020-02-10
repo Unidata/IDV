@@ -1754,7 +1754,7 @@ public class IdvUIManager extends IdvManager {
                 historyMenuSelected(menu);
                 break;
             case MENU_HISTORY_FILE:
-                historyMenuSelectedV(menu, "DataSourceHistory");
+                historyMenuSelected(menu);
                 break;
             case MENU_HISTORY_BUNDLE:
                 historyMenuSelectedV(menu, "ucar.unidata.idv.FileHistory");
