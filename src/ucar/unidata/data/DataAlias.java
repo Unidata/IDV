@@ -27,8 +27,7 @@ package ucar.unidata.data;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.w3c.dom.Element;
 
-
-import ucar.nc2.grib.GribVariableRenamer;
+import ucar.unidata.data.grid.GribVariableRenamer;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
