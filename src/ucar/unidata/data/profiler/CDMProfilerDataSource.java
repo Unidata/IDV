@@ -30,6 +30,8 @@ import ucar.nc2.constants.FeatureType;
 
 import ucar.nc2.ft.*;
 
+import ucar.nc2.ft.point.StationFeature;
+import ucar.nc2.time.CalendarDate;
 import ucar.unidata.data.*;
 import ucar.unidata.data.point.PointObFactory;
 import ucar.unidata.geoloc.Station;
@@ -111,7 +113,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
     private List allProfiles;
 
     /** _more_ */
-    private List<Station> stations;
+    private List<StationFeature> stations;
 
     /** _more_ */
     private List<Double> times;
@@ -246,7 +248,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
      *
      * @return _more_
      */
-    private List<NamedStation> getNamedStations(List<Station> stations) {
+    private List<NamedStation> getNamedStations(List<StationFeature> stations) {
         int                size      = stations.size();
         Unit               unit      = DataUtil.parseUnit("meter");
         List<NamedStation> nstations = new ArrayList();
@@ -398,9 +400,9 @@ public class CDMProfilerDataSource extends FilesDataSource {
         }
 
 
-        List<FeatureCollection> fcList =
+        List<DsgFeatureCollection> fcList =
             dataset.getPointFeatureCollectionList();
-        FeatureCollection fc = fcList.get(0);
+        DsgFeatureCollection fc = fcList.get(0);
         StationProfileFeatureCollection spc =
             (StationProfileFeatureCollection) fc;
         FeatureType ftype   = spc.getCollectionFeatureType();
@@ -424,14 +426,14 @@ public class CDMProfilerDataSource extends FilesDataSource {
      *
      * @param sts _more_
      */
-    private void addStations(List<Station> sts) {
+    private void addStations(List<StationFeature> sts) {
         if (stations == null) {
             stations         = sts;
             selectedStations = getNamedStations(sts);
         } else {
             int size = sts.size();
             for (int i = 0; i < size; i++) {
-                Station s = sts.get(i);
+                StationFeature s = sts.get(i);
                 if ( !selectedStations.contains(getNamedStation(s))) {
                     stations.add(s);
                     selectedStations.contains(getNamedStation(s));
@@ -452,7 +454,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
     private void initWPDN(StationProfileFeatureCollection spc, String sname)
             throws IOException, visad.VisADException {
 
-        List<Station>      lstations  = spc.getStations();
+        List<StationFeature>      lstations  = spc.getStationFeatures();
         List<NamedStation> lnstations = getNamedStations(lstations);
         addStations(lstations);
 
@@ -472,13 +474,13 @@ public class CDMProfilerDataSource extends FilesDataSource {
         int ii = 0;
         int j0 = 0;
         while (ii < size) {
-            Station               st  = lstations.get(ii);
+            StationFeature               st  = lstations.get(ii);
             StationProfileFeature spf = spc.getStationProfileFeature(st);
             //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
             PointFeatureCollectionIterator iter =
-                spf.getPointFeatureCollectionIterator(-1);  // not multiple
+                spf.getPointFeatureCollectionIterator();  // not multiple
 
-            List<Date> tList         = spf.getTimes();
+            List<CalendarDate> tList         = spf.getTimes();
             int        tsize         = tList.size();
             List       latVector     = new Vector();
             List       lonVector     = new Vector();
@@ -497,14 +499,15 @@ public class CDMProfilerDataSource extends FilesDataSource {
                 List           timeList = new ArrayList<Double>();
                 List           uSpdList = new ArrayList<Double>();
                 List           vSpdList = new ArrayList<Double>();
-                Date           dt       = tList.get(jj);
+                CalendarDate   cdt      = tList.get(jj);
+                Date           dt       = tList.get(jj).toDate();
 
                 DateTime       dateTime = new DateTime(dt);
 
-                ProfileFeature pf0      = spf.getProfileByDate(dt);
+                ProfileFeature pf0      = spf.getProfileByDate(cdt);
                 while (pf0.hasNext()) {
                     PointFeature  p0   = pf0.next();
-                    StructureData sd   = p0.getData();
+                    StructureData sd   = p0.getFeatureData();
                     float         uspd = sd.convertScalarFloat("uComponent");
                     float         vspd = sd.convertScalarFloat("vComponent");
                     if ((uspd != McIDASUtil.MCMISSING)
@@ -620,7 +623,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
     private void initWPDNOld(StationProfileFeatureCollection spc, String name)
             throws IOException, visad.VisADException {
 
-        stations         = spc.getStations();
+        stations         = spc.getStationFeatures();
         selectedStations = getNamedStations(stations);
         int size = stations.size();
         if (size < 3) {
@@ -638,13 +641,13 @@ public class CDMProfilerDataSource extends FilesDataSource {
         spc.resetIteration();
         int ii = 0;
         while (ii < size) {
-            Station               st  = stations.get(ii);
+            StationFeature               st  = stations.get(ii);
             StationProfileFeature spf = spc.getStationProfileFeature(st);
             //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
             PointFeatureCollectionIterator iter =
-                spf.getPointFeatureCollectionIterator(-1);  // not multiple
+                spf.getPointFeatureCollectionIterator();  // not multiple
 
-            List<Date> tList    = spf.getTimes();
+            List<CalendarDate> tList    = spf.getTimes();
             int        tsize    = tList.size();
             List       latList  = new ArrayList<Double>();
             List       lonList  = new ArrayList<Double>();
@@ -656,13 +659,13 @@ public class CDMProfilerDataSource extends FilesDataSource {
             int        jj       = 0;
             while (jj < tsize) {  //iter.hasNext()) {
                 //ProfileFeature pf0 =  (ProfileFeature)iter.next();
-                Date           dt       = tList.get(jj);
+                CalendarDate           dt       = tList.get(jj);
 
-                DateTime       dateTime = new DateTime(dt);
+                DateTime       dateTime = new DateTime(dt.toDate());
                 ProfileFeature pf0      = spf.getProfileByDate(dt);
                 while (pf0.hasNext()) {
                     PointFeature  p0   = pf0.next();
-                    StructureData sd   = p0.getData();
+                    StructureData sd   = p0.getFeatureData();
                     float         uspd = sd.convertScalarFloat("uComponent");
                     float         vspd = sd.convertScalarFloat("vComponent");
                     if ((uspd != McIDASUtil.MCMISSING)
@@ -780,7 +783,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
     private void initMadis(StationProfileFeatureCollection spc, String name)
             throws IOException, visad.VisADException {
 
-        stations         = spc.getStations();
+        stations         = spc.getStationFeatures();
         selectedStations = getNamedStations(stations);
 
         int size = stations.size();
@@ -799,13 +802,13 @@ public class CDMProfilerDataSource extends FilesDataSource {
         int ii = 0;
         int j0 = 0;
         while (ii < size) {
-            Station               st  = stations.get(ii);
+            StationFeature               st  = stations.get(ii);
             StationProfileFeature spf = spc.getStationProfileFeature(st);
             //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
             PointFeatureCollectionIterator iter =
-                spf.getPointFeatureCollectionIterator(-1);  // not multiple
+                spf.getPointFeatureCollectionIterator();  // not multiple
 
-            List<Date> tList         = spf.getTimes();
+            List<CalendarDate> tList         = spf.getTimes();
             int        tsize         = tList.size();
             List       latVector     = new Vector();
             List       lonVector     = new Vector();
@@ -824,14 +827,14 @@ public class CDMProfilerDataSource extends FilesDataSource {
                 List           timeList    = new ArrayList<Double>();
                 List           windSpdList = new ArrayList<Double>();
                 List           windDirList = new ArrayList<Double>();
-                Date           dt          = tList.get(jj);
+                CalendarDate           dt          = tList.get(jj);
 
-                DateTime       dateTime    = new DateTime(dt);
+                DateTime       dateTime    = new DateTime(dt.toDate());
 
                 ProfileFeature pf0         = spf.getProfileByDate(dt);
                 while (pf0.hasNext()) {
                     PointFeature  p0  = pf0.next();
-                    StructureData sd  = p0.getData();
+                    StructureData sd  = p0.getFeatureData();
                     float         spd = sd.convertScalarFloat("windSpeed");
                     float         dir = sd.convertScalarFloat("windDir");
                     if ((spd != McIDASUtil.MCMISSING) && (spd != CAPMissing)
