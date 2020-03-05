@@ -746,7 +746,38 @@ public class GeoSelectionPanel extends JPanel {
             np.zoom(0.6);
         }
 
+        /**
+         * ctor
+         *
+         *
+         * @param   r
+         *
+         */
+        public void resetBounds(ProjectionRect r ){
 
+            NavigatedPanel np = getNavigatedPanel();
+
+            if (r != null) {
+                points = new ArrayList();
+                np.setSelectedRegionBounds(r);
+                points.add(new ProjectionPointImpl(r.getX(), r.getY()));
+                points.add(new ProjectionPointImpl(r.getX() + r.getWidth(),
+                        r.getY()));
+                points.add(new ProjectionPointImpl(r.getX() + r.getWidth(),
+                        r.getY() + r.getHeight()));
+                points.add(new ProjectionPointImpl(r.getX(),
+                        r.getY() + r.getHeight()));
+                //                System.err.println("rect:" + r);
+                //                System.err.println ("Points:" + points);
+            }
+            np.setSelectRegionMode(true);
+
+            if (geoPanel.geoSelection.getBoundingBox() != null) {
+                np.setSelectedRegion(
+                        geoPanel.geoSelection.getBoundingBox().getLatLonRect());
+            }
+            np.zoom(0.6);
+        }
 
         /**
          * Update
