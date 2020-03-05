@@ -30,14 +30,13 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import ucar.ma2.Array;
 
 import ucar.nc2.dataset.CoordinateAxis1DTime;
+import ucar.nc2.ft2.coverage.CoverageCoordAxis1D;
+import ucar.nc2.ft2.coverage.TimeOffsetAxis;
 import ucar.nc2.time.CalendarDate;
 
-import ucar.unidata.util.DatedObject;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.nc2.time.CalendarDateRange;
+import ucar.nc2.util.NamedAnything;
+import ucar.unidata.util.*;
 
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
@@ -818,6 +817,28 @@ public class DataUtil {
         return times;
     }
 
+    /**
+     * Make a List of CalendarDateTime objects from the times in the timeAxis
+     *
+     * @param timeAxis  the time axis
+     * @return List of DateTimes
+     * @throws VisADException  problem parsing timeAxis calendar dates
+     */
+    public static List<CalendarDateTime> makeDateTimes(
+            CoverageCoordAxis1D timeAxis)
+            throws VisADException {
+        List<ucar.nc2.util.NamedObject> ttt= timeAxis.getCoordValueNames();
+        List<CalendarDateTime> times =
+                new ArrayList<CalendarDateTime>(ttt.size());
+
+        for(Object oj: ttt) {
+            NamedAnything anything = (NamedAnything)oj;
+            CalendarDate cdate = (CalendarDate)anything.getValue();
+            times.add(DataUtil.makeDateTime(cdate));
+        }
+
+        return times;
+    }
     /**
      * Make a date object corresponding the the calendar date
      *
