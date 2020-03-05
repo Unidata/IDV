@@ -47,9 +47,11 @@ import ucar.nc2.ft.point.StationFeatureImpl;
 import ucar.nc2.ft.point.StationTimeSeriesCollectionImpl;
 import ucar.nc2.ft.point.standard.StandardStationCollectionImpl;
 import ucar.nc2.time.CalendarDate;
+import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
 
 import ucar.nc2.units.DateUnit;
+import ucar.nc2.util.IOIterator;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
@@ -1728,28 +1730,30 @@ public class PointObFactory {
         String stationFieldName = null;
 
         // make sure we can read this kind of data
-        List<FeatureCollection> collectionList =
+        List<DsgFeatureCollection> collectionList =
                 input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {
             throw new IllegalArgumentException(
-                    "Can't handle point data with multiple collections");
+                    "Can'" +
+                            "t handle point data with multiple collections");
         }
-        FeatureCollection fc = collectionList.get(0);
+        DsgFeatureCollection fc = collectionList.get(0);
         PointFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
-        DateRange dateRange = null;
+        CalendarDateRange dateRange = null;
         if (dateSelection != null) {
             if (dateSelection.getTimes() != null) {
                 List<Date> range = dateSelection.getTimes();
                 Collections.sort(range);
-                dateRange = new DateRange(range.get(0),
-                        range.get(range.size() - 1));
+                CalendarDate calStart = CalendarDate.of(range.get(0));
+                CalendarDate calEnd = CalendarDate.of(range.get(range.size() - 1));
+                dateRange = CalendarDateRange.of(calStart, calEnd);
             } else if (dateSelection.hasInterval()) {
                 double interval = dateSelection.getInterval();
                 int count = dateSelection.getCount();
                 long timespan = (long) interval * count;
                 Date now = new Date();
-                dateRange = new DateRange(new Date(now.getTime() - timespan),
+                dateRange = CalendarDateRange.of(new Date(now.getTime() - timespan),
                         now);
             }
         }
@@ -1761,13 +1765,18 @@ public class PointObFactory {
             if ((llr != null) || (dateRange != null)) {
                 collection = collection.subset(llr, dateRange);
             }
-        } else if (fc instanceof NestedPointFeatureCollection) {
-            NestedPointFeatureCollection npfc =
-                    (NestedPointFeatureCollection) fc;
+        } else if (fc instanceof PointFeatureCC) {
+            PointFeatureCC npfc =
+                    (PointFeatureCC) fc;
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
-            collection = npfc.flatten(llr, dateRange);
+            IOIterator<PointFeatureCollection> itor =  npfc.getCollectionIterator();
+            while(itor.hasNext()){
+                PointFeatureCollection pfcc = itor.next();
+                pfcc = pfcc.subset(llr, dateRange);
+            }
+            //collection = npfc.flatten(llr, dateRange);
         } else {
             throw new IllegalArgumentException(
                     "Can't handle collection of type " + fc.getClass().getName());
@@ -1945,7 +1954,7 @@ public class PointObFactory {
         } else {
             PointFeatureIterator dataIterator =
                     //collection.getPointFeatureIterator(-1);
-                    collection.getPointFeatureIterator(16384);
+                    collection.getPointFeatureIterator();
             while (dataIterator.hasNext()) {
                 PointFeature po = (PointFeature) dataIterator.next();
                 iammissing = false;
@@ -1961,7 +1970,7 @@ public class PointObFactory {
                         : new String[numStrings]);
 
                 // make the VisAD data object
-                StructureData structure = po.getData();
+                StructureData structure = po.getFeatureData();
                 int stringCnt = 0;
                 int realCnt = 0;
                 if (needToAddStationId) {
@@ -2020,7 +2029,7 @@ public class PointObFactory {
                         realArray, stringArray, allUnits));
 
                 tuples.add(tuple);
-                times.add(new DateTime(po.getNominalTimeAsDate()));
+                times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
                 elts.add(elt);
 
                 if (obIdx % NUM == 0) {
@@ -2034,7 +2043,7 @@ public class PointObFactory {
             Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
                     "found " + ismissing + "/" + missing
                             + " missing out of " + obIdx);
-            dataIterator.finish();
+            dataIterator.close();
         }
         if (tuples.isEmpty()) {
             return null;
@@ -2108,28 +2117,29 @@ public class PointObFactory {
         String stationFieldName = null;
 
         // make sure we can read this kind of data
-        List<FeatureCollection> collectionList =
+        List<DsgFeatureCollection> collectionList =
                 input.getPointFeatureCollectionList();
         if (collectionList.size() > 1) {
             throw new IllegalArgumentException(
                     "Can't handle point data with multiple collections");
         }
-        FeatureCollection fc = collectionList.get(0);
-        FeatureCollection collection = null;
+        DsgFeatureCollection fc = collectionList.get(0);
+        DsgFeatureCollection collection = null;
         // System.out.println("llr = " + llr);
-        DateRange dateRange = null;
+        CalendarDateRange dateRange = null;
         if (dateSelection != null) {
             if (dateSelection.getTimes() != null) {
                 List<Date> range = dateSelection.getTimes();
                 Collections.sort(range);
-                dateRange = new DateRange(range.get(0),
-                        range.get(range.size() - 1));
+                CalendarDate calStart = CalendarDate.of(range.get(0));
+                CalendarDate calEnd = CalendarDate.of(range.get(range.size() - 1));
+                dateRange = CalendarDateRange.of(calStart, calEnd);
             } else if (dateSelection.hasInterval()) {
                 double interval = dateSelection.getInterval();
                 int count = dateSelection.getCount();
                 long timespan = (long) interval * count;
                 Date now = new Date();
-                dateRange = new DateRange(new Date(now.getTime() - timespan),
+                dateRange = CalendarDateRange.of(new Date(now.getTime() - timespan),
                         now);
             }
         }
@@ -2147,14 +2157,14 @@ public class PointObFactory {
                 collection = ((StandardStationCollectionImpl)collection).flatten(llr, dateRange);
             }
 
-        } else if (fc instanceof NestedPointFeatureCollection) {
-            NestedPointFeatureCollection npfc =
-                    (NestedPointFeatureCollection) fc;
+        } else if (fc instanceof PointFeatureCCC) {
+            PointFeatureCCC npfc =
+                    (PointFeatureCCC) fc;
             //if (llr != null) {
             //    npfc = npfc.subset(llr);
             //}
             if ((llr != null) || (dateRange != null)) {
-                collection = npfc.flatten(llr, dateRange);
+              //  collection = npfc.flatten(llr, dateRange);
             }
         } else {
             throw new IllegalArgumentException(
@@ -2342,7 +2352,7 @@ public class PointObFactory {
         }  else if(collection instanceof  PointFeatureCollection){
             PointFeatureIterator dataIterator =
                     //collection.getPointFeatureIterator(-1);
-                    ((PointFeatureCollection)collection).getPointFeatureIterator(16384);
+                    ((PointFeatureCollection)collection).getPointFeatureIterator();
             while (dataIterator.hasNext()) {
                 PointFeature po = (PointFeature) dataIterator.next();
                 iammissing = false;
@@ -2362,7 +2372,7 @@ public class PointObFactory {
                         : new String[numStrings]);
 
                 // make the VisAD data object
-                StructureData structure = po.getData();
+                StructureData structure = po.getFeatureData();
                 int stringCnt = 0;
                 int realCnt = 0;
                 if (needToAddStationId) {
@@ -2421,7 +2431,7 @@ public class PointObFactory {
                         realArray, stringArray, allUnits));
 
                 tuples.add(tuple);
-                times.add(new DateTime(po.getNominalTimeAsDate()));
+                times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
                 elts.add(elt);
 
                 if (obIdx % NUM == 0) {
@@ -2435,7 +2445,7 @@ public class PointObFactory {
             Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
                     "found " + ismissing + "/" + missing
                             + " missing out of " + obIdx);
-            dataIterator.finish();
+            dataIterator.close();
         } else if( collection instanceof  StandardStationCollectionImpl){
             StandardStationCollectionImpl ssci = (StandardStationCollectionImpl)collection;
            // PointFeatureCollectionIterator dataIterator =
@@ -2448,7 +2458,7 @@ public class PointObFactory {
                 iammissing = false;
                 obIdx++;
                 // StationTimeSeriesFeature el = po..next();
-                PointFeatureIterator pf = po.getPointFeatureIterator(-1);
+                PointFeatureIterator pf = po.getPointFeatureIterator();
                 while (pf.hasNext()) {
                     PointFeature pf0 = pf.next();
                     cdate = pf0.getObservationTimeAsCalendarDate();
