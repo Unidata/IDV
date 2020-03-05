@@ -39,7 +39,6 @@ import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.CFGridWriter2;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridDataset;
-import ucar.nc2.grib.GribVariableRenamer;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
@@ -2155,7 +2154,13 @@ public class GeoGridDataSource extends GridDataSource {
         StringBuilder buf = new StringBuilder();
         if ((dd != null) && (dt != null)) {
             for (int i = 0; i < timeIndices.length; i++) {
-                CalendarDate cd   = dd.getCalendarDate(timeIndices[i]);
+                CalendarDate cd   = null;
+                int dsize = dd.getCalendarDates().size();
+                if(dsize == 1)
+                    cd  = dd.getCalendarDate(0);
+                else
+                    cd  = dd.getCalendarDate(timeIndices[i]);
+
                 CalendarDate ct   = dt.getCalendarDate(timeIndices[i]);
                 long         diff = ct.getDifferenceInMsecs(cd);
                 float        fh   = diff / (1000.0f * 3600.0f);
@@ -2593,7 +2598,7 @@ public class GeoGridDataSource extends GridDataSource {
 
             // see if we have any categorization
             Group            group    = null;
-            VariableEnhanced variable = cfield.getVariable();
+            VariableDS variable = cfield.getVariable();
             if (variable != null) {
                 group = variable.getParentGroup();
                 if ((group != null) && !group.equals("")) {
