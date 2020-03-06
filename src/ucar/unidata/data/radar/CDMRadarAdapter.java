@@ -33,11 +33,11 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.RadialDatasetSweep;
-import ucar.nc2.dt.TypedDatasetFactory;
+//import ucar.nc2.dt.TypedDatasetFactory;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridCoordSys;
 import ucar.nc2.units.DateUnit;
-
+import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -321,13 +321,13 @@ public class CDMRadarAdapter implements RadarAdapter {
         try {
             Trace.call1("CDMRadarAdapter:open dataset");
             if(swpFileName.endsWith("entry.das"))
-                rds = (RadialDatasetSweep) TypedDatasetFactory.open(
+                rds = (RadialDatasetSweep) FeatureDatasetFactoryManager.open(
                     ucar.nc2.constants.FeatureType.RADIAL, DODSNetcdfFile.canonicalURL(swpFileName), null,
-                    new StringBuilder());
+                        new Formatter());
             else
-                rds = (RadialDatasetSweep) TypedDatasetFactory.open(
+                rds = (RadialDatasetSweep) FeatureDatasetFactoryManager.open(
                         ucar.nc2.constants.FeatureType.RADIAL, swpFileName, null,
-                        new StringBuilder());
+                        new Formatter());
 
             Trace.call2("CDMRadarAdapter:open dataset");
             stationID      = rds.getRadarID();
@@ -455,7 +455,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             }
 
 
-            baseTime = new DateTime(rds.getStartDate());
+            baseTime = new DateTime(rds.getCalendarDateStart().toDate());
 
             Iterator iter = rvars.iterator();
             int      p    = 0;
