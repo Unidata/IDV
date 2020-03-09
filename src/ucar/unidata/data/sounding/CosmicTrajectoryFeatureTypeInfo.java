@@ -186,7 +186,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
         }
 
         PointFeature  pf   = obsList.get(0);
-        StructureData pfsd = pf.getData();
+        StructureData pfsd = pf.getFeatureData();
         List<Member> members = pfsd.getMembers();
         for(int i=0; i< members.size(); i++){
             Member mb = members.get(i);
@@ -364,7 +364,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
         }
         while (i <= obsList.size() && j < range.length()) {
             PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getData();
+            StructureData pfsd = pf.getFeatureData();
 
             fdata[j++] = pfsd.getScalarFloat(var) * scale;
 
@@ -404,7 +404,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
         }
         while (i <= obsList.size() && j < range.length()) {
             PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getData();
+            StructureData pfsd = pf.getFeatureData();
 
             fdata[j++] = pfsd.getScalarDouble(var);
 
@@ -440,7 +440,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
         int      j      = 0;
         while (i < last) {
             PointFeature  pf   = obsList.get(i);
-            StructureData pfsd = pf.getData();
+            StructureData pfsd = pf.getFeatureData();
 
             sdata[j++] = pfsd.getScalarString(var);
             i          = i + stride;
@@ -515,8 +515,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
             }
             locations.add(location);
 
-            double dirVal = Util.calculateBearing(lastEL, location,
-                                workBearing).getAngle();
+            double dirVal = Util.calculateBearing(lastEL, location).getAngle();
 
 
             lastEL = location;
@@ -604,7 +603,7 @@ public class CosmicTrajectoryFeatureTypeInfo extends TrackInfo {
                     return null;
                 }
                 PointFeature  pf          = obsList.get(obIdx);
-                StructureData structure   = pf.getData();
+                StructureData structure   = pf.getFeatureData();
 
                 List          members     = structure.getMembers();
                 Data[]        tupleArray  = (Data[]) tuples.get(obIdx);
