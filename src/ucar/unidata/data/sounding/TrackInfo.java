@@ -126,7 +126,7 @@ public abstract class TrackInfo {
     protected Range lastSpatialSetRange = null;
 
     /** bearing class for bearing calculations */
-    protected Bearing workBearing = new Bearing();
+    //protected Bearing workBearing = new Bearing();
 
     /** base time for the sounding release */
     DateTime startTime;
@@ -542,8 +542,7 @@ public abstract class TrackInfo {
             }
             locations.add(location);
 
-            double dirVal = Util.calculateBearing(lastEL, location,
-                                workBearing).getAngle();
+            double dirVal = Util.calculateBearing(lastEL, location).getAngle();
 
 
             lastEL = location;
