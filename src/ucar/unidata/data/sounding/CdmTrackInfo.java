@@ -25,7 +25,6 @@ package ucar.unidata.data.sounding;
 
 import ucar.ma2.Array;
 
-import ucar.ma2.DataType;
 import ucar.ma2.Index;
 import ucar.ma2.Index0D;
 import ucar.ma2.Range;
@@ -36,55 +35,34 @@ import ucar.ma2.StructureMembers;
 
 import ucar.nc2.Attribute;
 import ucar.nc2.VariableSimpleIF;
-import ucar.nc2.dt.TrajectoryObsDataset;
-import ucar.nc2.dt.TrajectoryObsDatatype;
 
 
-import ucar.unidata.data.BadDataException;
+import ucar.nc2.ft.*;
+import ucar.nc2.ft.point.CollectionInfo;
+import ucar.nc2.ft.point.DsgCollectionImpl;
+import ucar.nc2.time.CalendarDateRange;
+import ucar.nc2.time.CalendarDateUnit;
 
-import ucar.unidata.data.DataAlias;
+
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
 
 import ucar.unidata.data.point.*;
-import ucar.unidata.geoloc.Bearing;
+
 
 import ucar.unidata.util.JobManager;
-import ucar.unidata.util.Misc;
+
 import ucar.unidata.util.Trace;
 
-import ucar.visad.UtcDate;
 
 import ucar.visad.Util;
 import ucar.visad.quantities.*;
 
 import visad.*;
-
-import visad.data.netcdf.Plain;
-import visad.data.units.ParseException;
-import visad.data.units.Parser;
-
 import visad.georef.*;
 
-import visad.util.DataUtility;
 
-
-import java.awt.Color;
-import java.awt.event.*;
-
-import java.net.MalformedURLException;
-
-import java.net.URL;
-
-import java.rmi.RemoteException;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-
-import javax.swing.JFrame;
-
+import java.util.*;
 
 /**
  * Class TrackInfo Provides access to a track or trajectory
@@ -107,15 +85,18 @@ public class CdmTrackInfo extends TrackInfo {
     /** Fixed var name for time */
     public static final String VAR_TIME = "Time";
 
+    List<PointFeature> obsList = new ArrayList<>();
 
+    /** The times. */
+    double[] times;
 
     /** The data set */
-    private TrajectoryObsDataset tod;
+    private FeatureDatasetPoint tod;
 
     /** The data type */
-    TrajectoryObsDatatype todt;
+    TrajectoryFeature todt;
 
-
+    CDMTrajectoryFeatureTypeInfo.TrajectoryFeatureBean trajBean;
     /**
      * ctor
      *
@@ -126,13 +107,14 @@ public class CdmTrackInfo extends TrackInfo {
      *
      * @throws Exception On badness
      */
-    public CdmTrackInfo(TrackAdapter adapter, TrajectoryObsDataset tod,
-                        TrajectoryObsDatatype todt)
+    public CdmTrackInfo(TrackAdapter adapter, FeatureDatasetPoint tod,
+                        TrajectoryFeature todt)
             throws Exception {
-        super(adapter, todt.getId());
+        super(adapter, tod.getTitle());
         this.tod  = tod;
         this.todt = todt;
         init();
+
         //            ucar.unidata.util.Misc.run(new Runnable(){public void run(){testit();}});
     }
 
@@ -151,11 +133,25 @@ public class CdmTrackInfo extends TrackInfo {
         varLongitude = VAR_LONGITUDE;
         varAltitude  = VAR_ALTITUDE;
 
-        startTime    = new DateTime(todt.getStartDate());
-        endTime      = new DateTime(todt.getEndDate());
+
+
+        trajBean = new CDMTrajectoryFeatureTypeInfo.TrajectoryFeatureBean(todt);
+
+        List<PointFeature> pfs = trajBean.pfs;
+        TrajectoryFeature tf = trajBean.pfc;
+
+        int  psize = pfs.size();
+        for (int i = 0; i < psize; i++) {
+            obsList.add(pfs.get(i));
+        }
+        CalendarDateRange cdr = tf.getCalendarDateRange();
+        Range rg = getDataRange();
+
+
         List allVariables = tod.getDataVariables();
+
         //TODO: Check size
-        StructureData structure = todt.getData(0);
+
 
         addVariable(new VarInfo(VAR_TIME, VAR_TIME, "Basic", getTimeUnit()));
 
@@ -170,11 +166,23 @@ public class CdmTrackInfo extends TrackInfo {
 
 
         for (int varIdx = 0; varIdx < allVariables.size(); varIdx++) {
+            String                  ustr = null;
+            Unit                    unit = null;
             VariableSimpleIF var =
                 (VariableSimpleIF) allVariables.get(varIdx);
             //Skip vector variables
             if (var.getRank() != 0) {
                 continue;
+            }
+
+            ustr = var.getUnitsString();
+            if ((ustr != null) && !ustr.equalsIgnoreCase("none")) {
+                    try {
+                        unit = Util.parseUnit(ustr);
+                    } catch (visad.VisADException e) {
+                        unit = null;
+                    }
+
             }
             VarInfo variable = new VarInfo(var.getShortName(),
                                            var.getDescription(),
@@ -190,26 +198,63 @@ public class CdmTrackInfo extends TrackInfo {
                 variable.setCategory(attr.getStringValue());
             }
 
-            if (structure != null) {
-                StructureMembers.Member member =
-                    (StructureMembers.Member) structure.findMember(
-                        var.getShortName());
-                variable.setIsNumeric(
-                     !((member.getDataType() == DataType.STRING)
-                       || (member.getDataType() == DataType.CHAR)));
+            if ((unit != null)) {
+                if (unit.isConvertible(CommonUnit.secondsSinceTheEpoch)
+                        && !(unit instanceof DerivedUnit) && (unit instanceof OffsetUnit)) {
+                    varTime = variable.getName();
+                } else if(Double.isNaN(trajBean.getAltitude()) && unit.isConvertible(CommonUnit.meter)) {
+                    if (var.getShortName().equalsIgnoreCase("alt") ||
+                            var.getShortName().equalsIgnoreCase("altitude") ||
+                            var.getShortName().toLowerCase().startsWith("alt")) {
+                        varAltitude = variable.getName();
+                        System.out.println(variable.getName());
+                    }
+                }
             }
+
             addVariable(variable);
+        }
+
+        times     = getTime(rg);
+        if(cdr != null) {
+            startTime = new DateTime(cdr.getStart().toDate());
+            endTime = new DateTime(cdr.getEnd().toDate());
+        } else {
+            startTime = getStartTime();
+            endTime = getEndTime();
         }
     }
 
 
+
+    public DateTime getStartTime() {
+        if (startTime == null) {
+            try {
+                startTime = new DateTime(times[0], getTimeUnit());
+            } catch (Exception e) {}
+        }
+        return startTime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DateTime getEndTime() {
+        if (endTime == null) {
+            try {
+                endTime = new DateTime(times[times.length - 1],
+                        getTimeUnit());
+            } catch (Exception e) {}
+        }
+        return endTime;
+    }
 
     /**
      * Get TrajectoryObsDatatype
      *
      * @return the TrajectoryObsDatatype
      */
-    public TrajectoryObsDatatype getTodt() {
+    public TrajectoryFeature getTodt() {
         return todt;
     }
 
@@ -220,7 +265,7 @@ public class CdmTrackInfo extends TrackInfo {
      * @return number of points
      */
     public int getNumberPoints() {
-        return getTodt().getNumberPoints();
+        return getTodt().size();
     }
 
 
@@ -262,19 +307,20 @@ public class CdmTrackInfo extends TrackInfo {
     private void test2() throws Exception {
         int   numObs      = getNumberPoints();
         Index scalarIndex = new Index0D(new int[0]);
-        for (int obIdx = 0; obIdx < numObs; obIdx++) {
-            StructureData structure  = todt.getData(obIdx);
+
+            //TrajectoryFeature pf = itertor.next();
+            StructureData structure  = todt.getFeatureData();
             List          members    = structure.getMembers();
             int           numMembers = members.size();
-            if (obIdx == 0) {
-                Trace.msg("test2-numMembers:" + numMembers);
-            }
+
+            Trace.msg("test2-numMembers:" + numMembers);
+
             for (int varIdx = 0; varIdx < numMembers; varIdx++) {
                 StructureMembers.Member member =
                     (StructureMembers.Member) members.get(varIdx);
                 Array a = structure.getArray(member);
             }
-        }
+
     }
 
 
@@ -286,7 +332,7 @@ public class CdmTrackInfo extends TrackInfo {
      * @throws Exception On badness
      */
     protected Range getDataRange() throws Exception {
-        return todt.getFullRange();
+        return new Range(0, (getNumberPoints()-1) , 1);
     }
 
     /**
@@ -297,7 +343,7 @@ public class CdmTrackInfo extends TrackInfo {
      * @throws Exception On badness
      */
     protected Unit getTimeUnit() throws Exception {
-        return DataUtil.parseUnit(todt.getTimeUnitsIdentifier());
+        return DataUtil.parseUnit(todt.getTimeUnit().toString());
     }
 
     /**
@@ -310,7 +356,26 @@ public class CdmTrackInfo extends TrackInfo {
      * @throws Exception On badness
      */
     protected double[] getTime(Range range) throws Exception {
-        return DataUtil.toDoubleArray(todt.getTime(range));
+        List<PointFeature> pfs = trajBean.pfs;
+        //VariableDS tvar =  ((PointDatasetStandardFactory.PointDatasetStandard) this.tod).netcdfDataset.findCoordinateAxis(AxisType.Time).orgVar;
+        double [] time = null;
+        time = trajBean.getTimes(range);
+
+        if(time == null || (time.length > 1 &&time[0]==time[time.length-1])) {
+            if (varTime != null)
+                time = trajBean.getDoubleData(range, varTime);
+            else {
+                time = trajBean.getDoubleData(range, "Time");
+                if (time == null) {
+                    time = trajBean.getDoubleData(range, "time");
+                    if (time == null)
+                        time = trajBean.getDoubleData(range, "TIME");
+                    if (time == null)
+                        return null;
+                }
+            }
+        }
+        return time;
     }
 
 
@@ -362,18 +427,18 @@ public class CdmTrackInfo extends TrackInfo {
      */
     protected float[] getFloatData(Range range, String var) throws Exception {
         if (var.equals(VAR_TIME)) {
-            return DataUtil.toFloatArray(todt.getTime(range));
+            return trajBean.getFloatData(range, varTime); //todt..getTime(range));
         }
         if (var.equals(VAR_LATITUDE)) {
-            return DataUtil.toFloatArray(todt.getLatitude(range));
+            return trajBean.getLatitudes(range);
         }
         if (var.equals(VAR_LONGITUDE)) {
-            return DataUtil.toFloatArray(todt.getLongitude(range));
+            return trajBean.getLongitudes(range);
         }
         if (var.equals(VAR_ALTITUDE)) {
-            return DataUtil.toFloatArray(todt.getElevation(range));
+            return trajBean.getAltitudes(range);
         }
-        return DataUtil.toFloatArray(todt.getData(range, var));
+        return trajBean.getFloatData(range, var);
     }
 
 
@@ -390,18 +455,18 @@ public class CdmTrackInfo extends TrackInfo {
     protected double[] getDoubleData(Range range, String var)
             throws Exception {
         if (var.equals(VAR_TIME)) {
-            return DataUtil.toDoubleArray(todt.getTime(range));
+            return trajBean.getDoubleData(range, varTime);
         }
         if (var.equals(VAR_LATITUDE)) {
-            return DataUtil.toDoubleArray(todt.getLatitude(range));
+            return trajBean.getDoubleData(range, VAR_LATITUDE);
         }
         if (var.equals(VAR_LONGITUDE)) {
-            return DataUtil.toDoubleArray(todt.getLongitude(range));
+            return trajBean.getDoubleData(range, VAR_LONGITUDE);
         }
         if (var.equals(VAR_ALTITUDE)) {
-            return DataUtil.toDoubleArray(todt.getElevation(range));
+            return trajBean.getDoubleData(range, VAR_ALTITUDE);
         }
-        return DataUtil.toDoubleArray(todt.getData(range, var));
+        return trajBean.getDoubleData(range, var);
     }
 
 
@@ -418,10 +483,24 @@ public class CdmTrackInfo extends TrackInfo {
      */
     protected String[] getStringData(Range range, String var)
             throws Exception {
-        return DataUtil.toStringArray(todt.getData(range, var));
+        return DataUtil.toStringArray(null); //todt.getData(range, var));
     }
 
-
+    /**
+     * get altitude values
+     *
+     * @param range subset on range. May be null
+     *
+     * @return altitude values
+     *
+     * @throws Exception On badness
+     */
+    protected float[] getAltitude(Range range) throws Exception {
+        if(Double.isNaN(trajBean.getAltitude()) && varAltitude != null)
+            return getFloatData(range, varAltitude);
+        else
+            return getFloatData(range, VAR_ALTITUDE);
+    }
 
     /**
      * Take a FlatField of data and turn it into a field of PointObs.
@@ -489,8 +568,7 @@ public class CdmTrackInfo extends TrackInfo {
             }
             locations.add(location);
 
-            double dirVal = Util.calculateBearing(lastEL, location,
-                                workBearing).getAngle();
+            double dirVal = Util.calculateBearing(lastEL, location).getAngle();
 
 
             lastEL = location;
@@ -565,11 +643,11 @@ public class CdmTrackInfo extends TrackInfo {
                 if ( !JobManager.getManager().canContinue(loadId)) {
                     return null;
                 }
-                StructureData structure   = todt.getData(obIdx);
+                StructureData structure   = todt.getFeatureData();
                 List          members     = structure.getMembers();
-                Data[]        tupleArray  = (Data[]) tuples.get(obIdx);
-                double[]      realArray   = (double[]) reals.get(obIdx);
-                String[]      stringArray = (String[]) strings.get(obIdx);
+                Data[]        tupleArray  = (Data[]) tuples.get(0); //obIdx);
+                double[]      realArray   = (double[]) reals.get(0); //
+                String[]      stringArray = (String[]) strings.get(0);
                 int           numMembers  = members.size();
                 int           varCnt      = 0;
                 int           realCnt     = 0;
