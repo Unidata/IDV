@@ -29,13 +29,10 @@ import java.util.Locale;
 
 import ucar.ma2.StructureData;
 import ucar.nc2.constants.FeatureType;
-import ucar.nc2.ft.FeatureCollection;
-import ucar.nc2.ft.FeatureDatasetFactoryManager;
-import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.PointFeature;
-import ucar.nc2.ft.ProfileFeature;
-import ucar.nc2.ft.StationProfileFeature;
-import ucar.nc2.ft.StationProfileFeatureCollection;
+import ucar.nc2.ft.*;
+import ucar.nc2.ft.DsgFeatureCollection;
+import ucar.nc2.ft.point.StationFeature;
+import ucar.nc2.time.CalendarDate;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
 import ucar.unidata.data.point.PointDataSource;
@@ -68,16 +65,16 @@ public class CDMProfileDataSource extends PointDataSource {
     	final Formatter formatter = new Formatter(new StringBuffer(), Locale.US);
     	//Obviously will have to be parameterized
     	final FeatureDatasetPoint dataset = (FeatureDatasetPoint)FeatureDatasetFactoryManager.open(FeatureType.STATION_PROFILE, "/tmp/Upperair_20110526_0000.nc", null, formatter);
-    	for (FeatureCollection fc : dataset.getPointFeatureCollectionList()) {
+    	for (DsgFeatureCollection fc : dataset.getPointFeatureCollectionList()) {
 			//Eventually, Logic to pull apart feature collection and put into a FieldImpl will be found here.
     		final StationProfileFeatureCollection spfc = (StationProfileFeatureCollection)fc;
-    		for (Station station : spfc.getStations()) {
+    		for (StationFeature station : spfc.getStationFeatures()) {
     			StationProfileFeature stationProfileFeature = spfc.getStationProfileFeature(station);
-    			for (Date date : stationProfileFeature.getTimes()) {
+    			for (CalendarDate date : stationProfileFeature.getTimes()) {
     				ProfileFeature profileByDate = stationProfileFeature.getProfileByDate(date);
     				while (profileByDate.hasNext()) {
     					PointFeature pf = profileByDate.next();
-    					StructureData data = pf.getData();
+    					StructureData data = pf.getFeatureData();
     				}
 				}
     			//Iterate through all times
