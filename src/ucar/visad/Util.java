@@ -2396,6 +2396,27 @@ public final class Util {
     }
 
     /**
+     * Calculate the bearing between the 2 points.
+     * See calculateBearing below.
+     *
+     * @param pt1 Point 1
+     * @param pt2 Point 2
+     *
+     * @return The bearing
+     * @throws VisADException When pt2 cannot be converted to the unit of pt1
+     */
+    public static ucar.unidata.geoloc.Bearing calculateBearing(
+            LatLonPoint pt1, LatLonPoint pt2)
+            throws VisADException {
+        visad.Unit latUnit = pt1.getLatitude().getUnit();
+        visad.Unit lonUnit = pt1.getLongitude().getUnit();
+
+        return ucar.unidata.geoloc.Bearing.calculateBearing(
+                pt1.getLatitude().getValue(), pt1.getLongitude().getValue(),
+                pt2.getLatitude().getValue(latUnit),
+                pt2.getLongitude().getValue(lonUnit));
+    }
+    /**
      * Format a real value to a nice looking number
      *
      * @param r real to format
@@ -3608,6 +3629,34 @@ public final class Util {
         }
         return new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple, values,
                                 values[0].length);
+    }
+
+    /**
+     * This makes a gridded earth domain set with the given lats, lons and (possible null) alts It uses RealTupleType.LatitudeLongitudeAltitude or RealTupleType.LatitudeLongitudeTuple as the type
+     *
+     * @param lats the lats
+     * @param lons the lons
+     * @param alts the (possibly null) altitudes
+     *
+     * @return the griddedset
+     *
+     * @throws VisADException on badness
+     */
+    public static GriddedSet makeEarthDomainSet(float[] lats, float[] lons,
+                                                float[] alts, Unit[] units)
+            throws VisADException {
+        float[][] values = new float[(alts != null)
+                ? 3
+                : 2][];
+        values[0] = lats;
+        values[1] = lons;
+        if (alts != null) {
+            values[2] = alts;
+            return new Gridded3DSet(RealTupleType.LatitudeLongitudeAltitude,
+                    values, values[0].length, null, units, null);
+        }
+        return new Gridded2DSet(RealTupleType.LatitudeLongitudeTuple, values,
+                values[0].length, null, units, null);
     }
 
     /**
