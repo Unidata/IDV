@@ -111,17 +111,17 @@ public class TrajectoryFeatureTypeAdapter extends TrackAdapter {
             isCosmic = true;
             addTrackInfo(new CosmicTrajectoryFeatureTypeInfo(this, dataset,
                     tfc));
-        }  /*else if (isProfile){
-             addTrackInfo(new CDMProfileFeatureTypeInfo(this, dataset,
-                     pfc));
-         } */
+        }  else if (isProfile){
+            for (ProfileFeature pf : pfc) {
+                addTrackInfo(new CDMProfileFeatureTypeInfo(this, dataset,
+                        pf));
+            }
+         }
         /*else if (isProfile){
            addTrackInfo(new CDMProfileFeatureTypeInfo(this, dataset,
                    pfc));
        } */
         else if (dataset.getFeatureType().equals(FeatureType.TRAJECTORY)) {
-
-
             for (TrajectoryFeature traj : tfc) {
                // if(Integer.parseInt(traj.getName()) > 800 &&  Integer.parseInt(traj.getName()) < 806)
                     addTrackInfo(
