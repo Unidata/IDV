@@ -32,9 +32,9 @@ import org.w3c.dom.traversal.TreeWalker;
 
 import org.xml.sax.SAXException;
 
-import thredds.util.UnidataTdsDataPathRemapper;
 
 import ucar.unidata.data.DataSource;
+import ucar.unidata.util.UnidataTdsDataPathRemapper;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
