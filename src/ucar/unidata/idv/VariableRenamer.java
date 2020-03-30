@@ -23,7 +23,6 @@ package ucar.unidata.idv;
 
 import org.w3c.dom.Element;
 
-import thredds.util.UnidataTdsDataPathRemapper;
 
 import ucar.unidata.data.DataSource;
 import ucar.unidata.data.DataSourceDescriptor;
