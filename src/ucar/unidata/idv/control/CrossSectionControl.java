@@ -227,7 +227,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     private LatLonPointImpl startLLP = new LatLonPointImpl();
 
     /** working bearing for calculations */
-    private Bearing workBearing = new Bearing();
+    //private Bearing workBearing = new Bearing();
 
     /** label for showing cross section location */
     private JLabel locationLabel;
@@ -2280,8 +2280,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             workLLP.set(lat, lon);
 
             xVals[i] = xVals[i - 1]
-                       + (float) Bearing.calculateBearing(startLLP, workLLP,
-                           workBearing).getDistance();
+                       + (float) Bearing.calculateBearing(startLLP, workLLP).getDistance();
 
             //System.out.println("                        xVal "+xVals[i]);
 
