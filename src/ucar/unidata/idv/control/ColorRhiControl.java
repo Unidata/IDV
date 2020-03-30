@@ -137,7 +137,11 @@ public class ColorRhiControl extends ColorCrossSectionControl {
     private double R = 6371.01;
     // from http://ssd.jpl.nasa.gov/phys_props_earth.html
 
+    /** old smoothing type */
+    private String OldSmoothingType = LABEL_NONE;
 
+    /** old smoothing factor */
+    private int OldSmoothingFactor = 0;
     /**
      * Default constructor.  Sets the appropriate attribute flags
      * to determine what gui objects appear in the control window.
@@ -589,7 +593,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
         Grid2DDisplayable display = new Grid2DDisplayable("vcs_col"
                                         + paramName, true);
         display.setTextureEnable(true);
-        addAttributedDisplayable(display, FLAG_COLORTABLE);
+        addAttributedDisplayable(display, FLAG_COLORTABLE | FLAG_SMOOTHING);
         return display;
     }
 
@@ -607,7 +611,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
         Grid2DDisplayable display = new Grid2DDisplayable("vcs_" + paramName,
                                         true);
         display.setTextureEnable(true);
-        addAttributedDisplayable(display, FLAG_COLORTABLE);
+        addAttributedDisplayable(display, FLAG_COLORTABLE | FLAG_SMOOTHING);
         return display;
     }
 
@@ -882,13 +886,19 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      * @throws RemoteException  Java RMI failure.
      */
     protected void loadDataFromLine() throws VisADException, RemoteException {
-        if ( !getHaveInitialized() || (lastLoadedAz == beamAz)) {
+        if ( !getHaveInitialized() ||
+                ((lastLoadedAz == beamAz) && getSmoothingType().equals(OldSmoothingType)) ){
             return;
         }
         getGridDataInstance().reInitialize();
         FieldImpl grid = getGridDataInstance().getGrid();
         if (grid == null) {
             return;
+        }
+        if (checkFlag(FLAG_SMOOTHING)
+                && !getSmoothingType().equals(LABEL_NONE)) {
+            grid = GridUtil.smooth(grid, getSmoothingType(),
+                    getSmoothingFactor());
         }
         showWaitCursor();
         loadData(grid);
