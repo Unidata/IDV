@@ -28,6 +28,7 @@ import ucar.ma2.Range;
 import ucar.nc2.dt.TrajectoryObsDataset;
 import ucar.nc2.dt.TrajectoryObsDatatype;
 
+import ucar.nc2.ft.TrajectoryFeature;
 import ucar.unidata.data.*;
 
 
@@ -49,6 +50,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+
+import static ucar.visad.Util.makeDate;
 
 
 /**
@@ -258,13 +261,13 @@ public class SondeDataSource extends TrackDataSource {
                     }
                     TrackInfo trackInfo = ((TrackInfo) infos.get(0));
                     //TODO:
-                    TrajectoryObsDatatype todt =
+                    TrajectoryFeature todt =
                         ((CdmTrackInfo) trackInfo).getTodt();
                     int numObs = 0;
                     try {
                         numObs = trackInfo.getNumberPoints();
                         double[] times =
-                            trackInfo.getTimeVals(todt.getFullRange());
+                            trackInfo.getTimeVals(trackInfo.getFullRange());
                         boolean ascendingTimes = (times[0]
                                                   < times[times.length - 1]);
                         int rVal;
@@ -278,19 +281,19 @@ public class SondeDataSource extends TrackDataSource {
                                    : times.length - 1;
                         }
                         Range r = new Range(rVal, rVal);
-                        Date trueStartDate = (todt.getStartDate().getTime()
-                                              > todt.getEndDate().getTime())
-                                             ? todt.getEndDate()
-                                             : todt.getStartDate();
+                        Date trueStartDate = (trackInfo.startTime.getValue()
+                                              > trackInfo.endTime.getValue())
+                                             ? makeDate(trackInfo.endTime)
+                                             : makeDate(trackInfo.startTime);
                         String time = new DateTime(
                                           trueStartDate).formattedString(
                                           "HH:mm", DateTime.DEFAULT_TIMEZONE);
                         xml.append("<station " + XmlUtil.attr("id", time)
                                 + XmlUtil.attr("name",
                                     IOUtil.getFileTail(adapter.getFilename())) + XmlUtil.attr("lat",
-                                        "" + todt.getLatitude(r)) + XmlUtil.attr("lon",
-                                            "" + todt.getLongitude(r)) + XmlUtil.attr("elev",
-                                                "" + todt.getElevation(r)) + XmlUtil.attr("time",
+                                "" + trackInfo.getLatitude(r)[0]) + XmlUtil.attr("lon",
+                                            "" + trackInfo.getLongitude(r)[0]) + XmlUtil.attr("elev",
+                                                "" + trackInfo.getAltitude(r)[0]) + XmlUtil.attr("time",
                                                     time) + "/>");
                     } catch (Exception exc) {
                         throw new IllegalStateException(
