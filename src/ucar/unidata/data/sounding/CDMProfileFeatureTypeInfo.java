@@ -22,14 +22,16 @@ package ucar.unidata.data.sounding;
 
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import ucar.ma2.Index;
-import ucar.ma2.Index0D;
-import ucar.ma2.Range;
-import ucar.ma2.StructureData;
-import ucar.ma2.StructureMembers;
+import ucar.ma2.*;
+import ucar.nc2.NCdumpW;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.PointFeatureCollection;
@@ -37,6 +39,7 @@ import ucar.nc2.ft.PointFeatureCollectionIterator;
 import ucar.nc2.ft.PointFeatureIterator;
 import ucar.nc2.ft.ProfileFeature;
 import ucar.nc2.ft.ProfileFeatureCollection;
+import ucar.nc2.ft.point.StationFeature;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.VarInfo;
 import ucar.unidata.data.point.PointOb;
@@ -48,21 +51,7 @@ import ucar.unidata.util.Trace;
 import ucar.visad.Util;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.Direction;
-import visad.CommonUnit;
-import visad.Data;
-import visad.DateTime;
-import visad.FieldImpl;
-import visad.FunctionType;
-import visad.Integer1DSet;
-import visad.Real;
-import visad.RealTuple;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.SetType;
-import visad.Text;
-import visad.Tuple;
-import visad.TupleType;
-import visad.Unit;
+import visad.*;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 
@@ -83,6 +72,9 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
     /** The data type */
     ProfileFeatureCollection pfc;
 
+    /** The data type */
+    ProfileFeature  pf;
+
     /** _more_ */
     List<PointFeature> obsList;
 
@@ -98,6 +90,9 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
     /** _more_          */
     private int nptsTotal = 0;
 
+    private Map<String, ProfileFeatureBean> beanCache = new ConcurrentHashMap<>();
+
+    Unit [] units = new Unit[3];
     /**
      * ctor
      *
@@ -119,10 +114,21 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
         //            ucar.unidata.util.Misc.run(new Runnable(){public void run(){testit();}});
     }
 
+
+    public CDMProfileFeatureTypeInfo(TrackAdapter adapter,
+                                     FeatureDatasetPoint fdp,
+                                     ProfileFeature pf)
+            throws Exception {
+        super(adapter, pf.getName());
+        this.fdp = fdp;
+        this.pfc = null;
+        this.pf = pf;
+        initPF();
+        //            ucar.unidata.util.Misc.run(new Runnable(){public void run(){testit();}});
+    }
+
     /** _more_ */
     private static String[] categoryAttributes = { "category", "group" };
-
-
 
     /**
      * init
@@ -133,7 +139,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
 
         PointFeatureCollectionIterator iter =
-            pfc.getPointFeatureCollectionIterator(-1);
+            pfc.getPointFeatureCollectionIterator();
         obsList = new ArrayList<PointFeature>();
         ProfileFeatureBean profBean = null;
         int                iii      = 0;
@@ -145,7 +151,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
             // obsList.add(profBean);
             nptsTotal = nptsTotal + pob.size();
 
-            PointFeatureIterator iter1 = pob.getPointFeatureIterator(-1);
+            PointFeatureIterator iter1 = pob.getPointFeatureIterator();
             try {
                 while (iter1.hasNext() && (count < maxCount)) {
                     PointFeature pf = iter1.next();
@@ -154,14 +160,14 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
                     //System.out.println(" here " + count + " and " + i );
                 }
             } finally {
-                iter1.finish();
+                iter1.close();
             }
             obsList.add(null);
             nptsTotal = nptsTotal + 1;
         }
 
         // TrajectoryFeatureBean         pf      = obsList.get(0);
-        StructureData                 pfsd    = obsList.get(0).getData();
+        StructureData                 pfsd    = obsList.get(0).getFeatureData();
         List<StructureMembers.Member> members = pfsd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             StructureMembers.Member mb   = members.get(i);
@@ -189,6 +195,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
                                             mb.getDescription(), "Basic",
                                             unit));
                     varAltitude = mb.getName();
+                    units[2] = unit;
                 } else if (mb.getName().equalsIgnoreCase("DEPTH")) {
                     positive = -1;
                     addVariable(new VarInfo(mb.getName(),
@@ -215,12 +222,14 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), "Basic",
                                             unit));
+                    units[0] = unit;
                 } else if (mb.getName().equalsIgnoreCase("LONGITUDE")
                            || mb.getName().equalsIgnoreCase("LON")) {
                     varLongitude = mb.getName();
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), "Basic",
                                             unit));
+                    units[1] = unit;
                 } else {
                     addVariable(new VarInfo(mb.getName(),
                                             mb.getDescription(), unit));
@@ -240,6 +249,114 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
     }
 
+    /**
+     * initPF
+     *
+     * @throws Exception On badness
+     */
+    private void initPF() throws Exception {
+        obsList = new ArrayList<PointFeature>();
+        int                count    = 0;
+        ProfileFeatureBean profBean = new ProfileFeatureBean((ProfileFeature) pf);
+        beanCache.put(pf.getName(), profBean);
+        nptsTotal = nptsTotal + pf.size();
+
+        Iterator<PointFeature> iter1 = pf.iterator();
+
+        while (iter1.hasNext() && (count < maxCount)) {
+            PointFeature pf = iter1.next();
+            obsList.add(pf);
+            count++;
+            //System.out.println(" here " + count + " and " + i );
+        }
+
+        obsList.add(null);
+        nptsTotal = nptsTotal + 1;
+
+
+        // TrajectoryFeatureBean         pf      = obsList.get(0);
+        StructureData                 pfsd    = obsList.get(0).getFeatureData();
+        List<StructureMembers.Member> members = pfsd.getMembers();
+        for (int i = 0; i < members.size(); i++) {
+            StructureMembers.Member mb   = members.get(i);
+            String                  ustr = mb.getUnitsString();
+            Unit                    unit = null;
+            if ((ustr != null) && !ustr.equalsIgnoreCase("none")) {
+                try {
+                    unit = Util.parseUnit(ustr);
+                } catch (visad.VisADException e) {
+                    unit = null;
+                }
+            }
+
+            if ((unit != null)
+                    && unit.isConvertible(CommonUnit.secondsSinceTheEpoch)) {
+                addVariable(new VarInfo(mb.getName(), mb.getDescription(),
+                        "Basic", unit));
+                varTime = mb.getName();
+            } else if (mb.getName().equalsIgnoreCase("ALTITUDE")
+                    || mb.getName().equalsIgnoreCase("ALT")) {
+                //   && unit.isConvertible(CommonUnits.KILOMETER)) {
+                if (mb.getName().equalsIgnoreCase("ALTITUDE")
+                        || mb.getName().equalsIgnoreCase("ALT")) {
+
+                    addVariable(new VarInfo(mb.getName(),
+                            mb.getDescription(), "Basic",
+                            unit));
+                    varAltitude = mb.getName();
+                    units[2] = unit;
+                } else if (mb.getName().equalsIgnoreCase("DEPTH")) {
+                    positive = -1;
+                    addVariable(new VarInfo(mb.getName(),
+                            mb.getDescription(), "Basic",
+                            unit));
+                    varAltitude = mb.getName();
+                } else if (mb.getName().equalsIgnoreCase("wv_level")) {
+                    positive = 1;
+                    addVariable(new VarInfo(mb.getName(),
+                            mb.getDescription(), "Basic",
+                            CommonUnits.KILOMETER));
+                    varAltitude = mb.getName();
+                } else {
+                    addVariable(new VarInfo(mb.getName(),
+                            mb.getDescription(), unit));
+                }
+            } else if ((unit != null)
+                    && unit.isConvertible(CommonUnits.DEGREE)) {
+
+
+                if (mb.getName().equalsIgnoreCase("LATITUDE")
+                        || mb.getName().equalsIgnoreCase("LAT")) {
+                    varLatitude = mb.getName();
+                    addVariable(new VarInfo(mb.getName(),
+                            mb.getDescription(), "Basic",
+                            unit));
+                    units[0] = unit;
+                } else if (mb.getName().equalsIgnoreCase("LONGITUDE")
+                        || mb.getName().equalsIgnoreCase("LON")) {
+                    varLongitude = mb.getName();
+                    addVariable(new VarInfo(mb.getName(),
+                            mb.getDescription(), "Basic",
+                            unit));
+                    units[1] = unit;
+                } else {
+                    addVariable(new VarInfo(mb.getName(),
+                            mb.getDescription(), unit));
+                }
+
+            } else {
+                addVariable(new VarInfo(mb.getName(), mb.getDescription(),
+                        unit));
+            }
+
+        }
+        Range rg = getDataRange();
+        times = getTime(rg);
+
+        startTime = getStartTime();  //new DateTime(df.parse(stimeStr.toString()));
+        endTime = getEndTime();  //new DateTime(df.parse(etimeStr.toString()));
+
+    }
 
     /**
      * _more_
@@ -271,10 +388,29 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
     protected Range getDataRange() throws Exception {
         // TrajectoryFeatureBean tfb   = obsList.get(0);
         // List                  ls    = tfb.pfs;
+        ProfileFeatureBean pfb = beanCache.get(pf.getName());
+        nptsTotal = pfb.pfc.size();
         Range range = new Range(0, nptsTotal - 1);
         return range;
     }
 
+    /**
+     * Make the earth spatial domain
+     *
+     *
+     * @param range The data range of the request
+     * @return The spatial domain
+     *
+     * @throws Exception On badness
+     */
+    protected GriddedSet makeEarthDomainSet(Range range) throws Exception {
+        return ucar.visad.Util.makeEarthDomainSet(getLatitude(range),
+                getLongitude(range), getAltitude(range), getUnits());
+    }
+
+    public Unit[] getUnits() {
+        return units;
+    }
     /**
      * Get number of points in track
      *
@@ -405,7 +541,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
         //  TrajectoryFeatureBean tfb = obsList.get(0);
         //   fdata = tfb.getAltitudes(range);
-        /*   int size = obsList.size();
+        int size = obsList.size();
            int      first  = range.first();
            int      stride = range.stride();
            int      last   = range.last();
@@ -417,9 +553,9 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
                fdata[j++] = (float)pf.getLocation().getAltitude() * positive;
                i          = i + stride;
-           }        */
-        float[] t = getFloatData(range, varAltitude);
-        return t;
+           }
+       // float[] t = getFloatData(range, varAltitude);
+        return fdata;
     }
 
     /**
@@ -521,17 +657,16 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
         int          j      = 0;
         while (i <= last) {
             PointFeature pf = obsList.get(i);
-
             if (pf == null) {
                 pf = pf_Old;
             }
 
-            StructureData pfsd = pf.getData();
-            fdata[j++] = pfsd.convertScalarFloat(var);
+            StructureData pfsd = pf.getFeatureData();
+            Array a   = pfsd.getArray(var);
+            fdata[j++] = a.getFloat(0);;
             pf_Old     = pf;
             i          = i + stride;
         }
-
 
         return fdata;
     }
@@ -564,7 +699,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
             PointFeature pf = obsList.get(i);
 
             if (pf != null) {
-                StructureData pfsd = pf.getData();
+                StructureData pfsd = pf.getFeatureData();
                 fdata[j++] = pfsd.getScalarDouble(var);
             } else {
                 fdata[j++] = Float.NaN;
@@ -599,7 +734,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
 
             if (pf != null) {
-                StructureData pfsd = pf.getData();
+                StructureData pfsd = pf.getFeatureData();
                 sdata[j++] = pfsd.getScalarString(var);
             } else {
                 sdata[j++] = null;
@@ -677,8 +812,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
             }
             locations.add(location);
 
-            double dirVal = Util.calculateBearing(lastEL, location,
-                                workBearing).getAngle();
+            double dirVal = Util.calculateBearing(lastEL, location).getAngle();
 
 
             lastEL = location;
@@ -848,6 +982,42 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
     }
 
+    /**
+     * Class description
+     *
+     *
+     * @version        Enter version here..., Wed, Dec 22, '10
+     * @author         Enter your name here...
+     */
+    public static class FeatureBean {
+
+        StructureData sdata;
+        String fields;
+
+        /**
+         *
+         */
+        public FeatureBean() {}
+
+        /**
+         *
+         */
+        FeatureBean(StructureData sdata) throws IOException {
+            this.sdata = sdata;
+            fields = NCdumpW.toString(sdata);
+        }
+
+        public String getFields() {
+            return fields;
+        }
+
+        public String showFields() {
+            StringWriter sw = new StringWriter(10000);
+            NCdumpW.printStructureData(new PrintWriter(sw), sdata);
+            return sw.toString();
+        }
+    }
+
 
     /**
      * Class description
@@ -856,10 +1026,10 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
      * @version        Enter version here..., Wed, Dec 22, '10
      * @author         Enter your name here...
      */
-    public static class StationBean implements ucar.unidata.geoloc.Station {
+    public static class StationBean extends FeatureBean implements ucar.unidata.geoloc.Station {
 
         /** _more_ */
-        private Station s;
+        private StationFeature s;
 
         /** _more_ */
         private int npts = -1;
@@ -869,14 +1039,19 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
          */
         public StationBean() {}
 
+
+        public StationBean(StructureData sdata) throws IOException {
+            super(sdata);
+        }
         /**
          * _more_
          *
          * @param s _more_
          */
-        public StationBean(Station s) {
-            this.s = s;
-            // this.npts = s.getNumberPoints();
+        public StationBean(Station s) throws IOException {
+            super(((StationFeature) s).getFeatureData());
+            this.s = (StationFeature) s;
+            this.npts = s.getNobs();
         }
 
         // for BeanTable
@@ -1004,31 +1179,29 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
      */
 
 
-    public class ProfileFeatureBean extends StationBean {
+    public static class ProfileFeatureBean extends StationBean {
 
         /** _more_          */
         int npts;
 
         /** _more_          */
-        ProfileFeature pfc;
+        public ProfileFeature pfc;
 
         /** _more_          */
-        PointFeature pf;
+        public PointFeature pf;
 
         /**
          * _more_
          *
          * @param pfc _more_
          */
-        public ProfileFeatureBean(ProfileFeature pfc) {
+          public ProfileFeatureBean(ProfileFeature pfc) throws IOException {
+            super(pfc.getFeatureData());
             this.pfc = pfc;
-            try {
-                pfc.calcBounds();
-                if (pfc.hasNext()) {
-                    pf = pfc.next();
-                }
-            } catch (IOException ioe) {}
-            pfc.finish();
+
+            for (PointFeature pf2 : pfc) {
+                pf = pf2; // a random point
+            }
             npts = pfc.size();
         }
 
