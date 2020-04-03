@@ -167,8 +167,6 @@ public class DoradeAdapter implements RadarAdapter {
             throw vex;
         } catch (DoradeSweepException ex) {
             LogUtil.logException("DORADE sweep error", ex);
-        } catch (java.io.IOException ex) {
-            LogUtil.logException("file not found", ex);
         }
         //
         // Set our description now.
