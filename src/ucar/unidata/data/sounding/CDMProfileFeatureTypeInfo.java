@@ -275,7 +275,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
 
 
         // TrajectoryFeatureBean         pf      = obsList.get(0);
-        StructureData                 pfsd    = obsList.get(0).getFeatureData();
+        StructureData                 pfsd    = obsList.get(0).getDataAll();   //.getFeatureData();
         List<StructureMembers.Member> members = pfsd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             StructureMembers.Member mb   = members.get(i);
@@ -661,7 +661,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
                 pf = pf_Old;
             }
 
-            StructureData pfsd = pf.getFeatureData();
+            StructureData pfsd = pf.getDataAll(); //.getFeatureData();
             Array a   = pfsd.getArray(var);
             fdata[j++] = a.getFloat(0);;
             pf_Old     = pf;
@@ -699,7 +699,7 @@ public class CDMProfileFeatureTypeInfo extends TrackInfo {
             PointFeature pf = obsList.get(i);
 
             if (pf != null) {
-                StructureData pfsd = pf.getFeatureData();
+                StructureData pfsd = pf.getDataAll();  //.getFeatureData();
                 fdata[j++] = pfsd.getScalarDouble(var);
             } else {
                 fdata[j++] = Float.NaN;
