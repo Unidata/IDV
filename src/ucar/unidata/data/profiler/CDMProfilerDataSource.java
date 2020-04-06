@@ -31,9 +31,11 @@ import ucar.nc2.constants.FeatureType;
 import ucar.nc2.ft.*;
 
 import ucar.nc2.ft.point.StationFeature;
+import ucar.nc2.ft.point.standard.StandardProfileCollectionImpl;
 import ucar.nc2.time.CalendarDate;
 import ucar.unidata.data.*;
 import ucar.unidata.data.point.PointObFactory;
+import ucar.unidata.data.sounding.*;
 import ucar.unidata.geoloc.Station;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
@@ -61,6 +63,7 @@ import java.rmi.RemoteException;
 
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.*;
 
@@ -115,6 +118,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
     /** _more_ */
     private List<StationFeature> stations;
 
+    private List  profileIds;
     /** _more_ */
     private List<Double> times;
 
@@ -133,6 +137,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
         "LAT", "LON", "Z", "TIME", "SPD", "DIR"
     };
 
+    private Map<String, CDMProfileFeatureTypeInfo.ProfileFeatureBean> beanCache = new ConcurrentHashMap<>();
     /**
      * No argument XML persistence constructor
      *
@@ -270,6 +275,33 @@ public class CDMProfilerDataSource extends FilesDataSource {
     /**
      * _more_
      *
+     * @param stations _more_
+     *
+     * @return _more_
+     */
+    private List<NamedStation> getNamedStations1(List<String> stations) {
+        int                size      = stations.size();
+        Unit               unit      = DataUtil.parseUnit("meter");
+        List<NamedStation> nstations = new ArrayList();
+
+        for (int i = 0; i < size; i++) {
+            String      st       = stations.get(i);
+            CDMProfileFeatureTypeInfo.ProfileFeatureBean pBean =
+                    beanCache.get(st);
+            NamedStation nstation = null;
+            try {
+                nstation = new NamedStationImpl(st, st,
+                        pBean.getLatitude(), pBean.getLongitude(),
+                        pBean.getAltitude(), unit);
+            } catch (VisADException ss) {}
+            catch (RemoteException re) {}
+            nstations.add(nstation);
+        }
+        return nstations;
+    }
+    /**
+     * _more_
+     *
      * @param st _more_
      *
      * @return _more_
@@ -395,7 +427,11 @@ public class CDMProfilerDataSource extends FilesDataSource {
                 FeatureType.STATION_PROFILE, fileNameOrUrl, null, log);
 
         if (dataset == null) {
-            throw new BadDataException("Could not open trajectory file:"
+            dataset =
+                    (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+                            FeatureType.PROFILE, fileNameOrUrl, null, log);
+            if (dataset == null)
+                throw new BadDataException("Could not open trajectory file:"
                                        + fileNameOrUrl);
         }
 
@@ -403,21 +439,32 @@ public class CDMProfilerDataSource extends FilesDataSource {
         List<DsgFeatureCollection> fcList =
             dataset.getPointFeatureCollectionList();
         DsgFeatureCollection fc = fcList.get(0);
-        StationProfileFeatureCollection spc =
-            (StationProfileFeatureCollection) fc;
-        FeatureType ftype   = spc.getCollectionFeatureType();
+        if(fc instanceof StandardProfileCollectionImpl){
+            StandardProfileCollectionImpl spc = (StandardProfileCollectionImpl)fc;
+            FeatureType ftype = spc.getCollectionFeatureType();
 
-        boolean     ismadis = isMadis(ftype, dataset.getNetcdfFile());
-        boolean     iswpdn  = isWPDN(ftype, dataset.getNetcdfFile());
-        // StationProfileFeatureCollection stationCollection = (StationProfileFeatureCollection) fc;
-        // StationProfileFeature feature = stationCollection.getStationProfileFeature(sb.s);
-        //   (String id, String name, double latitude, double longitude, double alt,Unit unit)
+            initWPDNOld(spc, sname);
+        } else {
+            StationProfileFeatureCollection spc =
+                    (StationProfileFeatureCollection) fc;
+            FeatureType ftype = spc.getCollectionFeatureType();
 
-        //(index -> (lat, lon, day, TIME, Z, DIR, SPD));
-        if (ismadis) {
-            initMadis(spc, sname);
-        } else if (iswpdn) {
-            initWPDN(spc, sname);
+            boolean ismadis = isMadis(ftype, dataset.getNetcdfFile());
+            boolean iswpdn = isWPDN(ftype, dataset.getNetcdfFile());
+            // StationProfileFeatureCollection stationCollection = (StationProfileFeatureCollection) fc;
+            // StationProfileFeature feature = stationCollection.getStationProfileFeature(sb.s);
+            //   (String id, String name, double latitude, double longitude, double alt,Unit unit)
+
+            //(index -> (lat, lon, day, TIME, Z, DIR, SPD));
+            if (ismadis) {
+                initMadis(spc, sname);
+            } else if (iswpdn) {
+                initWPDN(spc, sname);
+            } else {
+                StandardProfileCollectionImpl spc1 =
+                        (StandardProfileCollectionImpl) fc;
+                initWPDNOld(spc1, sname);
+            }
         }
     }
 
@@ -611,6 +658,16 @@ public class CDMProfilerDataSource extends FilesDataSource {
         }
     }
 
+    private List getProfileIds(StandardProfileCollectionImpl spc) throws IOException {
+        List pIds = new ArrayList();
+        List<CDMProfileFeatureTypeInfo.ProfileFeatureBean> beans = new ArrayList<>();
+        for (ProfileFeature profile : spc) {
+            CDMProfileFeatureTypeInfo.ProfileFeatureBean bean = new CDMProfileFeatureTypeInfo.ProfileFeatureBean(profile);
+            pIds.add(bean.getName());
+            beanCache.put(bean.getName(), bean);
+        }
+        return pIds;
+    }
     /**
      * _more_
      *
@@ -620,12 +677,12 @@ public class CDMProfilerDataSource extends FilesDataSource {
      * @throws IOException _more_
      * @throws visad.VisADException _more_
      */
-    private void initWPDNOld(StationProfileFeatureCollection spc, String name)
+    private void initWPDNOld(StandardProfileCollectionImpl spc, String name)
             throws IOException, visad.VisADException {
 
-        stations         = spc.getStationFeatures();
-        selectedStations = getNamedStations(stations);
-        int size = stations.size();
+        profileIds         = getProfileIds(spc);
+        selectedStations = getNamedStations1(profileIds);
+        int size = profileIds.size();
         if (size < 3) {
             name = name + StringUtil.join(", ", selectedStations);
         } else {
@@ -641,14 +698,12 @@ public class CDMProfilerDataSource extends FilesDataSource {
         spc.resetIteration();
         int ii = 0;
         while (ii < size) {
-            StationFeature               st  = stations.get(ii);
-            StationProfileFeature spf = spc.getStationProfileFeature(st);
-            //NestedPointFeatureCollection spf2 =  (NestedPointFeatureCollection)spf1;
-            PointFeatureCollectionIterator iter =
-                spf.getPointFeatureCollectionIterator();  // not multiple
+            String  st  = (String)profileIds.get(ii);
+            CDMProfileFeatureTypeInfo.ProfileFeatureBean bean  =
+                    beanCache.get(st);
 
-            List<CalendarDate> tList    = spf.getTimes();
-            int        tsize    = tList.size();
+            ProfileFeature profileFeature      = bean.pfc;
+
             List       latList  = new ArrayList<Double>();
             List       lonList  = new ArrayList<Double>();
             List       altList  = new ArrayList<Double>();
@@ -656,44 +711,36 @@ public class CDMProfilerDataSource extends FilesDataSource {
             List       timeList = new ArrayList<Double>();
             List       uSpdList = new ArrayList<Double>();
             List       vSpdList = new ArrayList<Double>();
-            int        jj       = 0;
-            while (jj < tsize) {  //iter.hasNext()) {
-                //ProfileFeature pf0 =  (ProfileFeature)iter.next();
-                CalendarDate           dt       = tList.get(jj);
 
-                DateTime       dateTime = new DateTime(dt.toDate());
-                ProfileFeature pf0      = spf.getProfileByDate(dt);
-                while (pf0.hasNext()) {
-                    PointFeature  p0   = pf0.next();
-                    StructureData sd   = p0.getFeatureData();
-                    float         uspd = sd.convertScalarFloat("uComponent");
-                    float         vspd = sd.convertScalarFloat("vComponent");
-                    if ((uspd != McIDASUtil.MCMISSING)
-                            && (uspd != WPDNissing)
-                            && (vspd != McIDASUtil.MCMISSING)
-                            && (vspd != WPDNissing)) {
-                        latList.add(sd.convertScalarDouble("staLat"));
-                        lonList.add(sd.convertScalarDouble("staLon"));
-                        altList.add(sd.convertScalarDouble("levels")
-                                    + sd.convertScalarDouble("staElev"));
-                        timeList.add((double) dateTime.getValue());  //sd.convertScalarFloat("observationTime"));
-                        uSpdList.add((double) uspd);
-                        vSpdList.add((double) vspd);
-                    }
-                    if (ii == 0) {
-                        units[0] = sd.findMember("staLat").getUnitsString();
-                        units[1] = sd.findMember("staLon").getUnitsString();
-                        units[2] = "meter";  //sd.findMember("levels").getUnitsString();
-                        units[3] = dateTime.getUnit().toString();  //sd.findMember("observationTime").getUnitsString();
-                        units[4] = "knots";
-                        units[5] = "degree_N";
 
-                    }
+            for (PointFeature pf : profileFeature) {
+                CalendarDate   dt = pf.getObservationTimeAsCalendarDate();
+                StructureData sd   = pf.getFeatureData();
+                float         uspd = sd.convertScalarFloat("uComponent");
+                float         vspd = sd.convertScalarFloat("vComponent");
+                if ((uspd != McIDASUtil.MCMISSING)
+                        && (uspd != WPDNissing)
+                        && (vspd != McIDASUtil.MCMISSING)
+                        && (vspd != WPDNissing)) {
+                    latList.add(pf.getLocation().getLatitude());
+                    lonList.add(pf.getLocation().getLongitude());
+                    altList.add(pf.getLocation().getAltitude());
+                    timeList.add( pf.getObservationTime());
+                    uSpdList.add((double) uspd);
+                    vSpdList.add((double) vspd);
+                }
+                if (ii == 0) {
+                    units[0] = "degrees_north";
+                    units[1] = "degrees_east";
+                    units[2] = "km";
+                    units[3] = dt.getTimeUnits() ;
+                    units[4] = "knots";
+                    units[5] = "degree_N";
 
                 }
 
-                jj++;
             }
+
             FieldImpl  dataFieldImpl = null;
             int        dsize         = latList.size();
             double[][] data          = new double[dsize][6];
@@ -721,11 +768,11 @@ public class CDMProfilerDataSource extends FilesDataSource {
             dataFieldImpl = makeField(data, units, scalingFactors);
 
             if (dataFieldImpl != null) {
-                if (stationsToProfiles.get(st.getName()) == null) {
+                if (stationsToProfiles.get(st ) == null) {
                     List<FieldImpl> alist = new ArrayList<FieldImpl>();
-                    stationsToProfiles.put(st.getName(), alist);
+                    stationsToProfiles.put(st , alist);
                 }
-                stationsToProfiles.get(st.getName()).add(dataFieldImpl);
+                stationsToProfiles.get(st ).add(dataFieldImpl);
             }
 
             ii++;
