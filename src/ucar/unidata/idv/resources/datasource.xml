@@ -124,7 +124,7 @@
      patterns="wetPrf_.*_nc$,atmPrf_.*_nc$"
      fileselection="true"
      doesmultiples="true"
-     label="Trajectory Sounding files"/>
+     label="Trajectory Sounding Profile files"/>
 
   <datasource
      id="NetCDF.POINT,OPENDAP.Station,CDMREMOTE.POINT,CDMREMOTE.STATION"
@@ -145,7 +145,17 @@
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>
   </datasource>
-
+  <!--datasource
+          id="Coverage.Grid"
+          factory="ucar.unidata.data.grid.GridCoverageDataSource"
+          patterns="\.nc$,\.nc4$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd,GRID....$,\.grb2$,\.gb2$,\.gb1$"
+          fileselection="true"
+          doesmultiples="false"
+          label="Grid Coverage">
+    <property
+            name="icon"
+            value="/auxdata/ui/icons/3D.gif"/>
+  </datasource-->
   <datasource
      id="ImageGrid,opendap.Image"
      factory="ucar.unidata.data.grid.ImageGridDataSource"
