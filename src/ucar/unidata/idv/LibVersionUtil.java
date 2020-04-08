@@ -21,8 +21,11 @@
 package ucar.unidata.idv;
 
 
-import ucar.nc2.grib.GribVariableRenamer;
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.NetcdfDatasets;
+import ucar.nc2.grib.GribResourceReader;
 import ucar.nc2.time.CalendarDate;
+import ucar.netcdf.Netcdf;
 
 import java.io.IOException;
 
@@ -57,12 +60,12 @@ public class LibVersionUtil {
      */
 
     private static HashMap<String, String> getBuildInfo() throws IOException {
-        GribVariableRenamer     renamer   = new GribVariableRenamer();
         HashMap<String, String> buildInfo = new HashMap<String, String>();
 
         Enumeration<URL> resources =
-            renamer.getClass().getClassLoader().getResources(
+            CalendarDate.class.getClassLoader().getResources(
                 "META-INF/MANIFEST.MF");
+
         while (resources.hasMoreElements()) {
             try {
                 Manifest manifest =
@@ -71,7 +74,7 @@ public class LibVersionUtil {
                 if (attrs != null) {
                     String implTitle = attrs.getValue("Implementation-Title");
                     if ((implTitle != null)
-                            && (implTitle.contains("ncIdv"))) {
+                            && (implTitle.contains("CDM"))) {
                         buildInfo.put(
                                 "version",
                                 attrs.getValue("Implementation-Version"));
@@ -87,6 +90,7 @@ public class LibVersionUtil {
                 e.printStackTrace();
             }
         }
+
         return buildInfo;
     }
 
