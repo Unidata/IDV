@@ -3,7 +3,7 @@
 
 <!-- Where do we find the xml definition of the 'favorites' bundles   -->
   <resources name="idv.resource.bundlexml">
-    <resource location="https://www.esrl.noaa.gov/psd/repository/entry/show/PSD+Climate+Data+Repository/Public/Visualizations/Monitoring/Climate+Bundles?entryid=5927ee61-bcd1-4020-809c-c815bc2c62d5&amp;output=idv.bundles"/>
+    <resource location="https://www.psl.noaa.gov/repository/entry/show/PSD+Climate+Data+Repository/Public/Visualizations/Monitoring/Climate+Bundles?entryid=5927ee61-bcd1-4020-809c-c815bc2c62d5&amp;output=idv.bundles"/>
   </resources>
 
 </resourcebundle>
