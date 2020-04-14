@@ -140,6 +140,30 @@ public class DataUtil {
     }
 
     /**
+     * Get the 1D values for an array as floats.
+     *
+     * @param arr   Array of values
+     * @return  float representation
+     */
+    public static float[] toFloatArray(Array[] arr){
+        float [] values0 = toFloatArray(arr[0]);
+        if(arr.length == 1)
+            return values0;
+        else {
+            int size0 = values0.length;
+            int size = size0 * arr.length;
+            float [] values = new float[size];
+            System.arraycopy(values0, 0, values, 0, size0);
+            for(int i = 1; i < arr.length; i++) {
+                float [] valuesi = toFloatArray(arr[i]);
+                System.arraycopy(valuesi, 0, values, i *size0, size0 );
+            }
+
+            return values;
+        }
+
+    }
+    /**
      * Get the 1D values for an array as doubles.
      *
      * @param arr   Array of values
