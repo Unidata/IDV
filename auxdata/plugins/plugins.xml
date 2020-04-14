@@ -15,7 +15,7 @@
 
 <plugin name="Example Globe IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/globeidv.jar" description="An example showing a stripped down version of the IDV" category="Customized IDVs"/>
 
-<plugin version="5.0" category="Customized IDVs" name="NOAA-ESRL-PSD IDV" description="NOAA/ESRL/PSD's IDV plugin" url="https://www.esrl.noaa.gov/psd/repository/entry/get/noaapsd.jar?entryid=be105b2f-ff5a-4f38-af36-3fb5fd3b5359"/>
+<plugin version="5.0" category="Customized IDVs" name="NOAA-PSL IDV" description="NOAA/PSL's IDV plugin" url="https://www.psl.noaa.gov/repository/entry/get/noaapsd.jar?entryid=be105b2f-ff5a-4f38-af36-3fb5fd3b5359"/>
 
 <!-- Displays -->
 <plugin name="User Interface Skins" url="http://www.unidata.ucar.edu/software/idv/plugins/skins.jar" description="Adds a number of different window configurations" category="Displays"/>
