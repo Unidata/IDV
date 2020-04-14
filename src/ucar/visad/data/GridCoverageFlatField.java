@@ -106,7 +106,7 @@ public class GridCoverageFlatField extends CachedFlatField {
         this.timeIndex = timeIndex;
         this.ensIndex = ensIndex;
         this.vIntv = params.getVertCoordIntv();
-        System.out.println("here "+ this.timeIndex);
+        //System.out.println("here "+ this.timeIndex);
     }
 
 
