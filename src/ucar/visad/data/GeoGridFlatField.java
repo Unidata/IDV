@@ -245,12 +245,12 @@ public class GeoGridFlatField extends CachedFlatField {
                     //arr = geoGrid.readVolumeData(timeIndex);
                     arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
                             -1);
-                    if(geoGrid.getDataType().equals(DataType.BYTE)){
+                    /*if(geoGrid.getDataType().equals(DataType.BYTE)){
                         Attribute att = geoGrid.findAttributeIgnoreCase("_unsigned");
                         if(att != null && att.getStringValue().equals("true")){
                             arr.setUnsigned(true);
                         }
-                    }
+                    } */
                 } catch(Exception exc) {
                     if(exc.toString().indexOf("Inconsistent array length read")>=0) {
                         throw new ucar.unidata.data.BadDataException("Error reading data from server");
