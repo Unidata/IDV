@@ -71,14 +71,12 @@ import visad.*;
 
 import visad.data.units.Parser;
 
-import visad.georef.EarthLocation;
-import visad.georef.EarthLocationTuple;
-import visad.georef.LatLonPoint;
-import visad.georef.MapProjection;
+import visad.georef.*;
 
 import visad.util.DataUtility;
 
 import static ucar.unidata.idv.IdvConstants.PROP_USE_DISPLAYAREA;
+import static ucar.unidata.util.Misc.normalizeLongitude;
 
 
 import java.awt.*;
@@ -571,14 +569,26 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             FieldImpl data = getGridDataInstance().getGrid(false);
             if (data != null) {
                 try {
-                    mp = GridUtil.getNavigation(
-                        getGridDataInstance().getGrid(false));
+                    double [][] xy = null;
+                    mp = GridUtil.getNavigation((FieldImpl) data);
+                    RealTupleType type = mp.getReference();
+                    if(mp instanceof TrivialMapProjection) {
+                        if (type.getComponent(0).equals(RealType.Longitude) &&
+                                type.getComponent(1).equals(RealType.Latitude) &&
+                                mp.getDefaultMapArea().getX() > 180.0) {
+                            Rectangle2D bounds = normalizeRectangle((mp.getDefaultMapArea()));
+                            mp = new TrivialMapProjection(mp.getReference(), bounds);
+                        }
+                    }
                 } catch (Exception e) {
                     mp = null;
                 }
             }
         }
-        return mp;
+        // TODO:  Should we just return null instead of calling super?
+        return (mp != null)
+                ? mp
+                : super.getDataProjection();
     }
 
     /**
@@ -1801,7 +1811,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         List<LatLonPoint> points = new ArrayList<LatLonPoint>(elArray.length);
         for (int i = 0; i < elArray.length; i++) {
-            points.add(elArray[i].getLatLonPoint());
+            EarthLocation el = elArray[i];
+            double lon = normalizeLongitude(el.getLongitude().getValue());
+            EarthLocation el1 = makeEarthLocation(el.getLatitude().getValue(), lon, 0.0);
+
+            points.add(el1.getLatLonPoint());
         }
 
         GridDataInstance gdi = getGridDataInstance();
