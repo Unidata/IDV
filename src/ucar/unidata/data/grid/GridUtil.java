@@ -3839,8 +3839,9 @@ public class GridUtil {
         for (LatLonPoint llp : points) {
             endpoints[latIndex][pi] =
                 (float) llp.getLatitude().getValue(CommonUnit.degree);
-            endpoints[lonIndex][pi] =
-                (float) LatLonPointImpl.lonNormal360(llp.getLongitude().getValue(CommonUnit.degree));
+            endpoints[lonIndex][pi] = (float) normalizeLongitude(spatialSet, llp.getLongitude().getValue(CommonUnit.degree));
+                   // (float) llp.getLongitude().getValue(CommonUnit.degree);
+                //(float) LatLonPointImpl.lonNormal360(llp.getLongitude().getValue(CommonUnit.degree));
 
             if (is3D) {
                 //endpoints[otherIndex][0] = 0.f;  // set vertical to 0
