@@ -37,6 +37,9 @@ public class NewMapAreaEvent extends java.util.EventObject {
     /** zoom flag */
     private boolean isZoom = true;
 
+    /** flip flag */
+    private boolean isFlip = false;
+
     /** map area bounds */
     private Rectangle2D bounds;
 
@@ -51,6 +54,10 @@ public class NewMapAreaEvent extends java.util.EventObject {
         super(source);
     }
 
+    public NewMapAreaEvent(Object source, boolean isFlip) {
+        super(source);
+        this.isFlip = isFlip;
+    }
     /**
      * Create an event for new map areas
      *
@@ -86,6 +93,12 @@ public class NewMapAreaEvent extends java.util.EventObject {
         return bounds;
     }
 
-
+    /**
+     * Get the flip property.
+     *  @return The Bounds
+     */
+    public boolean getIsFlip() {
+        return isFlip;
+    }
 }
 
