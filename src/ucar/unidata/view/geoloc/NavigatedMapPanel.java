@@ -63,6 +63,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -321,28 +322,61 @@ public class NavigatedMapPanel extends JPanel {
         }
 
 
+        DecimalFormat df2 = new DecimalFormat("#.##");
         // get NewMapAreaEvents from the navigate object
         navigatedPanel.addNewMapAreaListener(new NewMapAreaListener() {
             public void actionPerformed(NewMapAreaEvent e) {
                 ProjectionImpl project = getProjection();
-                if (project.isLatLon()) {
-                    ProjectionRect boundingBox = navigatedPanel.getMapArea();
-                    double wx0 = boundingBox.getX()
-                                 + boundingBox.getWidth() / 2;
-                    LatLonProjection llproj = (LatLonProjection) project;
-                    if (llproj.getCenterLon() != wx0) {
-                        llproj.setCenterLon(wx0);  // shift cylinder seam
-                        wx0 = llproj.getCenterLon();  // normalize wx0 to  [-180,180]
-                        applyProjectionToRenderers(project);
-                        //                        setProjectionImpl (project);
-                        navigatedPanel.setWorldCenterX(wx0);
-                        /*
-                        llproj.setCenterLon(0.0);
-                        ((LatLonProjection) project).setCenterLon(0.0);
-                        navigatedPanel.setWorldCenterX(0.0);
-                        navigatedPanel.setSelectedRegionBounds(navigatedPanel.getMapArea());
-                        navigatedPanel.selectedRegionChanged();
-                        */
+                if(project.isLatLon() ) {
+                    if (e.getIsFlip() && project.getDefaultMapArea().getWidth() == 360.0) {
+                        ProjectionRect boundingBox = navigatedPanel.getMapArea();
+                        double wx0 = boundingBox.getX()
+                                + boundingBox.getWidth() / 2;
+                        LatLonProjection llproj = (LatLonProjection) project;
+                        String centerLonStr = df2.format(llproj.getCenterLon());
+                        double centerLon = Double.valueOf(centerLonStr);
+                        String startXStr = df2.format(llproj.getDefaultMapArea().getX());
+                        double startX = Double.valueOf(startXStr);
+
+                        if ((centerLon == 180.0 && startX == 0.0)) {
+                            llproj.setCenterLon(0.0);  // shift cylinder seam
+                            ProjectionRect rect = ((LatLonProjection) project).getDefaultMapArea();
+                            rect.setX(-180.0);// normalize wx0 to  [-180,180]
+                            project.setDefaultMapArea(rect);
+                            applyProjectionToRenderers(project);
+                            //                        setProjectionImpl (project);
+                            navigatedPanel.setWorldCenterX(0.0);
+                            boundingBox.setX(-180.0);
+                            resetBounds(rect);
+                            navigatedPanel.setSelectedRegionBounds(rect);
+                            //.setSelectedRegionBounds(rect);
+                            System.out.println("yyyy " + wx0);
+
+                        } else if (centerLon == 0.0 && startX == -180.0) {
+                            llproj.setCenterLon(180);  // shift cylinder seam
+                            ProjectionRect rect = ((LatLonProjection) project).getDefaultMapArea();
+                            rect.setX(0.0);
+                            project.setDefaultMapArea(rect);
+                            applyProjectionToRenderers(project);
+                            //                        setProjectionImpl (project);
+                            navigatedPanel.setWorldCenterX(180.0);
+                            boundingBox.setX(-180.0);
+                            resetBounds(rect);
+                            navigatedPanel.setSelectedRegionBounds(rect);
+                        }
+                    } else {
+                        ProjectionRect boundingBox = navigatedPanel.getMapArea();
+                        double wx0 = boundingBox.getX()
+                                + boundingBox.getWidth() / 2;
+                        LatLonProjection llproj = (LatLonProjection) project;
+                        if (llproj.getCenterLon() != wx0) {
+                            llproj.setCenterLon(wx0);  // shift cylinder seam
+                            wx0 = llproj.getCenterLon();  // normalize wx0 to  [-180,180]
+                            applyProjectionToRenderers(project);
+                            //                        setProjectionImpl (project);
+                            navigatedPanel.setWorldCenterX(wx0);
+
+                        }
                     }
                 }
                 redraw();
@@ -399,6 +433,17 @@ public class NavigatedMapPanel extends JPanel {
         add(navigatedPanel, BorderLayout.CENTER);
         //add(statusPanel, BorderLayout.SOUTH);
         redraw();
+    }
+
+
+    /**
+     *
+     *
+     * @param   rect
+     *
+     */
+    public void resetBounds(ProjectionRect rect){
+
     }
 
     /**
