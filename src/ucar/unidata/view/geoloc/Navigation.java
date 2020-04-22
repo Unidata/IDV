@@ -297,6 +297,24 @@ public class Navigation {
         }
     }
 
+    /**
+     * Flip the map area
+     *
+     * @param ma  new map area
+     */
+    public void flipMapArea(ProjectionRect ma) {
+        if (debugMapArea) {
+            System.out.println("Navigation setMapArea " + ma);
+        }
+        bb.setRect(ma.getX(), ma.getY(), ma.getWidth(), ma.getHeight());
+        zoom.push();
+
+        mapAreaIsSet = true;
+        if (screenSizeIsSet) {
+            recalcFromBoundingBox();
+            fireFlipMapAreaEvent();
+        }
+    }
     // kludgy thing used to deal with cylindrical seams: package private
 
     /**
@@ -656,6 +674,17 @@ public class Navigation {
         lm.sendEvent(new NewMapAreaEvent(this));
     }
 
+    /**
+     * Fire a new map area event with isFlip set to true.
+     */
+    private synchronized void fireFlipMapAreaEvent() {
+        if (debugZoom) {
+            System.out.println("newArea ");
+        }
+
+        // send out event to all listeners
+        lm.sendEvent(new NewMapAreaEvent(this, true));
+    }
     // keep stack of previous zooms
     // this should propably be made into a circular buffer
 
