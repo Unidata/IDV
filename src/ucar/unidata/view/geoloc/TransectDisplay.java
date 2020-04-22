@@ -1032,15 +1032,14 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
         float[][] linePoints  = transect.getSamples();
         int       numpoints   = linePoints[0].length;
         double    distance    = 0;
-        Bearing   workBearing = new Bearing();
+        //Bearing   workBearing = new Bearing();
         for (int p = 0; p < numpoints - 1; p++) {
             LatLonPointImpl startPoint =
                 new LatLonPointImpl(linePoints[0][p], linePoints[1][p]);
             LatLonPointImpl endPoint =
                 new LatLonPointImpl(linePoints[0][p + 1],
                                     linePoints[1][p + 1]);
-            workBearing = Bearing.calculateBearing(startPoint, endPoint,
-                    workBearing);
+            Bearing workBearing = Bearing.calculateBearing(startPoint, endPoint);
             distance += workBearing.getDistance();
         }
         distance = horizontalRangeUnit.toThis(distance,
@@ -2057,7 +2056,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                     return Misc.cloneArray(cacheInfo.xyz);
                 }
             }
-            Bearing   workBearing = new Bearing();
+            //Bearing   workBearing = new Bearing();
             float[][] xyz         = new float[3][numpoints];
             call1("toReference(f)", numpoints);
             float[] x               = xyz[0];
@@ -2086,8 +2085,8 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             for (int i = 0; i < numpoints; i++) {
                 //System.out.println("Point: "+lat[i]+","+lon[i]);
                 if (numLinePoints == 2) {
-                    workBearing = Bearing.calculateBearing(linePoints[0][0],
-                            linePoints[1][0], lat[i], lon[i], workBearing);
+                    Bearing workBearing = Bearing.calculateBearing(linePoints[0][0],
+                            linePoints[1][0], lat[i], lon[i]);
 
                     minDistance = workBearing.getDistance();
                     minAngle    = workBearing.getAngle();
@@ -2101,10 +2100,9 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                      */
                     for (int j = 0; j < numLinePoints -1 ; j++) {
                         //System.out.println("Line Point: "+linePoints[0][j]+","+linePoints[1][j]);
-                        workBearing =
+                        Bearing workBearing =
                             Bearing.calculateBearing(linePoints[0][j],
-                                linePoints[1][j], lat[i], lon[i],
-                                workBearing);
+                                linePoints[1][j], lat[i], lon[i]);
 
                         double dist  = workBearing.getDistance();
                         double angle = workBearing.getAngle();
@@ -2206,7 +2204,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             int numpoints = latlonalt[0].length;
             checkForNewLine();
             float[][]  linePoints  = transect.getSamples(false);
-            Bearing    workBearing = new Bearing();
+            //Bearing    workBearing = new Bearing();
             double[][] xyz         = new double[3][numpoints];
             call1("toReference(d)", numpoints);
             double[] x               = xyz[0];
@@ -2234,8 +2232,8 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             }
             for (int i = 0; i < numpoints; i++) {
                 if (numLinePoints == 2) {
-                    workBearing = Bearing.calculateBearing(linePoints[0][0],
-                            linePoints[1][0], lat[i], lon[i], workBearing);
+                    Bearing workBearing = Bearing.calculateBearing(linePoints[0][0],
+                            linePoints[1][0], lat[i], lon[i]);
 
                     minDistance = workBearing.getDistance();
                     minAngle    = workBearing.getAngle();
@@ -2251,10 +2249,9 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                    // System.out.println("Line Point: "+lat[i]+","+lon[i]);
                     for (int j = 0; j < numLinePoints - 1; j++) {
                         //System.out.println("Line Point: "+linePoints[0][j]+","+linePoints[1][j]);
-                        workBearing =
+                        Bearing workBearing =
                             Bearing.calculateBearing(linePoints[0][j],
-                                linePoints[1][j], lat[i], lon[i],
-                                workBearing);
+                                linePoints[1][j], lat[i], lon[i]);
 
                         double dist  = workBearing.getDistance();
                         double angle = workBearing.getAngle();
@@ -2489,7 +2486,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
             lenToPoint    = new double[numLinePoints];
             distances     = new double[numSegments];
             angles        = new double[numSegments];
-            Bearing lineBearing = new Bearing();
+            //Bearing lineBearing = new Bearing();
             lenToPoint[0] = 0;
             LatLonPointImpl startWorkPoint = new LatLonPointImpl();
             LatLonPointImpl endWorkPoint   = new LatLonPointImpl();
@@ -2497,8 +2494,8 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                 startWorkPoint.set(linePoints[0][i - 1],
                                    linePoints[1][i - 1]);
                 endWorkPoint.set(linePoints[0][i], linePoints[1][i]);
-                lineBearing = Bearing.calculateBearing(startWorkPoint,
-                        endWorkPoint, lineBearing);
+                Bearing lineBearing = Bearing.calculateBearing(startWorkPoint,
+                        endWorkPoint);
                 distances[i - 1] = lineBearing.getDistance();
                 angles[i - 1]    = lineBearing.getAngle();
                 lenToPoint[i]    = lenToPoint[i - 1] + distances[i - 1];
