@@ -1657,7 +1657,7 @@ public class NavigatedPanel extends JPanel implements MouseListener,
                 flipLon();
             }
         };
-        BAMutil.setActionProperties(zoomBack, "Undo16", "Previous map area",
+        BAMutil.setActionProperties(zoomBack, "Undo16", "Flip map longitude",
                                     false, 'P', KeyEvent.VK_BACK_SPACE);
 
         zoomDefault = new AbstractAction() {
