@@ -197,7 +197,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
     private ScalarMap zMap = null;
 
     /** bearing class for bearing calculations */
-    private Bearing workBearing = new Bearing();
+   // private Bearing workBearing = new Bearing();
 
     /** default vertical range unit */
     private Unit verticalRangeUnit = CommonUnit.meter;
@@ -2086,7 +2086,7 @@ public abstract class MapProjectionDisplay extends NavigatedDisplay {
         super.updateLocation(el);
         cursorLLP.set(el.getLatitude().getValue(CommonUnit.degree),
                       el.getLongitude().getValue(CommonUnit.degree));
-        Bearing.calculateBearing(centerLLP, cursorLLP, workBearing);
+        Bearing workBearing = Bearing.calculateBearing(centerLLP, cursorLLP);
         setCursorRange(new Real(CURSOR_RANGE_TYPE,
                                 workBearing.getDistance()));
         setCursorBearing(new Real(CURSOR_BEARING_TYPE,
