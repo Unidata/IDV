@@ -1811,11 +1811,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         List<LatLonPoint> points = new ArrayList<LatLonPoint>(elArray.length);
         for (int i = 0; i < elArray.length; i++) {
-            EarthLocation el = elArray[i];
+      /*      EarthLocation el = elArray[i];
             double lon = normalizeLongitude(el.getLongitude().getValue());
             EarthLocation el1 = makeEarthLocation(el.getLatitude().getValue(), lon, 0.0);
 
-            points.add(el1.getLatLonPoint());
+            points.add(el1.getLatLonPoint()); */
+            points.add(elArray[i].getLatLonPoint());
         }
 
         GridDataInstance gdi = getGridDataInstance();
