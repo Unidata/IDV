@@ -455,7 +455,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         int[][]         neighbors     = grid.getNeighbors(index);
         LatLonPointImpl refPt         = new LatLonPointImpl();
         LatLonPointImpl neiPt         = new LatLonPointImpl();
-        Bearing         bearing       = new Bearing();
+        Bearing         bearing       = null;
         float[]         hat1          = new float[2];
         float[]         hat2          = new float[2];
         float[][]       hat           = new float[2][grid.getLength()];
@@ -507,15 +507,17 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
                     lonAfter = refCoords[lonI][neighbors[i][1]];
                 }
 
-                compute(refPt, neiPt, latBefore, lonBefore, backOffset,
-                        bearing, hat1);
+                bearing = compute(refPt, neiPt, latBefore, lonBefore, backOffset,
+                          hat1);
 
-                float d1 = (float) bearing.getDistance();
 
-                compute(refPt, neiPt, latAfter, lonAfter, foreOffset,
-                        bearing, hat2);
+                float   d1 = (float) bearing.getDistance();
 
-                float   d2   = (float) bearing.getDistance();
+                bearing = compute(refPt, neiPt, latAfter, lonAfter, foreOffset,
+                          hat2);
+
+                float   d2 = (float) bearing.getDistance();
+
                 boolean bad1 = Double.isNaN(d1);
                 boolean bad2 = Double.isNaN(d2);
 
@@ -602,7 +604,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         int[][]         neighbors = grid.getNeighbors(index);
         LatLonPointImpl refPt     = new LatLonPointImpl();
         LatLonPointImpl neiPt     = new LatLonPointImpl();
-        Bearing         bearing   = new Bearing();
+        Bearing         bearing   = null;
         float[]         hat1      = new float[2];
         float[]         hat2      = new float[2];
         float[][]       hat       = new float[2][grid.getLength()];
@@ -619,13 +621,13 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
             }
 
             refPt.set(refCoords[latI][0], refCoords[lonI][0]);
-            compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
-                    -180, bearing, hat1);
+            bearing = compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
+                    -180, hat1);
 
             float d1 = (float) bearing.getDistance();
 
-            compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1], 0,
-                    bearing, hat2);
+            bearing = compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1], 0,
+                    hat2);
 
             float   d2   = (float) bearing.getDistance();
             boolean bad1 = Double.isNaN(d1);
@@ -681,24 +683,22 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
      * @param lon               The longitude of the neighboring grid point.
      * @param azTerm            An amount in degrees to be added to the computed
      *                          azimuth.
-     * @param bearing           The holder for the computed range and bearing
-     *                          from the reference point to the neighboring
-     *                          grid point.
+     *
      * @param hat               2-element output array for computed (x,y)
      *                          components of unit vector.
      */
-    private static void compute(LatLonPointImpl refPt, LatLonPointImpl neiPt,
-                                float lat, float lon, float azTerm,
-                                Bearing bearing, float[] hat) {
+    private static Bearing compute(LatLonPointImpl refPt, LatLonPointImpl neiPt,
+                                float lat, float lon, float azTerm, float[] hat) {
 
         neiPt.set(lat, lon);
-        Bearing.calculateBearing(refPt, neiPt, bearing);
+        Bearing bearing = Bearing.calculateBearing(refPt, neiPt);
 
         float az = (float) Math.toRadians(bearing.getAngle() + azTerm);
         //System.out.println("bearing.Angle = " + bearing.getAngle() + "; azTerm = " + azTerm+ "; result= " + Math.toDegrees(az));
 
         hat[0] = (float) Math.sin(az);
         hat[1] = (float) Math.cos(az);
+        return bearing;
     }
 
     /**
@@ -783,8 +783,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
      *                                  visad.CoordinateSystem}, or if the
      *                                  reference of the grid's {@link
      *                                  visad.CoordinateSystem} doesn't contain
-     *                                  {@link visad.RealType.Latitude} and
-     *                                  {@link visad.RealType.Longitude}.
+     *
      *
      * @throws VisADException
      */
@@ -861,7 +860,7 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
         int[][]         neighbors     = grid.getNeighbors(index);
         LatLonPointImpl refPt         = new LatLonPointImpl();
         LatLonPointImpl neiPt         = new LatLonPointImpl();
-        Bearing         bearing       = new Bearing();
+        Bearing         bearing       = null;
         float[]         uv1           = new float[2];
         float[]         uv2           = new float[2];
         boolean         hasCS         = cs != null;
@@ -897,13 +896,13 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
 
                 refPt.set(refCoords[latI][0], refCoords[lonI][0]);
 
-                compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
-                        -180, gridWinds[index][i], bearing, uv1);
+                bearing = compute(refPt, neiPt, neiCoords[latI][0], neiCoords[lonI][0],
+                        -180, gridWinds[index][i], uv1);
 
                 float d1 = (float) bearing.getDistance();
 
-                compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1],
-                        0, gridWinds[index][i], bearing, uv2);
+                bearing = compute(refPt, neiPt, neiCoords[latI][1], neiCoords[lonI][1],
+                        0, gridWinds[index][i], uv2);
 
                 float   d2   = (float) bearing.getDistance();
                 boolean bad1 = Double.isNaN(d1);
@@ -941,18 +940,18 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
      * @param azTerm            An amount in degrees to be added to the computed
      *                          azimuth.
      * @param wind              Magnitude of grid-relative wind component.
-     * @param bearing           The holder for the computed range and bearing
+     * @return  bearing         The holder for the computed range and bearing
      *                          from the reference point to the neighboring
      *                          grid point.
      * @param uv                2-element output array for computed (U,V) wind
      *                          components.
      */
-    private static void compute(LatLonPointImpl refPt, LatLonPointImpl neiPt,
+    private static Bearing compute(LatLonPointImpl refPt, LatLonPointImpl neiPt,
                                 float lat, float lon, float azTerm,
-                                float wind, Bearing bearing, float[] uv) {
+                                float wind, float[] uv) {
 
         neiPt.set(lat, lon);
-        Bearing.calculateBearing(refPt, neiPt, bearing);
+        Bearing bearing = Bearing.calculateBearing(refPt, neiPt);
 
         float az   = (float) Math.toRadians(bearing.getAngle() + azTerm);
         float xhat = (float) Math.sin(az);
@@ -960,5 +959,6 @@ public final class GridRelativeHorizontalWind extends HorizontalWind {
 
         uv[0] = xhat * wind;
         uv[1] = yhat * wind;
+        return bearing;
     }
 }
