@@ -1695,8 +1695,7 @@ public abstract class DrawingGlyph {
             float lon2 = pts[IDX_LON][i];
             Bearing result =
                 Bearing.calculateBearing(new LatLonPointImpl(lat1, lon1),
-                                         new LatLonPointImpl(lat2, lon2),
-                                         null);
+                                         new LatLonPointImpl(lat2, lon2));
             if ( !Double.isNaN(result.getDistance())) {
                 distance += result.getDistance();
             }
@@ -1765,7 +1764,7 @@ public abstract class DrawingGlyph {
                             double lon2)
             throws Exception {
         Bearing result = Bearing.calculateBearing(new LatLonPointImpl(lat1,
-                             lon1), new LatLonPointImpl(lat2, lon2), null);
+                             lon1), new LatLonPointImpl(lat2, lon2));
         double distance = result.getDistance();
         Unit   kmUnit   = ucar.visad.Util.parseUnit("km");
         Unit   feetUnit = ucar.visad.Util.parseUnit("feet");
