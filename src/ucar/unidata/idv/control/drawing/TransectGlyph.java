@@ -306,7 +306,7 @@ public class TransectGlyph extends ShapeGlyph {
             Bearing.calculateBearing(p1.getLatitude().getValue(),
                                      p1.getLongitude().getValue(),
                                      p2.getLatitude().getValue(),
-                                     p2.getLongitude().getValue(), null);
+                                     p2.getLongitude().getValue());
 
 
         double baseAngle = baseBearing.getAngle();
