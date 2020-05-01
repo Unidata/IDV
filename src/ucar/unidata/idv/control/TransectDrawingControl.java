@@ -31,8 +31,11 @@ import org.w3c.dom.NodeList;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.gis.Transect;
 
+import ucar.unidata.data.grid.GridDataInstance;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.idv.TransectViewManager;
 
@@ -56,13 +59,14 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
 
+import ucar.visad.GeoUtils;
 import ucar.visad.display.*;
 
 
 import visad.*;
 
 import visad.georef.EarthLocation;
-import visad.georef.LatLonPoint;
+import visad.georef.MapProjection;
 
 
 import java.awt.*;
@@ -297,6 +301,27 @@ public class TransectDrawingControl extends DrawingControl {
         }
     }
 
+    /**
+     * Since the transect control is created without data object
+     * it is alwasy good to creat a map view display first to set
+     * the map projection correct for the transect line
+     */
+    public MapProjection getDataProjection() {
+        MapProjection mp = getMapViewProjection();
+        return mp;
+    }
+
+    /*
+     * No normalize 360 needed in the -180/180 coverage
+     */
+    public boolean getNormalize360() {
+        boolean normalized = true;
+        MapProjection mp = getMapViewProjection();
+        double  x = mp.getDefaultMapArea().getX();
+        if(x < 0)
+            normalized = false;
+        return normalized;
+    }
 
     /**
      * Provide the list of shape commands to the base class
@@ -373,7 +398,7 @@ public class TransectDrawingControl extends DrawingControl {
         pointStrings.add(from.getLongitude() + "");
         pointStrings.add(to.getLatitude() + "");
         pointStrings.add(to.getLongitude() + "");
-        tg.processPointStrings(pointStrings);
+        tg.processPointStrings(pointStrings, getNormalize360());
         tg.setMaxDataDistance(tvm.getMaxDataDistance());
         tg.updateLocation();
     }
