@@ -620,7 +620,7 @@ public abstract class DrawingGlyph {
             double lat = Misc.decodeLatLon(pointStrings.get(i).toString());
             double lon = Misc.decodeLatLon(pointStrings.get(i
                              + 1).toString());
-            lon = LatLonPointImpl.lonNormal360(lon);
+            //lon = LatLonPointImpl.lonNormalFrom().lonNormal360(lon);
             double alt;
             if (coordType == COORD_LATLONALT) {
                 alt = Double.parseDouble((String) pointStrings.get(i + 2));
@@ -634,8 +634,45 @@ public abstract class DrawingGlyph {
         }
     }
 
+    /**
+     * Parse the List of point strings. The format depends on the coordinate
+     * system type (e.g., XY, XYZ, etc.)
+     *
+     * @param pointStrings  List of Strings that represent double location values
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public void processPointStrings(List pointStrings, boolean normalize360)
+            throws VisADException, RemoteException {
+        int stride = 3;
+        if ((coordType == COORD_XY) || (coordType == COORD_LATLON)) {
+            stride = 2;
+        }
+        double fixedAlt;
+        if(control != null)
+            fixedAlt = getFixedAltitude();
+        else
+            fixedAlt = 0.0;
+        points = new ArrayList();
+        for (int i = 0; i < pointStrings.size(); i += stride) {
+            double lat = Misc.decodeLatLon(pointStrings.get(i).toString());
+            double lon = Misc.decodeLatLon(pointStrings.get(i
+                    + 1).toString());
+            if(normalize360)
+                lon = LatLonPointImpl.lonNormal360(lon);
+            double alt;
+            if (coordType == COORD_LATLONALT) {
+                alt = Double.parseDouble((String) pointStrings.get(i + 2));
+            } else {
+                alt = fixedAlt;
+            }
+            points.add(new EarthLocationTuple(new Real(RealType.Latitude,
+                    lat), new Real(RealType.Longitude, lon),
+                    new Real(RealType.Altitude, alt)));
 
-
+        }
+    }
 
     /**
      * handle event
