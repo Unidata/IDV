@@ -55,6 +55,7 @@ import java.io.*;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is a FloatField that caches to disk its float array.
@@ -260,20 +261,19 @@ public class GridCoverageFlatField extends CachedFlatField {
 
                     CoverageCoordAxis1D cca = (CoverageCoordAxis1D)geoGrid.getCoordSys().getTimeAxis();
                     Object [] ttt = cca.getCoordValueNames().toArray();
+                    List times = DataUtil.makeDateTimes(cca);
                     NamedAnything anything = (NamedAnything)ttt[timeIndex];
-                    CalendarDate cdate;
-                    CalendarDate cdate1 = null;
-                    if(anything.getValue() instanceof CalendarDate)
-                       cdate = (CalendarDate)anything.getValue();
-                    else if(anything.getValue() instanceof CoordInterval){
-                        double [] od = (double [])cca.getCoordObject(timeIndex);
-                        cdate = cca.makeDate(od[0]);
-                        cdate1 = cca.makeDate(od[1]);
-                    } else
-                        cdate = null;
-                    CalendarDateRange subsettimes = CalendarDateRange.of(cdate, cdate);
-                    if(cdate1 != null)
-                        subsettimes = CalendarDateRange.of(cdate, cdate1);
+                    CalendarDateTime cdt = (CalendarDateTime)times.get(timeIndex);
+                    //CalendarDate cdate;
+                    //CalendarDate cdate1 = null;
+                    double [] od = null;
+                    if(anything.getValue() instanceof CoordInterval){
+                        System.out.println(anything.getDescription() + "  " + timeIndex + " " + cdt);
+                        od = (double [])cca.getCoordObject(timeIndex);
+                    }
+                    //CalendarDateRange subsettimes = CalendarDateRange.of(cdate, cdate);
+                    // if(cdate1 != null)
+                    //    subsettimes = CalendarDateRange.of(cdate, cdate1);
                     double [] levels = null;
                     double [] ilevels = null;
                     if(geoGrid.getCoordSys().getZAxis() != null) {
@@ -299,7 +299,10 @@ public class GridCoverageFlatField extends CachedFlatField {
                         }
                     }
                     arr = new Array[numLevels];
-                    subsetParams.setTimeRange(subsettimes);
+                    subsetParams.setTime(cdt.getCalendarDate());
+                    if(od != null)
+                        subsetParams.setTimeOffsetIntv(new double[] {od[0], od[1]});
+                    //subsetParams.setTimeRange(subsettimes);
                     if(vIntv == null){
                         subsetParams.setVertCoordIntv(vIntv);
                         GeoReferencedArray mySubset = geoGrid.readData(subsetParams);
