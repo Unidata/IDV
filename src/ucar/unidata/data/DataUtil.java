@@ -30,6 +30,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import ucar.ma2.Array;
 
 import ucar.nc2.dataset.CoordinateAxis1DTime;
+import ucar.nc2.ft2.coverage.CoordInterval;
 import ucar.nc2.ft2.coverage.CoverageCoordAxis1D;
 import ucar.nc2.ft2.coverage.TimeOffsetAxis;
 import ucar.nc2.time.CalendarDate;
@@ -854,11 +855,18 @@ public class DataUtil {
         List<ucar.nc2.util.NamedObject> ttt= timeAxis.getCoordValueNames();
         List<CalendarDateTime> times =
                 new ArrayList<CalendarDateTime>(ttt.size());
-
+        double [] t = timeAxis.getValues();
+        int i = 0;
         for(Object oj: ttt) {
             NamedAnything anything = (NamedAnything)oj;
-            CalendarDate cdate = (CalendarDate)anything.getValue();
-            times.add(DataUtil.makeDateTime(cdate));
+            if(anything.getValue() instanceof CoordInterval){
+                double [] od = (double [])timeAxis.getCoordObject(i++);
+                CalendarDate cdate = timeAxis.makeDate(od[1]);
+                times.add(DataUtil.makeDateTime(cdate));
+            } else {
+                CalendarDate cdate = (CalendarDate) anything.getValue();
+                times.add(DataUtil.makeDateTime(cdate));
+            }
         }
 
         return times;
