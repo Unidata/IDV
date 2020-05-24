@@ -136,10 +136,10 @@ public class WorldWindReader {
         int numEntries = bdis.readLEInt();
         for (int i = 0; i < numEntries; i++) {
             String name = readString(bdis);
-            float  lon1 = bdis.readLEFloat();
-            float  lat1 = bdis.readLEFloat();
-            float  lon2 = bdis.readLEFloat();
-            float  lat2 = bdis.readLEFloat();
+            float  lon1 = (float)bdis.readLEDouble();
+            float  lat1 = (float)bdis.readLEDouble();
+            float  lon2 = (float)bdis.readLEDouble();
+            float  lat2 = (float)bdis.readLEDouble();
             name = dirPath + "/" + name;
             //            System.err.println ("name=" + name);
             entries.add(new Object[]{ name,
@@ -234,8 +234,8 @@ public class WorldWindReader {
                 lats[i] = bdis.readFloat();
                 lons[i] = bdis.readFloat();
             } else {
-                lats[i] = bdis.readLEFloat();
-                lons[i] = bdis.readLEFloat();
+                lats[i] = bdis.readLEDouble();
+                lons[i] = bdis.readLEDouble();
             }
             int numEntries = bdis.readLEInt();
             for (int entryIdx = 0; entryIdx < numEntries; entryIdx++) {
