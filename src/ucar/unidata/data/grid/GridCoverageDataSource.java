@@ -1748,7 +1748,7 @@ public class GridCoverageDataSource extends GridDataSource {
                 yStride = 1;
             }
 
-            geiGridSubsetParams.setHorizStride(xStride);
+            //geiGridSubsetParams.setHorizStride(xStride);
             String magValue = DataUtil.makeSamplingLabel(xStride, yStride,
                     "grid point");
             dataChoice.setProperty("MAG", magValue);
