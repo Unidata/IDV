@@ -21,15 +21,15 @@
 package ucar.unidata.data.grid;
 
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
-import ucar.ma2.Array;
-import ucar.ma2.InvalidRangeException;
-import ucar.ma2.Range;
+import ucar.ma2.*;
 
-import ucar.ma2.Section;
+import ucar.ma2.Range;
 import ucar.nc2.Attribute;
 import ucar.nc2.Group;
 import ucar.nc2.NetcdfFileWriter;
@@ -46,6 +46,7 @@ import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
 
 import ucar.nc2.util.NamedObject;
+import ucar.nc2.util.Optional;
 import ucar.unidata.data.BadDataException;
 import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
@@ -1699,15 +1700,33 @@ public class GridCoverageDataSource extends GridDataSource {
                         }
                     }
                     List yx_ranges = getRangesFromLatLonRect(geoGrid.getCoordinateSystem(), bbox);
+                    CoverageCoordAxis1D lonAxis = (CoverageCoordAxis1D)(geoCoverage.getCoordSys().getXAxis());
+                    double wantMin = LatLonPointImpl.lonNormalFrom(bbox.getLonMin(), lonAxis.getStartValue());
+                    double wantMax = LatLonPointImpl.lonNormalFrom(bbox.getLonMax(), lonAxis.getStartValue());
+                    double start = lonAxis.getStartValue();
+                    double end = lonAxis.getEndValue();
+                    List<MAMath.MinMax> lonIntvs = this.subsetLonIntervals(wantMin, wantMax, start, end);
 
                     yRange = makeRange(geoGrid.getYDimension(),
                             (Range) yx_ranges.get(0), 1);
-
-                    xRange = makeRange(geoGrid.getXDimension(),
-                            (Range) yx_ranges.get(1), 1);
+                    if(lonIntvs.size() == 1) {
+                        xRange = makeRange(geoGrid.getXDimension(),
+                                (Range) yx_ranges.get(1), 1);
+                        xLength = xRange.length();
+                    } else {
+                        List x1 = getRangesFromLonRange(geoGrid.getCoordinateSystem(),
+                                 lonIntvs.get(0).min, lonIntvs.get(0).max);
+                        List x2 = getRangesFromLonRange(geoGrid.getCoordinateSystem(),
+                                lonIntvs.get(1).min, lonIntvs.get(1).max);
+                        Range xRange1 = makeRange(geoGrid.getXDimension(),
+                                (Range) x1.get(0), 1);
+                        Range xRange2 = makeRange(geoGrid.getXDimension(),
+                                (Range) x2.get(0), 1);
+                        xLength = xRange1.length() + xRange2.length();
+                    }
 
                     yLength = yRange.length();
-                    xLength = xRange.length();
+                   // xLength = xRange.length();
                     geiGridSubsetParams.setLatLonBoundingBox(bbox);
                 }
 
@@ -1748,7 +1767,7 @@ public class GridCoverageDataSource extends GridDataSource {
                 yStride = 1;
             }
 
-            //geiGridSubsetParams.setHorizStride(xStride);
+            geiGridSubsetParams.setHorizStride(xStride);
             String magValue = DataUtil.makeSamplingLabel(xStride, yStride,
                     "grid point");
             dataChoice.setProperty("MAG", magValue);
@@ -1909,6 +1928,71 @@ public class GridCoverageDataSource extends GridDataSource {
         adapter.cacheFile = filename.toString();
         return adapter;
     }
+
+
+    private List<MAMath.MinMax> subsetLonIntervals(double wantMin, double wantMax, double start, double end) {
+        if (wantMin <= wantMax) {
+            if (wantMin > end && wantMax > end) {
+                return ImmutableList.of();
+            }
+
+            if (wantMin < end && wantMax < end) {
+                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, wantMax)});
+            }
+
+            if (wantMin < end && wantMax > end) {
+                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, end)});
+            }
+        } else {
+            if (wantMin > end && wantMax > end) {
+                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(start, end)});
+            }
+
+            if (wantMin < end && wantMax < end) {
+                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, end), new MAMath.MinMax(start, wantMax)});
+            }
+
+            if (wantMin < end && wantMax > end) {
+                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, end)});
+            }
+        }
+
+        return ImmutableList.of();
+    }
+
+
+    public Optional<RangeIterator> makeRange(DtCoverageCS dtCoverageCS, double minValue, double maxValue) {
+        CoordinateAxis1D xaxis = (CoordinateAxis1D)dtCoverageCS.getXHorizAxis();
+        double lower = Math.min(minValue, maxValue);
+        double upper = Math.max(minValue, maxValue);
+        int minIndex = xaxis.findCoordElementBounded(lower);
+        int maxIndex = xaxis.findCoordElementBounded(upper);
+        if (minIndex >= xaxis.getSize()) {
+            return Optional.empty(String.format("no points in subset: lower %f > end %f", lower, xaxis.getMinValue()));
+        } else if (maxIndex < 0) {
+            return Optional.empty(String.format("no points in subset: upper %f < start %f", upper, xaxis.getMaxValue()));
+        } else {
+            if (minIndex < 0) {
+                minIndex = 0;
+            }
+
+            if (maxIndex >= xaxis.getSize()) {
+                maxIndex = (int)xaxis.getSize() - 1;
+            }
+
+            int count = maxIndex - minIndex + 1;
+            if (count <= 0) {
+                return Optional.empty("no points in subset");
+            } else {
+                try {
+                    return Optional.of(new Range(minIndex, maxIndex));
+                } catch (InvalidRangeException var14) {
+                    return Optional.empty(var14.getMessage());
+                }
+            }
+        }
+    }
+
 
     /**
      * _more_
@@ -2761,6 +2845,33 @@ public class GridCoverageDataSource extends GridDataSource {
 
     }
 
+
+    public List<Range> getRangesFromLonRange(DtCoverageCS dtCoverageCS, double lonMin, double lonMax ) throws InvalidRangeException {
+        double minx, maxx;
+        CoordinateAxis xaxis = dtCoverageCS.getXHorizAxis();
+
+        minx = lonMin;
+        maxx = lonMax;
+
+        // normalize to [minLon,minLon+360]
+        double minLon = xaxis.getMinValue();
+        minx = LatLonPointImpl.lonNormalFrom( minx, minLon);
+        maxx = LatLonPointImpl.lonNormalFrom( maxx, minLon);
+
+
+        if ((xaxis instanceof CoordinateAxis1D)  ) {
+            CoordinateAxis1D xaxis1 = (CoordinateAxis1D) xaxis;
+            int minxIndex = xaxis1.findCoordElementBounded(minx);
+            int maxxIndex = xaxis1.findCoordElementBounded(maxx);
+
+            List<Range> list = new ArrayList<>();
+            list.add(new Range(Math.min(minxIndex, maxxIndex), Math.max(minxIndex, maxxIndex)));
+            return list;
+        } else {
+            throw new IllegalArgumentException("must be 1D LatLon ");
+        }
+
+    }
     /**
      *
      *
