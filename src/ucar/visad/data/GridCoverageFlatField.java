@@ -272,7 +272,7 @@ public class GridCoverageFlatField extends CachedFlatField {
                     if(anything.getValue() instanceof CoordInterval){
                         //System.out.println(anything.getDescription() + "  " + timeIndex + " " + cdt);
                         od = (double [])cca.getCoordObject(timeIndex);
-                        offsetsOfSpecificInterval = new double[] {od[0], od[1]};
+                        offsetsOfSpecificInterval = new double[] {od[1]-3, od[1]};
                         //System.out.println(cdate.toString() + "  [" + od[0] + " " + od[1] + "]");
                     }
                     //CalendarDateRange subsettimes = CalendarDateRange.of(cdate, cdate);
