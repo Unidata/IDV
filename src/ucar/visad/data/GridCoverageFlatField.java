@@ -245,8 +245,9 @@ public class GridCoverageFlatField extends CachedFlatField {
         //            return getParent().readData();
         //        }
         //        Misc.printStack("GeoGridFlatField.readData",15,null);
-        Array [] arr;
+        Array[] arr;
         int numLevels = 0;
+        float[][] fieldArray = new float[1][];
         try {
             //            System.err.println (myid +" GeoGridFlatField readData");
             msg("readData");
@@ -257,42 +258,42 @@ public class GridCoverageFlatField extends CachedFlatField {
                         .incrOutstandingGetDataCalls();
                 try {
                     //arr = geoGrid.readVolumeData(timeIndex);
-                   // arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
-                   //         -1);
+                    // arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
+                    //         -1);
 
-                    CoverageCoordAxis1D cca = (CoverageCoordAxis1D)geoGrid.getCoordSys().getTimeAxis();
-                    CoverageCoordAxis1D cca1 = (CoverageCoordAxis1D)geoGrid.getCoordSys().getAxis(AxisType.RunTime);
-                    Object [] ttt = cca.getCoordValueNames().toArray();
+                    CoverageCoordAxis1D cca = (CoverageCoordAxis1D) geoGrid.getCoordSys().getTimeAxis();
+                    CoverageCoordAxis1D cca1 = (CoverageCoordAxis1D) geoGrid.getCoordSys().getAxis(AxisType.RunTime);
+                    Object[] ttt = cca.getCoordValueNames().toArray();
                     List times = DataUtil.makeDateTimes(cca);
-                    NamedAnything anything = (NamedAnything)ttt[timeIndex];
-                    CalendarDateTime cdt = (CalendarDateTime)times.get(timeIndex);
+                    NamedAnything anything = (NamedAnything) ttt[timeIndex];
+                    CalendarDateTime cdt = (CalendarDateTime) times.get(timeIndex);
                     //CalendarDate cdate;
                     double[] offsetsOfSpecificInterval = null;
-                    double [] od = null;
-                    if(anything.getValue() instanceof CoordInterval){
+                    double[] od = null;
+                    if (anything.getValue() instanceof CoordInterval) {
                         //System.out.println(anything.getDescription() + "  " + timeIndex + " " + cdt);
-                        od = (double [])cca.getCoordObject(timeIndex);
-                        offsetsOfSpecificInterval = new double[] {od[1]-3, od[1]};
+                        od = (double[]) cca.getCoordObject(timeIndex);
+                        offsetsOfSpecificInterval = new double[]{od[1] - 3, od[1]};
                         //System.out.println(cdate.toString() + "  [" + od[0] + " " + od[1] + "]");
                     }
                     //CalendarDateRange subsettimes = CalendarDateRange.of(cdate, cdate);
                     //if(od == null)
                     //   subsettimes = CalendarDateRange.of(cdate, cdate);
-                    double [] levels = null;
-                    double [] ilevels = null;
-                    if(geoGrid.getCoordSys().getZAxis() != null) {
+                    double[] levels = null;
+                    double[] ilevels = null;
+                    if (geoGrid.getCoordSys().getZAxis() != null) {
                         Array lst = geoGrid.getCoordSys().getZAxis().getCoordsAsArray();
                         int size = (int) lst.getSize();
                         levels = new double[size];
-                        for (int k = 0; k <size; k++) {
+                        for (int k = 0; k < size; k++) {
                             float kValue = (float) lst.getFloat(k); //.getCoordValue(k);
                             levels[k] = kValue;
                         }
                         ilevels = new double[levels.length];
                     }
-                    double [] vIntv = this.vIntv;
+                    double[] vIntv = this.vIntv;
 
-                    if(vIntv == null)
+                    if (vIntv == null)
                         numLevels = 1;
                     else {
                         for (int i = 0; i < levels.length; i++) {
@@ -304,15 +305,15 @@ public class GridCoverageFlatField extends CachedFlatField {
                     }
                     arr = new Array[numLevels];
 
-                    if(od != null) {
-                       // System.out.println(cca1.getRefDate() + "  " + timeIndex + " [" + offsetsOfSpecificInterval[0] + " " + offsetsOfSpecificInterval[1] + "]");
+                    if (od != null) {
+                        System.out.println(cca1.getRefDate() + "  " + timeIndex + " [" + offsetsOfSpecificInterval[0] + " " + offsetsOfSpecificInterval[1] + "]");
                         subsetParams.setRunTime(cca1.getRefDate());
                         subsetParams.setTimeOffsetIntv(offsetsOfSpecificInterval);
                     } else {
                         subsetParams.setTime(cdt.getCalendarDate());
                     }
-                   // subsetParams.setTimeRange(subsettimes);
-                    if(vIntv == null){
+                    // subsetParams.setTimeRange(subsettimes);
+                    if (vIntv == null) {
                         subsetParams.setVertCoordIntv(vIntv);
                         GeoReferencedArray mySubset = geoGrid.readData(subsetParams);
                         arr[0] = mySubset.getData();
@@ -325,29 +326,30 @@ public class GridCoverageFlatField extends CachedFlatField {
                         }
                     }
 
-                } catch(Exception exc) {
-                    if(exc.toString().indexOf("Inconsistent array length read")>=0) {
+                } catch (Exception exc) {
+                    if (exc.toString().indexOf("Inconsistent array length read") >= 0) {
                         throw new ucar.unidata.data.BadDataException("Error reading data from server");
                     } else {
                         throw new RuntimeException(exc);
                     }
                 }
                 LogUtil.message("");
-            }
-            Trace.call2("GeoGridFlatField.geogrid.readVolumeData");
-            // 3D grid with one level - slice to 2D grid
-            if ((arr[0].getRank() > 2) && (domainSet.getDimension() == 2)) {
-                int[] lengths    = domainSet.getLengths();
-                int   sizeX      = lengths[0];
-                int   sizeY      = lengths[1];
-                int   levelIndex = 0;  // get the first by default
-                int[] shape      = arr[0].getShape();
-                for (int i = 0; i <= arr[0].getRank(); i++) {
-                    // find the index whose dimension is not x or y
-                    if ((shape[i] != sizeX) && (shape[i] != sizeY)) {
-                        // extract the correct "z" level data:
-                        arr[0] = arr[0].slice(i, levelIndex);
-                        break;
+
+                Trace.call2("GeoGridFlatField.geogrid.readVolumeData");
+                // 3D grid with one level - slice to 2D grid
+                if ((arr[0].getRank() > 2) && (domainSet.getDimension() == 2)) {
+                    int[] lengths = domainSet.getLengths();
+                    int sizeX = lengths[0];
+                    int sizeY = lengths[1];
+                    int levelIndex = 0;  // get the first by default
+                    int[] shape = arr[0].getShape();
+                    for (int i = 0; i <= arr[0].getRank(); i++) {
+                        // find the index whose dimension is not x or y
+                        if ((shape[i] != sizeX) && (shape[i] != sizeY)) {
+                            // extract the correct "z" level data:
+                            arr[0] = arr[0].slice(i, levelIndex);
+                            break;
+                        }
                     }
                 }
             }
@@ -357,9 +359,7 @@ public class GridCoverageFlatField extends CachedFlatField {
         } catch (IOException e) {
             LogUtil.logException("getFlatField read got IOException", e);
             return null;*/
-        } finally {
-            ucar.unidata.data.DataSourceImpl.decrOutstandingGetDataCalls();
-        }
+
 
 
         /* Simple Java arrays are used to make FlatFields:
@@ -368,57 +368,62 @@ public class GridCoverageFlatField extends CachedFlatField {
          *   they are ALL stored here (allows for non regular grid, possibly)
          */
 
-        Trace.call1("toFloatArray", " array:" + arr.getClass().getName());
-        float[][] fieldArray = new float[1][];
-        //fieldArray[0] = DataUtil.toFloatArray(arr);
-        float[] values = DataUtil.toFloatArray(arr);
-        Class dataClass = arr[0].getElementType();
-        if (! (dataClass.equals(float.class) ||
-                dataClass.equals(double.class) ) ) {
-          //  values = geoGrid.setMissingToNaN(values);
-        }
+            Trace.call1("toFloatArray", " array:" + arr.getClass().getName());
+            //float[][] fieldArray = new float[1][];
+            //fieldArray[0] = DataUtil.toFloatArray(arr);
+            float[] values = DataUtil.toFloatArray(arr);
+            Class dataClass = arr[0].getElementType();
+            if (!(dataClass.equals(float.class) ||
+                    dataClass.equals(double.class))) {
+                //  values = geoGrid.setMissingToNaN(values);
+            }
 
-        Trace.call2("toFloatArray", " length:" + values.length);
-        // if we have extended the longitudes, we need to add more points.
-        try {
-            if (values.length < domainSet.getLength()) {  // need to extend array
-                float[] newValues = new float[domainSet.getLength()];
-                int[]   lengths   = domainSet.getLengths();
-                int     l         = 0;
-                int     sizeX     = lengths[0];
-                int     sizeY     = lengths[1];
-                if (lengths.length == 2) {
-                    for (int j = 0; j < sizeY; j++) {
-                        for (int i = 0; i < sizeX; i++) {
-                            int xpos = (i < sizeX - 1)
-                                    ? i
-                                    : 0;
-                            newValues[l++] = values[j * (sizeX - 1) + xpos];
-                        }
-                    }
-                } else {
-                    for (int k = 0; k < lengths[2]; k++) {
+            Trace.call2("toFloatArray", " length:" + values.length);
+            // if we have extended the longitudes, we need to add more points.
+            try {
+                if (values.length < domainSet.getLength()) {  // need to extend array
+                    float[] newValues = new float[domainSet.getLength()];
+                    int[] lengths = domainSet.getLengths();
+                    int l = 0;
+                    int sizeX = lengths[0];
+                    int sizeY = lengths[1];
+                    if (lengths.length == 2) {
                         for (int j = 0; j < sizeY; j++) {
                             for (int i = 0; i < sizeX; i++) {
                                 int xpos = (i < sizeX - 1)
                                         ? i
                                         : 0;
-                                newValues[l++] =
-                                        values[k * sizeY * (sizeX - 1) + j * (sizeX - 1) + xpos];
+                                newValues[l++] = values[j * (sizeX - 1) + xpos];
+                            }
+                        }
+                    } else {
+                        for (int k = 0; k < lengths[2]; k++) {
+                            for (int j = 0; j < sizeY; j++) {
+                                for (int i = 0; i < sizeX; i++) {
+                                    int xpos = (i < sizeX - 1)
+                                            ? i
+                                            : 0;
+                                    newValues[l++] =
+                                            values[k * sizeY * (sizeX - 1) + j * (sizeX - 1) + xpos];
+                                }
                             }
                         }
                     }
-                }
-                fieldArray[0] = newValues;
+                    fieldArray[0] = newValues;
 
-            } else {
-                fieldArray[0] = values;
+                } else {
+                    fieldArray[0] = values;
+                }
+            } catch (VisADException e) {
+                LogUtil.logException("trying to extend grid got VisADException",
+                        e);
+                return null;
             }
-        } catch (VisADException e) {
-            LogUtil.logException("trying to extend grid got VisADException",
-                    e);
-            return null;
+
+        } finally {
+            ucar.unidata.data.DataSourceImpl.decrOutstandingGetDataCalls();
         }
+
         msg("readData DONE");
         return fieldArray;
 
