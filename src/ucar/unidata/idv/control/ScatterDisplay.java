@@ -30,6 +30,7 @@ import edu.wisc.ssec.mcidasv.data.hydra.LongitudeLatitudeCoordinateSystem;
 import edu.wisc.ssec.mcidasv.data.hydra.MultiSpectralData;
 import edu.wisc.ssec.mcidasv.data.hydra.SubsetRubberBandBox;
 
+import org.apache.fop.render.rtf.rtflib.tools.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.control.ColorTableWidget;
 import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.idv.ui.IdvWindow;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.ui.colortable.ColorTableManager;
 import ucar.unidata.util.*;
@@ -99,17 +101,15 @@ import visad.python.JPythonMethods;
 
 
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.*;
 
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.URL;
 
 import java.rmi.RemoteException;
@@ -2592,12 +2592,61 @@ public class ScatterDisplay extends DisplayControlImpl {
             return;
         }
         try {
-            ImageUtils.writeImageToFile(container, filename);
+            BufferedImage bufferedImage = makeBufferedImage(container);
+            if (filename.endsWith(".pdf")) {
+                OutputStream fos = new FileOutputStream(filename);
+
+                ImageUtils.writePDF(fos, (JComponent) container);
+                fos.close();
+
+                return;
+            }
+            ImageUtils.writeImageToFile(bufferedImage, filename);
+
             this.getIdv().getPublishManager().publishContent(filename,
                     null, publishCbx);
         } catch (Exception exc) {
             LogUtil.logException("Capturing image", exc);
         }
+    }
+
+    public BufferedImage makeBufferedImage(Component comp)
+            throws AWTException {
+        Dimension             dim   = comp.getSize();
+        Point                 loc   = comp.getLocationOnScreen();
+        GraphicsConfiguration gc    = comp.getGraphicsConfiguration();
+        Robot                 robot = new Robot(gc.getDevice());
+
+        if ((gc.getBounds().x > 0) || (gc.getBounds().y > 0)) {
+            System.err.println("Offsetting location:" + loc
+                    + " by gc bounds: " + gc.getBounds().x + " "
+                    + gc.getBounds().y);
+            loc.x -= gc.getBounds().x;
+            loc.y -= gc.getBounds().y;
+            System.err.println("new location:" + loc);
+        }
+
+        if ((dim.width <= 0) || (dim.height <= 0)) {
+            throw new IllegalStateException("Bad component size:" + dim.width
+                    + " X " + dim.height);
+        }
+
+        toFront();
+        Misc.sleep(250);
+
+        BufferedImage image = null;
+
+        try {
+            image = robot.createScreenCapture(new Rectangle(loc.x, loc.y,
+                    dim.width, dim.height));
+        } catch (Exception exc) {
+            logException("Error capturing image: "
+                    + " location:" + loc.x + "x"
+                    + loc.y + " dimension:" + dim.width + "x"
+                    + dim.height, exc);
+        }
+
+        return image;
     }
 
 }
