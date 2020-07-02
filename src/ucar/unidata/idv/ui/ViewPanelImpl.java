@@ -448,6 +448,8 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
             return;
         }
         Object dfltViewManager = control.getDefaultViewManager();
+        if(dfltViewManager == null)
+            dfltViewManager = getIdv().getViewManager();
         controlInfo = new ControlInfo(control, expandBtn, outer, inner,
                                       getVMInfo(dfltViewManager));
         control.putTmpProperty(PROP_CONTROLINFO, controlInfo);
