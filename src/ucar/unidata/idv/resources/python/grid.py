@@ -464,3 +464,6 @@ def thetaSurfaceADV(gridt, griduv, other, theta0):
 
 def heatIndex(gridtemp, gridrh):
   return DerivedGridFactory.createHeatIndex(gridtemp, gridrh)
+
+def unmixPrecipInterval(grid, accumulateHours):
+  return DerivedGridFactory.unmixPrecipInterval(grid, int(accumulateHours))
