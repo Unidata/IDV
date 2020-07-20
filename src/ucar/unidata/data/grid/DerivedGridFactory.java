@@ -30,6 +30,8 @@ import ucar.unidata.util.Range;
 
 import ucar.visad.UtcDate;
 import ucar.visad.Util;
+import ucar.visad.data.CalendarDateTime;
+import ucar.visad.data.GeoGridFlatField;
 import ucar.visad.quantities.*;
 
 import visad.*;
@@ -43,6 +45,7 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 
 /**
@@ -6268,4 +6271,80 @@ public class DerivedGridFactory {
     }
 
 
+    /**
+     * Make the fix interval of one grid's values ;
+     *
+     * @param grid     grid of data
+     * @param accumulateHours   accumulate hours
+     *
+     * @return computed layer difference
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl unmixPrecipInterval(FieldImpl grid, int accumulateHours)
+            throws VisADException {
+        try {
+            if ( !GridUtil.isTimeSequence(grid)) {
+                return grid;
+            }
+            List<float[][]> arrays       = new ArrayList<float[][]>();
+            FieldImpl       newGrid      = (FieldImpl) grid.clone();
+            Set             timeDomain   = Util.getDomainSet(newGrid);
+
+            Set timeSet = GridUtil.getTimeSet(grid);
+            CalendarDateTime[] timeArray = CalendarDateTime.timeSetToArray(timeSet);
+
+            for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength();
+                 timeStepIdx++) {
+                FlatField sample = (FlatField) newGrid.getSample(timeStepIdx);
+                float[][] timeStepValues = sample.getFloats(true);
+                arrays.add(Misc.cloneArray(timeStepValues));
+            }
+
+            for (int timeStepIdx = arrays.size() - 1; timeStepIdx >= 0;
+                 timeStepIdx--) {
+                FlatField sample = (FlatField) newGrid.getSample(timeStepIdx);
+                CalendarDateTime rtime = ((GeoGridFlatField) sample).getRuntime();
+                CalendarDateTime ftime = timeArray[timeStepIdx];
+                double rhtime = rtime.getValue(CommonUnit.secondsSinceTheEpoch);
+                double fhtime = ftime.getValue(CommonUnit.secondsSinceTheEpoch);
+                double accumhours = (fhtime - rhtime) / 3600;
+                float[][] value = arrays.get(timeStepIdx);
+
+                if(timeStepIdx > 0) {
+                    float[][] preValue = arrays.get(timeStepIdx - 1);
+                    FlatField preSample = (FlatField) newGrid.getSample(timeStepIdx - 1);
+                    CalendarDateTime preRuntime = ((GeoGridFlatField) preSample).getRuntime();
+                    CalendarDateTime prefortime = timeArray[timeStepIdx-1];
+
+                    String fhour = ftime.formattedString("HH", TimeZone.getTimeZone("GMT"));
+                    String rhour = rtime.formattedString("HH", TimeZone.getTimeZone("GMT"));
+
+                    System.out.println("F hour = " + fhour + " Run hour = " + rhour + " DIFF = " + accumhours);
+                    System.out.println("F hour = " + ftime + " Run hour = " + rtime + "\n");
+                    if (rtime.equals(preRuntime)) {
+                        value = Misc.subtractArray(value, preValue, value);
+                        double rhtime0 = preRuntime.getValue(CommonUnit.secondsSinceTheEpoch);
+                        double fhtime0 = prefortime.getValue(CommonUnit.secondsSinceTheEpoch);
+                        double pre_accumhours = (fhtime0 - rhtime0) / 3600;
+                        accumhours = accumhours - pre_accumhours;
+                        sample.setSamples(value, false);
+                        System.out.println("Subtract");
+                    }
+                }
+
+                double factor = accumulateHours/accumhours;
+                sample = (FlatField)sample.multiply(new Real(factor));
+                newGrid.setSample(timeStepIdx, sample);
+
+                //                newGrid.setSample(timeStepIdx,sample);
+            }
+            return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException in timeStepFunc");
+        }
+    }
 }
