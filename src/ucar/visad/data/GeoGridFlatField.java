@@ -26,7 +26,7 @@ import ucar.ma2.DataType;
 import ucar.ma2.Index;
 
 //import ucar.nc2.dataset.grid.*;
-import ucar.nc2.Attribute;
+import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dt.grid.*;
 
 import ucar.unidata.data.DataUtil;
@@ -49,7 +49,7 @@ import visad.util.DataUtility;
 import java.io.*;
 
 import java.rmi.RemoteException;
-
+import java.util.List;
 
 
 /**
@@ -77,6 +77,9 @@ public class GeoGridFlatField extends CachedFlatField {
 
     /** a read lock  */
     transient private Object readLock;
+
+    /** the run time  */
+    CalendarDateTime runTime;
 
     /**
      * Create a new GeoGridFlatField
@@ -219,6 +222,15 @@ public class GeoGridFlatField extends CachedFlatField {
     }
 
     /**
+     * Get the read lock
+     *
+     * @return  the read lock
+     */
+    public CalendarDateTime getRuntime() {
+        return runTime;
+    }
+
+    /**
      * Used to provide a hook to derived classes to dynamically read in the data
      *
      * @return data
@@ -237,11 +249,20 @@ public class GeoGridFlatField extends CachedFlatField {
             //            System.err.println (myid +" GeoGridFlatField readData");
             msg("readData");
             Trace.call1("GeoGridFlatField.geogrid.readVolumeData");
+            System.out.println("TIME " + timeIndex);
             synchronized (getReadLock()) {
                 LogUtil.message(readLabel);
                 ucar.unidata.data.DataSourceImpl
                     .incrOutstandingGetDataCalls();
                 try {
+                    CoordinateAxis1DTime ccar = geoGrid.getCoordinateSystem().getRunTimeAxis();
+                    List timesR = DataUtil.makeDateTimes(ccar);
+                    if(timesR.size() == 1)
+                        runTime = (CalendarDateTime)timesR.get(0);
+                    else if(timeIndex > timesR.size())
+                        runTime = (CalendarDateTime)timesR.get(timesR.size()-1);
+                    else
+                        runTime = (CalendarDateTime)timesR.get(timeIndex);
                     //arr = geoGrid.readVolumeData(timeIndex);
                     arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
                             -1);
