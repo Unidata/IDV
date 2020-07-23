@@ -6283,7 +6283,7 @@ public class DerivedGridFactory {
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
      */
-    public static FieldImpl timeStepAccumulationPrecip(FieldImpl grid)
+    public static FieldImpl timeStepAccumulatedPrecip(FieldImpl grid)
             throws VisADException {
         try {
             if ( !GridUtil.isTimeSequence(grid)) {
