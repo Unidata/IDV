@@ -81,6 +81,8 @@ public class GeoGridFlatField extends CachedFlatField {
     /** the run time  */
     CalendarDateTime runTime;
 
+    /** the coord bounds for discontinuous variable  */
+    double[] coordinateBounds = null;
     /**
      * Create a new GeoGridFlatField
      *
@@ -231,6 +233,15 @@ public class GeoGridFlatField extends CachedFlatField {
     }
 
     /**
+     * Get the read lock
+     *
+     * @return  the read lock
+     */
+    public double[] getCoordBounds() {
+        return coordinateBounds;
+    }
+
+    /**
      * Used to provide a hook to derived classes to dynamically read in the data
      *
      * @return data
@@ -249,20 +260,29 @@ public class GeoGridFlatField extends CachedFlatField {
             //            System.err.println (myid +" GeoGridFlatField readData");
             msg("readData");
             Trace.call1("GeoGridFlatField.geogrid.readVolumeData");
-            System.out.println("TIME " + timeIndex);
+
             synchronized (getReadLock()) {
                 LogUtil.message(readLabel);
                 ucar.unidata.data.DataSourceImpl
                     .incrOutstandingGetDataCalls();
                 try {
                     CoordinateAxis1DTime ccar = geoGrid.getCoordinateSystem().getRunTimeAxis();
-                    List timesR = DataUtil.makeDateTimes(ccar);
-                    if(timesR.size() == 1)
-                        runTime = (CalendarDateTime)timesR.get(0);
-                    else if(timeIndex > timesR.size())
-                        runTime = (CalendarDateTime)timesR.get(timesR.size()-1);
-                    else
-                        runTime = (CalendarDateTime)timesR.get(timeIndex);
+                    CoordinateAxis1DTime cca = geoGrid.getCoordinateSystem().getTimeAxis1D();
+                    if(cca.getCoordBoundsDate(timeIndex) != null)
+                        coordinateBounds = cca.getCoordBounds(timeIndex);
+
+                    if(ccar != null) {
+                        List timesR = DataUtil.makeDateTimes(ccar);
+                        //List times = DataUtil.makeDateTimes(cca);
+
+                        if (timesR.size() == 1)
+                            runTime = (CalendarDateTime) timesR.get(0);
+                        else if (timeIndex > timesR.size())
+                            runTime = (CalendarDateTime) timesR.get(timesR.size() - 1);
+                        else
+                            runTime = (CalendarDateTime) timesR.get(timeIndex);
+                    }
+                    //System.out.println("Index = " + timeIndex + " Run hour = " + runTime + times.get(timeIndex) + "\n");
                     //arr = geoGrid.readVolumeData(timeIndex);
                     arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
                             -1);
