@@ -22,6 +22,9 @@
 package ucar.unidata.util;
 
 
+import ucar.visad.data.CalendarDateTime;
+import visad.CommonUnit;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -765,6 +768,30 @@ public class DateUtil {
         for (String arg : args) {
             System.err.println(arg + " = " + parse(arg));
         }
+    }
+
+    /**
+     *
+     * This is calculated the hour difference between two calendardatetimes
+     *
+     *
+     * @param fromDate from date
+     * @param toDate to date
+     *
+     * @return date range
+     *
+     */
+    public static double getDateTimeRangeInHours(CalendarDateTime fromDate, CalendarDateTime toDate) {
+        double rangeInHour = 0.0;
+
+        try {
+            rangeInHour = (toDate.getValue(CommonUnit.secondsSinceTheEpoch) -
+                    fromDate.getValue(CommonUnit.secondsSinceTheEpoch)) / 3600.0;
+            rangeInHour = Math.abs(rangeInHour);
+        } catch (Exception ee){}
+
+        //        System.err.println("from:" + Repository.fmt(fromDttm) + " -- " + Repository.fmt(toDttm));
+        return rangeInHour;
     }
 
 
