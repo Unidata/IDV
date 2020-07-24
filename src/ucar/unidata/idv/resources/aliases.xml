@@ -173,6 +173,10 @@ The label is used  (if defined) for  the AliasEditor gui.
      name="WREL"
      aliases="GridRelative_w, omega, Vertical_velocity_pressure,Vertical_velocity_pressure_isobaric,Pressure_vertical_velocity"
      label="Grid Relative W component of wind" />
+  <alias
+    name="MiXINTERVALPRECIP"
+    aliases="Total_precipitation_surface_Mixed_intervals_Accumulation"
+    label="Precipitation" />
   <alias aliases="Optical_Depth_Land_And_Ocean" label="AerosolOpticalDepth_MOD04" name="AOD_MOD04"/>
   <alias aliases="Cloud_Optical_Thickness" label="CloudOpticalThickness_MOD06" name="COT_MOD06"/>
   <alias aliases="radiances.*" label="Radiance" name="Radiance"/>
