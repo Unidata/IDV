@@ -297,6 +297,15 @@ specified  -->
      ci_interval="2.5"
      unit="mm"/>
   <param
+     name="^.*precip"
+     table="Precip"
+     range_min="0.0"
+     range_max="50.0"
+     ci_base="0"
+     ci_min="0.25"
+     ci_interval="2.5"
+     unit="mm"/>
+  <param
      name="theta"
      table="Temperature"
      range_min="250.0"
