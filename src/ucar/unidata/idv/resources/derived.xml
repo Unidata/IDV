@@ -1123,7 +1123,24 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
          p1="GP"/>
     </operands>
   </derived>
-
+  <derived
+        id="timeStepAccumulatedPrecip"
+        description="TimeStep Precipitation Accumulation (from %N1%)"
+        label="timeStepPrecip"
+        isdefault="true"
+        isenduser="true"
+        formula="timeStepAccumulatedPrecip (D1)">
+    <categories>
+      <category
+        value="inherit"
+        append="Derived"
+        childidx="0"/>
+    </categories>
+    <operands>
+      <params categories="GRID-2D-*;"
+        p1="MiXINTERVALPRECIP"/>
+    </operands>
+  </derived>
   <!-- Adding derived from Mapes collection-->
   <!--derived description="Vertical Transformation of %N2 onto %N1" formula="vertical_transform(D1[label=New Vertical Coordinate],D2[label=Grid to be Transformed],user_Isosurface_Value)" id="Vertical Transform" isdefault="false" isenduser="true">
     <categories/>
