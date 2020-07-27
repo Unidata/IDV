@@ -6321,7 +6321,9 @@ public class DerivedGridFactory {
                     double[] prebounds =   preSample.getCoordBounds();
                     double preAccumhours = prebounds[1] - prebounds[0];
 
-                    if (rtime.equals(preRuntime)) {
+                    if (accumhours == accumulateHours) {
+                        sample.setSamples(value, false);
+                    } else if (rtime.equals(preRuntime)) {
                         value = Misc.subtractArray(value, preValue, value);
                         sample.setSamples(value, false);
                        // System.out.println("Subtract P");
