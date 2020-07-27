@@ -2129,10 +2129,23 @@ public class GeoGridDataSource extends GridDataSource {
                     timeIndices[i] = index;
                 }
             } else {
+                CoordinateAxis1DTime cca = geoGrid
+                        .getCoordinateSystem().getTimeAxis1D();
                 for (int i = 0; i < times.size(); i++) {
-                    int index = allTimes.indexOf(times.get(i));
+                    int index;
+
                     if (getReverseTimes()) {
-                        index = numTimes - index - 1;
+                        index = allTimes.indexOf(times.get(i));
+                        if (index < 0)
+                            index = numTimes - 1;
+                        else
+                            index = numTimes - index - 1;
+                        DateTime dateTime =  (DateTime)allTimes.get(index);
+                        //index = allTimes.indexOf(dateTime);
+                        index = getTimeIndexWithBounds(dateTime,  allTimes,  cca);
+
+                    } else {
+                        index = getTimeIndexWithBounds((DateTime)times.get(i),  allTimes,  cca);
                     }
                     timeIndices[i] = index;
                 }
@@ -2238,6 +2251,38 @@ public class GeoGridDataSource extends GridDataSource {
         log_.debug("Read grid in " + (System.currentTimeMillis() - millis));
         return fieldImpl;
     }  // end makeField
+
+    /**
+     * Find the time index in the dataset with smallest bound values
+     *
+     * @param dateTime  the time
+     * @param allTimes  the DateTime list
+     * @param cca  the data CoordinateAxis1DTime
+     * @return the GeoGrid or null dataset doesn't exist or if variable not found
+     */
+    public int getTimeIndexWithBounds(DateTime dateTime, List<DateTime> allTimes, CoordinateAxis1DTime cca){
+        int index = allTimes.indexOf(dateTime);
+        if (index < 0)
+            return 0;
+
+        int lastindex = allTimes.lastIndexOf(dateTime);
+        if(index == lastindex)
+            return index;
+        double [] bounds = cca.getCoordBounds(index);
+        int finalIndex0 = index;
+        if(bounds != null && bounds[1] != bounds[0]) {
+            double min = bounds[1] - bounds[0];
+            for (int ii = index; ii <= lastindex; ii++) {
+                bounds = cca.getCoordBounds(ii);
+                double tmp = bounds[1] - bounds[0];
+                if(tmp < min)
+                    finalIndex0 = ii;
+
+            }
+            index = finalIndex0;
+        }
+        return index;
+    }
 
     /**
      * Find the grid in the dataset from the DataChoice
