@@ -88,6 +88,11 @@ public class GridCoverageFlatField extends CachedFlatField {
 
     double [] vIntv;
 
+    /** the run time  */
+    CalendarDateTime runTime;
+
+    /** the coord bounds for discontinuous variable  */
+    double[] coordinateBounds = null;
     /**
      * Create a new GeoGridFlatField
      *
@@ -232,6 +237,24 @@ public class GridCoverageFlatField extends CachedFlatField {
     }
 
     /**
+     * Get the read lock
+     *
+     * @return  the read lock
+     */
+    public CalendarDateTime getRuntime() {
+        return runTime;
+    }
+
+    /**
+     * Get the read lock
+     *
+     * @return  the read lock
+     */
+    public double[] getCoordBounds() {
+        return coordinateBounds;
+    }
+
+    /**
      * Used to provide a hook to derived classes to dynamically read in the data
      *
      * @return data
@@ -257,28 +280,28 @@ public class GridCoverageFlatField extends CachedFlatField {
                 ucar.unidata.data.DataSourceImpl
                         .incrOutstandingGetDataCalls();
                 try {
-                    //arr = geoGrid.readVolumeData(timeIndex);
-                    // arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
-                    //         -1);
-
                     CoverageCoordAxis1D cca = (CoverageCoordAxis1D) geoGrid.getCoordSys().getTimeAxis();
                     CoverageCoordAxis1D cca1 = (CoverageCoordAxis1D) geoGrid.getCoordSys().getAxis(AxisType.RunTime);
-                    Object[] ttt = cca.getCoordValueNames().toArray();
+
+                    Object bobject = cca.getCoordObject(timeIndex);
+                    if(bobject instanceof double[] )
+                        coordinateBounds = (double[])bobject;
+                   // Object[] ttt = cca.getCoordValueNames().toArray();
                     List times = DataUtil.makeDateTimes(cca);
-                    NamedAnything anything = (NamedAnything) ttt[timeIndex];
+                    if(cca1 != null) {
+                        List timesR = DataUtil.makeDateTimes(cca1);
+
+                        if (timesR.size() == 1)
+                            runTime = (CalendarDateTime) timesR.get(0);
+                        else if (timeIndex > timesR.size())
+                            runTime = (CalendarDateTime) timesR.get(timesR.size() - 1);
+                        else
+                            runTime = (CalendarDateTime) timesR.get(timeIndex);
+                    }
+
                     CalendarDateTime cdt = (CalendarDateTime) times.get(timeIndex);
                     //CalendarDate cdate;
-                    double[] offsetsOfSpecificInterval = null;
-                    double[] od = null;
-                    if (anything.getValue() instanceof CoordInterval) {
-                        //System.out.println(anything.getDescription() + "  " + timeIndex + " " + cdt);
-                        od = (double[]) cca.getCoordObject(timeIndex);
-                        offsetsOfSpecificInterval = new double[]{od[1] - 3, od[1]};
-                        //System.out.println(cdate.toString() + "  [" + od[0] + " " + od[1] + "]");
-                    }
-                    //CalendarDateRange subsettimes = CalendarDateRange.of(cdate, cdate);
-                    //if(od == null)
-                    //   subsettimes = CalendarDateRange.of(cdate, cdate);
+
                     double[] levels = null;
                     double[] ilevels = null;
                     if (geoGrid.getCoordSys().getZAxis() != null) {
@@ -305,10 +328,10 @@ public class GridCoverageFlatField extends CachedFlatField {
                     }
                     arr = new Array[numLevels];
 
-                    if (od != null) {
-                        System.out.println(cca1.getRefDate() + "  " + timeIndex + " [" + offsetsOfSpecificInterval[0] + " " + offsetsOfSpecificInterval[1] + "]");
+                    if (coordinateBounds != null) {
+                        System.out.println(cca1.getRefDate() + "  " + timeIndex + " [" + coordinateBounds[0] + " " + coordinateBounds[1] + "]");
                         subsetParams.setRunTime(cca1.getRefDate());
-                        subsetParams.setTimeOffsetIntv(offsetsOfSpecificInterval);
+                        subsetParams.setTimeOffsetIntv(coordinateBounds);
                     } else {
                         subsetParams.setTime(cdt.getCalendarDate());
                     }
