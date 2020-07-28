@@ -33,6 +33,7 @@ import ucar.visad.UtcDate;
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
 import ucar.visad.data.GeoGridFlatField;
+import ucar.visad.data.GridCoverageFlatField;
 import ucar.visad.quantities.*;
 
 import visad.*;
@@ -6303,22 +6304,37 @@ public class DerivedGridFactory {
             for (int timeStepIdx = 0; timeStepIdx < timeDomain.getLength(); timeStepIdx++)
             {
                 FlatField sample =   (FlatField)newGrid.getSample(timeStepIdx);
-                CalendarDateTime rtime =  ((GeoGridFlatField)sample).getRuntime();
-                double[] bounds =  ((GeoGridFlatField)sample).getCoordBounds();
+                CalendarDateTime rtime = null;
+                double[] bounds = null;
+                if(sample instanceof GeoGridFlatField) {
+                    rtime = ((GeoGridFlatField) sample).getRuntime();
+                    bounds =  ((GeoGridFlatField)sample).getCoordBounds();
+                } else if(sample instanceof GridCoverageFlatField){
+                    rtime = ((GridCoverageFlatField) sample).getRuntime();
+                    bounds =  ((GridCoverageFlatField)sample).getCoordBounds();
+                }
+
                 CalendarDateTime ftime = timeArray[timeStepIdx];
 
                 double accumhours = bounds[1] - bounds[0];
                 float[][] value = sample.getFloats(true);
 
-                //System.out.println("Index = " + timeStepIdx + " F hour = " + bounds[0] + " T hour = " + bounds[1] + " DIFF = " + accumhours);
-                //System.out.println("F hour = " + ftime + " Run hour = " + rtime );
+                System.out.println("Index = " + timeStepIdx + " F hour = " + bounds[0] + " T hour = " + bounds[1] + " DIFF = " + accumhours);
+                System.out.println("F hour = " + ftime + " Run hour = " + rtime );
                 if(timeStepIdx > 0) {
                     //float[][] preValue = arrays.get(timeStepIdx - 1);
-                    GeoGridFlatField preSample = (GeoGridFlatField) grid.getSample(timeStepIdx - 1);
+                    FlatField preSample = (FlatField)grid.getSample(timeStepIdx - 1);
+                    CalendarDateTime preRuntime = null;
+                    double[] prebounds = null;
+                    if(preSample instanceof GeoGridFlatField) {
+                        preRuntime = ((GeoGridFlatField) sample).getRuntime();
+                        prebounds =  ((GeoGridFlatField)sample).getCoordBounds();
+                    } else if(preSample instanceof GridCoverageFlatField){
+                        preRuntime = ((GridCoverageFlatField) sample).getRuntime();
+                        prebounds =  ((GridCoverageFlatField)sample).getCoordBounds();
+                    }
                     float[][] preValue = preSample.getFloats(true);
-                    CalendarDateTime preRuntime = preSample.getRuntime();
                     //CalendarDateTime prefortime = timeArray[timeStepIdx-1];
-                    double[] prebounds =   preSample.getCoordBounds();
                     double preAccumhours = prebounds[1] - prebounds[0];
 
                     if (accumhours == accumulateHours) {
@@ -6332,7 +6348,7 @@ public class DerivedGridFactory {
                         sample.setSamples(value, false);
                        // System.out.println("Subtract PP");
                     } else if(accumhours < preAccumhours ){
-                        preSample = (GeoGridFlatField) newGrid.getSample(timeStepIdx - 1);
+                        preSample = (FlatField) newGrid.getSample(timeStepIdx - 1);
                         float[][] valueP = preSample.getFloats();
                         value = Misc.subtractArray(value, valueP, value);
                         sample.setSamples(value, false);
