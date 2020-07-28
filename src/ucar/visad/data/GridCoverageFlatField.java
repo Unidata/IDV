@@ -329,7 +329,7 @@ public class GridCoverageFlatField extends CachedFlatField {
                     arr = new Array[numLevels];
 
                     if (coordinateBounds != null) {
-                        System.out.println(cca1.getRefDate() + "  " + timeIndex + " [" + coordinateBounds[0] + " " + coordinateBounds[1] + "]");
+                        //System.out.println(cca1.getRefDate() + "  " + timeIndex + " [" + coordinateBounds[0] + " " + coordinateBounds[1] + "]");
                         subsetParams.setRunTime(cca1.getRefDate());
                         subsetParams.setTimeOffsetIntv(coordinateBounds);
                     } else {
