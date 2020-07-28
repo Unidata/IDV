@@ -6319,8 +6319,8 @@ public class DerivedGridFactory {
                 double accumhours = bounds[1] - bounds[0];
                 float[][] value = sample.getFloats(true);
 
-                System.out.println("Index = " + timeStepIdx + " F hour = " + bounds[0] + " T hour = " + bounds[1] + " DIFF = " + accumhours);
-                System.out.println("F hour = " + ftime + " Run hour = " + rtime );
+                //System.out.println("Index = " + timeStepIdx + " F hour = " + bounds[0] + " T hour = " + bounds[1] + " DIFF = " + accumhours);
+                //System.out.println("F hour = " + ftime + " Run hour = " + rtime );
                 if(timeStepIdx > 0) {
                     //float[][] preValue = arrays.get(timeStepIdx - 1);
                     FlatField preSample = (FlatField)grid.getSample(timeStepIdx - 1);
