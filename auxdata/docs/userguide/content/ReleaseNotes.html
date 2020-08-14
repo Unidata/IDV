@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 5.6 release.
+The items below reflect changes since the 5.7 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -57,11 +57,13 @@ The items below reflect changes since the 5.6 release.
   </p>
 </faqitem>
 
-<faqitem q="CDM Profile data type" id="cdmprofiletype">
+<faqitem id="gridcoveragetype" q="Grid Coverage and Cross Seam Subset">
   <p>
-    Common Data Model profile feature data is a set of data points along a vertical line, inlcluding a collection of
-    a time series of profile features at named locations. CDM Profile data can be loaded in the Data Choosers:
-    RAOB > Soundings Local.
+    The cross seam subsetting in the grid coverage type works similar to the grid file subsetting where
+    you can set the property for all fields in the Data Source or override the default for a particular
+    field in the field selector subset panel. The only difference in the Coverage data spatial subset is
+    that the Flip map longitude button at the bottom of the panel will allow user to flip longitudes in
+    a cyclic rectlinear grid from 0/360 to -180/180 (or vice-versa) before performing the cross seam subsetting.
   </p>
 </faqitem>
 
@@ -69,21 +71,18 @@ The items below reflect changes since the 5.6 release.
 <faqitem cat="Jython Changes"></faqitem>
 
 
-<faqitem q="ABI and AHI Formulas" id="abiahiformulas">
+<faqitem id="timestepAccuformulas" q="Time step Precipitation Accumulation Formulas">
   <p>
-    Added a series of formulas specific to ABI (Advanced Baseline Imager), AHI (Advanced Himawari Imager) and MSG (Meteosat-8 through 11)to create
-    displays of RGB and band subtraction products.  These formulas can be found in the Field Selector under Formulas > Satellite.
-    Also, derived fields for these products will be automatically added to the Field Selector when the multi bands ABI data source
-    is loaded that includes bands required to create the product.
+    The new GFS dataset collection has mixed accumulation hours in the time axis for each time step and the
+    previous logic in the IDV picks the first one in the list, unfortunately, always the longest one.
+    So the new logic will try to pick the shortest accumulation hour for each time step, and what we
+    got are 3 and 6 hours for GFS one degree or 0.25 degree, we can use the subtraction
+    to get the 3-hour time step accumulation. This change has been added as a derived variable named:
+    TimeStepAccumulatedPrecip. In general, this formula can be applied to other mixed interval parameters.
   </p>
 </faqitem>
 
-<faqitem q="Grid Diagnostics Formulas" id="mapessmth">
-  <p>
-    Added a variety of formulas specific to gridded datasource to calculate Saturation Equivalent Potential Temperature,
-    Heat Index,  Helicity,  Ellrod Index, LP Index, and Richardson number.
-  </p>
-</faqitem>
+
 
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
