@@ -317,6 +317,12 @@
      description="Create Text Note"
      action="jython:idv.doMakeControl('notecontrol')"/>
   <action
+     id="display.texthtml"
+     image="/auxdata/ui/icons/Text24.gif"
+     group="Special Displays"
+     description="Create Text/HTML Display in Legend"
+     action="jython:idv.doMakeControl('textdisplay')"/>
+  <action
      id="display.rangeandbearing"
      image="/auxdata/ui/icons/RangeAndBearing16.gif"
      group="Special Displays"
