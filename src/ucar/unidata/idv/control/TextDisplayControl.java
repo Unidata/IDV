@@ -36,6 +36,8 @@ import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.idv.ViewDescriptor;
 import ucar.unidata.idv.ViewManager;
+import ucar.unidata.idv.control.multi.DisplayComponent;
+import ucar.unidata.idv.control.multi.MultiDisplayHolder;
 import ucar.unidata.ui.FineLineBorder;
 
 import ucar.unidata.ui.ImageUtils;
@@ -53,7 +55,7 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
-
+import ucar.visad.display.CompositeDisplayable;
 import visad.*;
 
 
@@ -127,7 +129,7 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
     public static final int DEFAULT_WIDTH = 450;
 
     /** default height */
-    public static final int DEFAULT_HEIGHT = 550;
+    public static final int DEFAULT_HEIGHT = 200;
     //    public static final Dimension EDITOR_PREFERRRED_SIZE = new Dimension (DEFAULT_WIDTH-5, DEFAULT_HEIGHT);
 
     /** Preferred dimension for the editor pane */
@@ -191,6 +193,8 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
 
     /** editor pane */
     private MyEditorPane editor;
+    /** display holder */
+    CompositeDisplayable displayHolder;
 
     /** scroll pane */
     private ScrollPane scroller;
@@ -200,9 +204,13 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
 
     /** text field for url display/entry */
     private JTextField urlField = new JTextField();
+    /** editor pane */
+    private MyEditorPane legendEditor;
+    /** side legennd */
+    private JLabel sideLegendReadout;
 
-
-
+    /** Show the table in the legend */
+    private boolean showHtmlInLegend = false;
     /**
      * Default constructor; does nothing.  Heavy work done in init().
      */
@@ -222,8 +230,9 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
     public boolean init(DataChoice dataChoice)
             throws VisADException, RemoteException {
         //Perhaps we have been unpersisted
-        if (history.size() > 0) {
-            filename = (String) history.get(historyIdx);
+        if (history.size() > 0 ) {
+            if(history.get(historyIdx) != "file:null")
+                filename = (String) history.get(historyIdx);
             try {
                 //                this.textContents = IOUtil.readContents(filename);
             } catch (Exception exc) {
@@ -232,8 +241,11 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
             setFieldUrl(filename);
             checkHistory();
         } else {
-            if ( !setData(dataChoice)) {
-                return false;
+            if (dataChoice == null || !setData(dataChoice)) {
+                displayHolder = new CompositeDisplayable();
+                displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
+                addDisplayable(displayHolder);
+                return true;
             }
 
             /**
@@ -244,6 +256,9 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
             filename = dataChoice.getStringId();
             goToUrl(filename);
         }
+        displayHolder = new CompositeDisplayable();
+        displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
+        addDisplayable(displayHolder);
         return true;
     }
 
@@ -485,6 +500,13 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
         editor.addMouseMotionListener(this);
         editor.addMouseListener(this);
 
+        legendEditor = new MyEditorPane();
+        legendEditor.setEditable(false);
+        legendEditor.addHyperlinkListener(this);
+        legendEditor.setContentType("text/html");
+        legendEditor.setEditorKit(getEditorKit());
+        legendEditor.addMouseMotionListener(this);
+        legendEditor.addMouseListener(this);
         //First try to use the id of the data choice as a url
         processUrl(filename, true, false);
 
@@ -492,7 +514,7 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
             scroller.add(editor);
         }
         editor.setPreferredSize(EDITOR_PREFERRRED_SIZE);
-
+        legendEditor.setPreferredSize(EDITOR_PREFERRRED_SIZE);
 
         if (doJScroller) {
             jscroller = new JScrollPane(
@@ -955,6 +977,7 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
                 LogUtil.userMessage("Unable to post form to: " + action);
             } else {
                 editor.setText(result.toString());
+                legendEditor.setText(result.toString());
                 goToUrl(action);
             }
         } catch (Exception exc) {
@@ -1110,6 +1133,7 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
         try {
             if (IOUtil.isImageFile(url.toString())) {
                 editor.setText("<img src=\"" + url + "\">");
+                legendEditor.setText("<img src=\"" + url + "\">");
             } else {
                 File dir = getDirectory(url.toString());
                 if (dir != null) {
@@ -1180,8 +1204,10 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
                     }
                     sb.append("</table></body></html>");
                     editor.setText(sb.toString());
+                    legendEditor.setText(sb.toString());
                 } else {
                     editor.setPage(url);
+                    legendEditor.setPage(url);
                 }
             }
         } catch (Exception e) {
@@ -1202,6 +1228,21 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
         }
     }
 
+    /**
+     * Get the display file name.
+     * @return  file string
+     */
+    public String getFilename(){
+        return filename;
+    }
+
+    /**
+     * Set the display file name.
+     * @return  void
+     */
+    public void setFilename(String filename){
+        this.filename = filename;
+    }
     /**
      * Dores the given path represent a file system dir.
      *
@@ -1243,7 +1284,7 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
      * @return  empty string
      */
     public String getDisplayName() {
-        return "";
+        return "HTML Text Display";
     }
 
     /**
@@ -2045,5 +2086,90 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
         }
     }
 
+    public boolean getShowSideLegend() {
+        return true;
+    }
+
+    /**
+     * Assume that any display controls that have a color table widget
+     * will want the color table to show up in the legend.
+     *
+     * @param  legendType  type of legend
+     * @return The extra JComponent to use in legend
+     */
+    protected JComponent getExtraLegendComponent(int legendType) {
+        JComponent parentComp = super.getExtraLegendComponent(legendType);
+        if (legendType == BOTTOM_LEGEND) {
+            return parentComp;
+        }
+        if (sideLegendReadout == null) {
+            sideLegendReadout = new JLabel("<html><br></html>");
+        }
+        setShowHtmlInLegend(showHtmlInLegend);
+        return GuiUtils.vbox(parentComp, sideLegendReadout,
+            this.legendEditor);
+
+    }
+
+    /**
+     *  Set the show html item
+     *
+     *  @param items The items of view menu
+     */
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
+        super.getViewMenuItems(items, forMenuBar);
+        ViewManager viewManager = getViewManager();
+        items.add(GuiUtils.MENU_SEPARATOR);
+        items.add(GuiUtils.makeCheckboxMenuItem("Show Html In Legend",
+                this,
+                "showHtmlInLegend",
+                null));
+        if (forMenuBar) {
+            JMenu hovMenu = viewManager.makeViewMenu();
+            hovMenu.setText("Text/Html View");
+            items.add(hovMenu);
+        }
+    }
+
+    /**
+     *  Get the ShowTableInLegend property.
+     *
+     *  @return The ShowTableInLegend
+     */
+    public boolean getShowHtmlInLegend() {
+        return showHtmlInLegend;
+    }
+
+    /**
+     *  Set the ShowTableInLegend property.
+     *
+     *  @param value The new value for ShowTable
+     */
+    public void setShowHtmlInLegend(boolean value) {
+        showHtmlInLegend = value;
+
+        if (sideLegendReadout != null  ) {
+            legendEditor.setVisible(value);
+            sideLegendReadout.setVisible(value);
+        }
+        updateLegendLabel();
+    }
+
+    /**
+     * Called by the {@link ucar.unidata.idv.IntegratedDataViewer} to
+     * initialize after this control has been unpersisted
+     *
+     * @param vc The context in which this control exists
+     * @param properties Properties that may hold things
+     * @param preSelectedDataChoices set of preselected data choices
+     */
+    public void initAfterUnPersistence(ControlContext vc,
+                                       Hashtable properties,
+                                       List preSelectedDataChoices) {
+        super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
+        try {
+            reload();
+        } catch (Exception dd){}
+    }
 
 }
