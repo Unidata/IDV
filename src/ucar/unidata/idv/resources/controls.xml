@@ -1284,12 +1284,12 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="textdisplay"
-     categories="text;html"
+     categories="none"
+     canstandalone="true"
      class="ucar.unidata.idv.control.TextDisplayControl"
      label="Text/HTML display"
      displaycategory="General"
-     properties="windowVisible=true; showInTabs=false;"/>
-
+     properties="windowVisible=true; showInTabs=true;"/>
 
   <control
      id="chatlogdisplay"
