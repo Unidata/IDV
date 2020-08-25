@@ -81,7 +81,8 @@ def ABIDayCloudPhaseRGB(b2A, b5A, b13T):
     # red = band 13; 280.65K to 219.56K rescaled to 0 to 255
     # grn = band 2; 0% to 78% rescaled to 0 to 255
     # blu = band 5; 1% to 59% rescaled to 0 to 255
-    red = rescale(b13T, 280.65, 219.65, 0, 255)
+    hr_b13T = resampleGrid(b13T, b2A)
+    red = rescale(hr_b13T, 280.65, 219.65, 0, 255)
     grn = rescale(b2A, 0, 78, 0, 255)
     blu = rescale(b5A, 1, 59, 0, 255)
     return combineRGB(red, grn, blu)
@@ -103,7 +104,8 @@ def ABIDayLandCloudRGB(b2A, b3A, b5A):
     # red = band5; 0% to 97.5% rescaled to 0 to 255
     # grn = band3; 0% to 108.6% rescaled to 0 to 255
     # blu = band2; 0% to 100% rescaled to 0 to 255
-    red = rescale(b5A, 0, 97.5, 0, 255)
+    hr_b5A = resampleGrid(b5A, b2A)
+    red = rescale(hr_b5A, 0, 97.5, 0, 255)
     grn = rescale(b3A, 0, 108.6, 0, 255)
     blu = rescale(b2A, 0, 100, 0, 255)
     return combineRGB(red, grn, blu)
@@ -114,7 +116,8 @@ def ABIDayLandCloudFireRGB(b2A, b3A, b6A):
     # red = band6; 0% to 100% rescaled to 0 to 255
     # grn = band3; 0% to 100% rescaled to 0 to 255
     # blu = band2; 0% to 100% rescaled to 0 to 255
-    red = rescale(b6A, 0, 100, 0, 255)
+    hr_b6A = resampleGrid(b6A, b2A)
+    red = rescale(hr_b6A, 0, 100, 0, 255)
     grn = rescale(b3A, 0, 100, 0, 255)
     blu = rescale(b2A, 0, 100, 0, 255)
     return combineRGB(red, grn, blu)
@@ -202,9 +205,22 @@ def ABIDayConvectionRGB(b2A, b5A, b7T, b8T, b10T, b13T):
     # red = band8 - band10; -35C to 5C rescalled to 0 to 255; gamma 1.0
     # grn = band7 - band13; -5C to 60C rescalled to 0 to 255; gamma 1.0
     # blu = band5 - band2; -0.75% to 0.25% rescalled to 0 to 255; gamma 1.0
-    red = rescale(b8T-b10T, -35, 5, 0, 255)
+    hr_b8T = resampleGrid(b8T, b2A)
+    hr_b10T = resampleGrid(b10T, b2A)
+    red = rescale(hr_b8T-hr_b10T, -35, 5, 0, 255)
     grn = rescale(b7T-b13T, -5, 60, 0, 255)
     blu = rescale(b5A-b2A, -0.75, 0.25, 0, 255)
+    return combineRGB(red, grn, blu)
+
+# ABI Cloud Type RGB
+def ABICloudTypeRGB(b4A, b2A, b5A):
+    # red = band 4; 0% to 10% rescaled to 0 to 255; gamma 2.5
+    # grn = band 2; 0% to 50% rescaled to 0 to 255; gamma 1.4
+    # blu = band 5; 0% to 50% rescaled to 0 to 255; gamma 1.5
+    hr_b4A = resampleGrid(b4A, b2A)
+    red = 255*(rescale(hr_b4A, 0, 10, 0, 1)**0.4)
+    grn = 255*(rescale(b2A, 0, 50, 0, 1)**0.7)
+    blu = 255*(rescale(b5A, 0, 50, 0, 1)**0.7)
     return combineRGB(red, grn, blu)
 
 # Split Ozone Channel Difference
