@@ -3,7 +3,8 @@ def AHINaturalColorRGB(b3A, b4A, b5A):
     # red = band5; 0% to 100% rescalled to 0 to 255
     # grn = band4; 0% to 100% rescalled to 0 to 255
     # blu = band3; 0% to 100% rescalled to 0 to 255
-    red = rescale(b5A, 0, 100, 0, 255)
+    hr_b5A = resampleGrid(b5A, b3A)
+    red = rescale(hr_b5A, 0, 100, 0, 255)
     grn = rescale(b4A, 0, 100, 0, 255)
     blu = rescale(b3A, 0, 100, 0, 255)
     return combineRGB(red, grn, blu)
@@ -43,7 +44,9 @@ def AHIDayConvectiveStormRGB(b3A, b5A, b7T, b8T, b10T, b13T):
     # red = band8 - band10; -35K to 5K rescaled to 0 to 255
     # grn = band7 - band13; -5K to 60K rescaled to 0 to 255; gamma 0.5
     # blu = band5 - band3; -75% to 25%% rescaled to 0 to 255
-    red = rescale(b8T-b10T, -35, 5, 0, 255)
+    hr_b8T = resampleGrid(b8T, b3A)
+    hr_b10T = resampleGrid(b10T, b3A)
+    red = rescale(hr_b8T-hr_b10T, -35, 5, 0, 255)
     grn = 255*(rescale(b7T-b13T, -5, 60, 0, 1)**2)
     blu = rescale(b5A-b3A, -75, 25, 0, 255)
     return combineRGB(red, grn, blu)
@@ -85,6 +88,16 @@ def AHIAirmassRGB(b8T, b10T, b12T, b13T):
     # blu = band8; 243K to 208K rescaled to 0 to 255
     red = rescale(b8T-b10T, -25, 0, 0, 255)
     grn = rescale(b12T-b13T, -40, 5, 0, 255)
+    blu = rescale(b8T, 243, 208, 0, 255)
+    return combineRGB(red, grn, blu)
+
+# AHI Tropical Airmass RGB
+def AHITropicalAirmassRGB(b8T, b10T, b12T, b13T):
+    # red = band8 - band10; -25K to 0K rescaled to 0 to 255
+    # grn = band12 - band13; -25K to 25K rescaled to 0 to 255
+    # blu = band8; 243K to 208K rescaled to 0 to 255
+    red = rescale(b8T-b10T, -25, 0, 0, 255)
+    grn = rescale(b12T-b13T, -25, 25, 0, 255)
     blu = rescale(b8T, 243, 208, 0, 255)
     return combineRGB(red, grn, blu)
 
