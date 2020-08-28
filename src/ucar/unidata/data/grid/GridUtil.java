@@ -37,12 +37,14 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 import ucar.nc2.constants.CF;
+import ucar.nc2.geotiff.GeoTiffWriter2;
 import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
 import ucar.nc2.time.Calendar;
 
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.LatLonPointImpl;
+import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.geoloc.projection.LambertConformal;
 import ucar.unidata.geoloc.projection.Mercator;
@@ -135,12 +137,7 @@ import java.io.OutputStream;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static ucar.unidata.util.LogUtil.logException;
 
@@ -5932,8 +5929,94 @@ public class GridUtil {
         return values;
     }
 
+    /**
+     * Convert the domain to the latlonRect
+     *
+     * @param domain  the domain set
+     *
+     * @return  the latlonrect
+     *
+     * @throws VisADException  problem converting points
+     */
+    public static LatLonRect getLatLonRect(GriddedSet domain)
+            throws VisADException {
+        boolean   isLatLon = isLatLonOrder(domain);
+        float[][] values   = getEarthLocationPoints(domain);
+        if ( !isLatLon) {
+            float[] tmp = values[0];
+            values[0] = values[1];
+            values[1] = tmp;
+        }
 
+        //normalize lon
+        values[1] = GeoUtils.normalizeLongitude(values[1]);
 
+        float maxlon = max(values[1]);
+        float minlon = min(values[1]);
+        float maxlat = max(values[0]);
+        float minlat = min(values[0]);
+        ucar.unidata.geoloc.LatLonPoint ul = new LatLonPointImpl(maxlat,
+                minlon);
+        ucar.unidata.geoloc.LatLonPoint lr = new LatLonPointImpl(minlat,
+                maxlon);
+
+        LatLonRect latLonRect = new LatLonRect(ul, lr);
+        return latLonRect;
+    }
+
+    public static float max(float[] array) {
+        // Validates input
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+
+        // Finds and returns max
+        float max = array[0];
+        int jj = 0;
+        while(Float.isNaN(max)){
+            jj++;
+            max = array[jj];
+        }
+        for (int j = jj; j < array.length; j++) {
+            if (Float.isNaN(array[j])) {
+                continue;
+            }
+            if (array[j] > max) {
+                max = array[j];
+            }
+        }
+
+        return max;
+    }
+
+    public static float min(float[] array) {
+        // Validates input
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+
+        // Finds and returns max
+        float min = array[0];
+        int jj = 0;
+        while(Float.isNaN(min)){
+            jj++;
+            min = array[jj];
+        }
+        for (int j = jj; j < array.length; j++) {
+            if (Float.isNaN(array[j])) {
+                continue;
+            }
+            if (array[j] < min) {
+                min = array[j];
+            }
+        }
+
+        return min;
+    }
     /**
      * test
      *
@@ -6447,6 +6530,16 @@ public class GridUtil {
             }
             // write the file
             ncfile.close();
+            /*
+            String fileOut = filename + ".tiff";
+            LatLonRect llRect = getLatLonRect(domainSet);
+            try (GeoTiffWriter2 tiffWriter2 = new GeoTiffWriter2(fileOut)) {
+                tiffWriter2.writeGrid(ncfile.getLocation(), getVarName(rTypes[0]), 0, 0, true, llRect);
+            }
+            *
+             */
+            //write nc to tiff
+
         } catch (Exception exc) {
             LogUtil.logException("Writing grid to netCDF file: " + filename,
                                  exc);
