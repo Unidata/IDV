@@ -268,7 +268,7 @@ public class GeoGridFlatField extends CachedFlatField {
                 try {
                     CoordinateAxis1DTime ccar = geoGrid.getCoordinateSystem().getRunTimeAxis();
                     CoordinateAxis1DTime cca = geoGrid.getCoordinateSystem().getTimeAxis1D();
-                    if(cca.getCoordBoundsDate(timeIndex) != null)
+                    if(cca != null && cca.getCoordBoundsDate(timeIndex) != null)
                         coordinateBounds = cca.getCoordBounds(timeIndex);
 
                     if(ccar != null) {
@@ -282,7 +282,7 @@ public class GeoGridFlatField extends CachedFlatField {
                         else
                             runTime = (CalendarDateTime) timesR.get(timeIndex);
                     }
-                    //System.out.println("Index = " + timeIndex + " Run hour = " + runTime + times.get(timeIndex) + "\n");
+                    //System.out.println("Index = " + timeIndex + " Run hour = " + runTime + " " + coordinateBounds[1]  + " "  + coordinateBounds[0]  + "\n");
                     //arr = geoGrid.readVolumeData(timeIndex);
                     arr = geoGrid.readDataSlice(0, ensIndex, timeIndex, -1, -1,
                             -1);
