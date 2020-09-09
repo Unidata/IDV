@@ -607,5 +607,12 @@
      label="I'm Still Feeling Lucky"/>
 
 
+    <datasource
+      id="NC-PointClooud"
+      factory="ucar.unidata.data.point.NetcdfPointCloudDataSource"
+      doesmultiples="true"
+      fileselection="true"
+      label="Point Cloud Data (netcdf)"/>
+
 
 </datasources>
