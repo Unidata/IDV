@@ -29,7 +29,7 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
 
 
     /**
-     * Create a new WRFHDNetcdfDataSource
+     * Create a new NetcdfPointCloudDataSource
      *
      *
      * @param fixedDataset  the data source
@@ -48,7 +48,7 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
     }
 
     /**
-     * Create a new WRFHDNetcdfDataSource
+     * Create a new NetcdfPointCloudDataSource
      *
      * @param descriptor    data source descriptor
      * @param source        source of data (filename/URL)
@@ -65,7 +65,7 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
 
 
     /**
-     * Create a new WRFHDNetcdfDataSource
+     * Create a new NetcdfPointCloudDataSource
      *
      * @param descriptor    data source descriptor
      * @param sources      sources of data (filename/URL)
@@ -82,7 +82,7 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
 
 
     /**
-     * Create a new WRFHDNetcdfDataSource
+     * Create a new NetcdfPointCloudDataSource
      *
      * @param descriptor    data source descriptor
      * @param sources        List source of data (filenames/URLs)
@@ -97,6 +97,13 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         super(descriptor, sources, properties);
     }
 
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
     protected FeatureDatasetPoint doMakeDataset(String file) {
         FeatureDatasetPoint pods = null;
         pods     = super.doMakeDataset(file);
@@ -105,6 +112,18 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         return pods;
     }
 
+    /**
+     * make the obs
+     *
+     * @param dataChoice the datachoice
+     * @param subset teh data selection
+     * @param bbox the bbox
+     * @param sample just a taste?
+     *
+     * @return the obs
+     *
+     * @throws Exception on badness
+     */
     protected FieldImpl makeObs(DataChoice dataChoice, DataSelection subset,
                                 LatLonRect bbox, boolean sample)
             throws Exception {
@@ -141,7 +160,9 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         return obs;
     }
 
-
+    /**
+     * _more_
+     */
     public void doMakeDataChoices() {
         super.doMakeDataChoices();
 
@@ -170,6 +191,19 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param dataChoice _more_
+     * @param category _more_
+     * @param dataSelection _more_
+     * @param requestProperties _more_
+     *
+     * @return _more_
+     *
+     * @throws RemoteException _more_
+     * @throws VisADException _more_
+     */
     protected Data getDataInner(DataChoice dataChoice, DataCategory category,
                                 DataSelection dataSelection,
                                 Hashtable requestProperties)
