@@ -226,6 +226,59 @@ def ddt(grid,timegradunit):
     raise VisADException("Well, this data is not a time series, hard to do a time derivative!")
   return GridUtil.setParamType(ddtgrid,newType,0)
 
+def ddt_centered(grid,timegradunit):
+  """ compute tendency (time derivative) using *centered* difference,
+      units of returned grid are units of grid per timegradient unit
+      timegradient unit can be month, day, hour, minute, seconds
+
+  """
+  from visad import Real
+  from visad import FunctionType
+  from visad import FieldImpl
+  from visad import RealType
+  from visad import Gridded1DDoubleSet
+  from ucar.visad.data import CalendarDateTime
+  from visad import CommonUnit
+  from visad import VisADException
+  if (GridUtil.isTimeSequence(grid)==1):
+    newTimeValues= []
+    timediffs=[]
+    ts = GridUtil.getTimeSet(grid)
+    if (str(timegradunit).lower() in ("mon","month","months")):
+       timefactor=86400.0*30
+       timegradunit="month"
+    elif (str(timegradunit).lower() in ("day","d","days")):
+       timefactor=86400.0
+       timegradunit="day"
+    elif (str(timegradunit).lower() in ("hr","hour","hours")):
+       timefactor=3600.0
+       timegradunit="hr"
+    elif (str(timegradunit).lower() in ("m","min","minute","minutes")):
+       timefactor=60.0
+       timegradunit="min"
+    elif (str(timegradunit).lower() in ("s","sec","second","seconds")):
+       timefactor=1.0
+       timegradunit="s"
+    else:
+       raise VisADException("Requested time gradient unit is ambigious,use month,day,hour etc")
+    for i in range(1,grid.getDomainSet().getLength()-1):
+       newTimeValues.append((ts[i-1].getValue()+ts[i+1].getValue())/2)
+       prevtime=float(ts[i-1].getValue(CommonUnit.secondsSinceTheEpoch))
+       nexttime=float(ts[i+1].getValue(CommonUnit.secondsSinceTheEpoch))
+       timediffs.append((nexttime-prevtime)/timefactor)
+    newTimes=Gridded1DDoubleSet(RealType.Time,[newTimeValues],len(newTimeValues),None,ts.getSetUnits(),None)
+    ddtgrid = FieldImpl(FunctionType(RealType.Time, grid.getSample(0).getType()), newTimes)
+    for i in range(grid.getDomainSet().getLength()-1):
+       diff=(grid.getSample(i+1)-grid.getSample(i-1)).divide(Real(timediffs[i])).divide(2.0)
+       ddtgrid.setSample(i,diff)
+    unitname=str(GridUtil.getParamType(grid).getComponent(0).getDefaultUnit())
+    print("["+unitname+"]/"+str(timegradunit))
+    newunit = Util.parseUnit("("+unitname+")/"+str(timegradunit))
+    newType = Util.makeRealType("ddt of "+getVarName(grid), newunit)
+  else:
+    raise VisADException("Well, this data is not a time series, hard to do a centered time derivative!")
+  return GridUtil.setParamType(ddtgrid,newType,0)
+
 def anomalyFromTimeMeans(grid,meanType="None"):
   """ Returns deviation from time means, timemean can be monthly, daily etc..
       eg.., meanType="day" will return deviation of each step from its
