@@ -268,7 +268,7 @@ def ddt_centered(grid,timegradunit):
        timediffs.append((nexttime-prevtime)/timefactor)
     newTimes=Gridded1DDoubleSet(RealType.Time,[newTimeValues],len(newTimeValues),None,ts.getSetUnits(),None)
     ddtgrid = FieldImpl(FunctionType(RealType.Time, grid.getSample(0).getType()), newTimes)
-    for i in range(grid.getDomainSet().getLength()-1):
+    for i in range(1,grid.getDomainSet().getLength()-1):
        diff=(grid.getSample(i+1)-grid.getSample(i-1)).divide(Real(timediffs[i])).divide(2.0)
        ddtgrid.setSample(i,diff)
     unitname=str(GridUtil.getParamType(grid).getComponent(0).getDefaultUnit())
