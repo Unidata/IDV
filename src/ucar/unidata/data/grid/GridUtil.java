@@ -42,6 +42,7 @@ import ucar.nc2.iosp.mcidas.McIDASAreaProjection;
 import ucar.nc2.time.Calendar;
 
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.gis.MapMaker;
 import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
@@ -127,13 +128,7 @@ import visad.util.DataUtility;
 
 import java.awt.geom.Rectangle2D;
 
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import java.rmi.RemoteException;
 
@@ -8855,4 +8850,45 @@ public class GridUtil {
         return glyphList;
     }
 
+    /**
+     * Process the glyph to Unionset.
+     *
+     * @param domainSet
+     * @param glyphs list of polygon glyph
+     *
+     */
+    public static UnionSet glyphsToMap(GriddedSet domainSet, List glyphs) throws Exception {
+        MapMaker mapMaker = new MapMaker();
+        SampledSet domain2D =
+                makeDomain2D( domainSet);
+        boolean isLatLon = GridUtil.isLatLonOrder(domainSet);
+
+        int lonIndex = isLatLon
+                ? 1
+                : 0;
+        Unit[]   du       = domain2D.getSetUnits();
+
+        for (DrawingGlyph glyph : (List<DrawingGlyph>) glyphs) {
+            float[][] lls = glyph.getLatLons();
+            if(du[lonIndex] != null) {
+                if (du[lonIndex].isConvertible(CommonUnit.radian)) {
+                    lls[1] = ucar.visad.GeoUtils.normalizeLongitude(lls[1]);
+
+                } else if (du[lonIndex].isConvertible(
+                        CommonUnits.KILOMETER)) {
+                    for (int i = 0; i < lls[1].length; i++) {
+                        lls[1][i] =
+                                (float) LatLonPointImpl.lonNormal(lls[1][i]);
+                    }
+                }
+            } else {
+                for (int i = 0; i < lls[1].length; i++) {
+                    lls[1][i] =
+                            (float) LatLonPointImpl.lonNormal(lls[1][i]);
+                }
+            }
+            mapMaker.addMap(lls);
+        }
+        return mapMaker.getMaps();
+    }
 }
