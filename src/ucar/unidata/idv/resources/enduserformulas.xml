@@ -511,7 +511,20 @@
     <operands/>
   </derived>
 
-
+  <derived
+      description="Subset field from Polygons"
+      formula="subsetFromGlyphs(Field,file1[type=file,isuser=true, filepattern=\.xgrf], inverse=0)"
+      id="subsetFromPolygon"
+      isdefault="false"
+      isenduser="true">
+    <categories>
+      <category
+          display="true"
+          value="Maps"/>
+      <category value="GRID-2D-*"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
 
   <derived description="Subset field from map" formula="subsetFromMap(Field, Map[categories=GIS-SHAPEFILE],inverse=0)" id="subsetFromMap" isdefault="false" isenduser="true">
     <categories>
