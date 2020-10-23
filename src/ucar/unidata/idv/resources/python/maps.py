@@ -274,3 +274,14 @@ def  subsetRangeWithProperty(range, mapSets):
                  newValues[0][indexArray[j]] = float(value);
     rangeObject.setSamples(newValues)
     return rangeObject;
+
+def  subsetFromGlyphs(field, glyphsFileName, fillValue=java.lang.Float.NaN,inverse=0):
+    """glyphsFile defines a list of polygons. This procedure fills the areas in the field that are not
+    enclosed by the polygons with the fill value. If inverse is 1 then it fills the areas that are
+    enclosed
+    """
+    glyphs = GridUtil.read(glyphsFileName)
+    domainSet = GridUtil.getSpatialDomain(field)
+    mapSets = GridUtil.glyphsToMap(domainSet, glyphs)
+
+    return subsetFromMap(field, mapSets, fillValue, inverse);
