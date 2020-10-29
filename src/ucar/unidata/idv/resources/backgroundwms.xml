@@ -6,14 +6,21 @@
          title="Blue Marble - Static"/>
 
   <wms
-     server="http://neowms.sci.gsfc.nasa.gov/wms/wms"
+     server="http://neo.sci.gsfc.nasa.gov/wms/wms"
      layer="BlueMarbleNG"
      title="Blue Marble - Dynamic"
      srs="CRS:84"
      format="image/png"
      version="1.3.0"
      bbox="90,-180,-90,180"/>
-
+  <wms
+      server="http://neo.sci.gsfc.nasa.gov/wms/wms"
+      layer="BlueMarbleNG-TB"
+      title="Blue Marble Topo- Dynamic"
+      srs="CRS:84"
+      format="image/png"
+      version="1.3.0"
+      bbox="90,-180,-90,180"/>
 
   <image file="/auxdata/images/bathymetrytopo.jpg"
          layer="fixed-bathymetrytopo"
@@ -91,49 +98,52 @@
 
 
   <wms
-     server="http://cwcgom.aoml.noaa.gov/erddap/wms/request"
-     layer="etopo180:altitude"
-     title="Global Topography - Dynamic"
-     srs="EPSG:4326"
-     format="image/png"
-     version="1.3.0"
-     bbox="90,-180,-90,180"/>
-
-
-  <wms
-     server="http://msrmaps.com/ogcmap.ashx"
-     layer="DRG"
-     title="Topographic Map"
-     srs="EPSG:4326"
-     format="image/jpeg"
-     version="1.1.1"
-     bbox="71.0,-168.0, 17.0,-65.0"/>
-  <wms
-     server="http://msrmaps.com/ogcmap.ashx"
-     layer="DOQ"
-     title="Digital Ortho-Quad"
-     srs="EPSG:4326"
-     format="image/jpeg"
-     version="1.1.1"
-     bbox="71.0,-168.0, 17.0,-65.0"/>
-
-  <wms
-     server="http://msrmaps.com/ogcmap.ashx"
-     layer="UrbanArea"
-     title="Urban Area"
-     srs="EPSG:4326"
-     format="image/jpeg"
-     version="1.1.1"
-     bbox="71.0,-168.0, 17.0,-65.0"/>
-
-  <wms
-     server="http://basemap.nationalmap.gov/arcgis/services/USGSShadedReliefOnly/MapServer/WMSServer"
+     server="https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
      layer="0"
-     title="CONUS Shaded Relief"
+     title="USGS Global Topography - Dynamic"
      srs="EPSG:4326"
-     format="image/png"
+     format="image/png24"
+     version="1.1.0"
+     bbox="89.000000,-179.999996,-89.000000,179.999996"/>
+
+
+  <wms
+      server="https://basemap.nationalmap.gov/arcgis/services/USGSImageryOnly/MapServer/WMSServer"
+      layer="0"
+      title="USGS Orthoimagery"
+      srs="EPSG:4326"
+      format="image/png24"
+      version="1.1.1"
+      bbox="89.000000,-179.999996,-89.000000,179.999996"/>
+
+  <wms
+      server="https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WMSServer"
+      layer="0"
+      title="USGS Imagery Topography"
+      srs="EPSG:4326"
+      format="image/png"
+      version="1.1.1"
+      bbox="89.000000,-179.999996,-89.000000,179.999996"/>
+
+  <wms
+      server="https://basemap.nationalmap.gov/arcgis/services/USGSShadedReliefOnly/MapServer/WMSServer"
+      layer="0"
+      title="USGS Shaded Relief"
+      srs="EPSG:4326"
+      format="image/png24"
+      version="1.1.1"
+      bbox="83.999861, -179.999989, -88.261376, 179.999996"/>
+
+  <wms
+     server="https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WMSServer"
+     layer="0"
+     title="USGS National Hydrography Dataset"
+     srs="EPSG:4326"
+     format="image/png24"
      version="1.1.1"
-     bbox="49.99997399808, -125.0, 23.99999999808, -65.99561456"/>
+     bbox="89.000000,-179.999996,-89.000000,179.999996"/>
+
+
 
   <image file="/auxdata/images/blue.jpg"
          layer="fixed-solid-blue"
