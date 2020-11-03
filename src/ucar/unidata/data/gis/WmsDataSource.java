@@ -201,7 +201,7 @@ public class WmsDataSource extends DataSourceImpl {
         for (int i = 0; i < wmsSelections.size(); i++) {
             WmsSelection selection = (WmsSelection) wmsSelections.get(i);
             layerList.add(new TwoFacedObject(selection.getTitle(),
-                                             selection.getLayer()));
+                    selection.getTitle() + "-layer=" +selection.getLayer()));
         }
         for (int i = 0; i < wmsSelections.size(); i++) {
             Hashtable properties = new Hashtable();
@@ -258,12 +258,15 @@ public class WmsDataSource extends DataSourceImpl {
 
         //Look if there was a layer that overrides the one in the data choice
         Object tfoLayer = requestProperties.get(PROP_LAYER);
-        if ((tfoLayer != null) && (tfoLayer instanceof TwoFacedObject)) {
-            String layer = ((TwoFacedObject) tfoLayer).getId().toString();
+        Object tfoTitle = requestProperties.get(PROP_TITLE);
+        if ((tfoLayer != null) ) {
+            String layer=tfoLayer.toString();
+            String title=tfoTitle.toString();
+
             for (int i = 0; i < wmsSelections.size(); i++) {
                 WmsSelection tmpSelection =
                     (WmsSelection) wmsSelections.get(i);
-                if (Misc.equals(tmpSelection.getLayer(), layer)) {
+                if (Misc.equals(tmpSelection.getTitle(), title) && Misc.equals(tmpSelection.getLayer(), layer)) {
                     wmsInfo = tmpSelection;
                     break;
                 }
