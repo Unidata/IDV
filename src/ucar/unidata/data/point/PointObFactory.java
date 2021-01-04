@@ -25,12 +25,14 @@ import au.gov.bom.aifs.osa.analysis.Barnes;
 
 import edu.wisc.ssec.mcidas.McIDASUtil;
 
-import ucar.ma2.DataType;
-import ucar.ma2.StructureData;
-import ucar.ma2.StructureMembers;
+import ucar.ma2.*;
 
 import ucar.nc2.Attribute;
+import ucar.nc2.NCdumpW;
+import ucar.nc2.Variable;
 import ucar.nc2.VariableSimpleIF;
+import ucar.nc2.constants.AxisType;
+import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -45,17 +47,22 @@ import ucar.nc2.ft.point.PointIteratorFiltered;
 import ucar.nc2.ft.point.StationFeature;
 import ucar.nc2.ft.point.StationFeatureImpl;
 import ucar.nc2.ft.point.StationTimeSeriesCollectionImpl;
+import ucar.nc2.ft.point.standard.PointDatasetStandardFactory;
 import ucar.nc2.ft.point.standard.StandardStationCollectionImpl;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
 
 import ucar.nc2.units.DateUnit;
+import ucar.nc2.units.TimeUnit;
 import ucar.nc2.util.IOIterator;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.sounding.CDMTrajectoryFeatureTypeInfo;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.Station;
 import ucar.unidata.util.*;
 
 import ucar.visad.GeoUtils;
@@ -105,23 +112,15 @@ import visad.georef.LatLonPoint;
 import visad.util.DataUtility;
 
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import java.io.*;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -1768,9 +1767,9 @@ public class PointObFactory {
             }
         } else if (fc instanceof StandardStationCollectionImpl) {
             collection = (StandardStationCollectionImpl) fc;
-            if ((llr != null) || (dateRange != null)) {
-                collection = ((StandardStationCollectionImpl)collection).flatten(llr, dateRange);
-            }
+            //if ((llr != null) || (dateRange != null)) {
+             //   collection = ((StandardStationCollectionImpl)collection).subset(llr, dateRange);
+            //}
         } else if (fc instanceof PointFeatureCC) {
             PointFeatureCC npfc =
                     (PointFeatureCC) fc;
@@ -1897,7 +1896,7 @@ public class PointObFactory {
         int numReals = numericTypes.size();
         int numStrings = stringTypes.size();
         int obIdx = 0;
-        int NUM = 1000;
+        int NUM = 10000;
         TupleType allTupleType = (allReals
                 ? new RealTupleType(
                 (RealType[]) numericTypes.toArray(
@@ -2054,98 +2053,108 @@ public class PointObFactory {
                     "found " + ismissing + "/" + missing
                             + " missing out of " + obIdx);
             dataIterator.close();
-        } else if( collection instanceof  StandardStationCollectionImpl){
-            StandardStationCollectionImpl ssci = (StandardStationCollectionImpl)collection;
-            // PointFeatureCollectionIterator dataIterator =
-            //collection.getPointFeatureIterator(-1);
-            //        ((StandardStationCollectionImpl)collection).getPointFeatureCollectionIterator(16384);
+        } else if( collection instanceof  StandardStationCollectionImpl || collection instanceof  StationTimeSeriesFeatureCollection){
+            //StationTimeSeriesFeatureCollection ssci = (StationTimeSeriesFeatureCollection)collection;
+            //List<StationBean> list = setStations(ssci.getStationFeatures());
+            //CalendarDate dd = CalendarDate.parseISOformat(null, "2020-07-01 00:00:00");
+           // CalendarDateRange cdr = new CalendarDateRange(dd, 0);
+            //PointFeatureCollection pfc = ssci.flatten(null, null);
+            NetcdfDataset dataset = (NetcdfDataset)input.getNetcdfFile();
+            String name = dataChoice.getName();
+            Variable dataVar = dataset.findVariable(name);
+            ArrayFloat.D2 dataValue = (ArrayFloat.D2)dataVar.read();
+            boolean is2Dtime = false;
+            ArrayDouble.D2 timeValue2D = null;
+            ArrayDouble.D1 timeValue1D = null;
+            CoordinateAxis timeAxis0 = dataset.findCoordinateAxis(AxisType.Time);
+            Array timeArray = timeAxis0.getOriginalVariable().read();
+            if(timeArray instanceof ArrayDouble.D2) {
+                is2Dtime = true;
+                timeValue2D = (ArrayDouble.D2)timeArray;
+            } else {
+                timeValue1D = (ArrayDouble.D1)timeArray;
+            }
 
-            CalendarDate cdate = null;
-            while (ssci.hasNext()) {
-                StationTimeSeriesFeature po = (StationTimeSeriesFeature) ssci.next();
-                iammissing = false;
-                obIdx++;
-                // StationTimeSeriesFeature el = po..next();
-                PointFeatureIterator pf = po.getPointFeatureIterator();
-                while (pf.hasNext()) {
-                    PointFeature pf0 = pf.next();
-                    cdate = pf0.getObservationTimeAsCalendarDate();
+            //CoordinateAxis1D timeAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Time);
+            CoordinateAxis1D latAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Lat);
+            CoordinateAxis1D lonAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Lon);
+            CoordinateAxis1D altAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Height);
+            int [] datashape = dataVar.getShape();
+            double [] latValue = latAxis.getCoordValues();
+            double [] lonValue = lonAxis.getCoordValues();
+            double [] altValue = null;
+            if(altAxis != null)
+                altValue = altAxis.getCoordValues();
+            int timelen = datashape[1];
+            int stalen = datashape[0];
 
-                    double elt0 = 0.0;
-                    if (!Double.isNaN(po.getAltitude() )) {
-                        elt0 = po.getAltitude();
-                    }
-                    elt = new EarthLocationLite(
-                            lat.cloneButValue(po.getLatitude()),
-                            lon.cloneButValue(po.getLongitude()),
-                            alt.cloneButValue(elt0));
-                    double[] realArray = new double[numReals];
-                    String[] stringArray = ((numStrings == 0)
-                            ? null
-                            : new String[numStrings]);
 
-                    // make the VisAD data object
-                    StructureData structure = pf0.getDataAll(); //po.getFeatureData();
-                    int stringCnt = 0;
-                    int realCnt = 0;
-                    if (needToAddStationId) {
-                        StationObsDatatype sod = (StationObsDatatype) po;
-                        stringArray[stringCnt++] = sod.getStation().getName();
-                    }
-                    boolean allMissing = true;
-
-                    // check for a missing flag
-                    member = structure.findMember(_isMissing);
-                    if (member != null) {
-                        value = structure.convertScalarInt(member);
-                        if (value == 1) {
-                            iammissing = true;
-                            ismissing++;
-                            missing++;
-                            continue;
-                        }
-                    }
-
-                    for (varIdx = varIdxBase; varIdx < numVars; varIdx++) {
-                        member =
-                                structure.findMember((String) shortNames[varIdx]);
-                        if (member == null) {
-                            continue;
-                        }
-                        if (!isVarNumeric[varIdx]) {
-                            svalue = structure.getScalarString(member);
-                            if (svalue.length() != 0) {
-                                allMissing = false;
-                            }
-                            stringArray[stringCnt++] = svalue;
-                        } else {
-                            value = structure.convertScalarFloat(member);
-                            if (value == value) {
-                                allMissing = false;
-                            }
-                            realArray[realCnt++] = value;
-                        }
-                    }
-                    /*
-                    if (allMissing  && !iammissing) {
-                        System.out.println("has all missing, but not iammissing: " + el);
-                    }
-                    */
-                    if (allMissing) {
-                        missing++;
+            //System.out.println("YYYYYYYYYYYYYYYYYYYYYYYYYY" + stalen);
+            if(is2Dtime) {
+                for (int i = 0; i < stalen; i++) {
+                    if (llr != null && !llr.contains(latValue[i], lonValue[i])) {
                         continue;
                     }
+                    double elt0 = 0.0;
+                    if (altAxis != null) {
+                        elt0 = altValue[i];
+                    }
+                    elt = new EarthLocationLite(
+                            lat.cloneButValue(latValue[i]),
+                            lon.cloneButValue(lonValue[i]),
+                            alt.cloneButValue(elt0));
 
-                    Tuple tuple = (allReals
-                            ? (Tuple) new DoubleTuple(
-                            (RealTupleType) allTupleType, realArray,
-                            allUnits)
-                            : new DoubleStringTuple(allTupleType,
-                            realArray, stringArray, allUnits));
+                    double[] realArray = new double[1];
+                    for (int j = 0; j < timelen; j++) {
+                        DateTime dtt = new DateTime(timeValue2D.get(i, j), DataUtil.parseUnit(timeAxis0.getUnitsString()));
+                        times.add(dtt);
+                        elts.add(elt);
+                        realArray[0] = dataValue.get(i, j);
+                        Tuple tuple = (Tuple) new DoubleTuple(
+                                (RealTupleType) allTupleType, realArray,
+                                allUnits);
 
-                    tuples.add(tuple);
-                    times.add(new DateTime(cdate.toDate()));
-                    elts.add(elt);
+                        tuples.add(tuple);
+                    }
+
+                    obIdx++;
+
+                    if (obIdx % NUM == 0) {
+                        if (!JobManager.getManager().canContinue(loadId)) {
+                            LogUtil.message("");
+                            return null;
+                        }
+                        LogUtil.message("Read " + obIdx + " observations");
+                    }
+                }
+            } else {
+                for (int i = 0; i < stalen; i++) {
+                    if (llr != null && !llr.contains(latValue[i], lonValue[i])) {
+                        continue;
+                    }
+                    double elt0 = 0.0;
+                    if (altAxis != null) {
+                        elt0 = altValue[i];
+                    }
+                    elt = new EarthLocationLite(
+                            lat.cloneButValue(latValue[i]),
+                            lon.cloneButValue(lonValue[i]),
+                            alt.cloneButValue(elt0));
+
+                    double[] realArray = new double[1];
+                    for (int j = 0; j < timelen; j++) {
+                        DateTime dtt = new DateTime(timeValue1D.get(j), DataUtil.parseUnit(timeAxis0.getUnitsString()));
+                        times.add(dtt);
+                        elts.add(elt);
+                        realArray[0] = dataValue.get(i, j);
+                        Tuple tuple = (Tuple) new DoubleTuple(
+                                (RealTupleType) allTupleType, realArray,
+                                allUnits);
+
+                        tuples.add(tuple);
+                    }
+
+                    obIdx++;
 
                     if (obIdx % NUM == 0) {
                         if (!JobManager.getManager().canContinue(loadId)) {
