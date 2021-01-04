@@ -63,6 +63,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.*;
 
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -853,7 +854,11 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
                     LatLonRect baseLLR =
                             dataSelection.getGeoSelection().getLatLonRect();
                     //LatLonRect newLLR = overrideGeoSelection.getLatLonRect();
-                    LatLonRect newLLR = navDisplay.getLatLonRect();
+                    getViewManager().setProjectionFromData(false);
+                    Rectangle2D bbox = navDisplay.getLatLonBox();
+                    LatLonPointImpl p1 = new LatLonPointImpl(bbox.getY(), bbox.getX());
+                    LatLonRect newLLR = new LatLonRect(p1, bbox.getHeight(), bbox.getWidth());
+                    //LatLonRect newLLR = navDisplay.getLatLonRect();
 
                     relocateDisplay(baseLLR, newLLR, false);
 
