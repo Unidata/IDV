@@ -37,11 +37,7 @@ import ucar.unidata.idv.control.chart.VerticalProfileChart;
 
 import ucar.unidata.ui.LatLonWidget;
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.ObjectListener;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.util.*;
 
 import ucar.visad.GeoUtils;
 import ucar.visad.display.Animation;
@@ -888,9 +884,123 @@ public class VerticalProfileControl extends LineProbeControl {
         items.add(GuiUtils.makeMenuItem("Save Chart Image...",
                                         getChart(),
                                         "saveImage"));
-
+        items.add(GuiUtils.makeMenuItem("Export Current Time as CSV...",
+                this,
+                "exportCsv"));
+        items.add(GuiUtils.makeMenuItem("Export All Times as CSV...",
+                this,
+                "exportCsvAllTimes"));
     }
 
+    /**
+     * Export the current time as csv
+     */
+    public void exportCsv() {
+        try {
+            Animation animation = getInternalAnimation();
+            int       step      = animation.getCurrent();
+            Set       aniSet    = animation.getSet();
+            Real[]    times     = Animation.getDateTimeArray(aniSet);
+            if (times.length == 0) {
+                return;
+            }
+            exportToCsv(new Real[] { times[step] });
+            //        GuiUtils.exportAsCsv(tableModel);
+            paramsTable.repaint();
+        } catch (Exception exc) {
+            logException("Exporting to csv", exc);
+        }
+    }
+    /**
+     * Export all times as csv
+     */
+    public void exportCsvAllTimes() {
+        try {
+            Animation animation = getInternalAnimation();
+            Set       aniSet    = animation.getSet();
+            Real[]    times     = Animation.getDateTimeArray(aniSet);
+            exportToCsv(times);
+            paramsTable.repaint();
+        } catch (Exception exc) {
+            logException("Exporting to csv", exc);
+        }
+    }
+
+
+    /**
+     * Export all times as csv
+     *
+     * @param times export given times as csv
+     */
+    public void exportToCsv(Real[] times) {
+        try {
+            String filename =
+                    FileManager.getWriteFile(Misc.newList(FileManager.FILTER_CSV,
+                            FileManager
+                                    .FILTER_XLS), FileManager
+                            .SUFFIX_CSV);
+            if (filename == null) {
+                return;
+            }
+           // amExporting = true;
+            List choices = getDataChoices();
+            Real [] levels = getGridDataInstance().getLevels();
+            if (times.length == 0) {
+                LogUtil.userMessage("No times to export");
+                return;
+            }
+
+            //Force the sampling. This sets the sample at the current location, time set, etc.
+            //setData(times[0], 0);
+            List rows = new ArrayList();
+            List cols;
+            cols = Misc.newList("Time", "Level");
+
+            for (int row = 0; row < choices.size(); row++) {
+                VerticalProfileInfo info = getVPInfo(row);
+                cols.add(getFieldName(row));
+            }
+            rows.add(cols);
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                for(int level = 0; level < levels.length; level++) {
+                    Real lev = levels[level];
+                    cols = Misc.newList("" + aniValue, "" + lev);
+                    rows.add(cols);
+                }
+
+            }
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                for (int row = 0; row < choices.size(); row++) {
+                    VerticalProfileInfo info = getVPInfo(row);
+                    //Set          timeSet1 = info..getTimeSet();
+                    Data rt = null;
+                    FieldImpl sample = info.getProfile(); //.getPointSample();
+                    if ((sample != null)) {
+                        rt = sample.evaluate(aniValue,
+                                info.getSamplingMode(),
+                                Data.NO_ERRORS);
+                    } else {
+                        rt = info.getProfile().getSample(0); //.getPointSample().getSample(0);
+                    }
+
+                    float[][] levelData = ((FlatField) rt).getFloats();
+
+                    for(int l = 0; l < levels.length; l++) {
+                        cols = (List) rows.get(timeIdx * levels.length  + 1 +l);
+                        cols.add(levelData[0][l]);
+                    }
+                }
+            }
+            DataUtil.writeCsv(filename, rows);
+        } catch (Exception exc) {
+            logException("Exporting to csv", exc);
+        }
+       // amExporting = false;
+    }
     /**
      * Make the view menu items
      *
@@ -1279,4 +1389,7 @@ public class VerticalProfileControl extends LineProbeControl {
 
     }
 
+    public boolean canExportData() {
+        return false;
+    }
 }
