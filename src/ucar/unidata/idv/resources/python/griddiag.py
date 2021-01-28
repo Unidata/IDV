@@ -711,3 +711,11 @@ def StormRelativeHelicity(u, v, bottom, top, ux=0, vy=0):
       bottom and top in meter
   """
   return GridMath.calculateHelicity(u ,v, bottom, top, ux, vy)
+
+def dryStaticEnergy(T,Z):
+    """ Calculates Dry Static Energy with Temperature and Geopotential Height. """
+    from ucar.visad.quantities import SpecificHeatCapacityOfDryAirAtConstantPressure,LatentHeatOfEvaporation,Gravity
+    cp=SpecificHeatCapacityOfDryAirAtConstantPressure.newReal()
+    g=Gravity.newReal()
+# Geopotential Height in GFS data is apparently Geopotential, so omit the g multiplication
+    return cp*T + Z
