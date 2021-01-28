@@ -529,12 +529,13 @@ public class DerivedDataChoice extends ListDataChoice {
                 unboundOperands.add(op);
                 continue;
             } else {
-
                 DataSelection ds0 = boundChoice.getDataSelection();
-                if (ds0 != null) {
+                if (boundChoice instanceof DirectDataChoice && ds0 != null) {
                     Object ud =
                         ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
-                    if (ud != null) {
+                    Object udd =
+                            dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+                    if (ud != null && udd !=null && udd.toString().equals("false")) {
                         dataSelection.putProperty(
                             DataSelection.PROP_USESTIMEDRIVER,
                             ((Boolean) ud).booleanValue());
@@ -629,18 +630,7 @@ public class DerivedDataChoice extends ListDataChoice {
             throws VisADException, RemoteException {
         //System.out.println("getting data for " + dataChoice.getName() + "," + dataOperand.getName());
         Object data = dataChoiceToData.get(dataOperand.getName());
-        if( requestProperties != null){
-            Object tmpProperty = requestProperties.get(PROP_FROMDERIVED);
-            Object ud = null;
-            if(dataSelection != null){
-                ud = dataSelection.getProperty(
-                        DataSelection.PROP_USESTIMEDRIVER);
-            }
 
-            if (tmpProperty != null && ud != null) {
-                dataSelection.putProperty(DataSelection.PROP_USESTIMEDRIVER, tmpProperty);
-            }
-        }
         if (data == null) {
             if (dataChoice.getClass().equals(ListDataChoice.class)) {
                 ListDataChoice ldc = (ListDataChoice) dataChoice;
