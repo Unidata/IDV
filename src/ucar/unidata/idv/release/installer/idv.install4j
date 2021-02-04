@@ -18,7 +18,7 @@
       <variable name="JREDIR" value="/share/idv" description="" category="" />
     </variables>
     <mergedProjects />
-    <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" windowsEnabled="false" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="/share/idv/Certificates/windows.p12" />
+    <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" windowsEnabled="true" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="/share/idv/Certificates/windows.p12" />
   </application>
   <files keepModificationTimes="false" missingFilesStrategy="warn" globalExcludeSuffixes="" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
     <filesets>
