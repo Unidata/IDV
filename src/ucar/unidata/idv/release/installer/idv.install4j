@@ -9,6 +9,7 @@
       <variable name="JREDIR" value="/share/idv" />
     </variables>
     <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" windowsEnabled="true" windowsPkcs12File="/share/idv/Certificates/windows.p12" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u282-b08" />
   </application>
   <files>
     <filesets>
@@ -45,10 +46,7 @@
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.bat" overwriteMode="5" fileMode="755" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/testIDV" overwriteMode="5" fileMode="755" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-linux.zip" overwriteMode="2" overrideOverwriteMode="true" />
-      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-solaris.zip" overwriteMode="2" overrideOverwriteMode="true" />
-      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-windows.zip" overwriteMode="2" overrideOverwriteMode="true" />
-      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d-macosx.zip" overwriteMode="2" overrideOverwriteMode="true" />
+      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d.zip" overwriteMode="2" overrideOverwriteMode="true" />
       <dirEntry mountPoint="837" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/mac" overwriteMode="2" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" overrideDirMode="true" />
       <fileEntry mountPoint="837" file="${compiler:SRCDIR}/libsrc/sunjce_provider.jar" overwriteMode="2" overrideOverwriteMode="true" />
     </entries>
@@ -469,7 +467,7 @@ if (!context.isUpdateInstallation()) {
                   <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
                   <property name="zipFile">
                     <object class="java.io.File">
-                      <string>j3d-windows.zip</string>
+                      <string>j3d.zip</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -484,7 +482,7 @@ if (!context.isUpdateInstallation()) {
                   <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
                   <property name="zipFile">
                     <object class="java.io.File">
-                      <string>j3d-linux.zip</string>
+                      <string>j3d.zip</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -493,13 +491,13 @@ if (!context.isUpdateInstallation()) {
                 <serializedBean>
                   <property name="destinationDirectory">
                     <object class="java.io.File">
-                      <string>jre.bundle/Contents/Home/jre/lib/ext</string>
+                      <string>jre.bundle/Contents/Home/lib/ext</string>
                     </object>
                   </property>
                   <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
                   <property name="zipFile">
                     <object class="java.io.File">
-                      <string>j3d-macosx.zip</string>
+                      <string>j3d.zip</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -514,7 +512,7 @@ if (!context.isUpdateInstallation()) {
                   <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
                   <property name="zipFile">
                     <object class="java.io.File">
-                      <string>j3d-solaris.zip</string>
+                      <string>j3d.zip</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -528,7 +526,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="replaceValue" type="string">jre="jre.bundle/Contents/Home/jre"</property>
+                  <property name="replaceValue" type="string">jre="jre.bundle/Contents/Home"</property>
                   <property name="searchValue" type="string">JRE_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
@@ -579,7 +577,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="replaceValue" type="string">-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/jre/lib/ext/"</property>
+                  <property name="replaceValue" type="string">-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/lib/ext/"</property>
                   <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
@@ -598,28 +596,13 @@ if (!context.isUpdateInstallation()) {
               <action name="Clean up zips" id="1075" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" actionElevationType="elevated">
                 <serializedBean>
                   <property name="backupForRollback" type="boolean" value="false" />
-                  <property name="files" type="array" class="java.io.File" length="5">
+                  <property name="files" type="array" class="java.io.File" length="2">
                     <element index="0">
                       <object class="java.io.File">
-                        <string>j3d-windows.zip</string>
+                        <string>j3d.zip</string>
                       </object>
                     </element>
                     <element index="1">
-                      <object class="java.io.File">
-                        <string>j3d-linux.zip</string>
-                      </object>
-                    </element>
-                    <element index="2">
-                      <object class="java.io.File">
-                        <string>j3d-solaris.zip</string>
-                      </object>
-                    </element>
-                    <element index="3">
-                      <object class="java.io.File">
-                        <string>j3d-macosx.zip</string>
-                      </object>
-                    </element>
-                    <element index="4">
                       <object class="java.io.File">
                         <string>osxjre.zip</string>
                       </object>
@@ -636,7 +619,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="replaceValue" type="string">jre="jre.bundle/Contents/Home/jre"</property>
+                  <property name="replaceValue" type="string">jre="jre.bundle/Contents/Home"</property>
                   <property name="searchValue" type="string">JRE_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
@@ -662,7 +645,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="replaceValue" type="string">-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/jre/lib/ext/"</property>
+                  <property name="replaceValue" type="string">-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/lib/ext/"</property>
                   <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
@@ -1064,12 +1047,9 @@ return console.askYesNo(message, true);
       <exclude>
         <entry location="runIDV.bat" />
         <entry location="simpleIDV.bat" />
-        <entry rootId="696" location="j3d-solaris.zip" />
-        <entry rootId="696" location="j3d-windows.zip" />
-        <entry rootId="696" location="j3d-macosx.zip" />
         <entry filesetId="835" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="linux-x86-1.8.0_51.tar.gz" manualJreEntry="true" />
+      <jreBundle jreBundleSource="generated" />
     </unixInstaller>
     <unixInstaller name="Linux 64" id="117" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
       <excludedComponents>
@@ -1092,12 +1072,9 @@ return console.askYesNo(message, true);
       </excludedBeans>
       <exclude>
         <entry location="runIDV.bat" />
-        <entry rootId="696" location="j3d-solaris.zip" />
-        <entry rootId="696" location="j3d-windows.zip" />
-        <entry rootId="696" location="j3d-macosx.zip" />
         <entry filesetId="835" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="linux-amd64-1.8.0_51.tar.gz" manualJreEntry="true" />
+      <jreBundle jreBundleSource="generated" />
     </unixInstaller>
     <windows name="Windows 32" id="8" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32">
       <excludedComponents>
@@ -1110,12 +1087,9 @@ return console.askYesNo(message, true);
         <launcher id="49" />
       </excludedLaunchers>
       <exclude>
-        <entry rootId="696" location="j3d-linux.zip" />
-        <entry rootId="696" location="j3d-solaris.zip" />
-        <entry rootId="696" location="j3d-macosx.zip" />
         <entry filesetId="835" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="windows-x86-1.8.0_51.tar.gz" manualJreEntry="true" />
+      <jreBundle jreBundleSource="generated" />
     </windows>
     <windows name="Windows 64" id="580" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true">
       <excludedComponents>
@@ -1128,12 +1102,9 @@ return console.askYesNo(message, true);
         <launcher id="49" />
       </excludedLaunchers>
       <exclude>
-        <entry rootId="696" location="j3d-linux.zip" />
-        <entry rootId="696" location="j3d-solaris.zip" />
-        <entry rootId="696" location="j3d-macosx.zip" />
         <entry filesetId="835" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="windows-amd64-1.8.0_51.tar.gz" manualJreEntry="true" />
+      <jreBundle jreBundleSource="generated" />
     </windows>
     <macosFolder name="Mac OS X" id="12" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32">
       <excludedLaunchers>
@@ -1155,11 +1126,8 @@ return console.askYesNo(message, true);
       </excludedBeans>
       <exclude>
         <entry location="runIDV.bat" />
-        <entry rootId="696" location="j3d-linux.zip" />
-        <entry rootId="696" location="j3d-solaris.zip" />
-        <entry rootId="696" location="j3d-windows.zip" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="macosx-amd64-1.8.0_51" />
+      <jreBundle jreBundleSource="generated" />
     </macosFolder>
     <unixInstaller name="Solaris 32/64" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
       <excludedComponents>
@@ -1184,12 +1152,9 @@ return console.askYesNo(message, true);
       </excludedBeans>
       <exclude>
         <entry location="runIDV.bat" />
-        <entry rootId="696" location="j3d-linux.zip" />
-        <entry rootId="696" location="j3d-windows.zip" />
-        <entry rootId="696" location="j3d-macosx.zip" />
         <entry filesetId="835" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="solaris-x86-1.8.0_51.tar.gz" manualJreEntry="true" />
+      <jreBundle jreBundleSource="generated" platform="solaris-amd64" />
     </unixInstaller>
     <unixInstaller name="Generic Unix (no JVM)" id="59" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_${compiler:NOJRE}_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
       <excludedComponents>
