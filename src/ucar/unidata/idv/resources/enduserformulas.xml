@@ -446,6 +446,20 @@
     <operands/>
   </derived>
   <derived
+      description="Time step precipitation accumulation"
+      formula="timeStepAccumulatedPrecip (Mixed_intervals Accumulation)"
+      id="timeStepAccumulatedPrecip"
+      label="timeStepPrecip"
+      isdefault="false"
+      isenduser="true">
+    <categories>
+      <category
+              display="true"
+              value="Grids"/>
+    </categories>
+    <category value="GRID-2D-*"/>
+  </derived>
+  <derived
      description="Resample grid"
      formula="resampleGrid(grid, gridwithNewDomain)"
      id="resampled grid"
