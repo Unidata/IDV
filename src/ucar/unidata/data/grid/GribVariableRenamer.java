@@ -8,6 +8,7 @@ import ucar.nc2.constants.CDM;
 import ucar.nc2.dt.GridDataset;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.grib.GribResourceReader;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil2;
 import java.io.IOException;
 import java.io.InputStream;
@@ -234,7 +235,7 @@ public class GribVariableRenamer {
 
     private List<VariableRenamerBean> readVariableRenameFile(String path) {
         java.util.List<VariableRenamerBean> beans = new ArrayList<>(1000);
-        try (InputStream is = GribResourceReader.getInputStream(path)) {
+        try (InputStream is = IOUtil.getInputStream(path, getClass())) {
             if (is == null) {
                 logger.warn("Cant read file " + path);
                 return null;
