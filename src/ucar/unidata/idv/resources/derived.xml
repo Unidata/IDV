@@ -1010,10 +1010,6 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands categories=""/>
   </derived>
-  <derived description="testfunc" formula="testFunc1000(field)" id="testfunc" isdefault="false" isenduser="true">
-    <categories/>
-    <operands/>
-  </derived>
   <derived description="Max over time steps" formula="maxOverTime(field)" id="Max over time steps" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Time Steps"/>
@@ -1075,12 +1071,20 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories=""/>
   </derived>
 
-  <derived description="Time step sum (D(T)=D(T)+D(T-1))" formula="timeStepSum(field,-1)" id="Time step sum" isdefault="false" isenduser="true">
+  <derived description="Time step dum (D(T)=D(T)+D(T-1))" formula="timeStepSum(field,-1)" id="Time step sum" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Time Steps"/>
     </categories>
     <operands categories=""/>
   </derived>
+
+  <derived description="Time step accumulation (Mixed_intervals Accumulatioon)" formula="timeStepAccumulatedPrecip(field)" id="Time step accumu" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Time Steps"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+
 
   <derived
      id="relh"
@@ -1124,12 +1128,12 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </operands>
   </derived>
   <derived
-        id="timeStepAccumulatedPrecip"
-        description="TimeStep Precipitation Accumulation (from %N1%)"
-        label="timeStepPrecip"
-        isdefault="true"
-        isenduser="true"
-        formula="timeStepAccumulatedPrecip (D1)">
+    id="timeStepAccumulatedPrecip"
+    description="Time step precipitation accumulation (from %N1%)"
+    label="timeStepPrecip"
+    isdefault="true"
+    isenduser="false"
+    formula="timeStepAccumulatedPrecip (D1)">
     <categories>
       <category
         value="inherit"
