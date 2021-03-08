@@ -23,7 +23,7 @@ package ucar.unidata.idv.control;
 
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriter;
-import ucar.nc2.rewrite.Rewrite;
+//import ucar.nc2.rewrite.Rewrite;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
