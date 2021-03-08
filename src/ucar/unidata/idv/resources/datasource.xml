@@ -151,7 +151,7 @@
      patterns="\.nc$,\.nc4$,\.cdf$,.*netCDF.*,\.ncml$,\.wmo$,\.WMO$,\.grb$,\.grib$,\.gr2,\.grib1$,\.grib2$,\.gem$,\.grd,GRID....$,\.grb2$,\.gb2$,\.gb1$"
      fileselection="true"
      doesmultiples="false"
-     label="Grid Coverage(netCDF/GRIB/OPeNDAP/GEMPAK)">
+     label="Grid Coverages (netCDF/GRIB/OPeNDAP/GEMPAK)">
     <property
      name="icon"
      value="/auxdata/ui/icons/3D.gif"/>
@@ -212,12 +212,12 @@
   </datasource>
 
   <datasource
-     id="FILE.RADAR"
-     patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,6500.*$,7000.*$,.*\.raw$"
-     fileselection="true"
-     doesmultiples="true"
-     factory="ucar.unidata.data.radar.CDMRadarDataSource"
-     label="Radar files (NEXRAD/DORADE/UF)"></datasource>
+          id="FILE.RADAR"
+          patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,6500.*$,7000.*$,.*\.raw$"
+          fileselection="true"
+          doesmultiples="true"
+          factory="ucar.unidata.data.radar.CDMRadarDataSource"
+          label="Radar files (NEXRAD/DORADE/UF)"></datasource>
 
   <datasource
      id="OPENDAP.Radial"
@@ -250,8 +250,14 @@
      factory="ucar.unidata.data.gis.KmlDataSource"
      fileselection="true"
      label="Google Earth Files KML/KMZ"
-     patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"
-/>
+     patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"/>
+
+  <!--datasource
+          id="JSON"
+          factory="ucar.unidata.data.gis.JsonDataSource"
+          fileselection="true"
+          label="Geo Json"
+          patterns="\.json$,\.geojson$"/-->
 
   <datasource
      id="GRX PLACEFILE"
