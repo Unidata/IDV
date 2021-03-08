@@ -73,7 +73,7 @@ public class UnidataTdsDataPathRemapper {
 
         ClassLoader cl = this.getClass().getClassLoader();
 
-        try (InputStream is = cl.getResourceAsStream(path)) {
+        try (InputStream is = IOUtil.getInputStream(path, getClass())) {
 
             if (is == null) {
                 System.out.println("Cant read file " + path);
