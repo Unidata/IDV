@@ -2272,7 +2272,7 @@ public class GeoGridDataSource extends GridDataSource {
         int finalIndex0 = index;
         if(bounds != null && bounds[1] != bounds[0]) {
             double min = bounds[1] - bounds[0];
-            for (int ii = index; ii <= lastindex; ii++) {
+            for (int ii = index+1; ii <= lastindex; ii++) {
                 bounds = cca.getCoordBounds(ii);
                 double tmp = bounds[1] - bounds[0];
                 if(tmp < min)
