@@ -23,6 +23,7 @@
     - [Create the mac.p12](#h-6A338CF1)
     - [Copy mac.p12 Onto fserv](#h-913285E9)
     - [Checking Your Work](#h-EA4E90ED)
+    - [Apple MacOS Notarization Process](#h-D2579EE8)
 
 
 
@@ -192,7 +193,7 @@ Fix the soft link for the IDV build:
 
 ```sh
 rm /share/idv/.keystore
-ln -s /share/idv/.keystore-2021 /share/idv/.keystore 
+ln -s /share/idv/.keystore-2021 /share/idv/.keystore
 ```
 
 Tomorrow, ensure the IDV nightly build has successfully completed without errors. Also, install the IDV JNLP (<https://www.unidata.ucar.edu/software/idv/nightly/webstart/IDV/idv.jnlp>) to verify it has been properly signed with the new certificate.
@@ -213,7 +214,7 @@ You only need to do this once each time the keystore is updated with a new certi
 
 ```sh
 find . -regex ".*\.\(jar\)" | xargs -I % sh -c \
-  'jarsigner % idv -tsa http://timestamp.digicert.com -keystore keystore-2021 -storepass xxx'  
+  'jarsigner % idv -tsa http://timestamp.digicert.com -keystore keystore-2021 -storepass xxx'
 ```
 
 You can verify the certificate has been properly signed with:
@@ -262,7 +263,7 @@ Send that `.csr` file over to CISL. They will respond with a `.cer` certificate 
 A `.cer` file is a binary version of a certificate file. Convert it to text format:
 
 ```sh
-openssl x509 -inform der -in idv.cer -out idv.crt 
+openssl x509 -inform der -in idv.cer -out idv.crt
 ```
 
 
@@ -274,7 +275,7 @@ For reasons that will be come clear shortly, you also need to extract the privat
 
 ```sh
 keytool -importkeystore -srckeystore idv.jks -destkeystore tmp.p12\
-        -deststoretype PKCS12 -srcalias idv 
+        -deststoretype PKCS12 -srcalias idv
 ```
 
 followed by
@@ -348,3 +349,61 @@ openssl x509 -inform DER -in codesign0 -text
 ```
 
 Examine the contents of the output (e.g., `codesign0` )for signature expiration information. This step will ensure your certificate has been properly installed.
+
+
+<a id="h-D2579EE8"></a>
+
+### Apple MacOS Notarization Process
+
+-   Background
+
+    On MacOS, Apple now requires DMGs to be "notarized". This process involves XCode tools (so you'll need to install that on MacOS), therefore this step cannot be done automatically as part of the regular IDV build process. Moreover, the current IDV build is pretty closely tied to the hardware it is running on. As a result, notarization will just have to be a "one-off" performed on MacOS at IDV release time. Note the DMG will need to already be signed by the regular build process, so this will be the last step before the release. You'll need a Apple Developer ID. Contact CISL Help Desk to have your Apple ID be part of the UCAR Apple developer organization. Beyond that here are the steps required to notarize the IDV.
+
+-   Preperation
+
+    -   Grab the DMG from the Unidata Web Server
+
+        ```shell
+        scp user@web:/web/content/downloads/idv/current/ftp/\*.dmg
+        ```
+
+    -   Primary Bundle ID
+
+        Obtain the `primary-bundle-id` from `Integrated Data Viewer Installer.app/Contents/Info.plist` `CFBundleIdentifier` element. (I acutally do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.) Obtain the passwrod from developer.apple.com.
+
+    -   app-specific Password
+
+        Obtain an app-specific password at <https://appleid.apple.com/> (see under the security section).
+
+-   Upload to Notarization Server
+
+    At this point, you are ready to upload the DMG to Apple for a notarization attempt.
+
+    ```shell
+    xcrun altool --notarize-app --primary-bundle-id <bundle ID> --file \
+          /tmp/idv_5_7u1_macos_installer.dmg -u chastang@ucar.edu -p \
+          <app-specific password>
+    ```
+
+    If this command was successful, you will get a token. If upload is not successful, you will get a legthy error log with some obscure error codes. In that case, just try again. Sometimes I had to try a few times before it works.
+
+    Hopefully, after a few minutes you will get an email saying that you application has been successfully notarized. If not successul, you'll
+
+    ```shell
+    xcrun altool --notarization-info <upload token> -u chastang@ucar.edu \
+        -p <app-specific password>
+    ```
+
+-   Stapling
+
+    The last step as part of the notarization is "stapling".
+
+    ```shell
+    xcrun stapler staple idv_5_7u1_macos_installer.dmg
+    ```
+
+-   Copy Stapled DMG Back to Web Server
+
+    ```shell
+    scp <dmg> user@web:/web/content/downloads/idv/current/ftp/
+    ```
