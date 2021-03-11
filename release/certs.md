@@ -369,7 +369,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
     -   Primary Bundle ID
 
-        Obtain the `primary-bundle-id` from `Integrated Data Viewer Installer.app/Contents/Info.plist` `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.) Obtain the password from developer.apple.com.
+        Obtain the `primary-bundle-id` from `Integrated Data Viewer Installer.app/Contents/Info.plist` `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.)
 
     -   app-specific Password
 
@@ -386,12 +386,14 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
     If this command was successful, you will get a token. If upload is not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes I had to try a few times before it works.
 
-    Hopefully, after a few minutes you will get an email saying that your application has been successfully notarized. If not successful, you'll
+    Hopefully, after a few minutes you will get an email saying that your application has been successfully notarized. If not successful, you'll have to run
 
     ```shell
     xcrun altool --notarization-info <upload token> -u <email> -p \
           <app-specific password>
     ```
+
+    This command will return a message that contains a URL where you can find the error log.
 
 -   Stapling
 
