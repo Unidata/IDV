@@ -359,7 +359,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
     On MacOS, Apple now requires DMGs to be "notarized". This process involves XCode tools (so you'll need to install that on MacOS), therefore this step cannot be done automatically as part of the regular IDV build process. Moreover, the current IDV build is pretty closely tied to the hardware it is running on. As a result, notarization will just have to be a "one-off" performed on MacOS at IDV release time. Note the DMG will need to already be signed by the regular build process, so this will be the last step before the release. You'll need a Apple Developer ID. Contact CISL Help Desk to have your Apple ID be part of the UCAR Apple developer organization. Beyond that here are the steps required to notarize the IDV.
 
--   Preperation
+-   Preparation
 
     -   Grab the DMG from the Unidata Web Server
 
@@ -369,7 +369,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
     -   Primary Bundle ID
 
-        Obtain the `primary-bundle-id` from `Integrated Data Viewer Installer.app/Contents/Info.plist` `CFBundleIdentifier` element. (I acutally do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.) Obtain the passwrod from developer.apple.com.
+        Obtain the `primary-bundle-id` from `Integrated Data Viewer Installer.app/Contents/Info.plist` `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.) Obtain the password from developer.apple.com.
 
     -   app-specific Password
 
@@ -385,9 +385,9 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
           <app-specific password>
     ```
 
-    If this command was successful, you will get a token. If upload is not successful, you will get a legthy error log with some obscure error codes. In that case, just try again. Sometimes I had to try a few times before it works.
+    If this command was successful, you will get a token. If upload is not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes I had to try a few times before it works.
 
-    Hopefully, after a few minutes you will get an email saying that you application has been successfully notarized. If not successul, you'll
+    Hopefully, after a few minutes you will get an email saying that you application has been successfully notarized. If not successful, you'll
 
     ```shell
     xcrun altool --notarization-info <upload token> -u chastang@ucar.edu \
