@@ -384,7 +384,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
           -u <email> -p <app-specific password>
     ```
 
-    If this command was successful, you will get a token. If upload is not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes I had to try a few times before it works.
+    If this command was successful, you will get a token. If upload was not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes, you'll to try a few times before it works.
 
     Hopefully, after a few minutes you will get an email saying that your application has been successfully notarized. If not successful, you'll have to run
 
