@@ -23,7 +23,7 @@
     - [Create the mac.p12](#h-6A338CF1)
     - [Copy mac.p12 Onto fserv](#h-913285E9)
     - [Checking Your Work](#h-EA4E90ED)
-    - [Apple MacOS Notarization Process](#h-D2579EE8)
+    - [Notarization](#h-D2579EE8)
 
 
 
@@ -353,11 +353,11 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
 <a id="h-D2579EE8"></a>
 
-### Apple MacOS Notarization Process
+### Notarization
 
 -   Background
 
-    On MacOS, Apple now requires DMGs to be "notarized". This process involves XCode tools (so you'll need to install that on MacOS), therefore this step cannot be done automatically as part of the regular IDV build process. Moreover, the current IDV build is pretty closely tied to the hardware it is running on. As a result, notarization will just have to be a "one-off" performed on MacOS at IDV release time. Note the DMG will need to already be signed by the regular build process, so this will be the last step before the release. You'll need a Apple Developer ID. Contact CISL Help Desk to have your Apple ID be part of the UCAR Apple developer organization. Beyond that, here are the steps required to notarize the IDV.
+    On MacOS, Apple now requires DMGs to be "notarized". This process involves XCode tools (so you'll need to install that on MacOS), therefore this step cannot be done automatically as part of the regular IDV build process. Moreover, the current IDV build is closely tied to the hardware it is running on. As a result, notarization will just have to be a "one-off" performed on MacOS at IDV release time. Note the DMG will need to already be signed by the regular build process, so this will be the last step before the release. You'll need a Apple Developer ID. Contact CISL Help Desk to have your Apple ID be part of the UCAR Apple developer organization. Beyond that, here are the steps required to notarize the IDV.
 
 -   Preparation
 
@@ -369,13 +369,13 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
     -   Primary Bundle ID
 
-        Obtain the `primary-bundle-id` from `Integrated Data Viewer Installer.app/Contents/Info.plist` `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.)
+        Obtain the `primary-bundle-id` from `/Volumes/idv/Integrated\ Data\ Viewer\ Installer.app/Contents/Info.plist`, `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.)
 
     -   app-specific Password
 
         Obtain an app-specific password at <https://appleid.apple.com/> (see under the security section).
 
--   Upload to Notarization Server
+-   Upload DMG to Notarization Server
 
     At this point, you are ready to upload the DMG to Apple for a notarization attempt.
 
@@ -384,12 +384,17 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
           -u <email> -p <app-specific password>
     ```
 
-    If this command was successful, you will get a token. If upload was not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes, you'll have to try a few times before it works.
-
-    Hopefully, after a few minutes you will get an email saying that your application has been successfully notarized. If not successful, you'll have to run
+    If this command was successful, you will get a message with a `RequestUUID` that looks something like this:
 
     ```shell
-    xcrun altool --notarization-info <upload token> -u <email> -p \
+    No errors uploading '/tmp/idv_5_7u1_macos_installer.dmg'.
+    RequestUUID = e8d76646-d018-468d-bb0f
+    ```
+
+    If the upload attempt was not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes, you'll have to try a few times before it works. Hopefully, after a few minutes you will get an email saying "Your Mac software was successfully notarized". If not successful, you'll have to run
+
+    ```shell
+    xcrun altool --notarization-info <RequestUUID> -u <email> -p \
           <app-specific password>
     ```
 
@@ -397,7 +402,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
 -   Stapling
 
-    The last step as part of the notarization is "stapling".
+    The last step as part of the notarization process is "stapling".
 
     ```shell
     xcrun stapler staple <idv>.dmg
