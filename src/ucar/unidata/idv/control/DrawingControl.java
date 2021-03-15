@@ -1581,6 +1581,8 @@ public class DrawingControl extends DisplayControlImpl {
                     icon = "/auxdata/ui/icons/StationaryFront16.gif";
                 } else if (type.equals(FrontDrawer.TYPE_TROUGH)) {
                     icon = "/auxdata/ui/icons/Trough16.gif";
+                } else if (type.equals(FrontDrawer.TYPE_WAVE_LINE)) {
+                    icon = "/auxdata/ui/icons/WaveLine.png";
                 }
 
                 commands.add(
