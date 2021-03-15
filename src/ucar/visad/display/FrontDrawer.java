@@ -99,6 +99,9 @@ public class FrontDrawer extends DisplayableData {
     /** identifier for dry line */
     public static final String TYPE_DRY_LINE = "DRY_LINE";
 
+    /** identifier for wave line */
+    public static final String TYPE_WAVE_LINE = "WAVE_LINE";
+
     /** identifier for total-totals */
     public static final String TYPE_TOTAL_TOTALS = "TOTAL_TOTALS";
 
@@ -127,7 +130,7 @@ public class FrontDrawer extends DisplayableData {
     /** base type to use */
     public static final String[] BASETYPES = { TYPE_COLD_FRONT,
             TYPE_WARM_FRONT, TYPE_OCCLUDED_FRONT, TYPE_STATIONARY_FRONT,
-            TYPE_TROUGH };
+            TYPE_TROUGH, TYPE_WAVE_LINE};
 
 
     /** all types */
@@ -139,7 +142,7 @@ public class FrontDrawer extends DisplayableData {
         TYPE_UPPER_LEVEL_JET, TYPE_DRY_LINE, TYPE_TOTAL_TOTALS,
         TYPE_LIFTED_INDEX, TYPE_ISOTHERMS, TYPE_THICKNESS_RIDGE,
         TYPE_LOWER_THERMAL_TROUGH, TYPE_UPPER_THERMAL_TROUGH,
-        TYPE_UNEVEN_LOW_LEVEL_JET
+        TYPE_UNEVEN_LOW_LEVEL_JET, TYPE_WAVE_LINE
     };
 
 
@@ -150,7 +153,7 @@ public class FrontDrawer extends DisplayableData {
         "Upper warm front", "Trough", "Ridge", "Moisture", "Low level jet",
         "Upper level jet", "Dry line", "Total totals", "Lifted index",
         "Isotherms", "Thickness ridge", "Lower thermal trough",
-        "Upper thermal trough", "Uneven low level jet"
+        "Upper thermal trough", "Uneven low level jet", "Wave line"
     };
 
 
@@ -178,7 +181,8 @@ public class FrontDrawer extends DisplayableData {
         0.1f,   // THICKNESS_RIDGE = 18
         0.05f,  // LOWER_THERMAL_TROUGH = 19
         0.1f,   // UPPER_THERMAL_TROUGH = 20
-        0.1f    // UNEVEN_LOW_LEVEL_JET = 21
+        0.1f,   // UNEVEN_LOW_LEVEL_JET = 21
+        0.1f    // WAVE_LINE = 22
     };
 
     /** lengths of first segment in graphics coordinates */
@@ -204,7 +208,8 @@ public class FrontDrawer extends DisplayableData {
         0.1f,   // THICKNESS_RIDGE = 18
         0.05f,  // LOWER_THERMAL_TROUGH = 19
         0.1f,   // UPPER_THERMAL_TROUGH = 20
-        0.2f    // UNEVEN_LOW_LEVEL_JET = 21
+        0.2f,   // UNEVEN_LOW_LEVEL_JET = 21
+        0.1f    // WAVE_LINE = 22
     };
 
     /** shape coordinates */
@@ -364,7 +369,7 @@ public class FrontDrawer extends DisplayableData {
             {
                 {
                     0.0f, 0.05f, 0.1f, 0.1f, 0.05f, 0.0f
-                }, {
+            }, {
                     0.04f, -0.06f, 0.04f, 0.06f, -0.04f, 0.06f
                 }
             }
@@ -443,9 +448,10 @@ public class FrontDrawer extends DisplayableData {
         {
             {
                 {
-                    0.0f, 0.05f, 0.1f, 0.1f, 0.05f, 0.0f
+                    0.0f, 0.025f, 0.05f, 0.075f, 0.1f, 0.1f, 0.075f, 0.05f,
+                    0.025f, 0.0f
                 }, {
-                    0.01f, -0.06f, 0.01f, 0.06f, -0.01f, 0.06f
+                    0.01f, 0.03f, 0.037f, 0.03f, 0.01f, 0.02f, 0.04f, 0.047f,0.04f, 0.02f
                 }
             }
         },
@@ -469,6 +475,18 @@ public class FrontDrawer extends DisplayableData {
                     0.0f, 0.05f, 0.1f, 0.1f, 0.05f, 0.0f
                 }, {
                     0.0f, 0.0f, 0.0f, 0.01f, 0.01f, 0.01f
+                }
+            }
+        },
+        // WAVE_LINE = 22
+        {
+            {
+                {
+                    0.0f, 0.025f, 0.05f, 0.075f, 0.1f, 0.1f, 0.075f, 0.05f,
+                    0.025f, 0.0f
+                }, {
+                    0.01f, 0.03f, 0.037f, 0.03f, 0.01f, 0.02f, 0.04f, 0.047f,
+                    0.04f, 0.02f
                 }
             }
         },
@@ -497,7 +515,8 @@ public class FrontDrawer extends DisplayableData {
         { 1.0f },        // THICKNESS_RIDGE = 18
         { 1.0f },        // LOWER_THERMAL_TROUGH = 19
         { 1.0f },        // UPPER_THERMAL_TROUGH = 20
-        { 0.5f }         // UNEVEN_LOW_LEVEL_JET = 21
+        { 0.5f },        // UNEVEN_LOW_LEVEL_JET = 21
+        { 0.5f }         // WAVE_LINE = 22
     };
 
     /** green values for repeating shapes */
@@ -523,7 +542,8 @@ public class FrontDrawer extends DisplayableData {
         { 1.0f },        // THICKNESS_RIDGE = 18
         { 1.0f },        // LOWER_THERMAL_TROUGH = 19
         { 1.0f },        // UPPER_THERMAL_TROUGH = 20
-        { 0.5f }         // UNEVEN_LOW_LEVEL_JET = 21
+        { 0.5f },        // UNEVEN_LOW_LEVEL_JET = 21
+        { 0.5f }         // WAVE_LINE = 22
     };
 
     /** blue values for shapes */
@@ -549,7 +569,8 @@ public class FrontDrawer extends DisplayableData {
         { 1.0f },        // THICKNESS_RIDGE = 18
         { 1.0f },        // LOWER_THERMAL_TROUGH = 19
         { 1.0f },        // UPPER_THERMAL_TROUGH = 20
-        { 1.0f }         // UNEVEN_LOW_LEVEL_JET = 21
+        { 1.0f },        // UNEVEN_LOW_LEVEL_JET = 21
+        { 1.0f }         // WAVE_LINE = 22
     };
 
     /** first shape array */
@@ -608,7 +629,8 @@ public class FrontDrawer extends DisplayableData {
                     0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.075f, 0.08f, 0.01f
                 }
             }
-        }
+        },
+        null // wave line = 22
     };
 
     /** first segment reds */
@@ -634,7 +656,8 @@ public class FrontDrawer extends DisplayableData {
         null,      //
         null,      //
         null,      //
-        { 0.5f }   // UNEVEN_LOW_LEVEL_JET = 21
+        { 0.5f },  // UNEVEN_LOW_LEVEL_JET = 21
+        null       // wave line = 22
     };
 
     /** first segment greens */
@@ -660,7 +683,8 @@ public class FrontDrawer extends DisplayableData {
         null,      //
         null,      //
         null,      //
-        { 0.5f }   // UNEVEN_LOW_LEVEL_JET = 21
+        { 0.5f },  // UNEVEN_LOW_LEVEL_JET = 21
+        null       // wave line = 22
     };
 
     /** first segment blues */
@@ -686,7 +710,8 @@ public class FrontDrawer extends DisplayableData {
         null,      //
         null,      //
         null,      //
-        { 1.0f }   // UNEVEN_LOW_LEVEL_JET = 21
+        { 1.0f },  // UNEVEN_LOW_LEVEL_JET = 21
+        null       // wave line = 22
     };
 
 
