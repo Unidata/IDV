@@ -132,7 +132,7 @@ Tomorrow, ensure the IDV nightly build has successfully completed without errors
 
 ### Java keystore file
 
-Java Web Start jars are signed by `release/build.xml` with a valid Java keystore file.
+Java Web Start jars are signed by `release/build.xml` with a valid Java keystore file as part of the build process.
 
 
 <a id="h-AF846180"></a>
