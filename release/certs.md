@@ -111,6 +111,8 @@ As of February 2021, the Certificate Services Manager workflow is broken. I work
 
 ### Copy windows.p12 onto fserv
 
+This step will ensure that `.p12` file is in the correct location for Install4J to actually sign the Windows `.exe`.
+
 First, make a back up copy of `fserv:/share/idv/Certificates/windows.p12` e.g.,:
 
 ```sh
@@ -130,7 +132,7 @@ Tomorrow, ensure the IDV nightly build has successfully completed without errors
 
 ### Java keystore file
 
-Java Web Start jars are signed by the Install4J build with a valid Java keystore file.
+Java Web Start jars are signed by `release/build.xml` with a valid Java keystore file.
 
 
 <a id="h-AF846180"></a>
