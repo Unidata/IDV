@@ -1622,7 +1622,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             return FileManager.SUFFIX_PNG;
         }
 
-        String defSuffix = FileManager.SUFFIX_JPG;
+        String defSuffix = FileManager.SUFFIX_PNG;
 
         if ((scriptingNode != null) && (movieFileName != null)) {
             final String suffix = IOUtil.getFileExtension(movieFileName);
@@ -1634,7 +1634,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     defSuffix = FileManager.SUFFIX_PNG;
                 } else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
                     defSuffix = FileManager.SUFFIX_JPG;
-                }  // TODO: GIF, AVI?
+                }  else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_GIF)) {
+                    defSuffix = FileManager.SUFFIX_PNG;
+                }  // TODO: AVI?
             }
 
             defSuffix = imageGenerator.applyMacros(scriptingNode,
@@ -2014,8 +2016,14 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         imageSize = new Dimension(dim.width, dim.height);
 
-        return robot.createScreenCapture(new Rectangle(loc.x, loc.y,
-                dim.width, dim.height));
+        BufferedImage image = null;
+        //return robot.createScreenCapture(new Rectangle(loc.x, loc.y,
+         //          dim.width, dim.height));
+        try {
+            image = viewManager.getMaster().getImage(false);
+        } catch (Exception e){}
+
+        return image;
     }
 
     /**
