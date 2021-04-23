@@ -1977,17 +1977,21 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         List<Image> images = new LinkedList<Image>();
         List<ViewManager> vms = viewManager.getDisplayWindow()
                 .getViewManagers();
-        if(components.size() == 1){
-            for (Component c : components) {
-                images.add(captureImage(c));
-            }
-        } else {
+
+        if( allViewsBtn.isSelected()){
             try {
                 for (ViewManager c : vms) {
                     images.add(c.getMaster().getImage(false));
                 }
             } catch (Exception e){}
-
+        } else if (mainDisplayBtn.isSelected()) {
+            try {
+                images.add(viewManager.getMaster().getImage(false));
+            } catch (Exception e){}
+        } else {
+            for (Component c : components) {
+                images.add(captureImage(c));
+            }
         }
 
         return ImageUtils.gridImages2(images, 0, Color.GRAY, cols);
@@ -2026,14 +2030,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
         imageSize = new Dimension(dim.width, dim.height);
 
-        BufferedImage image = null;
-        //return robot.createScreenCapture(new Rectangle(loc.x, loc.y,
-         //          dim.width, dim.height));
-        try {
-                image = viewManager.getMaster().getImage(false);
-        } catch (Exception e){}
-
-        return image;
+        return robot.createScreenCapture(new Rectangle(loc.x, loc.y,
+                dim.width, dim.height));
     }
 
     /**
