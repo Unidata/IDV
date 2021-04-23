@@ -1975,9 +1975,19 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     public Image captureImages(List<? extends Component> components, int cols)
             throws AWTException {
         List<Image> images = new LinkedList<Image>();
+        List<ViewManager> vms = viewManager.getDisplayWindow()
+                .getViewManagers();
+        if(components.size() == 1){
+            for (Component c : components) {
+                images.add(captureImage(c));
+            }
+        } else {
+            try {
+                for (ViewManager c : vms) {
+                    images.add(c.getMaster().getImage(false));
+                }
+            } catch (Exception e){}
 
-        for (Component c : components) {
-            images.add(captureImage(c));
         }
 
         return ImageUtils.gridImages2(images, 0, Color.GRAY, cols);
@@ -2020,7 +2030,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         //return robot.createScreenCapture(new Rectangle(loc.x, loc.y,
          //          dim.width, dim.height));
         try {
-            image = viewManager.getMaster().getImage(false);
+                image = viewManager.getMaster().getImage(false);
         } catch (Exception e){}
 
         return image;
