@@ -366,7 +366,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
     -   Grab the DMG from the Unidata Web Server
 
         ```shell
-        scp user@web:/web/content/downloads/idv/current/ftp/\*.dmg
+        scp user@web:/web/content/downloads/idv/current/ftp/\*.dmg .
         ```
 
     -   Primary Bundle ID
