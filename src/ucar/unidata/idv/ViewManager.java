@@ -147,30 +147,7 @@ import java.util.zip.ZipOutputStream;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Group;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
@@ -6261,9 +6238,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
             String whichComponent)
             throws AWTException {
         List<BufferedImage> bis = new LinkedList<BufferedImage>();
+        List<ViewManager> vms = this.getDisplayWindow()
+                .getViewManagers();
 
-        for (Component c : views) {
-            bis.add(makeBufferedImage(c, whichComponent));
+        if( allViewsBtn.isSelected()){
+            try {
+                for (ViewManager c : vms) {
+                    bis.add(c.getMaster().getImage(false));
+                }
+            } catch (Exception e){}
+        } else if (mainDisplayBtn.isSelected()) {
+            try {
+                bis.add(this.getMaster().getImage(false));
+            } catch (Exception e){}
+        } else {
+            for (Component c : views) {
+                bis.add(makeBufferedImage(c, whichComponent));
+            }
         }
 
         return bis;
@@ -6361,8 +6352,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
         BufferedImage image = null;
 
         try {
-            image = robot.createScreenCapture(new Rectangle(loc.x, loc.y,
-                    dim.width, dim.height));
+                image = robot.createScreenCapture(new Rectangle(loc.x, loc.y,
+                        dim.width, dim.height));
+
         } catch (Exception exc) {
             logException("Error capturing image for component:"
                          + whichComponent + " location:" + loc.x + "x"
