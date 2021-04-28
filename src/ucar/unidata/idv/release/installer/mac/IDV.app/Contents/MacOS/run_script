@@ -1,4 +1,4 @@
 #!/bin/sh
 cd ${installer:sys.installationDir}
-${installer:sys.installationDir}/runIDV &
+open /System/Applications/Utilities/Terminal.app --args  ${installer:sys.installationDir}/runIDV &
 exit 0
