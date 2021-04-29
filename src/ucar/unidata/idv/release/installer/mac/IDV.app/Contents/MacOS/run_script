@@ -1,4 +1,9 @@
 #!/bin/sh
-cd ${installer:sys.installationDir}
-open /System/Applications/Utilities/Terminal.app --args  ${installer:sys.installationDir}/runIDV &
+
+osascript <<EOD
+tell application "Terminal"
+    do script ${installer:sys.installationDir}/runIDV
+end tell
+EOD
+
 exit 0
