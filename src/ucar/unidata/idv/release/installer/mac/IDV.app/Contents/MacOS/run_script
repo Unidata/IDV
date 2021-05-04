@@ -2,7 +2,7 @@
 
 osascript <<EOD
 tell application "Terminal"
-    do script ${installer:sys.installationDir}/runIDV
+    do script "${installer:sys.installationDir}/runIDV"
 end tell
 EOD
 
