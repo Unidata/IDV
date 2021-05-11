@@ -1078,8 +1078,8 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
         //    levels = getGridDataInstance().getLevels();
         //}
 
-
-        setLevels(levels);
+        if(!reloadFromBounds)
+            setLevels(levels);
 
         myDisplay.setActive(false);
         myDisplay.setUseSpeedForColor(useSpeedForColor);
