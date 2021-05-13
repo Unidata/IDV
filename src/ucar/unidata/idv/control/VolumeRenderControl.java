@@ -44,9 +44,11 @@ import visad.*;
 
 import visad.georef.MapProjection;
 
+import visad.meteorology.SingleBandedImage;
 import visad.util.SelectRangeWidget;
 
 import visad.data.CachedFlatField;
+import visad.util.ThreadManager;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -274,11 +276,6 @@ public class VolumeRenderControl extends GridDisplayControl {
     protected void applyQuality()
             throws VisADException, RemoteException {
         if (myDisplay != null) {
-            //myDisplay.setCurvedSize(getTextureQuality());
-            //float[] lows  = xyzSet.getLow();
-            //float[] highs = xyzSet.getHi();
-            //Misc.printArray("lows",lows);
-            //Misc.printArray("highs",highs);
             //showWaitCursor();
             int xyResample0 = (int)(2.56 * getVolumeQuality());
             int zResample0 = (int)(1.28 * getVolumeQuality());
@@ -392,20 +389,15 @@ public class VolumeRenderControl extends GridDisplayControl {
     public void setQuality(int quality) {
         volumeQuality = quality;
         if (getHaveInitialized()) {
-            Misc.runInABit(1, new Runnable() {
-                public void run() {
-                    try {
-                        applyQuality();
-                    } catch (Exception exc) {
-                        logException("Applying z position", exc);
-                    }
-                }
-            });
-          /*  try {
+            try {
+                 showWaitCursor();
                 applyQuality();
             } catch (Exception exc) {
-                logException("Applying z position", exc);
-            } */
+                logException("loading volume data", exc);
+            } finally {
+                showNormalCursor();
+            }
+
         }
     }
 
@@ -447,7 +439,7 @@ public class VolumeRenderControl extends GridDisplayControl {
             // transforming the data
             long              start    = System.currentTimeMillis();
             setProjectionInView(true, true);
-            showWaitCursor();
+            //showWaitCursor();
             CoordinateSystem cs =
                 getNavigatedDisplay().getDisplayCoordinateSystem();
             if ((cs != null)
@@ -516,11 +508,11 @@ public class VolumeRenderControl extends GridDisplayControl {
                         int[][]  indices = new int[numLocs][];
                         float[][] weights = new float[numLocs][];
                         float[][] xyzLocs = volumeXYZ.getSamples(false);
-                        System.out.println("Time used to resample1 = "
-                                + (System.currentTimeMillis() - start) / 1000.0);
+                        //System.out.println("Time used to resample1 = "
+                         //       + (System.currentTimeMillis() - start) / 1000.0);
                         domainSet0.valueToInterp(xyzLocs, indices, weights);
-                        System.out.println("Time used to resample2 = "
-                                + (System.currentTimeMillis() - start) / 1000.0);
+                        //System.out.println("Time used to resample2 = "
+                        //        + (System.currentTimeMillis() - start) / 1000.0);
                         Trace.call1("VRC.makeLinearGrid");
                             //int[] lengths = domainSet.getLengths();
                             //Misc.printArray("lengths",lengths);
@@ -554,10 +546,6 @@ public class VolumeRenderControl extends GridDisplayControl {
                             newGrid.setSample(i, timeField, false);
 
                         }
-                        //ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-                        //ThreadInfo[] infos = bean.dumpAllThreads(true, true);
-                        System.out.println("Time used to resample = "
-                                + (System.currentTimeMillis() - start) / 1000.0);
                     }
                 } catch (VisADException ve) {
                     ve.printStackTrace();
@@ -567,7 +555,7 @@ public class VolumeRenderControl extends GridDisplayControl {
                     newGrid = grid;
                 }
             }
-            showNormalCursor();
+            //showNormalCursor();
         }
         Trace.call1("VRC.loadVolumeData.loadData");
         myDisplay.loadData(newGrid);
