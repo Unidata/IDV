@@ -437,7 +437,7 @@ public class VolumeRenderControl extends GridDisplayControl {
         if ( !usePoints) {
             // make sure the projection is correct before we start
             // transforming the data
-            long              start    = System.currentTimeMillis();
+            //long              start    = System.currentTimeMillis();
             setProjectionInView(true, true);
             //showWaitCursor();
             CoordinateSystem cs =
@@ -448,8 +448,8 @@ public class VolumeRenderControl extends GridDisplayControl {
                 MapProjectionDisplay mpd =
                         (MapProjectionDisplay) getNavigatedDisplay();
                 try {
-                    System.out.println("Time used to resample0 = "
-                            + (System.currentTimeMillis() - start) / 1000.0);
+                    //System.out.println("Time used to resample0 = "
+                    //        + (System.currentTimeMillis() - start) / 1000.0);
                     GriddedSet domainSet   = (GriddedSet) GridUtil.getSpatialDomain(grid);
                     SampledSet ss          = null;
                     boolean    latLonOrder = GridUtil.isLatLonOrder(domainSet);
