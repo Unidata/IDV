@@ -5910,6 +5910,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * for a filename and save the image to it.
      */
     public void doSaveImage() {
+        updateDisplayList();
         doSaveImage(false);
     }
 
