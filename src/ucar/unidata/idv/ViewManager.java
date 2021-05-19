@@ -5910,7 +5910,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * for a filename and save the image to it.
      */
     public void doSaveImage() {
-        updateDisplayList();
+        //updateDisplayList();
         doSaveImage(false);
     }
 
@@ -6090,7 +6090,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     quality = 0.2f;
                 }
 
-                if (false && mainDisplayBtn.isSelected()) {
+                if ( mainDisplayBtn.isSelected()) {
 
                     // For now we'll try the robot based capture for everything.
                     writeImage(new File(filename), false, quality);
