@@ -6090,7 +6090,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                     quality = 0.2f;
                 }
 
-                if (mainDisplayBtn.isSelected()) {
+                if (false && mainDisplayBtn.isSelected()) {
 
                     // For now we'll try the robot based capture for everything.
                     writeImage(new File(filename), false, quality);
