@@ -5893,8 +5893,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void writeImage(File file, boolean block, float quality) {
         toFront();
+        try {
+            master.setDisplayActive();
+        }catch (Exception ee){}
         Misc.sleep(100);
-        master.saveCurrentDisplay(file, false, block, quality);
+        master.saveCurrentDisplay(file, true, block, quality);
     }
 
     /**
