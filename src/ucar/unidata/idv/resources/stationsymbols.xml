@@ -2,6 +2,12 @@
 
 <symbols>
 
+    <symbol class="ucar.unidata.ui.symbol.ThreeDCrossSymbol"
+            name="3D location cross"
+            icon="/ucar/unidata/ui/symbol/images/3dcrossicon.gif"
+            attrs=""
+    />
+
    <symbol class="ucar.unidata.ui.symbol.TextSymbol" 
             name="Text"
             icon="/ucar/unidata/ui/symbol/images/text.gif" 
