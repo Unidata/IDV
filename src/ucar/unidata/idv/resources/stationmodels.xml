@@ -1,7 +1,118 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <object class="java.util.ArrayList">
-
-
+    <method name="add">
+        <object class="ucar.unidata.ui.symbol.StationModel">
+            <property name="Name">
+                <string><![CDATA[Locations - 3D cross]]></string>
+            </property>
+            <property name="List">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.apps.moc.ThreeDCrossSymbol">
+                            <property name="ParamIds">
+                                <array class="string" length="1">
+                                    <string><![CDATA[CC]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="1">
+                                    <string><![CDATA[3d Cross Symbol]]></string>
+                                </array>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1136998739211-1]]></string>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-10</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.apps.moc.ThreeDCrossSymbol">
+                            <property name="ParamIds">
+                                <array class="string" length="1">
+                                    <string><![CDATA[CC]]></string>
+                                </array>
+                            </property>
+                            <property name="ParamDescs">
+                                <array class="string" length="1">
+                                    <string><![CDATA[3d Cross Symbol]]></string>
+                                </array>
+                            </property>
+                            <property name="Id">
+                                <string><![CDATA[ID-1136999838563-0]]></string>
+                            </property>
+                            <property name="Foreground">
+                                <object class="java.awt.Color">
+                                    <constructor>
+                                        <int>255</int>
+                                        <int>0</int>
+                                        <int>255</int>
+                                    </constructor>
+                                </object>
+                            </property>
+                            <property name="Filled">
+                                <boolean>true</boolean>
+                            </property>
+                            <property name="BeingCreated">
+                                <boolean>false</boolean>
+                            </property>
+                            <field name="bounds">
+                                <object class="java.awt.Rectangle">
+                                    <constructor>
+                                        <int>-10</int>
+                                        <int>-10</int>
+                                        <int>20</int>
+                                        <int>20</int>
+                                    </constructor>
+                                </object>
+                            </field>
+                            <field name="underline">
+                                <java.lang.Boolean>false</java.lang.Boolean>
+                            </field>
+                            <field name="url">
+                                <null/>
+                            </field>
+                            <field name="baseline">
+                                <java.lang.Integer>0</java.lang.Integer>
+                            </field>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
     <method name="add">
         <object class="ucar.unidata.ui.symbol.StationModel">
             <property name="Name">
