@@ -8,7 +8,7 @@
             <property name="List">
                 <object class="java.util.ArrayList">
                     <method name="add">
-                        <object class="ucar.unidata.apps.moc.ThreeDCrossSymbol">
+                        <object class="ucar.unidata.ui.symbol.ThreeDCrossSymbol">
                             <property name="ParamIds">
                                 <array class="string" length="1">
                                     <string><![CDATA[CC]]></string>
@@ -59,7 +59,7 @@
                         </object>
                     </method>
                     <method name="add">
-                        <object class="ucar.unidata.apps.moc.ThreeDCrossSymbol">
+                        <object class="ucar.unidata.ui.symbol.ThreeDCrossSymbol">
                             <property name="ParamIds">
                                 <array class="string" length="1">
                                     <string><![CDATA[CC]]></string>
