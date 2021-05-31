@@ -745,11 +745,11 @@ public class WrfUtil extends  ucar.unidata.data.grid.GridUtil {
         obs[1] = new PointObTuple(el1, dt, sample1, rangeType0);
 
         EarthLocation el2 = new EarthLocationLite(lat0, lon0, lln[1]);
-        double[] distance2 = new double[]{lln[0]};
+        double[] distance2 = new double[]{lln[1]};
         Data sample2 = new RealTuple(rtt, distance2);
         obs[2] = new PointObTuple(el2, dt, sample2, rangeType0);
 
-        double[] distance = new double[]{pMax};
+        double[] distance = new double[]{alt0};
         Data sample = new RealTuple(rtt, distance);
         PointObTuple pot = new PointObTuple(el0, dt, sample, rangeType0);
         obs[0] = pot;
