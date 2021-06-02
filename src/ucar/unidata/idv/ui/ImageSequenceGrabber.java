@@ -1981,11 +1981,13 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         if( allViewsBtn.isSelected()){
             try {
                 for (ViewManager c : vms) {
+                    c.updateDisplayList();
                     images.add(c.getMaster().getImage(true));
                 }
             } catch (Exception e){}
         } else if (mainDisplayBtn.isSelected()) {
             try {
+                viewManager.updateDisplayList();
                 images.add(viewManager.getMaster().getImage(true));
             } catch (Exception e){}
         } else {
