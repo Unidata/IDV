@@ -2307,7 +2307,6 @@ abstract public class DisplayMaster {
         BufferedImage   image;
         if (display instanceof DisplayImpl) {
             renderer.setWaitMessageVisible(false);
-            ((DisplayImpl) display).reDisplayAll();
             image = ((DisplayImpl) display).getImage(doSync);
             renderer.setWaitMessageVisible(true);
         } else {
