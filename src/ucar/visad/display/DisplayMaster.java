@@ -2251,8 +2251,8 @@ abstract public class DisplayMaster {
         final File saveFile = toFile;
 
         try {
-            //Runnable captureImage = new Runnable() {
-             //   public void run() {
+            Runnable captureImage = new Runnable() {
+                public void run() {
                     LocalDisplay    display  = getDisplay();
                     DisplayRenderer renderer = display.getDisplayRenderer();
                     BufferedImage   image;
@@ -2274,18 +2274,18 @@ abstract public class DisplayMaster {
                     } catch (Exception err) {
                         LogUtil.logException("Problem saving image", err);
                     }
-           //     }
-            //};
-            //Thread t = new Thread(captureImage);
+                }
+            };
+            Thread t = new Thread(captureImage);
 
             //For some reason visad does not allow a getImage call
             //from an AWT-EventQueue thread. So we won't block here
             //so the getImage will be called from this new thread
-           // if (block) {
-            //    t.run();
-           // } else {
-            //    t.start();
-           // }
+            if (block) {
+                t.run();
+            } else {
+                t.start();
+            }
         } catch (Exception exp) {
             LogUtil.logException("Problem saving image", exp);
         }
@@ -2301,7 +2301,7 @@ abstract public class DisplayMaster {
      *
      * @throws Exception problem getting the image
      */
-    public synchronized BufferedImage getImage(final boolean doSync) throws Exception {
+    public BufferedImage getImage(final boolean doSync) throws Exception {
         LocalDisplay    display  = getDisplay();
         DisplayRenderer renderer = display.getDisplayRenderer();
         BufferedImage   image;
