@@ -1975,26 +1975,10 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     public Image captureImages(List<? extends Component> components, int cols)
             throws AWTException {
         List<Image> images = new LinkedList<Image>();
-        List<ViewManager> vms = viewManager.getDisplayWindow()
-                .getViewManagers();
 
-        if( allViewsBtn.isSelected()){
-            try {
-                for (ViewManager c : vms) {
-                    c.getMaster().setDisplayActive();
-                    images.add(c.getMaster().getImage(false));
-                }
-            } catch (Exception e){}
-        } else if (mainDisplayBtn.isSelected()) {
-            try {
-                viewManager.getMaster().setDisplayActive();
-                images.add(viewManager.getMaster().getImage(false));
-            } catch (Exception e){}
-        } else {
             for (Component c : components) {
                 images.add(captureImage(c));
             }
-        }
 
         return ImageUtils.gridImages2(images, 0, Color.GRAY, cols);
     }
