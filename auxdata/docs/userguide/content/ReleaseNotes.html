@@ -42,31 +42,37 @@ The items below reflect changes since the 5.7 release.
 
 <faqitem cat="Display Changes"></faqitem>
 
-
-<faqitem q="Color Tables" id="colorTableA">
+<faqitem id="gridcoveragetype" q="Grid Coverage and Cross Seam Subset" >
   <p>
-    New enhanced color tables have been added in this version, including AWIPS color tables and Satellite products customized
-    color tables.
-  </p>
-</faqitem>
-
-<faqitem q="NWS Hazard Warning" id="warningshapfile">
-  <p>
-    NWS Tornado, Severe Thunderstorm, Flash Flood and Special Marine Warning KML files were supported in this release.
-    A new menu item has been added to access the official NWS Warnings site directly under Data > Special data list.
-  </p>
-</faqitem>
-
-<faqitem id="gridcoveragetype" q="Grid Coverage and Cross Seam Subset">
-  <p>
-    The cross seam subsetting in the grid coverage type works similar to the grid file subsetting where
-    you can set the property for all fields in the Data Source or override the default for a particular
+    The cross seam subset in the grid coverage type works similar to the grid file subset where
+    you can set the property for subsetting all fields in the Data Source or override the default setting for a particular
     field in the field selector subset panel. The only difference in the Coverage data spatial subset is
     that it will allow users to flip longitudes in a cyclic rect linear grid from 0/360 to -180/180 (or vice-versa)
     before performing the cross seam subsetting.
   </p>
 </faqitem>
 
+<faqitem id="volumerenderdisplay" q="New Volume Rendering">
+  <p>
+    New enhanced volume rendering display applies linear 3D re-sampling and stack 2D algorithm to enhance the
+    texture of the volume rendering display.
+  </p>
+</faqitem>
+
+<faqitem id="texthtmldisplay" q="Text Html Display">
+  <p>
+    New enhanced Text/Html display avaiable under Displays > Special for displaying straight text or HTML, the display
+    can be added to the view window legend panel for descriptive text about the display.
+  </p>
+</faqitem>
+
+<faqitem id="displayimagequality" q="Image Capture Quality">
+  <p>
+    When doing the image or movie capture we replaced the original screen capture APIs with Java Canvas3D “OffScreenRendering”
+    to improve the image quality. Keep Java Robot screen capture APIs only when the IDV legend and Full window is needed.
+    Replaced JPEG with PNG as the base image format for the animated movie.
+  </p>
+</faqitem>
 
 <faqitem cat="Jython Changes"></faqitem>
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?> 
-     <jnlp spec="1.0" codebase = "https://www.unidata.ucar.edu/software/idv/webstart"> 
+     <jnlp spec="1.0" codebase = "https://www.unidata.ucar.edu/idv/webstart">
        <information> 
          <title>Integrated Data Viewer (IDV)</title> 
          <vendor>Unidata</vendor> 
