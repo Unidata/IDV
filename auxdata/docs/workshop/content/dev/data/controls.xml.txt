@@ -934,7 +934,7 @@ Example of how to make an image movie control with a fixed table of contents
      label="Pacdex Catalog Images"
      displaycategory="General"
      properties="windowVisible=true;">
-    <property name="tocFiles" value="http://www.unidata.ucar.edu/software/idv/data/pacdex/images/products.xml"/>
+    <property name="tocFiles" value="http://www.unidata.ucar.edu/idv/data/pacdex/images/products.xml"/>
     </control>
 -->
 

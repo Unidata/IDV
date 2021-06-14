@@ -159,7 +159,7 @@ idv.jnlp.template = /ucar/unidata/idv/resources/template.jnlp
 
 ##This is where we find the webstart code release 
 idv.jnlp.codebase.proplabel=JNLP code base
-idv.jnlp.codebase = http://www.unidata.ucar.edu/software/idv/webstart
+idv.jnlp.codebase = http://www.unidata.ucar.edu/idv/webstart
 
 
 ##Title used in the jnlp file
