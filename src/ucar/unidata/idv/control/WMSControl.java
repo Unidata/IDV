@@ -952,6 +952,8 @@ public class WMSControl extends ImageControl implements ImageObserver {
             Hashtable requestProperties = new Hashtable();
             if (theTitle != null) {
                 requestProperties.put(WmsDataSource.PROP_TITLE, theTitle);
+            } else if(theTitle == null && theLayer != null){
+                requestProperties.put(WmsDataSource.PROP_TITLE, theLayer);
             }
             if (theLayer != null) {
                 requestProperties.put(WmsDataSource.PROP_LAYER, theLayer);
