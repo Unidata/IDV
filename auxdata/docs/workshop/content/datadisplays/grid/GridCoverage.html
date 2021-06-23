@@ -1,0 +1,76 @@
+<html>
+<head>
+    <title>Cross Boundary Subset of Grid Coverage Data </title>
+</head>
+
+<body>
+
+<div class="overview">
+    <p>This section describes how to make plots from the cross boundary subset of  a cyclic rectilinear grid data.</p>
+</div>
+
+<p> The set of steps involve:</p>
+
+<ol class="step">
+
+    <li> [ht::clearDisplaysAndData]</li>
+
+    <li> Connecting to a remote data server and loading GFS one degree as grid coverage type data.
+        <ul class="substep">
+            <li>Open the <code class="dialog">Data Choosers</code> window.</li>
+            <li>Click on the <code class="command">Catalogs</code> node in the chooser tree.</li>
+            <li>From the catalog selector drop-down, select the Thredds data server
+                catalog:
+                <ul>
+                    <p>
+                        <b>https://thredds.ucar.edu/thredds/catalog.xml</b>
+                    <p>
+                </ul>
+                If it is not in the list, type it into the selector area and press
+                the <code class="command">Update</code> button. [ht::cutAndPasteTip]
+                <p>
+                    A tree view of the data catalog will be displayed in the window below
+                    the selector.</li>
+            <li>Expand the <code class="param">Realtime data from IDD</code>
+                tab, and then the <code class="param">Forecast Model Data</code> tab.</li>
+            <li>Select the latest collection for <code command="dataset">GFS One Degree - Global Coverage</code>
+                entry. </li>
+            <li>Specify the data source type to be <b>Grid Coverage(netCDF/GRIB/OPENDAP/GEMPAK)</b>
+                using the Data Source Type drop down menu and then press
+                the <code class="command">Add Source</code> button.</li>
+            <div class="cimg"><img src="images/CatalogChooser1.png"></div>
+
+        </ul>
+
+    <li>Cross Seam Spatial Subset
+        <ul>
+            <li> The IDV defualts the type of model data as "Grid files" type. Only the "Grid Coverage" type
+                has the feature of cross seam spatial subset. </li>
+            <li>Spatially subset the grid using the [ht::tab Spatial Subset] tab of
+                the Data Source Properties or the Field Selector. The [ht::button Flip map longitude] button
+                at the bottom of the panel flips longitudes in a cyclic rectilinear grid from
+                0/360 to -180/180 (or vice-versa) before performing the cross seam subsetting. </li>
+            <div class="cimg"><img src="images/DataSourceSpatialSubset1.png"></div>
+
+
+        </ul>
+
+    <li>  To make a 3D plot of a cross seam subset of GFS one degree data
+        <ul>
+            <li> In the <b>Fields</b> panel of data parameters that are categorized as 2D and 3D fields,
+                Click on the 3D grid tab (<img alt="icon" src=images/TreeTagClosed.gif>)
+                to expand that category list. Select a  parameter name as "Speed (from u-component_of_wind_isobaric &
+                u-component_of_wind_isobaric)". </li>
+            <li>Select "Isosurface" display in the 3D Surface Displays list and click on the <b>Create Display</b> button.
+                Create another Contour Plan View by selecting that display in the Plan Views Displays list and click
+                on the Create Display button. Both displays will be created and shown in the main window. </li>
+            <div class="cimg"><img src="images/IsoContours.gif"></div>
+
+            <li>For more information on time and spatial subset, see the [ht::dialog Data Source Properties]
+                page of this User's Guide.</li>
+
+        </ul>
+</ol>
+
+</body>
+</html>
