@@ -1,16 +1,16 @@
 <html><head>
-    <title>Cross Seam Subset from Grid Coverage Data Type</title>
+    <title>Cross Boundary Subset</title>
     <link href="../idv.css" rel="stylesheet" title="Style" type="text/css">
 </head>
 <body>
 
-This section describes how to make plots from <b>grid coverage type</b> data sets and
-cross seam subset of a cyclic rectilinear grid. The set of steps involve:
+This section describes how to make a cross boundary subset of a cyclic rectilinear grid
+as a <b>grid coverage type</b> dataset. The set of steps involve:
 <%childlist%>
 
 
 
-<subhead id="connecting" intoc="false">Connecting to a Data Source on a Remote Server with grid coverage type</subhead>
+<subhead id="connecting" intoc="false">Connecting to a Remote Server for a grid coverage type data</subhead>
 
 
 In the <a href="../data/choosers/index.html">Data Chooser</a> select the
@@ -33,23 +33,23 @@ for Unidata's catalog of near real-time model output.
 
     Specify the data source type to be <b>Grid Coverage(netCDF/GRIB/OPENDAP/GEMPAK)</b>
     using the [ug::menu {Data Source Type}] drop down menu. The IDV defualts the type
-    of model data as "Grid files". Only the "Grid Coverage" type has the feature of
-    cross seam spatial subset.
+    of model data as <b>Grid files(netCDF/GRIB/OPENDAP/GEMPAK)</b>.
+    Only the "Grid Coverage" type has the feature of cross boundary spatial subset.
 
 <p>
     The list of this model's run times appears. Click on "Best Time Series" or "Latest Collection" to select
     it, and then click on the <b>Add Source</b> button. You have selected
     the model output to be accessible by the IDV.
 
-    <subhead id="spatialsubset" intoc="false">Cross Seam Spatial Subsetting</subhead>
+    <subhead id="spatialsubset" intoc="false">Cross Boundary Spatial Subsetting</subhead>
 
-    You can spatially subset the grid using the [ug::tab Spatial Subset] tab of
+    You can spatially subset the grid on the [ug::tab Spatial Subset] tab of
     the Data Source Properties or the Field Selector.  This works similarly to
-    the grid file subset where you can set the property for all fields in the Data Source or
-    override the default for a particular field in the field selector subset panel.
-    The only difference in the Coverage data spatial subset is that the [ug::button Flip map longitude] button
+    the grid file subset where you can set properties for all fields of the Data Source or
+    override the default property for a particular field on the field selector subset panel.
+    The difference in the Coverage data spatial subset is that the [ug::button Flip map longitude] button
     at the bottom of the panel will allow user to flip longitudes in a cyclic rectilinear grid from
-    0/360 to -180/180 (or vice-versa) before performing the cross seam subsetting.
+    0/360 to -180/180 (or vice-versa) before performing the cross boundary spatial subset.
 
     [ht::cimg images/DataSourceSpatialSubset1.png]
 
@@ -59,7 +59,7 @@ for Unidata's catalog of near real-time model output.
     page of this User's Guide.
 
 
-    <subhead id="selecting" intoc="false">To make a cross seam 3D plot of GFS one degree
+    <subhead id="selecting" intoc="false">To make a cross boundary 3D plot of GFS one degree
         data</subhead>
 
 
@@ -67,13 +67,11 @@ for Unidata's catalog of near real-time model output.
     <a href="../data/FieldSelector.html">Field Selector window</a>.
     In the <b>Fields</b> panel are folders of data parameters categorized as 2D and 3D fields.
     Click on the 3D grid tab (<img alt="icon" src=../data/images/TreeTagClosed.gif>)
-    to expand that category list. All 3D grid
-    parameters in the data source groups into different categories, expand Momentum and
-    Derived, click on a  parameter name as "Speed (from u-component_of_wind_isobaric &
-    u-component_of_wind_isobaric)", create an "Isosurface" display by selecting that display
-    in the 3D Surface Displays list and click on the <b>Create Display</b> button. Create another
-    Contour Plan View by selecting that display in the Plan Views Displays list and click
-    on the Create Display button. Both displays will be created and shown in the main window.
+    to expand that category, further expand Momentum and
+    Derived tab, click on "Speed (from u-component_of_wind_isobaric &
+    u-component_of_wind_isobaric)" and select "Isosurface" display type,
+    click on the <b>Create Display</b> button to create a wind speed isosurface display. Create another
+    Contour Plan View in the Plan Views Displays list. Both displays will be created and shown in the main window.
 
     [ht::cimg images/IsoContours.gif]
 
