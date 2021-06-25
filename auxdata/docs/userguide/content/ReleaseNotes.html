@@ -40,7 +40,7 @@ The items below reflect changes since the 5.7 release.
   </p>
 </faqitem>
 
-<faqitem q="IDV Certifcates" id="cert">
+<faqitem id="cert" q="IDV Certifcates and Notarization">
 
   <p>
     Java Webstart, Windows app and MacOS certificates have been renewed and will
@@ -48,7 +48,7 @@ The items below reflect changes since the 5.7 release.
     2024). Moreover, as properly signing the IDV under these different
     environments can be an involved process, this information has thoroughly
     <a href="https://github.com/Unidata/IDV/blob/master/release/certs.md">documented
-    here</a>.
+    here</a>. The IDV MacOS installer in this release has been notarized by Apple in order to run by default on MacOS.
   </p>
 </faqitem>
 
@@ -81,7 +81,7 @@ The items below reflect changes since the 5.7 release.
 
 <faqitem id="displayimagequality" q="Image Capture Quality">
   <p>
-    When doing the image or movie capture we replaced the original screen capture APIs with Java Canvas3D “OffScreenRendering”
+    When doing the image capture we replaced the original screen capture APIs with Java Canvas3D “OffScreenRendering”
     to improve the image quality. Keep Java Robot screen capture APIs only when the IDV legend and Full window is needed.
     Replaced JPEG with PNG as the base image format for the animated movie.
   </p>
