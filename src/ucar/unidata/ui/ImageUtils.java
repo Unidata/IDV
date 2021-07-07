@@ -970,7 +970,7 @@ public class ImageUtils {
     public static String convertImageTo(String file, String newType) {
         try {
             String newFile = IOUtil.stripExtension(file) + "." + newType;
-            Image  image   = readImage(file);
+            Image  image   = readImage(file, false);
 
             writeImageToFile(image, newFile);
 
