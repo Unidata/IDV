@@ -205,4 +205,50 @@
     <params p1="190_Band2_ALB" p2="190_Band5_ALB" p3="190_Band7_TEMP" p4="190_Band8_TEMP" p5="190_Band10_TEMP" p6="190_Band13_TEMP"/>
     <params p1="192_Band2_ALB" p2="192_Band5_ALB" p3="192_Band7_TEMP" p4="192_Band8_TEMP" p5="192_Band10_TEMP" p6="192_Band13_TEMP"/>
   </paramgroup>
+  <paramgroup description="AHI Natural Color RGB" name="AHI_RGB_NaturalColor">
+    <params p1="86_Band3_ALB" p2="86_Band4_ALB" p3="86_Band5_ALB"/>
+    <params p1="286_Band3_ALB" p2="286_Band4_ALB" p3="286_Band5_ALB"/>
+    <params p1="287_Band3_ALB" p2="287_Band4_ALB" p3="287_Band5_ALB"/>
+    <params p1="288_Band3_ALB" p2="288_Band4_ALB" p3="288_Band5_ALB"/>
+  </paramgroup>
+  <paramgroup description="AHI Night Microphysics RGB" name="AHI_RGB_NightMicrophysics">
+    <params p1="86_Band7_TEMP" p2="86_Band13_TEMP" p3="86_Band15_TEMP"/>
+    <params p1="286_Band7_TEMP" p2="286_Band13_TEMP" p3="286_Band15_TEMP"/>
+    <params p1="287_Band7_TEMP" p2="287_Band13_TEMP" p3="287_Band15_TEMP"/>
+    <params p1="288_Band7_TEMP" p2="288_Band13_TEMP" p3="288_Band15_TEMP"/>
+    <params p1="himawari_8_ahi_channel_7_brightness_temperature" p2="himawari_8_ahi_channel_13_brightness_temperature" p3="himawari_8_ahi_channel_15_brightness_temperature"/>
+  </paramgroup>
+  <paramgroup description="AHI Day Convective Storm RGB" name="AHI_RGB_DayConvectiveStorm">
+    <params p1="86_Band3_ALB" p2="86_Band5_ALB" p3="86_Band7_TEMP" p4="86_Band8_TEMP" p5="86_Band10_TEMP" p6="86_Band13_TEMP"/>
+    <params p1="286_Band3_ALB" p2="286_Band5_ALB" p3="286_Band7_TEMP" p4="286_Band8_TEMP" p5="286_Band10_TEMP" p6="286_Band13_TEMP"/>
+    <params p1="287_Band3_ALB" p2="287_Band5_ALB" p3="287_Band7_TEMP" p4="287_Band8_TEMP" p5="287_Band10_TEMP" p6="287_Band13_TEMP"/>
+    <params p1="288_Band3_ALB" p2="288_Band5_ALB" p3="288_Band7_TEMP" p4="288_Band8_TEMP" p5="288_Band10_TEMP" p6="288_Band13_TEMP"/>
+  </paramgroup>
+  <paramgroup description="AHI Airmass RGB" name="AHI_RGB_Airmass">
+    <params p1="86_Band8_TEMP" p2="86_Band10_TEMP" p3="86_Band12_TEMP" p4="86_Band13_TEMP"/>
+    <params p1="286_Band8_TEMP" p2="286_Band10_TEMP" p3="286_Band12_TEMP" p4="286_Band13_TEMP"/>
+    <params p1="287_Band8_TEMP" p2="287_Band10_TEMP" p3="287_Band12_TEMP" p4="287_Band13_TEMP"/>
+    <params p1="288_Band8_TEMP" p2="288_Band10_TEMP" p3="288_Band12_TEMP" p4="288_Band13_TEMP"/>
+    <params p1="himawari_8_ahi_channel_8_brightness_temperature" p2="himawari_8_ahi_channel_10_brightness_temperature" p3="himawari_8_ahi_channel_12_brightness_temperature" p4="himawari_8_ahi_channel_13_brightness_temperature"/>
+  </paramgroup>
+  <paramgroup description="AHI Ash RGB" name="AHI_RGB_Ash">
+    <params p1="86_Band11_TEMP" p2="86_Band13_TEMP" p3="86_Band15_TEMP"/>
+    <params p1="286_Band11_TEMP" p2="286_Band13_TEMP" p3="286_Band15_TEMP"/>
+    <params p1="287_Band11_TEMP" p2="287_Band13_TEMP" p3="287_Band15_TEMP"/>
+    <params p1="288_Band11_TEMP" p2="288_Band13_TEMP" p3="288_Band15_TEMP"/>
+    <params p1="himawari_8_ahi_channel_11_brightness_temperature" p2="himawari_8_ahi_channel_13_brightness_temperature" p3="himawari_8_ahi_channel_15_brightness_temperature"/>
+  </paramgroup>
+  <paramgroup description="AHI True Color RGB" name="AHI_RGB_TrueColor">
+    <params p1="86_Band1_ALB" p2="86_Band2_ALB" p3="86_Band3_ALB"/>
+    <params p1="286_Band1_ALB" p2="286_Band2_ALB" p3="286_Band3_ALB"/>
+    <params p1="287_Band1_ALB" p2="287_Band2_ALB" p3="287_Band3_ALB"/>
+    <params p1="288_Band1_ALB" p2="288_Band2_ALB" p3="288_Band3_ALB"/>
+  </paramgroup>
+  <paramgroup description="AHI Dust RGB" name="AHI_RGB_Dust">
+    <params p1="86_Band11_TEMP" p2="86_Band13_TEMP" p3="86_Band15_TEMP"/>
+    <params p1="286_Band11_TEMP" p2="286_Band13_TEMP" p3="286_Band15_TEMP"/>
+    <params p1="287_Band11_TEMP" p2="287_Band13_TEMP" p3="287_Band15_TEMP"/>
+    <params p1="288_Band11_TEMP" p2="288_Band13_TEMP" p3="288_Band15_TEMP"/>
+    <params p1="himawari_8_ahi_channel_11_brightness_temperature" p2="himawari_8_ahi_channel_13_brightness_temperature" p3="himawari_8_ahi_channel_15_brightness_temperature"/>
+  </paramgroup>
 </paramgroups>
