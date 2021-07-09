@@ -22,6 +22,7 @@ package ucar.unidata.data.radar;
 
 
 import ucar.unidata.data.*;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
@@ -50,6 +51,7 @@ import java.util.List;
  * @version $Revision: 1.16 $
  */
 public class NetcdfRadarDataSource extends RadarDataSource {
+    DataSourceDescriptor descriptor = null;
 
     /** logging category */
     static LogUtil.LogCategory log_ =
@@ -89,6 +91,7 @@ public class NetcdfRadarDataSource extends RadarDataSource {
                                  List sources, Hashtable properties)
             throws VisADException {
         super(descriptor, sources, DATA_DESCRIPTION, properties);
+        this.descriptor = descriptor;
     }
 
     /**
@@ -129,11 +132,29 @@ public class NetcdfRadarDataSource extends RadarDataSource {
      * @throws Exception problem opening the file or creating the data
      */
     protected RadarAdapter makeRadarAdapter(String source) throws Exception {
+        source = convertSourceFile(source);
         NetcdfSweepfileAdapter adapter = new NetcdfSweepfileAdapter(this,
                                              source);
         //      System.err.println ("adapter:" + adapter.getScanMode() + " " + adapter.isPPI() + " " + adapter.isRHI() + " " + adapter.isSurvey());
 
         return adapter;
+    }
+
+    public String convertSourceFile(String source) throws Exception {
+        if ((descriptor != null) && (descriptor.getNcmlTemplate() != null)) {
+            String ncml = IOUtil.readContents(descriptor.getNcmlTemplate(),
+                    getClass());
+            String file = getDataContext().getObjectStore().getUniqueTmpFile(
+                    "ncmltemplate", ".ncml");
+            ncml = ncml.replace("%location%",
+                    "" + IOUtil.getURL(source, getClass()));
+            //            System.err.println ("ncml" + ncml);
+            IOUtil.writeFile(file, ncml);
+            return file;
+        }
+        //Convert the -1 port number on urls to blank
+        source = source.replace(":-1/", "/");
+        return source;
     }
 
     /**
