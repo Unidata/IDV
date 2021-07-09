@@ -371,7 +371,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
     -   Primary Bundle ID
 
-        Obtain the `primary-bundle-id` from `/Volumes/idv/Integrated\ Data\ Viewer\ Installer.app/Contents/Info.plist`, `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.)
+        Open the DMG you just fetched. This step will mount it into `/Volumes/idv`. Obtain the `primary-bundle-id` from `/Volumes/idv/Integrated\ Data\ Viewer\ Installer.app/Contents/Info.plist`, `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.)
 
     -   app-specific Password
 
@@ -393,18 +393,76 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
     RequestUUID = e8d76646-d018-468d-bb0f
     ```
 
-    If the upload attempt was not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes, you'll have to try a few times before it works. Hopefully, after a few minutes you will get an email saying "Your Mac software was successfully notarized". If not successful, you'll have to run
+    If the upload attempt was not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes, you'll have to try a few times before it works. Hopefully, after a few minutes you will get an email saying "Your Mac software was successfully notarized".
 
-    ```shell
-    xcrun altool --notarization-info <RequestUUID> -u <email> -p \
-          <app-specific password>
-    ```
+    -   Notarization Failures
 
-    This command will return a message that contains a URL where you can find the error log.
+        After upload to Apple, if there are notarization failures you will see an email from Apple Developer titled "Your Mac software was not notarized". In this case you will have to access the notarization failure with:
 
--   Stapling
+        ```shell
+        xcrun altool --notarization-info <RequestUUID> -u <email> -p \
+              <app-specific password>
+        ```
 
-    The last step as part of the notarization process is "stapling".
+        This command will return a message that contains a URL where you can find the error log. **Note** notarization failures are considered by Apple as "upload" failures. This language is somewhat confusing since the DMG may have uploaded to Apple without problems, but when the notarization process fails, it is **still** considered an "upload" failure.
+
+    -   Common Problems
+
+        The most common problem you may encounter is 32-bit code which the notarization process will reject:
+
+        ```yaml
+        {
+          "logFormatVersion": 1,
+          "jobId": "7c91ddea",
+          "status": "Invalid",
+          "statusSummary": "Archive contains critical validation errors",
+          "statusCode": 4000,
+          "archiveFilename": "idv_6_0_macos_installer.dmg",
+          "uploadDate": "2021-07-08T18:50:09Z",
+          "sha256": "e5d0afa",
+          "ticketContents": null,
+          "issues": [
+            {
+              "severity": "error",
+              "code": null,
+              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
+              "message": "The binary is not signed.",
+              "docUrl": null,
+              "architecture": "i386"
+            },
+            {
+              "severity": "error",
+              "code": null,
+              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
+              "message": "The signature does not include a secure timestamp.",
+              "docUrl": null,
+              "architecture": "i386"
+            },
+            {
+              "severity": "error",
+              "code": null,
+              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
+              "message": "The binary is not signed.",
+              "docUrl": null,
+              "architecture": "x86_64"
+            },
+            {
+              "severity": "error",
+              "code": null,
+              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
+              "message": "The signature does not include a secure timestamp.",
+              "docUrl": null,
+              "architecture": "x86_64"
+            }
+          ]
+        }
+        ```
+
+        In this case, make sure you obtain an `ncIdv.jar` from the THREDDS group that does not contain 32-bit code when building the IDV.
+
+-   Stapling After Successful Notarization
+
+    After the "successfully notarized" email from Apple, the last step as part of the notarization process is "stapling".
 
     ```shell
     xcrun stapler staple <idv>.dmg
