@@ -530,7 +530,7 @@ public class DerivedDataChoice extends ListDataChoice {
                 continue;
             } else {
                 DataSelection ds0 = boundChoice.getDataSelection();
-                if (boundChoice instanceof DirectDataChoice && ds0 != null) {
+                if (ds0 != null) {
                     Object ud =
                         ds0.getProperty(DataSelection.PROP_USESTIMEDRIVER);
                     Object udd =
