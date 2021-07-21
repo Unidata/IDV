@@ -2569,7 +2569,13 @@ public class GridTrajectoryControlNew extends DrawingControl {
                                        Hashtable properties,
                                        List preSelectedDataChoices) {
 
+        if(is2D && getCurrentLevel()!=null){
+            dataSelection = getDataSelection();
+            dataSelection.setFromLevel(currentLevel);
+            dataSelection.setToLevel(currentLevel);
+        }
         super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
+
         if(!getIdv().getInteractiveMode()) {
             try {
                 doMakeContents();
