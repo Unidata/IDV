@@ -296,9 +296,11 @@ public class GridCoverageAdapter {
             return levels;
         }
         int sizeZ =  zAxis.getNcoords();
+
         if (sizeZ == 0) {
             return levels;
         }
+
         boolean  isLinear = true; //checkLinearity(zAxis, false);
         Unit zUnit    = getUnit(zAxis.getUnits());
         boolean  isLatLon = gcs.getProjection().isLatLon();
@@ -320,9 +322,19 @@ public class GridCoverageAdapter {
 
 
         // System.err.println("realtype:" + zType + " " + zUnit);
-        for (int k = 0; k < sizeZ; k++) {
-            float kValue = (float) zAxis.getCoordsAsArray().getFloat(k); //.getCoordValue(k);
-            levels.add(new Real(zType, kValue, zUnit));
+        if(subsetParams != null && subsetParams.getVertCoordIntv() != null){
+            double [] vert = subsetParams.getVertCoordIntv();
+            double [] allLevels = zAxis.getValues();
+            for(int i = 0; i < allLevels.length; i++){
+                if(allLevels[i] >=vert[0] && allLevels[i] <=vert[1]) {
+                    levels.add(new Real(zType, allLevels[i], zUnit));
+                }
+            }
+        } else {
+            for (int k = 0; k < sizeZ; k++) {
+                float kValue = (float) zAxis.getValues()[k]; //.getCoordsAsArray().getFloat(k); //.getCoordValue(k);
+                levels.add(new Real(zType, kValue, zUnit));
+            }
         }
         return levels;
 
