@@ -99,13 +99,21 @@ cd /content/downloads/idv
 
 Expand the javadoc
 
+cd /web/docs/idv
+mkdir <release>
 cd /content/software/idv/<release>/docs
 jar xvf ~ftp/pub/idv/<release_dir>/idv_javadoc_<version>.jar
 cd docs
-mv javadoc ..
+mv javadoc /web/docs/idv/<release>/.
 cd ..
+mv userguide /web/docs/idv/<release>/.
+mv workshop /web/docs/idv/<release>/.
 rm -rf META-INF/ docs
 
+cd /we/docs/idv
+rm docs
+ln -s <release> docs
+edit index.html
 ********************************************************************************
 
 Generate the PDFs
@@ -124,10 +132,10 @@ Note that ant may not be on your path. Look for it in
 
 Look at the ant output and you will see where these PDFs are located.
 
-Once this is done, copy them to conan:
+Once this is done, copy them to robin:
 
-/content/software/idv/<release>/docs/userguide/userguide.pdf
-/content/software/idv/<release>/docs/workshop/workshop.pdf
+/web/docs/idv/<release>/userguide/userguide.pdf
+/web/docs/idv/<release>/workshop/workshop.pdf
 
 ********************************************************************************
 
