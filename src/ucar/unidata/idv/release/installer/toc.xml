@@ -17,12 +17,12 @@
     Guide for more information.
     </description>
 
-   <file url="ftp/idv_%_version%_windows_installer.exe" name="IDV %version% Installer for Windows XP/Vista/10">
+   <!--file url="ftp/idv_%_version%_windows_installer.exe" name="IDV %version% Installer for Windows XP/Vista/10">
         <description>
         Installer for IDV under Windows XP/Vista/10.
         <![CDATA[<a href="ftp/idv_%_version%_windows_installer.exe.MD5">MD5</a>]]>
         </description>
-   </file>
+   </file-->
    <file url="ftp/idv_%_version%_windows64_installer.exe" name="IDV %version% Installer for 64-bit Windows XP/Vista/10">
         <description>
         Installer for IDV under 64-bit Windows XP/Vista/10.
