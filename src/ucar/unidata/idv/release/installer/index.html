@@ -1,29 +1,152 @@
-<html><head>
-<title>IDV Release @IDV_VERSION_SPACE@</title>
-</head><body>
 
-@IDV_TITLE@<p>
+<!DOCTYPE html>
+<!--
+  This file should be uploaded to artifacts.unidata in the appropriate repository as "index.html".
+-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="IDV Downloads" name="description">
+    <link href="./idv_release.css" rel="stylesheet" type="text/css">
+    <title>IDV Downloads</title>
 
 
-<h3>Webstart</h3>
-<ul>
-<li> <a href="webstart/IDV/idv.jnlp">IDV</a>
-<li> <a href="webstart/IDV/idv_oneinstance.jnlp">One instance IDV</a>
-<li> <a href="webstart/IDV/workshopIdv.jnlp">Workshop IDV</a>
-<li> <a href="webstart/IDV/simpleidv.jnlp">Simple IDV</a>
+    <script id="update_these">
+        var dotVer = @IDV_VERSION@;  // version string with dot
+        var undVer = @IDV_VERSION@;  // version string with underscore
+        var releaseDate = "2021-07-29 17:13 UTC";    // release date
+    </script>
+
+    <script id="do_not_update">
+        window.onload = function () {
+            document.title = "IDV " + dotVer + " Downloads";
+            replaceClass('dv', dotVer);
+            replaceClass('rd', releaseDate);
+            replaceIDs();
+        };
+    </script>
+
+</head>
+
+<body>
+<h1>IDV version <span class="dv">[version unknown]</span> Download and Installation</h1>
+<p>
+    Install4j installers for supported platforms. See the
+    <a id="getStart">Downloading and Running the IDV</a>
+
+    section of the <em>IDV User's Guide</em> for more information.
+</p>
+<p>Release created <span class="rd">[release date unknown]</span></p>
+<h2>IDV <span class="dv">[version unknown]</span> Installers</h2>
+<ul class="downloads">
+    <li>
+        <a id="win32">Windows XP/Vista/10 32-bit Installer</a>
+    </li>
+    <li>
+        <a id="win64">Windows XP/Vista/10 64-bit Installer</a>
+    </li>
+    <li>
+        <a id="linux32">Linux 32-bit Installer</a>
+    </li>
+    <li>
+        <a id="linux64">Linux 64-bit Installer</a>
+    </li>
+    <li>
+        <a id="macos">macOS Installer</a>
+        Requires Mac OS X 10.7 or later.
+        See the <a id="idvSystems">System Requirements</a> section of the User's Guide for more information.
+    </li>
+    <li>
+        <a id="solaris">Solaris-x86 (64-bit) Installer</a>
+    </li>
+    <li>
+        <a id="java">Generic Java-based Installer</a> for systems with their own Java and Java 3D.
+    </li>
+</ul>
+<h2>IDV <span class="dv">[version unknown]</span> Code, Source, and Documentation</h2>
+<ul class="downloads">
+    <li>
+        <a id="idvJars">Zip file</a> of all Java Archive (JAR) files necessary to run the IDV applications.
+        See README.idv_jars included in the ZIP file for more information.
+    </li>
+    <li>
+        <a id="idvSources">Jar file</a> containing the IDV source code for the 6.0u1 release.
+        See the <a id="idvBuild">Building the IDV from Source</a> section of the User's Guide
+        for more information.
+    </li>
+    <li>
+        <a id="idvUserguide">Zip file</a> of the IDV User's Guide. (Also <a id="userguide">available online</a>.)
+    </li>
+    <li>
+        <a id="idvJavadocs">Jar file</a> containing the javadoc for the <span class="dv">[version unknown]</span> release.
+        (Also <a id="javadocs">available on-line</a>.)
+    </li>
+</ul>
+<h2>IDV <span class="dv">[version unknown]</span> Sample Data</h2>
+<ul class="downloads">
+    <li>
+        <a id="idvData">Zip file</a> of the local datasets needed for the some sections of the
+        <a id="idvWorkshop">IDV Training Workshop</a>.
+        See the section on <a id="idvWorkshopData">Installing Local Datasets</a> for more information.
+    </li>
 </ul>
 
-<h3>Documentation</h3>
-<ul>
-    <li> <a href="docs/userguide/index.html">User Guide</a>
-    <li> <a href="docs/workshop/index.html">Training Workshop</a>
-</ul>
+<script id="do_not_update">
+    var docPath = "https://docs.unidata.ucar.edu/idv/" + undVer;
+    var userguide = docPath + "/userguide/";
+    var javadocs = docPath + "/javadoc/";
+    var idvWorkshop = docPath + "/workshop/";
+    var idvWorkshopData = idvWorkshop + "installandstart/LocalData.html";
+    var getStart = docPath + "/userguide/Starting.html";
+    var idvSystems = docPath + "/userguide/Systems.html";
+    var idvBuild = docPath + "/userguide/misc/SourceBuild.html";
+    var downPath = "https://downloads.unidata.ucar.edu/idv/" + dotVer + "/";
+    var downFile = downPath + "idv_" + undVer;
+    var win32 = downFile + "_windows_installer.exe";
+    var win64 = downFile + "_windows64_installer.exe";
+    var linux32 = downFile + "_linux-i386_installer.sh";
+    var linux64 = downFile + "_linux64_installer.sh";
+    var macos = downFile + "_macos_installer.dmg";
+    var solaris = downFile + "_solaris-x86_intel_installer.sh";
+    var java = downFile + "_unix_nojre_installer.sh";
+    var idvJars = downPath + "idv_jars_" + dotVer + ".zip";
+    var idvSources = downPath + "idv_src_" + dotVer + ".jar";
+    var idvUserguide = downPath + "idv_userguide_" + dotVer + ".zip";
+    var idvJavadocs = downPath + "idv_javadoc_" + dotVer + ".jar";
+    var idvData = downPath + "sample_data/workshopdata.zip";
+    var linkIDs = ["userguide", "javadocs", "getStart",
+        "idvSystems", "idvBuild", "idvWorkshop", "idvWorkshopData",
+        "win32", "win64", "linux32", "linux64", "macos", "solaris",
+        "java", "idvJars", "idvSources", "idvUserguide", "idvJavadocs",
+        "idvData"];
 
-<h3>Downloads (requires a login to Unidata website)</h3>
-<ul>
 
-<li> <a href="/downloads/idv/@IDV_NAME@">Installers, JARS, and Source</a></tr>
+    function replaceClass(theClass, theVariable) {
+        //console.log(theClass);
+        //console.log(theVariable);
+        var c = document.getElementsByClassName(theClass);
+        var i;
+        for (i = 0; i < c.length; i++) {
+            c[i].innerHTML = theVariable;
+        }
+    }
+    function replaceID(theID, theVariable) {
+        //console.log("ID: "+theID);
+        //console.log("Var: "+theVariable);
+        document.getElementById(theID).setAttribute("href", theVariable);
+    }
 
-</ul>
+    function replaceIDs() {
+        var j;
+        for (j = 0; j < linkIDs.length; j++) {
+            //console.log("replace: "+linkIDs[j]);
+            //console.log("usevar: "+window[linkIDs[j]]);
+            replaceID(linkIDs[j], window[linkIDs[j]]);
+        }
+    }
+</script>
+</body>
 
-</body></html>
+</html>
