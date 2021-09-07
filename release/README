@@ -42,17 +42,16 @@ cd /share/idv/release
 svn update build.xml
 ./buildIdv release
 
-Note that this script has a dependency on install4j license server.
-The user running this script must point to the right license server.
-As of October 2011, the license server is running on abbott (not zero).
-License server configuration information can be found in ~/.install4j4/config.xml.
-Therein you will find the license server host. More information on the
-install4j license server (including where to download the server) can
-be found here:
+Note that this script has a dependency on the install4j license server.  The
+user running this script must point to the right license server.  As of August
+2021, the license server is running on license.unidata.ucar.edu.  License server
+configuration information can be found in ~/.install4j4/config.xml.  Therein you
+will find the license server host. More information on the install4j license
+server (including where to download the server) can be found here:
 
 https://www.unidata.ucar.edu/unidata_only/admin/idv_software_license_info.html
 
-To start the server on abbott the startup script is/etc/rc5.d/S98ejtserver
+To start the server on license.unidata.ucar.edu the startup script is/etc/rc5.d/S98ejtserver
 and the install at /opt/ejtserver.
 
 The above buildIdv command  will run the build, generate the installers, move all
@@ -256,9 +255,9 @@ means that only one copy can run at a time, but on any machine you want even VMs
 as long as it is on the Unidata network.
 
 Website for install4j is
-http://www.ej-technologies.com/products/install4j/overview.html.  The Unidata
-Admin staff has the license information.  The license server runs on abbott as
-of October 2011.
+http://www.ej-technologies.com/products/install4j/overview.html. Unidata
+admin staff has the license information.  The license server runs on
+license.unidata.ucar.edu as of August 2021.
 
 The install4j support staff is usually pretty responsive so contact them if you
 have trouble: ej-technologies Support <bugs@ej-technologies.com>
@@ -271,6 +270,21 @@ process.  At that point, the version number is filled in.
 To make configuration changes, run /share/install4j/bin/install4j and open the
 template.  After making changes, test the build and if it works as you expect,
 save the changes back to the template.
+
+In order to run the install4j client, it needs to communicate to a license
+server (the floating license option when starting the install4j client). If
+running install4j on the Unidata network at FL4, you simply need to point to
+license (license.unidata.ucar.edu), but if using the client from outside
+Unidata, you will have to establish an ssh tunnel to the license server via
+gate. From the command line:
+
+ssh <username>@gate.unidata.ucar.edu -L 11862:license.unidata.ucar.edu:11862
+
+(11862 is the default Install4j port.)
+
+Then from the install4j client make a "direct connection" to localhost. Do not
+go through the ssh tunneling steps in install4j since the tunnel is already
+established.
 
 JRE bundles:
 
