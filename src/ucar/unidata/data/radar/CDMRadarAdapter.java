@@ -330,8 +330,13 @@ public class CDMRadarAdapter implements RadarAdapter {
                         new Formatter());
 
             Trace.call2("CDMRadarAdapter:open dataset");
-            stationID      = rds.getRadarID();
-            stationName    = rds.getRadarName();
+            if(rds.getRadarName() != "XXX") {
+                stationID = rds.getRadarID();
+                stationName = rds.getRadarName();
+            } else {
+                stationID = "XXX";
+                stationName = "XXX";
+            }
             isVolume       = rds.isVolume();
             dataFormatName = rds.getDataFormat();
             Attribute sweepMode =
@@ -3486,6 +3491,8 @@ public class CDMRadarAdapter implements RadarAdapter {
         }
         RadialDatasetSweep.RadialVariable sweepVar =
             getRadialVariable(varName);
+        if(sweepVar == null)
+            return null;
         RadialDatasetSweep.Sweep varSweep   = sweepVar.getSweep(sweepNum);
         int                      numRadials = varSweep.getRadialNumber();
         int                      numGates   = varSweep.getGateNumber();
