@@ -652,6 +652,9 @@ public interface IdvConstants {
         DisplayControl.PREF_SAMPLING_MODE;
 
     /** The sampling mode preference */
+    public static final String PREF_APPEARANCEMODE = "AppearanceMode";
+
+    /** The sampling mode preference */
     public static final String PREF_VERTICALCS = PREF_DATAPREFIX
                                                  + "VerticalCS";
 
