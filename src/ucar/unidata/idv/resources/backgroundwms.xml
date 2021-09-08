@@ -5,6 +5,9 @@
          layer="fixed-bluemarble"
          title="Blue Marble - Static"/>
 
+  <image file="/auxdata/images/bluemarble4.jpeg"
+         layer="fixed-bluemarbleL"
+         title="Color Map- Static"/>
   <wms
      server="http://neo.sci.gsfc.nasa.gov/wms/wms"
      layer="BlueMarbleNG"
