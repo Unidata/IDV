@@ -435,6 +435,13 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                         store.put(PREF_SAMPLINGMODE,
                                   ((JRadioButton) widget).getText());
                     }
+                } else if (key.equals("Appearance_IDV")
+                        || key.equals("Appearance_DARK")
+                        || key.equals("Appearance_LIGHT")) {
+                    if (((JRadioButton) widget).isSelected()) {
+                        store.put(PREF_APPEARANCEMODE,
+                                ((JRadioButton) widget).getText());
+                    }
                 } else if (key.equals("SYSTEM_LOCALE")
                            || key.equals("US_LOCALE")) {
                     if (key.equals("SYSTEM_LOCALE")
@@ -1074,6 +1081,32 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
             { "Ask where to put zipped data files", PREF_ZIDV_ASK }
         };
         JPanel     panel2 = makePrefPanel(prefs2, widgets, getStore());
+        String defaultAppearanceMode =
+                getStore().get(PREF_APPEARANCEMODE,
+                        DisplayControlImpl.APPEARANCE_IDV);
+
+        JRadioButton appearanceIdv = new JRadioButton(
+                DisplayControlImpl.APPEARANCE_IDV,
+                defaultAppearanceMode.equals(
+                        DisplayControlImpl.APPEARANCE_IDV));
+
+        appearanceIdv.setToolTipText("IDV appearance");
+
+        JRadioButton appearanceDark = new JRadioButton(
+                DisplayControlImpl.APPEARANCE_DARK,
+                defaultAppearanceMode.equals(
+                        DisplayControlImpl.APPEARANCE_DARK));
+
+        appearanceDark.setToolTipText("DARK appearance");
+
+        JRadioButton appearanceLight = new JRadioButton(
+                DisplayControlImpl.APPEARANCE_LIGHT,
+                defaultAppearanceMode.equals(
+                        DisplayControlImpl.APPEARANCE_LIGHT));
+
+        appearanceLight.setToolTipText("LIGHT appearance");
+
+        GuiUtils.buttonGroup(appearanceIdv, appearanceDark, appearanceLight);
         Object[][] prefs3 = {
             { "Display Controls:", null },
             { "Show windows when they are created", PREF_SHOWCONTROLWINDOW },
@@ -1089,6 +1122,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
               Boolean.FALSE },
             { "Remove standalone displays",
               DisplayControl.PREF_STANDALONE_REMOVEONCLOSE, Boolean.FALSE },
+
             /*
              * { "Ask to remove standalone displays",
              * DisplayControl.PREF_STANDALONE_REMOVEONCLOSE_ASK,
@@ -1100,6 +1134,17 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
              */
         };
         JPanel panel3    = makePrefPanel(prefs3, widgets, getStore());
+
+        JPanel panel4 = GuiUtils.hbox(
+                GuiUtils.left(GuiUtils.rLabel("IDV Appearance: ")),
+                GuiUtils.left(appearanceIdv),
+                GuiUtils.left(appearanceDark),
+                GuiUtils.left(appearanceLight));
+
+        widgets.put("Appearance_IDV", appearanceIdv);
+        widgets.put("Appearance_DARK", appearanceDark);
+        widgets.put("Appearance_LIGHT", appearanceLight);
+
         JLabel timeLabel = GuiUtils.rLabel("");
 
         try {
@@ -1340,7 +1385,8 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         GuiUtils.tmpInsets = new Insets(5, 5, 5, 5);
 
-        JPanel rightPanel = panel3;
+        JPanel rightPanel = GuiUtils.inset(GuiUtils.vbox(panel3, panel4),
+                                            new Insets(0, 40, 0, 0));
         JPanel leftPanel = GuiUtils.inset(GuiUtils.vbox(panel1, panel2),
                                           new Insets(0, 40, 0, 0));
 
