@@ -21,6 +21,9 @@
 package ucar.unidata.idv;
 
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
@@ -34,6 +37,7 @@ import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.*;
 
 
 /**
@@ -46,7 +50,8 @@ import java.util.List;
 
 public class DefaultIdv extends IntegratedDataViewer {
 
-
+    /** appearance */
+    private String appearanceMode;
     /**
      * Parameterless ctor. Why? I'm not quite sure.
      *
@@ -67,6 +72,18 @@ public class DefaultIdv extends IntegratedDataViewer {
 
     public DefaultIdv(String[] args) throws VisADException, RemoteException {
         super(args);
+        this.appearanceMode =
+                getStore().get(PREF_APPEARANCEMODE,
+                        DisplayControlImpl.APPEARANCE_IDV);
+
+        try {
+            if(this.appearanceMode.equals("dark") )
+                UIManager.setLookAndFeel( new FlatDarkLaf() );
+            else if(this.appearanceMode.equals("light"))
+                UIManager.setLookAndFeel( new FlatLightLaf() );
+        } catch( Exception ex ) {
+            System.err.println( "Failed to initialize LaF" );
+        }
         init();
     }
 
@@ -119,9 +136,6 @@ public class DefaultIdv extends IntegratedDataViewer {
       }catch(Exception exc) {
       }
     */
-
-
-
 
     /**
      * The main. Configure the logging and create the DefaultIdv
