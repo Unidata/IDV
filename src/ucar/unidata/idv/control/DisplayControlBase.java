@@ -235,6 +235,15 @@ public abstract class DisplayControlBase extends SharableImpl {
     /** What is the default samppling mode */
     protected static String DEFAULT_SAMPLING_MODE = WEIGHTED_AVERAGE;
 
+    /** String used  to set the appearance mode */
+    public static final String APPEARANCE_IDV = "idv";
+
+    /** String used  to set the appearance mode */
+    public static final String APPEARANCE_DARK = "dark";
+
+    /** String used  to set the appearance mode */
+    public static final String APPEARANCE_LIGHT = "light";
+
     /** Used for doing doLayout calls */
     protected static final Insets GRID_INSETS = new Insets(4, 4, 4, 4);
 
