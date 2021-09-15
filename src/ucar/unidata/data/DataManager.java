@@ -1611,19 +1611,33 @@ public class DataManager {
                         try {
                             dataSource.initAfterCreation();
                             break;
-                        } catch (WrapperException e) {
-                            if ((accountManager == null)
-                                    || (accountManager.getCredentials()
-                                        == null)) {
+                        } catch (WrapperException e ) {
+                            if ((accountManager == null)) {
                                 throw e;  //no id and pwd enter
                             }
-                            if (e.getException().getCause().getMessage()
-                            .contains("InvalidCredentialsException")
-                                    || e.getException().getCause().getCause()
-                                    .getMessage()
-                                    .contains("InvalidCredentialsException")
-                                    || e.getException().getCause().getCause()
-                                    .getCause().getMessage()
+
+                            if(e.getException().getCause() != null){
+                                if (e.getException().getCause().getMessage()
+                                        .contains("InvalidCredentialsException")
+                                        || e.getException().getCause().getCause()
+                                        .getMessage()
+                                        .contains("InvalidCredentialsException")
+                                        || e.getException().getCause().getCause()
+                                        .getCause().getMessage()
+                                        .contains("InvalidCredentialsException")) {
+                                    --numTries;
+                                    //remove idNpwd from unidata folder if fail
+                                    accountManager.removeUserNamePassword();
+                                    accountManager.clear();
+                                    dataSource.setInError(false);
+                                    if (numTries <= 0) {
+                                        dataSource.setInError(true);
+                                        throw e;
+                                    }
+                                }
+                            } else if (e.getException().getMessage()
+                                    .contains("401 Unauthorized on URL=")
+                                    || e.getException().getMessage()
                                     .contains("InvalidCredentialsException")) {
                                 --numTries;
                                 //remove idNpwd from unidata folder if fail
