@@ -1668,6 +1668,24 @@ public class Misc {
     }
 
     /**
+     * Create a List and add the arguments to it.
+     *
+     * @param o1   first object to add
+     * @param o2   second object to add
+     * @param o3   third object to add
+     * @param o4   fourth object to add
+     * @param o5   fifth object to add
+     * @param o6   fifth object to add
+     * @param o7   fifth object to add
+     * @return  list with the five objects
+     */
+    public static List newList(Object o1, Object o2, Object o3, Object o4,
+                               Object o5, Object o6, Object o7) {
+        return toList(new Object[] {
+                o1, o2, o3, o4, o5, o6, o7
+        });
+    }
+    /**
      * See if the string is HTML.
      *
      * @param s   String to check
