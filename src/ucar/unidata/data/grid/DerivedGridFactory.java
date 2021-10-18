@@ -1003,7 +1003,7 @@ public class DerivedGridFactory {
                     grid, GridUtil.getSpatialDomain(topoGrid));
             }
 
-            return combineGrids(grid, topoGrid);
+            return combineGrids(grid,  topoGrid);
         }
 
     }
@@ -3164,6 +3164,67 @@ public class DerivedGridFactory {
 
     }  // end make mixing_ratio fieldimpl
 
+    public static FieldImpl createWRFMixingRatio(FieldImpl pFI, FieldImpl pbFI, FieldImpl temperFI,
+                                              FieldImpl rhFI)
+            throws VisADException, RemoteException {
+
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+                && GridUtil.isTimeSequence(rhFI));
+        FieldImpl mixFI = null;
+        FieldImpl pressFI = GridMath.add(pFI , pbFI);
+
+        if (isSequence) {
+
+            // Implementation:  have to take the raw data FieldImpl
+            // apart, make a mixing ratio FlatField by FlatField,
+            // and put all back together again into a new mixing ratio FieldImpl
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample to domainSet of tempFI.  If they are the same, this
+            // should be a no-op
+            if (timeSet.getLength() > 1) {
+                rhFI = (FieldImpl) rhFI.resample(timeSet);
+            }
+            Boolean ensble = (GridUtil.hasEnsemble(temperFI)
+                    && GridUtil.hasEnsemble(rhFI));
+            TupleType    rangeType = null;
+            FunctionType innerType = null;
+            FlatField    press     = null;
+
+            press = (FlatField) pressFI.getSample(0);
+
+            // compute each mixing ratio FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                FlatField mixFF = makeMixFromTAndRHAndP(
+                        (FlatField) temperFI.getSample(i),
+                        (FlatField) rhFI.getSample(i),
+                        press);
+
+                if (i == 0) {  // first time through
+                    FunctionType functionType =
+                            new FunctionType(
+                                    ((FunctionType) temperFI.getType()).getDomain(),
+                                    mixFF.getType());
+
+                    // make the new FieldImpl for mixing ratio
+                    // (but as yet empty of data)
+                    mixFI = new FieldImpl(functionType, timeSet);
+                }
+
+                mixFI.setSample(i, mixFF, false);
+
+            }  // end isSequence
+        } else {
+
+            // single time
+            mixFI = makeMixFromTAndRHAndP(
+                    (FlatField) temperFI, (FlatField) rhFI,
+                    createPressureGridFromDomain((FlatField) temperFI));
+        }  // end single time
+
+        return mixFI;
+
+    }  // end make mixing_ratio fieldimpl
     /**
      * Make mixingRatio from two FlatFields
      *
@@ -3184,6 +3245,15 @@ public class DerivedGridFactory {
                               temp);
         RealType rhRT =
             (RealType) DataUtility.getFlatRangeType(rh).getComponent(0);
+        Unit         percentUnit = CommonUnits.PERCENT;
+        Unit         rUnit       = rh.getRangeUnits()[0][0];
+
+        if ((rUnit == null) || !(rUnit.isConvertible(percentUnit)) ||  rUnit.toString().equals("1")) {
+            FlatField mr = (FlatField) (satMR.multiply(rh));
+
+            return mr;
+        }
+
         FlatField mr = (FlatField) (satMR.multiply(rh.divide(new Real(rhRT,
                                                                       100.0))));
 
