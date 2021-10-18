@@ -61,7 +61,7 @@ public class OldVersionCheck {
 
     /** THE URL containing the currently running version of the IDV */
     private static final String IDV_VERSION_URL =
-        "http://www.unidata.ucar.edu/software/idv/docs/javadoc/index.html";
+        "https://docs.unidata.ucar.edu/idv/docs/javadoc/index.html";
 
 
     /** The current version that can be downloaded from Unidata */
