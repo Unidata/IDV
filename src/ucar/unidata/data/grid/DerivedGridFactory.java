@@ -3249,8 +3249,15 @@ public class DerivedGridFactory {
         Unit         rUnit       = rh.getRangeUnits()[0][0];
 
         if ((rUnit == null) || !(rUnit.isConvertible(percentUnit)) ||  rUnit.toString().equals("1")) {
-            FlatField mr = (FlatField) (satMR.multiply(rh));
+            FlatField mr;
+            Range[] range = GridUtil.fieldMinMax(rh);
+            if ((range[0].max <= 1.1) && (range[0].min > 0)) {
+                mr = (FlatField) (satMR.multiply(rh));
 
+            } else {
+                mr = (FlatField) (satMR.multiply(rh.divide(new Real(rhRT,
+                        100.0))));
+            }
             return mr;
         }
 
