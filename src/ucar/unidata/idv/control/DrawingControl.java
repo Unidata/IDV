@@ -394,7 +394,7 @@ public class DrawingControl extends DisplayControlImpl {
                 GuiUtils.getImage("/auxdata/ui/icons/Cut16.gif"),
                 new Point(0, 0), "Custom Delete");
         }
-
+        dataSelection = getDataSelection();
         initDisplayUnit();
         displayHolder = new CompositeDisplayable();
         displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
@@ -414,7 +414,7 @@ public class DrawingControl extends DisplayControlImpl {
         checkGlyphTimes();
         if (dataChoice != null) {
             this.datachoice = dataChoice;
-            Data data = dataChoice.getData(null);
+            Data data = dataChoice.getData(dataSelection);
             if (data != null) {
                 editable    = false;
                 displayOnly = true;
