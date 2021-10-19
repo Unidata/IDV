@@ -65,6 +65,7 @@ public class CompositeDataChoice extends DirectDataChoice {
     public CompositeDataChoice(CompositeDataChoice other) {
         super(other);
         this.dataChoices = cloneDataChoices(other.dataChoices);
+        useDataSourceToFindTimes = other.useDataSourceToFindTimes;
     }
 
     /**
