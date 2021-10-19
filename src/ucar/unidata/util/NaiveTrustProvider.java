@@ -20,7 +20,7 @@
 //j-
 
 /**
- * Code is from http://www.howardism.org/Technical/Java/SelfSignedCerts.html
+ * Code is from https://www.howardism.org/Technical/Java/SelfSignedCerts.html
  */
 
 package ucar.unidata.util;

@@ -86,7 +86,7 @@ public class TDSRadarChooser1 extends TimesChooser {
     private String selectedProduct;
 
     /** Those urls we connect to */
-    //"http://thredds.ucar.edu/thredds/radarServer/catalog.xml";
+    //"https://thredds.ucar.edu/thredds/radarServer/catalog.xml";
     private String serverUrl;
 
     /** Component to hold collections */

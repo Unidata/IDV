@@ -3,7 +3,7 @@ package ucar.unidata.ui.test;
 // Diff -- text file difference utility.
 // See full docu-comment at beginning of Diff class.
 
-/* Copyright (c) Ian F. Darwin, http://www.darwinsys.com/, 1996-2002.
+/* Copyright (c) Ian F. Darwin, https://www.darwinsys.com/, 1996-2002.
  * All rights reserved. Software written by Ian F. Darwin and others.
  * $Id: LICENSE,v 1.8 2004/02/09 03:33:38 ian Exp $
  *
@@ -85,7 +85,7 @@ class fileInfo {
  * advantage, and when credit to the source is given. Other uses
  * require specific permission.
  * <p/>
- * Converted from C to Java by Ian F. Darwin, http://www.darwinsys.com/, January, 1997.
+ * Converted from C to Java by Ian F. Darwin, https://www.darwinsys.com/, January, 1997.
  * Copyright 1997, Ian F. Darwin.
  * <p/>
  * Conversion is NOT FULLY TESTED.

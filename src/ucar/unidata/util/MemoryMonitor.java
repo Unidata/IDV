@@ -286,7 +286,7 @@ public class MemoryMonitor extends JPanel implements Runnable, Removable {
      * @return String with value and unit
      *
      * modified based on StackOverflow:
-     * http://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
+     * https://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
      *
      */
 

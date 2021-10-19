@@ -1,6 +1,6 @@
 
 <datasetChoice 
-	actiontemplate="http://unidata.ucar.edu/data?value=%choice1%&amp;fruit=%choice2%&amp;checked=%choice3%">
+	actiontemplate="https://unidata.ucar.edu/data?value=%choice1%&amp;fruit=%choice2%&amp;checked=%choice3%">
     <field name="choice1" label="Test 1:" type="text" value="" />
 
     <field name="choice2" label="Fruit:"  type="radio" value="bananas">

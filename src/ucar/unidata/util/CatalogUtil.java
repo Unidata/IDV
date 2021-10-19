@@ -795,7 +795,7 @@ public class CatalogUtil {
                              NULL_STRING);
 
         //   <dataset name="Model data" dataType="Grid">
-        //      <service serviceType="DODS" name="mlode" base="http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/"/>
+        //      <service serviceType="DODS" name="mlode" base="https://motherlode.ucar.edu/cgi-bin/dods/nph-nc/"/>
         //      <dataset name="NCEP AVN-Q model data">
         //         <dataset name="NCEP AVN-Q 2002-12-20 18:00:00 GMT" serviceName="mlode" urlPath="dods/model/2002122018_avn-q.nc"/>
 
@@ -977,7 +977,7 @@ public class CatalogUtil {
                     jnlp = StringUtil.replace(jnlp, "%jnlpfile%", jnlpFile);
                     jnlp = StringUtil.replace(
                         jnlp, "%bundle%",
-                        "http://www.unidata.ucar.edu/projects/metapps/testgen/"
+                        "https://www.unidata.ucar.edu/projects/metapps/testgen/"
                         + bundleFile);
                     IOUtil.writeFile(jnlpFile, jnlp);
                 } catch (Exception exc) {

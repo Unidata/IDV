@@ -159,7 +159,7 @@ ${description}
     </if>
 
 <!-- Generate the movie and the thumbnail   -->
-<!--         kml_desc="&lt;a href=&quot;http://www.unidata.ucar.edu/cgi-bin/idv/getbundle.jnlp?bundleurl=${wwwroot}/${bundle}&quot;&gt;Run in the IDV&lt;/a&gt; (Needs Java Webstart)"
+<!--         kml_desc="&lt;a href=&quot;https://www.unidata.ucar.edu/cgi-bin/idv/getbundle.jnlp?bundleurl=${wwwroot}/${bundle}&quot;&gt;Run in the IDV&lt;/a&gt; (Needs Java Webstart)"
 -->
     <if expr="'${movie_files}'!=''">
       <movie

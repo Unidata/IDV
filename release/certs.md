@@ -216,7 +216,7 @@ You only need to do this once each time the keystore is updated with a new certi
 
 ```sh
 find . -regex ".*\.\(jar\)" | xargs -I % sh -c \
-  'jarsigner % idv -tsa http://timestamp.digicert.com -keystore keystore-2021 -storepass xxx'
+  'jarsigner % idv -tsa https://timestamp.digicert.com -keystore keystore-2021 -storepass xxx'
 ```
 
 You can verify the certificate has been properly signed with:

@@ -148,7 +148,7 @@ public class KmlUtil {
 
     /** the KML 2.2 XML namespace */
     public static final String XMLNS_KML2_2 =
-        "http://www.opengis.net/kml/2.2";
+        "https://www.opengis.net/kml/2.2";
 
     /**
      * Make a Kml element
@@ -234,7 +234,7 @@ public class KmlUtil {
         <visibility>1</visibility>
         <flyToView>0</flyToView>
         <Link>
-                <href>http://dataserver.imedea.uib-csic.es:8080/repository/entry/get/20090511_sinocop_b82224.kmz?entryid=0b13318a-2520-4fcb-915e-55af83c1fede</href>
+                <href>https://dataserver.imedea.uib-csic.es:8080/repository/entry/get/20090511_sinocop_b82224.kmz?entryid=0b13318a-2520-4fcb-915e-55af83c1fede</href>
 
     */
 
@@ -415,7 +415,7 @@ public class KmlUtil {
         <Style id="globeIcon">
       <IconStyle>
         <Icon>
-          <href>http://maps.google.com/mapfiles/kml/pal3/icon19.png</href>
+          <href>https://maps.google.com/mapfiles/kml/pal3/icon19.png</href>
         </Icon>
       </IconStyle>
       </Style>*/
@@ -1093,7 +1093,7 @@ public class KmlUtil {
          <description>This screen overlay uses fractional positioning
          to put the image in the exact center of the screen</description>
          <Icon>
-              <href>http://myserver/myimage.jpg</href>
+              <href>https://myserver/myimage.jpg</href>
          </Icon>
          <overlayXY x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
          <screenXY x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>

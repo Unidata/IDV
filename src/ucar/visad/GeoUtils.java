@@ -264,7 +264,7 @@ public class GeoUtils {
 
                     // changed to Google 12/2013...
                     String url =
-                        "http://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address="
+                        "https://maps.googleapis.com/maps/api/geocode/xml?sensor=false&address="
                         + tmp;
 
                     String result = IOUtil.readContents(url, GeoUtils.class);
@@ -299,7 +299,7 @@ public class GeoUtils {
              *           && Pattern.compile("\\d\\d\\d\\d\\d").matcher(
              *               address).find()) {
              *       String url =
-             *           "http://www.census.gov/cgi-bin/gazetteer?city=&state=&zip="
+             *           "https://www.census.gov/cgi-bin/gazetteer?city=&state=&zip="
              *           + address;
              *       String result = IOUtil.readContents(url, GeoUtils.class);
              *       if ((master != null) && (master[0] != timestamp)) {
@@ -321,7 +321,7 @@ public class GeoUtils {
              * }
              *
              * if ((latString == null) || (lonString == null)) {
-             *   String url = "http://rpc.geocoder.us/service/rest?address="
+             *   String url = "https://rpc.geocoder.us/service/rest?address="
              *                + encodedAddress;
              *   String result = IOUtil.readContents(url, GeoUtils.class);
              *   if ((master != null) && (master[0] != timestamp)) {
@@ -344,7 +344,7 @@ public class GeoUtils {
              *
              * //Try the gazeteer
              * if ((latString == null) || (lonString == null)) {
-             *   String url = "http://www.census.gov/cgi-bin/gazetteer?"
+             *   String url = "https://www.census.gov/cgi-bin/gazetteer?"
              *                + encodedAddress;
              *   String result = IOUtil.readContents(url, GeoUtils.class);
              *   if ((master != null) && (master[0] != timestamp)) {

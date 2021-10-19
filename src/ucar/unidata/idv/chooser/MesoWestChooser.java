@@ -96,7 +96,7 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
      */
 
     public static final String BASEURL =
-        "http://mesowest.utah.edu/cgi-bin/droman/obs_lsa_export.cgi";
+        "https://mesowest.utah.edu/cgi-bin/droman/obs_lsa_export.cgi";
 
     /** _more_          */
     public static final String ARG_CLAT = "clat";

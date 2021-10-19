@@ -885,7 +885,7 @@ public class ImageUtils {
 
     /**
      * Flip the image horizontally
-     * From: Josiah Hester - http://www.javalobby.org/articles/ultimate-image
+     * From: Josiah Hester - https://www.javalobby.org/articles/ultimate-image
      *
      * @param img image
      *
@@ -905,7 +905,7 @@ public class ImageUtils {
 
     /**
      * Flip the image vertically
-     * From: Josiah Hester - http://www.javalobby.org/articles/ultimate-image
+     * From: Josiah Hester - https://www.javalobby.org/articles/ultimate-image
      *
      * @param img image
      *

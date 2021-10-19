@@ -89,7 +89,7 @@ line using: and -Dbasedir=/some/other/dir
         <property name="installer_src_dir" value="${release_src_dir}/installer" />
 
         <property name="sign_keystore" value="/share/idv/.keystore"/>
-        <property name="sign_tsaurl" value="http://timestamp.digicert.com"/>
+        <property name="sign_tsaurl" value="https://timestamp.digicert.com"/>
         <property name="keypassfile" value="/share/idv/.keypass"/>
         <property file="${keypassfile}"/>
         <available file="${keypassfile}" property="sign_password" value="${key.password}"/>

@@ -2319,7 +2319,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 new StringBuffer(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
-            sb.append("<kml xmlns=\"http://earth.google.com/kml/2.0\">\n");
+            sb.append("<kml xmlns=\"https://earth.google.com/kml/2.0\">\n");
 
             String open       = "1";
             String visibility = "1";

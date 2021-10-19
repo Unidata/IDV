@@ -222,7 +222,7 @@ https://hub.docker.com/r/unidata/idv-test/
 Currently, the testing suite runs on a nightly basis on our Azure resources.
 Please see here for the results of these tests:
 
-http://unidata-idvtest.cloudapp.net/compare.html
+https://unidata-idvtest.cloudapp.net/compare.html
 
 ********************************************************************************
 
@@ -255,7 +255,7 @@ means that only one copy can run at a time, but on any machine you want even VMs
 as long as it is on the Unidata network.
 
 Website for install4j is
-http://www.ej-technologies.com/products/install4j/overview.html. Unidata
+https://www.ej-technologies.com/products/install4j/overview.html. Unidata
 admin staff has the license information.  The license server runs on
 license.unidata.ucar.edu as of August 2021.
 
@@ -292,7 +292,7 @@ The JREs that are included in the installers need to be updated periodically as
 new versions of Java come out. This process has been made much easier for a
 variety of reasons. We can generally use the JRE provided by install4j. 
 
-http://resources.ej-technologies.com/install4j/help/doc/index.html#install4j.helptopics.concepts.jreBundles
+https://resources.ej-technologies.com/install4j/help/doc/index.html#install4j.helptopics.concepts.jreBundles
 
 For Linux, we use Vagrant VMs coupled with install4j for the creation of the
 JRE.  The Vagrantfiles are located in release/vagrant. Note you will have to run
@@ -353,7 +353,7 @@ Java 3D:
 Java 3D is being maintained by the open source community. The API is frozen, bug
 fixes only (and, yes, they really do fix bugs). The best place to obtain
 information on the status of Java 3D is the JogAmp Java 3D forum:
-http://forum.jogamp.org/java3d-f3728156.html
+https://forum.jogamp.org/java3d-f3728156.html
 
 Contrary to the past, the Java 3D files are contained in zip files in libsrc
 directory. The files are incorporated into the install4j build process so that

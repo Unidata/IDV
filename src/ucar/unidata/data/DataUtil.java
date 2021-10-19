@@ -695,7 +695,7 @@ public class DataUtil {
     /**
      * Determine if the given point is inside the given polygon
      *
-     * Code originally taken from: http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+     * Code originally taken from: https://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
      *
      *
      *     Copyright (c) 1970-2003, Wm. Randolph Franklin

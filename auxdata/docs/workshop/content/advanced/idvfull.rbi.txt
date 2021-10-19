@@ -582,7 +582,7 @@
 
 <!-- Where to look for extensions  -->
   <resources name="idv.resource.pluginindex">
-    <resource location="http://www.unidata.ucar.edu/idv/plugins/plugins.xml"/>
+    <resource location="https://www.unidata.ucar.edu/idv/plugins/plugins.xml"/>
   </resources>
 
 <!-- Where to look for prototypes  -->
@@ -628,7 +628,7 @@
     <resource location="%SITEPATH%/imagesets.xml"/>
     <resource location="%APPPATH%/imagesets.xml"/>
     <resource location="%IDVPATH%/imagesets.xml"/>
-    <resource location="http://www.unidata.ucar.edu/georesources/webcams/images/index.xml"/>
+    <resource location="https://www.unidata.ucar.edu/georesources/webcams/images/index.xml"/>
   </resources>
 
   <resources name="idv.resource.njconfig">

@@ -1994,7 +1994,7 @@ public class ImageMovieControl extends DisplayControlImpl {
                         continue;
                     }
                     String url =
-                        "http://api.wxbug.net/getCamerasXML.aspx?ACode=A6357478562&lat="
+                        "https://api.wxbug.net/getCamerasXML.aspx?ACode=A6357478562&lat="
                         + lat + "&long=" + lon + "&unittype=1";
                     String xml = IOUtil.readContents(url,
                                      ImageMovieControl.class, (String) null);
@@ -2103,7 +2103,7 @@ public class ImageMovieControl extends DisplayControlImpl {
 
         for (CameraInfo camInfo : cameras) {
             StringBuffer sb = new StringBuffer();
-            String imageUrl = "http://wwc.instacam.com/instacamimg/"
+            String imageUrl = "https://wwc.instacam.com/instacamimg/"
                               + camInfo.id + "/" + camInfo.id + "_s.jpg";
             String html = "<h3>WeatherBug WebCam</h3><b>" + camInfo.name
                           + "</b><br><img src=\"" + imageUrl + "\">";

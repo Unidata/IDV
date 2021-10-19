@@ -100,7 +100,7 @@ public class Utils {
 
     /**
      *  The julian date functions below are from
-     *  http://www.rgagnon.com/javadetails/java-0506.html
+     *  https://www.rgagnon.com/javadetails/java-0506.html
      */
 
     /**

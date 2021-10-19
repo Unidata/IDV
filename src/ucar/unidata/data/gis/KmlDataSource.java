@@ -1157,7 +1157,7 @@ public class KmlDataSource extends FilesDataSource {
         String imageName =
             IOUtil.getFileTail(IOUtil.stripExtension(imageFileName));
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        sb.append("<kml xmlns=\"http://earth.google.com/kml/2.0\">\n");
+        sb.append("<kml xmlns=\"https://earth.google.com/kml/2.0\">\n");
         sb.append("<GroundOverlay>\n");
         sb.append("<name>" + name + "</name>\n");
         sb.append("<Icon>\n");
@@ -1252,7 +1252,7 @@ public class KmlDataSource extends FilesDataSource {
             //            <station idn="000525" id="APD" name="Fairbanks/Pedro Dome" st="AK" co="US" lat="65.03" lon="-147.50" elev="790"/>
             StringBuffer sb = new StringBuffer();
             sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            sb.append("<kml xmlns=\"http://earth.google.com/kml/2.0\">\n");
+            sb.append("<kml xmlns=\"https://earth.google.com/kml/2.0\">\n");
             sb.append(XmlUtil.tag("name", "", "Nexrad Stations"));
             sb.append(XmlUtil.tag("description", "", "Nexrad Stations"));
             sb.append("<Document>\n");
@@ -1273,13 +1273,13 @@ public class KmlDataSource extends FilesDataSource {
             sb.append(
                 XmlUtil.tag(
                     "href", "",
-                    "http://www.unidata.ucar.edu/software/idv/logo.gif"));
+                    "https://www.unidata.ucar.edu/software/idv/logo.gif"));
             sb.append("</Icon>\n");
             sb.append("</IconStyle>\n");
             sb.append("</Style>\n");
 
             sb.append(
-                "<ScreenOverlay>  <name>Unidata Nexrad Radar</name>  <Icon>   <href>http://www.unidata.ucar.edu/img/unidata_logo.gif</href>  </Icon>  <overlayXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <screenXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <size x=\"0\" y=\"0\" xunits=\"fraction\" yunits=\"fraction\"/></ScreenOverlay>");
+                "<ScreenOverlay>  <name>Unidata Nexrad Radar</name>  <Icon>   <href>https://www.unidata.ucar.edu/img/unidata_logo.gif</href>  </Icon>  <overlayXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <screenXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <size x=\"0\" y=\"0\" xunits=\"fraction\" yunits=\"fraction\"/></ScreenOverlay>");
 
 
             Element root = XmlUtil.getRoot("nexradstns.xml",
@@ -1317,7 +1317,7 @@ public class KmlDataSource extends FilesDataSource {
                 double lon = XmlUtil.getAttribute(child, "lon", 0.0);
 
                 String desc =
-                    "<![CDATA[<a href=\"http://www.unidata.ucar.edu/software/idv/radar.jnlp\">View in the IDV</a>]]>";
+                    "<![CDATA[<a href=\"https://www.unidata.ucar.edu/software/idv/radar.jnlp\">View in the IDV</a>]]>";
 
                 StringBuffer lookAt = new StringBuffer();
                 lookAt.append("<LookAt>\n");
@@ -1374,7 +1374,7 @@ public class KmlDataSource extends FilesDataSource {
                 buff.append(
                     XmlUtil.tag(
                         "href", "",
-                        "http://motherlode.ucar.edu/cgi-bin/ldm/radargif?"
+                        "https://motherlode.ucar.edu/cgi-bin/ldm/radargif?"
                         + id));
                 buff.append("</Icon>\n");
                 buff.append("<LatLonBox id=\"latlonbox\">\n");

@@ -459,7 +459,7 @@ public class ResourceCollection {
      * @return Is it http
      */
     public boolean isHttp(String resource) {
-        return resource.trim().startsWith("http://");
+        return resource.trim().startsWith("https://");
     }
 
 

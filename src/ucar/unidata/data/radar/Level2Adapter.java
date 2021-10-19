@@ -103,7 +103,7 @@ public class Level2Adapter implements RadarAdapter {
 
     /** radius of the earth (km) */
     private double R = 6371.01;
-    // from http://ssd.jpl.nasa.gov/phys_props_earth.html
+    // from https://ssd.jpl.nasa.gov/phys_props_earth.html
 
     /** station table */
     private static NamedStationTable nexradStations;

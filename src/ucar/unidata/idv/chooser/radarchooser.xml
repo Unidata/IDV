@@ -1,5 +1,5 @@
 <queryCapability name="NEXRAD Level 3 Radar">
-    <query action="http://adde.ucar.edu/cgi-bin/thredds/RadarServer.pl?%station%product=%product%&amp;time=%time%"/>
+    <query action="https://adde.ucar.edu/cgi-bin/thredds/RadarServer.pl?%station%product=%product%&amp;time=%time%"/>
     <selections>
       <selectStations id="station" label="Station:" template="stn=%value%&amp;" select="one" map="/auxdata/maps/OUTLUSAM"  required="true" >
       <station name="ANCHORAGE/Bethel AK" value="ABC" lat="60.78" lon="-161.87"/>

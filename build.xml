@@ -540,8 +540,8 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             maxmemory="512m"
             sourcepath="${sourcedir}"
                  >
-            <link href="http://www.ssec.wisc.edu/visad-docs/javadoc"/>
-            <link href="http://java.sun.com/javase/6/docs/api/"/>
+            <link href="https://www.ssec.wisc.edu/visad-docs/javadoc"/>
+            <link href="https://java.sun.com/javase/6/docs/api/"/>
             <package name="ucar.unidata.beans"/>
             <package name="ucar.unidata.collab"/>
             <package name="ucar.unidata.data.*"/>

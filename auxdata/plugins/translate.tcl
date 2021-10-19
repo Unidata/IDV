@@ -92,7 +92,7 @@ if {[string trim $err]!=""} {
 
 
 ##fetch the translated page from google
-set url "http://64.233.179.104/translate_c?hl=en&ie=UTF-8&oe=UTF-8&langpair=en%7C$targetLanguage&u=http://www.unidata.ucar.edu/software/idv/tmp/$htmlfile"
+set url "https://64.233.179.104/translate_c?hl=en&ie=UTF-8&oe=UTF-8&langpair=en%7C$targetLanguage&u=https://www.unidata.ucar.edu/software/idv/tmp/$htmlfile"
 
 
 puts stderr "Translating page"

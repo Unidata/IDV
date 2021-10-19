@@ -721,7 +721,7 @@ public class ThreddsHandler extends XmlHandler {
             doc   = XmlUtil.getChildText(node);
             title = "Rights";
         } else {
-            //            <documentation xlink:href="http://cloud1.arc.nasa.gov/solve/" xlink:title="SOLVE home page"/>
+            //            <documentation xlink:href="https://cloud1.arc.nasa.gov/solve/" xlink:title="SOLVE home page"/>
             String xlink = XmlUtil.getAttribute(node,
                                CatalogUtil.ATTR_XLINK_HREF, (String) null);
             if (xlink != null) {
@@ -1261,7 +1261,7 @@ public class ThreddsHandler extends XmlHandler {
         LogUtil.configure();
         LogUtil.setTestMode(true);
         String catalog =
-            "http://thredds.ucar.edu/thredds/idv/rt-models.xml";
+            "https://thredds.ucar.edu/thredds/idv/rt-models.xml";
         String xml = IOUtil.readContents(catalog, (String) null);
         if (xml == null) {
             System.err.println("Unable to read: " + catalog);

@@ -55,7 +55,7 @@ import org.w3c.dom.*;
 
 /**
  * This reads placefile and generates a xgrf file
- * Placefile syntax is defined here: http://www.grlevelx.com/downloads/places.txt
+ * Placefile syntax is defined here: https://www.grlevelx.com/downloads/places.txt
  *
  * @author IDV development team
  * @version $Revision: 1.15 $

@@ -77,7 +77,7 @@ import visad.python.JPythonMethods;
  * Space Science and Engineering Center (SSEC)
  * University of Wisconsin - Madison
  * 1225 W. Dayton Street, Madison, WI 53706, USA
- * http://www.ssec.wisc.edu/mcidas
+ * https://www.ssec.wisc.edu/mcidas
  *
  * All Rights Reserved
  *
@@ -95,7 +95,7 @@ import visad.python.JPythonMethods;
  * GNU Lesser Public License for more details.
  *
  * You should have received a copy of the GNU Lesser Public License
- * along with this program.  If not, see http://www.gnu.org/licenses.
+ * along with this program.  If not, see https://www.gnu.org/licenses.
  */
 
 

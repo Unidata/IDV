@@ -971,7 +971,7 @@ public class IdvWindow extends MultiFrame {
      * Enable full screen mode in the context of mac osx (>=10.7)
      * Special thanks to
      *
-     * http://saipullabhotla.blogspot.com/2012/05/enabling-full-screen-mode-for-java.html
+     * https://saipullabhotla.blogspot.com/2012/05/enabling-full-screen-mode-for-java.html
      *
      * @param window The window to which you wish to add the full screen option
      */

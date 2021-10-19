@@ -186,7 +186,7 @@ public class TimelineApplet extends Applet {
             if(port!=80 && port!=-1) {
                 portString = ":" +port;
             }
-            String s = "http://" + base.getHost()  + portString +loadUrl;
+            String s = "https://" + base.getHost()  + portString +loadUrl;
             URL doc = new URL(s);
             System.err.println ("URL: " + doc);
             getAppletContext().showDocument(doc);

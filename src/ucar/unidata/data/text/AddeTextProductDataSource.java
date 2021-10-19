@@ -357,7 +357,7 @@ public class AddeTextProductDataSource extends NwxTextProductDataSource {
     protected String getTablePath() {
         return getIdvProperty(
             PROP_TABLE_PATH,
-            "http://www.unidata.ucar.edu/software/idv/resources");
+            "https://www.unidata.ucar.edu/software/idv/resources");
     }
 
     /**

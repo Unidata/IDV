@@ -727,7 +727,7 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
         String stime = DateUtil.getTimeAsISO8601(absTime).replaceAll("GMT",
                            "");
         // construct a query like this:
-        // http://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
+        // https://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
         StringBuilder queryb  = new StringBuilder();
         String        baseURI = dsc_location.replaceFirst("/dataset.xml",
                                     "?");
@@ -841,7 +841,7 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
     private TDSRadarDatasetInfo queryRadarStation(String stnName,
             String productID, Date start, Date end)
             throws IOException {
-        // http://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
+        // https://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
         StringBuilder queryb  = new StringBuilder();
         String        baseURI = dsc_location.replaceFirst("/dataset.xml",
                                     "?");
@@ -1293,8 +1293,8 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
 
         ds_location =
             //"http://localhost:8080/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
-            //"http://motherlode.ucar.edu:8081/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
-            "http://thredds.ucar.edu/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
+            //"https://motherlode.ucar.edu:8081/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
+            "https://thredds.ucar.edu/thredds/radarServer/nexrad/level3/CCS039/dataset.xml";
         dsc = TDSRadarDatasetCollection.factory("test", ds_location, errlog);
         System.out.println(" errs= " + errlog);
         stns = dsc.getStations();
