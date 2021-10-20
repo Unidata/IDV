@@ -1,7 +1,7 @@
 /*
  * $Id: CloudCoverageSymbol.java,v 1.17 2007/05/22 20:00:21 jeffmc Exp $
  *
- * Copyright  1997-2020 Unidata Program Center/University Corporation for
+ * Copyright  1997-2022 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

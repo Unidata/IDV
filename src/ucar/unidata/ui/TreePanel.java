@@ -1,7 +1,7 @@
 /*
  * $Id: TreePanel.java,v 1.6 2007/07/30 19:37:18 jeffmc Exp $
  *
- * Copyright  1997-2020 Unidata Program Center/University Corporation for
+ * Copyright  1997-2022 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
