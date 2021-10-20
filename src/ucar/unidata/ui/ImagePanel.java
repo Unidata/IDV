@@ -1,7 +1,7 @@
 /*
  * $Id: ImageMovieControl.java,v 1.71 2007/08/09 17:22:25 dmurray Exp $
  *
- * Copyright  1997-2020 Unidata Program Center/University Corporation for
+ * Copyright  1997-2022 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

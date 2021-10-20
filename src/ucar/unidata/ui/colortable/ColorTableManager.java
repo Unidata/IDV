@@ -1,7 +1,7 @@
 /*
  * $Id: ColorTableManager.java,v 1.25 2007/06/15 19:34:38 jeffmc Exp $
  *
- * Copyright  1997-2020 Unidata Program Center/University Corporation for
+ * Copyright  1997-2022 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

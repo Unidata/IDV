@@ -1,7 +1,7 @@
 /*
  * $Id: DisplayControlWrapper.java,v 1.6 2007/04/16 21:32:37 jeffmc Exp $
  *
- * Copyright 1997-2020 Unidata Program Center/University Corporation for
+ * Copyright 1997-2022 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

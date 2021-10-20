@@ -1,7 +1,7 @@
 /*
  * $Id: Msg.java,v 1.14 2007/03/15 19:16:45 jeffmc Exp $
  *
- * Copyright  1997-2020 Unidata Program Center/University Corporation for
+ * Copyright  1997-2022 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
