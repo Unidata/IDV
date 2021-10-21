@@ -1,7 +1,7 @@
 /*
  * $Id: NetcdfFileBrowser.java,v 1.22 2007/04/02 21:59:35 dmurray Exp $
  *
- * Copyright  1997-2020 Unidata Program Center/University Corporation for
+ * Copyright  1997-2022 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
