@@ -31,7 +31,7 @@ import thredds.catalog.InvAccess;
 import thredds.catalog.InvCatalogFactory;
 import thredds.catalog.InvCatalogImpl;
 import thredds.catalog.InvDataset;
-import thredds.catalog.XMLEntityResolver;
+//import thredds.catalog.XMLEntityResolver;
 
 import ucar.nc2.dt.DataIterator;
 import ucar.nc2.dt.RadialDatasetSweep;
@@ -89,9 +89,9 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
     private String summary;
 
     /** _more_ */
-    protected static final Namespace defNS =
-        Namespace.getNamespace(
-            thredds.catalog.XMLEntityResolver.DQC_NAMESPACE_04);
+    //protected static final Namespace defNS =
+    //    Namespace.getNamespace(
+    //        thredds.catalog.XMLEntityResolver.DQC_NAMESPACE_04);
 
     /** the original document URI */
     private URI docURI;
@@ -128,10 +128,10 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
             String dsc_location, StringBuffer errlog)
             throws IOException {
         // super();
-        SAXBuilder        builder;
+        SAXBuilder        builder  = new SAXBuilder();
         Document          doc  = null;
-        XMLEntityResolver jaxp = new XMLEntityResolver(true);
-        builder = jaxp.getSAXBuilder();
+        //XMLEntityResolver jaxp = new XMLEntityResolver(true);
+        //builder = jaxp.getSAXBuilder();
 
         try {
             doc = builder.build(dsc_location);
@@ -223,10 +223,10 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
      */
     public HashMap readRadarStations(String stsXML_location)
             throws IOException {
-        SAXBuilder        builder;
+        SAXBuilder        builder = new SAXBuilder();
         Document          doc  = null;
-        XMLEntityResolver jaxp = new XMLEntityResolver(true);
-        builder = jaxp.getSAXBuilder();
+        //XMLEntityResolver jaxp = new XMLEntityResolver(true);
+        //builder = jaxp.getSAXBuilder();
         HashMap stations = new HashMap();
 
         try {

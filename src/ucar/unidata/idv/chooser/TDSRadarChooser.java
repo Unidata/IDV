@@ -31,7 +31,7 @@ import org.w3c.dom.*;
 
 import org.w3c.dom.Element;
 
-import thredds.catalog.XMLEntityResolver;
+//import thredds.catalog.XMLEntityResolver;
 
 //import ucar.nc2.thredds.TDSRadarDatasetCollection;
 import ucar.nc2.units.DateUnit;
@@ -481,20 +481,20 @@ public class TDSRadarChooser extends TimesChooser {
      * @return  a map of the collection names to URL
      */
     private List getRadarCollections(String radarServerURL) {
-        SAXBuilder        builder;
+        SAXBuilder        builder = new SAXBuilder();
         Document          doc  = null;
-        XMLEntityResolver jaxp = new XMLEntityResolver(true);
-        builder = jaxp.getSAXBuilder();
+        //XMLEntityResolver jaxp = new XMLEntityResolver(true);
+        //builder = jaxp.getSAXBuilder();
         List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
 
         try {
             doc = builder.build(radarServerURL);
         } catch (JDOMException e) {
             userMessage("Invalid catalog");
-            //e.printStackTrace();
+            e.printStackTrace();
         } catch (IOException e) {
             userMessage("Unable to open catalog");
-            //e.printStackTrace();
+            e.printStackTrace();
         }
 
         org.jdom2.Element rootElem    = doc.getRootElement();

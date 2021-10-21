@@ -27,7 +27,7 @@ import org.jdom2.input.SAXBuilder;
 
 import org.w3c.dom.Element;
 
-import thredds.catalog.XMLEntityResolver;
+//import thredds.catalog.XMLEntityResolver;
 
 import ucar.nc2.dt.StationImpl;
 
@@ -419,10 +419,10 @@ public class TDSRadarChooser1 extends TimesChooser {
      * @return  a map of the collection names to URL
      */
     private List getRadarCollections(String radarServerURL) {
-        SAXBuilder        builder;
+        SAXBuilder        builder = new SAXBuilder();
         Document          doc  = null;
-        XMLEntityResolver jaxp = new XMLEntityResolver(true);
-        builder = jaxp.getSAXBuilder();
+        //XMLEntityResolver jaxp = new XMLEntityResolver(true);
+        //builder = jaxp.getSAXBuilder();
         List collections = new ArrayList();
 
         try {
