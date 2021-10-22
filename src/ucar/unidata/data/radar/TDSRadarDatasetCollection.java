@@ -238,10 +238,10 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
      */
     public HashMap<String,Station> readRadarStations(String stsXML_location)
             throws IOException {
-        SAXBuilder        builder;
+        SAXBuilder        builder  =  new SAXBuilder();
         Document          doc  = null;
-        XMLEntityResolver jaxp = new XMLEntityResolver(true);
-        builder = jaxp.getSAXBuilder();
+        //XMLEntityResolver jaxp = new XMLEntityResolver(true);
+       //builder = jaxp.getSAXBuilder();
         HashMap<String,Station> stations = new HashMap<String,Station>();
 
         try {
