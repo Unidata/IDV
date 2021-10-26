@@ -1241,7 +1241,8 @@ abstract public class DisplayMaster {
     protected void handleMouseWheelMoved(java.awt.event.MouseWheelEvent e) {
 
         int    rot     = e.getWheelRotation();
-        double degrees = 2.0;
+        double rotd    =  e.getPreciseWheelRotation();
+        double degrees = 1.0;
         int    control = e.isControlDown()
                          ? 1
                          : 0;
@@ -1250,13 +1251,16 @@ abstract public class DisplayMaster {
                          : 0;
         int    func    = wheelEventMap[control][shift];
         if (func == EventMap.WHEEL_ROTATEZ) {
+
             if (rot < 0) {
                 rotateZ(degrees);
             } else {
                 rotateZ(-degrees);
             }
         } else if (func == EventMap.WHEEL_ROTATEX) {
-            if (rot < 0) {
+            //System.out.println("Rotate X " + rot);
+            //System.out.println("Rotate X " + e.getPreciseWheelRotation());
+            if (rot < 0 || rotd < 0.0) {
                 rotateX(degrees);
             } else {
                 rotateX(-degrees);
@@ -1268,13 +1272,15 @@ abstract public class DisplayMaster {
                 rotateY(-degrees);
             }
         } else if (func == EventMap.WHEEL_ZOOMIN) {
-            if (rot < 0) {
-                zoom(0.9);
+            //System.out.println("ZOOM In " + rot);
+            //System.out.println("ZOOM Inn " + e.getPreciseWheelRotation());
+            if (rot < 0 || rotd < 0.0 ) {
+                zoom(0.99);
             } else {
-                zoom(1.1);
+                zoom(1.01);
             }
         } else if (func == EventMap.WHEEL_ZOOMOUT) {
-            if (rot < 0) {
+            if (rot < 0 || rotd < 0.0) {
                 zoom(1.1);
             } else {
                 zoom(0.9);
