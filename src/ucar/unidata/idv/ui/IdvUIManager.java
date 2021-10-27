@@ -2450,7 +2450,13 @@ public class IdvUIManager extends IdvManager {
             for (int i = 0; i < historyList.size(); i++) {
                 //the triple list holds (type, name, id, properties);
                 History   history = (History) historyList.get(i);
-                JMenuItem mi      = new JMenuItem(history.toString());
+                JMenuItem mi;
+                if(history.toString().length()  <= 40) {
+                    mi = new JMenuItem(history.toString());
+                } else {
+                    mi = new JMenuItem(history.toString().substring(0, 39) + "...");
+                    mi.setToolTipText(history.toString());
+                }
                 fileMenu.add(mi);
                 mi.addActionListener(new ObjectListener(history) {
                     public void actionPerformed(ActionEvent ae) {
@@ -2489,7 +2495,14 @@ public class IdvUIManager extends IdvManager {
                 //the triple list holds (type, name, id, properties);
                 History   history = (History) historyList.get(i);
                 if(history.getClass().toString().contains(type)) {
-                    JMenuItem mi = new JMenuItem(history.toString());
+                    JMenuItem mi;
+
+                    if(history.toString().length()  <= 40) {
+                        mi = new JMenuItem(history.toString());
+                    } else {
+                        mi = new JMenuItem(history.toString().substring(0, 39) + "...");
+                        mi.setToolTipText(history.toString());
+                    }
                     fileMenu.add(mi);
                     mi.addActionListener(new ObjectListener(history) {
                         public void actionPerformed(ActionEvent ae) {
