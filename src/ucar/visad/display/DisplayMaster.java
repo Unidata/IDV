@@ -1274,13 +1274,17 @@ abstract public class DisplayMaster {
         } else if (func == EventMap.WHEEL_ZOOMIN) {
             //System.out.println("ZOOM In " + rot);
             //System.out.println("ZOOM Inn " + e.getPreciseWheelRotation());
-            if (rot < 0 || rotd < 0.0 ) {
-                zoom(0.99);
+            if (rot < 0   ) {
+                zoom(0.9);
+            } else if (rotd < 0.0) {
+                zoom(0.95);
+            } else if (rot == 0.0) {
+                zoom(1.05);
             } else {
-                zoom(1.01);
+                zoom(1.1);
             }
         } else if (func == EventMap.WHEEL_ZOOMOUT) {
-            if (rot < 0 || rotd < 0.0) {
+            if (rot < 0) {
                 zoom(1.1);
             } else {
                 zoom(0.9);
