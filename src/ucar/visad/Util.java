@@ -115,10 +115,7 @@ import java.lang.reflect.Method;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.View;
@@ -2240,6 +2237,32 @@ public final class Util {
     public static Date makeDate(DateTime dttm) throws VisADException {
         return new Date((long) dttm.getValue(CommonUnit.secondsSinceTheEpoch)
                         * 1000);
+    }
+
+    /**
+     * Make a datetime from a year,...
+     *
+     * @param zone timezone to use
+     *
+     * @return the DateTime
+     *
+     * @throws VisADException problem converting units
+     */
+    public static DateTime getGregorianDateTime(TimeZone zone, int year, int month, int day, int hour, int min, int sec)
+            throws VisADException {
+        if(zone == null)
+            zone = TimeZone.getDefault();
+        GregorianCalendar convertCal =
+                new GregorianCalendar(zone);
+        convertCal.clear();
+        convertCal.set(java.util.Calendar.YEAR, year);
+        //The MONTH is 0 based. The incoming month is 1 based
+        convertCal.set(java.util.Calendar.MONTH, month - 1);
+        convertCal.set(java.util.Calendar.DAY_OF_MONTH, day);
+        convertCal.set(java.util.Calendar.HOUR_OF_DAY, hour);
+        convertCal.set(java.util.Calendar.MINUTE, min);
+        convertCal.set(java.util.Calendar.SECOND, sec);
+        return new DateTime(convertCal.getTime());
     }
 
     /**
