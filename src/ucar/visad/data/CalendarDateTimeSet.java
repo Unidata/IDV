@@ -196,7 +196,7 @@ public class CalendarDateTimeSet extends Gridded1DDoubleSet {
      * @param coord_sys   CoordinateSystem
      * @param units       the set units
      * @param errors      the errors
-     * @param copy        true to copy the sample
+     * @param
      *
      * @throws VisADException  problem with Set creation
      */
@@ -217,7 +217,7 @@ public class CalendarDateTimeSet extends Gridded1DDoubleSet {
      * @param coord_sys   CoordinateSystem
      * @param units       the set units
      * @param errors      the errors
-     * @param copy        true to copy the sample
+     * @param
      *
      * @throws VisADException  problem with Set creation
      */
