@@ -21,11 +21,10 @@
 package ucar.visad.data;
 
 
-import ucar.nc2.time.Calendar;
-import ucar.nc2.time.CalendarDate;
-import ucar.nc2.time.CalendarDateFormatter;
-import ucar.nc2.time.CalendarTimeZone;
+import ucar.nc2.time.*;
 
+import ucar.nc2.time.Calendar;
+import ucar.visad.Util;
 import visad.CommonUnit;
 import visad.CoordinateSystem;
 import visad.DateTime;
@@ -37,11 +36,7 @@ import visad.Unit;
 import visad.VisADException;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 
 /**
@@ -183,6 +178,24 @@ public class CalendarDateTime extends visad.DateTime {
         Calendar cal = null;
         if (times[0] instanceof CalendarDateTime) {
             cal = ((CalendarDateTime) times[0]).getCalendar();
+        }
+        if(cal != null && cal.equals(Calendar.julian)){
+            DateTime[] timeArray = new DateTime[times.length];
+            for(int i=0; i < times.length; i++){
+                DateTime dt = times[i];
+                TimeZone zoneInfo = dt.getFormatTimeZone();
+                CalendarDate cdate = ((CalendarDateTime) dt).getCalendarDate();
+                int day = cdate.getDayOfMonth();
+                int mon= cdate.getFieldValue(CalendarPeriod.Field.Month);
+                int year = cdate.getFieldValue(CalendarPeriod.Field.Day.Year);
+                int hour = cdate.getFieldValue(CalendarPeriod.Field.Hour);
+                int min = cdate.getFieldValue(CalendarPeriod.Field.Minute);
+                int sec = cdate.getFieldValue(CalendarPeriod.Field.Second);
+                DateTime  dt0 = Util.getGregorianDateTime(zoneInfo, year, mon, day, hour, min, sec);
+                timeArray[i]  = new DateTime(dt0);
+            }
+            cal = Calendar.gregorian;
+            times = timeArray;
         }
         Arrays.sort(times);
         double[][] timeValues = new double[1][times.length];
