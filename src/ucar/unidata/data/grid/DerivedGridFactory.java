@@ -2836,6 +2836,144 @@ public class DerivedGridFactory {
     }
 
     /**
+     * Make a FieldImpl of Equivalent Potential Temperature; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     * @param temperFI grid of air temperature
+     * @param pressFI grid of air pressure
+     * @param rhFI     grid of relative humidity
+     *
+     * @return grid computed mixing ratio result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createEquivalentPotentialTemperature(
+            FieldImpl temperFI, FieldImpl pressFI, FieldImpl rhFI)
+            throws VisADException, RemoteException {
+
+        FieldImpl  airpressFI;
+        if(GridUtil.getParamType(pressFI).equals(AirPressure.getRealTupleType()))
+            airpressFI = pressFI;
+        else
+            airpressFI = convertToAirPressure(pressFI);
+        FieldImpl mixingRatioFI = createMixingRatio(temperFI, airpressFI, rhFI);
+        EquivalentPotentialTemperature ept   = null;
+        FieldImpl                      eptFI = null;
+
+        // ept.create(pressure, temperFI, mixingRatioFI);
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+                && GridUtil.isTimeSequence(rhFI));
+
+        // get a grid of pressure values
+        Boolean ensble = (GridUtil.hasEnsemble(temperFI)
+                && GridUtil.hasEnsemble(rhFI));
+        TupleType    rangeType = null;
+        FunctionType innerType = null;
+        FlatField    press1     = null;
+
+        if (isSequence) {
+            // Implementation:  have to take the raw time series of data FieldImpls
+            // apart, make the ept FlatField by FlatField (for each time step),
+            // and put all back together again into a new FieldImpl with all times.
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample RH to match domainSet (list of times) of temperFI.
+            // If they are the same, this should be a no-op.
+            if (timeSet.getLength() > 1) {
+                rhFI = (FieldImpl) rhFI.resample(timeSet);
+            }
+
+            // compute each FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) rhFI.getSample(i);
+                    FieldImpl samplep   = (FieldImpl) airpressFI.getSample(i);
+
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerField1 =
+                                (FlatField) sample1.getSample(j, false);
+                        FlatField innerField2 =
+                                (FlatField) sample2.getSample(j, false);
+
+                        if ((innerField1 == null) || (innerField2 == null)) {
+                            continue;
+                        }
+                        FlatField innerdivFF =
+                                makeDewpointFromTAndRH(innerField1, innerField2);
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                    DataUtility.getDomainType(ensDomain),
+                                    innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+
+
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (eptFI == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeSet.getType()).getDomain(),
+                                        funcFF.getType());
+                        eptFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    eptFI.setSample(i, funcFF, false);
+                } else {
+                    FlatField eptFF =
+                            (FlatField) ept.create((FlatField) airpressFI.getSample(i),
+                                    (FlatField) temperFI.getSample(i),
+                                    (FlatField) mixingRatioFI.getSample(i));
+
+                    // first time through
+                    if (i == 0) {
+                        FunctionType functionType =
+                                new FunctionType(
+                                        ((FunctionType) temperFI.getType()).getDomain(),
+                                        eptFF.getType());
+
+                        // make the new FieldImpl for mixing ratio
+                        // (but as yet empty of data)
+                        eptFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    eptFI.setSample(i, eptFF, false);
+                }
+            }  // end isSequence
+
+        }
+        // if one time only
+        else {
+            FlatField press = (FlatField) airpressFI;
+            // make one FlatField
+            mixingRatioFI = makeMixFromTAndRHAndP((FlatField) temperFI,
+                    (FlatField) rhFI, press);
+            eptFI = (FieldImpl) ept.create(press, temperFI,
+                    mixingRatioFI);
+        }  // end single time
+
+        return eptFI;
+
+    }
+
+
+    public static FieldImpl removeUnit(String varname, FieldImpl field) throws VisADException {
+        RealType newType = Util.makeRealType(varname, null);
+        return GridUtil.setParamType(field, newType, false);
+    }
+
+
+    /**
      * Make a FieldImpl of Relative Humidity; usually in 3d grids
      * in a time series (at one or more times).
      *
@@ -2874,6 +3012,31 @@ public class DerivedGridFactory {
     }
 
     /**
+     * Make a FieldImpl of Relative Humidity; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     *
+     * @param temperFI grid of air temperature
+     * @param pressFI grid of air pressure
+     * @param specificFI grid of specific humidity
+     *
+     * @return grid computed Relative Humidity result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createRelativeHumidityFromSpecificHumidity(FieldImpl temperFI,
+                                                                       FieldImpl pressFI, FieldImpl specificFI)
+            throws VisADException, RemoteException {
+        FieldImpl  airpressFI;
+        if(GridUtil.getParamType(pressFI).equals(AirPressure.getRealTupleType()))
+            airpressFI = pressFI;
+        else
+            airpressFI = convertToAirPressure(pressFI);
+        return createRelativeHumidity(temperFI, airpressFI, specificFI, true);
+    }
+
+    /**
      * Make a FieldImpl of Equivalent Potential Temperature; usually in 3d grids
      * in a time series (at one or more times).
      *
@@ -2891,6 +3054,32 @@ public class DerivedGridFactory {
         FieldImpl rhFI = createRelativeHumidityFromSpecificHumidity(temperFI,
                 specificFI);
         return createEquivalentPotentialTemperature(temperFI, rhFI);
+    }
+
+    /**
+     * Make a FieldImpl of Equivalent Potential Temperature; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     * @param temperFI grid of air temperature
+     * @param pressFI grid of air pressure
+     * @param specificFI     grid of specific humidity
+     *
+     * @return grid computed mixing ratio result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createEPTFromSpecificHumidity(
+            FieldImpl temperFI, FieldImpl pressFI, FieldImpl specificFI)
+            throws VisADException, RemoteException {
+        FieldImpl  airpressFI;
+        if(GridUtil.getParamType(pressFI).equals(AirPressure.getRealTupleType()))
+            airpressFI = pressFI;
+        else
+            airpressFI = convertToAirPressure(pressFI);
+        FieldImpl rhFI = createRelativeHumidityFromSpecificHumidity(temperFI,
+                airpressFI, specificFI);
+        return createEquivalentPotentialTemperature(temperFI, airpressFI, rhFI);
     }
     /**
      * Make a FieldImpl of Relative Humidity; usually in 3d grids
@@ -3042,6 +3231,150 @@ public class DerivedGridFactory {
     }
 
     /**
+     * Make a FieldImpl of Relative Humidity; usually in 3d grids
+     * in a time series (at one or more times).
+     *
+     *
+     * @param temperFI grid of air temperature
+     * @param pressFI grid of air pressure
+     * @param mixingRatioFI grid of mixing ratio
+     * @param isSpecificHumidity  is the mixingRationFI really SH?
+     *
+     * @return grid computed Relative Humidity result grids
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createRelativeHumidity(FieldImpl temperFI, FieldImpl pressFI,
+                                                   FieldImpl mixingRatioFI, boolean isSpecificHumidity)
+            throws VisADException, RemoteException {
+
+        FieldImpl rhFI          = null;
+        FlatField mixingRatioFF = null;
+        FlatField press1         = null;
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+                && GridUtil.isTimeSequence(mixingRatioFI));
+
+        Boolean ensble = (GridUtil.hasEnsemble(temperFI)
+                && GridUtil.hasEnsemble(mixingRatioFI));
+        FieldImpl  airpressFI;
+        if(GridUtil.getParamType(pressFI).equals(AirPressure.getRealTupleType()))
+            airpressFI = pressFI;
+        else
+            airpressFI = convertToAirPressure(pressFI);
+        TupleType    rangeType = null;
+        FunctionType innerType = null;
+
+        if (isSequence) {
+
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample mixingRationFI to match domainSet (list of times) of temperFI.
+            // If they are the same, this should be a no-op.
+            if (timeSet.getLength() > 1) {
+                mixingRatioFI = (FieldImpl) mixingRatioFI.resample(timeSet);
+            }
+
+            // compute each FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sample1 = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2 =
+                            (FieldImpl) mixingRatioFI.getSample(i);
+                    FieldImpl samplep = (FieldImpl) airpressFI.getSample(i);
+
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerField1 =
+                                (FlatField) sample1.getSample(j, false);
+                        FlatField innerField2 =
+                                (FlatField) sample2.getSample(j, false);
+                        FlatField press  =
+                                (FlatField) samplep.getSample(j, false);
+                        if ((innerField1 == null) || (innerField2 == null)) {
+                            continue;
+                        }
+
+                        FlatField innerdivFF =
+                                (FlatField) RelativeHumidity.create(innerField2,
+                                        press, innerField1);
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                    DataUtility.getDomainType(ensDomain),
+                                    innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+
+
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (rhFI == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeSet.getType()).getDomain(),
+                                        funcFF.getType());
+                        rhFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    rhFI.setSample(i, funcFF, false);
+
+                } else {
+                    mixingRatioFF = (FlatField) mixingRatioFI.getSample(i);
+                    FlatField press  = (FlatField) airpressFI.getSample(i);
+                    if (isSpecificHumidity) {
+                        mixingRatioFF =
+                                (FlatField) WaterVaporMixingRatio.create(
+                                        mixingRatioFF);
+                    }
+
+                    FlatField rhFF =
+                            (FlatField) RelativeHumidity.create(mixingRatioFF,
+                                    press, temperFI.getSample(i));
+
+                    // first time through
+                    if (i == 0) {
+                        FunctionType functionType =
+                                new FunctionType(
+                                        ((FunctionType) temperFI.getType()).getDomain(),
+                                        rhFF.getType());
+
+                        // make the new FieldImpl for relative humidity
+                        // (but as yet empty of data)
+                        rhFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    rhFI.setSample(i, rhFF, false);
+                }
+            }  // end isSequence
+        }
+        // if one time only
+        else {
+            // get a grid of pressure values
+            FlatField  press  = (FlatField) airpressFI;
+
+            mixingRatioFF = (FlatField) mixingRatioFI;
+
+            if (isSpecificHumidity) {
+                mixingRatioFF =
+                        (FlatField) WaterVaporMixingRatio.create(mixingRatioFI);
+            }
+
+            // make one FlatField
+            rhFI = (FieldImpl) RelativeHumidity.create(mixingRatioFF, press,
+                    temperFI);
+        }  // end single time
+
+        return rhFI;
+
+    }
+    /**
      * Make a FieldImpl of mixing ratio values for series of times
      * in general mr = (saturation mixing ratio) * (RH/100%);
      *
@@ -3158,6 +3491,129 @@ public class DerivedGridFactory {
             mixFI = makeMixFromTAndRHAndP(
                 (FlatField) temperFI, (FlatField) rhFI,
                 createPressureGridFromDomain((FlatField) temperFI));
+        }  // end single time
+
+        return mixFI;
+
+    }  // end make mixing_ratio fieldimpl
+
+    /**
+     * Make a FieldImpl of mixing ratio values for series of times
+     * in general mr = (saturation mixing ratio) * (RH/100%);
+     *
+     * @param temperFI grid of air temperature
+     * @param pressFI grid of air temperature
+     * @param rhFI     grid of relative humidity
+     * @return grid of computed mixing ratio
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createMixingRatio(FieldImpl temperFI,
+                                              FieldImpl pressFI, FieldImpl rhFI)
+            throws VisADException, RemoteException {
+
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI)
+                && GridUtil.isTimeSequence(rhFI));
+        FieldImpl  airpressFI;
+        if(GridUtil.getParamType(pressFI).equals(AirPressure.getRealTupleType()))
+            airpressFI = pressFI;
+        else
+            airpressFI = convertToAirPressure(pressFI);
+        FieldImpl mixFI = null;
+
+        if (isSequence) {
+
+            // Implementation:  have to take the raw data FieldImpl
+            // apart, make a mixing ratio FlatField by FlatField,
+            // and put all back together again into a new mixing ratio FieldImpl
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample to domainSet of tempFI.  If they are the same, this
+            // should be a no-op
+            if (timeSet.getLength() > 1) {
+                rhFI = (FieldImpl) rhFI.resample(timeSet);
+            }
+            Boolean ensble = (GridUtil.hasEnsemble(temperFI)
+                    && GridUtil.hasEnsemble(rhFI));
+            TupleType    rangeType = null;
+            FunctionType innerType = null;
+
+            // compute each mixing ratio FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sample1   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sample2   = (FieldImpl) rhFI.getSample(i);
+                    FieldImpl samplep   = (FieldImpl) airpressFI.getSample(i);
+
+                    Set       ensDomain = sample1.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerField1 =
+                                (FlatField) sample1.getSample(j, false);
+                        FlatField innerField2 =
+                                (FlatField) sample2.getSample(j, false);
+                        FlatField press =
+                                (FlatField) samplep.getSample(j, false);
+
+                        if ((innerField1 == null) || (innerField2 == null)) {
+                            continue;
+                        }
+                        FlatField innerdivFF =
+                                makeMixFromTAndRHAndP(innerField1, innerField2,
+                                        press);
+
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                    DataUtility.getDomainType(ensDomain),
+                                    innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+
+
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (mixFI == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeSet.getType()).getDomain(),
+                                        funcFF.getType());
+                        mixFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    mixFI.setSample(i, funcFF, false);
+                } else {
+                    FlatField mixFF = makeMixFromTAndRHAndP(
+                            (FlatField) temperFI.getSample(i),
+                            (FlatField) rhFI.getSample(i),
+                            (FlatField) airpressFI.getSample(i));
+
+                    if (i == 0) {  // first time through
+                        FunctionType functionType =
+                                new FunctionType(
+                                        ((FunctionType) temperFI.getType()).getDomain(),
+                                        mixFF.getType());
+
+                        // make the new FieldImpl for mixing ratio
+                        // (but as yet empty of data)
+                        mixFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    mixFI.setSample(i, mixFF, false);
+                }
+            }  // end isSequence
+        } else {
+
+            // single time
+            mixFI = makeMixFromTAndRHAndP(
+                    (FlatField) temperFI, (FlatField) rhFI,
+                    (FlatField) airpressFI);
         }  // end single time
 
         return mixFI;
