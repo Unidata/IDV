@@ -493,9 +493,6 @@ public class SerializedObjectStore implements PersistentStore {
  *  Revision 1.13  2005/05/13 18:32:44  jeffmc
  *  Clean up the odd copyright symbols
  *
- *  Revision 1.12  2004/08/19 21:34:47  jeffmc
- *  Scratch log4j
- *
  *  Revision 1.11  2004/02/27 21:18:54  jeffmc
  *  Lots of javadoc warning fixes
  *
