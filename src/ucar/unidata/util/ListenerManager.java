@@ -210,9 +210,6 @@ public class ListenerManager {
  *  Revision 1.14  2004/08/23 17:27:26  dmurray
  *  silence some javadoc warnings
  *
- *  Revision 1.13  2004/08/19 21:34:45  jeffmc
- *  Scratch log4j
- *
  *  Revision 1.12  2004/02/27 21:18:51  jeffmc
  *  Lots of javadoc warning fixes
  *
