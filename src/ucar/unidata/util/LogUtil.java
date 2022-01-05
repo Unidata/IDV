@@ -294,7 +294,7 @@ public class LogUtil {
     public static void configure() {
 
         /**
-         * Properties[] props = getProperties("log4j.properties", LogUtil.class);
+         * Properties[] props = getProperties("log*j.properties", LogUtil.class);
          * for (int i = 0; i < props.length; i++) {
          *   PropertyConfigurator.configure(props[i]);
          * }
