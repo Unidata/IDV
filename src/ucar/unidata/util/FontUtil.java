@@ -248,9 +248,6 @@ public class FontUtil {
  *  Revision 1.7  2005/05/13 18:32:39  jeffmc
  *  Clean up the odd copyright symbols
  *
- *  Revision 1.6  2004/08/19 21:34:44  jeffmc
- *  Scratch log4j
- *
  *  Revision 1.5  2004/02/27 21:18:50  jeffmc
  *  Lots of javadoc warning fixes
  *
