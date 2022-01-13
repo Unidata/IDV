@@ -1548,16 +1548,30 @@ public class IOUtil {
      * @return _more_
      */
     public static boolean isADescendent(File parent, File child) {
-        if (child == null) {
+        if ((parent == null) || (child == null)) {
+            return false;
+        }
+
+        try {
+            //Convert the files with their canonical path to get rid of "..", symbolic links, etc
+            parent = new File(parent.getCanonicalPath());
+            child = new File(child.getCanonicalPath());
+            return isADescendentInner(parent, child);
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+    private static boolean isADescendentInner(File parent, File child) {
+        if ((parent == null) || (child == null)) {
             return false;
         }
         if (parent.equals(child)) {
             return true;
         }
         File newParent = child.getParentFile();
-        return isADescendent(parent, newParent);
+        return isADescendentInner(parent, newParent);
     }
-
 
     /**
      * Return the String contents of the specified contentName.
