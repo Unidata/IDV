@@ -92,10 +92,10 @@ def ABIAshRGB(b11T, b13T, b14T, b15T):
     # http://rammb.cira.colostate.edu/training/visit/quick_guides/GOES_Ash_RGB.pdf
     # red = band15 - band13; -6.7C to 2.6C rescaled to 0 to 255
     # grn = band14 - band11; -6.0C to 6.3C rescaled to 0 to 255
-    # blu = band13; 246.3K to 302.4K rescaled to 0 to 255
+    # blu = band13; 243.6K to 302.4K rescaled to 0 to 255
     red = rescale(b15T-b13T, -6.7, 2.6, 0, 255)
     grn = rescale(b14T-b11T, -6.0, 6.3, 0, 255)
-    blu = rescale(b13T, 246.3, 302.4, 0, 255)
+    blu = rescale(b13T, 243.6, 302.4, 0, 255)
     return combineRGB(red, grn, blu)
 
 # ABI Day Land Cloud RGB
@@ -169,10 +169,11 @@ def ABIDayCloudConvectionRGB(b2A, b13T):
 # ABI Fire Temperature RGB
 def ABIFireTemperatureRGB(b5A, b6A, b7T):
     # http://rammb.cira.colostate.edu/training/visit/quick_guides/Fire_Temperature_RGB.pdf
-    # red = band7; 0C to 60C rescalled to 0 to 255; gamma 0.4
-    # grn = band6; 0% to 100% rescalled to 0 to 255; gamma 1.0
-    # blu = band5; 0% to 75% rescalled to 0 to 255; gamma 1.0
-    red = 255*(rescale(b7T, 273.15, 333.15, 0, 1)**2.5)
+    # red = band7; 0C to 60C rescaled to 0 to 255; gamma 0.4
+    # grn = band6; 0% to 100% rescaled to 0 to 255; gamma 1.0
+    # blu = band5; 0% to 75% rescaled to 0 to 255; gamma 1.0
+    hr_b7T = resampleGrid(b7T, b5A)
+    red = 255*(rescale(hr_b7T, 273.15, 333.15, 0, 1)**2.5)
     grn = rescale(b6A, 0, 100, 0, 255)
     blu = rescale(b5A, 0, 75, 0, 255)
     return combineRGB(red, grn, blu)
@@ -236,10 +237,11 @@ def ABISplitWaterVaporDifference(b8T, b10T):
     return sub(b8T, b10T)
 
 # Split Snow Channel Difference
-def ABISplitSnowDifference(b5B, b2B):
+def ABISplitSnowDifference(b5R, b2R):
     # http://cimss.ssec.wisc.edu/goes/OCLOFactSheetPDFs/ABIQuickGuide_SplitSnowv2.pdf
-    # band5 brit - band2 brit
-    return sub(b5B, b2B)
+    # band5 reflectance - band2 reflectance
+    hr_b5R = resampleGrid(b5R, b2R)
+    return sub(hr_b5R, b2R)*100
 
 # Split Cloud Phase Channel Difference
 def ABISplitCloudPhaseDifference(b14T, b11T):
