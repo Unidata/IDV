@@ -99,7 +99,7 @@ class fileInfo {
  * advantage, and when credit to the source is given. Other uses
  * require specific permission.
  * <p/>
- * Converted from C to Java by Ian F. Darwin, http://www.darwinsys.com/, January, 1997.
+ * Converted from C to Java by Ian F. Darwin, https://www.darwinsys.com/, January, 1997.
  * Copyright 1997, Ian F. Darwin.
  * <p/>
  * Conversion is NOT FULLY TESTED.

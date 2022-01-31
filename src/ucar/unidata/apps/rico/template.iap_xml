@@ -844,7 +844,7 @@ To run the $PRODUCT_NAME$ from the directory  $USER_INSTALL_DIR$:
 						</object>
 					</property>
 					<property name="productURL">
-						<string><![CDATA[http://my.unidata.ucar.edu/content/software/IDV/]]></string>
+						<string><![CDATA[https://my.unidata.ucar.edu/content/software/IDV/]]></string>
 					</property>
 					<property name="productDescription">
 						<string><![CDATA[The Unidata Integrated Data Viewer (IDV) is a software framework for visualizing and analysing geoscience data. 
@@ -866,7 +866,7 @@ The IDV brings together the ability to display and work with satellite imagery, 
 						<int>2</int>
 					</property>
 					<property name="supportURL">
-						<string><![CDATA[http://my.unidata.ucar.edu/content/support/email_support.php]]></string>
+						<string><![CDATA[https://my.unidata.ucar.edu/content/support/email_support.php]]></string>
 					</property>
 					<property name="vendorName">
 						<string><![CDATA[Unidata]]></string>
@@ -879,7 +879,7 @@ The IDV brings together the ability to display and work with satellite imagery, 
 						</object>
 					</property>
 					<property name="vendorURL">
-						<string><![CDATA[http://my.unidata.ucar.edu/]]></string>
+						<string><![CDATA[https://my.unidata.ucar.edu/]]></string>
 					</property>
 					<property name="email">
 						<string><![CDATA[support@unidata.ucar.edu]]></string>

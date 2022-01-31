@@ -54,8 +54,8 @@ import java.net.URL;
  * by David Priegnitz at NSSL.<p>
  *
  * Documentation on Archive Level II data format can be found at:
- * <a href="http://www.ncdc.noaa.gov/oa/radar/leveliidoc.html">
- * http://www.ncdc.noaa.gov/oa/radar/leveliidoc.html</a>
+ * <a href="https://www.ncdc.noaa.gov/oa/radar/leveliidoc.html">
+ * https://www.ncdc.noaa.gov/oa/radar/leveliidoc.html</a>
  *
  * @author MetApps Development Team
  * @version $Revision: 1.27 $ $Date: 2007/05/04 16:00:18 $

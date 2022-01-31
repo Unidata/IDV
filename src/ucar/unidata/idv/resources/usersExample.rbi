@@ -34,7 +34,7 @@
 e.g.:
     <resource location="%USERPATH%/colortables.xml"/>
     <resource location="%SITEPATH%/colortables.xml"/>
-    <resource location="http://www.somewebsite.edu/somepath/colortables.xml"/>
+    <resource location="https://www.somewebsite.edu/somepath/colortables.xml"/>
 -->
   </resources>
 

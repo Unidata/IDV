@@ -156,7 +156,7 @@ public class MovieDisplayControl extends DisplayControlImpl implements Controlle
 
 
         // URL for our media file
-        //mediaFile = "http://java.sun.com/products/java-media/jmf/2.1.1/samples/samples/media/darkcity.7.160x120.11khz.mov";
+        //mediaFile = "https://java.sun.com/products/java-media/jmf/2.1.1/samples/samples/media/darkcity.7.160x120.11khz.mov";
         MediaLocator mrl = null;
 
         try {

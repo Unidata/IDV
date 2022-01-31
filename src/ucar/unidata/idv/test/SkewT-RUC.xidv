@@ -9,7 +9,7 @@
         <object class="ucar.unidata.data.grid.DodsGeoGridDataSource"  id="id6" >
           <property name="Name" >
             <string>
-<![CDATA[http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/july18_2002/grids/2002071812_ruc.nc]]>            </string>
+<![CDATA[https://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/july18_2002/grids/2002071812_ruc.nc]]>            </string>
           </property>
           <property name="Properties" >
             <object class="java.util.Hashtable"  id="id4" />

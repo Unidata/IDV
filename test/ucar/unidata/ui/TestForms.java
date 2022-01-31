@@ -21,7 +21,7 @@
 /**
  * In order to test the changes to HttpFormEntry, I created
  * a unit test for it. Testing http connections is always a bit
- * tricky, so what I did was to use an echo service: http://echo.httpkit.com.
+ * tricky, so what I did was to use an echo service: https://echo.httpkit.com.
  * The echo services accepts requests from some client and returns
  * what it received in text form, but encoded in Json format.
  * So, This test creates a form and sends it to the echo service.
@@ -72,10 +72,10 @@ public class TestForms extends UnitTestCommon {
     // Pick a URL to test
 
     // Will send to esupport
-    //static protected final String TESTURL = "http://www.unidata.ucar.edu/support/requestSupport.jsp";
+    //static protected final String TESTURL = "https://www.unidata.ucar.edu/support/requestSupport.jsp";
 
     /** _more_ */
-    static protected final String TESTURL = "http://echo.httpkit.com";
+    static protected final String TESTURL = "https://echo.httpkit.com";
 
     // Field values to use
 
@@ -527,15 +527,15 @@ public class TestForms extends UnitTestCommon {
         + "hardware: x86\n" + "organization: UCAR\n" + "os: <OS_NAME>\n"
         + "packageVersion: 1.0\n" + "softwarePackage: IDV\n"
         + "subject: test httpformentry\n" + "submit: Send Email\",\n"
-        + "  \"docs\" : \"http://httpkit.com/echo\",\n"
+        + "  \"docs\" : \"https://httpkit.com/echo\",\n"
         + "  \"ip\" : \"127.0.0.1\",\n" + "  \"method\" : \"POST\",\n"
         + "  \"path\" : {\n" + "    \"name\" : \"/\",\n"
         + "    \"params\" : {},\n" + "    \"query\" : \"\"\n" + "  },\n"
-        + "  \"powered-by\" : \"http://httpkit.com\",\n"
+        + "  \"powered-by\" : \"https://httpkit.com\",\n"
         + "  \"uri\" : \"/\"\n" + "}\n";
 
     /** _more_ */
     static final String expectedSimple =
         "{\n"
-        + "  \"body\" : \"description=hello+world&emailAddress=jones%40gmail.com&fullName=Jim+Jones&hardware=x86&organization=UCAR&os=<OS+NAME>&packageVersion=1.0&softwarePackage=IDV&subject=test+httpformentry&submit=Send+Email\",\n" + "  \"docs\" : \"http://httpkit.com/echo\",\n" + "  \"ip\" : \"127.0.0.1\",\n" + "  \"method\" : \"POST\",\n" + "  \"path\" : {\n" + "    \"name\" : \"/\",\n" + "    \"params\" : {},\n" + "    \"query\" : \"\"\n" + "  },\n" + "  \"powered-by\" : \"http://httpkit.com\",\n" + "  \"uri\" : \"/\"\n" + "}\n" + "\n";
+        + "  \"body\" : \"description=hello+world&emailAddress=jones%40gmail.com&fullName=Jim+Jones&hardware=x86&organization=UCAR&os=<OS+NAME>&packageVersion=1.0&softwarePackage=IDV&subject=test+httpformentry&submit=Send+Email\",\n" + "  \"docs\" : \"https://httpkit.com/echo\",\n" + "  \"ip\" : \"127.0.0.1\",\n" + "  \"method\" : \"POST\",\n" + "  \"path\" : {\n" + "    \"name\" : \"/\",\n" + "    \"params\" : {},\n" + "    \"query\" : \"\"\n" + "  },\n" + "  \"powered-by\" : \"https://httpkit.com\",\n" + "  \"uri\" : \"/\"\n" + "}\n" + "\n";
 }

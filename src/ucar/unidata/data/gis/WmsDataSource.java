@@ -448,7 +448,7 @@ public class WmsDataSource extends DataSourceImpl {
                     /* Check to see if this is of the form:
 
                     <?xml version='1.0' encoding="UTF-8" standalone="no" ?>
-                    <!DOCTYPE ServiceExceptionReport SYSTEM "http://www.digitalearth.gov/wmt/xml/exception_1_1_0.dtd ">
+                    <!DOCTYPE ServiceExceptionReport SYSTEM "https://www.digitalearth.gov/wmt/xml/exception_1_1_0.dtd ">
                     <ServiceExceptionReport version="1.1.0">
                      <ServiceException>
                        Service denied due to system overload. Please try again later.

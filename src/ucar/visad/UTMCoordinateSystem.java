@@ -57,8 +57,8 @@ import java.util.List;
  * in meters, a zone number, a hemisphere boolean flag (true in northern),
  * and a reference ellipsoid.
  *
- * @see <a href="http://www.ai.sri.com/geotransform/">
- *      http://www.ai.sri.com/geotransform/</a>
+ * @see <a href="https://www.ai.sri.com/geotransform/">
+ *      https://www.ai.sri.com/geotransform/</a>
  * @version $Revision: 1.18 $ $Date: 2005/05/13 18:34:06 $
  */
 public class UTMCoordinateSystem extends MapProjection implements XmlPersistable {
@@ -218,7 +218,7 @@ public class UTMCoordinateSystem extends MapProjection implements XmlPersistable
      * for NAD 27 (Clark 1866 ellipsoid), or
      * new RF_Ellipsoid()  for NAD 83 (GRS 80 ellipsoid), or
      * new WE_Ellipsoid()  for WSG 84.
-     * See http://www.ai.sri.com/geotransform/api.html for more details about
+     * See https://www.ai.sri.com/geotransform/api.html for more details about
      * 239 supported datums.
      *
      * @param ellipsoid the basis for some UTM coordinate system;
@@ -254,7 +254,7 @@ public class UTMCoordinateSystem extends MapProjection implements XmlPersistable
      * for NAD 27 (Clark 1866 ellipsoid), or
      * new RF_Ellipsoid()  for NAD 83 (GRS 80 ellipsoid), or
      * new WE_Ellipsoid()  for WSG 84.
-     * See http://www.ai.sri.com/geotransform/api.html for more details about
+     * See https://www.ai.sri.com/geotransform/api.html for more details about
      * 239 supported datums.
      *
      * @param ellipsoid the basis for some UTM coordinate system;

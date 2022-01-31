@@ -1719,7 +1719,7 @@ public class StormTrackControl extends DisplayControlImpl {
             Element docNode = KmlUtil.document(kmlNode, "");
             KmlUtil.iconstyle(
                 docNode, "hurricaneicon",
-                "http://www.unidata.ucar.edu/software/idv/kml/images/hurricane.png");
+                "https://www.unidata.ucar.edu/software/idv/kml/images/hurricane.png");
             Hashtable state = new Hashtable();
             for (StormDisplayState stormDisplayState : getActiveStorms()) {
                 stormDisplayState.writeToKml(docNode, state, doObs,

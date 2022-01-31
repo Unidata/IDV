@@ -1463,7 +1463,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAABBAAAAAAAAAAAAAAACg==</pa
                     <property name="Sources">
                         <object class="java.util.ArrayList">
                             <method name="add">
-                                <string><![CDATA[http://thredds.ucar.edu/thredds/dodsC/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20081030_1200.grib1]]></string>
+                                <string><![CDATA[https://thredds.ucar.edu/thredds/dodsC/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20081030_1200.grib1]]></string>
                             </method>
                         </object>
                     </property>
@@ -1538,19 +1538,19 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAABBAAAAAAAAAAAAAAACg==</pa
                             </method>
                             <method name="put">
                                 <string><![CDATA[prop.service.wcs]]></string>
-                                <string><![CDATA[http://thredds.ucar.edu/thredds/wcs/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20070928_0600.grib1]]></string>
+                                <string><![CDATA[https://thredds.ucar.edu/thredds/wcs/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20070928_0600.grib1]]></string>
                             </method>
                             <method name="put">
                                 <string><![CDATA[prop.service.ncserver]]></string>
-                                <string><![CDATA[http://thredds.ucar.edu/thredds/ncServer/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20070928_0600.grib1]]></string>
+                                <string><![CDATA[https://thredds.ucar.edu/thredds/ncServer/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20070928_0600.grib1]]></string>
                             </method>
                             <method name="put">
                                 <string><![CDATA[RESOLVERURL]]></string>
-                                <string><![CDATA[http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/CONUS_80km/latest.xml]]></string>
+                                <string><![CDATA[https://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/CONUS_80km/latest.xml]]></string>
                             </method>
                             <method name="put">
                                 <string><![CDATA[Thredds.CatalogUrl]]></string>
-                                <string><![CDATA[http://www.unidata.ucar.edu/georesources/idvcatalog.xml]]></string>
+                                <string><![CDATA[https://www.unidata.ucar.edu/georesources/idvcatalog.xml]]></string>
                             </method>
                             <method name="put">
                                 <string><![CDATA[TITLE]]></string>
@@ -1570,7 +1570,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAABBAAAAAAAAAAAAAAACg==</pa
                             </method>
                             <method name="put">
                                 <string><![CDATA[prop.service.http]]></string>
-                                <string><![CDATA[http://thredds.ucar.edu/thredds/fileServer/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20081030_1200.grib1]]></string>
+                                <string><![CDATA[https://thredds.ucar.edu/thredds/fileServer/grib/NCEP/GFS/CONUS_80km/GFS_CONUS_80km_20081030_1200.grib1]]></string>
                             </method>
                         </object>
                     </property>

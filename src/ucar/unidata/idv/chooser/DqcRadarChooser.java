@@ -91,7 +91,7 @@ public class DqcRadarChooser extends TimesChooser {
 
     /** The fixed (for now) url we connect to */
     private String collectionUrl =
-        "http://thredds.ucar.edu/thredds/idd/radarLevel2";
+        "https://thredds.ucar.edu/thredds/idd/radarLevel2";
 
 
     /**

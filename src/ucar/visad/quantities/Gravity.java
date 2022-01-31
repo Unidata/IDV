@@ -115,7 +115,7 @@ public class Gravity extends Acceleration {
                     try {
 
                         /*
-                         * See <http://physics.nist.gov/cgi-bin/cuu> for the
+                         * See <https://physics.nist.gov/cgi-bin/cuu> for the
                          * numerical value used below.
                          */
                         gravity = new Real(getRealType(), 9.80665,

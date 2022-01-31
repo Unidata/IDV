@@ -16,7 +16,7 @@ Leveraging the IDV Jython command shell with VisAD  creates a powerful combinati
 To achieve this objective, we will leverage the VisAD Jython APIs. Complete documentation for these APIs can be found here: 
 </p>
 <ul>
-<li><a href="http://www.ssec.wisc.edu/visad-docs/javadoc/visad/python/JPythonMethods.html">JPythonMethods</a></li>
+<li><a href="https://www.ssec.wisc.edu/visad-docs/javadoc/visad/python/JPythonMethods.html">JPythonMethods</a></li>
 <li><a href="https://docs.unidata.ucar.edu/dv/docs/userguide/tools/JythonLib.html">JythonLib</a></li>
 </ul>
 
@@ -97,7 +97,7 @@ def  windSpeed(u,v):
 <pre>
 sds = makeDataSource("/Users/chastang/tmp/sat/GOES-East100.area")
 img = selectData()
-gds = makeDataSource("http://motherlode.ucar.edu/thredds/dodsC/model/NCEP/NAM/CONUS_40km/conduit/NAM_CONUS_40km_conduit_20110712_1200.grib2")
+gds = makeDataSource("https://motherlode.ucar.edu/thredds/dodsC/model/NCEP/NAM/CONUS_40km/conduit/NAM_CONUS_40km_conduit_20110712_1200.grib2")
 grid = selectData()
 </pre>
 Here you will be prompted for the field.  Select Formulas -> Grid -> Make 2D slice, then pick the 300hPa temperature -- one time only!

@@ -55,7 +55,7 @@ proc defineImage {url name args}  {
         regsub -all {[\.\s-]+} $A(-id) {} A(-id)
     }
     if {$A(-desc) == ""} {
-        if {![regexp {(http://[^/]+)/} $url match source]} {
+        if {![regexp {(https://[^/]+)/} $url match source]} {
             regexp {(ftp://[^/]+)/} $url match source
         }
         set A(-desc) "From: $source"
@@ -354,7 +354,7 @@ proc writeFile {f c {binary 1}} {
 proc kml {contents name {vis 1}} {
     set kml {<?xml version="1.0" encoding="UTF-8"?>}
     append kml "\n"
-    append kml {<kml xmlns="http://earth.google.com/kml/2.2">}
+    append kml {<kml xmlns="https://earth.google.com/kml/2.2">}
     append kml "\n"
     append kml "<Folder>\n<name>$name</name>\n<visibility>$vis</visibility>\n"
     append kml $contents

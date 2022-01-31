@@ -235,7 +235,7 @@ public class YahooLocationControl extends StationLocationControl {
                 lon -= 180;
             }
             String fullQuery =
-                "http://api.local.yahoo.com/LocalSearchService/V3/localSearch?appid=idvunidata&radius=100&results=20&latitude="
+                "https://api.local.yahoo.com/LocalSearchService/V3/localSearch?appid=idvunidata&radius=100&results=20&latitude="
                 + lat + "&longitude=" + lon + "&query=" + query;
             //      System.err.println(fullQuery);
 

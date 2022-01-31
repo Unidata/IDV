@@ -62,7 +62,7 @@ public class SystemMemoryManager {
      * Private constructor.
      *
      * See this discussion:
-     * http://stackoverflow.com/questions/1190837/java-xmx-max-memory-on-system
+     * https://stackoverflow.com/questions/1190837/java-xmx-max-memory-on-system
      *
      * Post condition: memory will either be -1, or the result of
      * getTotalPhysicalMemorySize

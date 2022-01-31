@@ -7,7 +7,7 @@ package require http
 
 proc createStateIndex {layer abbrev} {
     set fips  [getStateFips $abbrev]
-    set url "http://arcdata.esri.com/data/tiger2000/tiger_county.cfm?sfips=$fips"
+    set url "https://arcdata.esri.com/data/tiger2000/tiger_county.cfm?sfips=$fips"
     set tok [::http::geturl $url -query "layer=$layer"]
     set body [::http::data $tok]
     if {![regexp {Below is a list of the counties} $body]} {
@@ -25,7 +25,7 @@ proc createStateIndex {layer abbrev} {
 
 proc  getShapeFile {filename layer fips county} {
     set id $::stateIndex($county)
-    set url "http://arcdata.esri.com/data/tiger2000/tiger_final.cfm?RequestTimeout=500"
+    set url "https://arcdata.esri.com/data/tiger2000/tiger_final.cfm?RequestTimeout=500"
     set tok [::http::geturl $url -query "filename_id=$id"]
     set body [::http::data $tok]
     if {![regexp -nocase {href="([^"]+/out/data/[^"]+)"} $body match link]} {

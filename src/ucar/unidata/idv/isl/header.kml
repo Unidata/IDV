@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://earth.google.com/kml/2.0">
+<kml xmlns="https://earth.google.com/kml/2.0">
 <Document>
 <name>${title}</name>
 <description>
@@ -7,7 +7,7 @@ ${description}
 </description>
 <ScreenOverlay>
 <name>IDV Logo</name>
-<Icon><href>http://www.unidata.ucar.edu/software/idv/logo.gif</href></Icon>
+<Icon><href>https://www.unidata.ucar.edu/software/idv/logo.gif</href></Icon>
 <overlayXY x="0" y="1" xunits="fraction" yunits="fraction"/>
   <screenXY x="0" y="1" xunits="fraction" yunits="fraction"/>
   <size x="0" y="0" xunits="fraction" yunits="fraction"/>

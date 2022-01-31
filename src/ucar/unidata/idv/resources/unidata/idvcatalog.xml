@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog xmlns="https://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" name="Unidata IDV Catalogs">
+<catalog xmlns="https://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="https://www.w3.org/1999/xlink" name="Unidata IDV Catalogs">
 
   <dataset name="IDV catalog">
     <service name="nwswarnings" serviceType="http" base="https://www.weather.gov/gis/NWS_Shapefile/" />
@@ -15,7 +15,7 @@
 
     <catalogRef xlink:title="Example Bundles from the Unidata RAMADDA Server" xlink:href="https://remadda.unidata.ucar.edu/repository/entry/show/Top/IDV+Resources/Bundles?entryid=196cb40d-6cc9-4726-8285-3a7eea8bcb92&amp;output=thredds.catalog&amp;orderby=name"/>
     <catalogRef xlink:title="Community Data Servers" xlink:href="https://ramadda.unidata.ucar.edu/repository/entry/show?entryid=23dec561-b869-4e20-8b1b-f38e4659ebab&amp;output=thredds.catalog"/>
-    <catalogRef xlink:title="Topography/Bathymetry" xlink:href="http://geoport.whoi.edu/thredds/bathy_catalog.xml" xlink:type="simple"/>
+    <catalogRef xlink:title="Topography/Bathymetry" xlink:href="https://geoport.whoi.edu/thredds/bathy_catalog.xml" xlink:type="simple"/>
     <!--catalogRef xlink:title="Tiger Shapefiles" xlink:href="https://www.unidata.ucar.edu/georesources/shapefiles/shapefiles.xml" xlink:type="simple"/-->
 
     <catalogRef xlink:title="Tiger Shapefiles" xlink:href="https://ramadda.unidata.ucar.edu/repository/entry/show/RAMADDA/RAMADDA+Examples/Tiger+Shapefiles?entryid=8194294b-2cad-468c-9466-8f32b6ff8c90&amp;output=thredds.catalog&amp;orderby=name"/>
@@ -27,116 +27,116 @@
     </dataset>
 
     <dataset name="NOAA Oceanography Data" >
-      <catalogRef xlink:title="Coast Watch" xlink:href="http://coastwatch.noaa.gov/thredds/catalog.xml"/>
-      <catalogRef xlink:title="Ocean Watch" xlink:href="http://oceanwatch.pfeg.noaa.gov/thredds/catalog.xml"/>
+      <catalogRef xlink:title="Coast Watch" xlink:href="https://coastwatch.noaa.gov/thredds/catalog.xml"/>
+      <catalogRef xlink:title="Ocean Watch" xlink:href="https://oceanwatch.pfeg.noaa.gov/thredds/catalog.xml"/>
     </dataset>
 
     <dataset name="Web Map Servers">
-      <catalogRef xlink:title="National Map" xlink:href="http://nmcatalog.usgs.gov/catalogwms/base?request=getCapabilities"/>
-      <catalogRef xlink:title="USGS Status Graphics" xlink:href="http://columbo.nrlssc.navy.mil/ogcwms/servlet/WMSServlet/USGS_Status_Graphics.wms?SERVICE=WMS&amp;REQUEST=GetCapabilities"/>
+      <catalogRef xlink:title="National Map" xlink:href="https://nmcatalog.usgs.gov/catalogwms/base?request=getCapabilities"/>
+      <catalogRef xlink:title="USGS Status Graphics" xlink:href="https://columbo.nrlssc.navy.mil/ogcwms/servlet/WMSServlet/USGS_Status_Graphics.wms?SERVICE=WMS&amp;REQUEST=GetCapabilities"/>
 
       <dataset name="NGDC">
         <dataset name="Hazards">
           <catalogRef xlink:title="Deep-ocean Assessment and Reporting of Tsunamis (DART)"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/dart?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/dart?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Natural Hazards"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/hazards?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/hazards?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Natural Hazards Pacific"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/hazards_pac?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/hazards_pac?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Satellite Fire Detections"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/firedetects?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/firedetects?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Marine Data">
           <catalogRef xlink:title="Digital Elevation Model Discovery Portal"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/dem?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/dem?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Great Lakes Bathymetric Contours"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/greatlakesbathy?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/greatlakesbathy?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Index to Marine and Lacustrine Geological Samples"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/Sample_Index?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/Sample_Index?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Marine Geology Data"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/geology?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/geology?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Marine Trackline Geophysics"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/trackline?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/trackline?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Multibeam Bathymetric Data"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/multibeam?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/multibeam?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="NOS Hydrographic Survey Data"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/nos_hydro?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/nos_hydro?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Surficial Sea Floor Composition"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/Deck41?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/Deck41?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="US Bathymetric and Fishing Maps"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/fishmap?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/fishmap?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Paleoclimatology">
           <catalogRef xlink:title="Climate Timeline"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/timeline?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/timeline?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Satellite Data and Applications">
           <catalogRef xlink:title="Satellite Fire Detections"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/firedetects?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/firedetects?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Snow and Ice">
           <catalogRef xlink:title="World Glacier Inventory"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/glacier?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/glacier?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Thermal Springs">
           <catalogRef xlink:title="Thermal Springs of the United States"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/Hot_Springs?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/Hot_Springs?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Global Ecosystems">
           <catalogRef xlink:title="Bailey Ecoregions of the Continents"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/bec?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/bec?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Bazilevich Global Primary Productivity"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/baz?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/baz?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Fedorova, Varlyguin and Volkova World Vegetation Map"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/fvvveg?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/fvvveg?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="UNEP Gridded FAO/UNESCO Soil Units"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/faosoil?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/faosoil?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Collaborations with NOAA and Other Organizations">
           <catalogRef xlink:title="Emission Inventory Mapviewer"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/emissions?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/emissions?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="NOAA Observing Systems"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/nosa?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/nosa?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="NOS Hydrographic Survey Data"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/nos_hydro?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/nos_hydro?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="Operational Significant Event Imagery"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/osei?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/osei?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
           <catalogRef xlink:title="World Glacier Inventory"
-                      xlink:href="http://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/glacier?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
+                      xlink:href="https://map.ngdc.noaa.gov/wmsconnector/com.esri.wms.Esrimap/glacier?request=getcapabilities&amp;service=WMS&amp;version=1.1.1"/>
         </dataset>
 
         <dataset name="Defense Meteorological Satellite Program">
           <catalogRef xlink:title="DMSP OLS Daily Mosaics (Limited Resolution)"
-                      xlink:href="http://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/mosaic/ut_night/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
+                      xlink:href="https://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/mosaic/ut_night/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
           <catalogRef xlink:title="DMSP OLS Gas Flare Monitoring"
-                      xlink:href="http://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/gasflares/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
+                      xlink:href="https://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/gasflares/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
           <catalogRef xlink:title="DMSP OLS Global Composites Version 2"
-                      xlink:href="http://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/gcv2/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
+                      xlink:href="https://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/gcv2/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
           <catalogRef xlink:title="DMSP OLS Lunar Cycle Composite"
-                      xlink:href="http://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/lc/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
+                      xlink:href="https://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/lc/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
           <catalogRef xlink:title="Las Vegas High Resolution Lights"
-                      xlink:href="http://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/las_vegas/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
+                      xlink:href="https://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/las_vegas/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
           <catalogRef xlink:title="Nighttime Lights of the World"
-                      xlink:href="http://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/poster/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
+                      xlink:href="https://www.ngdc.noaa.gov/eog/maps/cgi-bin/public/ms/poster/?service=WMS&amp;request=getCapabilities&amp;version=1.1.1" />
         </dataset>
       </dataset>
 
-      <catalogRef xlink:title="NASA-NEOWMS" xlink:href="http://neowms.sci.gsfc.nasa.gov/wms/wms"/>
-      <catalogRef xlink:title="Nasa-SVS" xlink:href="http://aes.gsfc.nasa.gov/cgi-bin/wms?"/>
+      <catalogRef xlink:title="NASA-NEOWMS" xlink:href="https://neowms.sci.gsfc.nasa.gov/wms/wms"/>
+      <catalogRef xlink:title="Nasa-SVS" xlink:href="https://aes.gsfc.nasa.gov/cgi-bin/wms?"/>
 
       <dataset name="KNMI - ADAGUC">
-        <catalogRef xlink:title="Sciamachy Daily Level 2 Tropospheric Nitrogen Dioxide" xlink:href="http://geoservices.knmi.nl/cgi-bin/SCIA_L2_TDTNO2_2007.cgi?SERVICE=WMS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities"/>
-        <catalogRef xlink:title="Sciamachy Monthly Level 3 Tropospheric Nitrogen Dioxide" xlink:href="http://geoservices.knmi.nl/cgi-bin/SCIA_L3_TMTNO2.cgi?SERVICE=WMS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities"/>
+        <catalogRef xlink:title="Sciamachy Daily Level 2 Tropospheric Nitrogen Dioxide" xlink:href="https://geoservices.knmi.nl/cgi-bin/SCIA_L2_TDTNO2_2007.cgi?SERVICE=WMS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities"/>
+        <catalogRef xlink:title="Sciamachy Monthly Level 3 Tropospheric Nitrogen Dioxide" xlink:href="https://geoservices.knmi.nl/cgi-bin/SCIA_L3_TMTNO2.cgi?SERVICE=WMS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities"/>
       </dataset>
 
-      <catalogRef xlink:title="CSU CHILL Radar Facility" xlink:href="http://wms.chill.colostate.edu/cgi-bin/mapserv?map=/var/www/html/maps/test.map&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;request=getCapabilities"/>
+      <catalogRef xlink:title="CSU CHILL Radar Facility" xlink:href="https://wms.chill.colostate.edu/cgi-bin/mapserv?map=/var/www/html/maps/test.map&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;request=getCapabilities"/>
     </dataset>
 
     <catalogRef xlink:title="Unidata's RAMADDA Server" xlink:href="https://ramadda.unidata.ucar.edu/repository?output=thredds.catalog"/>

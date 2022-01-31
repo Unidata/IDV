@@ -197,7 +197,7 @@ public class GeodasDataSource extends DataSourceImpl {
         for (int i = 0; i < args.length; i += 2) {
             opts[i / 2] = new HTTPClient.NVPair(args[i], args[i + 1]);
         }
-        URL url = new URL("http://www.ngdc.noaa.gov/cgi-bin/mgg/gd_gtran");
+        URL url = new URL("https://www.ngdc.noaa.gov/cgi-bin/mgg/gd_gtran");
         CookieModule.setCookiePolicyHandler(null);
         HTTPConnection conn = new HTTPConnection(url.getHost(),
                                   url.getPort());
@@ -213,7 +213,7 @@ public class GeodasDataSource extends DataSourceImpl {
             return;
         }
 
-        url = new URL("http://www.ngdc.noaa.gov/mgg/tmp/1/gtran/" + key
+        url = new URL("https://www.ngdc.noaa.gov/mgg/tmp/1/gtran/" + key
                       + "_data/" + key + "/" + key + ".asc");
         byte[] ascBytes =
             IOUtil.readBytes(url.openConnection().getInputStream());
@@ -221,7 +221,7 @@ public class GeodasDataSource extends DataSourceImpl {
         IOUtil.writeBytes(new File("test.asc"), ascBytes);
 
         /**
-         * url = new URL("http://www.ngdc.noaa.gov/cgi-bin/mgg/gd_rtvg");
+         * url = new URL("https://www.ngdc.noaa.gov/cgi-bin/mgg/gd_rtvg");
          * opts = new HTTPClient.NVPair[]{
          * new HTTPClient.NVPair(  "KEY","12313131"),
          * new HTTPClient.NVPair("PATH_RTV","/net/prod/www/mgg/dat/tmp/1/gtran")
@@ -229,7 +229,7 @@ public class GeodasDataSource extends DataSourceImpl {
          * res  = conn.Post(url.getFile(), opts);
          *   ok = !(res.getStatusCode() >= 300);
          *   if (ok) {
-         *       url = new URL("http://www.ngdc.noaa.gov/mgg/tmp/1/gtran/"+key+".zip");
+         *       url = new URL("https://www.ngdc.noaa.gov/mgg/tmp/1/gtran/"+key+".zip");
          *       byte[]zipBytes = IOUtil.readBytes(url.openConnection().getInputStream());
          *       System.out.println ("read" + zipBytes.length);
          *       ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipBytes));

@@ -53,8 +53,8 @@ public class TimestampFormat extends java.text.Format {
      * SimpleDateFormat pattern to describe
      * ISO 8601 complete date plus hours, minutes, seconds
      * and a decimal fraction of a second.
-     * <a href="http://www.w3.org/TR/NOTE-datetime">
-     *      http://www.w3.org/TR/NOTE-datetime</a>
+     * <a href="https://www.w3.org/TR/NOTE-datetime">
+     *      https://www.w3.org/TR/NOTE-datetime</a>
      * @see java.text.SimpleDateFormat
      */
     static public final String isoTimeFmtPattern =
@@ -64,8 +64,8 @@ public class TimestampFormat extends java.text.Format {
      * Formats an Timestamp to produce a string.
      * ISO 8601 Complete date plus hours, minutes, seconds
      * and a decimal fraction of a second.
-     * <a href="http://www.w3.org/TR/NOTE-datetime">
-     *      http://www.w3.org/TR/NOTE-datetime</a>
+     * <a href="https://www.w3.org/TR/NOTE-datetime">
+     *      https://www.w3.org/TR/NOTE-datetime</a>
      *
      * @param ts    Timestamp to format
      * @param buf   StringBuffer where the text is to be appended

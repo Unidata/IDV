@@ -97,7 +97,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
 
     /** Earth radius */
     private double R = 6371.01;
-    // from http://ssd.jpl.nasa.gov/phys_props_earth.html
+    // from https://ssd.jpl.nasa.gov/phys_props_earth.html
 
     /**
      *  Do we request 3d or 2d data.

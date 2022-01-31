@@ -490,7 +490,7 @@ public class DqcRadarDatasetCollection extends StationRadarCollectionImpl {
             throws IOException {
         String stime = DateUtil.getTimeAsISO8601(absTime);
         // construct a query like this:
-        // http://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
+        // https://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
         StringBuffer queryb = new StringBuffer();
 
         queryb.append(dqc.getQuery().getUriResolved().toString());
@@ -539,7 +539,7 @@ public class DqcRadarDatasetCollection extends StationRadarCollectionImpl {
     private DqcRadarDatasetInfo queryRadarStation(String stnName, Date start,
             Date end)
             throws IOException {
-        // http://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
+        // https://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
         StringBuffer queryb = new StringBuffer();
 
         queryb.append(dqc.getQuery().getUriResolved().toString());
@@ -977,7 +977,7 @@ public class DqcRadarDatasetCollection extends StationRadarCollectionImpl {
     public static void main(String args[]) throws IOException {
         StringBuffer errlog = new StringBuffer();
         String dqc_location =
-            "http://thredds.ucar.edu/thredds/idd/radarLevel2";
+            "https://thredds.ucar.edu/thredds/idd/radarLevel2";
         DqcRadarDatasetCollection ds = factory("test", dqc_location, errlog);
         System.out.println(" errs= " + errlog);
 

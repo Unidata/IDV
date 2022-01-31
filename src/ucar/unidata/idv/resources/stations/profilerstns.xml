@@ -2,7 +2,7 @@
 <stationtable name="Profiler Sites" elevunit="meters" category="Weather">
 <!-- see NOAA Profiler Network Site Location Information  -->
 <!-- (Generated Wed Apr 09 19:06:48 GMT 2003) -->
-<!-- http://www.profiler.noaa.gov/jsp/npnSiteLocations.jsp -->
+<!-- https://www.profiler.noaa.gov/jsp/npnSiteLocations.jsp -->
 <station idn="74630" id="AZCN5" name="Aztec" st="NM" co="US" lat="36.84" lon="-107.9" elev="1902"/>
 <station idn="74662" id="BLMM7" name="Bloomfield" st="MO" co="US" lat="36.88" lon="-89.97" elev="130"/>
 <station idn="74357" id="BLRW3" name="Blue River" st="WI" co="US" lat="43.22" lon="-90.53" elev="226"/>

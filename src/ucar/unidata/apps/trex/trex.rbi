@@ -91,7 +91,7 @@
 
   <!-- Defines the image set xml  -->
   <resources name="idv.resource.imagesets">
-    <resource location="http://www.unidata.ucar.edu/software/idv/projects/trex/products/trexproducts.xml"/>
+    <resource location="https://www.unidata.ucar.edu/software/idv/projects/trex/products/trexproducts.xml"/>
   </resources>
 
 

@@ -711,7 +711,7 @@ public class FileManager {
 
     /* claimed workaround for WebStart
 
-    http://forum.java.sun.com/read/56761/q_D4Xl3nS380AAZX5#LR
+    https://forum.java.sun.com/read/56761/q_D4Xl3nS380AAZX5#LR
 
 
     Hi Surya,

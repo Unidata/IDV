@@ -31,7 +31,7 @@ package ucar.unidata.util;
 
 
 /**
- * Taken from http://www.javapractices.com/Topic28.cjp.
+ * Taken from https://www.javapractices.com/Topic28.cjp.
  * <p>
  * Collected methods which allow easy implementation of <code>hashCode</code>.
  * <p>

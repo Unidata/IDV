@@ -6,7 +6,7 @@
 7304,User alias,A secondary alternative name assigned by user; not populated by EPSG.,(User to insert),EPSG,2000-05-07 00:00:00,,0
 7305,User abbreviation,An abbreviation assigned by user; not populated by EPSG.,(User to insert),EPSG,2000-05-07 00:00:00,,0
 7306,POSC acronym,An abbreviation assigned by the Petrotechnical Open Software Corporation (POSC).,POSC,EPSG,2000-05-07 00:00:00,,0
-7307,EuroGeographics Identifier,A unique identifier used in the compilation of European national mapping agency data by EuroGeographics.,EuroGeographics; http://crs.ifag.de/,EPSG,2001-06-05 00:00:00,,0
+7307,EuroGeographics Identifier,A unique identifier used in the compilation of European national mapping agency data by EuroGeographics.,EuroGeographics; https://crs.ifag.de/,EPSG,2001-06-05 00:00:00,,0
 7308,Croatia alternative identifier,,EPSG,EPSG,2001-06-05 00:00:00,,0
 7309,Slovenia alternative identifier,,EPSG,EPSG,2001-06-05 00:00:00,,0
 7310,Germany alternative identifier,An alternative name used by the BfK.,EPSG,EPSG,2001-06-05 00:00:00,,0

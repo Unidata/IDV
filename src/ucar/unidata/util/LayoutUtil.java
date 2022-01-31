@@ -880,7 +880,7 @@ public class LayoutUtil extends MenuUtil {
      * This does a column oriented grid bag layout. It will layout
      * the given components in a grid with the given number of columns.
      * It is probably good to read up a bit on
-     * <a href=http://java.sun.com/j2se/1.3/docs/api/java/awt/GridBagLayout.html>GridBagLayout</a>
+     * <a href=https://java.sun.com/j2se/1.3/docs/api/java/awt/GridBagLayout.html>GridBagLayout</a>
      * <p>
      * The weights define how much weight or spacing to give to the width
      * of each column and the height of each row.

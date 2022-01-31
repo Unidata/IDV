@@ -81,7 +81,7 @@ For the workshop we will demonstrate a simple example.
     &lt;view id="view1" props="size=300:300;"&gt;
     &lt;p&gt;
 
-    &lt;form action="idv:idv.createDisplay ('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/idvtest/grids/%datetime%_%nwpmodel%.nc', 'u', 'planviewcontour', 'DefaultView=view1;')"&gt;
+    &lt;form action="idv:idv.createDisplay ('https://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies/idvtest/grids/%datetime%_%nwpmodel%.nc', 'u', 'planviewcontour', 'DefaultView=view1;')"&gt;
     
     Date and Time:
     &lt;select name="datetime"&gt;
@@ -111,7 +111,7 @@ For the workshop we will demonstrate a simple example.
     <li>The display creation is defined in the  &lt;form&gt; tag.
         The form action:
 <pre>
-    action="idv:idv.createDisplay('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/%datetime%_%nwpmodel%.nc',
+    action="idv:idv.createDisplay('https://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/model/%datetime%_%nwpmodel%.nc',
                                   'u', 'planviewcontour', 'DefaultView=view1;') "
 </pre>
         is a call to the IDV and creates a display with
@@ -171,7 +171,7 @@ remove the line returns in this text.
 
 <pre>
 &lt;display
-data="http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods
+data="https://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods
 /casestudies/july18_2002/grids/2002071812_ruc.nc"
 param="skewt" display="skewt">
 &gt;
@@ -189,7 +189,7 @@ environment.
 <pre>
 
 &lt;a href="idv:datamanager.createDataSource
-('http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies
+('https://motherlode.ucar.edu/cgi-bin/dods/nph-nc/dods/casestudies
 /july18_2002/grids/2002071812_ruc.nc');"&gt;
 Load OPeNDAP data source &lt;/a&gt;
 &lt;p&gt;

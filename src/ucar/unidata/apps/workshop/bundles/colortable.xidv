@@ -26,7 +26,7 @@
                             </method>
                             <method name="put">
                                 <string><![CDATA[Thredds.CatalogUrl]]></string>
-                                <string><![CDATA[http://www.unidata.ucar.edu/software/IDV/data/workshopCatalog.xml]]></string>
+                                <string><![CDATA[https://www.unidata.ucar.edu/software/IDV/data/workshopCatalog.xml]]></string>
                             </method>
                         </object>
                     </property>
@@ -48,7 +48,7 @@
                                 <string><![CDATA[Grids from an OPeNDAP server]]></string>
                             </property>
                             <property name="Patterns">
-                                <string><![CDATA[http://.*/dods/.*$,dods://.*$]]></string>
+                                <string><![CDATA[https://.*/dods/.*$,dods://.*$]]></string>
                             </property>
                         </object>
                     </property>
@@ -58,7 +58,7 @@
                                 <boolean>false</boolean>
                             </property>
                             <property name="FilePattern">
-                                <string><![CDATA[http://.*/dods/.*$,dods://.*$]]></string>
+                                <string><![CDATA[https://.*/dods/.*$,dods://.*$]]></string>
                             </property>
                         </object>
                     </property>

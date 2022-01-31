@@ -79,7 +79,7 @@ public class GasConstant extends ScalarQuantity {
 
     /**
      * The universal (or ideal) molar gas constant value.  See
-     * <http://physics.nist.gov/cgi-bin/cuu/Constants/>.
+     * <https://physics.nist.gov/cgi-bin/cuu/Constants/>.
      */
     public static final Real UNIVERSAL_GAS_CONSTANT;
 
@@ -99,7 +99,7 @@ public class GasConstant extends ScalarQuantity {
             instance = new GasConstant(unit);
 
             /*
-             * See <http://physics.nist.gov/cgi-bin/cuu/Constants/>
+             * See <https://physics.nist.gov/cgi-bin/cuu/Constants/>
              * for the numeric value of the following.
              */
             ugc = NewReal(8.314472, unit);

@@ -713,7 +713,7 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
     public URI getQueryRadarStationURI(String stnName, String productID,
                                        Date start, Date end)
             throws IOException {
-        // http://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
+        // https://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
         StringBuilder queryb  = new StringBuilder();
         String        baseURI = dsc_location.replaceFirst("/dataset.xml",
                                     "?");
@@ -766,7 +766,7 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
         String stime = DateUtil.getTimeAsISO8601(absTime).replaceAll("GMT",
                            "");
         // construct a query like this:
-        // http://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
+        // https://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
         StringBuilder queryb  = new StringBuilder();
         String        baseURI = dsc_location.replaceFirst("/dataset.xml",
                                     "?");
@@ -880,7 +880,7 @@ public class IdvRadarDatasetCollection extends StationRadarCollectionImpl {
     private TDSRadarDatasetInfo queryRadarStation(String stnName,
             String productID, Date start, Date end)
             throws IOException {
-        // http://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
+        // https://motherlode.ucar.edu:9080/thredds/idd/radarLevel2?returns=catalog&stn=KFTG&dtime=latest
         StringBuilder queryb  = new StringBuilder();
         String        baseURI = dsc_location.replaceFirst("/dataset.xml",
                                     "?");

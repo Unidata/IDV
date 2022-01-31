@@ -1,7 +1,7 @@
 
 ---------------------------------------------------------------
 mailapi.jar and smtp.jar:
-from: http://java.sun.com/products/javamail/ 
+from: https://java.sun.com/products/javamail/ 
 These are from the Java Mail package and are used by RAMADDA
 Note: They were originally signed jars. To make them into the 
 jar of jars they need to be unjarred and the META_INF directory
@@ -10,7 +10,7 @@ removed.
 
 ---------------------------------------------------------------
 jetty.jar jetty-util.jar:
-These are from the Jetty project: http://www.mortbay.org/jetty/
+These are from the Jetty project: https://www.mortbay.org/jetty/
 and provide a embeddable web server used by RAMADDA
 
 ---------------------------------------------------------------
@@ -18,7 +18,7 @@ render.jar:
 This holds the pdf/svg/ps rendering code from the FOP project.
 render.jar a big jar of the classes in the FOP release.
 We get the FOP-0_95 release from:
-http://xmlgraphics.apache.org/fop/download.html
+https://xmlgraphics.apache.org/fop/download.html
 
 From the fop directory we want to unjar all of the jars in lib
 and the build/fop.jar

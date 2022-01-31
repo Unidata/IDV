@@ -23,23 +23,23 @@ Other Copyrights/Licenses:
 This product includes software developed by:
 
     * The University Corporation for Atmospherice Research (netCDF-Java)
-         (http://www.unidata.ucar.edu/software/netcdf-java)
+         (https://www.unidata.ucar.edu/software/netcdf-java)
     * The University of Wisconsin-Madison 
-         (VisAD) (http://www.ssec.wisc.edu/~billh/visad.html).
+         (VisAD) (https://www.ssec.wisc.edu/~billh/visad.html).
     * The  Australian Bureau of Meteorology (AIFS) 
-         (http://ssu1.bom.gov.au/pub/ims/aifs.html)
-    * The Apache Software Foundation (http://www.apache.org/).
-    * The Jython project (http://www.jython.org)
-    * The JDOM project (http://www.jdom.org)
-    * The ImageJ project (http://rsb.info.nih.gov/ij/) 
-    * The JJ2000 project (http://jpeg2000.epfl.ch/)
-    * The JFreeChart project (http://www.jfree.org/jfreechart/index.php)
-    * The JCommon project (http://www.jfree.org/jcommon/)
-    * The L2FProd.com Common Components 6.9.1 (http://common.L2FProd.com)
-    * The jnumeric package (http://jnumerical.sourceforge.net/)
-    * JAMA: The Java Matrix Package (http://math.nist.gov/javanumerics/jama/)
+         (https://ssu1.bom.gov.au/pub/ims/aifs.html)
+    * The Apache Software Foundation (https://www.apache.org/).
+    * The Jython project (https://www.jython.org)
+    * The JDOM project (https://www.jdom.org)
+    * The ImageJ project (https://rsb.info.nih.gov/ij/) 
+    * The JJ2000 project (https://jpeg2000.epfl.ch/)
+    * The JFreeChart project (https://www.jfree.org/jfreechart/index.php)
+    * The JCommon project (https://www.jfree.org/jcommon/)
+    * The L2FProd.com Common Components 6.9.1 (https://common.L2FProd.com)
+    * The jnumeric package (https://jnumerical.sourceforge.net/)
+    * JAMA: The Java Matrix Package (https://math.nist.gov/javanumerics/jama/)
     * JTEM: Java tools for experimental mathematics 
-        (http://www-sfb288.math.tu-berlin.de/~jtem/numericalMethods/index.html)
+        (https://www-sfb288.math.tu-berlin.de/~jtem/numericalMethods/index.html)
 
 Please read the different LICENSE files present in the root directory
 of the IDV distribution for restrictions on those packages.

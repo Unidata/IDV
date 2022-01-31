@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog xmlns="https://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" name="Latest Unidata IDD Model Data" version="1.0">
-  <service name="latest" serviceType="Resolver" base="http://motherlode.ucar.edu:8080/thredds/dqc/latestModel-InvCat1.0" />
+<catalog xmlns="https://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="https://www.w3.org/1999/xlink" name="Latest Unidata IDD Model Data" version="1.0">
+  <service name="latest" serviceType="Resolver" base="https://motherlode.ucar.edu:8080/thredds/dqc/latestModel-InvCat1.0" />
   <dataset name="Unidata Latest Models" collectionType="TimeSeries" ID="ucar.unidata.idd.model">
     <dataset name="NCEP NAM 80km CONUS model data" urlPath="?nam_211">
       <serviceName>latest</serviceName>

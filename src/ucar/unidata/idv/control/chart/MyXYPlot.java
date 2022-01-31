@@ -5,7 +5,7 @@
  *
  * (C) Copyright 2000-2005, by Object Refinery Limited and Contributors.
  *
- * Project Info:  http://www.jfree.org/jfreechart/index.html
+ * Project Info:  https://www.jfree.org/jfreechart/index.html
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -132,7 +132,7 @@
  * 23-Mar-2004 : Fixed more cloning bugs (DG);
  * 07-Apr-2004 : Fixed problem with axis range when the secondary renderer is
  *               stacked, see this post in the forum:
- *               http://www.jfree.org/phpBB2/viewtopic.php?t=8204 (DG);
+ *               https://www.jfree.org/phpBB2/viewtopic.php?t=8204 (DG);
  * 07-Apr-2004 : Added get/setDatasetRenderingOrder() methods (DG);
  * 26-Apr-2004 : Added option to fill quadrant areas in the background of the
  *               plot (DG);

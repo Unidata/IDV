@@ -51,7 +51,7 @@ import java.util.zip.ZipInputStream;
  * EsriShapefile.java
  *
  * Encapsulates details of ESRI Shapefile format, documented at
- * http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
+ * https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
  *
  * @author Russ Rew
  */
@@ -826,7 +826,7 @@ public class EsriShapefile {
      * points.
      *
      * Note: This reads the MRANGE and MPOINTS every time though, according to:
-     * http://en.wikipedia.org/wiki/Shapefile
+     * https://en.wikipedia.org/wiki/Shapefile
      * these fields are optional but how does one tell?
      *
      * @author Jeff McWhirter

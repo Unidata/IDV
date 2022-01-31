@@ -1,5 +1,5 @@
-http://www.oracle.com/technetwork/java/javase/downloads/jre-6u31-download-1501637.html
-http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-java-client-419417.html#java3d-1.5.1-oth-JPR
+https://www.oracle.com/technetwork/java/javase/downloads/jre-6u31-download-1501637.html
+https://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-java-client-419417.html#java3d-1.5.1-oth-JPR
 
 |-----------------------+------------------+----------+----------------------------------+--------------------------+------------------+------------+----------+-----+----------------------------------------+------|
 | Operating System      | 32/64            | size     | install                          | /share/idv/jre directory | host             | downloaded | unpacked | j3d | /share/install4j4.2.6/jres             | idv? |

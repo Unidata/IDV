@@ -9,7 +9,7 @@
          layer="fixed-bluemarbleL"
          title="Color Map- Static"/>
   <wms
-     server="http://neo.sci.gsfc.nasa.gov/wms/wms"
+     server="https://neo.sci.gsfc.nasa.gov/wms/wms"
      layer="BlueMarbleNG"
      title="Blue Marble - Dynamic"
      srs="CRS:84"
@@ -17,7 +17,7 @@
      version="1.3.0"
      bbox="90,-180,-90,180"/>
   <wms
-      server="http://neo.sci.gsfc.nasa.gov/wms/wms"
+      server="https://neo.sci.gsfc.nasa.gov/wms/wms"
       layer="BlueMarbleNG-TB"
       title="Blue Marble Topo- Dynamic"
       srs="CRS:84"

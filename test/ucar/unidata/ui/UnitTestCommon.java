@@ -374,7 +374,7 @@ public class UnitTestCommon extends TestCase {
         if (servlet.startsWith("/")) {
             servlet = servlet.substring(1);
         }
-        String svc = "http://" + svcname + "/" + servlet;
+        String svc = "https://" + svcname + "/" + servlet;
         if ( !checkServer(svc)) {
             throw new Exception("Server not reachable:" + svc);
         }

@@ -75,15 +75,15 @@ public class OpenSearchHandler extends XmlHandler {
 
     /** xml items          */
     public static final String XMLNS_XMLNS =
-        "http://a9.com/-/spec/opensearch/1.1/";
+        "https://a9.com/-/spec/opensearch/1.1/";
 
     /** xml items          */
     public static final String XMLNS_XMLNS_GEO =
-        "http://a9.com/-/opensearch/extensions/geo/1.0/";
+        "https://a9.com/-/opensearch/extensions/geo/1.0/";
 
     /** xml items          */
     public static final String XMLNS_XMLNS_TIME =
-        "http://a9.com/-/opensearch/extensions/time/1.0/";
+        "https://a9.com/-/opensearch/extensions/time/1.0/";
 
     /** xml items          */
     public static final String TAG_OPENSEARCHDESCRIPTION =

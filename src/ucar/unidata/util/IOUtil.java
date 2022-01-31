@@ -944,7 +944,7 @@ public class IOUtil {
      */
     public static String getFileExtension(String f) {
         int idx = f.lastIndexOf(".");
-        //Check for the case of http://www.foo.bar/
+        //Check for the case of https://www.foo.bar/
         int slashIdx = f.lastIndexOf("/");
         if (idx < slashIdx) {
             return "";
@@ -1162,7 +1162,7 @@ public class IOUtil {
         if (filenameOrUrl.indexOf("?") < 0) {
             if (filenameOrUrl.startsWith("http:")) {
                 if ( !StringUtil.stringMatch(filenameOrUrl,
-                                             "http://[^\\/].*\\.\\.*")) {
+                                             "https://[^\\/].*\\.\\.*")) {
                     return true;
                 }
             }
@@ -1170,7 +1170,7 @@ public class IOUtil {
 
 
         //TODO - this fails when you don't have an "/" at the end
-        //e.g., http://www.yahoo.com fails
+        //e.g., https://www.yahoo.com fails
         String ext = getFileExtension(filenameOrUrl);
         int    idx = ext.indexOf("?");
         if (idx >= 0) {
@@ -2483,7 +2483,7 @@ public class IOUtil {
         }
 
         String baseUrl =
-            "http://motherlode.ucar.edu:9080/thredds/radarServer/nexrad/level3/IDD?&stn=${station}&var=N0R&time_start=1909-05-24T21:26:24&time_end=2109-04-05T21:26:24";
+            "https://motherlode.ucar.edu:9080/thredds/radarServer/nexrad/level3/IDD?&stn=${station}&var=N0R&time_start=1909-05-24T21:26:24&time_end=2109-04-05T21:26:24";
         String[] stations = {
             "TLH", "BYX", "EVX", "FFC", "JGX", "VAX", "GUA", "HMO", "HWA",
             "HKM", "HKI", "DMX", "DVN", "CBX", "SFX", "LOT", "ILX", "IND",
@@ -2546,7 +2546,7 @@ public class IOUtil {
             new AccountManager(new File(".")));
 
         String url =
-            "http://delllaptop:8080/repository/entry/show/Projects/PRIVATE?entryid=441dce70-b70c-4993-a514-f5b50d3234bf&output=thredds.catalog";
+            "https://delllaptop:8080/repository/entry/show/Projects/PRIVATE?entryid=441dce70-b70c-4993-a514-f5b50d3234bf&output=thredds.catalog";
         InputStream is = getInputStream(url, IOUtil.class);
         if (is == null) {
             is = getInputStream(url, IOUtil.class);

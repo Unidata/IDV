@@ -135,7 +135,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
 
     /** Earth radius */
     private double R = 6371.01;
-    // from http://ssd.jpl.nasa.gov/phys_props_earth.html
+    // from https://ssd.jpl.nasa.gov/phys_props_earth.html
 
     /** old smoothing type */
     private String OldSmoothingType = LABEL_NONE;
