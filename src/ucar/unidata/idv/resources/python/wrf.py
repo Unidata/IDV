@@ -12,8 +12,15 @@ def wrf_tk(P, PB, T):
   Pair        = noUnit(P + PB)
   theta       = noUnit(T) + 300.
   tk          = theta * (( Pair/100000. )**(Rd_Cp))
-  tk0         = newUnit(tk, "temperature", "kelvin")
-  return tk
+  tk1         = noUnit(tk)
+  tk0         = newUnit(tk1, "temperature", "kelvin")
+  return tk0
+
+def wrf_theta0(T):
+  # calculate potential temperature (K)
+  #------------------------------------
+  thetaT       = T + 300.
+  return thetaT
 
 def wrf_rh(T, QVAPOR, P, PB, flag=1 ):
   # calculate Relative humidity (%) with respect to liquid water
@@ -66,7 +73,55 @@ def wrf_rh(T, QVAPOR, P, PB, flag=1 ):
       es = ((Tdeg - Tdegice)*es_liq + (Tdegliq - Tdeg)*es_ice)/(Tdegliq - Tdegice)
   #----------------------------------------
   QVS       = EP_3 * es / (Pair - es)     # [kg kg-1]
-  rh        =  QV/QVS
-  rh        =  substitute(rh, -10, 0, 0)
-  rh        =  substitute(rh, 1, 10, 1)
+  rh        =  noUnit(QV)/noUnit(QVS) * 100
+  rh        =  substitute(rh, -100, 0, 0)
+  rh        =  substitute(rh, 100, 1000, 100)
+  rh        =  newUnit(rh, "rh", "%")
   return rh
+
+def wrf_es(T, flag=1):
+    # calculate saturation vapor pressure(Es)
+    #  T is temperature (K)
+    #------------------------------------
+  if flag == 1:
+    a      = 7.5
+    b      = 237.3
+  elif flag == -1:
+    a      = 9.5
+    b      = 265.5
+    #---
+  tdeg   = T - 273.16
+  es = 6.11 * 10**(a * tdeg / (b + tdeg)) * 100.0
+  return es
+
+def wrf_qs(P, PB, T, flag=1):
+  # calculate Mixing Ratio
+  #  qs (kg kg-1)
+  #  p  (Pa)
+  #  T  (K)
+  Pair      = P  +  PB
+  epsi   = 0.62185
+  es     = wrf_es(T, flag)
+  qs     = 0.62185 * es / (Pair - es)
+  return qs
+
+def wrf_dewpoint(T, QVAPOR, P, PB, flag=1 ):
+  # calculate dewpoint temperature
+  # this function use "Tetens formula"
+  #------------------------------------
+  # input variables
+  # - T: perturbationj potential temperature (theta-t0)";
+  # - QVAPOR: Water vapor mixing ratio (kg kg-1)
+  # - P: perturbation pressure
+  # - PB: base state pressure
+  # # es is calculated with respect to : flag=1 water, flag=-1 ice, flag=0 mix
+  #------------------------------------
+  Temp = wrf_tk(P, PB, T)
+  Rh = wrf_rh(T, QVAPOR, P, PB, flag=1 )
+
+  return DerivedGridFactory.createDewpoint (Temp, Rh)
+
+def wrf_eth(P, PB, T, QVAPOR):
+  temp = wrf_tk(P, PB, T)
+  eth = DerivedGridFactory.createWRFEquivalentPotentialTemperature(p, PB, temp, QVAPOR)
+  return eth
