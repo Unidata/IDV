@@ -161,7 +161,7 @@ public class Main {
         double PositionLongitude = History.IRCurrentRecord.longitude;
         String topoPath = new File(".").getCanonicalPath();
         System.err.println("topoPath: " + topoPath);
-        String TopoFileName = "/edu/wisc/ssec/mcidasv/resources/digelev_hires_le.map";
+        String TopoFileName = "/auxdata/maps/digelev_hires_le.map";
 
         int TopographyFlag = 0;
         System.out.printf("TOPO Info : File=%s Lat=%f Lon=%f\n", TopoFileName, PositionLatitude,
