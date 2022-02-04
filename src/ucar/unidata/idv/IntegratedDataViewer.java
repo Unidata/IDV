@@ -718,7 +718,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                         //Check for the bundles.xml
                         getInstallManager().automaticallyCheckForUpdates();
                         IOUtil.readContents(
-                            "https://www.unidata.ucar.edu/software/idv/resources/bundles.xml",
+                            "https://resources.unidata.ucar.edu/idv/resources/bundles.xml",
                             getClass());
                     } catch (Exception exc) {}
                 }

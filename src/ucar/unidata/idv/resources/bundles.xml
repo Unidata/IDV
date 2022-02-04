@@ -7,58 +7,58 @@ Note: you can also add a type="data|display|favorite" in the bundle tag
   <bundle
      category="Samples"
      name="Grid Displays"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/samples/grid.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/samples/grid.xidv"/>
 
   <bundle
      category="Samples"
      name="Radar Displays"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/samples/radar.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/samples/radar.xidv"/>
 
 
   <bundle
      category="Samples"
      name="Satellite Displays"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/samples/satellite.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/samples/satellite.xidv"/>
 
   <bundle
       category="Samples"
       name="Hurricane Displays"
-      url="https://www.unidata.ucar.edu/software/idv/resources/bundles/samples/hmichael.xidv"/>
+      url="https://resources.unidata.ucar.edu/idv/resources/bundles/samples/hmichael.xidv"/>
 
   <bundle
      category="Samples > NAM211"
      name="Winds/Heights (default 500 mb)"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/NAM211/winds_heights (default 500 mb).xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/NAM211/winds_heights (default 500 mb).xidv"/>
   <bundle
      category="Samples > NAM211"
      name="Isentropic Potential Vorticity"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/NAM211/IPV.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/NAM211/IPV.xidv"/>
   <bundle
      category="Samples > NAM211"
      name="Sea Level Pressure/1000-500 mb thickness"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/NAM211/Sea Level Pressure_1000-500 mb thickness.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/NAM211/Sea Level Pressure_1000-500 mb thickness.xidv"/>
   <bundle
      category="Samples > NAM211"
      name="Theta-E Isosurface/Grid skewT"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/NAM211/Theta-E_Grid skewT.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/NAM211/Theta-E_Grid skewT.xidv"/>
   <bundle
      category="Samples > NAM211"
      name="Synoptic overview (SLP, PCP, 500 Z, THK)"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/NAM211/500Synop.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/NAM211/500Synop.xidv"/>
   <bundle
      category="Samples > NAM211"
      name="Sea Level Pressure in 3D"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/NAM211/3D_Pressure.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/NAM211/3D_Pressure.xidv"/>
   <bundle
      category="Samples > NAM211"
      name="Windspeed Volume Rendering"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/NAM211/windspeed_volume.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/NAM211/windspeed_volume.xidv"/>
   <bundle
      category="Samples > Ocean"
      name="El Nino/La Nina Comparison"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/Ocean/elnino-dods.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/Ocean/elnino-dods.xidv"/>
   <bundle
      category="Samples > Ocean"
      name="Latest SST"
-     url="https://www.unidata.ucar.edu/software/idv/resources/bundles/Ocean/sst.xidv"/>
+     url="https://resources.unidata.ucar.edu/idv/resources/bundles/Ocean/sst.xidv"/>
 </bundles>
