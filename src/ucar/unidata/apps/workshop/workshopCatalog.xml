@@ -31,5 +31,5 @@ xmlns:xlink="https://www.w3.org/1999/xlink">
     </dataset>
 
 
-    <catalogRef xlink:title="Main IDV Catalog" xlink:href="https://www.unidata.ucar.edu/georesources/idvcatalog.xml"/>
+    <catalogRef xlink:title="Main IDV Catalog" xlink:href="https://resources.unidata.ucar.edu/georesources/idvcatalog.xml"/>
 </catalog>

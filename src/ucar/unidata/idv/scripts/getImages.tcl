@@ -422,7 +422,7 @@ set ::imageSource ${dirRoot}defineImages.tcl
 set ::logFile     ${logRoot}getImages.log.out
 set ::imageDir ${imgRoot}images
 set ::kmlTemplateFile     ${imgRoot}photooverlay.kml
-set ::imageRoot https://www.unidata.ucar.edu/georesources/webcams/images/
+set ::imageRoot https://resources.unidata.ucar.edu/georesources/webcams/images/
 
 set ::imagePath ${imgRoot}images
 
