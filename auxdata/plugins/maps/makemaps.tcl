@@ -61,7 +61,7 @@ proc endPlugin {} {
     }
     set size [file size $pluginName.jar]
     
-    puts "<plugin name=\"$pluginDesc\" description=\"Map\" size=\"$size\" url=\"http://www.unidata.ucar.edu/software/idv/plugins/maps/$pluginName.jar\" category=\"Maps\"/>"
+    puts "<plugin name=\"$pluginDesc\" description=\"Map\" size=\"$size\" url=\"https://resources.unidata.ucar.edu/idv/plugins/maps/$pluginName.jar\" category=\"Maps\"/>"
 }
 
 

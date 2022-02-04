@@ -25,7 +25,7 @@
            <argument>-oneinstanceport</argument>
            <argument>14445</argument>
            <argument>-installplugin</argument>
-           <argument>https://www.unidata.ucar.edu/software/idv/plugins/workshop.jar</argument>
+           <argument>https://resources.unidata.ucar.edu/idv/plugins/workshop.jar</argument>
         </application>
        <security>
            <all-permissions/>

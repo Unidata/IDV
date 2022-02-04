@@ -1,4 +1,4 @@
-<stationtables base="https://www.unidata.ucar.edu/georesources/locations">
+<stationtables base="https://resources.unidata.ucar.edu/georesources/locations">
 <stationtable name="Places" category="US/State locations/A/Alaska" href="ak_places.xml"/>
 <stationtable name="Counties" category="US/State locations/A/Alaska" href="ak_counties.xml"/>
 <stationtable name="Airport" category="US/State locations/A/Alaska/Man made features" href="ak_feature_airport.xml"/>

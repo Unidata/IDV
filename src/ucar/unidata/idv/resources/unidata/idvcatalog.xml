@@ -16,7 +16,7 @@
     <catalogRef xlink:title="Example Bundles from the Unidata RAMADDA Server" xlink:href="https://remadda.unidata.ucar.edu/repository/entry/show/Top/IDV+Resources/Bundles?entryid=196cb40d-6cc9-4726-8285-3a7eea8bcb92&amp;output=thredds.catalog&amp;orderby=name"/>
     <catalogRef xlink:title="Community Data Servers" xlink:href="https://ramadda.unidata.ucar.edu/repository/entry/show?entryid=23dec561-b869-4e20-8b1b-f38e4659ebab&amp;output=thredds.catalog"/>
     <catalogRef xlink:title="Topography/Bathymetry" xlink:href="http://geoport.whoi.edu/thredds/bathy_catalog.xml" xlink:type="simple"/>
-    <!--catalogRef xlink:title="Tiger Shapefiles" xlink:href="https://www.unidata.ucar.edu/georesources/shapefiles/shapefiles.xml" xlink:type="simple"/-->
+    <!--catalogRef xlink:title="Tiger Shapefiles" xlink:href="https://resources.unidata.ucar.edu/georesources/shapefiles/shapefiles.xml" xlink:type="simple"/-->
 
     <catalogRef xlink:title="Tiger Shapefiles" xlink:href="https://ramadda.unidata.ucar.edu/repository/entry/show/RAMADDA/RAMADDA+Examples/Tiger+Shapefiles?entryid=8194294b-2cad-468c-9466-8f32b6ff8c90&amp;output=thredds.catalog&amp;orderby=name"/>
     <dataset name="National Weather Service Warning Shapefiles" >

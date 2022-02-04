@@ -14,7 +14,7 @@
   <stationtable
      name="Weather Bug Web Cams"
      category="US"
-     href="https://www.unidata.ucar.edu/georesources/locations/weatherbugcameras.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/weatherbugcameras.xml"/>
 
 
   <stationtable
@@ -35,7 +35,7 @@
   <stationtable
      name="USGS Stream Gauges"
      category="Earth"
-     href="https://www.unidata.ucar.edu/georesources/locations/usgs.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/usgs.xml"/>
 
 
 
@@ -52,46 +52,46 @@
   <stationtable
      name="Glaciers with images"
      category="Earth/Glaciers"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/glaciersandimages.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/glaciersandimages.xml"/>
   <stationtable
      name="North American Glaciers"
      category="Earth/Glaciers"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/glaciers_north_america.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/glaciers_north_america.xml"/>
   <stationtable
      name="South American Glaciers"
      category="Earth/Glaciers"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/glaciers_south_america.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/glaciers_south_america.xml"/>
 
   <stationtable
      name="African Glaciers"
      category="Earth/Glaciers"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/glaciers_africa.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/glaciers_africa.xml"/>
   <stationtable
      name="Asian Glaciers"
      category="Earth/Glaciers"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/glaciers_asia.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/glaciers_asia.xml"/>
   <stationtable
      name="European Glaciers"
      category="Earth/Glaciers"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/glaciers_europe.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/glaciers_europe.xml"/>
   <stationtable
      name="New Zealand Glaciers"
      category="Earth/Glaciers"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/glaciers_new_zealand.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/glaciers_new_zealand.xml"/>
   <stationtable
      name="Snotel Sites"
      category="Earth"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/snotel.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/snotel.xml"/>
   <stationtable
      name="Volcanos"
      category="Earth"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/volcanos.kmz"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/volcanos.kmz"/>
 
 
   <stationtable
      name="Antarctica (long)"
      category="World"
-     href="https://www.unidata.ucar.edu/georesources/locations/earth/antarctica.xml"/>
+     href="https://resources.unidata.ucar.edu/georesources/locations/earth/antarctica.xml"/>
   <stationtable
      name="Antarctica (short)"
      category="World"
