@@ -1,136 +1,136 @@
 <plugins>
 
 <!-- Customized IDVs -->
-<plugin name="Workshop IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/workshop.jar" description="Workshop specific configuration" category="Customized IDVs"/>
+<plugin name="Workshop IDV" url="https://resources.unidata.ucar.edu/idv/plugins/workshop.jar" description="Workshop specific configuration" category="Customized IDVs"/>
 
-<plugin name="Simple IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/simpleidv.jar" description="A simpler user interface for the IDV" category="Customized IDVs"/>
+<plugin name="Simple IDV" url="https://resources.unidata.ucar.edu/idv/plugins/simpleidv.jar" description="A simpler user interface for the IDV" category="Customized IDVs"/>
 
 <!--
-<plugin name="TC IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/tcidv.jar" description="Shanghai Typhoon Institute IDV" category="Customized IDVs"/>
+<plugin name="TC IDV" url="https://resources.unidata.ucar.edu/idv/plugins/tcidv.jar" description="Shanghai Typhoon Institute IDV" category="Customized IDVs"/>
 -->
 
 <plugin name="UNAVCO IDV" url="http://www.unavco.org/software/visualization/idv/unavcoidv.jar" description="UNAVCO's IDV plugin for supporting Geophysicical data sets" category="Customized IDVs"/>
 
-<plugin name="T-Rex IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/trex.jar" description="Configuration for the Terrain Induced Rotor Experiment (T-Rex) Field Project" category="Customized IDVs"/>
+<plugin name="T-Rex IDV" url="https://resources.unidata.ucar.edu/idv/plugins/trex.jar" description="Configuration for the Terrain Induced Rotor Experiment (T-Rex) Field Project" category="Customized IDVs"/>
 
-<plugin name="Example Globe IDV" url="http://www.unidata.ucar.edu/software/idv/plugins/globeidv.jar" description="An example showing a stripped down version of the IDV" category="Customized IDVs"/>
+<plugin name="Example Globe IDV" url="https://resources.unidata.ucar.edu/idv/plugins/globeidv.jar" description="An example showing a stripped down version of the IDV" category="Customized IDVs"/>
 
 <plugin version="5.0" category="Customized IDVs" name="NOAA-PSL IDV" description="NOAA/PSL's IDV plugin" url="https://www.psl.noaa.gov/repository/entry/get/noaapsd.jar?entryid=be105b2f-ff5a-4f38-af36-3fb5fd3b5359"/>
 
 <!-- Displays -->
-<plugin name="User Interface Skins" url="http://www.unidata.ucar.edu/software/idv/plugins/skins.jar" description="Adds a number of different window configurations" category="Displays"/>
+<plugin name="User Interface Skins" url="https://resources.unidata.ucar.edu/idv/plugins/skins.jar" description="Adds a number of different window configurations" category="Displays"/>
 
-<plugin name="2D Multipane UI Skins" url="http://www.unidata.ucar.edu/software/idv/plugins/skin2d.jar" description="Adds a number of different 2D window configurations" category="Displays"/>
+<plugin name="2D Multipane UI Skins" url="https://resources.unidata.ucar.edu/idv/plugins/skin2d.jar" description="Adds a number of different 2D window configurations" category="Displays"/>
 
-<plugin name="Miscellaneous Controls" url="http://www.unidata.ucar.edu/software/idv/plugins/misccontrols.jar" description="Adds a couple of extra display controls" category="Displays"/>
+<plugin name="Miscellaneous Controls" url="https://resources.unidata.ucar.edu/idv/plugins/misccontrols.jar" description="Adds a couple of extra display controls" category="Displays"/>
 
-<plugin name="VGEE" url="http://www.unidata.ucar.edu/software/idv/plugins/vgee.jar" description="A set of animation displays from the VGEE project" category="Displays"/>
+<plugin name="VGEE" url="https://resources.unidata.ucar.edu/idv/plugins/vgee.jar" description="A set of animation displays from the VGEE project" category="Displays"/>
 
-<plugin version="4.0" name="Enable Mac Fullscreen" url="http://www.unidata.ucar.edu/software/idv/plugins/macFullScreen.jar" description="Enables the Mac Fullscreen Widget" category="Displays"/>
+<plugin version="4.0" name="Enable Mac Fullscreen" url="https://resources.unidata.ucar.edu/idv/plugins/macFullScreen.jar" description="Enables the Mac Fullscreen Widget" category="Displays"/>
 
 <!-- Color Tables -->
-<plugin name="GEMPAK Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/gempak.jar" description="Color tables from GEMPAK" category="Color Tables"/>
+<plugin name="GEMPAK Color Tables" url="https://resources.unidata.ucar.edu/idv/plugins/gempak.jar" description="Color tables from GEMPAK" category="Color Tables"/>
 
-<plugin name="NCL Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/ncl.jar" description="Color tables from NCL" category="Color Tables"/>
+<plugin name="NCL Color Tables" url="https://resources.unidata.ucar.edu/idv/plugins/ncl.jar" description="Color tables from NCL" category="Color Tables"/>
 
-<plugin name="McIDAS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/mcidas.jar" description="Color tables from McIDAS" category="Color Tables"/>
+<plugin name="McIDAS Color Tables" url="https://resources.unidata.ucar.edu/idv/plugins/mcidas.jar" description="Color tables from McIDAS" category="Color Tables"/>
 
-<plugin name="WSR Radar Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/radarTable.jar" description="Color tables from WSR radar" category="Color Tables"/>
+<plugin name="WSR Radar Color Tables" url="https://resources.unidata.ucar.edu/idv/plugins/radarTable.jar" description="Color tables from WSR radar" category="Color Tables"/>
 
-<plugin name="Panoply Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/panoply.jar" description="Color tables from the Panoply application" category="Color Tables"/>
+<plugin name="Panoply Color Tables" url="https://resources.unidata.ucar.edu/idv/plugins/panoply.jar" description="Color tables from the Panoply application" category="Color Tables"/>
 
-<plugin name="Geovista Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/geovista.jar" description="Color tables from the Geovista application" category="Color Tables"/>
+<plugin name="Geovista Color Tables" url="https://resources.unidata.ucar.edu/idv/plugins/geovista.jar" description="Color tables from the Geovista application" category="Color Tables"/>
 
-<plugin name="CIMSS Color Tables" url="http://www.unidata.ucar.edu/software/idv/plugins/cimssenh.jar" description="Color tables for CIMSS Satellite products" category="Color Tables"/>
+<plugin name="CIMSS Color Tables" url="https://resources.unidata.ucar.edu/idv/plugins/cimssenh.jar" description="Color tables for CIMSS Satellite products" category="Color Tables"/>
 
 <!-- Maps -->
 
-<plugin  version="2.2"  name="U.S. Highways and Roads" description="Map" size="4201747" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/usroads.jar" category="Maps"/>
+<plugin  version="2.2"  name="U.S. Highways and Roads" description="Map" size="4201747" url="https://resources.unidata.ucar.edu/idv/plugins/maps/usroads.jar" category="Maps"/>
 
-<plugin  version="2.2" name="U.S. Rivers and Lakes" description="Map" size="5427910" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/lakes.jar" category="Maps"/>
+<plugin  version="2.2" name="U.S. Rivers and Lakes" description="Map" size="5427910" url="https://resources.unidata.ucar.edu/idv/plugins/maps/lakes.jar" category="Maps"/>
 
-<plugin  version="2.2" name="Marine Zones" description="Map" size="6271681" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/nwsmarinezones.jar" category="Maps"/>
+<plugin  version="2.2" name="Marine Zones" description="Map" size="6271681" url="https://resources.unidata.ucar.edu/idv/plugins/maps/nwsmarinezones.jar" category="Maps"/>
 
-<plugin  version="2.2" name="Gempak Weather" description="Map" size="3887944" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_basic.jar" category="Maps"/>
+<plugin  version="2.2" name="Gempak Weather" description="Map" size="3887944" url="https://resources.unidata.ucar.edu/idv/plugins/maps/gempak_basic.jar" category="Maps"/>
 
-<plugin  version="2.2" name="River Forecast Basins" description="Map" size="8033935" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_basins.jar" category="Maps"/>
+<plugin  version="2.2" name="River Forecast Basins" description="Map" size="8033935" url="https://resources.unidata.ucar.edu/idv/plugins/maps/gempak_basins.jar" category="Maps"/>
 
-<plugin version="2.2" name="Climate Zones" description="Map" size="1029967" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_maps.jar" category="Maps"/>
+<plugin version="2.2" name="Climate Zones" description="Map" size="1029967" url="https://resources.unidata.ucar.edu/idv/plugins/maps/gempak_maps.jar" category="Maps"/>
 
-<plugin  version="2.2" name="Offshore Forecast Areas" description="Map" size="494557" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_forecast.jar" category="Maps"/>
+<plugin  version="2.2" name="Offshore Forecast Areas" description="Map" size="494557" url="https://resources.unidata.ucar.edu/idv/plugins/maps/gempak_forecast.jar" category="Maps"/>
 
-<plugin  version="2.2"  name="Pacific and Atlantic Products" description="Map" size="12409" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/gempak_intl.jar" category="Maps"/>
+<plugin  version="2.2"  name="Pacific and Atlantic Products" description="Map" size="12409" url="https://resources.unidata.ucar.edu/idv/plugins/maps/gempak_intl.jar" category="Maps"/>
 
-<plugin name="African Maps" description="Map" size="23573725" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/africamaps.jar" category="Maps"/>
+<plugin name="African Maps" description="Map" size="23573725" url="https://resources.unidata.ucar.edu/idv/plugins/maps/africamaps.jar" category="Maps"/>
 
-<plugin name="European Maps" description="Map" size="381433" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/europemaps.jar" category="Maps"/>
+<plugin name="European Maps" description="Map" size="381433" url="https://resources.unidata.ucar.edu/idv/plugins/maps/europemaps.jar" category="Maps"/>
 
-<plugin version="2.2" name="China Maps" description="Map" size="3883648" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/chinamaps.jar" category="Maps"/>
+<plugin version="2.2" name="China Maps" description="Map" size="3883648" url="https://resources.unidata.ucar.edu/idv/plugins/maps/chinamaps.jar" category="Maps"/>
 
-<plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mexico.jar" category="Maps"/>
+<plugin version="2.2" name="Mexico Map" description="Map" size="13806" url="https://resources.unidata.ucar.edu/idv/plugins/maps/mexico.jar" category="Maps"/>
 
-<plugin version="2.2" name="Colombia Departments Map" description="Map" size="9421523" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/colombiamap.jar" category="Maps"/>
+<plugin version="2.2" name="Colombia Departments Map" description="Map" size="9421523" url="https://resources.unidata.ucar.edu/idv/plugins/maps/colombiamap.jar" category="Maps"/>
 
-<plugin version="2.2" name="Mongolia Maps" description="Various maps of Mongolia" size="2859237" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/mongoliamaps_maps.jar" category="Maps"/>
+<plugin version="2.2" name="Mongolia Maps" description="Various maps of Mongolia" size="2859237" url="https://resources.unidata.ucar.edu/idv/plugins/maps/mongoliamaps_maps.jar" category="Maps"/>
 
-<plugin version="2.7" name="World Maps" description="Miscellaneous World Maps" size="1875100" url="http://www.unidata.ucar.edu/software/idv/plugins/maps/world_maps.jar" category="Maps"/>
+<plugin version="2.7" name="World Maps" description="Miscellaneous World Maps" size="1875100" url="https://resources.unidata.ucar.edu/idv/plugins/maps/world_maps.jar" category="Maps"/>
 
 
 
 <!-- Misc -->
-<plugin name="Collaboration Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
+<plugin name="Collaboration Menu" url="https://resources.unidata.ucar.edu/idv/plugins/collaboration.jar" description="Adds the Collaboration menu" category="Miscellaneous"/>
 
-<plugin name="Test Menu" url="http://www.unidata.ucar.edu/software/idv/plugins/testmenu.jar" description="Adds the Test menu for debugging" category="Miscellaneous"/>
+<plugin name="Test Menu" url="https://resources.unidata.ucar.edu/idv/plugins/testmenu.jar" description="Adds the Test menu for debugging" category="Miscellaneous"/>
 
-<plugin name="Jython Dev. Control" url="http://www.unidata.ucar.edu/software/idv/plugins/jythoncontrol.jar" description="Contains the Jython Display Control for developers" category="Miscellaneous"/>
+<plugin name="Jython Dev. Control" url="https://resources.unidata.ucar.edu/idv/plugins/jythoncontrol.jar" description="Contains the Jython Display Control for developers" category="Miscellaneous"/>
 
-<plugin name="RAMADDA Publisher" url="http://www.unidata.ucar.edu/software/idv/plugins/ramaddaplugin.jar" description="Supports publishing to a RAMADDA data repository" category="Miscellaneous"/>
+<plugin name="RAMADDA Publisher" url="https://resources.unidata.ucar.edu/idv/plugins/ramaddaplugin.jar" description="Supports publishing to a RAMADDA data repository" category="Miscellaneous"/>
 
-<plugin  category="Miscellaneous" name="UCAR Africa Initiative" description="A plugin for the UCAR Africa Initiative"  url="http://www.unidata.ucar.edu/software/idv/plugins/africaidv.jar"/>
+<plugin  category="Miscellaneous" name="UCAR Africa Initiative" description="A plugin for the UCAR Africa Initiative"  url="https://resources.unidata.ucar.edu/idv/plugins/africaidv.jar"/>
 
-<plugin  version="3.0" category="Miscellaneous" name="Time Matching" description="A plugin for dataset time matching (Experimental)"  url="http://www.unidata.ucar.edu/software/idv/plugins/timeMatching.jar"/>
+<plugin  version="3.0" category="Miscellaneous" name="Time Matching" description="A plugin for dataset time matching (Experimental)"  url="https://resources.unidata.ucar.edu/idv/plugins/timeMatching.jar"/>
 
-<plugin  name="Greenland Layout Models" url="http://www.unidata.ucar.edu/software/idv/plugins/greenland.jar" category="Miscellaneous"/>
+<plugin  name="Greenland Layout Models" url="https://resources.unidata.ucar.edu/idv/plugins/greenland.jar" category="Miscellaneous"/>
 
 <!-- Data Helpers -->
 
-<plugin version="2.6"  category="Data Sources" name="PAM NetCDF Enhancement" description="NcML needed to read Portable Automated Mesonet (PAM) netCDF files"  url="http://www.unidata.ucar.edu/software/idv/plugins/pam.jar"/>
+<plugin version="2.6"  category="Data Sources" name="PAM NetCDF Enhancement" description="NcML needed to read Portable Automated Mesonet (PAM) netCDF files"  url="https://resources.unidata.ucar.edu/idv/plugins/pam.jar"/>
 
-<plugin  category="Data Sources" name="NACP Plugin" description="Provides data sources for North American Carbon Project data"  url="http://www.unidata.ucar.edu/software/idv/plugins/nacpidv.jar"/>
+<plugin  category="Data Sources" name="NACP Plugin" description="Provides data sources for North American Carbon Project data"  url="https://resources.unidata.ucar.edu/idv/plugins/nacpidv.jar"/>
 
-<plugin  category="Data Sources" name="NLAS Lidar Data" description="Provides data sources for reading LiDAR data (las, lvis, csv)"  url="http://www.unidata.ucar.edu/software/idv/plugins/nlasidv.jar"/>)
+<plugin  category="Data Sources" name="NLAS Lidar Data" description="Provides data sources for reading LiDAR data (las, lvis, csv)"  url="https://resources.unidata.ucar.edu/idv/plugins/nlasidv.jar"/>)
 
-<plugin version="2.6"  category="Data Sources" name="SSEC Lightning Data" description="NcML needed to read a lightning point data format"  url="http://www.unidata.ucar.edu/software/idv/plugins/sseclightning.jar"/>
+<plugin version="2.6"  category="Data Sources" name="SSEC Lightning Data" description="NcML needed to read a lightning point data format"  url="https://resources.unidata.ucar.edu/idv/plugins/sseclightning.jar"/>
 
-<!--plugin version="2.7"  category="Data Sources" name="NAPLN Text Lightning Data" description="Datasource and some layout models for NAPLN Lightning data"  url="http://www.unidata.ucar.edu/software/idv/plugins/napln.jar"/-->
+<!--plugin version="2.7"  category="Data Sources" name="NAPLN Text Lightning Data" description="Datasource and some layout models for NAPLN Lightning data"  url="https://resources.unidata.ucar.edu/idv/plugins/napln.jar"/-->
 
-<plugin name="Mesowest Chooser" url="http://www.unidata.ucar.edu/software/idv/plugins/mesowestplugin.jar" description="Provides access to mesowest point data" category="Data Sources"/>
+<plugin name="Mesowest Chooser" url="https://resources.unidata.ucar.edu/idv/plugins/mesowestplugin.jar" description="Provides access to mesowest point data" category="Data Sources"/>
 
-<plugin name="ADDE via port 80" url="http://www.unidata.ucar.edu/software/idv/plugins/addeport.jar" description="Provides access to Unidata's ADDE server via port 80" category="Data Sources"/>
+<plugin name="ADDE via port 80" url="https://resources.unidata.ucar.edu/idv/plugins/addeport.jar" description="Provides access to Unidata's ADDE server via port 80" category="Data Sources"/>
 
-<plugin  name="MMOUT NetCDF Files" url="http://www.unidata.ucar.edu/software/idv/plugins/mmout.jar" category="Data Sources"/>
+<plugin  name="MMOUT NetCDF Files" url="https://resources.unidata.ucar.edu/idv/plugins/mmout.jar" category="Data Sources"/>
 
-<!--plugin version="4.1"  category="Data Sources" name="Test Unidata TDS Upgrade" description="Forces all opendap links in bundles to load from thredds-test.unidata.ucar.edu in order to test your bundles before the thredds.ucar.edu is upgraded"  url="http://www.unidata.ucar.edu/software/idv/plugins/testThreddsUpgrade.jar"/-->
+<!--plugin version="4.1"  category="Data Sources" name="Test Unidata TDS Upgrade" description="Forces all opendap links in bundles to load from thredds-test.unidata.ucar.edu in order to test your bundles before the thredds.ucar.edu is upgraded"  url="https://resources.unidata.ucar.edu/idv/plugins/testThreddsUpgrade.jar"/-->
 
-<!--plugin version="4.0"  category="Data Sources" name="Motherlode TDS 4.2 persistence (IDV 4.0 only!)" description="This plugin is required for IDV 4.0 if users have bundles that were created with previous versions of the IDV. The plugin should be removed after June 1st 2013."  url="http://www.unidata.ucar.edu/software/idv/plugins/mlode42Persistence.jar"/-->
+<!--plugin version="4.0"  category="Data Sources" name="Motherlode TDS 4.2 persistence (IDV 4.0 only!)" description="This plugin is required for IDV 4.0 if users have bundles that were created with previous versions of the IDV. The plugin should be removed after June 1st 2013."  url="https://resources.unidata.ucar.edu/idv/plugins/mlode42Persistence.jar"/-->
 
-<plugin version="5.0"  category="Data Sources" name="Unidata TDS Release Candidate Bundle Tester" description="Make all the Unidata TDS OPeNDAP links found in a bundle use the Unidata Release Candidate TDS. Use this plugin to test your bundles before the main Unidata TDS is upgraded. Please remove this plugin when not needed."  url="http://www.unidata.ucar.edu/software/idv/plugins/testUnidataTdsUpgrade.jar" />
+<plugin version="5.0"  category="Data Sources" name="Unidata TDS Release Candidate Bundle Tester" description="Make all the Unidata TDS OPeNDAP links found in a bundle use the Unidata Release Candidate TDS. Use this plugin to test your bundles before the main Unidata TDS is upgraded. Please remove this plugin when not needed."  url="https://resources.unidata.ucar.edu/idv/plugins/testUnidataTdsUpgrade.jar" />
 
-<plugin version="5.0"  category="Data Sources" name="Unidata TDS Fallback Server" description="Use this plugin if you are having issues with your bundles due to an upgrade of main Unidata TDS. Report any issues found with the new server before using this plugin. Note: only active during transition periods. Please remove this plugin when not needed."  url="http://www.unidata.ucar.edu/software/idv/plugins/unidataTdsFallback.jar" />
+<plugin version="5.0"  category="Data Sources" name="Unidata TDS Fallback Server" description="Use this plugin if you are having issues with your bundles due to an upgrade of main Unidata TDS. Report any issues found with the new server before using this plugin. Note: only active during transition periods. Please remove this plugin when not needed."  url="https://resources.unidata.ucar.edu/idv/plugins/unidataTdsFallback.jar" />
 
 <!-- Bug Fixes -->
-<plugin  version="2.8" name="Spurious Map Lines Fix" url="http://www.unidata.ucar.edu/software/idv/plugins/graphicsfix.jar" description="Provides a fix for the problem of random map lines on some systems" category="Bug Fixes"/>
+<plugin  version="2.8" name="Spurious Map Lines Fix" url="https://resources.unidata.ucar.edu/idv/plugins/graphicsfix.jar" description="Provides a fix for the problem of random map lines on some systems" category="Bug Fixes"/>
 
 <!-- Satellite -->
-<plugin  version="2.9" name="Satellite Jython Formula" url="http://www.unidata.ucar.edu/software/idv/plugins/satelliteJython.jar" description="Provides a set of Jython Formulas" category="Satellite"/>
+<plugin  version="2.9" name="Satellite Jython Formula" url="https://resources.unidata.ucar.edu/idv/plugins/satelliteJython.jar" description="Provides a set of Jython Formulas" category="Satellite"/>
 
 <!-- Language Packs -->
 <!--
-<plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/fr.pack"/>
-<plugin version="2.2"  category="Language Packs" name="German Language Pack" description="Contains German translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/de.pack"/>
-<plugin version="2.2"  category="Language Packs" name="Spanish Language Pack" description="Contains Spansish translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/es.pack"/>
-<plugin version="2.2"  category="Language Packs" name="Portugese Language Pack" description="Contains Portugese translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/pt.pack"/>
-<plugin version="2.2"  category="Language Packs" name="Chinese Language Pack" description="Contains Chinese translations"  url="http://www.unidata.ucar.edu/software/idv/plugins/language/zh.pack"/>
+<plugin version="2.2"  category="Language Packs" name="French Language Pack" description="Contains French translations"  url="https://resources.unidata.ucar.edu/idv/plugins/language/fr.pack"/>
+<plugin version="2.2"  category="Language Packs" name="German Language Pack" description="Contains German translations"  url="https://resources.unidata.ucar.edu/idv/plugins/language/de.pack"/>
+<plugin version="2.2"  category="Language Packs" name="Spanish Language Pack" description="Contains Spansish translations"  url="https://resources.unidata.ucar.edu/idv/plugins/language/es.pack"/>
+<plugin version="2.2"  category="Language Packs" name="Portugese Language Pack" description="Contains Portugese translations"  url="https://resources.unidata.ucar.edu/idv/plugins/language/pt.pack"/>
+<plugin version="2.2"  category="Language Packs" name="Chinese Language Pack" description="Contains Chinese translations"  url="https://resources.unidata.ucar.edu/idv/plugins/language/zh.pack"/>
 -->
 
 
