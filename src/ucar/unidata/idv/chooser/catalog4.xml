@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE catalog SYSTEM "http://www.unidata.ucar.edu/projects/THREDDS/xml/InvCatalog.0.4.dtd">
+<!DOCTYPE catalog SYSTEM "https://www.unidata.ucar.edu/projects/THREDDS/xml/InvCatalog.0.4.dtd">
 <catalog xmlns:xlink="http://www.w3.org/1999/xlink" name="Unidata IDD Server" version="0.4">
   <server ID="motherlode" type="DODS" base="http://motherlode.ucar.edu/cgi-bin/dods/nph-nc/" />
   <action name="Show data tree" url="jython:idv.createDataTreeWindow();"/>
   <action name="Radar chooser" url="/ucar/unidata/idv/chooser/radarchooser.xml"/>
   <action name="Catalog6" url="/ucar/unidata/idv/chooser/catalog6.xml"/>
   <collection name="NCEP AVN-Q" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/AVN-Q.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/AVN-Q.xml" />
     <dataset name="2002-09-15 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091506_avn-q.nc" />
     <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_avn-q.nc" />
     <dataset name="2002-09-14 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091418_avn-q.nc" />
@@ -37,7 +37,7 @@
     <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_avn-q.nc" />
   </collection>
   <collection name="NCEP AVN-X" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/AVN-X.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/AVN-X.xml" />
     <dataset name="2002-09-15 06:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091506_avn-x.nc" />
     <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_avn-x.nc" />
     <dataset name="2002-09-14 18:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091418_avn-x.nc" />
@@ -68,7 +68,7 @@
     <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_avn-x.nc" />
   </collection>
   <collection name="NCEP RUC" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/RUC.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/RUC.xml" />
     <dataset name="2002-09-15 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091512_ruc.nc" />
     <dataset name="2002-09-15 11:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091511_ruc.nc" />
     <dataset name="2002-09-15 10:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091510_ruc.nc" />
@@ -240,7 +240,7 @@
     <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_ruc.nc" />
   </collection>
   <collection name="NCEP NGM-Q" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/NGM-Q.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/NGM-Q.xml" />
     <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_ngm-q.nc" />
     <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_ngm-q.nc" />
     <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_ngm-q.nc" />
@@ -257,7 +257,7 @@
     <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_ngm-q.nc" />
   </collection>
   <collection name="NCEP Eta" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/ETA.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/ETA.xml" />
     <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_eta.nc" />
     <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_eta.nc" />
     <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_eta.nc" />
@@ -274,7 +274,7 @@
     <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_eta.nc" />
   </collection>
   <collection name="NCEP MRF-A" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/MRF-A.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/MRF-A.xml" />
     <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_mrf-a.nc" />
     <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_mrf-a.nc" />
     <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_mrf-a.nc" />
@@ -284,7 +284,7 @@
     <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_mrf-a.nc" />
   </collection>
   <collection name="NCEP MRF-E" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/MRF-E.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/MRF-E.xml" />
     <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_mrf-e.nc" />
     <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_mrf-e.nc" />
     <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_mrf-e.nc" />
@@ -294,7 +294,7 @@
     <dataset name="2002-09-09 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090900_mrf-e.nc" />
   </collection>
   <collection name="NCEP Ocean" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/Ocean.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/Ocean.xml" />
     <dataset name="2002-09-15 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091500_ocean.nc" />
     <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_ocean.nc" />
     <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_ocean.nc" />
@@ -311,7 +311,7 @@
     <dataset name="2002-09-08 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090812_ocean.nc" />
   </collection>
   <collection name="NCEP SST-A" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/SST-A.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/SST-A.xml" />
     <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_sst-a.nc" />
     <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_sst-a.nc" />
     <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_sst-a.nc" />
@@ -321,7 +321,7 @@
     <dataset name="2002-09-08 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090800_sst-a.nc" />
   </collection>
   <collection name="NCEP SST-T" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/SST-T.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/SST-T.xml" />
     <dataset name="2002-09-14 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091400_sst-t.nc" />
     <dataset name="2002-09-13 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091300_sst-t.nc" />
     <dataset name="2002-09-12 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091200_sst-t.nc" />
@@ -331,7 +331,7 @@
     <dataset name="2002-09-08 00:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002090800_sst-t.nc" />
   </collection>
   <collection name="NCEP ECMF" dataType="GRID" serverID="motherlode">
-    <datasetDesc xlink:href="http://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/ECMF.xml" />
+    <datasetDesc xlink:href="https://www.unidata.ucar.edu/projects/THREDDS/xml/datasetDesc/ECMF.xml" />
     <dataset name="2002-09-14 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091412_ecmf.nc" />
     <dataset name="2002-09-13 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091312_ecmf.nc" />
     <dataset name="2002-09-12 12:00:00 UTC" serverID="motherlode" urlPath="dods/model/2002091212_ecmf.nc" />

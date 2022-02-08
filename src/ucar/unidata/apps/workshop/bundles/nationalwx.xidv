@@ -1550,7 +1550,7 @@ AAAATkVYUlJBVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAABBAAAAAAAAAAAAAAACg==</pa
                             </method>
                             <method name="put">
                                 <string><![CDATA[Thredds.CatalogUrl]]></string>
-                                <string><![CDATA[http://www.unidata.ucar.edu/georesources/idvcatalog.xml]]></string>
+                                <string><![CDATA[https://www.unidata.ucar.edu/georesources/idvcatalog.xml]]></string>
                             </method>
                             <method name="put">
                                 <string><![CDATA[TITLE]]></string>

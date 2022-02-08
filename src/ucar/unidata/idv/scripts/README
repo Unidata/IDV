@@ -22,7 +22,7 @@ images/<collection>/...
 
 
 The xml format is defined at:
-https://www.unidata.ucar.edu/software/idv/docs/userguide/data/ImageMovie.html
+https://docs.unidata.ucar.edu/idv/userguide/data/ImageMovie.html
 
 There are also index files written which define the actual images and their times:
 images/<collection>/index.xml

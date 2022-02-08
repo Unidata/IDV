@@ -1273,13 +1273,13 @@ public class KmlDataSource extends FilesDataSource {
             sb.append(
                 XmlUtil.tag(
                     "href", "",
-                    "http://www.unidata.ucar.edu/software/idv/logo.gif"));
+                    "https://www.unidata.ucar.edu/software/idv/logo.gif"));
             sb.append("</Icon>\n");
             sb.append("</IconStyle>\n");
             sb.append("</Style>\n");
 
             sb.append(
-                "<ScreenOverlay>  <name>Unidata Nexrad Radar</name>  <Icon>   <href>http://www.unidata.ucar.edu/img/unidata_logo.gif</href>  </Icon>  <overlayXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <screenXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <size x=\"0\" y=\"0\" xunits=\"fraction\" yunits=\"fraction\"/></ScreenOverlay>");
+                "<ScreenOverlay>  <name>Unidata Nexrad Radar</name>  <Icon>   <href>https://www.unidata.ucar.edu/img/unidata_logo.gif</href>  </Icon>  <overlayXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <screenXY x=\"0\" y=\"1\" xunits=\"fraction\" yunits=\"fraction\"/>  <size x=\"0\" y=\"0\" xunits=\"fraction\" yunits=\"fraction\"/></ScreenOverlay>");
 
 
             Element root = XmlUtil.getRoot("nexradstns.xml",
@@ -1317,7 +1317,7 @@ public class KmlDataSource extends FilesDataSource {
                 double lon = XmlUtil.getAttribute(child, "lon", 0.0);
 
                 String desc =
-                    "<![CDATA[<a href=\"http://www.unidata.ucar.edu/software/idv/radar.jnlp\">View in the IDV</a>]]>";
+                    "<![CDATA[<a href=\"https://www.unidata.ucar.edu/software/idv/radar.jnlp\">View in the IDV</a>]]>";
 
                 StringBuffer lookAt = new StringBuffer();
                 lookAt.append("<LookAt>\n");

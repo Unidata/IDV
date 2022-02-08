@@ -977,7 +977,7 @@ public class CatalogUtil {
                     jnlp = StringUtil.replace(jnlp, "%jnlpfile%", jnlpFile);
                     jnlp = StringUtil.replace(
                         jnlp, "%bundle%",
-                        "http://www.unidata.ucar.edu/projects/metapps/testgen/"
+                        "https://www.unidata.ucar.edu/projects/metapps/testgen/"
                         + bundleFile);
                     IOUtil.writeFile(jnlpFile, jnlp);
                 } catch (Exception exc) {

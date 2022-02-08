@@ -17,7 +17,7 @@
      <!-- Make another image -->
      <image file="${islpath}/matted.png">
           <!-- add a logo overlay -->
-          <overlay image="http://www.unidata.ucar.edu/idv/logo.gif"
+          <overlay image="https://www.unidata.ucar.edu/idv/logo.gif"
                    place="LL,10,-10"
                    anchor="LL"/>
 

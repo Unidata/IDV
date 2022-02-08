@@ -6,7 +6,7 @@
             <method name="add">
                 <object class="ucar.unidata.data.VisadDataSource" id="id8">
                     <property name="Name">
-                        <string><![CDATA[http://www.unidata.ucar.edu/software/idv/data/images/MoonColorTopo.gif]]></string>
+                        <string><![CDATA[https://www.unidata.ucar.edu/software/idv/data/images/MoonColorTopo.gif]]></string>
                     </property>
                     <property name="Properties">
                         <object class="java.util.Hashtable"/>
@@ -54,7 +54,7 @@
             <method name="add">
                 <object class="ucar.unidata.data.VisadDataSource" id="id12">
                     <property name="Name">
-                        <string><![CDATA[http://www.unidata.ucar.edu/software/idv/data/images/MoonGrey.gif]]></string>
+                        <string><![CDATA[https://www.unidata.ucar.edu/software/idv/data/images/MoonGrey.gif]]></string>
                     </property>
                     <property name="Properties">
                         <object class="java.util.Hashtable"/>

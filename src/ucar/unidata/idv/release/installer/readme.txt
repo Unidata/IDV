@@ -23,7 +23,7 @@ Other Copyrights/Licenses:
 This product includes software developed by:
 
     * The University Corporation for Atmospherice Research (netCDF-Java)
-         (http://www.unidata.ucar.edu/software/netcdf-java)
+         (https://www.unidata.ucar.edu/software/netcdf-java)
     * The University of Wisconsin-Madison 
          (VisAD) (http://www.ssec.wisc.edu/~billh/visad.html).
     * The  Australian Bureau of Meteorology (AIFS) 

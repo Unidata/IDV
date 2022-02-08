@@ -46,7 +46,7 @@ return "<pre>$v</pre>"
 
 
 
-set ::javadocPrefix "https://docs.unidata.ucar.edu/idv/docs/javadoc"
+set ::javadocPrefix "https://docs.unidata.ucar.edu/idv/javadoc"
 
 
 proc dg::class {class {method ""}} {

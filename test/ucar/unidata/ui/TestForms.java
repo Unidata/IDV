@@ -72,7 +72,7 @@ public class TestForms extends UnitTestCommon {
     // Pick a URL to test
 
     // Will send to esupport
-    //static protected final String TESTURL = "http://www.unidata.ucar.edu/support/requestSupport.jsp";
+    //static protected final String TESTURL = "https://www.unidata.ucar.edu/support/requestSupport.jsp";
 
     /** _more_ */
     static protected final String TESTURL = "http://echo.httpkit.com";

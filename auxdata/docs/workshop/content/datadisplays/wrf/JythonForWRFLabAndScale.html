@@ -14,7 +14,7 @@ Labeling your images and adding a color scale.
 <p>
 Built-in to the IDV display label is a macro sub-language. This will allow us to refer to information contained within the datafile, such as longname, shortname, and timestamp, through easy commands like %longname%, %shortname%, and %timestamp%. That said, sometimes the macro for things like %longname% and %shortname% return not-so-informative strings, like "Data" (which is what happens in our example). Not to worry, as you have complete control over the text in the label, as shown in the example below. Note that a list of display name macros can be found in source code for [ht::classpopup  https://github.com/Unidata/IDV/blob/master/src/ucar/unidata/idv/control/DisplayControlBase.java DisplayControlbase] and are listed as variables named <code>MACRO_*</code>.</P>
 
-<p>Also included in the example below is a demonstration of how a color scale can be added to your display. Note that all of the work is being done to a [ht::classpopup https://docs.unidata.ucar.edu/idv/docs/javadoc/ucar/visad/display/ColorScaleInfo.html ColorScaleInfo] object (which we have stored in the variable <code>colorScaleInfo</code>).</p>
+<p>Also included in the example below is a demonstration of how a color scale can be added to your display. Note that all of the work is being done to a [ht::classpopup https://docs.unidata.ucar.edu/idv/javadoc/ucar/visad/display/ColorScaleInfo.html ColorScaleInfo] object (which we have stored in the variable <code>colorScaleInfo</code>).</p>
 
 [ht::codetable {
 import java.awt.Color as Color
