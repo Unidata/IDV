@@ -16,7 +16,7 @@ Available types:
 
 </nj22Config>
 Configuration file for netCDF java.  See full docs at:
-http://www.unidata.ucar.edu/software/netcdf-java/reference/RuntimeLoading.html
+https://www.unidata.ucar.edu/software/netcdf-java/reference/RuntimeLoading.html
 -->
 <nj22Config>
 <!--

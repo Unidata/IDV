@@ -7,7 +7,7 @@
 <!-- This is where we put the web content  -->
   <property
      name="wwwdir"
-     value="http://www.unidata.ucar.edu/idv/examples/kml"/>
+     value="https://www.unidata.ucar.edu/idv/examples/kml"/>
 
 <!-- 
     Define the procedure to load in the bundle, generate the images, etc.  

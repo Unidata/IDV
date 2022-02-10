@@ -36,7 +36,7 @@ idv.support.package=idv
 idv.support.message.propdesc=This is the message we show in the support request form
 idv.support.message.proplabel=Support form message
 idv.support.message=This form allows you to post a support request to the Unidata Program Center (UPC).<br>\
-Alternatively, use the form on the Support page at http://www.unidata.ucar.edu.
+Alternatively, use the form on the Support page at https://www.unidata.ucar.edu.
 
 
 idv.ui.skin.template.proplabel=Path to the default template UI skin
@@ -159,7 +159,7 @@ idv.jnlp.template = /ucar/unidata/idv/resources/template.jnlp
 
 ##This is where we find the webstart code release 
 idv.jnlp.codebase.proplabel=JNLP code base
-idv.jnlp.codebase = http://www.unidata.ucar.edu/idv/webstart
+idv.jnlp.codebase = https://www.unidata.ucar.edu/idv/webstart
 
 
 ##Title used in the jnlp file
@@ -238,7 +238,7 @@ idv.ui.showmenubar = true
 ##Semicolon delimited list of urls pointing to thredds catalogs
 idv.data.catalog.list.proplabel=Catalogs
 idv.data.catalog.list.propdelimiter=;
-idv.data.catalog.list=http://www.unidata.ucar.edu/georesources/idvcatalog.xml;http://motherlode.ucar.edu:8080/thredds/idv/rt-models.1.0.xml
+idv.data.catalog.list=https://www.unidata.ucar.edu/georesources/idvcatalog.xml;http://motherlode.ucar.edu:8080/thredds/idv/rt-models.1.0.xml
 idv.data.catalog.list.merge=true
 idv.data.catalog.list.merge.proplabel=Merge Catalogs
 idv.data.catalog.list.delete.proplabel=Catalogs To Remove

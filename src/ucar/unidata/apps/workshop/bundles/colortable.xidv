@@ -26,7 +26,7 @@
                             </method>
                             <method name="put">
                                 <string><![CDATA[Thredds.CatalogUrl]]></string>
-                                <string><![CDATA[http://www.unidata.ucar.edu/software/IDV/data/workshopCatalog.xml]]></string>
+                                <string><![CDATA[https://www.unidata.ucar.edu/software/IDV/data/workshopCatalog.xml]]></string>
                             </method>
                         </object>
                     </property>

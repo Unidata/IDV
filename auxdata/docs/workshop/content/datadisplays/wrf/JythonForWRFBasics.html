@@ -9,7 +9,7 @@ Creating basic WRF displays with Jython and the IDV
 </div>
 
 <p>
-The IDV and associated Jython scripting environment is capable of reading <b>post-processed</b> WRF output. Specifically, the output need to be on a non-staggered for optimal performance. Also, please understand that the Jython API for the IDV is under active development and calls using Java code must be used to temporarily fill in the gaps. Also, a fair amount of the documentation, such as lists of valid input for functions, can be found in either the IDV java source code or .xml documents; links to these files (hosted on the [ht::popup "https://github.com/unidata/idv" {Unidata github site}] are provided throughout this part of the tutorial. That said, several analysis functions and basic I/O routines are exposed via Jython and are [ht::popup "https://docs.unidata.ucar.edu/idv/docs/userguide/tools/JythonLib.html" documented].
+The IDV and associated Jython scripting environment is capable of reading <b>post-processed</b> WRF output. Specifically, the output need to be on a non-staggered for optimal performance. Also, please understand that the Jython API for the IDV is under active development and calls using Java code must be used to temporarily fill in the gaps. Also, a fair amount of the documentation, such as lists of valid input for functions, can be found in either the IDV java source code or .xml documents; links to these files (hosted on the [ht::popup "https://github.com/unidata/idv" {Unidata github site}] are provided throughout this part of the tutorial. That said, several analysis functions and basic I/O routines are exposed via Jython and are [ht::popup "https://docs.unidata.ucar.edu/idv/userguide/tools/JythonLib.html" documented].
 </p>
 
 <p>
@@ -52,7 +52,7 @@ file_opener = 'file.grid'
 }]
 
 <p>
-Note that <code>makeDataSource</code> returns a [ht::classpopup {https://docs.unidata.ucar.edu/idv/docs/javadoc/ucar/unidata/data/DataSource.html} {DataSource}] object, which we've named <code>ds</code> in our example.
+Note that <code>makeDataSource</code> returns a [ht::classpopup {https://docs.unidata.ucar.edu/idv/javadoc/ucar/unidata/data/DataSource.html} {DataSource}] object, which we've named <code>ds</code> in our example.
 </p>
 
 <p>
