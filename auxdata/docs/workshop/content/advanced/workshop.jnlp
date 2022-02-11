@@ -2,7 +2,7 @@
      <!-- JNLP File for Integrated Data Viewer --> 
      <jnlp 
         spec="1.0+" 
-        codebase = "https://www.unidata.ucar.edu/idv/webstart" href="https://www.unidata.ucar.edu/IDV/data/workshopIdv.jnlp">
+        codebase = "https://www.unidata.ucar.edu/idv/webstart" href="https://www.unidata.ucar.edu/idv/data/workshopIdv.jnlp">
        <information> 
          <title>Integrated Data Viewer for Unidata Training Workshops </title> 
          <vendor>Unidata</vendor> 
@@ -23,10 +23,10 @@
        </resources>
        <application-desc main-class="ucar.unidata.idv.DefaultIdv"> 
             <argument>-sitepath</argument>
-            <argument>https://www.unidata.ucar.edu/IDV/data/</argument>
+            <argument>https://www.unidata.ucar.edu/idv/data/</argument>
 <!-- here is the command line argument to start the IDV with a  bundle file read remotely from a URL  -->
     <!--     
-    <argument>https://www.unidata.ucar.edu/IDV/data/example.xidv</argument>
+    <argument>https://www.unidata.ucar.edu/idv/data/example.xidv</argument>
     --!>
         </application>
        <security>
