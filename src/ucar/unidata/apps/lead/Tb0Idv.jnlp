@@ -2,11 +2,11 @@
      <!-- JNLP File for Integrated Data Viewer --> 
      <jnlp 
         spec="1.0+" 
-        codebase = "https://www.unidata.ucar.edu/content/software/idv/webstart/" href="https://www.unidata.ucar.edu/content/software/idv/webstart/LEAD/Tb0Idv.jnlp"> 
+        codebase = "https://www.unidata.ucar.edu/software/idv/webstart/" href="https://www.unidata.ucar.edu/software/idv/webstart/LEAD/Tb0Idv.jnlp">
        <information> 
          <title>LEAD Integrated Data Viewer (IDV) </title> 
          <vendor>Unidata</vendor> 
-         <homepage href="https://www.unidata.ucar.edu/content/software/idv/index.html"/> 
+         <homepage href="https://www.unidata.ucar.edu/software/idv/index.html"/>
          <description>LEAD IDV</description> 
          <description kind="short">Version of the IDV for the LEAD TB0
         </description> 

@@ -2816,7 +2816,7 @@ public class Timeline extends JPanel implements MouseListener,
                                             new InputStreamReader(
                                                 new FileInputStream(file)));
                 String line;
-                //[Sat Jul 28 03:14:46 2007] [error] [client 74.6.26.164] Directory index forbidden by rule: /content/software/IDV/release/stable/webstart/
+                //[Sat Jul 28 03:14:46 2007] [error] [client 74.6.26.164] Directory index forbidden by rule: /content/software/idv/release/stable/webstart/
                 SimpleDateFormat dateFormat =
                     new java.text.SimpleDateFormat(fmt);
                 java.text.ParsePosition pp = new java.text.ParsePosition(0);

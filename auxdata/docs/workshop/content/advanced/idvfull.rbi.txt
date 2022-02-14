@@ -628,7 +628,7 @@
     <resource location="%SITEPATH%/imagesets.xml"/>
     <resource location="%APPPATH%/imagesets.xml"/>
     <resource location="%IDVPATH%/imagesets.xml"/>
-    <resource location="https://www.unidata.ucar.edu/georesources/webcams/images/index.xml"/>
+    <resource location="https://resources.unidata.ucar.edu/georesources/webcams/images/index.xml"/>
   </resources>
 
   <resources name="idv.resource.njconfig">

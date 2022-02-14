@@ -238,7 +238,7 @@ idv.ui.showmenubar = true
 ##Semicolon delimited list of urls pointing to thredds catalogs
 idv.data.catalog.list.proplabel=Catalogs
 idv.data.catalog.list.propdelimiter=;
-idv.data.catalog.list=https://www.unidata.ucar.edu/georesources/idvcatalog.xml;http://motherlode.ucar.edu:8080/thredds/idv/rt-models.1.0.xml
+idv.data.catalog.list=https://resources.unidata.ucar.edu/georesources/idvcatalog.xml;http://motherlode.ucar.edu:8080/thredds/idv/rt-models.1.0.xml
 idv.data.catalog.list.merge=true
 idv.data.catalog.list.merge.proplabel=Merge Catalogs
 idv.data.catalog.list.delete.proplabel=Catalogs To Remove
