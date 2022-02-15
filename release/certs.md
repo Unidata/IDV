@@ -339,7 +339,7 @@ Tomorrow, ensure the IDV nightly build has successfully completed without errors
 
 At this point, you will want to check the signature of the IDV to make sure it is properly signed.
 
-After the nightly build is complete, [download and install the nightly IDV](https://www.unidata.ucar.edu/downloads/idv/nightly/index.jsp). The installation process will extract the IDV MacOS installer `.dmg` into `/Volumes/idv`. Copy the contents of that directory into a tmp directory (e.g., `/tmp/idv`) and run the commands:
+After the nightly build is complete, [download and install the nightly IDV](https://downloads.unidata.ucar.edu/idv/#nightly). The installation process will extract the IDV MacOS installer `.dmg` into `/Volumes/idv`. Copy the contents of that directory into a tmp directory (e.g., `/tmp/idv`) and run the commands:
 
 ```sh
 rsync --recursive /Volumes/idv/Integrated\ Data\ Viewer\ Installer.app /tmp/

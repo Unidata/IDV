@@ -116,7 +116,7 @@ public class OldVersionCheck {
                + "</head>\n" + "<body>\n"
                + "<p>There is a new verion of the IDV (" + currentIDVVersion
                + ") available.</p>"
-               + "<a href=\"https://www.unidata.ucar.edu/downloads/idv/current/index.jsp\">Download now</a>."
+               + "<a href=\"https://downloads.unidata.ucar.edu/idv/\">Download now</a>."
                + "</body>\n" + "</html>";
     }
 
