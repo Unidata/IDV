@@ -582,7 +582,7 @@
 
 <!-- Where to look for extensions  -->
   <resources name="idv.resource.pluginindex">
-    <resource location="https://www.unidata.ucar.edu/idv/plugins/plugins.xml"/>
+    <resource location="https://resources.unidata.ucar.edu/idv/plugins/plugins.xml"/>
   </resources>
 
 <!-- Where to look for prototypes  -->

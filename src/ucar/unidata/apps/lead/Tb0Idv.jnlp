@@ -2,7 +2,7 @@
      <!-- JNLP File for Integrated Data Viewer --> 
      <jnlp 
         spec="1.0+" 
-        codebase = "https://www.unidata.ucar.edu/software/idv/webstart/" href="https://www.unidata.ucar.edu/software/idv/webstart/LEAD/Tb0Idv.jnlp">
+        codebase = "https://resources.unidata.ucar.edu/idv/webstart/" href="https://resources.unidata.ucar.edu/idv/webstart/LEAD/Tb0Idv.jnlp">
        <information> 
          <title>LEAD Integrated Data Viewer (IDV) </title> 
          <vendor>Unidata</vendor> 

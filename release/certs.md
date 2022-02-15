@@ -198,7 +198,7 @@ rm /share/idv/.keystore
 ln -s /share/idv/.keystore-2021 /share/idv/.keystore
 ```
 
-Tomorrow, ensure the IDV nightly build has successfully completed without errors. Also, install the IDV JNLP (<https://www.unidata.ucar.edu/software/idv/nightly/webstart/IDV/idv.jnlp>) to verify it has been properly signed with the new certificate.
+Tomorrow, ensure the IDV nightly build has successfully completed without errors. Also, install the IDV JNLP (<https://downloads.unidata.ucar.edu/idv/#nightly>) to verify it has been properly signed with the new certificate.
 
 
 <a id="h-5AF558A1"></a>
