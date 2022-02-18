@@ -198,7 +198,7 @@ rm /share/idv/.keystore
 ln -s /share/idv/.keystore-2021 /share/idv/.keystore
 ```
 
-Tomorrow, ensure the IDV nightly build has successfully completed without errors. Also, install the IDV JNLP (<https://www.unidata.ucar.edu/software/idv/nightly/webstart/IDV/idv.jnlp>) to verify it has been properly signed with the new certificate.
+Tomorrow, ensure the IDV nightly build has successfully completed without errors. Also, install the IDV JNLP (<https://downloads.unidata.ucar.edu/idv/#nightly>) to verify it has been properly signed with the new certificate.
 
 
 <a id="h-5AF558A1"></a>
@@ -339,7 +339,7 @@ Tomorrow, ensure the IDV nightly build has successfully completed without errors
 
 At this point, you will want to check the signature of the IDV to make sure it is properly signed.
 
-After the nightly build is complete, [download and install the nightly IDV](https://www.unidata.ucar.edu/downloads/idv/nightly/index.jsp). The installation process will extract the IDV MacOS installer `.dmg` into `/Volumes/idv`. Copy the contents of that directory into a tmp directory (e.g., `/tmp/idv`) and run the commands:
+After the nightly build is complete, [download and install the nightly IDV](https://downloads.unidata.ucar.edu/idv/#nightly). The installation process will extract the IDV MacOS installer `.dmg` into `/Volumes/idv`. Copy the contents of that directory into a tmp directory (e.g., `/tmp/idv`) and run the commands:
 
 ```sh
 rsync --recursive /Volumes/idv/Integrated\ Data\ Viewer\ Installer.app /tmp/
