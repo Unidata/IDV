@@ -17,21 +17,6 @@
     <style>
     </style>
 
-
-    <script id="update_these">
-        var dotVer = @IDV_VERSION@;  // version string with dot
-        var undVer = @IDV_VERSION_UNDER@;  // version string with underscore
-        var releaseDate = @IDV_BUILDTIME@;    // release date
-    </script>
-
-    <script id="do_not_update">
-        window.onload = function () {
-            document.title = "IDV " + dotVer + " Documentation";
-            replaceClass('dv', dotVer);
-            replaceClass('rd', releaseDate);
-        };
-    </script>
-
 </head>
 
 <body>
@@ -43,8 +28,8 @@
 
             <h1>IDV Documentation</h1>
 
-            <p>IDV <span class="dv">[version unknown]</span> release</p>
-            <p>Built: <span class="rd">[release date unknown]</span> UTC</p>
+            <p>IDV @IDV_VERSION@ release</p>
+            <p>Built: @IDV_BUILDTIME@ UTC</p>
 
             <ul>
                 <li> <a href="userguide/">User Guide</a>
@@ -61,15 +46,6 @@
 </body>
 <script>
     includeHTML();
-    function replaceClass(theClass, theVariable) {
-        //console.log(theClass);
-        //console.log(theVariable);
-        var c = document.getElementsByClassName(theClass);
-        var i;
-        for (i = 0; i < c.length; i++) {
-            c[i].innerHTML = theVariable;
-        }
-    }
 </script>
 
 </body>
