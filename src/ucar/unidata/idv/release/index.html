@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--
+  This file should be uploaded to artifacts.unidata in the appropriate repository as "index.html".
+-->
+<html>
+
+<head>
+    <title>IDV Documentation</title>
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <script src="/js/jquery/jquery-latest.min.js" type="text/javascript"></script>
+    <script src="/js/site_search.js" type="text/javascript"></script>
+    <script src="/js/common.js" type="text/javascript"></script>
+    <link href="/css/upcdocs.css" rel="stylesheet" type="text/css">
+    <link href="/css/flexdocs.css" rel="stylesheet" type="text/css">
+    <link href="/css/header.css" rel="stylesheet" type="text/css">
+    <style>
+    </style>
+
+
+    <script id="update_these">
+        var dotVer = @IDV_VERSION@;  // version string with dot
+        var undVer = @IDV_VERSION_UNDER@;  // version string with underscore
+        var releaseDate = @IDV_BUILDTIME@;;    // release date
+    </script>
+
+    <script id="do_not_update">
+        window.onload = function () {
+            document.title = "IDV " + dotVer + " Documentation";
+            replaceClass('dv', dotVer);
+            replaceClass('rd', releaseDate);
+            replaceIDs();
+        };
+    </script>
+
+</head>
+
+<body>
+<div id="vwrapper">
+    <div id="head" w3-include-html="/includes/hd_doc.html"></div>
+
+    <div id="wrap">
+        <div id="container">
+
+            <h1>IDV Documentation</h1>
+
+            <p>IDV <span class="dv">[version unknown]</span> release</p>
+            <p>Built: <span class="rd">[release date unknown]</span> UTC</p>
+
+            <ul>
+                <li> <a href="userguide/">User Guide</a>
+                <li> <a href="workshop/">Training Workshop</a>
+                <li> <a href="javadoc/">Javadoc</a>
+            </ul>
+
+        </div>
+    </div>
+
+    <div w3-include-html="/includes/ft_doc_top.html"></div>
+
+</div>
+</body>
+<script>
+    includeHTML();
+</script>
+
+</body>
+
+</html>
