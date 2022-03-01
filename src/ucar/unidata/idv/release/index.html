@@ -29,7 +29,6 @@
             document.title = "IDV " + dotVer + " Documentation";
             replaceClass('dv', dotVer);
             replaceClass('rd', releaseDate);
-            replaceIDs();
         };
     </script>
 
@@ -62,6 +61,15 @@
 </body>
 <script>
     includeHTML();
+    function replaceClass(theClass, theVariable) {
+        //console.log(theClass);
+        //console.log(theVariable);
+        var c = document.getElementsByClassName(theClass);
+        var i;
+        for (i = 0; i < c.length; i++) {
+            c[i].innerHTML = theVariable;
+        }
+    }
 </script>
 
 </body>
