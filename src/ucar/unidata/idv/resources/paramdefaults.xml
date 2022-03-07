@@ -439,9 +439,9 @@ specified  -->
     <param ci_base="-1.0" ci_interval="0.5" ci_max="7.0" ci_min="-1.0" ci_width="1" name="ABI_L2_ACTP" range_max="6.5" range_min="-0.5" table="Cloud Top Phase"/>
     <param ci_base="0.0" ci_interval="10000.0" ci_max="100000.0" ci_min="0.0" ci_width="1" name="ABI_L2_VAA_Height" range_max="98000.0" range_min="0.0" table="Volcanic Ash Cloud Height" unit="ft"/>
     <param ci_base="0.0" ci_interval="0.5" ci_max="5.0" ci_min="0.0" ci_width="1" name="ABI_L2_TPW" range_max="2.5" range_min="0.0" table="Total Precipitable Water" unit="in"/>
-    <param ci_base="0.0" ci_interval="5.0" ci_max="45.0" ci_min="-10.0" ci_width="1" name="ABI_L2_SST" range_max="35.0" range_min="-5.0" table="Sea Surface Temperature" unit="celsius"/>
+    <param ci_base="0.0" ci_interval="5.0" ci_max="45.0" ci_min="-10.0" ci_width="1" name="ABI_L2_SST" range_max="35.0" range_min="-5.0" table="Sea Surface Temperature" unit="°C"/>
     <param ci_base="0.0" ci_interval="0.25" ci_max="5.0" ci_min="0.0" ci_width="1" name="RRQPE" range_max="3.0" range_min="0.0" table="Rain Rate QPF Estimate" unit="in h-1"/>
-    <param ci_base="0.0" ci_interval="10.0" ci_max="130.0" ci_min="-30.0" ci_width="1" name="ABI_L2_LST" range_max="110.0" range_min="-10.0" table="Land Surface Temperature" unit="Fahrenheit"/>
+    <param ci_base="0.0" ci_interval="10.0" ci_max="130.0" ci_min="-30.0" ci_width="1" name="ABI_L2_LST" range_max="110.0" range_min="-10.0" table="Land Surface Temperature" unit="°F"/>
     <param ci_base="0.0" ci_interval="100.0" ci_max="1100.0" ci_min="0.0" ci_width="1" name="ABI_L2_FDC_Power" range_max="1000.0" range_min="0.0" table="Fire Radiative Power" unit="MW"/>
     <param ci_base="0.0" ci_interval="100.0" ci_max="1300.0" ci_min="400.0" ci_width="1" name="ABI_L2_FDC_Temp" range_max="1200.0" range_min="400.0" table="Fire Temperature" unit="K"/>
     <param ci_base="0.0" ci_interval="500000.0" ci_max="5000000.0" ci_min="0.0" ci_width="1" name="ABI_L2_FDC_AREA" range_max="4000000.0" range_min="0.0" table="Fire Area" unit="m2"/>
@@ -459,18 +459,272 @@ specified  -->
     <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="0.0" ci_width="1" name="ABI_L2_FSC" range_max="1.0" range_min="0.0" table="Fractional Snow Cover"/>
     <param ci_base="0.0" ci_interval="20.0" ci_max="340.0" ci_min="0.0" ci_width="1" name="ABI_L2_VAA_Mass" range_max="50.0" range_min="0.0" table="Volcanic Ash Mass Loading" unit="t km-2"/>
     <param ci_base="0.0" ci_interval="35.0" ci_max="280.0" ci_min="0.0" ci_width="1" name="ABI_L2_FDC_Mask" range_max="245.0" range_min="0.0" table="Fire Mask"/>
-    <param name="ABI_L2_ADP_Aerosol" range_max="1.0" range_min="0.0" table="Aerosol Detection - Aerosol"/>
-    <param name="ABI_L2_ADP_Smoke" range_max="1.0" range_min="0.0" table="Aerosol Detection - Smoke"/>
-    <param name="ABI_L2_ADP_Dust" range_max="1.0" range_min="0.0" table="Aerosol Detection - Dust"/>
+    <param ci_base="0.0" ci_interval="1.0" ci_label="false" ci_max="2.0" ci_min="-1.0" ci_width="1" name="ABI_L2_ADP_Aerosol" range_max="1.1" range_min="0.0" table="Aerosol Detection - Aerosol" unit="1"/>
+    <param ci_base="0.0" ci_interval="1.0" ci_label="false" ci_max="2.0" ci_min="-1.0" ci_width="1" name="ABI_L2_ADP_Dust" range_max="1.1" range_min="0.0" table="Aerosol Detection - Dust" unit="1"/>
+    <param ci_base="0.0" ci_interval="1.0" ci_label="false" ci_max="2.0" ci_min="-1.0" ci_width="1" name="ABI_L2_ADP_Smoke" range_max="1.1" range_min="0.0" table="Aerosol Detection - Smoke" unit="1"/>
     <param ci_base="0.0" ci_interval="5.0" ci_max="100.0" ci_min="0.0" ci_width="1" name=".*_Band24_QPE" range_max="99.0" range_min="0.0" table="Rain Rate QPF Estimate" unit="mm h-1"/>
     <!-- end inq2679 -->
 
     <!-- bob inq 2836 -->
-    <param ci_base="-30.0" ci_interval="30.0" ci_max="270.0" ci_min="-60.0" ci_width="1" name="abinightfog" range_max="16.0" range_min="-16.0" table="ABI Fog" unit="K"/>
+  <param ci_base="0.0" ci_interval="4.0" ci_max="20.0" ci_min="-20.0" ci_width="1" name="abinightfog" range_max="16.0" range_min="-16.0" table="ABI Fog" unit="K"/>
     <param ci_base="-28.0" ci_interval="4.0" ci_max="8.0" ci_min="-32.0" ci_width="1" name="abisplitwindow" range_max="-11.0" range_min="3.4" table="Enhanced Echo Tops" unit="K"/>
-    <param ci_base="-16.0" ci_interval="4.0" ci_max="16.0" ci_min="-20.0" ci_width="1" name="abisplitcloudphase" range_max="25.0" range_min="-10.0" table="truncated gridded data" unit="K"/>
-    <param name="abisplitsnow" table="truncated gridded data"/>
+    <param ci_base="-16.0" ci_interval="4.0" ci_max="30.0" ci_min="-20.0" ci_width="1" name="abisplitcloudphase" range_max="25.0" range_min="-10.0" table="truncated gridded data" unit="K"/>
+    <param ci_base="0.0" ci_interval="10.0" ci_max="40.0" ci_min="-100.0" ci_width="1" name="abisplitsnow" range_max="30.0" range_min="-80.0" table="truncated gridded data"/>
     <param ci_base="-28.0" ci_interval="4.0" ci_max="8.0" ci_min="-32.0" ci_width="1" name="abisplitwatervapor" range_max="5.0" range_min="-32.0" table="truncated gridded data" unit="K"/>
     <param ci_base="-42.0" ci_interval="7.0" ci_max="28.0" ci_min="-49.0" ci_width="1" name="abisplitozone" range_max="5.0" range_min="-45.0" table="truncated gridded data" unit="K"/>
     <!-- end inq 2836 -->
+
+  <!-- bob inq 2876 - Feb 2020 -->
+  <param ci_base="0.0" ci_interval="0.1" ci_max="2.0" ci_min="-2.0" ci_width="1" name="modis_evi" range_max="1.0" range_min="-1.0" table="NDVI"/>
+  <param ci_base="0.0" ci_interval="0.1" ci_max="2.0" ci_min="-2.0" ci_width="1" name="modis_ndvi" range_max="1.0" range_min="-1.0" table="NDVI"/>
+  <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="0.0" ci_width="1" name="modis_ndsi" range_max="1.0" range_min="0.0" table="NDSI"/>
+  <param ci_base="0.0" ci_interval="0.2" ci_max="1.2" ci_min="-1.2" ci_width="1" name="modis_ndwi" range_max="1.0" range_min="-1.0" table="NDVI"/>
+  <!-- end inq 2876 -->
+
+  <!-- bob inq 2670 - Feb 2020 -->
+  <param ci_base="0.0" ci_interval="0.1" ci_max="2.0" ci_min="-2.0" ci_width="1" name="VIIRS_NDVI" range_max="1.0" range_min="-1.0" table="NDVI"/>
+  <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="0.0" ci_width="1" name="VIIRS_NDSI" range_max="1.0" range_min="0.0" table="NDSI"/>
+  <!-- end inq 2670 -->
+
+  <!-- bob inq 2881 - Sep 2021 -->
+  <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="-0.1" ci_width="1" name="PRODUCT_SUPPORT_DATA_DETAILED_RESULTS/cloud_fraction_intensity_weighted_precision" range_max="1.0" range_min="0.0" table="default" unit="1"/>
+  <!-- end inq 2881 -->
+
+  <!-- bob inq 2955 (NUCAPS grids) - Feb/May 2021 -->
+  <param ci_base="0.0" ci_interval="0.3" ci_max="2.3" ci_min="-0.3" ci_width="1" name="Quality_Flag" range_max="2.0" range_min="0.0" table="Quality Flag" unit="1"/>
+  <param ci_base="0.0" ci_interval="2.5" ci_max="60.0" ci_min="0.25" ci_width="1" name="PrecipWater_Total" range_max="50.0" range_min="0.0" table="Precip Water" unit="mm"/>
+  <param ci_base="0.0" ci_interval="20.0" ci_max="120.0" ci_min="-20.0" ci_width="1" name="RelHum_2m" range_max="100.0" range_min="0.0" table="Rel Humidity" unit="percent"/>
+  <param ci_base="0.0" ci_interval="100.0" ci_max="1100.0" ci_min="-100.0" ci_width="1" name="CloudTopPressure*.*" range_max="1000.0" range_min="0.0" table="Cloud Top Press" unit="mb"/>
+  <param ci_base="0.0" ci_interval="0.2" ci_max="1.2" ci_min="-0.2" ci_width="1" name="CloudTopFraction*.*" range_max="1.0" range_min="0.0" table="Cloud Top Fraction" unit="1"/>
+  <param ci_base="100.0" ci_interval="50.0" ci_max="650.0" ci_min="50.0" ci_width="1" name="Tropopause_Height" range_max="600.0" range_min="100.0" table="Tropopause Height" unit="mb"/>
+  <param ci_base="0.0" ci_interval="25.0" ci_max="225.0" ci_min="-25.0" ci_width="1" name="O3_Anom" range_max="200.0" range_min="0.0" table="Ozone Anomaly" unit="percent"/>
+  <param ci_base="100.0" ci_interval="50.0" ci_max="650.0" ci_min="50.0" ci_width="1" name="O3_Total" range_max="600.0" range_min="100.0" table="Ozone Total" unit="DU"/>
+  <param ci_base="25.0" ci_interval="5.0" ci_max="50.0" ci_min="20.0" ci_width="1" name="CH4_Total" range_max="45.0" range_min="25.0" table="Methane"/>
+  <param ci_base="0.0" ci_interval="5.0" ci_max="35.0" ci_min="0.0" ci_width="1" name="CO_Total" range_max="30.0" range_min="5.0" table="Carbon Monoxide"/>
+  <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="-0.1" ci_width="1" name="SO2_Total" range_max="1.0" range_min="0.0" table="Sulfur Dioxide" unit="DU"/>
+  <param ci_base="0.0" ci_interval="5.0" ci_max="55.0" ci_min="-5.0" ci_width="1" name="PrecipWater_*.*_*.*mb" range_max="50.0" range_min="0.0" table="Precip Water" unit="mm"/>
+  <param ci_base="0.0" ci_interval="1.0" ci_max="8.0" ci_min="-1.0" ci_width="1" name="HainesIndex_*.*_*.*mb" range_max="7.0" range_min="0.0" table="Haines Index" unit="1"/>
+  <param ci_base="0.0" ci_interval="1.0" ci_max="11.0" ci_min="-1.0" ci_width="1" name="LapseRate_*.*_*.*mb" range_max="10.0" range_min="-2.0" table="Lapse Rate" unit="°C/km"/>
+  <param ci_base="0.0" ci_interval="5.0" ci_max="105.0" ci_min="-5.0" ci_width="1" name="RelHum_*.*ft" range_max="100.0" range_min="0.0" table="Rel Humidity" unit="Percent"/>
+  <param ci_base="0.0" ci_interval="5.0" ci_max="105.0" ci_min="-5.0" ci_width="1" name="RelHum_*.*mb" range_max="100.0" range_min="0.0" table="Rel Humidity" unit="Percent"/>
+  <param ci_base="-15.0" ci_interval="5.0" ci_max="55.0" ci_min="-15.0" ci_width="1" name="Temperature_2m" range_max="50.0" range_min="-10.0" table="Temp 2m" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_100mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Temperature_125mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_150mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_175mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_200mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_200mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_200mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_225mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_250mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_250mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_250mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_275mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="20.0" ci_min="-90.0" ci_width="1" name="Temperature_300mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="40.0" ci_min="-90.0" ci_width="1" name="Temperature_325mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="40.0" ci_min="-90.0" ci_width="1" name="Temperature_350mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="40.0" ci_min="-90.0" ci_width="1" name="Temperature_375mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="40.0" ci_min="-90.0" ci_width="1" name="Temperature_400mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_425mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_450mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_475mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_500mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_525mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_550mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_575mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_600mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_625mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_650mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_675mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_700mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_725mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_750mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_775mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_800mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_825mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_850mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_875mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_900mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_925mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-50.0" ci_width="1" name="Temperature_950mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-20.0" ci_width="1" name="Temperature_975mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-20.0" ci_width="1" name="Temperature_1000mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-20.0" ci_width="1" name="Temperature_1025mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-20.0" ci_width="1" name="Temperature_1050mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-20.0" ci_width="1" name="Temperature_1075mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-20.0" ci_width="1" name="Temperature_1100mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_100mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_125mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_150mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_175mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_200mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_225mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_250mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_275mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_300mb" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_325mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_350mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_375mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_400mb" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_425mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_450mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_475mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_500mb" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_525mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_550mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_575mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_600mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_625mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_650mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_675mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_700mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_725mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_750mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_775mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_800mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_825mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_850mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_875mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_900mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_925mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_950mb" range_max="40.0" range_min="-40.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_975mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_1000mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_1025mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_1050mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_1075mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="60.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_1100mb" range_max="50.0" range_min="-10.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_18279ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_19513ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_20801ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_22149ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_23562ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_25048ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_26618ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_28280ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Virtual_Temperature_30050ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_31943ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_33981ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_36192ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_38612ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_41290ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_44298ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_47744ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Virtual_Temperature_51802ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_18279ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_19513ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_20801ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_22149ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_23562ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_25048ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_26618ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_28280ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-70.0" ci_width="1" name="Temperature_30050ft" range_max="40.0" range_min="-60.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_31943ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_33981ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_36192ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="50.0" ci_min="-90.0" ci_width="1" name="Temperature_38612ft" range_max="40.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Temperature_41290ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Temperature_44298ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Temperature_47744ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="30.0" ci_min="-90.0" ci_width="1" name="Temperature_51802ft" range_max="20.0" range_min="-80.0" table="Temp mb" unit="°C"/>
+  <param ci_base="12000.0" ci_interval="200.0" ci_max="18200.0" ci_min="11800.0" ci_width="1" name="Geopotential_Heights_100mb" range_max="18000.0" range_min="12000.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="12000.0" ci_interval="200.0" ci_max="18200.0" ci_min="11800.0" ci_width="1" name="Geopotential_Heights_125mb" range_max="18000.0" range_min="12000.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="12000.0" ci_interval="200.0" ci_max="18200.0" ci_min="11800.0" ci_width="1" name="Geopotential_Heights_150mb" range_max="18000.0" range_min="12000.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="10000.0" ci_interval="200.0" ci_max="15200.0" ci_min="9800.0" ci_width="1" name="Geopotential_Heights_175mb" range_max="15000.0" range_min="10000.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="10000.0" ci_interval="200.0" ci_max="15200.0" ci_min="9800.0" ci_width="1" name="Geopotential_Heights_200mb" range_max="15000.0" range_min="10000.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="10000.0" ci_interval="200.0" ci_max="15200.0" ci_min="9800.0" ci_width="1" name="Geopotential_Heights_225mb" range_max="15000.0" range_min="10000.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="7800.0" ci_interval="200.0" ci_max="15200.0" ci_min="7600.0" ci_width="1" name="Geopotential_Heights_250mb" range_max="10000.0" range_min="7800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="7800.0" ci_interval="200.0" ci_max="10200.0" ci_min="7600.0" ci_width="1" name="Geopotential_Heights_275mb" range_max="10000.0" range_min="7800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="7800.0" ci_interval="200.0" ci_max="10200.0" ci_min="7600.0" ci_width="1" name="Geopotential_Heights_300mb" range_max="10000.0" range_min="7800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="7800.0" ci_interval="200.0" ci_max="10200.0" ci_min="7600.0" ci_width="1" name="Geopotential_Heights_325mb" range_max="10000.0" range_min="7800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="7800.0" ci_interval="200.0" ci_max="10200.0" ci_min="7600.0" ci_width="1" name="Geopotential_Heights_350mb" range_max="10000.0" range_min="7800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="7000.0" ci_interval="200.0" ci_max="8000.0" ci_min="4600.0" ci_width="1" name="Geopotential_Heights_375mb" range_max="7800.0" range_min="5200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="5200.0" ci_interval="200.0" ci_max="8000.0" ci_min="4600.0" ci_width="1" name="Geopotential_Heights_400mb" range_max="7800.0" range_min="5200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="5200.0" ci_interval="200.0" ci_max="8000.0" ci_min="5000.0" ci_width="1" name="Geopotential_Heights_425mb" range_max="7800.0" range_min="5200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="4800.0" ci_interval="200.0" ci_max="6400.0" ci_min="4600.0" ci_width="1" name="Geopotential_Heights_450mb" range_max="6200.0" range_min="4800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="4800.0" ci_interval="200.0" ci_max="6400.0" ci_min="4600.0" ci_width="1" name="Geopotential_Heights_475mb" range_max="6200.0" range_min="4800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="4800.0" ci_interval="200.0" ci_max="6400.0" ci_min="4600.0" ci_width="1" name="Geopotential_Heights_500mb" range_max="6200.0" range_min="4800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="4800.0" ci_interval="200.0" ci_max="6400.0" ci_min="4600.0" ci_width="1" name="Geopotential_Heights_525mb" range_max="6200.0" range_min="4800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="2800.0" ci_interval="200.0" ci_max="5200.0" ci_min="2600.0" ci_width="1" name="Geopotential_Heights_550mb" range_max="5000.0" range_min="2800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="2800.0" ci_interval="200.0" ci_max="5200.0" ci_min="2600.0" ci_width="1" name="Geopotential_Heights_575mb" range_max="5000.0" range_min="2800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="2800.0" ci_interval="200.0" ci_max="5200.0" ci_min="2600.0" ci_width="1" name="Geopotential_Heights_600mb" range_max="5000.0" range_min="2800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="2800.0" ci_interval="200.0" ci_max="5200.0" ci_min="2600.0" ci_width="1" name="Geopotential_Heights_625mb" range_max="5000.0" range_min="2800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="2200.0" ci_interval="200.0" ci_max="3600.0" ci_min="2000.0" ci_width="1" name="Geopotential_Heights_650mb" range_max="3400.0" range_min="2200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="2200.0" ci_interval="200.0" ci_max="3600.0" ci_min="2000.0" ci_width="1" name="Geopotential_Heights_675mb" range_max="3400.0" range_min="2200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="2200.0" ci_interval="200.0" ci_max="3600.0" ci_min="2000.0" ci_width="1" name="Geopotential_Heights_700mb" range_max="3400.0" range_min="2200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="1200.0" ci_interval="200.0" ci_max="3000.0" ci_min="1000.0" ci_width="1" name="Geopotential_Heights_725mb" range_max="2800.0" range_min="1200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="1200.0" ci_interval="200.0" ci_max="3000.0" ci_min="1000.0" ci_width="1" name="Geopotential_Heights_750mb" range_max="2800.0" range_min="1200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="1200.0" ci_interval="200.0" ci_max="2400.0" ci_min="1000.0" ci_width="1" name="Geopotential_Heights_775mb" range_max="2200.0" range_min="1200.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="800.0" ci_interval="200.0" ci_max="2400.0" ci_min="600.0" ci_width="1" name="Geopotential_Heights_800mb" range_max="2200.0" range_min="800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="800.0" ci_interval="200.0" ci_max="2000.0" ci_min="600.0" ci_width="1" name="Geopotential_Heights_825mb" range_max="1800.0" range_min="800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="800.0" ci_interval="200.0" ci_max="2000.0" ci_min="600.0" ci_width="1" name="Geopotential_Heights_850mb" range_max="1800.0" range_min="800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="800.0" ci_interval="200.0" ci_max="2000.0" ci_min="600.0" ci_width="1" name="Geopotential_Heights_875mb" range_max="1800.0" range_min="800.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_900mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_925mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_950mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_975mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_1000mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_1025mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_1050mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_1075mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <param ci_base="0.0" ci_interval="200.0" ci_max="2000.0" ci_min="-200.0" ci_width="1" name="Geopotential_Heights_1100mb" range_max="1800.0" range_min="0.0" table="Geopotential Height mb" unit="m"/>
+  <!-- end inq 2955 -->
+
+  <!-- bob inq 2924 (VIIRS EDRs) - May 2021 -->
+  <param ci_base="0.0" ci_interval="5.0" ci_max="75.0" ci_min="-5.0" ci_width="1" name="AshMassLoading" range_max="70.0" range_min="0.0" unit="tons/km^2"/>
+  <param ci_base="0.0" ci_interval="5.0" ci_max="105.0" ci_min="-5.0" ci_width="1" name="AshOD_IR" range_max="100.0" range_min="1.0" unit="1"/>
+  <param ci_base="0.0" ci_interval="5.0" ci_max="105.0" ci_min="-5.0" ci_width="1" name="AshOD_VIS" range_max="100.0" range_min="1.0" unit="1"/>
+  <param ci_base="0.0" ci_interval="2.0" ci_max="22.0" ci_min="-2.0" ci_width="1" name="AshEffRad" range_max="20.0" range_min="0.0" unit="microns"/>
+  <param ci_base="0.0" ci_interval="1000.0" ci_max="31000.0" ci_min="-1000.0" ci_width="1" name="AshTopHeight" range_max="30000.0" range_min="0.0" unit="m"/>
+  <param ci_base="0.0" ci_interval="100.0" ci_max="1200.0" ci_min="-100.0" ci_width="1" name="AshTopPress" range_max="1100.0" range_min="0.0" unit="hPa"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="360.0" ci_min="160.0" ci_width="1" name="AshTopTemp" range_max="340.0" range_min="180.0" unit="K"/>
+  <param ci_base="90.0" ci_interval="10.0" ci_max="410.0" ci_min="400.0" ci_width="1" name="IceSrfTemp" range_max="390.0" range_min="100.0" unit="K"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="110.0" ci_min="-10.0" ci_width="1" name="IceConc" range_max="100.0" range_min="0.0" unit="%"/>
+  <param ci_base="0.0" ci_interval="1000.0" ci_max="10000.0" ci_min="-1000.0" ci_width="1" name="IceThickness" range_max="9999.0" range_min="0.0" unit="m"/>
+  <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="-0.1" ci_width="1" name="Conv_Cld_Prob" range_max="1.0" range_min="0.0" unit="%"/>
+  <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="-0.1" ci_width="1" name="SC_Cld_Prob" range_max="1.0" range_min="0.0" unit="%"/>
+  <param ci_base="0.0" ci_interval="50.0" ci_max="1050.0" ci_min="-50.0" ci_width="1" name="Cost" range_max="1000.0" range_min="0.0" unit="1"/>
+  <param ci_base="0.0" ci_interval="1000.0" ci_max="11000.0" ci_min="-1000.0" ci_width="1" name="ZcError" range_max="10000.0" range_min="0.0" unit="m"/>
+  <param ci_base="0.0" ci_interval="100.0" ci_max="1100.0" ci_min="-100.0" ci_width="1" name="PcError" range_max="1000.0" range_min="0.0" unit="hPa"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="110.0" ci_min="-10.0" ci_width="1" name="TcError" range_max="100.0" range_min="0.0" unit="K"/>
+  <param ci_base="0.0" ci_interval="1000.0" ci_max="21000.0" ci_min="-1000.0" ci_width="1" name="CldTopHght" range_max="20000.0" range_min="-300.0" unit="m"/>
+  <param ci_base="0.0" ci_interval="100.0" ci_max="1200.0" ci_min="-100.0" ci_width="1" name="CldTopPres" range_max="1100.0" range_min="0.0" unit="hPa"/>
+  <param ci_base="180.0" ci_interval="20.0" ci_max="360.0" ci_min="160.0" ci_width="1" name="CldTopTemp" range_max="340.0" range_min="180.0" unit="K"/>
+  <param ci_base="0.0" ci_interval="500.0" ci_max="5500.0" ci_min="-500.0" ci_width="1" name="CloudMicroIWP" range_max="5000.0" range_min="0.0" unit="g/m2"/>
+  <param ci_base="0.0" ci_interval="500.0" ci_max="5500.0" ci_min="-500.0" ci_width="1" name="CloudMicroLWP" range_max="5000.0" range_min="0.0" unit="g/m2"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="160.0" ci_min="-10.0" ci_width="1" name="CloudMicroEffRad" range_max="150.0" range_min="0.0" unit="Micron"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="110.0" ci_min="-10.0" ci_width="1" name="CloudMicroEffRadMD6" range_max="100.0" range_min="0.0" unit="Micron"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="110.0" ci_min="-10.0" ci_width="1" name="CloudMicroVisODMD6" range_max="100.0" range_min="0.0" unit="1"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="170.0" ci_min="-10.0" ci_width="1" name="CloudMicroVisOD" range_max="160.0" range_min="0.0" unit="1"/>
+  <param ci_base="0.0" ci_interval="1000.0" ci_max="21000.0" ci_min="-1000.0" ci_width="1" name="CldBaseHght" range_max="20000.0" range_min="-300.0" unit="m"/>
+  <param ci_base="0.0" ci_interval="1000.0" ci_max="12000.0" ci_min="-1000.0" ci_width="1" name="CldBasePres" range_max="1100.0" range_min="0.0" unit="hPa"/>
+  <param ci_base="0.0" ci_interval="1000.0" ci_max="21000.0" ci_min="-1000.0" ci_width="1" name="CldTopHght_Adj" range_max="20000.0" range_min="-300.0" unit="m"/>
+  <param ci_base="0.0" ci_interval="100.0" ci_max="1200.0" ci_min="-100.0" ci_width="1" name="CldTopPres_Adj" range_max="1100.0" range_min="0.0" unit="hPa"/>
+  <param ci_base="0.0" ci_interval="0.1" ci_max="1.1" ci_min="-0.1" ci_width="1" name="SpaStddev" range_max="1.0" range_min="0.0" unit="1"/>
+  <param ci_base="0.0" ci_interval="0.2" ci_max="3.2" ci_min="-1.2" ci_width="1" name="AngsExp2" range_max="3.0" range_min="-1.0" unit="1"/>
+  <param ci_base="0.0" ci_interval="0.2" ci_max="3.2" ci_min="-1.2" ci_width="1" name="AngsExp1" range_max="3.0" range_min="-1.0" unit="1"/>
+  <!-- end inq 2924 -->
+
+  <!-- bob inq 2969 (HiRes RH) - June 2021 -->
+  <param ci_base="0.0" ci_interval="10.0" ci_max="110.0" ci_min="-10.0" ci_width="1" name="rh" range_max="100.0" range_min="0.0" table="Relative Humidity" unit="%"/>
+  <!-- end inq 2969 -->
+
+  <!-- bob inq 2994 -->
+  <param ci_base="0.0" ci_interval="0.2" ci_max="1.2" ci_min="-0.2" ci_width="1" name="Refl" range_max="1.0" range_min="0.0" table="Gray Scale" unit="1"/>
+  <!-- end inq 2994 -->
+
+  <!-- bob inq 3004 -->
+  <param ci_base="0.0" ci_interval="1.0" ci_max="200.0" ci_min="0.0" ci_width="1" name="^.*_precipitation" range_max="70.0" range_min="0.0" table="Precipitation - Transparent" unit="mm"/>
+  <param ci_base="0.0" ci_interval="1.0" ci_max="200.0" ci_min="0.0" ci_width="1" name="^precip.*" range_max="70.0" range_min="0.0" table="Precipitation - Transparent" unit="mm"/>
+  <param ci_base="1000.0" ci_interval="4.0" ci_max="2000.0" ci_min="900.0" ci_width="1" name="pressure" range_max="1052.0" range_min="952.0" table="PressureMSL" unit="hPa"/>
+  <param ci_base="0.0" ci_interval="2.0" ci_max="200.0" ci_min="-200.0" ci_width="1" name="u" range_max="50.0" range_min="-50.0" table="Wind comps" unit="m/s"/>
+  <param ci_base="0.0" ci_interval="2.0" ci_max="200.0" ci_min="-200.0" ci_width="1" name="v" range_max="50.0" range_min="-50.0" table="Wind comps" unit="m/s"/>
+  <param ci_base="0.0" ci_interval="1.0" ci_label="false" ci_max="4.0" ci_min="-1.0" ci_width="1" name="ACM" range_max="3.0" range_min="0.0" table="default"/>
+  <param ci_base="0.0" ci_interval="10.0" ci_max="200.0" ci_min="0.0" ci_width="1" name="speed" range_max="80.0" range_min="0.0" table="Windspeed" unit="m/s"/>
+  <param ci_base="0.0" ci_interval="0.5" ci_max="100.0" ci_min="-50.0" ci_width="1" name="reflect.*" range_max="94.5" range_min="-32.0" table="Base Reflectivity - Transparent" unit="dBZ"/>
+  <param ci_base="0.0" ci_interval="0.5" ci_max="100.0" ci_min="-50.0" ci_width="1" name=".*base.*" range_max="94.5" range_min="-32.0" table="Base Reflectivity - Transparent" unit="dBZ"/>
+  <param ci_base="0.0" ci_interval="0.5" ci_max="100.0" ci_min="-50.0" ci_width="1" name=".*rcm.*" range_max="94.5" range_min="-32.0" table="Base Reflectivity - Transparent" unit="dBZ"/>
+  <param ci_base="0.0" ci_interval="0.5" ci_max="100.0" ci_min="-50.0" ci_width="1" name="7.*echo.*" range_max="94.5" range_min="-32.0" table="Base Reflectivity - Transparent" unit="dBZ"/>
+  <!-- end inq 3004 -->
 </params>
