@@ -94,9 +94,9 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
     private String summary;
 
     /** _more_ */
-    //protected static final Namespace defNS =
-    //    Namespace.getNamespace(
-     //       thredds.catalog.XMLEntityResolver.DQC_NAMESPACE_04);
+    protected static final Namespace defNS =
+        Namespace.getNamespace(
+            thredds.catalog.XMLEntityResolver.DQC_NAMESPACE_04);
 
     /** the original document URI */
     private URI docURI;
@@ -138,10 +138,10 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
             String dsc_location, StringBuffer errlog)
             throws IOException {
         // super();
-        SAXBuilder        builder = new SAXBuilder();
+        SAXBuilder        builder;
         Document          doc  = null;
-        //XMLEntityResolver jaxp = new XMLEntityResolver(true);
-        //builder = jaxp.getSAXBuilder();
+        XMLEntityResolver jaxp = new XMLEntityResolver(true);
+        builder = jaxp.getSAXBuilder();
 
         //from tommy Jasmin to keep bundles working
         if (dsc_location != null) {
@@ -238,10 +238,10 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
      */
     public HashMap<String,Station> readRadarStations(String stsXML_location)
             throws IOException {
-        SAXBuilder        builder  =  new SAXBuilder();
+        SAXBuilder        builder;
         Document          doc  = null;
-        //XMLEntityResolver jaxp = new XMLEntityResolver(true);
-       //builder = jaxp.getSAXBuilder();
+        XMLEntityResolver jaxp = new XMLEntityResolver(true);
+        builder = jaxp.getSAXBuilder();
         HashMap<String,Station> stations = new HashMap<String,Station>();
 
         try {
