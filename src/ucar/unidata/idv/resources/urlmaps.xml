@@ -7,22 +7,14 @@
     -->
     <urlmap
         type="opendap"
-        old="motherlode.ucar.edu/thredds/"
-        new="thredds.ucar.edu/thredds/"/>
-    <urlmap
-        type="opendap"
         old="motherlode.ucar.edu:8080/thredds/"
-        new="thredds.ucar.edu/thredds/"/>
+        new="threddsrc.ucar.edu/thredds/"/>
     <urlmap
         type="opendap"
-        old="motherlode.ucar.edu:-1/thredds/"
-        new="thredds.ucar.edu/thredds/"/>
+        old="motherlode.ucar.edu/thredds/"
+        new="threddsrc.ucar.edu/thredds/"/>
     <urlmap
         type="opendap"
-        old="motherlode.ucar.edu:8081/thredds/"
-        new="thredds-test.ucar.edu/thredds/"/>
-    <urlmap
-        type="opendap"
-        old="motherlode.ucar.edu:9080/thredds/"
-        new="thredds-dev.ucar.edu/thredds/"/>
+        old="thredds.ucar.edu/thredds/"
+        new="threddsrc.ucar.edu/thredds/"/>
 </urlmaps>
