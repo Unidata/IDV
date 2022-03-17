@@ -2226,7 +2226,10 @@ public class GeoGridDataSource extends GridDataSource {
             CalendarDateTime t1 =
                 new CalendarDateTime((DateTime) times.get(times.size() - 1));
             CalendarDate dt1 = t1.getCalendarDate();
-            dateRange = CalendarDateRange.of(dt0, dt1);
+            if(dt1.getMillis()  >= dt0.getMillis())
+                dateRange = CalendarDateRange.of(dt0, dt1);
+            else
+                dateRange = CalendarDateRange.of(dt1, dt0);
         } else {
             dateRange = null;
         }
