@@ -1015,6 +1015,12 @@ public class GridCoverageDataSource extends GridDataSource {
             // NetcdfFileWriter writer
 
             FeatureDatasetCoverage cc = DtCoverageAdapter.factory(dataset, null);
+            //CoverageCollection ccc   =  cc.getSingleCoverageCollection(); //.getCoverageCollections().get(0);
+            //Coverage geoCoverage = ccc.findCoverage((String) varNames.get(0));
+            //CoverageCoordAxis1D cca = (CoverageCoordAxis1D) geoCoverage.getCoordSys().getTimeAxis();
+            //CoverageCoordAxis1D cca1 = (CoverageCoordAxis1D) geoCoverage.getCoordSys().getAxis(AxisType.RunTime);
+
+            subsetParams.setTimeRange(dateRange);
             CFGridCoverageWriter2.write(cc.getSingleCoverageCollection() , varNames, subsetParams, false, ncFileWriter);
         } catch (Exception exc) {
             logException("Error writing local netcdf file.\nData:"
@@ -1330,9 +1336,9 @@ public class GridCoverageDataSource extends GridDataSource {
             //      System.out.println("llr:" + cfield.getProjection().getDefaultMapAreaLL());
             DtCoverageCS gcs   = cfield.getCoordinateSystem();
             CoordinateAxis1D zaxis = gcs.getVerticalAxis() ;
-            if (  zaxis == null) {
-                continue;
-            }
+            //if (  zaxis == null) {
+                //continue;
+            //}
             CoordinateAxis1DTime tAxis    = (CoordinateAxis1DTime)gcs.getTimeAxis();
             if(tAxis == null){
                 //CoordinateAxis t0Axis = gcs.getTimeAxis();
@@ -1932,32 +1938,18 @@ public class GridCoverageDataSource extends GridDataSource {
 
     private List<MAMath.MinMax> subsetLonIntervals(double wantMin, double wantMax, double start, double end) {
         if (wantMin <= wantMax) {
-            if (wantMin > end && wantMax > end) {
+            if (wantMin > end) { // none A.1
                 return ImmutableList.of();
+            } else { // A.2
+                return Lists.newArrayList(new MAMath.MinMax(wantMin, Math.min(wantMax, end)));
             }
-
-            if (wantMin < end && wantMax < end) {
-                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, wantMax)});
-            }
-
-            if (wantMin < end && wantMax > end) {
-                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, end)});
-            }
-        } else {
-            if (wantMin > end && wantMax > end) {
-                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(start, end)});
-            }
-
-            if (wantMin < end && wantMax < end) {
-                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, end), new MAMath.MinMax(start, wantMax)});
-            }
-
-            if (wantMin < end && wantMax > end) {
-                return Lists.newArrayList(new MAMath.MinMax[]{new MAMath.MinMax(wantMin, end)});
+        } else { // wantMin > wantMax
+            if (wantMax > end) { // all B.1
+                return Lists.newArrayList(new MAMath.MinMax(start, end)); // LOOK is this correct?!
+            } else {
+                return Lists.newArrayList(new MAMath.MinMax(wantMin, end), new MAMath.MinMax(start, wantMax));
             }
         }
-
-        return ImmutableList.of();
     }
 
 
