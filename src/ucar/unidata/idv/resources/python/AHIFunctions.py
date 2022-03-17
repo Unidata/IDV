@@ -3,8 +3,10 @@ def AHINaturalColorRGB(b3A, b4A, b5A):
     # red = band5; 0% to 100% rescalled to 0 to 255
     # grn = band4; 0% to 100% rescalled to 0 to 255
     # blu = band3; 0% to 100% rescalled to 0 to 255
-    hr_b5A = resampleGrid(b5A, b3A)
-    red = rescale(hr_b5A, 0, 100, 0, 255)
+    time_steps = b3A.getLength()
+    for i in range(time_steps):
+        b5A.setSample(i, resampleGrid(b5A[i], b3A[i]))
+    red = rescale(b5A, 0, 100, 0, 255)
     grn = rescale(b4A, 0, 100, 0, 255)
     blu = rescale(b3A, 0, 100, 0, 255)
     return combineRGB(red, grn, blu)
@@ -208,10 +210,11 @@ def AHINaturalColorFireRGB(b3A, b4A, b6A):
     # red = band6; 0% to 100% rescaled to 0 to 255
     # grn = band4; 0% to 100% rescaled to 0 to 255
     # blu = band3; 0% to 100% rescaled to 0 to 255
-    hr_b4A = resampleGrid(b4A, b3A)
-    hr_b6A = resampleGrid(b6A, b3A)
-    red = rescale(hr_b6A, 0, 100, 0, 255)
-    grn = rescale(hr_b4A, 0, 100, 0, 255)
+    time_steps = b3A.getLength()
+    for i in range(time_steps):
+        b6A.setSample(i, resampleGrid(b6A[i], b3A[i]))
+    red = rescale(b6A, 0, 100, 0, 255)
+    grn = rescale(b4A, 0, 100, 0, 255)
     blu = rescale(b3A, 0, 100, 0, 255)
     return combineRGB(red, grn, blu)
 
@@ -234,10 +237,11 @@ def AHIDayCloudPhaseRGB(b1A, b5A, b6A):
     # red = band5; 0% to 50% rescaled to 0 to 255
     # grn = band6; 0% to 50% rescaled to 0 to 255
     # blu = band1; 0% to 100% rescaled to 0 to 255
-    hr_b5A = resampleGrid(b5A, b1A)
-    hr_b6A = resampleGrid(b6A, b1A)
-    red = rescale(hr_b5A, 0, 50, 0, 255)
-    grn = rescale(hr_b6A, 0, 50, 0, 255)
+    time_steps = b1A.getLength()
+    for i in range(time_steps):
+        b5A.setSample(i, resampleGrid(b5A[i], b1A[i]))
+    red = rescale(b5A, 0, 50, 0, 255)
+    grn = rescale(b6A, 0, 50, 0, 255)
     blu = rescale(b1A, 0, 100, 0, 255)
     return combineRGB(red, grn, blu)
 
