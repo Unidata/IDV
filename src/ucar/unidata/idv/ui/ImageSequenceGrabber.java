@@ -23,7 +23,20 @@ package ucar.unidata.idv.ui;
 
 import ij.ImagePlus;
 
+import org.jcodec.api.SequenceEncoder;
+import org.jcodec.codecs.mjpeg.JpegDecoder;
+import org.jcodec.codecs.png.PNGDecoder;
+import org.jcodec.common.Preconditions;
+import org.jcodec.common.VideoCodecMeta;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.model.ColorSpace;
+import org.jcodec.common.model.Picture;
+import org.jcodec.scale.ColorUtil;
+import org.jcodec.scale.Transform;
 import org.w3c.dom.Element;
+
+
+
 
 import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
@@ -51,6 +64,7 @@ import ucar.visad.display.AnimationWidget;
 import visad.DateTime;
 import visad.Real;
 
+import java.awt.Graphics;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Component;
@@ -68,6 +82,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
+import java.nio.ByteBuffer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -79,6 +94,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -1457,71 +1473,11 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         return scriptingNode == null;
     }
 
-    /**
-     * Write out the movie
-     */
-    private void writeMovie() {
-        stopCapturingAuto();
-
-        String filename = null;
-
-        if (isInteractive() && (movieFileName == null)) {
-            JCheckBox writePositionsCbx = new JCheckBox("Save viewpoints",
-                                              writePositions);
-
-            writePositionsCbx.setToolTipText(
-                "Also save the viewpoint matrices as an 'xidv' file");
-
-            JCheckBox otherGlobalPaletteBox =
-                new JCheckBox("Use constant color palette for GIF",
-                    getGlobalPaletteValue());
-            otherGlobalPaletteBox.setToolTipText(GLOBAL_PALETTE_TOOLTIP);
-            otherGlobalPaletteBox.addActionListener(e -> {
-                boolean value = otherGlobalPaletteBox.isSelected();
-                IdvObjectStore store = idv.getStore();
-                store.put(PREF_USE_GLOBAL_PALETTE, value);
-                store.save();
-            });
-            List<JComponent> accessoryComps = new ArrayList<>(10);
-
-            accessoryComps.add(
-                GuiUtils.leftRight(
-                    GuiUtils.rLabel(" Frames per second: "), displayRateFld));
-            accessoryComps.add(
-                GuiUtils.leftRight(
-                    GuiUtils.rLabel(" End Frame Pause: "), endPauseFld));
-            accessoryComps.add(writePositionsCbx);
-            accessoryComps.add(otherGlobalPaletteBox);
-
-            if (publishCbx == null) {
-                publishCbx = idv.getPublishManager().makeSelector();
-            }
-
-            if (publishCbx != null) {
-                accessoryComps.add(publishCbx);
-            }
-
-            JComponent extra =
-                GuiUtils.topCenter(GuiUtils.vbox(accessoryComps),
-                                   GuiUtils.filler());
-
-            filename =
-                FileManager.getWriteFile(Misc.newList(FileManager.FILTER_MOV,
-                    FileManager.FILTER_AVI, FileManager.FILTER_ANIMATEDGIF,
-                    FileManager.FILTER_ZIP, FileManager.FILTER_KMZ,
-                    FILTER_ANIS), FileManager.SUFFIX_MOV, extra);
-            writePositions = writePositionsCbx.isSelected();
-        } else {
-            filename = movieFileName;
-        }
-
-        if (filename != null) {
-
-            // if ( !filename.toLowerCase().endsWith(".mov")) {
-            // filename = filename + ".mov";
-            // }
-            createMovie(filename);
-        }
+    public static Picture convertColorSpace(Picture pic, ColorSpace tgtColor) {
+        Transform tr = ColorUtil.getTransform(pic.getColor(), tgtColor);
+        Picture res = Picture.create(pic.getWidth(), pic.getHeight(), tgtColor);
+        tr.transform(pic, res);
+        return res;
     }
 
     /**
@@ -1613,46 +1569,71 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
     /**
-     * What file suffix should we use for the images. For now better by jpg
-     *
-     * @return File suffix
+     * Write out the movie
      */
-    protected String getFileSuffix() {
-        if (justCaptureAnimation) {
-            return FileManager.SUFFIX_PNG;
-        }
+    private void writeMovie() {
+        stopCapturingAuto();
 
-        String defSuffix = FileManager.SUFFIX_PNG;
+        String filename = null;
 
-        if ((scriptingNode != null) && (movieFileName != null)) {
-            final String suffix = IOUtil.getFileExtension(movieFileName);
+        if (isInteractive() && (movieFileName == null)) {
+            JCheckBox writePositionsCbx = new JCheckBox("Save viewpoints",
+                                              writePositions);
 
-            if (suffix != null) {
-                if (suffix.equalsIgnoreCase(FileManager.SUFFIX_KMZ)
-                        || suffix.equalsIgnoreCase(FileManager.SUFFIX_ZIP)
-                        || suffix.equalsIgnoreCase(FileManager.SUFFIX_KML)) {
-                    defSuffix = FileManager.SUFFIX_PNG;
-                } else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
-                    defSuffix = FileManager.SUFFIX_JPG;
-                }  else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_GIF)) {
-                    defSuffix = FileManager.SUFFIX_PNG;
-                }  // TODO: AVI?
+            writePositionsCbx.setToolTipText(
+                "Also save the viewpoint matrices as an 'xidv' file");
+
+            JCheckBox otherGlobalPaletteBox =
+                new JCheckBox("Use constant color palette for GIF",
+                    getGlobalPaletteValue());
+            otherGlobalPaletteBox.setToolTipText(GLOBAL_PALETTE_TOOLTIP);
+            otherGlobalPaletteBox.addActionListener(e -> {
+                boolean value = otherGlobalPaletteBox.isSelected();
+                IdvObjectStore store = idv.getStore();
+                store.put(PREF_USE_GLOBAL_PALETTE, value);
+                store.save();
+            });
+            List<JComponent> accessoryComps = new ArrayList<>(10);
+
+            accessoryComps.add(
+                GuiUtils.leftRight(
+                    GuiUtils.rLabel(" Frames per second: "), displayRateFld));
+            accessoryComps.add(
+                GuiUtils.leftRight(
+                    GuiUtils.rLabel(" End Frame Pause: "), endPauseFld));
+            accessoryComps.add(writePositionsCbx);
+            accessoryComps.add(otherGlobalPaletteBox);
+
+            if (publishCbx == null) {
+                publishCbx = idv.getPublishManager().makeSelector();
             }
 
-            defSuffix = imageGenerator.applyMacros(scriptingNode,
-                    ATTR_IMAGESUFFIX, defSuffix);
-
-            if ( !defSuffix.startsWith(".")) {
-                defSuffix = "." + defSuffix;
+            if (publishCbx != null) {
+                accessoryComps.add(publishCbx);
             }
+
+            JComponent extra =
+                GuiUtils.topCenter(GuiUtils.vbox(accessoryComps),
+                                   GuiUtils.filler());
+
+            filename =
+                FileManager.getWriteFile(Misc.newList(
+                        FileManager.FILTER_MP4, FileManager.FILTER_MOV,
+                        FileManager.FILTER_AVI, FileManager.FILTER_ANIMATEDGIF,
+                        FileManager.FILTER_ZIP, FileManager.FILTER_KMZ,
+                        FILTER_ANIS), FileManager.SUFFIX_MP4, extra);
+            writePositions = writePositionsCbx.isSelected();
+        } else {
+            filename = movieFileName;
         }
 
-        if ((backgroundTransparentBtn != null)
-                && backgroundTransparentBtn.isSelected()) {
-            defSuffix = FileManager.SUFFIX_PNG;
-        }
+        if (filename != null) {
 
-        return defSuffix;
+            // if ( !filename.toLowerCase().endsWith(".mov")) {
+            // filename = filename + ".mov";
+            // }
+            createMovie(filename);
+        }
     }
 
     /**
@@ -2173,6 +2154,51 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
     }
 
     /**
+     * What file suffix should we use for the images. For now better by jpg
+     *
+     * @return File suffix
+     */
+    protected String getFileSuffix() {
+        if (justCaptureAnimation) {
+            return FileManager.SUFFIX_PNG;
+        }
+
+        String defSuffix = FileManager.SUFFIX_PNG;
+
+        if ((scriptingNode != null) && (movieFileName != null)) {
+            final String suffix = IOUtil.getFileExtension(movieFileName);
+
+            if (suffix != null) {
+                if (suffix.equalsIgnoreCase(FileManager.SUFFIX_KMZ)
+                        || suffix.equalsIgnoreCase(FileManager.SUFFIX_ZIP)
+                        || suffix.equalsIgnoreCase(FileManager.SUFFIX_KML)) {
+                    defSuffix = FileManager.SUFFIX_PNG;
+                } else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MOV)) {
+                    defSuffix = FileManager.SUFFIX_JPG;
+                }  else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_GIF)) {
+                    defSuffix = FileManager.SUFFIX_PNG;
+                }  else if (suffix.equalsIgnoreCase(FileManager.SUFFIX_MP4)) {
+                    defSuffix = FileManager.SUFFIX_PNG;
+                }// TODO: AVI?
+            }
+
+            defSuffix = imageGenerator.applyMacros(scriptingNode,
+                    ATTR_IMAGESUFFIX, defSuffix);
+
+            if ( !defSuffix.startsWith(".")) {
+                defSuffix = "." + defSuffix;
+            }
+        }
+
+        if ((backgroundTransparentBtn != null)
+                && backgroundTransparentBtn.isSelected()) {
+            defSuffix = FileManager.SUFFIX_PNG;
+        }
+
+        return defSuffix;
+    }
+
+    /**
      * actually create the movie
      *
      *
@@ -2266,6 +2292,24 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                         FileManager.SUFFIX_AVI)) {
                     ImageUtils.writeAvi(ImageWrapper.makeFileList(images),
                                         displayRate, new File(movieFile));
+                } else if (movieFile.toLowerCase().endsWith(FileManager.SUFFIX_MP4)) {
+                    File output = new File(movieFile);
+                    // TODO(jon): jcodec has a strange way of specifying FPS...30 FPS would be "30/1", 29.97 FPS would be "30000/1001".
+                    //SequenceEncoder enc = SequenceEncoder.createWithFps(NIOUtils.writableChannel(output), new Rational(displayRate, 1));
+                    //for (ImageWrapper img : images) {
+                    //    logger.trace("IMG WRAPPER: path: {}", img.getPath());
+                    //}
+
+                    SequenceEncoder enc = SequenceEncoder.createSequenceEncoder(output, (int)displayRate);
+                    List<String> imageList = ImageWrapper.makeFileList(images);
+                    for (String image : imageList) {
+                        if (image.endsWith(".jpg")) {
+                            enc.encodeNativeFrame(decodeJPG(new File(image), ColorSpace.RGB));
+                        } else if (image.endsWith(".png")) {
+                            enc.encodeNativeFrame(decodePNG(new File(image), ColorSpace.RGB));
+                        }
+                    }
+                    enc.finish();
                 } else {
 
                     // System.err.println("mov:" + movieFile);
@@ -2298,6 +2342,73 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
 
     }
 
+    public Picture decodeJPG(File f, ColorSpace tgtColor) throws IOException {
+        Picture picture = decodeJPG0(f);
+        return convertColorSpace(picture, tgtColor);
+    }
+
+    public Picture decodeJPG0(File f) throws IOException {
+        padImage(f, "jpg");
+        JpegDecoder jpgDec = new JpegDecoder();
+        ByteBuffer buf = NIOUtils.fetchFromFile(f);
+        VideoCodecMeta codecMeta = jpgDec.getCodecMeta(buf);
+        Picture pic = Picture.create(codecMeta.getSize().getWidth(), codecMeta.getSize().getHeight(),
+                ColorSpace.RGB);
+        return jpgDec.decodeFrame(buf, pic.getData());
+    }
+
+    public Picture decodePNG(File f, ColorSpace tgtColor) throws IOException {
+        Picture picture = decodePNG0(f);
+        Preconditions.checkNotNull(picture, "cant decode " + f.getPath());
+        return convertColorSpace(picture, tgtColor);
+    }
+
+    public Picture decodePNG0(File f) throws IOException {
+        padImage(f, "png");
+        PNGDecoder pngDec = new PNGDecoder();
+        ByteBuffer buf = NIOUtils.fetchFromFile(f);
+        VideoCodecMeta codecMeta = pngDec.getCodecMeta(buf);
+        Picture pic = Picture.create(codecMeta.getSize().getWidth(), codecMeta.getSize().getHeight(),
+                ColorSpace.RGB);
+        return pngDec.decodeFrame(buf, pic.getData());
+    }
+
+    /**
+     * Given an existing image file, check to see if either the width or height
+     * of the image is not divisible by two, and simply rewrite the given image
+     * with both a width and height that are divisible by two.
+     *
+     * <p>This oddity is due to an apparent limitation with YUV420.</p>
+     *
+     * @param f Image file. Cannot be {@code null}.
+     * @param type For now one of {@literal "png"} or {@code "jpg"}.
+     *
+     * @throws IOException if there was a problem reading or writing the image.
+     */
+    private void padImage(File f, String type) throws IOException {
+        BufferedImage orig = ImageIO.read(f);
+        int newWidth = orig.getWidth();
+        int newHeight = orig.getHeight();
+        if ((orig.getWidth() % 2) != 0) {
+            newWidth++;
+        }
+        if ((orig.getHeight() % 2) != 0) {
+            newHeight++;
+        }
+        if ((newWidth != orig.getWidth()) || (newHeight != orig.getHeight())) {
+            BufferedImage newImg = new BufferedImage(newWidth, newHeight, orig.getType());
+            Graphics g = newImg.getGraphics();
+            Color bgColor = Color.BLACK;
+            if (viewManager != null) {
+                bgColor = viewManager.getBackground();
+            }
+            g.setColor(bgColor);
+            g.fillRect(0, 0, newWidth, newHeight);
+            g.drawImage(orig, 0, 0, null);
+            g.dispose();
+            ImageIO.write(newImg, type, f);
+        }
+    }
     /**
      * create the kmz
      *
