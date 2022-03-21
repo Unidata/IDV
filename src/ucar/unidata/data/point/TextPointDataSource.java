@@ -241,6 +241,9 @@ public class TextPointDataSource extends PointDataSource {
 
     /** _more_          */
     public boolean useDriverTime = false;
+
+    /** _more_          */
+    public boolean hasLatLon = true;
     /**
      * Default constructor
      *
@@ -2094,7 +2097,18 @@ public class TextPointDataSource extends PointDataSource {
         return retField;
     }
 
-
+    /**
+     * Get the default categories for data from PointDataSource-s
+     *
+     * @return list of categories
+     */
+    protected List getPointCategories() {
+        if(hasLatLon)
+            return super.getPointCategories();
+        else
+            return DataCategory.parseCategories("display:timeseries"   + ";" + "display:obslistcontrol" ,
+                            false);
+    }
 
 
 
@@ -2135,6 +2149,8 @@ public class TextPointDataSource extends PointDataSource {
             }
 
             Real      dfltAlt          = new Real(RealType.Altitude, 1);
+            Real      dfltLat          = new Real(RealType.Latitude, 1);
+            Real      dfltLon          = new Real(RealType.Longitude, 1);
             Real      dfltReal         = getDefaultValue();
 
 
@@ -2168,14 +2184,16 @@ public class TextPointDataSource extends PointDataSource {
 
 
             //if (altIndex == -1) altIndex = type.getIndex("elev");
-            if ((latIndex == -1) || (lonIndex == -1)) {
-                throw new IllegalArgumentException("can't find lat/lon");
-            }
+            //if ((latIndex == -1) || (lonIndex == -1)) {
+              //  throw new IllegalArgumentException("can't find lat/lon");
+            //}
 
             int numVars        = type.getDimension();
             int numNotRequired = numVars - ((altIndex != -1)
                                             ? 4
                                             : 3);
+            if((latIndex == -1) && (lonIndex == -1))
+                numNotRequired = numNotRequired + 2;
             if (timeIndex == -1) {
                 numNotRequired++;
             }
@@ -2185,10 +2203,19 @@ public class TextPointDataSource extends PointDataSource {
             int[] notReqIndices = new int[numNotRequired];
 
             int   l             = 0;
-            for (int i = 0; i < numVars; i++) {
-                if ((i != timeIndex) && (i != latIndex) && (i != lonIndex)
-                        && (i != altIndex)) {
-                    notReqIndices[l++] = i;
+            if((latIndex != -1) && (lonIndex != -1)) {
+                for (int i = 0; i < numVars; i++) {
+                    if ((i != timeIndex) && (i != latIndex) && (i != lonIndex)
+                            && (i != altIndex)) {
+                        notReqIndices[l++] = i;
+                    }
+                }
+            } else {
+                this.hasLatLon = false;
+                for (int i = 0; i < numVars; i++) {
+                    if ((i != timeIndex)) {
+                        notReqIndices[l++] = i;
+                    }
                 }
             }
 
@@ -2303,8 +2330,14 @@ public class TextPointDataSource extends PointDataSource {
 
                 tuples.add(tuple);
 
-                Real lat = (Real) tupleData[latIndex];
-                Real lon = (Real) tupleData[lonIndex];
+                //Real lat = (Real) tupleData[latIndex];
+                //Real lon = (Real) tupleData[lonIndex];
+                Real lat = (latIndex != -1)
+                        ? (Real) tupleData[latIndex]
+                        : dfltLat;
+                Real lon = (lonIndex != -1)
+                        ? (Real) tupleData[lonIndex]
+                        : dfltLon;
                 Real alt = (altIndex != -1)
                            ? (Real) tupleData[altIndex]
                            : dfltAlt;
@@ -2589,17 +2622,42 @@ public class TextPointDataSource extends PointDataSource {
             if (getDataChoices().size() == 0) {
                 return;
             }
+
+            if(!hasLatLon){
+                List  choices = getDataChoices();
+                for(int i  = 0; i < choices.size(); i++){
+                    DataChoice dc = (DataChoice)choices.get(i);
+                    if(dc.getDescription().contains("Gridded Fields")) {
+                        getDataChoices().remove(dc);
+                        i--;
+                    }
+                }
+                DataChoice dc = (DataChoice)choices.get(0);
+                Hashtable ht = dc.getProperties();
+                ht.put("haslatlon", hasLatLon);
+                for (String varname : varNames) {
+                    DirectDataChoice subChoice = new DirectDataChoice(this,
+                            (String) sources.get(0),
+                            getDescription(), varname,
+                            getPointCategories(),
+                            ht);
+                    addDataChoice(subChoice);
+                }
+
+            }
             DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
             //Sample the data to see if we need to show the metadata gui
             Data sample = makeObs(dataChoice, null, null, null, true, true);
 
-            List cloudCats =
-                DataCategory.parseCategories("Point Cloud;pointcloud", true);
-            for (String varname : varNames) {
-                DataChoice choice = new DirectDataChoice(this,
-                                        "pointcloud:" + varname, varname,
-                                        varname, cloudCats, (Hashtable) null);
-                addDataChoice(choice);
+            if(hasLatLon) {
+                List cloudCats =
+                        DataCategory.parseCategories("Point Cloud;pointcloud", true);
+                for (String varname : varNames) {
+                    DataChoice choice = new DirectDataChoice(this,
+                            "pointcloud:" + varname, varname,
+                            varname, cloudCats, (Hashtable) null);
+                    addDataChoice(choice);
+                }
             }
             if (isTrajectoryEnabled()) {
 
