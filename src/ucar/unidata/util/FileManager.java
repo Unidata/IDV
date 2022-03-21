@@ -936,6 +936,9 @@ public class FileManager {
     /** Suffix for Quicktime files */
     public static final String SUFFIX_MOV = ".mov";
 
+    /** Suffix for MPEG-4 files. */
+    public static final String SUFFIX_MP4 = ".mp4";
+
     /** Suffix for CSV files */
     public static final String SUFFIX_TXT = ".txt";
 
@@ -1027,6 +1030,12 @@ public class FileManager {
     /** Filter for QuickTime files */
     public static final PatternFileFilter FILTER_ANIMATEDGIF =
         new PatternFileFilter(".+\\.gif", "Animated GIF (*.gif)", SUFFIX_GIF);
+
+    /** File filter for MPEG-4 files. */
+    public static final PatternFileFilter FILTER_MP4 =
+            new PatternFileFilter(".+\\.mp4",
+                    "MPEG-4 files (*.mp4)",
+                    SUFFIX_MP4);
 
     /** Filter for ZIP files */
     public static final PatternFileFilter FILTER_ZIP =
