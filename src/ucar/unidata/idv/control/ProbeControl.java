@@ -273,6 +273,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
     /** probe shape selector */
     private JComboBox shapeCbx;
 
+    /** _more_          */
+    public boolean hasLatLon = true;
+
     /**
      * Cstr; sets flags; see init() for creation actions.
      * needed for bean persistence
@@ -300,6 +303,11 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             Data         data = info.getDataInstance().getData();
             if ( !(data instanceof FieldImpl)) {
                 continue;
+            }
+            if(i == 0){
+                DataChoice dc = (DataChoice)choices.get(i);
+                Boolean hasll = (Boolean)dc.getProperty("haslatlon", true);
+                hasLatLon = hasll.booleanValue();
             }
             Set set = ((FieldImpl) data).getDomainSet();
             if (set != null) {
@@ -392,7 +400,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
 
         probe.setFixed(xFixed, yFixed, zFixed);
         probe.setAutoSize(true);
-        probe.setVisible(true);
+        probe.setVisible(hasLatLon);
         probe.addPropertyChangeListener(this);
 
 
@@ -1110,6 +1118,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         showWaitCursor();
         for (int i = 0; i < newChoices.size(); i++) {
             ProbeRowInfo info = new ProbeRowInfo(this);
+            if(newChoices.get(i) instanceof DirectDataChoice)
+                info.setPointParameter(((DirectDataChoice) newChoices.get(i)).getDescription());
             newInfos.add(info);
             DataChoice dc = (DataChoice) newChoices.get(i);
             initRowInfo(info, dc);
@@ -1135,8 +1145,11 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         if (sideLegendReadout == null) {
             sideLegendReadout = new JLabel("<html><br></html>");
         }
-        return GuiUtils.vbox(parentComp, sideLegendReadout,
+        if(hasLatLon)
+            return GuiUtils.vbox(parentComp, sideLegendReadout,
                              getChart().getThumb());
+        else
+            return parentComp;
     }
 
     /**
@@ -1147,7 +1160,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     public void getLegendLabels(List labels, int legendType) {
         super.getLegendLabels(labels, legendType);
-        labels.add(positionText);
+        if(hasLatLon)
+            labels.add(positionText);
     }
 
     /**
@@ -1788,10 +1802,11 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         }
         //getChart().setEmptyChartLabel("Right click on observation in table to add to chart");
 
-
         JTabbedPane tab         = new JTabbedPane();
         List        bottomComps = new ArrayList();
-        JComponent  bottomPanel = GuiUtils.leftRight(aniWidget, latLonWidget);
+        JComponent  bottomPanel = (hasLatLon  == true)
+                ? GuiUtils.leftRight(aniWidget, latLonWidget)
+                : GuiUtils.left(aniWidget);
 
         bottomPanel = GuiUtils.inset(bottomPanel, 5);
         JComponent bottom = GuiUtils.centerBottom(tablePanel, bottomPanel);
@@ -2148,6 +2163,9 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         final List<ProbeRowInfo> rowInfos = new ArrayList();
         List                     choices  = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
+            ProbeRowInfo probeRowInfo = getRowInfo(i);
+            if(choices.get(i) instanceof DirectDataChoice)
+                probeRowInfo.setPointParameter(((DirectDataChoice) choices.get(i)).getDescription());
             rowInfos.add(getRowInfo(i));
         }
         if (showSunriseSunset) {
@@ -2211,6 +2229,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         for (int i = 0; i < choices.size(); i++) {
             Real         theValue     = null;
             ProbeRowInfo info         = getRowInfo(i);
+            if(choices.get(i) instanceof DirectDataChoice)
+                info.setPointParameter(((DirectDataChoice) choices.get(i)).getDescription());
             DataInstance dataInstance = info.getDataInstance();
             List         reals        = new ArrayList();
             Real         theReal      = info.getRealValue();
@@ -2709,6 +2729,8 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         List               choices = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
             ProbeRowInfo info = getRowInfo(i);
+            if(choices.get(i) instanceof DirectDataChoice)
+                info.setPointParameter(((DirectDataChoice) choices.get(i)).getDescription());
             Data[]       d    = getSampleAt(info, elt, aniValue, step, true);
             if (d == null) {
                 continue;
