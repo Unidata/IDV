@@ -332,6 +332,10 @@ public class DrawingControl extends DisplayControlImpl {
     private int autoScrollCnt = 0;
 
     protected DataChoice datachoice = null;
+
+    public boolean showName = false;
+    /** The label to show the readout in the side legend */
+    private JLabel sideLegendDataChoiceName;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -421,6 +425,9 @@ public class DrawingControl extends DisplayControlImpl {
                 processData(data);
             }
         }
+
+        showName = (boolean) dataChoice.getProperty("showName", false);
+
         return true;
     }
 
@@ -3050,4 +3057,35 @@ public class DrawingControl extends DisplayControlImpl {
         }
         return super.getDefaultDisplayListTemplate();
     }
+
+    /**
+     * Assume that some display controls that a name to tell difference
+     *
+     * @param  legendType  type of legend
+     * @return The extra JComponent to use in legend
+     */
+    protected JComponent getExtraLegendComponent(int legendType) {
+        JComponent parentComp = super.getExtraLegendComponent(legendType);
+        if (legendType == BOTTOM_LEGEND) {
+            return parentComp;
+        }
+        if (sideLegendDataChoiceName == null) {
+            sideLegendDataChoiceName = new JLabel();
+        }
+
+        if (showName) {
+            sideLegendDataChoiceName.setText("<html>" + datachoice.getName()
+                    + "</html>");
+        } else {
+            sideLegendDataChoiceName = new JLabel("<html><br></html>");
+        }
+        //if (sideLegendReadout == null) {
+         //   sideLegendReadout = new JLabel("<html><br></html>");
+        //}
+        if(showName)
+            return GuiUtils.vbox(parentComp, sideLegendDataChoiceName);
+        else
+            return parentComp;
+    }
+
 }
