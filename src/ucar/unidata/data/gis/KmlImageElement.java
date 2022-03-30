@@ -166,7 +166,20 @@ public abstract class KmlImageElement extends KmlInfo {
         return  dataSource.readImage(getHref(), baseUrl);
     }
 
-
+    /**
+     * get the image data
+     *
+     * @param dataSource data source
+     *
+     * @return image data
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public Image  getImage(JsonDataSource dataSource)
+            throws VisADException, RemoteException {
+        return  dataSource.readImage(getHref(), baseUrl);
+    }
 
     /**
      * Set the Href property.

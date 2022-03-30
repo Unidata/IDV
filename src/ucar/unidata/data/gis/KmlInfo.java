@@ -187,6 +187,9 @@ public abstract class KmlInfo extends DirectDataChoice{
     public abstract Data getData(KmlDataSource dataSource, Object loadId)
      throws VisADException, RemoteException;
 
+    public abstract Data getData(JsonDataSource dataSource, Object loadId)
+            throws VisADException, RemoteException;
+
     /**
      *  Set the Name property.
      *

@@ -216,6 +216,49 @@ public class KmlGroundOverlay extends KmlImageElement {
 
     }
 
+    /**
+     * get the json data
+     *
+     * @param dataSource data source
+     * @param loadId for loading
+     *
+     * @return json data
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public Data getData(JsonDataSource dataSource, Object loadId)
+            throws VisADException, RemoteException {
+        Image image = getImage(dataSource);
+        if (image == null) {
+            return null;
+        }
+        Trace.call1("makeField");
+        try {
+            //            FieldImpl xyData = DataUtility.makeField(image);
+            //Threshold alpha at 127
+            FieldImpl xyData = ucar.visad.Util.makeField(image,127f);
+            Trace.call2("makeField");
+            Linear2DSet domain = (Linear2DSet) xyData.getDomainSet();
+            Linear2DSet imageDomain =
+                    new Linear2DSet(RealTupleType.SpatialEarth2DTuple, getWest(),
+                            getEast(), domain.getX().getLength(),
+                            getNorth(), getSouth(),
+                            domain.getY().getLength());
+
+
+
+            FieldImpl field = GridUtil.setSpatialDomain(xyData, imageDomain,
+                    true);
+
+            return field;
+        } catch (Exception iexc) {
+            LogUtil.logException("Error making image data", iexc);
+        }
+        return null;
+
+
+    }
 
     /**
      * Set the ViewBoundScale property.

@@ -247,7 +247,45 @@ public class KmlPhotoOverlay extends KmlImageElement {
 
     }
 
+    /**
+     * get the image data
+     *
+     * @param dataSource data source
+     * @param loadId for loading
+     *
+     * @return image data
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public Data getData(JsonDataSource dataSource, Object loadId)
+            throws VisADException, RemoteException {
+        System.err.println(latitude + " " + longitude + " " + near + " " +Math.cos(Math.toRadians(leftFov)));
+        System.err.println("h=" + near/Math.cos(Math.toRadians(leftFov)));
 
+        LatLonPoint llp2 = Bearing.findPoint(latitude, longitude,
+                rotation, near/1000.0,null);
+        System.err.println("llp:" + llp2.getLatitude() + " " + llp2.getLongitude());
+
+        double lat2 = latitude;
+        double lon2 = longitude;
+
+        double left = longitude +Math.sqrt(near*near*(1/squared(Math.cos(Math.toRadians(leftFov)))-1));
+        double right = longitude -Math.sqrt(near*near*(1/squared(Math.cos(Math.toRadians(rightFov)))-1));
+        double top = 0 +Math.sqrt(near*near*(1/squared(Math.cos(Math.toRadians(topFov)))-1));
+        double bottom = 0 -Math.sqrt(near*near*(1/squared(Math.cos(Math.toRadians(bottomFov)))-1));
+
+
+        System.err.println("b:" + left +  " " + right + " " + top + " " + bottom);
+        Image image = getImage(dataSource);
+        if (image == null) {
+            return null;
+        }
+
+        return null;
+
+
+    }
 
     /**
      * Set the Rotation property.

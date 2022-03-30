@@ -184,6 +184,50 @@ public class KmlPolygons extends KmlInfo {
         return new visad.Text(sb.toString());
     }
 
+    /**
+     * Create the data
+     *
+     * @param dataSource from
+     * @param loadId For loading
+     *
+     * @return The data
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public Data getData(JsonDataSource dataSource, Object loadId)
+            throws VisADException, RemoteException {
+        StringBuffer sb = new StringBuffer("<shapes>\n");
+        Element multiGeometryNode = (Element) XmlUtil.findChild(node,
+                KmlDataSource.TAG_MULTIGEOMETRY);
+        Element linestringNode =
+                (Element) XmlUtil.findChild(node, KmlDataSource.TAG_LINESTRING);
+        if (linestringNode != null) {
+            processPolygonNode(linestringNode, sb, color);
+        } else   if (multiGeometryNode != null) {
+            NodeList children = XmlUtil.getElements(multiGeometryNode);
+            for (int childIdx = 0; childIdx < children.getLength();
+                 childIdx++) {
+                Element child = (Element) children.item(childIdx);
+                if (child.getTagName().equals(TAG_POLYGON)) {
+                    processPolygonNode(child, sb, color);
+                }
+            }
+        } else {
+            Element polygonNode = (Element) XmlUtil.findChild(node,
+                    TAG_POLYGON);
+            if (polygonNode != null) {
+                processPolygonNode(polygonNode, sb, color);
+            } else {
+                processPolygonNode(node, sb, color);
+            }
+        }
+
+
+        sb.append("</shapes>");
+        return new visad.Text(sb.toString());
+    }
+
 
     /**
      * Process the xml
@@ -197,7 +241,7 @@ public class KmlPolygons extends KmlInfo {
     	String altitudeMode = XmlUtil.getChildText(XmlUtil.findChild(node,
                 "altitudeMode"));
     	String attrs;
-    	if (altitudeMode.contentEquals("clampToGround"))
+    	if (altitudeMode != null && altitudeMode.contentEquals("clampToGround"))
     	{
     		attrs = XmlUtil.attrs("smooth", "false", "filled", "false",
                     "color", color, "coordtype", "LATLON");

@@ -257,6 +257,65 @@ public class KmlPoints extends KmlInfo {
         return new visad.Text(sb.toString());
     }
 
+    /**
+     * get the data
+     *
+     * @param dataSource data source
+     * @param loadId for loading
+     *
+     * @return the point data as xml
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    public Data getData(JsonDataSource dataSource, Object loadId)
+            throws VisADException, RemoteException {
+        Trace.call1("KmlPoints.getData", " #placemarks:" + names.size());
+        StringBuffer sb = new StringBuffer(XmlUtil.XML_HEADER
+                + "\n<stationtable name=\""
+                + getName() + "\">\n");
+        int size = names.size();
+        for (int i = 0; i < size; i++) {
+            double[][] coords = (double[][]) coordinates.get(i);
+            String     desc   = (String) descriptions.get(i);
+            sb.append("<station ");
+            attr(sb, "name", (String) names.get(i));
+            if (coords[0].length == 1) {
+                attr(sb, "lon", "" + coords[0][0]);
+                attr(sb, "lat", "" + coords[1][0]);
+                if (coords.length > 2) {
+                    attr(sb, "elev", "" + coords[2][0]);
+                }
+                sb.append(">");
+            } else {
+                sb.append(">");
+                sb.append("<coordinates>");
+
+                for (int coordIdx = 0; coordIdx < coords[0].length;
+                     coordIdx++) {
+                    sb.append(coords[0][coordIdx]);
+                    sb.append(",");
+                    sb.append(coords[1][coordIdx]);
+                    if (coords.length > 2) {
+                        sb.append(",");
+                        sb.append(coords[2][coordIdx]);
+                    }
+                    sb.append(" ");
+
+                }
+                sb.append("</coordinates>");
+            }
+            if (desc != null) {
+                sb.append("<![CDATA[");
+                sb.append(desc);
+                sb.append("]]>");
+            }
+            sb.append("</station>");
+        }
+        sb.append("</stationtable>");
+        Trace.call2("KmlPoints.getData");
+        return new visad.Text(sb.toString());
+    }
 
     /**
      * Utility to add an xml attribute to the buffer
