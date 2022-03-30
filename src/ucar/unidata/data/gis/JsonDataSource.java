@@ -611,12 +611,15 @@ public class JsonDataSource extends FilesDataSource {
             polyStyleTag.appendChild(outlineTag);
 
             HashMap ploygoncoords = new HashMap();
+            HashMap ploygoncoordsHail = new HashMap();
+            HashMap ploygoncoordsSevere = new HashMap();
+            HashMap ploygoncoordsWind = new HashMap();
+            HashMap ploygoncoordsTor = new HashMap();
             // Parcours de tous les features
             for (Object feat : features) {
                 // Creation de la balise <PlaceMark>
                 final Element placeMark = document.createElement("Placemark");
                 documentTag.appendChild(placeMark);
-
                 // Creation de la balise <styleUrl> permettant d'appliquer un style sur un placemark
                 final Element styleURLTag = document.createElement("styleUrl");
                 styleURLTag.appendChild(document.createTextNode("#style1"));
@@ -629,8 +632,6 @@ public class JsonDataSource extends FilesDataSource {
 
                 // Recuperation des valeurs de la propriete.
                // String admin = (featJSON.get("density")).toString();
-                String name = (String) featJSON.get("ID");
-
                 // Creation de propriete
                 //Properties properties = new Properties(admin , name);
 
@@ -642,17 +643,61 @@ public class JsonDataSource extends FilesDataSource {
                 String type          = (String) coordJSON.get("type");
                 JSONArray coords     = (JSONArray) coordJSON.get("coordinates");
                 JSONObject modelsJSON = (JSONObject) featJ.get("models");
-                JSONObject probsevereJSON = (JSONObject) modelsJSON.get("probsevere");
-                String prob          = (String)probsevereJSON.get("PROB");
-                if (type.equals("Polygon") || type.equals("MultiPolygon")){
-                    ploygoncoords.put(name, getCoordinates(coords, prob));
-                }
-                else {
-                    throw new Error("Type mal forme !");
+
+                if(modelsJSON != null) {
+                    String name = (String) featJSON.get("ID");
+                    if(name == null){
+                        name = (String) featJ.get("id");
+                    }
+                    JSONObject probsevereJSON = (JSONObject) modelsJSON.get("probsevere");
+                    JSONObject probwindJSON = (JSONObject) modelsJSON.get("probwind");
+                    JSONObject probhailJSON = (JSONObject) modelsJSON.get("probhail");
+                    JSONObject probtorJSON = (JSONObject) modelsJSON.get("probtor");
+                    String probSevere = (String) probsevereJSON.get("PROB");
+                    String probWind = (String) probwindJSON.get("PROB");
+                    String probHail = (String) probhailJSON.get("PROB");
+                    String probTor = (String) probtorJSON.get("PROB");
+                    System.out.println("probsevere  " +  probSevere);
+                    System.out.println("probwind  " +  probWind);
+                    System.out.println("probhail " +  probHail);
+                    System.out.println("probtor " +  probTor);
+                    if (type.equals("Polygon") || type.equals("MultiPolygon")) {
+                        if(!probSevere.equals("0"))
+                            ploygoncoordsSevere.put(name, getCoordinates(coords, probSevere));
+                        if(!probWind.equals("0"))
+                            ploygoncoordsWind.put(name, getCoordinates(coords, probWind));
+                        if(!probHail.equals("0"))
+                            ploygoncoordsHail.put(name, getCoordinates(coords, probHail));
+                        if(!probTor.equals("0"))
+                            ploygoncoordsTor.put(name, getCoordinates(coords, probTor));
+                    } else {
+                        throw new Error("Type mal forme !");
+                    }
+                } else {
+                    String name1 = (String) featJSON.get("name");
+                    if (type.equals("Polygon") || type.equals("MultiPolygon")) {
+                        ploygoncoords.put(name1, getCoordinates(coords));
+                    } else {
+                        throw new Error("Type mal forme !");
+                    }
                 }
             }
-            if(dts != null)
-                jsonInfo.put(dts, ploygoncoords);
+            if(dts != null) {
+                HashMap ploygons = new HashMap();
+                if(ploygoncoordsSevere.size() >  0){
+                    ploygons.put("probSevere", ploygoncoordsSevere);
+                }
+                if(ploygoncoordsWind.size() >  0){
+                    ploygons.put("probWind", ploygoncoordsWind);
+                }
+                if(ploygoncoordsHail.size() >  0){
+                    ploygons.put("probHail", ploygoncoordsHail);
+                }
+                if(ploygoncoordsTor.size() >  0){
+                    ploygons.put("probTornado", ploygoncoordsTor);
+                }
+                jsonInfo.put(dts, ploygons);
+            }
             else
                 jsonInfo.put("polygon", ploygoncoords);
             //this.timeList = Misc.sort(this.timeList);
@@ -687,6 +732,20 @@ public class JsonDataSource extends FilesDataSource {
         return outStr;
     }
 
+    /**
+     *  build the polygon coordinate string
+     *
+     * @param
+     */
+    private  String getCoordinates( JSONArray coords) {
+        String outStr = coords.toJSONString();
+
+        outStr = outStr.replaceAll("\\[", "");
+        outStr = outStr.replaceAll("\\]", "");
+        outStr = "<polygon" + " smooth=" + "\"false\"" + " filled=" + "\"false\"" + " coordtype=" + "\"LONLAT\"" + " points=" + "\"" + outStr + "\"" +
+                "/>";
+        return outStr;
+    }
     /**
      *  Add the xml header if needed
      *
@@ -754,6 +813,8 @@ public class JsonDataSource extends FilesDataSource {
     private Object getDateTime(DataChoice dataChoice) {
         DataSelection   dataSelection  = dataChoice.getDataSelection();
         List timeList = dataSelection.getTimes();
+        if(timeList == null)
+            return null;
         return timeList.get(0);
     }
 
@@ -810,28 +871,24 @@ public class JsonDataSource extends FilesDataSource {
      */
     protected void doMakeDataChoices() {
         idToNode = new Hashtable();
-
         schemas = new Hashtable();
         //HashMap polygonHMap = (HashMap)jsonInfo.get(timeList.get(0));
         //DateTime dt = (DateTime)timeList.get(0);
-        if(timeList.size()  >= 1) {
-
-            //for(int i = 0; i  < timeList.size(); i++ ) {
-             //   DateTime dt = (DateTime)timeList.get(i);
-             //   HashMap plyCoords = (HashMap)jsonInfo.get(dt);
-                processNode(null, null,  new ArrayList(),null);
-          //  }
+        if(timeList.size()  > 0) {
+            processNode(null,   new ArrayList());
+        }  else {
+            processNodeNoTime(null,  new ArrayList());
         }
 
         //processNode(null, polygonHMap,  new ArrayList(),dt);
         Trace.call1("JsonDataSource.processing kml");
 
 
-        List dataChoices =   getDataChoices();
+       // List dataChoices =   getDataChoices();
         // CompositeDataChoice dc0 = (CompositeDataChoice) dataChoices.get(0);
         // List dataChoices0 = dc0.getDataChoices();
 
-        for (int i = 0; i < dataChoices.size(); i++) {
+        /*for (int i = 0; i < dataChoices.size(); i++) {
             DataChoice dc = (DataChoice) dataChoices.get(i);
             DataSelection dataSelection = dc.getDataSelection();
             if(dataSelection == null)
@@ -842,7 +899,7 @@ public class JsonDataSource extends FilesDataSource {
 
                // mergeChildren((CompositeDataChoice) dc);
             }
-        }
+        }  */
     }
 
     /**
@@ -934,43 +991,29 @@ public class JsonDataSource extends FilesDataSource {
     /**
      * Walk the kml tree
      *
-     *
      * @param parentDataChoice data choice
-     * @param polygonHMap1 node
      * @param displayCategories display categories for uniqueness
-     * @param dts1 where the kml came from
      */
-    private void processNode(CompositeDataChoice parentDataChoice,
-                             HashMap polygonHMap1, List displayCategories,
-                             DateTime dts1) {
-
-        String tagName = "polygon";
-
+    private void processNodeNoTime(CompositeDataChoice parentDataChoice,
+                              List displayCategories) {
         //        System.err.println ("tag:" + tagName);
         //DateTime dts = (DateTime)jsonInfo.get("timeObj");
-        String tmp = (String) schemas.get(tagName);
-        if (tmp != null) {
-            tagName = tmp;
-        }
-
         //        System.err.println("tag:" + tagName);
         List currentDisplayCategories = new ArrayList(displayCategories);
 
-
         CompositeDataChoice newParentDataChoice =
             new CompositeDataChoice(
-                this, "All Warning", "Probsevere", "Probsevere" ,
+                this, "All Warning", "Polygon", "Polygon" ,
                 Misc.newList(DataCategory.XGRF_CATEGORY));
-        newParentDataChoice.setProperty("JsonWARNING", "folderName");
-        newParentDataChoice.setUseDataSourceToFindTimes(true);
+        newParentDataChoice.setProperty("Polygon", "folderName");
+        //newParentDataChoice.setUseDataSourceToFindTimes(true);
         //newParentDataChoice.getProperties().put("timeObj", dts);
         addDataChoice(newParentDataChoice, parentDataChoice);
         List categories =
                 Misc.newList(DataCategory.XGRF_CATEGORY);
         //Hashtable properties = new Hashtable();
-        for(int i = 0; i  < timeList.size(); i++ ) {
-            DateTime dt = (DateTime) timeList.get(i);
-            HashMap plyCoords = (HashMap) jsonInfo.get(dt);
+
+            HashMap plyCoords = (HashMap) jsonInfo.get("polygon");
 
            // if (dt != null)
            //     properties.put("timeObj", dt);
@@ -980,7 +1023,7 @@ public class JsonDataSource extends FilesDataSource {
                 Hashtable newProperties = new Hashtable();
                 String coordStr = (String) plyCoords.get(k);
                 newProperties.put("coordStr", coordStr);
-                newProperties.put("timeObj", dt);
+                //newProperties.put("timeObj", dt);
                 //System.out.println(" Name " + name);
                 //System.out.println(" name " + name + " " + coordStr);
                 String displayCategory =
@@ -997,7 +1040,7 @@ public class JsonDataSource extends FilesDataSource {
                 }
                 //System.out.println(" Name " + name);
                 KmlId id = new KmlId(KmlId.NODE_SHAPES, name,
-                        displayCategory, dt.dateString());
+                        displayCategory, null);
                 //newParentDataChoice.addDataChoice(new DirectDataChoice(this,
                 //       ID_DUMMY, name, name + "coordinates", categories));
                 DataChoice dc = new DirectDataChoice(
@@ -1006,14 +1049,109 @@ public class JsonDataSource extends FilesDataSource {
                 DataSelection dataSelection = dc.getDataSelection();
                 if(dataSelection == null)
                     dataSelection = new DataSelection();
-                dataSelection.setTimes(Misc.newList(dt));
+                //dataSelection.setTimes(Misc.newList(dt));
                 dc.setDataSelection(dataSelection);
                 newParentDataChoice.addDataChoice(dc);
             }
-        }
+       // }
 
     }
 
+    /**
+     * Walk the kml tree
+     *
+     *
+     * @param parentDataChoice data choice
+     * @param displayCategories display categories for uniqueness
+     */
+    private void processNode(CompositeDataChoice parentDataChoice, List displayCategories) {
+        //        System.err.println("tag:" + tagName);
+        List currentDisplayCategories = new ArrayList(displayCategories);
+        CompositeDataChoice newParentDataChoice =
+                new CompositeDataChoice(
+                        this, "All Warning", "Probsevere Models", "ProbsevereModels" ,
+                        Misc.newList(DataCategory.XGRF_CATEGORY));
+        newParentDataChoice.setProperty("JsonWARNING", "folderName");
+        newParentDataChoice.setUseDataSourceToFindTimes(true);
+        newParentDataChoice.getProperties().put("showName", true);
+        addDataChoice(newParentDataChoice, parentDataChoice);
+        List categories =
+                Misc.newList(DataCategory.XGRF_CATEGORY);
+        //Hashtable properties = new Hashtable();
+        for(int i = 0; i  < timeList.size(); i++ ) {
+            DateTime dt = (DateTime) timeList.get(i);
+            HashMap models = (HashMap) jsonInfo.get(dt);
+            Set modelkeys = models.keySet();
+            for (Object mk : modelkeys) {
+                String modelName = (String)mk;
+                CompositeDataChoice newParentDataChoice0 = (CompositeDataChoice)findDataChoice(newParentDataChoice,  mk);
+                if(newParentDataChoice0 ==  null) {
+                    newParentDataChoice0 =
+                            new CompositeDataChoice(
+                                    this, "All Warning", modelName, modelName,
+                                    Misc.newList(DataCategory.XGRF_CATEGORY));
+                    newParentDataChoice0.setProperty("JsonWARNING", "folderName0");
+                    newParentDataChoice0.setProperty("showName", true);
+                    newParentDataChoice0.setUseDataSourceToFindTimes(true);
+                    //newParentDataChoice.getProperties().put("timeObj", dts);
+                    addDataChoice(newParentDataChoice0, newParentDataChoice);
+                }
+                HashMap plyCoords = (HashMap) models.get(mk);
+                // if (dt != null)
+                //     properties.put("timeObj", dt);
+                Set keys = plyCoords.keySet();
+                for (Object k : keys) {
+                    String name = (String) k;
+                    Hashtable newProperties = new Hashtable();
+                    String coordStr = (String) plyCoords.get(k);
+                    newProperties.put("coordStr", coordStr);
+                    newProperties.put("timeObj", dt);
+                    //System.out.println(" Name " + name);
+                    //System.out.println(" name " + name + " " + coordStr);
+                    String displayCategory =
+                            StringUtil.join("-", currentDisplayCategories);
+                    if (name != null) {
+                        if (displayCategory.length() > 0) {
+                            displayCategory = displayCategory + "-"
+                                    + name;
+                        } else {
+                            displayCategory = name;
+                        }
+                    } else {
+                        name = "Shapes";
+                    }
+                    //System.out.println(" Name " + name);
+                    KmlId id = new KmlId(KmlId.NODE_SHAPES, name,
+                            displayCategory, dt.dateString());
+                    //newParentDataChoice.addDataChoice(new DirectDataChoice(this,
+                    //       ID_DUMMY, name, name + "coordinates", categories));
+                    DataChoice dc = new DirectDataChoice(
+                            this, id, name, name, categories,
+                            newProperties);
+                    newProperties.put("showName", true);
+                    DataSelection dataSelection = dc.getDataSelection();
+                    if (dataSelection == null)
+                        dataSelection = new DataSelection();
+                    dataSelection.setTimes(Misc.newList(dt));
+                    dc.setDataSelection(dataSelection);
+                    newParentDataChoice0.addDataChoice(dc);
+                }
+            }
+        }
+    }
+
+    public DataChoice findDataChoice(CompositeDataChoice parentDataChoice,  Object id) {
+        List choices = parentDataChoice.getDataChoices();
+        if ((choices != null) && (choices.size() > 0)) {
+            int size = choices.size();
+            for(int i = 0; i < size; i++){
+                DataChoice  dc = (DataChoice)choices.get(i);
+                if(dc.getName().equals(id))
+                    return dc;
+            }
+        }
+        return null;
+    }
     /**
      * Actually get the data identified by the given DataChoce. The default is
      * to call the getDataInner that does not take the requestProperties. This
@@ -1077,7 +1215,11 @@ public class JsonDataSource extends FilesDataSource {
             dt = (DateTime) dcproperties.get("timeObj");
             List subTimeList = getJsonTimes(dataSelection);
             //System.out.println(" ID " + id);
-            HashMap polygonInfo = (HashMap)jsonInfo.get(dt);
+            HashMap polygonInfo = null;
+            if(dt != null)
+                polygonInfo = (HashMap)jsonInfo.get(dt);
+            else
+                polygonInfo = (HashMap)jsonInfo.get("polygon");
             DateTime polygonTime = dt;
             if(subTimeList.contains(dt)) {
                 String timeStr = null;
@@ -1090,6 +1232,13 @@ public class JsonDataSource extends FilesDataSource {
                 sb = sb.append(coordsStr);
                 int idx = sb.indexOf("polygon");
                 sb.insert(idx + 8, "times=\"" + timeStr + "\" ");
+                sb.append("</shapes>");
+                //System.out.println(" ss " + sb);
+                return new visad.Text(sb.toString());
+            } else if(dt == null  && polygonInfo != null) {
+                String coordsStr = (String) dcproperties.get("coordStr");
+                StringBuffer sb = new StringBuffer("<shapes>\n");
+                sb = sb.append(coordsStr);
                 sb.append("</shapes>");
                 //System.out.println(" ss " + sb);
                 return new visad.Text(sb.toString());
