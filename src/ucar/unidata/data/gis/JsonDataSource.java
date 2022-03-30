@@ -217,7 +217,7 @@ public class JsonDataSource extends FilesDataSource {
         this.sources = Misc.newList(kmlUrl);
         this.descriptor = descriptor;
 
-        setName("PROBSEVERE: " + IOUtil.stripExtension(IOUtil.getFileTail(kmlUrl)));
+        setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(kmlUrl)));
 
         initPolygonColorMap();
 
@@ -1000,12 +1000,13 @@ public class JsonDataSource extends FilesDataSource {
         //DateTime dts = (DateTime)jsonInfo.get("timeObj");
         //        System.err.println("tag:" + tagName);
         List currentDisplayCategories = new ArrayList(displayCategories);
-
+        String dcname = getName();
         CompositeDataChoice newParentDataChoice =
             new CompositeDataChoice(
-                this, "All Warning", "Polygon", "Polygon" ,
+                this, "All Warning", dcname, dcname ,
                 Misc.newList(DataCategory.XGRF_CATEGORY));
         newParentDataChoice.setProperty("Polygon", "folderName");
+        newParentDataChoice.setProperty("showName", true);
         //newParentDataChoice.setUseDataSourceToFindTimes(true);
         //newParentDataChoice.getProperties().put("timeObj", dts);
         addDataChoice(newParentDataChoice, parentDataChoice);
@@ -1043,6 +1044,7 @@ public class JsonDataSource extends FilesDataSource {
                         displayCategory, null);
                 //newParentDataChoice.addDataChoice(new DirectDataChoice(this,
                 //       ID_DUMMY, name, name + "coordinates", categories));
+                newProperties.put("showName", true);
                 DataChoice dc = new DirectDataChoice(
                         this, id, name, name, categories,
                         newProperties);
