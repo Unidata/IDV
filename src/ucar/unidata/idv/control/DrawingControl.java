@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import ucar.unidata.collab.Sharable;
+import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.idv.control.drawing.DrawingCommand;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
@@ -95,6 +96,7 @@ import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -336,6 +338,8 @@ public class DrawingControl extends DisplayControlImpl {
     public boolean showName = false;
     /** The label to show the readout in the side legend */
     private JLabel sideLegendDataChoiceName;
+
+    protected HashMap dataChoiceProperties;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -406,6 +410,7 @@ public class DrawingControl extends DisplayControlImpl {
 
         List oldGlyphs = glyphs;
         glyphs = new ArrayList();
+        dataChoiceProperties = new HashMap();
         setDisplayInactive();
         for (int i = 0; i < oldGlyphs.size(); i++) {
             DrawingGlyph glyph = (DrawingGlyph) oldGlyphs.get(i);
@@ -418,15 +423,18 @@ public class DrawingControl extends DisplayControlImpl {
         checkGlyphTimes();
         if (dataChoice != null) {
             this.datachoice = dataChoice;
+            showName = (boolean) dataChoice.getProperty("showName", false);
+            if(showName){
+                setShowNoteText(true);
+            }
             Data data = dataChoice.getData(dataSelection);
             if (data != null) {
                 editable    = false;
                 displayOnly = true;
                 processData(data);
+                processProperties(dataChoice);
             }
         }
-
-        showName = (boolean) dataChoice.getProperty("showName", false);
 
         return true;
     }
@@ -501,11 +509,6 @@ public class DrawingControl extends DisplayControlImpl {
         super.timeChanged(time);
     }
 
-
-
-
-
-
     /**
      * Process the visad data object. For now  this is a text object
      * that holds the glyph xml
@@ -532,6 +535,28 @@ public class DrawingControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * Process the visad data object. For now  this is a text object
+     * that holds the glyph xml
+     *
+     * @param dataChoice The data object
+     *
+     * @throws RemoteException When bad things happen
+     * @throws VisADException When bad things happen
+     */
+    protected void processProperties(DataChoice dataChoice){
+        if (dataChoice instanceof CompositeDataChoice) {
+            ArrayList<DataChoice>  choices = (ArrayList<DataChoice>)((CompositeDataChoice)dataChoice).getDataChoices();
+            for(DataChoice dc: choices) {
+                processProperties(dc);
+            }
+        }  else  {
+            Object pObj = dataChoice.getProperty("plygonProperties");
+            if(pObj  != null) {
+                dataChoiceProperties.put(dataChoice.getName(), pObj.toString());
+            }
+        }
+    }
 
     /**
      * respond to the reload data call
@@ -2752,6 +2777,10 @@ public class DrawingControl extends DisplayControlImpl {
                     }
                     try {
                         DrawingGlyph glyph = (DrawingGlyph) glyphs.get(row);
+                        if(dataChoiceProperties.size() > 0 && glyph.getName() != null  &&
+                                dataChoiceProperties.get(glyph.getName())!= null) {
+                            setNoteText((String) dataChoiceProperties.get(glyph.getName()));
+                        }
                         if (e.getClickCount() > 1) {
                             doProperties(Misc.newList(glyph));
                         }
