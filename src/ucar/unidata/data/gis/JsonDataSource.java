@@ -168,11 +168,11 @@ public class JsonDataSource extends FilesDataSource {
     /**
      * Create a KmlDataSource from the specification given.
      *
-     * @param descriptor          descriptor for the data source
+     * @param descriptor descriptor for the data source
      * @param newSources Where the json came from
-     * @param properties          extra properties
+     * @param properties extra properties
      *
-     * @throws VisADException     some problem occurred creating data
+     * @throws VisADException some problem occurred creating data
      */
     public JsonDataSource(DataSourceDescriptor descriptor, List newSources,
                           Hashtable properties) {
@@ -180,8 +180,8 @@ public class JsonDataSource extends FilesDataSource {
         super(descriptor, newSources, "JSON data source", properties);
         String name = "ddd";
         int idx = name.indexOf("?");
-        if(idx>=0) {
-            name= name.substring(0,idx);
+        if (idx >= 0) {
+            name = name.substring(0, idx);
             setName(name);
         }
 
@@ -189,7 +189,7 @@ public class JsonDataSource extends FilesDataSource {
             if (newSources.size() > 0) {
                 String s = newSources.get(0).toString();
                 idx = s.indexOf("?");
-                if(idx>=0) s= s.substring(0,idx);
+                if (idx >= 0) s = s.substring(0, idx);
                 setName(s);
             } else {
                 //setName(description);
@@ -203,14 +203,14 @@ public class JsonDataSource extends FilesDataSource {
     /**
      * Create a KmlDataSource from the specification given.
      *
-     * @param descriptor          descriptor for the data source
-     * @param kmlUrl Where the kml came from
-     * @param properties          extra properties
+     * @param descriptor descriptor for the data source
+     * @param kmlUrl     Where the kml came from
+     * @param properties extra properties
      *
-     * @throws VisADException     some problem occurred creating data
+     * @throws VisADException some problem occurred creating data
      */
     public JsonDataSource(DataSourceDescriptor descriptor, String kmlUrl,
-                         Hashtable properties)
+                          Hashtable properties)
             throws VisADException, Exception {
 
         super(descriptor, Misc.newList(kmlUrl), "JSON data source", properties);
@@ -227,12 +227,11 @@ public class JsonDataSource extends FilesDataSource {
     /**
      * write image as a kml to file
      *
-     * @param kmlFilename kml filename
-     * @param bounds _image bounds
+     * @param kmlFilename   kml filename
+     * @param bounds        _image bounds
      * @param imageFileName image filename
-     *
      * @throws FileNotFoundException On badness
-     * @throws IOException On badness
+     * @throws IOException           On badness
      */
     public static void writeToFile(String kmlFilename,
                                    GeoLocationInfo bounds,
@@ -263,13 +262,11 @@ public class JsonDataSource extends FilesDataSource {
     /**
      * Create some kml from the given bounds and image file
      *
-     * @param bounds bounds
+     * @param bounds        bounds
      * @param imageFileName image
-     *
      * @return kml
-     *
      * @throws FileNotFoundException On badness
-     * @throws IOException On badness
+     * @throws IOException           On badness
      */
     public static String createKml(GeoLocationInfo bounds,
                                    String imageFileName)
@@ -297,7 +294,7 @@ public class JsonDataSource extends FilesDataSource {
      * Utility to create a latlonbox kml
      *
      * @param bounds bounds
-     * @param sb buffer to add to
+     * @param sb     buffer to add to
      */
     public static void createLatLonBox(GeoLocationInfo bounds,
                                        StringBuffer sb) {
@@ -328,7 +325,7 @@ public class JsonDataSource extends FilesDataSource {
      */
     protected void initPolygonColorMap() {
         if (this.colorMap == null) {
-            List colors     = new ArrayList();
+            List colors = new ArrayList();
             List resources =
                     Misc.newList("/ucar/unidata/idv/resources/probsevere_cmap.xml");
             XmlResourceCollection colorMapResources = new XmlResourceCollection("", resources);
@@ -339,22 +336,22 @@ public class JsonDataSource extends FilesDataSource {
     }
 
     /**
-     *  Get color map from xml file
+     * Get color map from xml file
      *
      * @param
      */
     public List processXml(Element root) {
-        List colors     = new ArrayList();
+        List colors = new ArrayList();
         List colorNodes = XmlUtil.findChildren(root, "color");
         for (int i = 0; i < colorNodes.size(); i++) {
             Element serverNode = (Element) colorNodes.get(i);
-            String  aval       = XmlUtil.getAttribute(serverNode, "a");
-            String  bval       = XmlUtil.getAttribute(serverNode, "b");
-            String  gval       = XmlUtil.getAttribute(serverNode, "g");
-            String  rval       = XmlUtil.getAttribute(serverNode, "r");
+            String aval = XmlUtil.getAttribute(serverNode, "a");
+            String bval = XmlUtil.getAttribute(serverNode, "b");
+            String gval = XmlUtil.getAttribute(serverNode, "g");
+            String rval = XmlUtil.getAttribute(serverNode, "r");
 
-            float [] values = new float[]{ Float.parseFloat(aval), Float.parseFloat(bval),
-                    Float.parseFloat(gval),Float.parseFloat(rval),};
+            float[] values = new float[]{Float.parseFloat(aval), Float.parseFloat(bval),
+                    Float.parseFloat(gval), Float.parseFloat(rval),};
 
             colors.add(values);
         }
@@ -362,7 +359,7 @@ public class JsonDataSource extends FilesDataSource {
     }
 
     /**
-     *  Get color map from xml file
+     * Get color map from xml file
      *
      * @param
      */
@@ -402,9 +399,8 @@ public class JsonDataSource extends FilesDataSource {
     /**
      * Read the image
      *
-     * @param url image url
+     * @param url     image url
      * @param baseUrl Where the kml came from_
-     *
      * @return The image
      */
     protected Image readImage(String url, String baseUrl) {
@@ -425,8 +421,8 @@ public class JsonDataSource extends FilesDataSource {
         try {
             imageContent = readBytes(url);
             if (imageContent == null) {
-                if ( !url.startsWith("http")) {
-                    url          = IOUtil.getFileRoot(baseUrl) + "/" + url;
+                if (!url.startsWith("http")) {
+                    url = IOUtil.getFileRoot(baseUrl) + "/" + url;
                     imageContent = readBytes(url);
                 }
             }
@@ -458,9 +454,7 @@ public class JsonDataSource extends FilesDataSource {
      * Utility to read the bytes from the file or url
      *
      * @param path file or url
-     *
      * @return bytes
-     *
      * @throws Exception On badness
      */
     protected byte[] readBytes(String path) throws Exception {
@@ -479,9 +473,7 @@ public class JsonDataSource extends FilesDataSource {
      * Create the input stream. Handle the case when it is a zip file
      *
      * @param path file or url
-     *
      * @return input stream to kml file
-     *
      * @throws Exception On badness
      */
     protected InputStream getInputStream(String path) throws Exception {
@@ -490,7 +482,7 @@ public class JsonDataSource extends FilesDataSource {
         }
 
         try {
-            URL           url        = new URL(path);
+            URL url = new URL(path);
             URLConnection connection = url.openConnection();
             return connection.getInputStream();
         } catch (Exception mue) {}
@@ -532,15 +524,15 @@ public class JsonDataSource extends FilesDataSource {
         }
         try {
             int size = this.sources.size();
-            for(int i = 0; i < size; i++) {
-                String fPath = (String)this.sources.get(i);
+            for (int i = 0; i < size; i++) {
+                String fPath = (String) this.sources.get(i);
                 parseJSON(fPath);
             }
             this.timeList = Misc.sort(this.timeList);
         } catch (Exception iexc) {
             LogUtil.logException(
-                "There was an error parsing the xml file:\n "
-                + getFilePath(), iexc);
+                    "There was an error parsing the xml file:\n "
+                            + getFilePath(), iexc);
             setInError(true, false, "");
         }
     }
@@ -549,9 +541,7 @@ public class JsonDataSource extends FilesDataSource {
      * Get the kml root element
      *
      * @param jsonUrl json url
-     *
      * @return Root element
-     *
      * @throws Exception On badness
      */
     private void parseJSON(String jsonUrl) throws Exception {
@@ -562,19 +552,19 @@ public class JsonDataSource extends FilesDataSource {
 
         try (FileReader reader = new FileReader(jsonUrl)) {
             // lecture du fichier
-            Object obj         = jsonParser.parse(reader);
+            Object obj = jsonParser.parse(reader);
             JSONObject feature = (JSONObject) obj;
             JSONArray features = (JSONArray) feature.get("features");
             String dateTimePattern = "yyyyMMdd_hhnnss UTC";
             DateTime dts = null;
-            String descrip = (String)feature.get("validTime");
-            if(descrip != null){
+            String descrip = (String) feature.get("validTime");
+            if (descrip != null) {
                 //System.out.println(descrip);
-                DatePattern  dp  = new DatePattern(dateTimePattern);
+                DatePattern dp = new DatePattern(dateTimePattern);
                 if (dp.match(descrip)) {
                     dts = dp.getDateTime();
                 }
-                if(dts != null) {
+                if (dts != null) {
                     this.timeList.add(dts);
                     jsonInfo.put("timeObj", dts);
                 }
@@ -582,8 +572,8 @@ public class JsonDataSource extends FilesDataSource {
 
             // Construction initiale du KML avec un factory
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder builder        = factory.newDocumentBuilder();
-            final Document document             = builder.newDocument();
+            final DocumentBuilder builder = factory.newDocumentBuilder();
+            final Document document = builder.newDocument();
 
             // Creation du tag <kml> avec la version voulue
             final Element kmlTag = document.createElement("kml");
@@ -626,50 +616,30 @@ public class JsonDataSource extends FilesDataSource {
                 placeMark.appendChild(styleURLTag);
 
                 // Conversion des features de Object vers JSONObject
-                JSONObject featJ    = (JSONObject) feat;
+                JSONObject featJ = (JSONObject) feat;
                 // Recuperation des prorietes de l'objet feature
                 JSONObject featJSON = (JSONObject) featJ.get("properties");
 
-                // Recuperation des valeurs de la propriete.
-               // String admin = (featJSON.get("density")).toString();
-                // Creation de propriete
-                //Properties properties = new Properties(admin , name);
-
-                // Entete de la ligne pour la console
-                //String titre          = properties.toString();
-                //System.out.println(titre);
-
                 JSONObject coordJSON = (JSONObject) featJ.get("geometry");
-                String type          = (String) coordJSON.get("type");
-                JSONArray coords     = (JSONArray) coordJSON.get("coordinates");
+                String type = (String) coordJSON.get("type");
+                JSONArray coords = (JSONArray) coordJSON.get("coordinates");
                 JSONObject modelsJSON = (JSONObject) featJ.get("models");
 
-                if(modelsJSON != null) {
+                if (modelsJSON != null) {
                     String name = (String) featJSON.get("ID");
-                    if(name == null){
+                    if (name == null) {
                         name = (String) featJ.get("id");
                     }
-                    JSONObject probsevereJSON = (JSONObject) modelsJSON.get("probsevere");
-                    JSONObject probwindJSON = (JSONObject) modelsJSON.get("probwind");
-                    JSONObject probhailJSON = (JSONObject) modelsJSON.get("probhail");
-                    JSONObject probtorJSON = (JSONObject) modelsJSON.get("probtor");
-                    String probSevere = (String) probsevereJSON.get("PROB");
-                    String probWind = (String) probwindJSON.get("PROB");
-                    String probHail = (String) probhailJSON.get("PROB");
-                    String probTor = (String) probtorJSON.get("PROB");
-                    System.out.println("probsevere  " +  probSevere);
-                    System.out.println("probwind  " +  probWind);
-                    System.out.println("probhail " +  probHail);
-                    System.out.println("probtor " +  probTor);
                     if (type.equals("Polygon") || type.equals("MultiPolygon")) {
-                        if(!probSevere.equals("0"))
-                            ploygoncoordsSevere.put(name, getCoordinates(coords, probSevere));
-                        if(!probWind.equals("0"))
-                            ploygoncoordsWind.put(name, getCoordinates(coords, probWind));
-                        if(!probHail.equals("0"))
-                            ploygoncoordsHail.put(name, getCoordinates(coords, probHail));
-                        if(!probTor.equals("0"))
-                            ploygoncoordsTor.put(name, getCoordinates(coords, probTor));
+                        JSONObject probsevereJSON = (JSONObject) modelsJSON.get("probsevere");
+                        JSONObject probwindJSON = (JSONObject) modelsJSON.get("probwind");
+                        JSONObject probhailJSON = (JSONObject) modelsJSON.get("probhail");
+                        JSONObject probtorJSON = (JSONObject) modelsJSON.get("probtor");
+
+                        ploygoncoordsSevere.put(name, parseJSONModel(coords , probsevereJSON));
+                        ploygoncoordsWind.put(name, parseJSONModel(coords , probwindJSON));
+                        ploygoncoordsHail.put(name, parseJSONModel(coords , probhailJSON));
+                        ploygoncoordsTor.put(name, parseJSONModel(coords , probtorJSON));
                     } else {
                         throw new Error("Type mal forme !");
                     }
@@ -682,23 +652,22 @@ public class JsonDataSource extends FilesDataSource {
                     }
                 }
             }
-            if(dts != null) {
+            if (dts != null) {
                 HashMap ploygons = new HashMap();
-                if(ploygoncoordsSevere.size() >  0){
+                if (ploygoncoordsSevere.size() > 0) {
                     ploygons.put("probSevere", ploygoncoordsSevere);
                 }
-                if(ploygoncoordsWind.size() >  0){
+                if (ploygoncoordsWind.size() > 0) {
                     ploygons.put("probWind", ploygoncoordsWind);
                 }
-                if(ploygoncoordsHail.size() >  0){
+                if (ploygoncoordsHail.size() > 0) {
                     ploygons.put("probHail", ploygoncoordsHail);
                 }
-                if(ploygoncoordsTor.size() >  0){
+                if (ploygoncoordsTor.size() > 0) {
                     ploygons.put("probTornado", ploygoncoordsTor);
                 }
                 jsonInfo.put(dts, ploygons);
-            }
-            else
+            } else
                 jsonInfo.put("polygon", ploygoncoords);
             //this.timeList = Misc.sort(this.timeList);
         } catch (IOException | ParseException | ParserConfigurationException e) {
@@ -707,6 +676,40 @@ public class JsonDataSource extends FilesDataSource {
 
     }
 
+    /**
+     *  parsing the json object coordinate and properties
+     *
+     * @param
+     */
+    public HashMap parseJSONModel(JSONArray coords , JSONObject probJSON){
+        HashMap coordsNproperties = new HashMap();
+
+        String prob = (String) probJSON.get("PROB");
+        String probSevereAll = jsonObjToString(probJSON);
+        coordsNproperties.put("coordinates", getCoordinates(coords, prob));
+        coordsNproperties.put("properties",  probSevereAll);
+
+        return coordsNproperties;
+    }
+
+    /**
+     *  build the json object string
+     *
+     * @param
+     */
+    public String jsonObjToString(JSONObject jsonObj) {
+        StringBuilder sb = new StringBuilder();
+        Set keys = jsonObj.keySet();
+
+        for(Object k :keys){
+            sb.append(k.toString());
+            sb.append('=');
+            sb.append(jsonObj.get(k).toString());
+            sb.append(System.lineSeparator());
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
     /**
      *  build the polygon coordinate string
      *
@@ -1105,8 +1108,11 @@ public class JsonDataSource extends FilesDataSource {
                 for (Object k : keys) {
                     String name = (String) k;
                     Hashtable newProperties = new Hashtable();
-                    String coordStr = (String) plyCoords.get(k);
+                    HashMap coordsNporperties = (HashMap) plyCoords.get(k);
+                    String coordStr = (String)coordsNporperties.get("coordinates");
+                    String probStr = (String)coordsNporperties.get("properties");
                     newProperties.put("coordStr", coordStr);
+                    newProperties.put("plygonProperties", probStr);
                     newProperties.put("timeObj", dt);
                     //System.out.println(" Name " + name);
                     //System.out.println(" name " + name + " " + coordStr);
@@ -1233,7 +1239,10 @@ public class JsonDataSource extends FilesDataSource {
                 StringBuffer sb = new StringBuffer("<shapes>\n");
                 sb = sb.append(coordsStr);
                 int idx = sb.indexOf("polygon");
-                sb.insert(idx + 8, "times=\"" + timeStr + "\" ");
+                String nameStr  = "name=\"" + dataChoice.getName() + "\" ";
+                String tStr = "times=\"" + timeStr + "\" ";
+                sb.insert(idx + 8, nameStr);
+                sb.insert(idx +  8 + nameStr.length(), tStr);
                 sb.append("</shapes>");
                 //System.out.println(" ss " + sb);
                 return new visad.Text(sb.toString());
