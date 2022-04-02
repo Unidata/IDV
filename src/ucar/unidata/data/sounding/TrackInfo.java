@@ -368,7 +368,12 @@ public abstract class TrackInfo {
      * @throws Exception On badness
      */
     protected float[] getLatitude(Range range) throws Exception {
-        return getFloatData(range, varLatitude);
+        try {
+            return getFloatData(range, varLatitude);
+        } catch (java.lang.IllegalArgumentException ee) {
+            double[] d = getDoubleData(range, varLatitude);
+            return Misc.toFloat(d);
+        }
     }
 
     /**
@@ -381,7 +386,13 @@ public abstract class TrackInfo {
      * @throws Exception On badness
      */
     protected float[] getLongitude(Range range) throws Exception {
-        return getFloatData(range, varLongitude);
+        try {
+            return getFloatData(range, varLongitude);
+        } catch (java.lang.IllegalArgumentException ee) {
+            double[] d = getDoubleData(range, varLongitude);
+            return Misc.toFloat(d);
+        }
+
     }
 
 
@@ -395,7 +406,13 @@ public abstract class TrackInfo {
      * @throws Exception On badness
      */
     protected float[] getAltitude(Range range) throws Exception {
-        return getFloatData(range, varAltitude);
+        try {
+            return getFloatData(range, varAltitude);
+        } catch (java.lang.IllegalArgumentException ee) {
+            double[] d = getDoubleData(range, varAltitude);
+            return Misc.toFloat(d);
+        }
+
     }
 
 
