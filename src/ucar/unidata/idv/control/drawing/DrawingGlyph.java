@@ -171,19 +171,22 @@ public abstract class DrawingGlyph {
     /** Represents LAT/LON vertical coordinate */
     public static final int COORD_LATLON = 3;
 
+    /** Represents LAT/LON vertical coordinate */
+    public static final int COORD_LONLAT = 4;
+
     /** Drawing coordinate types */
     public static final int[] COORD_TYPES = { COORD_XYZ, COORD_XY,
-            COORD_LATLONALT, COORD_LATLON };
+            COORD_LATLONALT, COORD_LATLON, COORD_LONLAT };
 
 
     /** Drawing coordinate names */
     public static final String[] COORD_TYPENAMES = { "XYZ", "XY", "LATLONALT",
-            "LATLON" };
+            "LATLON", "LONLAT" };
 
 
     /** labels for coordinate syste type. */
     public static final String[] COORD_LABELS = { "X/Y/Z", "X/Y",
-            "Lat/Lon/Alt", "Lat/Lon" };
+            "Lat/Lon/Alt", "Lat/Lon", "Lon/Lat" };
 
     /** The name of this glyph */
     private String name;
@@ -607,7 +610,7 @@ public abstract class DrawingGlyph {
     public void processPointStrings(List pointStrings)
             throws VisADException, RemoteException {
         int stride = 3;
-        if ((coordType == COORD_XY) || (coordType == COORD_LATLON)) {
+        if ((coordType == COORD_XY) || (coordType == COORD_LATLON) || (coordType == COORD_LONLAT)) {
             stride = 2;
         }
         double fixedAlt;
@@ -620,6 +623,12 @@ public abstract class DrawingGlyph {
             double lat = Misc.decodeLatLon(pointStrings.get(i).toString());
             double lon = Misc.decodeLatLon(pointStrings.get(i
                              + 1).toString());
+
+            if(coordType == COORD_LONLAT){
+                 lon = Misc.decodeLatLon(pointStrings.get(i).toString());
+                 lat = Misc.decodeLatLon(pointStrings.get(i
+                        + 1).toString());
+            }
             //lon = LatLonPointImpl.lonNormalFrom().lonNormal360(lon);
             double alt;
             if (coordType == COORD_LATLONALT) {
@@ -1125,11 +1134,20 @@ public abstract class DrawingGlyph {
             return;
         }
         Real currentAnimationTime = animation.getAniValue();
-        if ((currentAnimationTime == null)
-                || currentAnimationTime.isMissing()) {
-            setVisible(true);
-            return;
+        if(currentAnimationTime == null  && timeValues.size() > 0){
+            DateTime [] dateTimes = control.getAnimationWidget().getTimes();
+            if(control.getViewAnimation() != null)
+                currentAnimationTime = control.getViewAnimation().getAniValue();
+            if(currentAnimationTime == null  && timeValues.size() == 1 )
+                currentAnimationTime = (Real)dateTimes[0];
         }
+
+        if(timeValues == null)
+            if ((currentAnimationTime == null)
+                    || currentAnimationTime.isMissing()) {
+                setVisible(true);
+                return;
+            }
 
         if (timeSet == null) {
             timeSet = Util.makeTimeSet(timeValues);
@@ -1254,7 +1272,7 @@ public abstract class DrawingGlyph {
      * @return Is in 2d space
      */
     public boolean isInFlatSpace() {
-        return (coordType == COORD_XY) || (coordType == COORD_LATLON);
+        return (coordType == COORD_XY) || (coordType == COORD_LATLON) || (coordType == COORD_LONLAT);
     }
 
     /**
@@ -1263,7 +1281,7 @@ public abstract class DrawingGlyph {
      * @return Is in latlon space
      */
     public boolean isInLatLonSpace() {
-        return (coordType == COORD_LATLONALT) || (coordType == COORD_LATLON);
+        return (coordType == COORD_LATLONALT) || (coordType == COORD_LATLON) || (coordType == COORD_LONLAT);
     }
 
 
@@ -2075,7 +2093,7 @@ public abstract class DrawingGlyph {
                     double[] point = getSpatialCoordinates(el);
                     pts[IDX_X][i] = (float) point[IDX_X];
                     pts[IDX_Y][i] = (float) point[IDX_Y];
-                    if (coordType == COORD_LATLON) {
+                    if (coordType == COORD_LATLON || coordType == COORD_LONLAT) {
                         pts[IDX_Z][i] =
                             (float) control.getVerticalValue(zPosition);
                     }
@@ -2196,7 +2214,7 @@ public abstract class DrawingGlyph {
                     double[] point = getSpatialCoordinates(el);
                     pts[IDX_X][i] = (double) point[IDX_X];
                     pts[IDX_Y][i] = (double) point[IDX_Y];
-                    if (coordType == COORD_LATLON) {
+                    if (coordType == COORD_LATLON || coordType == COORD_LONLAT) {
                         pts[IDX_Z][i] =
                             (double) control.getVerticalValue(zPosition);
                     }
