@@ -161,7 +161,7 @@ public abstract class TrackInfo {
 
 
     /**
-     * Add variable
+     * Add variable test
      *
      * @param variable the variable
      */
