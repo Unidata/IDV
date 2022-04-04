@@ -2415,7 +2415,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      */
     private void showNoteTextArea() {
         if (noteTextArea == null) {
-            noteTextArea = new JTextArea(5, 30);
+            noteTextArea = new JTextArea(10, 30);
             if (initNoteText != null) {
                 noteTextArea.setText(initNoteText);
             }
@@ -2426,7 +2426,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
             JViewport vp = sp.getViewport();
-            vp.setViewSize(new Dimension(60, 30));
+            vp.setViewSize(new Dimension(60, 60));
             noteWrapper = GuiUtils.inset(sp, 4);
         }
         if (mainPanel != null) {
