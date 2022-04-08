@@ -337,9 +337,12 @@ public class DrawingControl extends DisplayControlImpl {
 
     public boolean showName = false;
     /** The label to show the readout in the side legend */
-    private JLabel sideLegendDataChoiceName;
+    //private JLabel sideLegendDataChoiceName;
 
     protected HashMap dataChoiceProperties;
+
+    /** Keep around for the label macros */
+    private String glyphNameText;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -426,6 +429,7 @@ public class DrawingControl extends DisplayControlImpl {
             showName = (boolean) dataChoice.getProperty("showName", false);
             if(showName){
                 setShowNoteText(true);
+                glyphNameText = datachoice.getName();
             }
             Data data = dataChoice.getData(dataSelection);
             if (data != null) {
@@ -433,6 +437,9 @@ public class DrawingControl extends DisplayControlImpl {
                 displayOnly = true;
                 processData(data);
                 processProperties(dataChoice);
+                if(dataChoiceProperties.size() > 0)
+                    currentCmd = CMD_SELECT;
+                    //setCurrentCommand(CMD_SELECT);
             }
         }
 
@@ -820,6 +827,8 @@ public class DrawingControl extends DisplayControlImpl {
         } else {
             super.getLegendLabels(labels, legendType);
         }
+        if(showName)
+            labels.add(glyphNameText);
     }
 
 
@@ -966,11 +975,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @return Ok to handle events
      */
     protected boolean canHandleEvents() {
-        if (displayOnly || !getEnabled() || !editable
-                || !getHaveInitialized()
-                || (getMakeWindow() && !getWindowVisible())) {
-            return false;
-        }
+
         return isGuiShown();
     }
 
@@ -1099,6 +1104,16 @@ public class DrawingControl extends DisplayControlImpl {
                     if (closestGlyph != null) {
                         closestGlyph.mousePressed(event);
                         setCurrentGlyph(currentGlyph, null);
+                        List newSelection = Misc.newList(closestGlyph);
+                        if (newSelection.equals(selectedGlyphs)) {
+                            if (showName && selectedGlyphs.size() != 0) {
+                                clearSelection();
+                                setNoteText(null);
+                                glyphNameText = datachoice.getName() ;
+                                updateLegendLabel();
+                                return;
+                            }
+                        }
                         setSelection(Misc.newList(closestGlyph),
                                      inputEvent.isControlDown());
                     } else {
@@ -1392,13 +1407,20 @@ public class DrawingControl extends DisplayControlImpl {
             }
             selectedGlyphs.add(g);
             g.setSelected(true);
+            if(dataChoiceProperties.size() > 0 && g.getName() != null  &&
+                    dataChoiceProperties.get(g.getName())!= null) {
+                setNoteText((String) dataChoiceProperties.get(g.getName()));
+                if (showName) {
+                    glyphNameText = datachoice.getName() + " : " + g.getName();
+                    updateLegendLabel();
+                }
+            }
         }
         if ( !oldSelection.equals(selectedGlyphs)) {
             selectionChanged();
         }
         setDisplayActive();
     }
-
 
     /**
      * Is the given glyph selected
@@ -3070,7 +3092,9 @@ public class DrawingControl extends DisplayControlImpl {
         if(datachoice != null) {
             String magStr = (String) datachoice.getProperty("KMLWARNING");
             if(magStr != null)
-            setExtraLabelTemplate(MACRO_LONGNAME);
+                setExtraLabelTemplate(MACRO_LONGNAME);
+            //patterns.add(MACRO_LONGNAME);
+            //values.add(glyphNameText);
         }
     }
 
@@ -3087,34 +3111,18 @@ public class DrawingControl extends DisplayControlImpl {
         return super.getDefaultDisplayListTemplate();
     }
 
-    /**
-     * Assume that some display controls that a name to tell difference
-     *
-     * @param  legendType  type of legend
-     * @return The extra JComponent to use in legend
-     */
-    protected JComponent getExtraLegendComponent(int legendType) {
-        JComponent parentComp = super.getExtraLegendComponent(legendType);
-        if (legendType == BOTTOM_LEGEND) {
-            return parentComp;
-        }
-        if (sideLegendDataChoiceName == null) {
-            sideLegendDataChoiceName = new JLabel();
-        }
 
-        if (showName) {
-            sideLegendDataChoiceName.setText("<html>" + datachoice.getName()
-                    + "</html>");
-        } else {
-            sideLegendDataChoiceName = new JLabel("<html><br></html>");
+    /**
+     * This method is called  to update the legend labels when
+     * some state has changed in this control that is reflected in the labels.
+     */
+    protected void updateLegendLabel() {
+        super.updateLegendLabel();
+        // if the display label has the position, we'll update the list also
+        String template = getDisplayListTemplate();
+        if (template.contains(MACRO_POSITION)) {
+            updateDisplayList();
         }
-        //if (sideLegendReadout == null) {
-         //   sideLegendReadout = new JLabel("<html><br></html>");
-        //}
-        if(showName)
-            return GuiUtils.vbox(parentComp, sideLegendDataChoiceName);
-        else
-            return parentComp;
     }
 
 }
