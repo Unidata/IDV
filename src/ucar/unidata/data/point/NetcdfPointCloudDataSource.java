@@ -456,7 +456,7 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         FunctionType ft     = new FunctionType(index, rangeType);
         FlatField    field  = new FlatField(ft, domain);
         field.setSamples(pts, false);
-        return field;
+        return (FlatField)field.clone();
     }
 
     private FieldImpl makeGrid(float[][] pts, RealType type,
