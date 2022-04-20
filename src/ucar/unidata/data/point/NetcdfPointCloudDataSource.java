@@ -261,7 +261,9 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         super.doMakeDataChoices();
 
         try {
-            if (getDataChoices().size() == 0) {
+            if (getDataChoices().size() != 0) {
+                getDataChoices().clear();  // remove point data datachoice
+            }  else {
                 return;
             }
             //Sample the data to see if we need to show the metadata gui
@@ -270,7 +272,7 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
             List cloudCats =
                     DataCategory.parseCategories("Point Cloud;pointcloud", true);
             List pointGridCats =
-                    DataCategory.parseCategories("Point Grid;GRID-2D;", true);
+                    DataCategory.parseCategories("Point Grids;GRID-2D;", true);
             for (VariableSimpleIF var : varNames) {
                 String varname = var.getShortName();
 
