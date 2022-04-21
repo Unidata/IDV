@@ -30,6 +30,8 @@ import edu.wisc.ssec.mcidasv.data.hydra.LongitudeLatitudeCoordinateSystem;
 import edu.wisc.ssec.mcidasv.data.hydra.MultiSpectralData;
 import edu.wisc.ssec.mcidasv.data.hydra.SubsetRubberBandBox;
 
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.fop.render.rtf.rtflib.tools.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,7 @@ import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.MapProjectionDisplay;
 import ucar.unidata.view.geoloc.MapProjectionDisplayJ3D;
 
+import ucar.visad.Util;
 import ucar.visad.data.AreaImageFlatField;
 import ucar.visad.data.MyAreaImageFlatField;
 import ucar.visad.display.DisplayMaster;
@@ -122,6 +125,8 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+
+import static visad.python.JPythonMethods.createAreaField;
 
 
 /**
@@ -282,6 +287,10 @@ public class ScatterDisplay extends DisplayControlImpl {
     JMenu viewMenu = null;
 
     Component[] threeComps = null;
+
+    ImageControl dCntrlX = null;
+
+    ImageControl dCntrlY = null;
     /**
      * Construct a ScatterDisplay 
      */
@@ -422,22 +431,22 @@ public class ScatterDisplay extends DisplayControlImpl {
         probeX.doMakeProbe(Color.red, dspMasterX);
         probeY.doMakeProbe(Color.red, dspMasterY);
 
-        ImageControl dCntrl =
+        dCntrlX =
             new ImageControl(
                 (HydraRGBDisplayable) dspMasterX.getDisplayables(0),
                 getDisplayConventions());
-        ColorTableWidget ctw1 = new ColorTableWidget(dCntrl, ColorTableManager.getManager(),
+        ColorTableWidget ctw1 = new ColorTableWidget(dCntrlX, ColorTableManager.getManager(),
                                    clrTableX, rangeX);
         ctwCompX   = ctw1.getLegendPanel(BOTTOM_LEGEND);
-        dCntrl.ctw = ctw1;
+        dCntrlX.ctw = ctw1;
 
-        dCntrl = new ImageControl(
+        dCntrlY = new ImageControl(
             (HydraRGBDisplayable) dspMasterY.getDisplayables(0),
             getDisplayConventions());
-        ctw1 = new ColorTableWidget(dCntrl, ColorTableManager.getManager(),
+        ctw1 = new ColorTableWidget(dCntrlY, ColorTableManager.getManager(),
                                    clrTableY, rangeY);
         ctwCompY   = ctw1.getLegendPanel(BOTTOM_LEGEND);
-        dCntrl.ctw = ctw1;
+        dCntrlY.ctw = ctw1;
 
         return true;
 
@@ -458,19 +467,11 @@ public class ScatterDisplay extends DisplayControlImpl {
         }
         tt.put("id", dataChoiceX.getId());
         X_data         = dataChoiceX.getData(dataSelectionX, tt);
-        int idx = 0;
-        if(dataSelectionX != null && dataSelectionX.getTimes() != null ){
-            idx = dataSelectionX.getTimes().size() - 1;
-        } else if (getUsesTimeDriver() && dataChoiceX.getAllDateTimes() != null) {
-            idx = 0;
 
-        } else if (dataSelectionX.getTimes() ==  null &&
-                dataChoiceX.getAllDateTimes() != null) {
-            idx = dataChoiceX.getAllDateTimes().size() -1;
-        }
         if (X_data instanceof FlatField) {
             X_field = (FlatField) X_data;
         } else if (X_data instanceof FieldImpl) {
+            int idx = ((FieldImpl) X_data).getLength() - 1;
             X_field = (FlatField) ((FieldImpl) X_data).getSample(idx);
         }
 //if(X_field instanceof MyAreaImageFlatField)
@@ -492,18 +493,11 @@ public class ScatterDisplay extends DisplayControlImpl {
         dataSelectionY.setGeoSelection(dataSelectionX.getGeoSelection());
 
         Y_data = dataChoiceY.getData(dataSelectionY, tt1);
-        int idy = 0;
-        if(dataSelectionY != null &&  dataSelectionY.getTimes() != null){
-            idy = dataSelectionY.getTimes().size() - 1;
-        } else if (getUsesTimeDriver() && dataChoiceY.getAllDateTimes() != null) {
-            idy = 0;
-        } else if (dataSelectionY.getTimes() == null &&
-                dataChoiceY.getAllDateTimes() != null) {
-            idy = dataChoiceY.getAllDateTimes().size() - 1;
-        }
+
         if (Y_data instanceof FlatField) {
             Y_field = (FlatField) Y_data;
         } else if (Y_data instanceof FieldImpl) {
+            int idy = ((FieldImpl) Y_data).getLength() - 1;
             Y_field = (FlatField) ((FieldImpl) Y_data).getSample(idy);
         }
 
@@ -511,7 +505,7 @@ public class ScatterDisplay extends DisplayControlImpl {
             Y_field = resample(X_field, Y_field);
         }
 
-        Area_field = JPythonMethods.createAreaField(X_field);
+        Area_field = createAreaField(X_field);
         statsTable = new StatsTable();
     }
 
@@ -563,6 +557,21 @@ public class ScatterDisplay extends DisplayControlImpl {
         } catch (Exception ex) {
             logger.error("could not change color palette", ex);
         }
+        container.getComponent(0).setVisible(true);
+        GuiUtils.toggleHeavyWeightComponents(container.getComponent(0), true);
+        GuiUtils.showComponentInTabs(container);
+
+
+        dCntrlX.removePropertyChangeListener(this);
+
+        dCntrlY.removePropertyChangeListener(this);
+        scatterMaster.removePropertyChangeListener(this);
+        try{
+            dCntrlX.doRemove();
+            dCntrlY.doRemove();
+            scatterMaster.setDisplayInactive() ;
+        } catch (Exception ee){}
+
     }
 
     @Override
@@ -608,6 +617,8 @@ public class ScatterDisplay extends DisplayControlImpl {
             threeComps[0] = dspMasterX.getComponent();
             threeComps[1] = dspMasterY.getComponent();
             threeComps[2] = scatterMaster.getComponent();
+            dspMasterX.draw();
+            dspMasterY.draw();
             container.repaint();
 
             for (int k = 0; k < n_selectors; k++) {
@@ -961,7 +972,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                 }
 
                 statsTable.setIsShowing();
-                statsTable.setFields(X_field, Y_field, 0);
+                statsTable.setFields(noUnit(X_field), noUnit(Y_field), 0);
             });
 
         buttonPanel.add(computeStatsButton);
@@ -971,10 +982,26 @@ public class ScatterDisplay extends DisplayControlImpl {
 
         //-container = pane;
         JPanel new_pane = new JPanel(new BorderLayout());
-        new_pane.add(pane, BorderLayout.CENTER);
-        new_pane.add(buttonPanel, BorderLayout.SOUTH);
-        container = new_pane;
+        container = GuiUtils.centerBottom(pane,
+                buttonPanel);
         return container;
+    }
+
+    /**
+     * _more_
+     *
+     * @param grid _more_
+     */
+    public FlatField noUnit(FlatField grid){
+        FlatField field = null;
+        try {
+            Unit newunit = CommonUnit.promiscuous;
+            RealType rt = GridUtil.getParamType(grid).getRealComponents()[0];
+            RealType newType = Util.makeRealType(rt.getName(), visad.CommonUnit.promiscuous);
+            field = (FlatField) GridUtil.setParamType(grid, newType, false);
+        } catch (Exception ee){}
+
+        return field;
     }
 
     /**
@@ -1912,7 +1939,7 @@ public class ScatterDisplay extends DisplayControlImpl {
         int myTableIndex = 0;
 
         /**
-         * Construct a ImageBoxSelector 
+         * Construct a ImageBoxSelector
          *
          * @param subsetBox _more_
          * @param imageDomain _more_
@@ -1975,7 +2002,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                 return;
             }
 
-            if ((imageDomain instanceof Linear2DSet) || !earthCoordDomain) {
+            if ((imageDomain instanceof Linear2DSet) && !earthCoordDomain) {
                 coords = ((Gridded2DSet) imageDomain).valueToGrid(corners);
             }
 
@@ -2558,7 +2585,7 @@ public class ScatterDisplay extends DisplayControlImpl {
 
     public JMenu makeViewMenu() {
         ViewManager vm = new ViewManager();
-        vm.setShowControlLegend(false);
+        vm.setShowControlLegend(true);
         JMenu viewMenu = GuiUtils.makeDynamicMenu("View", vm,
                 "firstInitializeViewMenu");
 
@@ -2649,4 +2676,8 @@ public class ScatterDisplay extends DisplayControlImpl {
         return image;
     }
 
+    public Image getImage(String what) throws Exception {
+
+        return  makeBufferedImage(container);
+    }
 }
