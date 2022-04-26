@@ -252,12 +252,13 @@
      label="Google Earth Files KML/KMZ"
      patterns="\.kml$,\.kmz$,\.KML$,\.KMZ$,bbs\.keyhole\.com.*download.php"/>
 
-  <!--datasource
+  <datasource
           id="JSON"
           factory="ucar.unidata.data.gis.JsonDataSource"
           fileselection="true"
-          label="Geo Json"
-          patterns="\.json$,\.geojson$"/-->
+          doesmultiples="true"
+          label="GeoJson"
+          patterns="\.json$,\.geojson$"/>
 
   <datasource
      id="GRX PLACEFILE"
@@ -347,11 +348,18 @@
   </datasource>
 
   <datasource
-          id="WEATHER.WARNING"
-          fileselection="true"
-          standalone="true"
-          factory="ucar.unidata.data.gis.KmlDataSource"
-          label="NWS Hazard Warning (from server)"/>
+      id="WEATHER.WARNING"
+      fileselection="true"
+      standalone="true"
+      factory="ucar.unidata.data.gis.KmlDataSource"
+      label="NWS Hazard Warning (from server)"/>
+
+  <datasource
+      id="SEVERE.WARNING"
+      fileselection="true"
+      standalone="true"
+      factory="ucar.unidata.data.gis.JsonDataSource"
+      label="NCEP PEOBSEVERE (from server)"/>
 
   <datasource
      id="STORM.ATCF"
