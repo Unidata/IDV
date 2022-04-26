@@ -21,6 +21,8 @@
 package ucar.unidata.data.gis;
 
 
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -159,6 +161,8 @@ public class JsonDataSource extends FilesDataSource {
     /** The descriptor */
     private DataSourceDescriptor descriptor = null;
 
+    private static String DEFAULT_PATH =
+            "https://mrms.ncep.noaa.gov/data/ProbSevere/PROBSEVERE/";
 
     /**
      * Dummy constructor so this object can get unpersisted.
@@ -175,7 +179,7 @@ public class JsonDataSource extends FilesDataSource {
      * @throws VisADException some problem occurred creating data
      */
     public JsonDataSource(DataSourceDescriptor descriptor, List newSources,
-                          Hashtable properties) {
+                          Hashtable properties) throws VisADException, Exception {
 
         super(descriptor, newSources, "JSON data source", properties);
         String name = "ddd";
@@ -204,23 +208,48 @@ public class JsonDataSource extends FilesDataSource {
      * Create a KmlDataSource from the specification given.
      *
      * @param descriptor descriptor for the data source
-     * @param kmlUrl     Where the kml came from
+     * @param probSevereUrl     Where the kml came from
      * @param properties extra properties
      *
      * @throws VisADException some problem occurred creating data
      */
-    public JsonDataSource(DataSourceDescriptor descriptor, String kmlUrl,
+    public JsonDataSource(DataSourceDescriptor descriptor, String probSevereUrl,
                           Hashtable properties)
             throws VisADException, Exception {
 
-        super(descriptor, Misc.newList(kmlUrl), "JSON data source", properties);
-        this.sources = Misc.newList(kmlUrl);
-        this.descriptor = descriptor;
+        super(descriptor, Misc.newList(probSevereUrl), "JSON data source", properties);
+        if(probSevereUrl.length() == 0){
+            ArrayList defSources = new ArrayList();
+            org.jsoup.nodes.Document doc = Jsoup.connect(DEFAULT_PATH).get();
+            org.jsoup.select.Elements rows = doc.select("tr");
+            int size = rows.size();
+            org.jsoup.select.Elements rows0 = null;
+            if(size > 30)
+                rows0 = new Elements(rows.subList(size- 31, size-1));
+            else
+                rows0 = rows.clone();
+            for(org.jsoup.nodes.Element row :rows0)
+            {
+                org.jsoup.select.Elements columns = row.select("td");
+                for (org.jsoup.nodes.Element column:columns)
+                {
+                    if(column.text().endsWith("json") ) {
+                        System.out.print( column.text());
+                        String ss = DEFAULT_PATH + column.text();
+                        defSources.add(ss);
+                    }
+                }
+                System.out.println();
+            }
+            this.sources = defSources;
+        } else {
+            this.sources = Misc.newList(probSevereUrl);
+        }
 
-        setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(kmlUrl)));
+        this.descriptor = descriptor;
+        setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(probSevereUrl)));
 
         initPolygonColorMap();
-
         initGeoJsonDataSource();
     }
 
@@ -536,7 +565,22 @@ public class JsonDataSource extends FilesDataSource {
             setInError(true, false, "");
         }
     }
+    /**
+     * Get the json object from URL
+     *
+     * @param jsonUrl json url
+     * @return Object jsonObj
+     * @throws Exception On badness
+     */
+    private Object getRemoteJSON(String jsonUrl) throws Exception {
 
+        URL url = new URL(jsonUrl);
+        URLConnection request = url.openConnection();
+        request.connect();
+
+        JSONObject resObj = (JSONObject)new JSONParser().parse(new InputStreamReader((InputStream) request.getContent()));
+        return resObj;
+    }
     /**
      * Get the kml root element
      *
@@ -549,10 +593,16 @@ public class JsonDataSource extends FilesDataSource {
         //JSON parser object pour lire le fichier
 
         JSONParser jsonParser = new JSONParser();
-
-        try (FileReader reader = new FileReader(jsonUrl)) {
+        BufferedReader reader1 = null;
+        try {
             // lecture du fichier
-            Object obj = jsonParser.parse(reader);
+            Object obj = null;
+            if(!jsonUrl.startsWith("http")) {
+                FileReader reader = new FileReader(jsonUrl);
+                obj = jsonParser.parse(reader);
+            } else {
+                obj = getRemoteJSON(jsonUrl);
+            }
             JSONObject feature = (JSONObject) obj;
             JSONArray features = (JSONArray) feature.get("features");
             String dateTimePattern = "yyyyMMdd_hhnnss UTC";
