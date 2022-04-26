@@ -1765,6 +1765,13 @@ public class ScatterDisplay extends DisplayControlImpl {
                             selected);
                     myTable.setPoints(markScatter, len, myTableIndex,
                                       total_area);
+                } else if(statsTable != null){
+                    int[] selected = new int[len];
+                    System.arraycopy(tmpsel, 0, selected, 0, len);
+                    total_area = JPythonMethods.computeSum(Area_field,
+                            selected);
+                    statsTable.setPoints(markScatter, len, myTableIndex,
+                            total_area);
                 }
 
             }
@@ -2071,6 +2078,9 @@ public class ScatterDisplay extends DisplayControlImpl {
             if (myTable != null) {
                 total_area = JPythonMethods.computeSum(Area_field, selected);
                 myTable.setPoints(markScatter, len, myTableIndex, total_area);
+            } else if (statsTable != null){
+                total_area = JPythonMethods.computeSum(Area_field, selected);
+                statsTable.setPoints(markScatter, len, myTableIndex, total_area);
             }
 
             updateBox();
