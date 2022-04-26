@@ -750,8 +750,9 @@ public class KmlDataSource extends FilesDataSource {
             List pointNodes = null;
             String folderName = XmlUtil.getChildText(XmlUtil.findChild(node,
                                     TAG_NAME));
-            if (folderName == null) {
-                folderName = "Folder";
+            if (folderName == null && this.descriptor != null) {
+                //folderName = "Folder";
+                folderName = this.descriptor.getLabel();
             }
 
             CompositeDataChoice newParentDataChoice =
