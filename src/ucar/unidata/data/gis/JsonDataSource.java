@@ -234,12 +234,12 @@ public class JsonDataSource extends FilesDataSource {
                 for (org.jsoup.nodes.Element column:columns)
                 {
                     if(column.text().endsWith("json") ) {
-                        System.out.print( column.text());
+                        //System.out.print( column.text());
                         String ss = DEFAULT_PATH + column.text();
                         defSources.add(ss);
                     }
                 }
-                System.out.println();
+                //System.out.println();
             }
             this.sources = defSources;
         } else {
@@ -251,6 +251,7 @@ public class JsonDataSource extends FilesDataSource {
 
         initPolygonColorMap();
         initGeoJsonDataSource();
+        getIdv().getIdvUIManager().showDataSelector();
     }
 
     /**
