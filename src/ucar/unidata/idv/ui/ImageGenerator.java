@@ -5970,14 +5970,15 @@ public class ImageGenerator extends IdvManager {
     public Date getAnimationTime() {
         List vms = getViewManagers(currentNode);
         if (vms.size() > 0) {
-            ViewManager vm        = (ViewManager) vms.get(0);
-            Animation   animation = vm.getAnimation();
-            if (animation != null) {
-                Real v = animation.getAniValue();
-                if (v != null) {
-                    return new Date((long) v.getValue() * 1000);
+            for(int i = 0; i < vms.size(); i++) {
+                ViewManager vm = (ViewManager) vms.get(i);
+                Animation animation = vm.getAnimation();
+                if (animation != null) {
+                    Real v = animation.getAniValue();
+                    if (v != null) {
+                        return new Date((long) v.getValue() * 1000);
+                    }
                 }
-
             }
         }
         return new Date(Misc.getCurrentTime());
