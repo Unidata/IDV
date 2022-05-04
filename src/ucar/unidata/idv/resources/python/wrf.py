@@ -72,6 +72,11 @@ def wrf_es(T, flag=1):
   return es
 
 def wrf_rh(T, QVAPOR, P, PB, flag=1 ):
+  # input variables
+  # - T: perturbation temperature ( Ttotal - 300)";
+  # - QVAPOR: Water vapor mixing ratio (kg kg-1)
+  # - P: perturbation pressure
+  # - PB: base state pressure
   temp = T + 300
   press = P + PB
   rh = DerivedGridFactory.createRelativeHumidity(temp, press, QVAPOR, 0)
@@ -90,10 +95,8 @@ def wrf_qs(P, PB, T, flag=1):
 
 def wrf_dewpoint(T, QVAPOR, P, PB, flag=1 ):
   # calculate dewpoint temperature
-  # this function use "Tetens formula"
-  #------------------------------------
   # input variables
-  # - T: perturbationj potential temperature (theta-t0)";
+  # - T: perturbation temperature ( Ttotal - 300)";
   # - QVAPOR: Water vapor mixing ratio (kg kg-1)
   # - P: perturbation pressure
   # - PB: base state pressure
@@ -117,6 +120,7 @@ def wrf_theta(P, PB, T):
   return theta
 
 def wrf_thetaE(P, PB, T, QVAPOR):
+  # T is perturbation temperature
   temp = T + 300
   press = P + PB
   rh = DerivedGridFactory.createRelativeHumidity(temp, press, QVAPOR,0)
