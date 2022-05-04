@@ -1,28 +1,5 @@
 
-def wrf_tk(P, PB, T):
-  # calculate absolute temperature (K)
-  # Rd / CP   = 0.28571 (dimensionless)
-  # Pair      = P + PB
-  # theta     = Tk * (100000./Pair)^(Rd/Cp)
-  # --> Tk    = theta * (Pair / 100000.)^(R\/Cp)
-  #------------------------------------
-  Rd          = 287.0
-  Cp          = 7.0*Rd / 2.0
-  Rd_Cp       = Rd / Cp
-  Pair        = noUnit(P + PB)
-  theta       = noUnit(T) + 300.
-  tk          = theta * (( Pair/100000. )**(Rd_Cp))
-  tk1         = noUnit(tk)
-  tk0         = newUnit(tk1, "temperature", "kelvin")
-  return tk0
-
-def wrf_theta0(T):
-  # calculate potential temperature (K)
-  #------------------------------------
-  thetaT       = T + 300.
-  return thetaT
-
-def wrf_rh(T, QVAPOR, P, PB, flag=1 ):
+def wrf_rh0(T, QVAPOR, P, PB, flag=1 ):
   # calculate Relative humidity (%) with respect to liquid water
   # this function use "Tetens formula"
   #------------------------------------
@@ -47,7 +24,7 @@ def wrf_rh(T, QVAPOR, P, PB, flag=1 ):
   EP_3      = 0.622
   QV        = QVAPOR
   Pair      = P  +  PB
-  Tair      = wrf_tk(P, PB, T)
+  Tair      = T + 300
   #-- calc es -----------------------------
   a_liq = 7.5
   b_liq = 237.3
@@ -94,6 +71,12 @@ def wrf_es(T, flag=1):
   es = 6.11 * 10**(a * tdeg / (b + tdeg)) * 100.0
   return es
 
+def wrf_rh(T, QVAPOR, P, PB, flag=1 ):
+  temp = T + 300
+  press = P + PB
+  rh = DerivedGridFactory.createRelativeHumidity(temp, press, QVAPOR, 0)
+  return rh
+
 def wrf_qs(P, PB, T, flag=1):
   # calculate Mixing Ratio
   #  qs (kg kg-1)
@@ -116,12 +99,26 @@ def wrf_dewpoint(T, QVAPOR, P, PB, flag=1 ):
   # - PB: base state pressure
   # # es is calculated with respect to : flag=1 water, flag=-1 ice, flag=0 mix
   #------------------------------------
-  Temp = wrf_tk(P, PB, T)
-  Rh = wrf_rh(T, QVAPOR, P, PB, flag=1 )
+  temp = T + 300
+  press = P + PB
+  rh = DerivedGridFactory.createRelativeHumidity(temp, press, QVAPOR,0)
+  return DerivedGridFactory.createDewpoint (temp, rh)
 
-  return DerivedGridFactory.createDewpoint (Temp, Rh)
+def wrf_theta(P, PB, T):
+  # calculate potential temperature (K)
+  # T is perturbation temperature
+  # Rd / CP   = 0.28571 (dimensionless)
+  # Pair      = P + PB
+  # theta     = Tk * (100000./Pair)^(Rd/Cp)
+  #------------------------------------
+  temp = T + 300
+  press = P + PB
+  theta = DerivedGridFactory.createPotentialTemperature(temp, press)
+  return theta
 
-def wrf_eth(P, PB, T, QVAPOR):
-  temp = wrf_tk(P, PB, T)
-  eth = DerivedGridFactory.createWRFEquivalentPotentialTemperature(p, PB, temp, QVAPOR)
-  return eth
+def wrf_thetaE(P, PB, T, QVAPOR):
+  temp = T + 300
+  press = P + PB
+  rh = DerivedGridFactory.createRelativeHumidity(temp, press, QVAPOR,0)
+  thetaE = DerivedGridFactory.createEquivalentPotentialTemperature(temp, press, rh)
+  return thetaE
