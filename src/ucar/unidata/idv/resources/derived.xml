@@ -1404,37 +1404,35 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands/>
   </derived>
 
-  <derived description="WRF calculate potential temperature (K)" formula="wrf_theta(P, PB, T)" id="WRF potential temperature" isdefault="false" isenduser="true">
+  <derived description="WRF potential temperature (K)" formula="wrf_theta(P, PB, T)" id="WRF potential temperature" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-WRF"/>
     </categories>
     <operands/>
   </derived>
-  <derived description="WRF calculate Relative humidity (%)" formula="wrf_rh(T, QVAPOR, P, PB, flag=1 )" id="WRF relative humidity" isdefault="false" isenduser="true">
+  <derived description="WRF Relative humidity (%)" formula="wrf_rh(T, QVAPOR, P, PB, flag=1 )" id="WRF relative humidity" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-WRF"/>
     </categories>
     <operands/>
   </derived>
-  <derived description="WRF calculate dewpoint" formula="wrf_dewpoint(T, QVAPOR, P, PB, flag=1 )" id="WRF dewpoint" isdefault="false" isenduser="true">
+  <derived description="WRF dewpoint" formula="wrf_dewpoint(T, QVAPOR, P, PB, flag=1 )" id="WRF dewpoint" isdefault="false" isenduser="true">
   <categories>
     <category display="true" value="Grids-WRF"/>
   </categories>
   <operands/>
   </derived>
-  <derived description="WRF calculate EquivalentPotentialTemperature" formula="wrf_thetaE(P, PB, T, QVAPOR)" id="WRF equivTheta" isdefault="false" isenduser="true">
+  <derived description="WRF EquivalentPotentialTemperature" formula="wrf_thetaE(P, PB, T, QVAPOR)" id="WRF equivTheta" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-WRF"/>
     </categories>
     <operands/>
   </derived>
-  <derived description="WRF calculate sounding" formula="DerivedGridFactory.combineGrids (D1, D2)" id="WRF sounding" isdefault="false" isenduser="true">
+  <derived description="WRF Sat' Equiv' Potential Temperature" formula="wrf_SatThetaE(P, PB, T)" id="WRF SatEquivTheta" isdefault="false" isenduser="true">
   <categories>
     <category display="true" value="Grids-WRF"/>
   </categories>
-  <operands/>
   </derived>
-
   <!--derived description="Subgrid fluxes using CDO 2 Variables at a Time" formula="cdoSubGrid(DerivedGridFactory.combineGrids(variable1,variable2),user_nlon,user_nlat)" id="subgrid fluxes using cdo 2 variables at a time" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-MapesCollection-Climate Data Operators"/>
