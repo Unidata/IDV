@@ -126,3 +126,10 @@ def wrf_thetaE(P, PB, T, QVAPOR):
   rh = DerivedGridFactory.createRelativeHumidity(temp, press, QVAPOR,0)
   thetaE = DerivedGridFactory.createEquivalentPotentialTemperature(temp, press, rh)
   return thetaE
+
+def wrf_SatThetaE(P, PB, T):
+   # T is perturbation temperature
+   temp = T + 300
+   press = P + PB
+   thetaESat = DerivedGridFactory.createSatEquivalentPotentialTemperature(temp, press)
+   return thetaESat
