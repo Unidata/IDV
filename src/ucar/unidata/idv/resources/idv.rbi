@@ -522,12 +522,19 @@
          value="System"/>
     </resource>
     <resource
-           label="Mapes Collection"
-           location="%IDVPATH%/python/MapesCollection.py">
-          <property
-             name="category"
-             value="System"/>
-        </resource>
+       label="Mapes Collection"
+       location="%IDVPATH%/python/MapesCollection.py">
+       <property
+         name="category"
+         value="System"/>
+    </resource>
+    <resource
+      label="WRF Diagnostics"
+      location="%IDVPATH%/python/wrf.py">
+      <property
+        name="category"
+        value="System"/>
+    </resource>
     <resource
        label="Radar Diagnostics"
        location="%IDVPATH%/python/radar.py">
