@@ -50,8 +50,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 
-
-
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -401,6 +400,7 @@ public class XmlChooser extends IdvChooser implements ActionListener {
         try {
             if (xmlPath.length() > 0) {
                 showWaitCursor();
+                xmlPath =  IOUtil.getFinalURL(xmlPath);
                 xmlContents = IOUtil.readContents(xmlPath, NULL_STRING);
                 showNormalCursor();
                 if (myTimestamp != timestamp) {
