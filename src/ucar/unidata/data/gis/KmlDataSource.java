@@ -368,6 +368,7 @@ public class KmlDataSource extends FilesDataSource {
     private void initKmlDataSource() {
         Trace.call1("KmlDataSource.initKml");
         initKmlDataSourceInner();
+        getIdv().getIdvUIManager().showDataSelector();
         Trace.call2("KmlDataSource.initKml");
     }
 
