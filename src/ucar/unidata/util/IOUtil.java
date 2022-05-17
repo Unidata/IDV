@@ -1668,8 +1668,36 @@ public class IOUtil {
         return results;
     }
 
-
-
+    /**
+     *  Return the String contents of the final url string.
+     *
+     * @param urlStr can  be a URL .
+     *
+     * @return   contents or <code>null</code> if there is a problem.
+     */
+    public static String getFinalURL(String urlStr) {
+        try {
+            URL url = new URL(urlStr);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setInstanceFollowRedirects(false);
+            con.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
+            con.addRequestProperty("Referer", "https://www.google.com/");
+            con.connect();
+            int resCode = con.getResponseCode();
+            if (resCode == HttpURLConnection.HTTP_SEE_OTHER
+                    || resCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || resCode == HttpURLConnection.HTTP_MOVED_TEMP) {
+                String Location = con.getHeaderField("Location");
+                if (Location.startsWith("/")) {
+                    Location = url.getProtocol() + "://" + url.getHost() + Location;
+                }
+                return getFinalURL( Location);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return urlStr;
+    }
     /**
      * See if the content is in the perma-cache. If it is then return it.
      * Else read it (e.g., from  a url) and cache it.
