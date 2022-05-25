@@ -30,6 +30,7 @@ import org.w3c.dom.NodeList;
 import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataSelection;
 import ucar.unidata.idv.control.drawing.DrawingCommand;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
 import ucar.unidata.idv.control.drawing.FrontGlyph;
@@ -95,10 +96,7 @@ import java.awt.event.MouseEvent;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -430,6 +428,7 @@ public class DrawingControl extends DisplayControlImpl {
             if(showName){
                 setShowNoteText(true);
                 glyphNameText = datachoice.getName();
+                setDisplayName(glyphNameText);
             }
             Data data = dataChoice.getData(dataSelection);
             if (data != null) {
@@ -561,6 +560,11 @@ public class DrawingControl extends DisplayControlImpl {
             Object pObj = dataChoice.getProperty("plygonProperties");
             if(pObj  != null) {
                 dataChoiceProperties.put(dataChoice.getName(), pObj.toString());
+            } else {
+                Hashtable properties =   dataChoice.getProperties();
+                if(properties != null && properties.size() > 0){
+                    dataChoiceProperties.putAll(properties);
+                }
             }
         }
     }
@@ -575,7 +579,10 @@ public class DrawingControl extends DisplayControlImpl {
         DataChoice dataChoice = getDataChoice();
         if (dataChoice != null) {
             removeAllGlyphs();
-            Data data = dataChoice.getData(null);
+            DataSelection ds = getDataSelection();
+            if(ds != null)
+              ds = updateDataSelection(ds);
+            Data data = dataChoice.getData(ds);
             if (data != null) {
                 processData(data);
             }
