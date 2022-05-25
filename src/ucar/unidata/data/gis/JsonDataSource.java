@@ -22,53 +22,38 @@ package ucar.unidata.data.gis;
 
 
 import org.jsoup.Jsoup;
-import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import ucar.nc2.dataset.CoordinateAxis1DTime;
-import ucar.unidata.data.*;
 
-import ucar.unidata.data.imagery.AddeImageDescriptor;
-import ucar.unidata.data.imagery.BandInfo;
-import ucar.unidata.idv.chooser.adde.AddeServer;
+import ucar.nc2.ft2.coverage.CoverageCoordAxis1D;
+import ucar.unidata.data.*;
+import ucar.unidata.data.radar.TDSRadarDatasetCollection;
 import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.CoordinateFormat;
-import ucar.unidata.view.station.StationLocationMap;
 import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 import visad.Data;
 import visad.DateTime;
-import visad.FieldImpl;
 import visad.VisADException;
 
 import java.awt.*;
-
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.*;
 
 import java.net.URL;
 
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.*;
 
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+
 
 
 import org.json.simple.JSONArray;
@@ -165,6 +150,9 @@ public class JsonDataSource extends FilesDataSource {
     private static String DEFAULT_PATH =
             "https://mrms.ncep.noaa.gov/data/ProbSevere/PROBSEVERE/";
     protected List times;
+
+    /** _more_          */
+    public boolean useDriverTime = false;
     /**
      * Dummy constructor so this object can get unpersisted.
      */
@@ -203,7 +191,7 @@ public class JsonDataSource extends FilesDataSource {
         this.sources = newSources;
         this.descriptor = descriptor;
         initPolygonColorMap();
-        initGeoJsonDataSource();
+        initGeoJsonDataSourceInner();
     }
     /**
      * Create a KmlDataSource from the specification given.
@@ -253,6 +241,7 @@ public class JsonDataSource extends FilesDataSource {
             }
             this.sources = defSources;
             this.times = sourceTimes;
+            this.timeList = Misc.sort(this.times);
         } else {
             this.sources = Misc.newList(probSevereUrl);
         }
@@ -263,50 +252,49 @@ public class JsonDataSource extends FilesDataSource {
         else
             setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(probSevereUrl)));
         initPolygonColorMap();
-        initGeoJsonDataSource();
+       //initGeoJsonDataSource();
         getIdv().getIdvUIManager().showDataSelector();
     }
 
+    /**
+     * init KmlDataSource from the specification given.
+     *
+     * @param probSevereUrl     Where the json came from
+     *
+     * @throws VisADException some problem occurred creating data
+     */
     public void init(String probSevereUrl)
             throws VisADException, Exception {
 
-        if(probSevereUrl == null || probSevereUrl.length() == 0){
-            ArrayList defSources = new ArrayList();
-            ArrayList sourceTimes = new ArrayList();
-            String dateTimePattern = "yyyymmdd_hhnnss";
-            DatePattern dp       = new DatePattern(dateTimePattern);
-            org.jsoup.nodes.Document doc = Jsoup.connect(DEFAULT_PATH).get();
-            org.jsoup.select.Elements rows = doc.select("tr");
-            int size = rows.size();
-            org.jsoup.select.Elements rows0 = null;
-            //if(size > 30)
-            //    rows0 = new Elements(rows.subList(size- 300, size-1));
-            //else
-            //    rows0 = rows.clone();
-            for(org.jsoup.nodes.Element row :rows)
-            {
-                org.jsoup.select.Elements columns = row.select("td");
-                for (org.jsoup.nodes.Element column:columns)
-                {
-                    if(column.text().endsWith("json") ) {
-                        //System.out.print( column.text());
-                        int nn = column.text().length();
-                        String timeStr = column.text().substring(nn-20, nn-5);
-                        String ss = DEFAULT_PATH + column.text();
-                        if (dp.match(timeStr)) {
-                            defSources.add(ss);
-                            sourceTimes.add(dp.getDateTime());
-                        }
+        ArrayList defSources = new ArrayList();
+        ArrayList sourceTimes = new ArrayList();
+        String dateTimePattern = "yyyymmdd_hhnnss";
+        DatePattern dp       = new DatePattern(dateTimePattern);
+        org.jsoup.nodes.Document doc = Jsoup.connect(probSevereUrl).get();
+        org.jsoup.select.Elements rows = doc.select("tr");
 
+        for(org.jsoup.nodes.Element row :rows)
+        {
+            org.jsoup.select.Elements columns = row.select("td");
+            for (org.jsoup.nodes.Element column:columns)
+            {
+                if(column.text().endsWith("json") ) {
+                    //System.out.print( column.text());
+                    int nn = column.text().length();
+                    String timeStr = column.text().substring(nn-20, nn-5);
+                    String ss = DEFAULT_PATH + column.text();
+                    if (dp.match(timeStr)) {
+                        defSources.add(ss);
+                        sourceTimes.add(dp.getDateTime());
                     }
+
                 }
-                //System.out.println();
             }
-            this.sources = defSources;
-            this.times = sourceTimes;
-        } else {
-            this.sources = Misc.newList(probSevereUrl);
+            //System.out.println();
         }
+        this.sources = defSources;
+        this.times = sourceTimes;
+
 
         this.descriptor = descriptor;
         if(probSevereUrl == null || probSevereUrl.length() == 0)
@@ -314,8 +302,39 @@ public class JsonDataSource extends FilesDataSource {
         else
             setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(probSevereUrl)));
         initPolygonColorMap();
-        initGeoJsonDataSource();
         getIdv().getIdvUIManager().showDataSelector();
+    }
+
+    /**
+     * Get the list of times to compare to the time driver times
+     *
+     * @param dataChoice  the data choice
+     * @param selection   the selection (for things like level)
+     * @param timeDriverTimes  the time driver times (use range for server query)
+     *
+     * @return  the list of times for comparison
+     */
+    public List<DateTime> getAllTimesForTimeDriver(DataChoice dataChoice,
+                                                   DataSelection selection, List<DateTime> timeDriverTimes) {
+
+        int num = timeDriverTimes.size();
+        Collections.sort(timeDriverTimes);
+        TDSRadarDatasetCollection collection;
+        List  collectionTimes = dataChoice.getAllDateTimes();
+
+
+        List results = null;
+        try {
+            results = DataUtil.selectDatesFromList(collectionTimes,
+                    timeDriverTimes);
+            //for(Object dt: results){
+            //    System.out.println("Times " + dt);
+            //}
+        } catch (Exception e) {}
+        //initTimes = results;
+
+        return results;
+
     }
     /**
      * write image as a kml to file
@@ -469,10 +488,10 @@ public class JsonDataSource extends FilesDataSource {
      */
     public void reloadData() {
         root = null;
-        super.reloadData();
         dataChoices = null;
-        initGeoJsonDataSource();
+        initGeoJsonDataSourceInner();
         getDataChoices();
+        super.reloadData();
     }
 
     /**
@@ -490,7 +509,7 @@ public class JsonDataSource extends FilesDataSource {
         super.initAfterUnpersistence();
         //initKmlDataSource();
         initPolygonColorMap();
-        initGeoJsonDataSource();
+        initGeoJsonDataSourceInner();
     }
 
     /**
@@ -600,30 +619,23 @@ public class JsonDataSource extends FilesDataSource {
     }
 
     /**
-     * Initialization method
-     */
-    private void initGeoJsonDataSource() {
-        Trace.call1("JsonDataSource.initJson");
-        initGeoJsonDataSourceInner();
-        Trace.call2("JsonDataSource.initJson");
-    }
-
-    /**
      * init
      */
     private void initGeoJsonDataSourceInner() {
-
-        if (root != null) {
-            return;
-        }
-        if (getFilePath() == null) {
-            return;
-        }
         try {
+            if (root != null) {
+                return;
+            }
+            if (getFilePath() == null) {
+                return;
+            } else if(getFilePath().startsWith(DEFAULT_PATH)){
+                init(DEFAULT_PATH);
+            }
+
             int size = this.sources.size();
             //for (int i = 0; i < size; i++) {
-                String fPath = (String) this.sources.get(0);
-                parseJSON(fPath);
+            String fPath = (String) this.sources.get(0);
+            parseJSON(fPath);
             //}
             this.timeList = Misc.sort(this.times);
         } catch (Exception iexc) {
@@ -987,7 +999,7 @@ public class JsonDataSource extends FilesDataSource {
         schemas = new Hashtable();
         //HashMap polygonHMap = (HashMap)jsonInfo.get(timeList.get(0));
         //DateTime dt = (DateTime)timeList.get(0);
-        if(timeList.size()  > 0) {
+        if(times.size()  > 0) {
             processNode(null,   new ArrayList());
         }  else {
             processNodeNoTime(null,  new ArrayList());
@@ -1244,6 +1256,19 @@ public class JsonDataSource extends FilesDataSource {
             requestProperties = new Hashtable();
         }
         Object  tmp     = dataChoice.getId();
+        List times0 = null;
+
+        Object cu = dataSelection.getProperty(DataSelection.PROP_USESTIMEDRIVER);
+        if (cu != null) {
+            useDriverTime = ((Boolean) cu).booleanValue();
+        }
+
+        if (dataSelection != null) {
+            times0 = getTimesFromDataSelection(dataSelection, dataChoice);
+        }
+        //if (times0 == null) {
+        //    times0 = dataChoice.getSelectedDateTimes();
+        //}
 
         KmlInfo kmlInfo = null;
         //For legacy bundles
@@ -1277,7 +1302,82 @@ public class JsonDataSource extends FilesDataSource {
             DateTime dt = null;
             HashMap polygonInfo = null;
             List timeSL = dataSelection.getTimes();
-            if(timeSL != null && timeSL.size() > 0) {
+            if(useDriverTime){
+                int size = times0.size();
+                List  allTimes = dataChoice.getAllDateTimes();
+                for (int i = 0; i < size; i++) {
+                    int ii = allTimes.indexOf(times0.get(i));
+                    String fPath = (String) this.sources.get(ii);
+                    try {
+                        parseJSON(fPath);
+                    } catch (Exception eee) {
+                    }
+                }
+
+                List pdata0 = new ArrayList();
+
+                for (int i = 0; i < size; i++) {
+                    int ii = allTimes.indexOf(times0.get(i));
+
+                    //KmlId id = (KmlId) tmp;
+                    Hashtable dcproperties = dataChoice.getProperties();
+                    dt = (DateTime) times.get(ii);
+                    //System.out.println(" ss " + dt);
+                    List subTimeList = times0;
+                    //System.out.println(" ID " + id);
+
+                    if (dt != null)
+                        polygonInfo = (HashMap) jsonInfo.get(dt);
+                    else
+                        polygonInfo = (HashMap) jsonInfo.get("polygon");
+                    HashMap models = (HashMap) jsonInfo.get(dt);
+                    if(models == null)
+                        break;
+                    HashMap plyCoords = (HashMap) models.get(dataChoice.getDescription());
+                    Set keys = plyCoords.keySet();
+                    DateTime polygonTime = dt;
+
+                    if (subTimeList.contains(dt)) {
+                        String timeStr = null;
+                        if (polygonTime != null) {
+                            timeStr = polygonTime.toString();
+                            polygonInfo.put("time", timeStr);
+                        }
+                        for (Object k : keys) {
+                            String name = (String) k;
+                            // Hashtable newProperties = new Hashtable();
+                            HashMap coordsNporperties = (HashMap) plyCoords.get(k);
+                            String coordStr = (String) coordsNporperties.get("coordinates");
+                            String probStr = (String)coordsNporperties.get("properties");
+                            //String coordsStr = (String) dcproperties.get("coordStr");
+                            dcproperties.put(name, probStr);
+                            StringBuffer sb0 = new StringBuffer("<shapes>\n");
+                            sb0 = sb0.append(coordStr);
+                            int idx = sb0.indexOf("polygon");
+                            String nameStr = "name=\"" + name + "\" ";
+                            String tStr = "times=\"" + timeStr + "\" ";
+                            sb0.insert(idx + 8, nameStr);
+                            sb0.insert(idx + 8 + nameStr.length(), tStr);
+                            sb0.append("</shapes>");
+                            pdata0.add(new visad.Text(sb0.toString()));
+                        }
+                    }
+                }
+                StringBuffer sb = new StringBuffer("<shapes>\n");
+                for (int j = 0; j < pdata0.size(); j++) {
+                    visad.Text vt = (visad.Text) pdata0.get(j);
+                    if (vt != null) {
+                        String ttt = vt.toString();
+                        ttt = ttt.replace("<shapes>\n", "");
+                        ttt = ttt.replace("</shapes>", "");
+                        sb = sb.append(ttt);
+                    }
+                }
+                sb.append("</shapes>");
+
+                //System.out.println(" ss " + sb);
+                return new visad.Text(sb.toString());
+            } else if(timeSL != null && timeSL.size() > 0) {
                 int size = timeSL.size();
                 for (int i = 0; i < size; i++) {
                     int ii = (int) timeSL.get(i);
@@ -1366,6 +1466,33 @@ public class JsonDataSource extends FilesDataSource {
         return null;
     }
 
+    public int getTimeIndexWithBounds(DateTime dateTime, List<DateTime> allTimes, CoverageCoordAxis1D cca){
+        int index = allTimes.indexOf(dateTime);
+        if (index < 0)
+            return 0;
+
+        int lastindex = allTimes.lastIndexOf(dateTime);
+        if(index == lastindex)
+            return index;
+        Object bbb = cca.getCoordObject(index);
+        double [] bounds = null;
+        if(bbb instanceof double[])
+            bounds = (double [])bbb;
+        //double [] bounds = (double [])cca.getCoordObject(index);
+        int finalIndex0 = index;
+        if(bounds != null && bounds[1] != bounds[0]) {
+            double min = bounds[1] - bounds[0];
+            for (int ii = index + 1; ii <= lastindex; ii++) {
+                bounds = (double [])cca.getCoordObject(ii);
+                double tmp = bounds[1] - bounds[0];
+                if(tmp < min)
+                    finalIndex0 = ii;
+
+            }
+            index = finalIndex0;
+        }
+        return index;
+    }
     /**
      * make a list of DateTime-s from a geoJson timeList
      *
