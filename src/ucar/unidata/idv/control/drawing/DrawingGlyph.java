@@ -24,6 +24,7 @@
 package ucar.unidata.idv.control.drawing;
 
 
+import ij.macro.Symbol;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -1158,7 +1159,24 @@ public abstract class DrawingGlyph {
         if (timeSet.getLength() == 1) {
             Real myTime = (Real) timeValues.get(0);
             //            System.err.println("ctv one time:" + myTime + " " + currentAnimationTime);
-            setVisible(myTime.equals(currentAnimationTime));
+            if(myTime.equals(currentAnimationTime))
+                setVisible(true);
+            else {
+                DateTime[] dateTimes = animation.getTimes();
+                int len = dateTimes.length;
+                DateTime t0 = dateTimes[0];
+                DateTime t1 = dateTimes[1];
+
+                double intval = (t1.getValue() - t0.getValue())/2.0;
+
+                if(myTime.getValue() > (currentAnimationTime.getValue() - intval)
+                        && myTime.getValue() < (currentAnimationTime.getValue() + intval)){
+                    setVisible(true);
+                } else{
+                    setVisible(false);
+                    //System.out.println("hhh");
+                }
+            }
         } else {
             //Else work the visad magic
             float timeValueFloat = (float) currentAnimationTime.getValue(
