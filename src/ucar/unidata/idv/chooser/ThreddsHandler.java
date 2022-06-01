@@ -1202,12 +1202,12 @@ public class ThreddsHandler extends XmlHandler {
             urlPaths.add(new XmlChooser.PropertiedAction(url, properties));
         } else {
             //For now don't deal with container dataset nodes
-            if (true) {
-                if (flagMissing) {
-                    IdvChooser.errorMessage("No url path found for dataset.");
-                }
-                return false;
-            }
+            //if (true) {
+            //    if (flagMissing) {
+                   // IdvChooser.errorMessage("No url path found for dataset.");
+           //     }
+                //return false;
+            //}
             //This is for dataset nodes that contain other dataset nodes.
             List children = XmlUtil.findChildren(datasetNode,
                                 CatalogUtil.TAG_DATASET);
