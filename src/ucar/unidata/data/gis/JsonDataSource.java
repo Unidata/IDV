@@ -781,16 +781,16 @@ public class JsonDataSource extends FilesDataSource {
             if (dts != null) {
                 HashMap ploygons = new HashMap();
                 if (ploygoncoordsSevere.size() > 0) {
-                    ploygons.put("probSevere", ploygoncoordsSevere);
+                    ploygons.put("Probability Severe Weather", ploygoncoordsSevere);
                 }
                 if (ploygoncoordsWind.size() > 0) {
-                    ploygons.put("probWind", ploygoncoordsWind);
+                    ploygons.put("Probability Wind", ploygoncoordsWind);
                 }
                 if (ploygoncoordsHail.size() > 0) {
-                    ploygons.put("probHail", ploygoncoordsHail);
+                    ploygons.put("Probability Hail", ploygoncoordsHail);
                 }
                 if (ploygoncoordsTor.size() > 0) {
-                    ploygons.put("probTornado", ploygoncoordsTor);
+                    ploygons.put("Probability Tornado", ploygoncoordsTor);
                 }
                 jsonInfo.put(dts, ploygons);
             } else
@@ -1198,7 +1198,7 @@ public class JsonDataSource extends FilesDataSource {
         noDisplayCatList.add(DataCategory.NONE_CATEGORY);
         CompositeDataChoice newParentDataChoice =
                 new CompositeDataChoice(
-                        this, "All Warning", "Probsevere Models", "ProbsevereModels" ,
+                        this, "All Warning", "Probsevere Models", "Probability Severe Weather Models" ,
                         noDisplayCatList);
         //newParentDataChoice.setProperty("JsonWARNING", "folderName");
         //newParentDataChoice.setUseDataSourceToFindTimes(true);
@@ -1206,15 +1206,21 @@ public class JsonDataSource extends FilesDataSource {
         addDataChoice(newParentDataChoice);
         //List categories =
         //        Misc.newList(DataCategory.XGRF_CATEGORY);
-        Set modelkeys = new HashSet<>(Arrays.asList("probSevere", "probTornado", "probHail", "probWind"));
-
+        Map<String, String> modelsMap  = new HashMap<String, String>() {{
+            put("probSevere", "Probability Severe Weather");
+            put("probTornado", "Probability Tornado");
+            put("probHail", "Probability Hail");
+            put("probWind", "Probability Wind");
+        }};
+        Set modelkeys =  modelsMap.keySet();
         for (Object mk : modelkeys) {
             String modelName = (String)mk;
+            String modelFullName = modelsMap.get(mk);
             Hashtable props = Misc.newHashtable(DataChoice.PROP_ICON,
                     "/ucar/unidata/ui/symbol/images/" + modelName + ".png");
             DataChoice  dataChoice0 =
                         new DirectDataChoice(
-                                this, "NCEP ProbsevereModels", modelName, modelName,
+                                this, "NCEP ProbsevereModels", modelFullName, modelFullName,
                                 Misc.newList(DataCategory.XGRF_CATEGORY), props);
 
             dataChoice0.setProperty("JsonWARNING", "folderName0");
