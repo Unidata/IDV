@@ -3112,8 +3112,11 @@ public class DrawingControl extends DisplayControlImpl {
     protected String getDefaultDisplayListTemplate() {
         if(datachoice != null) {
             String magStr = (String) datachoice.getProperty("KMLWARNING");
+            String idStr = datachoice.getStringId();
             if(magStr != null)
                 return MACRO_SHORTNAME + " - " + MACRO_LONGNAME ;
+            else if(idStr != null && idStr.contains("Probsevere"))
+                return MACRO_DISPLAYNAME + " - " + MACRO_TIMESTAMP;
         }
         return super.getDefaultDisplayListTemplate();
     }
