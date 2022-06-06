@@ -713,9 +713,75 @@ def StormRelativeHelicity(u, v, bottom, top, ux=0, vy=0):
   return GridMath.calculateHelicity(u ,v, bottom, top, ux, vy)
 
 def dryStaticEnergy(T,Z):
-    """ Calculates Dry Static Energy with Temperature and Geopotential Height. """
-    from ucar.visad.quantities import SpecificHeatCapacityOfDryAirAtConstantPressure,LatentHeatOfEvaporation,Gravity
-    cp=SpecificHeatCapacityOfDryAirAtConstantPressure.newReal()
-    g=Gravity.newReal()
+  """ Calculates Dry Static Energy with Temperature and Geopotential Height. """
+  from ucar.visad.quantities import SpecificHeatCapacityOfDryAirAtConstantPressure,LatentHeatOfEvaporation,Gravity
+  cp=SpecificHeatCapacityOfDryAirAtConstantPressure.newReal()
+  g=Gravity.newReal()
 # Geopotential Height in GFS data is apparently Geopotential, so omit the g multiplication
-    return cp*T + Z
+  return cp*T + Z
+
+def subtract3D2Dgrid(grid3d, grid2d):
+  """ Computes a vertical substract of a 2D grid.
+  """
+  from visad import FieldImpl
+  from visad import FlatField
+  from visad import Real
+  def twoDthreeDSubtract(grid_sample3d,grid_sample2d):
+     from visad import FlatField
+     levels=getLevels(grid_sample3d)
+     tempFF=FlatField(grid_sample3d.getType(),grid_sample3d.getDomainSet())
+
+     dims=range(len(grid_sample3d.getDomainSet().getLengths()))
+     leveldim=GridUtil.getSpatialDomain(grid_sample3d).getManifoldDimension()
+     dims.pop(leveldim-1)
+     latlonlen=1
+     for i in dims:
+         latlonlen=latlonlen*len(set(grid_sample3d.getDomainSet().getDoubles()[i]))
+     vals=grid_sample3d.getValues()[0]
+
+     levsF=grid_sample3d.getDomainSet().getDoubles()[2] #must be manifold dimension
+     levslice0=GridUtil.make2DGridFromSlice(grid_sample2d)
+     for level in levels:
+         levslice=GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid_sample3d,level))
+         diff_levslice=sub(levslice,levslice0)
+         ind=levsF.index(level)
+         vals[ind:ind+latlonlen]=diff_levslice.getValues()[0]
+     tempFF.setSamples([vals])
+     return tempFF
+  tempFI=grid3d.clone()
+  for i in range(len(grid3d)):
+      tempFI.setSample(i,twoDthreeDSubtract(grid3d.getSample(i),grid2d.getSample(i)),0)
+  return tempFI
+
+def multiply3D2Dgrid(grid3d, grid2d):
+  """ Computes a vertical substract of a 2D grid.
+  """
+  from visad import FieldImpl
+  from visad import FlatField
+  from visad import Real
+  def twoDthreeDMultiply(grid_sample3d,grid_sample2d):
+     from visad import FlatField
+     levels=getLevels(grid_sample3d)
+     tempFF=FlatField(grid_sample3d.getType(),grid_sample3d.getDomainSet())
+
+     dims=range(len(grid_sample3d.getDomainSet().getLengths()))
+     leveldim=GridUtil.getSpatialDomain(grid_sample3d).getManifoldDimension()
+     dims.pop(leveldim-1)
+     latlonlen=1
+     for i in dims:
+         latlonlen=latlonlen*len(set(grid_sample3d.getDomainSet().getDoubles()[i]))
+     vals=grid_sample3d.getValues()[0]
+
+     levsF=grid_sample3d.getDomainSet().getDoubles()[2] #must be manifold dimension
+     levslice0=GridUtil.make2DGridFromSlice(grid_sample2d)
+     for level in levels:
+         levslice=GridUtil.make2DGridFromSlice(GridUtil.sliceAtLevel(grid_sample3d,level))
+         multiply_levslice=mul(levslice,levslice0)
+         ind=levsF.index(level)
+         vals[ind:ind+latlonlen]=multiply_levslice.getValues()[0]
+     tempFF.setSamples([vals])
+     return tempFF
+  tempFI=grid3d.clone()
+  for i in range(len(grid3d)):
+     tempFI.setSample(i,twoDthreeDMultiply(grid3d.getSample(i),grid2d.getSample(i)),0)
+  return tempFI
