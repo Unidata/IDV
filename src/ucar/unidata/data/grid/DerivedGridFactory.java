@@ -6907,5 +6907,374 @@ public class DerivedGridFactory {
         }
     }
 
+    /**
+     * Calculate the VirtualPotentialTemperature
+     *
+     * @param pressFI  wind
+     * @param temperFI  wind
+     * @param dewPtFI  wind
+     *
+     * @return  the angle
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl createVirtualPotentialTemperature(
+            FieldImpl pressFI, FieldImpl temperFI, FieldImpl dewPtFI)
+            throws VisADException, RemoteException {
 
+        FieldImpl                   vptFI = null;
+
+        // ept.create(pressure, temperFI, mixingRatioFI);
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI));
+
+        // get a grid of pressure values
+        Boolean ensble = (GridUtil.hasEnsemble(temperFI));
+        TupleType    rangeType = null;
+        FunctionType innerType = null;
+
+
+        if (isSequence) {
+            // Implementation:  have to take the raw time series of data FieldImpls
+            // apart, make the ept FlatField by FlatField (for each time step),
+            // and put all back together again into a new FieldImpl with all times.
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample RH to match domainSet (list of times) of temperFI.
+            // If they are the same, this should be a no-op.
+            if (timeSet.getLength() > 1) {
+                dewPtFI = (FieldImpl) dewPtFI.resample(timeSet);
+            }
+
+            // compute each FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sampleT   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sampleD   = (FieldImpl) dewPtFI.getSample(i);
+                    FieldImpl sampleP   = (FieldImpl) pressFI.getSample(i);
+
+                    Set       ensDomain = sampleT.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerFieldP =
+                                (FlatField) sampleP.getSample(j, false);
+                        FlatField innerFieldT =
+                                (FlatField) sampleT.getSample(j, false);
+                        FlatField innerFieldD =
+                                (FlatField) sampleD.getSample(j, false);
+
+                        if ((innerFieldP == null) || (innerFieldT == null)) {
+                            continue;
+                        }
+                        FlatField innerdivFF = (FlatField)
+                                VirtualPotentialTemperature.createFromDewPoint(innerFieldP, innerFieldT, innerFieldD);
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                    DataUtility.getDomainType(ensDomain),
+                                    innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+
+
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (vptFI == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeSet.getType()).getDomain(),
+                                        funcFF.getType());
+                        vptFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    vptFI.setSample(i, funcFF, false);
+                } else {
+                    FlatField vptFF =
+                            (FlatField) VirtualPotentialTemperature.createFromDewPoint(
+                                    (FlatField) pressFI.getSample(i),
+                                    (FlatField) temperFI.getSample(i),
+                                    (FlatField) dewPtFI.getSample(i));
+
+                    // first time through
+                    if (i == 0) {
+                        FunctionType functionType =
+                                new FunctionType(
+                                        ((FunctionType) temperFI.getType()).getDomain(),
+                                        vptFF.getType());
+                        vptFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    vptFI.setSample(i, vptFF, false);
+                }
+            }  // end isSequence
+
+        }
+        // if one time only
+        else {
+            FlatField press = (FlatField) pressFI;
+            // make one FlatField
+            vptFI = (FieldImpl)VirtualPotentialTemperature.createFromDewPoint(
+                    press,
+                    (FlatField) temperFI,
+                    (FlatField) dewPtFI );
+
+        }  // end single time
+
+        return vptFI;
+
+    }
+
+    /**
+     * Calculate the VirtualTemperature
+     *
+     * @param pressFI  wind
+     * @param temperFI  wind
+     * @param dewPtFI  wind
+     *
+     * @return  the angle
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl createVirtualTemperature(
+            FieldImpl pressFI, FieldImpl temperFI, FieldImpl dewPtFI)
+            throws VisADException, RemoteException {
+
+        FieldImpl                   vtFI = null;
+
+        // ept.create(pressure, temperFI, mixingRatioFI);
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI));
+
+        // get a grid of pressure values
+        Boolean ensble = (GridUtil.hasEnsemble(temperFI));
+        TupleType    rangeType = null;
+        FunctionType innerType = null;
+
+
+        if (isSequence) {
+            // Implementation:  have to take the raw time series of data FieldImpls
+            // apart, make the ept FlatField by FlatField (for each time step),
+            // and put all back together again into a new FieldImpl with all times.
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample RH to match domainSet (list of times) of temperFI.
+            // If they are the same, this should be a no-op.
+            if (timeSet.getLength() > 1) {
+                dewPtFI = (FieldImpl) dewPtFI.resample(timeSet);
+            }
+
+            // compute each FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sampleT   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sampleD   = (FieldImpl) dewPtFI.getSample(i);
+                    FieldImpl sampleP   = (FieldImpl) pressFI.getSample(i);
+
+                    Set       ensDomain = sampleT.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerFieldP =
+                                (FlatField) sampleP.getSample(j, false);
+                        FlatField innerFieldT =
+                                (FlatField) sampleT.getSample(j, false);
+                        FlatField innerFieldD =
+                                (FlatField) sampleD.getSample(j, false);
+
+                        if ((innerFieldP == null) || (innerFieldT == null)) {
+                            continue;
+                        }
+                        FlatField innerdivFF = (FlatField)
+                                VirtualTemperature.createFromDewPoint(innerFieldP, innerFieldT, innerFieldD);
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                    DataUtility.getDomainType(ensDomain),
+                                    innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (vtFI == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeSet.getType()).getDomain(),
+                                        funcFF.getType());
+                        vtFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    vtFI.setSample(i, funcFF, false);
+                } else {
+                    FlatField vptFF =
+                            (FlatField) VirtualTemperature.createFromDewPoint(
+                                    (FlatField) pressFI.getSample(i),
+                                    (FlatField) temperFI.getSample(i),
+                                    (FlatField) dewPtFI.getSample(i));
+
+                    // first time through
+                    if (i == 0) {
+                        FunctionType functionType =
+                                new FunctionType(
+                                        ((FunctionType) temperFI.getType()).getDomain(),
+                                        vptFF.getType());
+                        vtFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    vtFI.setSample(i, vptFF, false);
+                }
+            }  // end isSequence
+
+        }
+        // if one time only
+        else {
+            FlatField press = (FlatField) pressFI;
+            // make one FlatField
+            vtFI = (FieldImpl)VirtualTemperature.createFromDewPoint(
+                    press,
+                    (FlatField) temperFI,
+                    (FlatField) dewPtFI );
+
+        }  // end single time
+
+        return vtFI;
+
+    }
+
+    public static int getIndexOfLargest(float[] a) {
+        if (a == null || a.length == 0) return -1; // null or empty
+
+        int largest = 0;
+        for (int i = 1; i < a.length; i++) {
+            if (a[i] > a[largest]) largest = i;
+        }
+        return largest; // position of the first largest found
+    }
+
+    public static float interpolateMaxHeight(FieldImpl grid, float lat0, float lon0, float alt0)
+            throws VisADException, RemoteException{
+        float h = 0;
+        float deltaAlt = 20;
+        float preVal = 0;
+        float    degreesToRadians = (float) (Math.PI / 180.0);
+        for(int i = 1; i< 1000; i++) {
+            float alt = alt0 + deltaAlt * i ;
+            EarthLocation el = new EarthLocationLite(lat0, lon0, alt);
+            FieldImpl f1  = GridUtil.sample(grid, el.getLatLonPoint(),
+                    GridUtil.DEFAULT_SAMPLING_MODE, GridUtil.DEFAULT_ERROR_MODE);
+            if(f1.getFloats()[0][0] >= preVal) {
+                h = alt;
+            } else {
+                preVal = f1.getFloats()[0][0];
+            }
+        }
+        return h;
+    }
+
+    public static FieldImpl extractMaxGridSurface(FieldImpl theta, float theta0)
+            throws VisADException, RemoteException {
+        boolean copy = true;
+        FieldImpl pFI = DerivedGridFactory.createPressureGridFromDomain(
+                (FlatField) theta.getSample(0));;
+        FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
+        float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
+        float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
+        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
+        if ((domainSet.getDimension() != 3)) {
+            throw new VisADException("slice is not 3D ");
+        }
+        Gridded2DSet new2DDomainSet = GridUtil.makeDomain2D(domainSet);
+        float[][] geoVals  = GridUtil.getEarthLocationPoints((GriddedSet) new2DDomainSet);
+        TupleType paramType = GridUtil.getParamType(theta);
+        FunctionType rangeFT =
+                new FunctionType(((SetType) new2DDomainSet.getType()).getDomain(),
+                        Altitude.getRealTupleType());
+
+        FieldImpl newFieldImpl = null;
+
+        if (GridUtil.isSequence(theta) ) {
+            // could be (time -> (domain -> value))   or
+            //          (time -> (index -> (domain -> value)))  or
+            //          (index -> (domain -> value))
+
+            try {
+
+                Set sequenceSet = Util.getDomainSet(theta);
+                int numSteps    = sequenceSet.getLength();
+                MathType sequenceType =
+                        ((SetType) sequenceSet.getType()).getDomain();
+
+                FieldImpl firstSample = (FieldImpl) theta.getSample(0, false);
+                boolean      hasInnerSteps = GridUtil.isSequence(firstSample);
+
+                FunctionType newFieldType;
+                FunctionType innerFieldType = null;
+
+                if ( !(GridUtil.isSequence(firstSample))) {
+
+                    newFieldType = new FunctionType(sequenceType, rangeFT);
+
+                } else {
+                    innerFieldType = new FunctionType(
+                            ((FunctionType) firstSample.getType()).getDomain(),
+                            rangeFT);
+
+                    newFieldType = new FunctionType(sequenceType,
+                            innerFieldType);
+
+                }
+                newFieldImpl = new FieldImpl(newFieldType, sequenceSet);
+
+                // get each grid in turn; change domain;
+                // set result into new sequence
+                for (int i = 0; i < numSteps; i++) {
+                    FieldImpl data = (FieldImpl) theta.getSample(i, false);
+                    //FieldImpl datap = (FieldImpl) hPI.getSample(i, false);
+
+
+                    FieldImpl fi;
+                    if (data.isMissing()) {
+                        fi = data;
+                    } else {
+                        float[][][] dataA = convert3Darray((FlatField) data, 0);
+                        int sizeX = ((Gridded3DSet) domainSet).getLengths()[0];
+                        int sizeY = ((Gridded3DSet) domainSet).getLengths()[1];
+                        float [][] newdata = new  float[1][sizeX*sizeY];
+                        // float [][] newdata0 = new  float[sizeY][sizeX];
+                        for (int jj = 0; jj < sizeY; jj++) {
+                            for (int ii = 0; ii < sizeX; ii++) {
+                                float lat0 = geoVals[0][jj * (sizeX) + ii];
+                                float lon0 = geoVals[1][jj * (sizeX) + ii];
+                                float alt0 = 0;
+                                //newdata[0][jj * (sizeX) + ii] = linearInterpolateHeight(dataA[jj][ii],  dataAP[jj][ii], theta0, isDecrese);
+                                newdata[0][jj * (sizeX) + ii] =   interpolateMaxHeight(data, lat0, lon0, alt0);
+                            }
+                        }
+                        fi = new FlatField(rangeFT, new2DDomainSet);
+                        ((FlatField) fi).setSamples(newdata, false);
+                    }
+                    newFieldImpl.setSample(i, fi);
+                }
+            } catch (RemoteException re) {}
+        } else {  // single time
+            if ( !theta.isMissing()) {
+                newFieldImpl = new FlatField(rangeFT, new2DDomainSet);
+                try {
+                    ((FlatField) newFieldImpl).setSamples(
+                            theta.getFloats(copy), false);
+                } catch (RemoteException re) {}
+            } else {
+                newFieldImpl = theta;
+            }
+        }
+
+        return newFieldImpl;
+    }
 }
