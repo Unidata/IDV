@@ -467,3 +467,9 @@ def heatIndex(gridtemp, gridrh):
 
 def timeStepAccumulatedPrecip(grid):
   return DerivedGridFactory.timeStepAccumulatedPrecip(grid)
+
+def virtualTemperature(p, t, dp):
+  return DerivedGridFactory.createVirtualTemperature(p, t, dp)
+
+def virtualPotentialTemperature(p, t, dp):
+  return DerivedGridFactory.createVirtualPotentialTemperature(p, t, dp)
