@@ -298,7 +298,7 @@ public class JsonDataSource extends FilesDataSource {
 
         this.descriptor = descriptor;
         if(probSevereUrl == null || probSevereUrl.length() == 0)
-            setName("JSON: NCEP PROBSEVERE(server)" );
+            setName("JSON: NCEP ProbSevere(server)" );
         else
             setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(probSevereUrl)));
         initPolygonColorMap();
@@ -1198,7 +1198,7 @@ public class JsonDataSource extends FilesDataSource {
         noDisplayCatList.add(DataCategory.NONE_CATEGORY);
         CompositeDataChoice newParentDataChoice =
                 new CompositeDataChoice(
-                        this, "All Warning", "Probsevere Models", "Probability Severe Weather Models" ,
+                        this, "All Warning", "ProbSevere Models", "Probability Severe Weather Models" ,
                         noDisplayCatList);
         //newParentDataChoice.setProperty("JsonWARNING", "folderName");
         //newParentDataChoice.setUseDataSourceToFindTimes(true);
@@ -1220,7 +1220,7 @@ public class JsonDataSource extends FilesDataSource {
                     "/ucar/unidata/ui/symbol/images/" + modelName + ".png");
             DataChoice  dataChoice0 =
                         new DirectDataChoice(
-                                this, "NCEP ProbsevereModels", modelFullName, modelFullName,
+                                this, "NCEP ProbSevereModels", modelFullName, modelFullName,
                                 Misc.newList(DataCategory.XGRF_CATEGORY), props);
 
             dataChoice0.setProperty("JsonWARNING", "folderName0");
@@ -1430,6 +1430,12 @@ public class JsonDataSource extends FilesDataSource {
                             String coordStr = (String) coordsNporperties.get("coordinates");
                             String probStr = (String)coordsNporperties.get("properties");
                             //String coordsStr = (String) dcproperties.get("coordStr");
+                            List toks = StringUtil.split(probStr, "\n", false, true);
+                            String[] stockArr = new String[toks.size()];
+                            toks.toArray(stockArr);
+                            StringUtil.string_Sort(stockArr, 0, 6);
+                            String probStr0 = String.join("\n", stockArr);
+                            probStr = probStr0.replaceAll("LINE\\d\\d=", "");
                             dcproperties.put(name, probStr);
                             StringBuffer sb0 = new StringBuffer("<shapes>\n");
                             sb0 = sb0.append(coordStr);
