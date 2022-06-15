@@ -2540,6 +2540,42 @@ public class StringUtil {
     return "a";
   }
 
+  /**
+   * sort a string array by comparing the sub string
+   *
+   * @param substart sub string start index
+   * @param subend sub string end index
+   *
+   */
+  public static void string_Sort(String my_arr[], int substart, int subend){
+    boolean swapped = true;
+    int start = 0;
+    int end = my_arr.length;
+    while (swapped == true) {
+      swapped = false;
+      for (int i = start; i < end - 1; ++i) {
+        if (my_arr[i].substring(substart, subend).compareTo(my_arr[i + 1].substring(substart, subend)) > 0) {
+          String temp = my_arr[i];
+          my_arr[i] = my_arr[i + 1];
+          my_arr[i + 1] = temp;
+          swapped = true;
+        }
+      }
+      if (swapped == false)
+        break;
+      swapped = false;
+      end = end - 1;
+      for (int i = end - 1; i >= start; i--) {
+        if (my_arr[i].substring(substart, subend).compareTo(my_arr[i + 1].substring(substart, subend)) > subend){
+          String temp = my_arr[i];
+          my_arr[i] = my_arr[i + 1];
+          my_arr[i + 1] = temp;
+          swapped = true;
+        }
+      }
+      start = start + 1;
+    }
+  }
 
 }
 
