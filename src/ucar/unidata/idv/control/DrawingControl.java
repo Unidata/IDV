@@ -31,6 +31,7 @@ import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.control.drawing.DrawingCommand;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
 import ucar.unidata.idv.control.drawing.FrontGlyph;
@@ -98,20 +99,7 @@ import java.rmi.RemoteException;
 
 import java.util.*;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.AbstractTableModel;
@@ -341,6 +329,15 @@ public class DrawingControl extends DisplayControlImpl {
 
     /** Keep around for the label macros */
     private String glyphNameText;
+
+    /** Keep around for the legend */
+    protected JTextArea legendNoteTextArea;
+
+    /** Show the table in the legend */
+    private boolean showNoteInLegend = false;
+
+    /** Keep around for the legend */
+    protected JComponent legendNoteWrapper;
     /**
      * Create a new Drawing Control; set attributes.
      */
@@ -3135,4 +3132,94 @@ public class DrawingControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * Assume that any display controls that have a color table widget
+     * will want the color table to show up in the legend.
+     *
+     * @param  legendType  type of legend
+     * @return The extra JComponent to use in legend
+     */
+    protected JComponent getExtraLegendComponent(int legendType) {
+        JComponent parentComp = super.getExtraLegendComponent(legendType);
+        if (legendType == BOTTOM_LEGEND) {
+            return parentComp;
+        }
+
+        setShowNoteInLegend(showNoteInLegend);
+        return GuiUtils.vbox(parentComp, this.legendNoteWrapper);
+
+    }
+
+
+    /**
+     *  Set the show html item
+     *
+     *  @param items The items of view menu
+     */
+    protected void getViewMenuItems(List items, boolean forMenuBar) {
+        super.getViewMenuItems(items, forMenuBar);
+        ViewManager viewManager = getViewManager();
+        items.add(GuiUtils.MENU_SEPARATOR);
+        items.add(GuiUtils.makeCheckboxMenuItem("Show Text Note In Legend",
+                this,
+                "showNoteInLegend",
+                null));
+        if (forMenuBar) {
+            JMenu hovMenu = viewManager.makeViewMenu();
+            hovMenu.setText("Text/Html View");
+            items.add(hovMenu);
+        }
+    }
+
+    /**
+     *  Set the ShowNoteInLegend property.
+     *
+     *  @param value The new value for ShowTable
+     */
+    public void setShowNoteInLegend(boolean value) {
+        showNoteInLegend = value;
+        if (legendNoteTextArea == null) {
+            legendNoteTextArea = new JTextArea(10, 20);
+            if (initNoteText != null) {
+                legendNoteTextArea.setText(initNoteText);
+            }
+            JScrollPane sp =
+                    new JScrollPane(
+                            legendNoteTextArea,
+                            ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+            JViewport vp = sp.getViewport();
+            vp.setViewSize(new Dimension(20, 10));
+            legendNoteWrapper = GuiUtils.inset(sp, 4);
+        }
+
+        legendNoteTextArea.setVisible(value);
+        legendNoteWrapper.setVisible(value);
+
+        updateLegendLabel();
+    }
+
+    /**
+     *  Get the ShowNoteInLegend property.
+     *
+     */
+    public boolean getShowNoteInLegend() {
+        return showNoteInLegend;
+    }
+
+    /**
+     * Set the value of the note text area.
+     *
+     * @param n The note text
+     */
+    public void setNoteText(String n) {
+        initNoteText = n;
+        if (noteTextArea != null) {
+            noteTextArea.setText(n);
+        }
+        if(legendNoteTextArea != null){
+            legendNoteTextArea.setText(n);
+        }
+    }
 }
