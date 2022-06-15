@@ -359,7 +359,7 @@
       fileselection="true"
       standalone="true"
       factory="ucar.unidata.data.gis.JsonDataSource"
-      label="PROBSEVERE (from NCEP server)"/>
+      label="ProbSevere (from NCEP server)"/>
 
   <datasource
      id="STORM.ATCF"
