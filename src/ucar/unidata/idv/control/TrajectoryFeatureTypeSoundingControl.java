@@ -21,16 +21,17 @@
 package ucar.unidata.idv.control;
 
 
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.JComboBox;
+import javax.swing.*;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSource;
@@ -41,17 +42,9 @@ import ucar.unidata.data.sounding.TrajectoryFeatureTypeAdapter;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 import ucar.visad.Util;
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.IndicatorPoint;
-import ucar.visad.display.LineDrawing;
-import ucar.visad.display.PickableLineDrawing;
-import visad.ActionImpl;
-import visad.Data;
-import visad.DateTime;
-import visad.Field;
-import visad.RealTuple;
-import visad.RealTupleType;
-import visad.VisADException;
+import ucar.visad.display.*;
+import ucar.visad.functiontypes.AirTemperatureProfile;
+import visad.*;
 import visad.georef.LatLonPoint;
 import visad.georef.NamedLocationTuple;
 
@@ -100,6 +93,19 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
 
     /** _more_          */
     private List<DateTime> timeList;
+
+    /** _more_ */
+    Hashtable<String, List> stationsTimes;
+
+    /** _more_ */
+    Hashtable<String, Set> stationsTimeSet;
+
+    /** _more_ */
+    private DisplayableData timesHolder;
+
+
+    /** _more_ */
+    private Container container;
 
     /**
      * Constructs from nothing.
@@ -255,6 +261,8 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
         latLons    = new LatLonPoint[len];
         dataList   = new ArrayList();
         timeList   = new ArrayList();
+        stationsTimes   = new Hashtable<String, List>();
+        stationsTimeSet = new Hashtable<String, Set>();
 
         for (int i = 0; i < len; i++) {
             TrajectoryFeatureTypeAdapter cta   = adapters.get(i);
@@ -266,11 +274,38 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
             NamedLocationTuple s = cfti.getLatLonPoint();
             latLons[i]    = s.getLatLonPoint();
             stationIds[i] = s.getIdentifier().getValue();
+            List<DateTime> stimeList  = stationsTimes.get(stationIds[i]);
+            if(stimeList == null){
+                stimeList = new ArrayList<DateTime>();
+                stationsTimes.put(stationIds[i], stimeList);
+            }
+            stimeList.add(cfti.getStartTime());
             timeList.add(cfti.getStartTime());
         }
 
+        for (int i = 0; i < stationIds.length; i++) {
+            String     st        =  stationIds[i];
+            stationsTimeSet.put(st, Util.makeTimeSet(stationsTimes.get(st)));
+        }
         return true;
 
+    }
+
+    /**
+     * Collect the time animation set from the displayables.
+     * If none found then return null.
+     *
+     * @return Animation set
+     *
+     * @throws RemoteException On badness
+     * @throws VisADException On badness
+     */
+    protected Set getDataTimeSet() throws RemoteException, VisADException {
+        Set aniSet = null;
+        int index  = getSelectedStationIndex();
+        aniSet = stationsTimeSet.get(stationIds[index]);
+
+        return aniSet;
     }
 
 
@@ -368,9 +403,40 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
 
             }
         });
+        Set times = getDataTimeSet();
+        RealType timeType =
+                (RealType) ((SetType) times.getType()).getDomain().getComponent(
+                        0);
+        if (timesHolder == null) {
+            timesHolder = new LineDrawing("times ref");
+        }
 
-        return GuiUtils.top(GuiUtils.inset(GuiUtils.label("Soundings: ",
-                stationMenue), 8));
+        /*
+         * Add a data object to the display that has the right
+         * time-centers.
+         */
+        Field dummy = new FieldImpl(new FunctionType(timeType,
+                AirTemperatureProfile.instance()), times);
+
+        for (int i = 0, n = times.getLength(); i < n; i++) {
+            dummy.setSample(
+                    i, AirTemperatureProfile.instance().missingData());
+        }
+
+        timesHolder.setData(dummy);
+
+        Animation animation = getInternalAnimation(timeType);
+        getSoundingView().setExternalAnimation(animation,
+                getAnimationWidget());
+        aeroDisplay.addDisplayable(animation);
+        aeroDisplay.addDisplayable(timesHolder);
+
+        container = Box.createHorizontalBox();
+        //Wrap these components so they don't get stretched in the Y direction
+        container.add(GuiUtils.wrap(getAnimationWidget().getContents(false)));
+
+        return GuiUtils.topBottom(GuiUtils.inset(GuiUtils.label("Soundings: ",
+                stationMenue), 8), container);
     }
 
     /**
@@ -387,6 +453,12 @@ public class TrajectoryFeatureTypeSoundingControl extends AerologicalSoundingCon
         setLocation(latLons[index]);
         initSounding(dataList.get(index));
         getSoundingView().updateDisplayList();
+        Set times = getDataTimeSet();
+        RealType timeType =
+                (RealType) ((SetType) times.getType()).getDomain().getComponent(
+                        0);
+        Animation animation = getAnimation();
+        animation.setSet(times);
     }
 
     /**
