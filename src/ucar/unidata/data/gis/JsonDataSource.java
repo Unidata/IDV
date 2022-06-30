@@ -462,8 +462,8 @@ public class JsonDataSource extends FilesDataSource {
             String gval = XmlUtil.getAttribute(serverNode, "g");
             String rval = XmlUtil.getAttribute(serverNode, "r");
 
-            float[] values = new float[]{Float.parseFloat(aval), Float.parseFloat(bval),
-                    Float.parseFloat(gval), Float.parseFloat(rval),};
+            float[] values = new float[]{Float.parseFloat(rval),Float.parseFloat(gval),
+                    Float.parseFloat(bval),Float.parseFloat(aval)};
 
             colors.add(values);
         }
@@ -844,13 +844,15 @@ public class JsonDataSource extends FilesDataSource {
     private  String getCoordinates( JSONArray coords, String prob) {
         String outStr = coords.toJSONString();
         float probability = Float.parseFloat(prob);
-        int idx = (int)(256*(probability/100.0)) - 1;
+        int idx = (int)(255*(probability/100.0)) ;
         String colorStr = "255,0,0";
-        if(this.colorMap != null && idx > 0){
+        //if(probability > 40)
+        //    System.out.println("here");
+        if(this.colorMap != null ){
             float [] values = (float [])this.colorMap.get(idx);
-            int blue = (int)(values[1] * 255);
-            int green = (int)(values[2] * 255);
-            int red = (int)(values[3] * 255);
+            int blue = (int)(values[2]*255 );
+            int green = (int)(values[1]*255);
+            int red = (int)(values[0]*255);
             colorStr = red  +  "," + green + "," + blue;
         }
         outStr = outStr.replaceAll("\\[", "");
