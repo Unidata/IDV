@@ -2566,7 +2566,7 @@ public class StringUtil {
       swapped = false;
       end = end - 1;
       for (int i = end - 1; i >= start; i--) {
-        if (my_arr[i].substring(substart, subend).compareTo(my_arr[i + 1].substring(substart, subend)) > subend){
+        if (my_arr[i].substring(substart, subend).compareTo(my_arr[i + 1].substring(substart, subend)) > 0){
           String temp = my_arr[i];
           my_arr[i] = my_arr[i + 1];
           my_arr[i + 1] = temp;
