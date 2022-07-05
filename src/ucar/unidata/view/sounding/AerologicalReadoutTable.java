@@ -146,7 +146,7 @@ public final class AerologicalReadoutTable extends JTable {
      * The CIN readout.
      */
     private CinReadout cinReadout;
-
+    private  BoundaryLayerHeightReadout blhReadout;
     /**
      * Constructs from nothing.
      *
@@ -177,7 +177,7 @@ public final class AerologicalReadoutTable extends JTable {
             lclAltitudeReadout          = new LCLAltitudeReadout();
             capeReadout                 = new CapeReadout();
             cinReadout                  = new CinReadout();
-
+            blhReadout                  = new BoundaryLayerHeightReadout();
             // Background:
             tableModel.addRowEntry(new SeparatorRowEntry("Background:"));
             tableModel.addRowEntry(new RealRowEntry(pressureReadout, "    "));
@@ -239,6 +239,8 @@ public final class AerologicalReadoutTable extends JTable {
 
         tableModel.addRowEntry(new RealRowEntry(capeReadout, ""));
         tableModel.addRowEntry(new RealRowEntry(cinReadout, ""));
+        tableModel.addRowEntry(new SeparatorRowEntry("Boundary Layer:"));
+        tableModel.addRowEntry(new RealRowEntry(blhReadout, "    "));
         setModel(tableModel);
 
         TableColumnModel columnModel = getColumnModel();
@@ -435,6 +437,13 @@ public final class AerologicalReadoutTable extends JTable {
         cinReadout.setCin(cin);
     }
 
+    /**
+     * Sets the profile BLH property.
+     * @param h       The new profile blh.
+     */
+    public void setBlh(Real h) {
+        blhReadout.setBlh(h);
+    }
     /**
      * Sets the width of a column.
      * @param table             The table.
@@ -1380,6 +1389,36 @@ public final class AerologicalReadoutTable extends JTable {
             }
         }
     }
+
+
+    /**
+     * Provides support for boundary layer height readouts.
+     */
+    protected class BoundaryLayerHeightReadout extends MyReadout {
+
+        /**
+         * Constructs from nothing.
+         * @throws ParseException       Invalid internal unit specification.
+         */
+        public BoundaryLayerHeightReadout() throws ParseException {
+            super("Height", "m", 2);
+        }
+
+        /**
+         * Sets the value of the blh property.
+         * @param blh           The new value.
+         */
+        public void setBlh(Real blh) {
+
+            try {
+                setReal(blh);
+            } catch (Exception e) {
+                System.err.println("Couldn't set BLH readout: " + e);
+            }
+        }
+    }
+
+
 }
 
 
