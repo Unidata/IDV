@@ -57,6 +57,7 @@ import ucar.visad.display.CompositeDisplayable;
 import ucar.visad.display.Displayable;
 import ucar.visad.display.FrontDrawer;
 
+import ucar.visad.quantities.CommonUnits;
 import visad.Data;
 import visad.DateTime;
 import visad.DisplayEvent;
@@ -3264,7 +3265,33 @@ public class DrawingControl extends DisplayControlImpl {
         }
     }
 
+    /**
+     * Hook method to allow derived classes to return a different
+     * initial {@link ucar.unidata.util.Range}
+     *
+     * @return The initial range to use
+     *
+     * @throws RemoteException    Java RMI problem
+     * @throws VisADException     VisAD problem
+     */
     protected Range getInitialRange() throws RemoteException, VisADException {
-        return new Range(0, 100);
+        if (showName) {
+            return new Range(0, 100);
+        } else {
+            return null;
+        }
+
+    }
+
+    /**
+     * Return the display unit
+     *
+     * @return The display unit
+     */
+    public Unit getDisplayUnit() {
+        if (showName) {
+            displayUnit = CommonUnits.PERCENT;
+        }
+        return displayUnit;
     }
 }
