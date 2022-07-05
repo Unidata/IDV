@@ -73,6 +73,7 @@ import java.beans.PropertyChangeListener;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.*;
@@ -904,6 +905,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
                 soundingTable.setCurrentSounding(currIndex);
 
+
             } catch (VisADException ex) {
                 // need to get the actual data for manipulation
                 Sounding s = aeroDisplay.getActiveSounding();
@@ -947,6 +949,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         dewProRef.setData(dewPro);
         tempProRef.setData(tempPro);
         windProRef.setData(windPro);
+        float blh = computeBLH((FlatField)tempPro);
+        readoutTable.setBlh(new Real(blh));
         updateLegendAndList();
     }
 
@@ -1034,6 +1038,11 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
         soundingTable.setSoundings(tableSoundings);
         soundingTable.setCurrentSounding(currIndex);
+        //calculate BLH here and update sounding Table
+        float blh = computeBLH((FlatField) tempPros[0]);
+
+        readoutTable.setBlh(new Real(blh));
+
         if (viewTabs != null) {
             viewTabs.setEnabledAt(viewTabs.indexOfTab(HODOGRAPH_DISPLAY),
                                   haveWinds);
@@ -1043,6 +1052,42 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         setSounding(currIndex);
     }
 
+    /**
+     * Provides blh based on the temperature profile.
+     */
+    public float computeBLH(FlatField tempPros) throws VisADException, RemoteException {
+        float blh = 0.0f;
+        Set              domain     = tempPros.getDomainSet();
+        CoordinateSystem cs         = domain.getCoordinateSystem();
+
+        float[][] domSamples = domain.getSamples(false);
+        float[][] domFloats = Set.copyFloats(domSamples);
+        float[] altData = cs.toReference(domFloats)[0];
+        int altStartIdx = 0;
+        int altEndIdx = 0;
+        // pressure value domFloats smaller is higher
+        boolean isDescending = domFloats[0][0] < domFloats[0][1];
+        if(isDescending){
+            altEndIdx = altData.length-1;
+            while (Float.isNaN(altData[altStartIdx]) || altData[altStartIdx] > 5000) {
+                altStartIdx++;
+            }
+        } else {
+            while (Float.isNaN(altData[altEndIdx]) || altData[altEndIdx] < 5000) {
+                altEndIdx++;
+            }
+        }
+        FlatField dtempdp = (FlatField)tempPros.derivative(0);
+        float [] tempgrd = Arrays.copyOfRange(dtempdp.getFloats()[0], altStartIdx, altEndIdx);
+        float [] alt = Arrays.copyOfRange(altData, altStartIdx, altEndIdx);
+
+        int[] sortedIdx = QuickSort.sort(tempgrd);
+        int index = 0;
+        //if(Math.abs(tempgrd[0]) < tempgrd[sortedIdx.length-1])
+         //   index = sortedIdx.length-1;
+
+        return alt[sortedIdx[index]];
+    }
     /**
      * <p>Returns the title of this display.</p>
      *
