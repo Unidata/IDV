@@ -248,7 +248,7 @@ public class JsonDataSource extends FilesDataSource {
 
         this.descriptor = descriptor;
         if(probSevereUrl == null || probSevereUrl.length() == 0)
-            setName("JSON: NCEP PROBSEVERE(server)" );
+            setName("JSON: NCEP ProbSevere (server)" );
         else
             setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(probSevereUrl)));
         initPolygonColorMap();
