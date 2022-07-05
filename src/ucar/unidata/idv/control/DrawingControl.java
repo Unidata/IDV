@@ -45,15 +45,10 @@ import ucar.unidata.idv.control.drawing.SymbolGlyph;
 import ucar.unidata.idv.control.drawing.TextGlyph;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.FineLineBorder;
-import ucar.unidata.util.ColorTable;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.PatternFileFilter;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.ui.colortable.ColorTableDefaults;
+import ucar.unidata.util.*;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
+import ucar.unidata.xml.XmlResourceCollection;
 import ucar.unidata.xml.XmlUtil;
 
 import ucar.visad.data.CalendarDateTime;
@@ -404,7 +399,7 @@ public class DrawingControl extends DisplayControlImpl {
         initDisplayUnit();
         displayHolder = new CompositeDisplayable();
         displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
-        addDisplayable(displayHolder);
+        addDisplayable(displayHolder, FLAG_COLORTABLE);
 
         List oldGlyphs = glyphs;
         glyphs = new ArrayList();
@@ -426,6 +421,7 @@ public class DrawingControl extends DisplayControlImpl {
                 setShowNoteText(true);
                 glyphNameText = datachoice.getName();
                 setDisplayName(glyphNameText);
+                setAttributeFlags(FLAG_COLORTABLE);
             }
             Data data = dataChoice.getData(dataSelection);
             if (data != null) {
@@ -437,6 +433,17 @@ public class DrawingControl extends DisplayControlImpl {
                     currentCmd = CMD_SELECT;
                     //setCurrentCommand(CMD_SELECT);
             }
+        /*    if (ctw == null) {
+                ColorTable colorTableToUse = getColorTableToApply();
+                ctw = new ColorTableWidget(this,
+                        controlContext.getColorTableManager(),
+                        ((colorTableToUse != null)
+                                ? colorTableToUse
+                                : controlContext
+                                .getColorTableManager()
+                                .getDefaultColorTable()), getRangeForColorTable());
+                addRemovable(ctw);
+            } */
         }
 
         return true;
@@ -770,7 +777,7 @@ public class DrawingControl extends DisplayControlImpl {
             //DisplayMaster if needed
             Displayable displayable = glyph.getDisplayable();
             displayable.setUseTimesInAnimation(getUseTimesInAnimation());
-            displayHolder.addDisplayable(displayable);
+            addDisplayable(displayable, FLAG_COLORTABLE);
             if ( !glyph.initFinal()) {
                 return false;
             }
@@ -1706,6 +1713,7 @@ public class DrawingControl extends DisplayControlImpl {
             }
             tabbedPane.add("Shapes", doMakeShapesPanel());
         }
+
         return GuiUtils.centerBottom(tabbedPane, msgLabel);
     }
 
@@ -3221,5 +3229,42 @@ public class DrawingControl extends DisplayControlImpl {
         if(legendNoteTextArea != null){
             legendNoteTextArea.setText(n);
         }
+    }
+
+    /**
+     * The specific color table here is for the ProbSevere display
+     *
+     * @return The color table to use
+     */
+    protected ColorTable getInitialColorTable() {
+        if(showName) {
+            List resources =
+                    Misc.newList("/ucar/unidata/idv/resources/probsevere_cmap.xml");
+            XmlResourceCollection colorMapResources = new XmlResourceCollection("", resources);
+            Element root = colorMapResources.getRoot(0);
+            List colorNodes = XmlUtil.findChildren(root, "color");
+            float[][] pl = new float[4][colorNodes.size()];
+            for (int i = 0; i < colorNodes.size(); i++) {
+                Element serverNode = (Element) colorNodes.get(i);
+                String aval = XmlUtil.getAttribute(serverNode, "a");
+                String bval = XmlUtil.getAttribute(serverNode, "b");
+                String gval = XmlUtil.getAttribute(serverNode, "g");
+                String rval = XmlUtil.getAttribute(serverNode, "r");
+                pl[3][i] = Float.parseFloat(aval);
+                pl[2][i] = Float.parseFloat(bval);
+                pl[1][i] = Float.parseFloat(gval);
+                pl[0][i] = Float.parseFloat(rval);
+
+            }
+            ColorTable ct = new ColorTable("probsevereColorMap", "Basic", pl);
+            ct.setRange(new Range(0, 100));
+            return ct;
+        } else {
+            return super.getInitialColorTable();
+        }
+    }
+
+    protected Range getInitialRange() throws RemoteException, VisADException {
+        return new Range(0, 100);
     }
 }
