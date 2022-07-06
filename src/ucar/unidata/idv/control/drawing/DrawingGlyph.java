@@ -1165,16 +1165,20 @@ public abstract class DrawingGlyph {
                 DateTime[] dateTimes = animation.getTimes();
                 int len = dateTimes.length;
                 DateTime t0 = dateTimes[0];
-                DateTime t1 = dateTimes[1];
-
-                double intval = (t1.getValue() - t0.getValue())/2.0;
-
-                if(myTime.getValue() > (currentAnimationTime.getValue() - intval)
-                        && myTime.getValue() < (currentAnimationTime.getValue() + intval)){
+                if(len == 1) {
                     setVisible(true);
-                } else{
-                    setVisible(false);
-                    //System.out.println("hhh");
+                } else {
+                    DateTime t1 = dateTimes[1];
+
+                    double intval = (t1.getValue() - t0.getValue()) / 2.0;
+
+                    if (myTime.getValue() > (currentAnimationTime.getValue() - intval)
+                            && myTime.getValue() < (currentAnimationTime.getValue() + intval)) {
+                        setVisible(true);
+                    } else {
+                        setVisible(false);
+                        //System.out.println("hhh");
+                    }
                 }
             }
         } else {
