@@ -1183,6 +1183,8 @@ public abstract class DrawingGlyph {
             }
         } else {
             //Else work the visad magic
+            if(currentAnimationTime == null)
+                return;
             float timeValueFloat = (float) currentAnimationTime.getValue(
                                        timeSet.getSetUnits()[0]);
             //            System.err.println("multiple times:" + timeValueFloat);
