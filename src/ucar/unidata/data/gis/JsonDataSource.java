@@ -171,27 +171,27 @@ public class JsonDataSource extends FilesDataSource {
                           Hashtable properties) throws VisADException, Exception {
 
         super(descriptor, newSources, "JSON data source", properties);
-        String name = "ddd";
-        int idx = name.indexOf("?");
-        if (idx >= 0) {
-            name = name.substring(0, idx);
-            setName(name);
-        }
-
-        if (getName().length() == 0) {
-            if (newSources.size() > 0) {
-                String s = newSources.get(0).toString();
-                idx = s.indexOf("?");
-                if (idx >= 0) s = s.substring(0, idx);
-                setName(s);
-            } else {
-                //setName(description);
-            }
-        }
         this.sources = newSources;
+        try {
+            int size = this.sources.size();
+            for(int i = 0; i < size; i++) {
+                String fPath = (String)this.sources.get(i);
+                parseJSONHead(fPath);
+            }
+            this.timeList = Misc.sort(this.timeList);
+            this.times = this.timeList;
+        } catch (Exception iexc) {
+            LogUtil.logException(
+                    "There was an error parsing the xml file:\n "
+                            + getFilePath(), iexc);
+            setInError(true, false, "");
+        }
         this.descriptor = descriptor;
+
+        setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail((String)sources.get(0))));
         initPolygonColorMap();
-        initGeoJsonDataSourceInner();
+        //initGeoJsonDataSource();
+        getIdv().getIdvUIManager().showDataSelector();
     }
     /**
      * Create a KmlDataSource from the specification given.
@@ -208,42 +208,24 @@ public class JsonDataSource extends FilesDataSource {
 
         super(descriptor, Misc.newList(probSevereUrl), "JSON data source", properties);
         if(probSevereUrl.length() == 0){
-            ArrayList defSources = new ArrayList();
-            ArrayList sourceTimes = new ArrayList();
-            String dateTimePattern = "yyyymmdd_hhnnss";
-            DatePattern dp       = new DatePattern(dateTimePattern);
-            org.jsoup.nodes.Document doc = Jsoup.connect(DEFAULT_PATH).get();
-            org.jsoup.select.Elements rows = doc.select("tr");
-            int size = rows.size();
-            org.jsoup.select.Elements rows0 = null;
-            //if(size > 30)
-            //    rows0 = new Elements(rows.subList(size- 300, size-1));
-            //else
-            //    rows0 = rows.clone();
-            for(org.jsoup.nodes.Element row :rows)
-            {
-                org.jsoup.select.Elements columns = row.select("td");
-                for (org.jsoup.nodes.Element column:columns)
-                {
-                    if(column.text().endsWith("json") ) {
-                        //System.out.print( column.text());
-                        int nn = column.text().length();
-                        String timeStr = column.text().substring(nn-20, nn-5);
-                        String ss = DEFAULT_PATH + column.text();
-                        if (dp.match(timeStr)) {
-                            defSources.add(ss);
-                            sourceTimes.add(dp.getDateTime());
-                        }
-
-                    }
-                }
-                //System.out.println();
-            }
-            this.sources = defSources;
-            this.times = sourceTimes;
+            init(DEFAULT_PATH);
             this.timeList = Misc.sort(this.times);
         } else {
             this.sources = Misc.newList(probSevereUrl);
+            try {
+                int size = this.sources.size();
+                for(int i = 0; i < size; i++) {
+                    String fPath = (String)this.sources.get(i);
+                    parseJSONHead(fPath);
+                }
+                this.timeList = Misc.sort(this.timeList);
+                this.times = this.timeList;
+            } catch (Exception iexc) {
+                LogUtil.logException(
+                        "There was an error parsing the xml file:\n "
+                                + getFilePath(), iexc);
+                setInError(true, false, "");
+            }
         }
 
         this.descriptor = descriptor;
@@ -301,8 +283,8 @@ public class JsonDataSource extends FilesDataSource {
             setName("JSON: NCEP ProbSevere(server)" );
         else
             setName("JSON: " + IOUtil.stripExtension(IOUtil.getFileTail(probSevereUrl)));
-        initPolygonColorMap();
-        getIdv().getIdvUIManager().showDataSelector();
+        //initPolygonColorMap();
+        //getIdv().getIdvUIManager().showDataSelector();
     }
 
     /**
@@ -630,14 +612,20 @@ public class JsonDataSource extends FilesDataSource {
                 return;
             } else if(getFilePath().startsWith(DEFAULT_PATH)){
                 init(DEFAULT_PATH);
+                String fPath = (String) this.sources.get(0);
+                //parseJSON(fPath);
+                this.timeList = Misc.sort(this.times);
+            } else {
+                int size = this.sources.size();
+                for (int i = 0; i < size; i++) {
+                    String fPath = (String) this.sources.get(i);
+                    parseJSONHead(fPath);
+                }
+                this.timeList = Misc.sort(this.timeList);
+                this.times = timeList;
             }
-
-            int size = this.sources.size();
-            //for (int i = 0; i < size; i++) {
-            String fPath = (String) this.sources.get(0);
-            parseJSON(fPath);
-            //}
-            this.timeList = Misc.sort(this.times);
+            this.timeList = Misc.sort(this.timeList);
+            this.times = timeList;
         } catch (Exception iexc) {
             LogUtil.logException(
                     "There was an error parsing the xml file:\n "
@@ -793,9 +781,52 @@ public class JsonDataSource extends FilesDataSource {
                     ploygons.put("Probability Tornado", ploygoncoordsTor);
                 }
                 jsonInfo.put(dts, ploygons);
+                timeList.add(dts);
             } else
                 jsonInfo.put("polygon", ploygoncoords);
             //this.timeList = Misc.sort(this.timeList);
+        } catch (IOException | ParseException | ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Get the time list information
+     *
+     * @param jsonUrl json url
+     * @return Root element
+     * @throws Exception On badness
+     */
+    protected void parseJSONHead(String jsonUrl) throws Exception {
+
+        //JSON parser object pour lire le fichier
+
+        JSONParser jsonParser = new JSONParser();
+        BufferedReader reader1 = null;
+        try {
+            // lecture du fichier
+            Object obj = null;
+            if(!jsonUrl.startsWith("http")) {
+                FileReader reader = new FileReader(jsonUrl);
+                obj = jsonParser.parse(reader);
+            } else {
+                obj = getRemoteJSON(jsonUrl);
+            }
+            JSONObject feature = (JSONObject) obj;
+            JSONArray features = (JSONArray) feature.get("features");
+            String dateTimePattern = "yyyyMMdd_hhnnss UTC";
+            DateTime dts = null;
+            String descrip = (String) feature.get("validTime");
+            if (descrip != null) {
+                //System.out.println(descrip);
+                DatePattern dp = new DatePattern(dateTimePattern);
+                if (dp.match(descrip)) {
+                    dts = dp.getDateTime();
+                }
+            }
+
+            timeList.add(dts);
         } catch (IOException | ParseException | ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -1001,7 +1032,7 @@ public class JsonDataSource extends FilesDataSource {
         schemas = new Hashtable();
         //HashMap polygonHMap = (HashMap)jsonInfo.get(timeList.get(0));
         //DateTime dt = (DateTime)timeList.get(0);
-        if(times.size()  > 0) {
+        if(   timeList.size() > 0) {
             processNode(null,   new ArrayList());
         }  else {
             processNodeNoTime(null,  new ArrayList());
@@ -1388,7 +1419,15 @@ public class JsonDataSource extends FilesDataSource {
             } else if(timeSL != null && timeSL.size() > 0) {
                 int size = timeSL.size();
                 for (int i = 0; i < size; i++) {
-                    int ii = (int) timeSL.get(i);
+                    int ii = i;
+                    if(timeSL.get(i) instanceof Integer) {
+                        if((int)timeSL.get(size-1) > this.sources.size()){
+                            ii = this.sources.size() - size + i;
+                        } else {
+                            ii = (int) timeSL.get(i);
+                        }
+                    }
+
                     String fPath = (String) this.sources.get(ii);
                     try {
                         parseJSON(fPath);
@@ -1399,11 +1438,98 @@ public class JsonDataSource extends FilesDataSource {
                 List pdata0 = new ArrayList();
 
                 for (int i = 0; i < size; i++) {
-                    int ii = (int) timeSL.get(i);
+                    int ii = i;
+                    if (timeSL.get(i) instanceof Integer) {
+                        if ((int) timeSL.get(size - 1) > this.sources.size()) {
+                            ii = this.sources.size() - size + i;
+                        } else {
+                            ii = (int) timeSL.get(i);
+                        }
+                    }
 
                     //KmlId id = (KmlId) tmp;
                     Hashtable dcproperties = dataChoice.getProperties();
                     dt = (DateTime) times.get(ii);
+                    //System.out.println(" ss " + dt);
+                    List subTimeList = getJsonTimes(dataSelection);
+                    //System.out.println(" ID " + id);
+
+                    if (dt != null)
+                        polygonInfo = (HashMap) jsonInfo.get(dt);
+                    else
+                        polygonInfo = (HashMap) jsonInfo.get("polygon");
+                    HashMap models = (HashMap) jsonInfo.get(dt);
+                    if(models == null)
+                        break;
+                    HashMap plyCoords = (HashMap) models.get(dataChoice.getDescription());
+                    Set keys = plyCoords.keySet();
+                    DateTime polygonTime = dt;
+
+                    if (subTimeList.contains(dt)) {
+                        String timeStr = null;
+                        if (polygonTime != null) {
+                            timeStr = polygonTime.toString();
+                            polygonInfo.put("time", timeStr);
+                        }
+                        for (Object k : keys) {
+                            String name = (String) k;
+                            // Hashtable newProperties = new Hashtable();
+                            HashMap coordsNporperties = (HashMap) plyCoords.get(k);
+                            String coordStr = (String) coordsNporperties.get("coordinates");
+                            String probStr = (String)coordsNporperties.get("properties");
+                            //String coordsStr = (String) dcproperties.get("coordStr");
+                            List toks = StringUtil.split(probStr, "\n", false, true);
+                            String[] stockArr = new String[toks.size()];
+                            toks.toArray(stockArr);
+                            StringUtil.string_Sort(stockArr, 0, 6);
+                            String probStr0 = String.join("\n", stockArr);
+                            probStr = probStr0.replaceAll("LINE\\d\\d=", "");
+                            dcproperties.put(name, probStr);
+                            StringBuffer sb0 = new StringBuffer("<shapes>\n");
+                            sb0 = sb0.append(coordStr);
+                            int idx = sb0.indexOf("polygon");
+                            String nameStr = "name=\"" + name + "\" ";
+                            String tStr = "times=\"" + timeStr + "\" ";
+                            sb0.insert(idx + 8, nameStr);
+                            sb0.insert(idx + 8 + nameStr.length(), tStr);
+                            sb0.append("</shapes>");
+                            pdata0.add(new visad.Text(sb0.toString()));
+                        }
+                    }
+                }
+                StringBuffer sb = new StringBuffer("<shapes>\n");
+                for (int j = 0; j < pdata0.size(); j++) {
+                    visad.Text vt = (visad.Text) pdata0.get(j);
+                    if (vt != null) {
+                        String ttt = vt.toString();
+                        ttt = ttt.replace("<shapes>\n", "");
+                        ttt = ttt.replace("</shapes>", "");
+                        sb = sb.append(ttt);
+                    }
+                }
+                sb.append("</shapes>");
+
+                //System.out.println(" ss " + sb);
+                return new visad.Text(sb.toString());
+            } else if(times0 != null && times0.size() > 0) {
+                int size = times0.size();
+                for (int i = 0; i < size; i++) {
+                    //int ii = (int) timeSL.get(i);
+                    String fPath = (String) this.sources.get(i);
+                    try {
+                        parseJSON(fPath);
+                    } catch (Exception eee) {
+                    }
+                }
+
+                List pdata0 = new ArrayList();
+
+                for (int i = 0; i < size; i++) {
+                    //int ii = (int) timeSL.get(i);
+
+                    //KmlId id = (KmlId) tmp;
+                    Hashtable dcproperties = dataChoice.getProperties();
+                    dt = (DateTime) times0.get(i);
                     //System.out.println(" ss " + dt);
                     List subTimeList = getJsonTimes(dataSelection);
                     //System.out.println(" ID " + id);
@@ -1519,7 +1645,15 @@ public class JsonDataSource extends FilesDataSource {
 
         if (timeSL != null && timeList != null) {
             for (int i = 0; i < timeSL.size(); i++) {
-                int ii = (int) timeSL.get(i);
+                int ii = i;
+                int size = timeSL.size();
+                if(timeSL.get(i) instanceof Integer) {
+                    if((int)timeSL.get(size-1) > this.sources.size()){
+                        ii = this.sources.size() - size + i;
+                    } else {
+                        ii = (int) timeSL.get(i);
+                    }
+                }
                 subTimeList.add(timeList.get(ii));
             }
             return subTimeList;
