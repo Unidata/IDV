@@ -1389,6 +1389,12 @@ public class JsonDataSource extends FilesDataSource {
                             String coordStr = (String) coordsNporperties.get("coordinates");
                             String probStr = (String)coordsNporperties.get("properties");
                             //String coordsStr = (String) dcproperties.get("coordStr");
+                            List toks = StringUtil.split(probStr, "\n", false, true);
+                            String[] stockArr = new String[toks.size()];
+                            toks.toArray(stockArr);
+                            StringUtil.string_Sort(stockArr, 0, 6);
+                            String probStr0 = String.join("\n", stockArr);
+                            probStr = probStr0.replaceAll("LINE\\d\\d=", "");
                             dcproperties.put(name, probStr);
                             StringBuffer sb0 = new StringBuffer("<shapes>\n");
                             sb0 = sb0.append(coordStr);
