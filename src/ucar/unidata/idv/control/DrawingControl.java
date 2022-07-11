@@ -31,6 +31,7 @@ import ucar.unidata.collab.Sharable;
 import ucar.unidata.data.CompositeDataChoice;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
+import ucar.unidata.idv.ControlContext;
 import ucar.unidata.idv.ViewManager;
 import ucar.unidata.idv.control.drawing.DrawingCommand;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
@@ -3136,7 +3137,7 @@ public class DrawingControl extends DisplayControlImpl {
         super.updateLegendLabel();
         // if the display label has the position, we'll update the list also
         String template = getDisplayListTemplate();
-        if (template.contains(MACRO_POSITION)) {
+        if (template != null && template.contains(MACRO_POSITION)) {
             updateDisplayList();
         }
     }
@@ -3206,7 +3207,7 @@ public class DrawingControl extends DisplayControlImpl {
         legendNoteTextArea.setVisible(value);
         legendNoteWrapper.setVisible(value);
 
-        updateLegendLabel();
+        //updateLegendLabel();
     }
 
     /**
@@ -3293,5 +3294,11 @@ public class DrawingControl extends DisplayControlImpl {
             displayUnit = CommonUnits.PERCENT;
         }
         return displayUnit;
+    }
+
+    public void initAfterUnPersistence(ControlContext vc,
+                                       Hashtable properties) {
+        super.initAfterUnPersistence(vc, properties);
+        setShowNoteInLegend(showNoteInLegend);
     }
 }
