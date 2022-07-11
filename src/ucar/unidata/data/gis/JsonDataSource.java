@@ -171,7 +171,7 @@ public class JsonDataSource extends FilesDataSource {
                           Hashtable properties) throws VisADException, Exception {
 
         super(descriptor, newSources, "JSON data source", properties);
-        this.sources = newSources;
+        this.sources = Misc.sort(newSources);
         try {
             int size = this.sources.size();
             for(int i = 0; i < size; i++) {
