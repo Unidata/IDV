@@ -1121,7 +1121,25 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                     / ((theta1.getValue() + theta2.getValue()) * deltaSpeed));
 
             return ri;
+        } else if (tempdomainUnit.isConvertible(Pressure.getRealType().getDefaultUnit()) &&
+                winddomainUnit.isConvertible(Pressure.getRealType().getDefaultUnit()) ) {
+            Real h1 = (Real) alt.add(new Real(100));
+            Real h2 = (Real) alt.subtract(new Real(100));
+            Real theta1 = (Real) potTempPro.evaluate((Real)AirPressure.fromAltitude(h1));
+            Real theta2 = (Real) potTempPro.evaluate((Real)AirPressure.fromAltitude(h2));
+            Data wind1 = windPros.evaluate((Real) AirPressure.fromAltitude(h1));
+            Data wind2 = windPros.evaluate((Real) AirPressure.fromAltitude(h2));
+            double u1 = ((RealTuple) wind1).getValues()[0] * Math.cos((float) ((RealTuple) wind1).getValues()[1]);
+            double v1 = ((RealTuple) wind1).getValues()[0] * Math.sin((float) ((RealTuple) wind1).getValues()[1]);
+            double u2 = ((RealTuple) wind2).getValues()[0] * Math.cos((float) ((RealTuple) wind2).getValues()[1]);
+            double v2 = ((RealTuple) wind2).getValues()[0] * Math.sin((float) ((RealTuple) wind2).getValues()[1]);
+            float deltaSpeed = (float) ((u1 - u2) * (u1 - u2) + (v1 - v2) * (v1 - v2));
+            float ri = (float) (9.8 * deltaH * (theta1.getValue() - theta2.getValue()) * 2
+                    / ((theta1.getValue() + theta2.getValue()) * deltaSpeed));
+
+            return ri;
         } else {
+
             return 0.0f;
         }
     }
