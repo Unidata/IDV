@@ -146,7 +146,11 @@ public final class AerologicalReadoutTable extends JTable {
      * The CIN readout.
      */
     private CinReadout cinReadout;
+    /**
+     * The boundary readout.
+     */
     private  BoundaryLayerHeightReadout blhReadout;
+    private  BulkRichardsonNumReadout bulkRiReadout;
     /**
      * Constructs from nothing.
      *
@@ -178,6 +182,7 @@ public final class AerologicalReadoutTable extends JTable {
             capeReadout                 = new CapeReadout();
             cinReadout                  = new CinReadout();
             blhReadout                  = new BoundaryLayerHeightReadout();
+            bulkRiReadout               = new BulkRichardsonNumReadout();
             // Background:
             tableModel.addRowEntry(new SeparatorRowEntry("Background:"));
             tableModel.addRowEntry(new RealRowEntry(pressureReadout, "    "));
@@ -241,6 +246,7 @@ public final class AerologicalReadoutTable extends JTable {
         tableModel.addRowEntry(new RealRowEntry(cinReadout, ""));
         tableModel.addRowEntry(new SeparatorRowEntry("Boundary Layer:"));
         tableModel.addRowEntry(new RealRowEntry(blhReadout, "    "));
+        tableModel.addRowEntry(new RealRowEntry(bulkRiReadout, "    "));
         setModel(tableModel);
 
         TableColumnModel columnModel = getColumnModel();
@@ -443,6 +449,14 @@ public final class AerologicalReadoutTable extends JTable {
      */
     public void setBlh(Real h) {
         blhReadout.setBlh(h);
+    }
+
+    /**
+     * Sets the profile BLH property.
+     * @param h       The new profile blh.
+     */
+    public void setBulkRi(Real h) {
+        bulkRiReadout.setBulkRi(h);
     }
     /**
      * Sets the width of a column.
@@ -1412,6 +1426,33 @@ public final class AerologicalReadoutTable extends JTable {
 
             try {
                 setReal(blh);
+            } catch (Exception e) {
+                System.err.println("Couldn't set BLH readout: " + e);
+            }
+        }
+    }
+
+
+    /**
+     * Provides support for boundary layer Bulk Richardson Number.
+     */
+    protected class BulkRichardsonNumReadout extends MyReadout {
+
+        /**
+         * Constructs from nothing.
+         * @throws ParseException       Invalid internal unit specification.
+         */
+        public BulkRichardsonNumReadout() throws ParseException {
+            super("Bulk RiNumber", " ", 2);
+        }
+
+        /**
+         * Sets the value of the blh property.
+         * @param brn          The new value.
+         */
+        public void setBulkRi(Real brn) {
+            try {
+                setReal(brn);
             } catch (Exception e) {
                 System.err.println("Couldn't set BLH readout: " + e);
             }
