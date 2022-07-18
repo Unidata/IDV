@@ -45,15 +45,13 @@ import ucar.unidata.view.sounding.RealEvaluatorCell;
 import ucar.unidata.view.sounding.Sounding;
 
 import ucar.visad.UtcDate;
+import ucar.visad.VisADMath;
 import ucar.visad.display.*;
 
 import ucar.visad.functiontypes.AirTemperatureProfile;
 import ucar.visad.functiontypes.CartesianHorizontalWindOfPressure;
 import ucar.visad.functiontypes.DewPointProfile;
-import ucar.visad.quantities.AirPressure;
-import ucar.visad.quantities.AirTemperature;
-import ucar.visad.quantities.CartesianHorizontalWind;
-import ucar.visad.quantities.PolarHorizontalWind;
+import ucar.visad.quantities.*;
 
 import visad.*;
 
@@ -676,6 +674,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                     AerologicalDisplay.POINTER_PRESSURE)) {
                 Real pressure = (Real) event.getNewValue();
                 pointerPresRef.setData(pressure);
+                if(windProfiles != null && tempProfiles != null){
+                    float rri = computeBulkRi(pressure, (FlatField) tempProfiles[currIndex], (FlatField)windProfiles[currIndex]);
+                    readoutTable.setBulkRi(new Real(rri));
+                }
                 readoutTable.setPressure(pressure);
             } else if (event.getPropertyName().equals(
                     AerologicalDisplay.CURSOR_TEMPERATURE)) {
@@ -951,6 +953,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         windProRef.setData(windPro);
         float blh = computeBLH((FlatField)tempPro);
         readoutTable.setBlh(new Real(blh));
+        readoutTable.setBlh(new Real(blh));
         updateLegendAndList();
     }
 
@@ -1088,6 +1091,41 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
         return alt[sortedIdx[index]];
     }
+
+    /**
+     * Provides bulk Richardsonn number based on the temperature profile.
+     */
+    public float computeBulkRi(Real pressure, FlatField tempPros, FlatField windPros) throws VisADException, RemoteException {
+        Unit   tempdomainUnit     = tempPros.getDomainUnits()[0];
+        Unit   winddomainUnit     = windPros.getDomainUnits()[0];
+
+        FlatField potTempPro =
+                (FlatField) PotentialTemperature.create(tempPros.getDomainSet(),
+                        tempPros);
+        float deltaH = 200;
+        Real alt = (Real)AirPressure.toAltitude(pressure);
+        if(tempdomainUnit.isConvertible(Pressure.getRealType().getDefaultUnit()) &&
+                winddomainUnit.isConvertible(GeopotentialAltitude.getGeopotentialMeter()) ) {
+            Real h1 = (Real) alt.add(new Real(100));
+            Real h2 = (Real) alt.subtract(new Real(100));
+            Real theta1 = (Real) potTempPro.evaluate((Real)AirPressure.fromAltitude(h1));
+            Real theta2 = (Real) potTempPro.evaluate((Real)AirPressure.fromAltitude(h2));
+            Data wind1 = windPros.evaluate((Real) GeopotentialAltitude.fromAltitude(h1));
+            Data wind2 = windPros.evaluate((Real) GeopotentialAltitude.fromAltitude(h2));
+            double u1 = ((RealTuple) wind1).getValues()[0] * Math.cos((float) ((RealTuple) wind1).getValues()[1]);
+            double v1 = ((RealTuple) wind1).getValues()[0] * Math.sin((float) ((RealTuple) wind1).getValues()[1]);
+            double u2 = ((RealTuple) wind2).getValues()[0] * Math.cos((float) ((RealTuple) wind2).getValues()[1]);
+            double v2 = ((RealTuple) wind2).getValues()[0] * Math.sin((float) ((RealTuple) wind2).getValues()[1]);
+            float deltaSpeed = (float) ((u1 - u2) * (u1 - u2) + (v1 - v2) * (v1 - v2));
+            float ri = (float) (9.8 * deltaH * (theta1.getValue() - theta2.getValue()) * 2
+                    / ((theta1.getValue() + theta2.getValue()) * deltaSpeed));
+
+            return ri;
+        } else {
+            return 0.0f;
+        }
+    }
+
     /**
      * <p>Returns the title of this display.</p>
      *
