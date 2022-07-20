@@ -773,6 +773,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
                     stationsToProfiles.put(st , alist);
                 }
                 stationsToProfiles.get(st ).add(dataFieldImpl);
+                times.add(Double.valueOf(data[0][3]));
             }
 
             ii++;
@@ -1278,7 +1279,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
             DateTime[] dts       = new DateTime[ssize];
             for (int i = 0; i < ssize; i++) {
 
-                data   = (FieldImpl) allProfiles.get(sortedAzs[i]);
+                data   = (FieldImpl) stationsToProfiles.get(((NamedStationImpl) selectedStations.get(i)).getName()).get(0);
                 dts[i] = new DateTime(dt[i]);
                 if (data != null) {
                     datas.add(data);
