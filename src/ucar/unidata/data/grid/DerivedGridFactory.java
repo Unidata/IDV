@@ -7277,4 +7277,119 @@ public class DerivedGridFactory {
 
         return newFieldImpl;
     }
+
+    /**
+     * Calculate the AirDensity
+     *
+     * @param pressFI  wind
+     * @param temperFI  wind
+     *
+     * @return  the angle
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl createAirDensity(
+            FieldImpl pressFI, FieldImpl temperFI)
+            throws VisADException, RemoteException {
+
+        FieldImpl                   vtFI = null;
+
+        // ept.create(pressure, temperFI, mixingRatioFI);
+        boolean isSequence = (GridUtil.isTimeSequence(temperFI));
+
+        // get a grid of pressure values
+        Boolean ensble = (GridUtil.hasEnsemble(temperFI));
+        TupleType    rangeType = null;
+        FunctionType innerType = null;
+
+
+        if (isSequence) {
+            // Implementation:  have to take the raw time series of data FieldImpls
+            // apart, make the ept FlatField by FlatField (for each time step),
+            // and put all back together again into a new FieldImpl with all times.
+            Set timeSet = temperFI.getDomainSet();
+
+            // resample RH to match domainSet (list of times) of temperFI.
+            // If they are the same, this should be a no-op.
+            if (timeSet.getLength() > 1) {
+                temperFI = (FieldImpl) temperFI.resample(timeSet);
+            }
+
+            // compute each FlatField in turn; load in FieldImpl
+            for (int i = 0; i < timeSet.getLength(); i++) {
+
+                if (ensble) {
+                    FieldImpl sampleT   = (FieldImpl) temperFI.getSample(i);
+                    FieldImpl sampleP   = (FieldImpl) pressFI.getSample(i);
+
+                    Set       ensDomain = sampleT.getDomainSet();
+                    FieldImpl funcFF    = null;
+
+                    for (int j = 0; j < ensDomain.getLength(); j++) {
+                        FlatField innerFieldP =
+                                (FlatField) sampleP.getSample(j, false);
+                        FlatField innerFieldT =
+                                (FlatField) sampleT.getSample(j, false);
+
+
+                        if ((innerFieldP == null) || (innerFieldT == null)) {
+                            continue;
+                        }
+                        FlatField innerdivFF = (FlatField)
+                                AirDensity.create(innerFieldP, innerFieldT);
+
+                        if (rangeType == null) {
+                            rangeType = GridUtil.getParamType(innerdivFF);
+                            innerType = new FunctionType(
+                                    DataUtility.getDomainType(ensDomain),
+                                    innerdivFF.getType());
+                        }
+                        if (j == 0) {
+                            funcFF = new FieldImpl(innerType, ensDomain);
+                        }
+                        funcFF.setSample(j, innerdivFF, false);
+
+                    }
+                    if (vtFI == null) {
+                        FunctionType newFieldType =
+                                new FunctionType(
+                                        ((SetType) timeSet.getType()).getDomain(),
+                                        funcFF.getType());
+                        vtFI = new FieldImpl(newFieldType, timeSet);
+                    }
+                    vtFI.setSample(i, funcFF, false);
+                } else {
+                    FlatField vptFF =
+                            (FlatField)  AirDensity.create(
+                                    (FlatField) pressFI.getSample(i),
+                                    (FlatField) temperFI.getSample(i));
+
+                    // first time through
+                    if (i == 0) {
+                        FunctionType functionType =
+                                new FunctionType(
+                                        ((FunctionType) temperFI.getType()).getDomain(),
+                                        vptFF.getType());
+                        vtFI = new FieldImpl(functionType, timeSet);
+                    }
+
+                    vtFI.setSample(i, vptFF, false);
+                }
+            }  // end isSequence
+
+        }
+        // if one time only
+        else {
+            FlatField press = (FlatField) pressFI;
+            // make one FlatField
+            vtFI = (FieldImpl)AirDensity.create(
+                    press,
+                    (FlatField) temperFI);
+
+        }  // end single time
+
+        return vtFI;
+
+    }
+
 }
