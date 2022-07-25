@@ -59,6 +59,7 @@ title:Display Controls
 
 >title:Miscellaneous Controls
 >>stormtrack/StormTrackControl.html
+>>stormtrack/ADTControl.html
 >>misc/MultiDisplayHolder.html
 >>misc/RangeAndBearingControl.html
 >>misc/NoteControl.html
