@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 5.7 release.
+The items below reflect changes since the 6.0 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -40,35 +40,35 @@ The items below reflect changes since the 5.7 release.
   </p>
 </faqitem>
 
-<faqitem id="cert" q="IDV Certifcates and Notarization">
+<faqitem id="darkmode" q="IDV Appearance Mode">
 
   <p>
-    Java Webstart, Windows app and MacOS certificates have been renewed and will
-    be valid until at least May 30, 2020 (MacOS certificate is valid until
-    2024). Moreover, as properly signing the IDV under these different
-    environments can be an involved process, this information has thoroughly
-    <a href="https://github.com/Unidata/IDV/blob/master/release/certs.md">documented
-    here</a>. The IDV MacOS installer in this release has been notarized by Apple in order to run by default on MacOS.
+    In macOS and Linux users can choose to adopt a light, dark, or IDV regular appearance. The dark appearance,
+    known as Dark Mode, implements an interface style that many apps already adopt. Users can edit the user
+    preference and can choose their interface appearance mode based on ambient lighting conditions.
   </p>
 </faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem id="gridcoveragetype" q="Grid Coverage and Cross Boundary Subset" >
+<faqitem id="ProbSevere" q="ProbSevere Statistical Model Display" >
   <p>
-    The cross boundary subset in the grid coverage type works similar to the grid file subset where
-    you can set the property for subset all fields in the Data Source Property panel or you can
-    override the default setting for a particular
-    field in the field selector subset panel. The only difference in the Coverage data spatial subset is
-    that it will allow users to flip longitudes in a cyclic rect linear grid from 0/360 to -180/180 (or vice-versa)
-    before performing the cross boundary subset.
+    The IDV has developed a new data source type to create a time series display of the ProbSevere Statistical
+    models output that provide probabilistic guidance to forecasters on the likelihood of severe weather
+    occurrence for convection in the near term. Algorithms of ProbSevere incorporate multiple datasets
+    from satellite, radar, total lightning, and NWP into easy-to interpret products. With a direct connection
+    to the NCEP ProbSevere web page to retrieve data of the last 24 hours and the time matching feature
+    of the IDV, it is  very easy to integrate ProbSevere model data with other data source types and
+    to assist forecasters in severe weather situations.
   </p>
 </faqitem>
 
-<faqitem id="volumerenderdisplay" q="New Volume Rendering">
+<faqitem id="ADT" q="ADT Integration and Development">
   <p>
-    New enhanced volume rendering display applies linear 3D re-sampling and stack 2D algorithm to enhance the
-    texture of the volume rendering display.
+    The Advanced Dvorak Technique (ADT) utilizes longwave-infrared, temperature measurements from geostationary
+    satellites to estimate tropical cyclone (TC) intensity. The Dvorak Technique continues to be the standard
+    method for estimating TC intensity. The ADT is still experimental and we are working on the integration and
+    enhancement of the ADT functionalities for the IDV community.
   </p>
 </faqitem>
 
@@ -87,32 +87,17 @@ The items below reflect changes since the 5.7 release.
   </p>
 </faqitem>
 
-<faqitem id="display3Dcross" q="3D Cross Layout Model">
-  <p>
-    3D cross draws a symbol for a location point indication, it is a very simple graphic elements and
-    the large numbers of symbols can be displayed with it. 3D cross symbol can be colored by the value of numerical attribute
-    of the location.
-  </p>
-</faqitem>
 
-<faqitem id="scallopedline" q="Scalloped Line Display">
-  <p>
-    Scalloped line draws boundaries for the significant weather chart. This new drawing feature has been added to the drawing control
-    and could be applied to the demarcation of significant weather.
-  </p>
-</faqitem>
 
 <faqitem cat="Jython Changes"></faqitem>
 
 
-<faqitem id="timestepAccuformulas" q="Time step Precipitation Accumulation Formulas">
+<faqitem id="wrfformulas" q="WRF NetCDF Formulas">
   <p>
-    The new GFS dataset collection has mixed accumulation hours in the time axis for each time step and the
-    previous logic in the IDV picks the first one in the list, unfortunately, always the longest one.
-    So the new logic will try to pick the shortest accumulation hour for each time step, and what we
-    got are 3 and 6 hours for GFS one degree or 0.25 degree, we can use the subtraction
-    to get the 3-hour time step accumulation. This change has been added as a derived variable named:
-    TimeStepAccumulatedPrecip. In general, this formula can be applied to other mixed interval parameters.
+    The original WRF netCDF output is in sigma coordinate. The current grid diagnostic formulas are mostly
+    designed for the isobaric surface parameters. The newly added WRF derived formulas provide functions
+    to directly create the derived parameters such as: Equivalent potential temperature, relative humidity,
+    Saturated Equivalent potential temperature, dewpoint, and others.
   </p>
 </faqitem>
 
