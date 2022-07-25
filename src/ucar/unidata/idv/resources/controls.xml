@@ -1077,7 +1077,13 @@ Since this is confusing and needs more work lets remove this for now
      displaycategory="Point Data"
      properties="windowVisible=true;"/>
 
-
+  <!--control
+    id="timeseries"
+    categories="POINT;PointPlot;*-flowvector-*"
+    class="ucar.unidata.idv.control.ProbeControl"
+    label="Text Point Time Series"
+    displaycategory="Probes"
+    properties="windowVisible=true;showThumbNail=true"/-->
 
   <control
      id="probe"
@@ -1388,7 +1394,7 @@ Since this is confusing and needs more work lets remove this for now
      icon="/auxdata/ui/icons/Text16.gif"
      label="Text Note"
      displaycategory="General"
-     properties="windowVisible=true;expandedInTabs=true;showInTabs=false"/>
+     properties="windowVisible=true; showInTabs=true;"/>
 
   <control
      id="locationcontrol"
@@ -1522,7 +1528,7 @@ Example of how to make an image movie control with a fixed table of contents
      label="Pacdex Catalog Images"
      displaycategory="General"
      properties="windowVisible=true;">
-    <property name="tocFiles" value="https://resources.unidata.ucar.edu/idv/data/pacdex/images/products.xml"/>
+    <property name="tocFiles" value="http://www.unidata.ucar.edu/software/idv/data/pacdex/images/products.xml"/>
     </control>
 -->
 
@@ -1720,6 +1726,12 @@ Example of how to make an image movie control with a fixed table of contents
           canstandalone="false"
           properties="displayName=Crossection;windowVisible=true;probeType=transect;developerMode=false;
                         jythonCodeURL=/ucar/unidata/idv/resources/python/verticalCrossSection.py">
+  </control>
+
+  <control id="stormintesitydisplay" categories="IMAGE-*-*"
+           class="ucar.unidata.idv.control.ADTControl"
+           label="Advanced Dvorak Technique (Under Development)" displaycategory="Probe" properties="">
+           <property name="viewManagerClassNames" value="ucar.unidata.idv.MapViewManager" />
   </control>
 
 </controls>
