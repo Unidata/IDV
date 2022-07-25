@@ -1,0 +1,80 @@
+{Advanced Dvorak Technique Control}
+
+{
+<%nochildlist%>
+
+The Advanced Dvorak Technique (ADT) utilizes longwave-infrared, temperature measurements
+from geostationary satellites to estimate tropical cyclone (TC) intensity. More information
+about the ADT and various run-time options, algorithms, and program outputs can be found in
+the McIDAS-X ADT-Version 8.2.1 Users' Guide at the
+<a href="http://tropic.ssec.wisc.edu/misc/adt/info.html">Advanced Dvorak Technique (ADT)</a>
+
+<li>First select and display a geostationary satellite longwave-infrared imagerys.</li>
+
+<li>Second select "Temperature" calibration of the same longwave-infrared band and select
+    Advanced Dvorak Technique (Under Development) display type and click Create Display. </li>
+
+<li>The GUI to control the ADT will then be displayed in the "Displays" tab of the Dashboard. </li>
+
+[ht::cimg images/ADTControl.png]
+
+<li>Perform ADT analysis on the image:  If it is the Manual option (default), left-click and drag
+    the probe in the Main Display window to select the storm center and click on the blue
+    [ug::button Run Analysis] button at the bottom of the screen of the ADT control. Once the
+    analysis has completed a popup window will appear containing the ADT Analysis Bulletin output</li>
+
+[ht::cimg images/ADTOutput.png]
+
+
+<p>
+    The ADT is still experimental and may have bugs that have not been found and we are
+    keep working on the development of the connection of the automated storm selection with the
+    National Hurricane Center online ATCF Best Track files.
+
+    }
+    {{Storm Center Selection} {
+    If the Manual option (default) is utilized, the storm position is selected manually by the user
+    in the Display Window. A colored dot will mark the storm position selected, with the corresponding
+    position displayed in the ADT GUI window in the Latitude and Longitude text boxes in the "Manual
+    Storm Selection" section. To select the storm center, left-click and drag the probe in the Main Display
+    window.
+    }}
+
+    {{History File Information} {
+    There are several operations on an existing ADT History file. To initiate, first select a
+    history file in the "History File Information" section by clicking on the "Select History File"
+    button and choosing a history file. Once a history file is chosen, press the "List/Write History File"
+    button at the bottom of the "Layer Controls" tab. A new popup window will be displayed containing
+    the history file listing of the selected history file along with two buttons at the bottom of
+    the window.
+    }}
+
+    {{PMW Analysis} {
+    To initiate the "PMW Analysis" section, click on the "Activate" checkbox. The "Manual" entry option
+    button will be activated along with the three text entry boxes corresponding to the PMW overpass Date,
+    Time, and Eye Score values. Please note that you MUST press "Enter" on the keyboard after entering
+    input into each text window! The "Automated" option will be grayed out since this option is not
+    available in this version of the McV-ADT, as mentioned above. Also note that the use of the PMW
+    Analysis is only available when utilizing an ADT History file.
+    }}
+
+    {{Miscellaneous Options:} {
+    <ul>
+    <li>The [ug::button MSLP Conversion Method] defines the methodology used to convert the CI#/Wind Speed value to
+    mean sea level pressure. The "Dvorak" option (default) will utilize the historical Atlantic or West Pacific
+    conversions. The "CKZ" option will use the "Courtney/Knaff/Zehr" conversion, which requires two input
+    parameters to be supplied to the conversion equations; Environmental MSLP (Penv) and the 34-knot
+    wind/Gale radius (34kt Radius).</li>
+
+    <li>The [ug::button Land Flag] allows the ADT to operate over land if the "OFF" radio button is selected (default selection
+    is "ON", which will keep the land flag activated and forbid ADT analysis when the storm center is over a
+    significant land feature).</li>
+
+    <li>The [ug::button ACTF Output] allows the user to write an ATCF formatted intensity record to an output file (location
+    defined with the ODTOUTPUT variable in the adtenv file). The name of the file is automatically
+    determined and is based upon the image date and time along with two manually input variables.</li>
+    </ul>
+    }}
+
+
+
