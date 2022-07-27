@@ -523,7 +523,8 @@ public abstract class DrawingGlyph {
                                 ATTR_POINTS), ",", true, true);
 
         int stride = 3;
-        if ((coordType == COORD_XY) || (coordType == COORD_LATLON)) {
+        if ((coordType == COORD_XY) || (coordType == COORD_LATLON) ||
+                (coordType == COORD_LONLAT)) {
             stride = 2;
         }
         if (isInXYSpace()) {
@@ -656,7 +657,7 @@ public abstract class DrawingGlyph {
     public void processPointStrings(List pointStrings, boolean normalize360)
             throws VisADException, RemoteException {
         int stride = 3;
-        if ((coordType == COORD_XY) || (coordType == COORD_LATLON)) {
+        if ((coordType == COORD_XY) || (coordType == COORD_LATLON) || (coordType == COORD_LONLAT)) {
             stride = 2;
         }
         double fixedAlt;
@@ -1305,7 +1306,7 @@ public abstract class DrawingGlyph {
      * @return Is in latlon space
      */
     public boolean isInLatLonSpace() {
-        return (coordType == COORD_LATLONALT) || (coordType == COORD_LATLON) || (coordType == COORD_LONLAT);
+        return (coordType == COORD_LATLONALT) || (coordType == COORD_LATLON) || (coordType == COORD_LONLAT) ;
     }
 
 
@@ -1765,6 +1766,7 @@ public abstract class DrawingGlyph {
         if ( !isInLatLonSpace() || !canShowDistance()) {
             return null;
         }
+
         double    distance = 0.0;
         float[][] pts      = getPointValues();
         for (int i = 1; i < pts[0].length; i++) {

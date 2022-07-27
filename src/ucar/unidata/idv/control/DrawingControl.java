@@ -318,7 +318,7 @@ public class DrawingControl extends DisplayControlImpl {
 
     protected DataChoice datachoice = null;
 
-    public boolean showName = false;
+    public boolean isProbsevere = false;
     /** The label to show the readout in the side legend */
     //private JLabel sideLegendDataChoiceName;
 
@@ -375,7 +375,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @return the distance unit
      */
     public Unit getDistanceUnit() {
-        return getDisplayUnit();
+        return getDefaultDistanceUnit();
     }
 
     /**
@@ -418,8 +418,8 @@ public class DrawingControl extends DisplayControlImpl {
         checkGlyphTimes();
         if (dataChoice != null) {
             this.datachoice = dataChoice;
-            showName = (boolean) dataChoice.getProperty("showName", false);
-            if(showName){
+            isProbsevere = (boolean) dataChoice.getProperty("isProbsevere", false);
+            if(isProbsevere){
                 setShowNoteText(true);
                 glyphNameText = datachoice.getName();
                 setDisplayName(glyphNameText);
@@ -840,7 +840,7 @@ public class DrawingControl extends DisplayControlImpl {
         } else {
             super.getLegendLabels(labels, legendType);
         }
-        if(showName)
+        if(isProbsevere)
             labels.add(glyphNameText);
     }
 
@@ -1119,7 +1119,7 @@ public class DrawingControl extends DisplayControlImpl {
                         setCurrentGlyph(currentGlyph, null);
                         List newSelection = Misc.newList(closestGlyph);
                         if (newSelection.equals(selectedGlyphs)) {
-                            if (showName && selectedGlyphs.size() != 0) {
+                            if (isProbsevere && selectedGlyphs.size() != 0) {
                                 clearSelection();
                                 setNoteText(null);
                                 glyphNameText = datachoice.getName() ;
@@ -1423,7 +1423,7 @@ public class DrawingControl extends DisplayControlImpl {
             if(dataChoiceProperties.size() > 0 && g.getName() != null  &&
                     dataChoiceProperties.get(g.getName())!= null) {
                 setNoteText((String) dataChoiceProperties.get(g.getName()));
-                if (showName) {
+                if (isProbsevere) {
                     glyphNameText = datachoice.getName() + " : " + g.getName();
                     updateLegendLabel();
                 }
@@ -1773,8 +1773,8 @@ public class DrawingControl extends DisplayControlImpl {
 
         int[] coords = { DrawingGlyph.COORD_XYZ, DrawingGlyph.COORD_XY,
                          DrawingGlyph.COORD_LATLONALT,
-                         DrawingGlyph.COORD_LATLON };
-        String[] coordLabels = { "X/Y/Z", "X/Y", "Lat/Lon/Alt", "Lat/Lon" };
+                         DrawingGlyph.COORD_LATLON, DrawingGlyph.COORD_LONLAT };
+        String[] coordLabels = { "X/Y/Z", "X/Y", "Lat/Lon/Alt", "Lat/Lon", "Lon/Lat" };
         List           coordItems = new ArrayList();
         TwoFacedObject coordTfo   = null;
         for (int i = 0; i < coords.length; i++) {
@@ -3239,7 +3239,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @return The color table to use
      */
     protected ColorTable getInitialColorTable() {
-        if(showName) {
+        if(isProbsevere) {
             List resources =
                     Misc.newList("/ucar/unidata/idv/resources/probsevere_cmap.xml");
             XmlResourceCollection colorMapResources = new XmlResourceCollection("", resources);
@@ -3276,7 +3276,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @throws VisADException     VisAD problem
      */
     protected Range getInitialRange() throws RemoteException, VisADException {
-        if (showName) {
+        if (isProbsevere) {
             return new Range(0, 100);
         } else {
             return null;
@@ -3290,7 +3290,7 @@ public class DrawingControl extends DisplayControlImpl {
      * @return The display unit
      */
     public Unit getDisplayUnit() {
-        if (showName) {
+        if (isProbsevere) {
             displayUnit = CommonUnits.PERCENT;
         }
         return displayUnit;

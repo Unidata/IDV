@@ -582,7 +582,8 @@ public class PolyGlyph extends LineGlyph {
 
         if(lineDisplayable != null && getTimeValues() != null &&
                 getTimeValues().size() > 0) {
-            setCoordType(COORD_LATLON);
+            if(coordType == COORD_NONE)
+               setCoordType(COORD_LATLON);
             setAnimationSet(lineDisplayable, getTimeValues());
         }
 
