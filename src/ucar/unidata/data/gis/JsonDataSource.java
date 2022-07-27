@@ -1164,7 +1164,7 @@ public class JsonDataSource extends FilesDataSource {
                 this, "All Warning", dcname, dcname ,
                 Misc.newList(DataCategory.XGRF_CATEGORY));
         newParentDataChoice.setProperty("Polygon", "folderName");
-        newParentDataChoice.setProperty("showName", true);
+        newParentDataChoice.setProperty("isProbsevere", true);
         //newParentDataChoice.setUseDataSourceToFindTimes(true);
         //newParentDataChoice.getProperties().put("timeObj", dts);
         addDataChoice(newParentDataChoice, parentDataChoice);
@@ -1202,7 +1202,7 @@ public class JsonDataSource extends FilesDataSource {
                         displayCategory, null);
                 //newParentDataChoice.addDataChoice(new DirectDataChoice(this,
                 //       ID_DUMMY, name, name + "coordinates", categories));
-                newProperties.put("showName", true);
+                newProperties.put("isProbsevere", true);
                 DataChoice dc = new DirectDataChoice(
                         this, id, name, name, categories,
                         newProperties);
@@ -1235,7 +1235,7 @@ public class JsonDataSource extends FilesDataSource {
                         noDisplayCatList);
         //newParentDataChoice.setProperty("JsonWARNING", "folderName");
         //newParentDataChoice.setUseDataSourceToFindTimes(true);
-        //newParentDataChoice.getProperties().put("showName", true);
+        //newParentDataChoice.getProperties().put("isProbsevere", true);
         addDataChoice(newParentDataChoice);
         //List categories =
         //        Misc.newList(DataCategory.XGRF_CATEGORY);
@@ -1257,7 +1257,7 @@ public class JsonDataSource extends FilesDataSource {
                                 Misc.newList(DataCategory.XGRF_CATEGORY), props);
 
             dataChoice0.setProperty("JsonWARNING", "folderName0");
-            dataChoice0.setProperty("showName", true);
+            dataChoice0.setProperty("isProbsevere", true);
             DataSelection dataSelection = dataChoice0.getDataSelection();
             if (dataSelection == null)
                 dataSelection = new DataSelection();
