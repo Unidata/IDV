@@ -375,7 +375,10 @@ public class DrawingControl extends DisplayControlImpl {
      * @return the distance unit
      */
     public Unit getDistanceUnit() {
-        return getDefaultDistanceUnit();
+        if(isProbsevere)
+            return getDefaultDistanceUnit();
+        else
+            return getDisplayUnit();
     }
 
     /**
