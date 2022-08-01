@@ -5066,7 +5066,27 @@ public class GuiUtils extends LayoutUtil {
     }
 
 
+    public static class JJMenu0 extends JMenu {
 
+        public JJMenu0(String s) {
+            super(s);
+        }
+
+        Color bgColor=Color.white;
+
+        public void setColor(Color color) {
+            bgColor=color;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setColor(bgColor);
+            g2d.fillRect(0, 0, getWidth() - 1, getHeight() - 1);
+
+        }
+    }
 
 
     /**
@@ -5755,6 +5775,7 @@ public class GuiUtils extends LayoutUtil {
         slider.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {}
             public void focusLost(FocusEvent e) {
+                Misc.sleep(200);
                 if (dialogArray[0] != null) {
                     dialogArray[0].dispose();
                 }
