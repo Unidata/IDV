@@ -28,6 +28,8 @@ import edu.wisc.ssec.mcidas.adde.AddeTextReader;
 
 import ucar.unidata.data.*;
 import ucar.unidata.geoloc.*;
+import ucar.unidata.idv.control.ValueSliderWidget;
+import ucar.unidata.idv.ui.ValueSliderComponent;
 import ucar.unidata.ui.LatLonWidget;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
@@ -1079,7 +1081,7 @@ public class AddeImageAdvancedPanel extends DataSelectionComponent {
         boolean oldAmSettingProperties = amSettingProperties;
         amSettingProperties = true;
         ChangeListener lineListener = new ChangeListener() {
-            public void stateChanged(ChangeEvent evt) {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 if (amSettingProperties) {
                     return;
                 }
