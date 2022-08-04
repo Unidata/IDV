@@ -118,12 +118,12 @@
           <property name="customIconImageFiles">
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/installer_32x32.png</string>
+                <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/installer_48x48.png</string>
               </object>
             </add>
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/installer_32x32.png</string>
+                <string>${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/installer_48x48.png</string>
               </object>
             </add>
           </property>
