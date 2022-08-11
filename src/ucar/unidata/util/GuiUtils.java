@@ -5775,7 +5775,7 @@ public class GuiUtils extends LayoutUtil {
         slider.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {}
             public void focusLost(FocusEvent e) {
-                Misc.sleep(200);
+                Misc.sleep(100);
                 if (dialogArray[0] != null) {
                     dialogArray[0].dispose();
                 }
