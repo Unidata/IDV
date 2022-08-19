@@ -142,6 +142,15 @@
     </resource>
 
     <resource
+       skinid="idv.skin.sixview.map"
+       label="Map View&gt;Six Panes"
+       location="%IDVPATH%/skins/sixviewskin.xml">
+      <property
+         name="view_class"
+         value="ucar.unidata.idv.MapViewManager"/>
+    </resource>
+
+    <resource
        skinid="idv.skin.oneview.globe"
        label="Globe View&gt;One Pane"
        location="%IDVPATH%/skins/globeskin.xml"/>
@@ -161,6 +170,11 @@
        skinid="idv.skin.fourview.globe"
        label="Globe View&gt;Four Panes"
        location="%IDVPATH%/skins/fourglobeskin.xml"/>
+
+    <resource
+       skinid="idv.skin.sixview.globe"
+       label="Globe View&gt;Six Panes"
+       location="%IDVPATH%/skins/sixglobeskin.xml"/>
 
 <!--  
     <resource
