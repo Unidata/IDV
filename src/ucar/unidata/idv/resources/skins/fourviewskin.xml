@@ -6,7 +6,7 @@ See: /auxdata/docs/developer/contents/XmlUi.html
   <properties>
     <property
        name="view.size"
-       value="300:300"/>
+       value="500:600"/>
     <property
        name="icon.wait.wait"
        value="/ucar/unidata/idv/images/wait.gif"/>
