@@ -275,7 +275,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     protected JComboBox descriptorComboBox;
 
     /** Flag to keep from infinite looping */
-    private boolean ignoreDescriptorChange = false;
+    protected boolean ignoreDescriptorChange = false;
 
     /** The descriptor names */
     protected String[] descriptorNames;
@@ -1922,7 +1922,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
     /**
      *  Generate a list of image descriptors for the descriptor list.
      */
-    private void readDescriptors() {
+    protected void readDescriptors() {
         try {
             StringBuffer buff   = getGroupUrl(REQ_DATASETINFO, getGroup());
             DataSetInfo  dsinfo = new DataSetInfo(buff.toString());
