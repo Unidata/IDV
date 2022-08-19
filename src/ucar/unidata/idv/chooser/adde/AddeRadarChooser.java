@@ -20,51 +20,29 @@
 
 package ucar.unidata.idv.chooser.adde;
 
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
+import javax.swing.*;
+
+import edu.wisc.ssec.mcidas.adde.DataSetInfo;
+import org.w3c.dom.Element;
 
 import edu.wisc.ssec.mcidas.AreaDirectory;
 import edu.wisc.ssec.mcidas.AreaDirectoryList;
-import edu.wisc.ssec.mcidas.AreaFile;
 import edu.wisc.ssec.mcidas.AreaFileException;
-import edu.wisc.ssec.mcidas.McIDASException;
 import edu.wisc.ssec.mcidas.McIDASUtil;
-import edu.wisc.ssec.mcidas.adde.AddeURLException;
-import edu.wisc.ssec.mcidas.adde.DataSetInfo;
 
-import org.w3c.dom.Element;
-
-import ucar.unidata.data.imagery.AddeImageDescriptor;
 import ucar.unidata.data.imagery.AddeImageInfo;
 import ucar.unidata.data.imagery.ImageDataSource;
-import ucar.unidata.geoloc.ProjectionImpl;
-import ucar.unidata.geoloc.ProjectionRect;
-import ucar.unidata.geoloc.projection.*;
-import ucar.unidata.gis.mcidasmap.McidasMap;
-
-import ucar.unidata.idv.chooser.IdvChooser;
 import ucar.unidata.idv.chooser.IdvChooserManager;
-
+import ucar.unidata.idv.chooser.adde.AddeServer;
 import ucar.unidata.metdata.NamedStationTable;
-
-import ucar.unidata.metdata.Station;
-
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
-import ucar.unidata.util.PreferenceList;
 import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.view.station.StationLocationMap;
-
-import ucar.unidata.xml.XmlResourceCollection;
-
-import ucar.unidata.xml.XmlResourceCollection;
-
-import visad.VisADException;
-
-import visad.georef.NamedLocation;
-
-import java.awt.*;
-
-import java.awt.event.*;
 
 import java.beans.*;
 
@@ -165,6 +143,10 @@ public class AddeRadarChooser extends AddeImageChooser {
         return "Radar Data";
     }
 
+    @Override public String getDataType() {
+        return "RADAR";
+    }
+
     /**
      * Get the descriptor label
      *
@@ -233,8 +215,6 @@ public class AddeRadarChooser extends AddeImageChooser {
         return GuiUtils.centerBottom(imagePanel, getDefaultButtons(this));
     }
 
-
-
     /**
      * Add the times component
      *
@@ -262,6 +242,46 @@ public class AddeRadarChooser extends AddeImageChooser {
         setAvailableStations();
     }
 
+    /**
+     *  Generate a list of image descriptors for the descriptor list.
+     */
+    protected void readDescriptors() {
+        try {
+            StringBuffer buff   = getGroupUrl(REQ_DATASETINFO, getGroup());
+            DataSetInfo dsinfo = new DataSetInfo(buff.toString());
+            descriptorTable = dsinfo.getDescriptionTable();
+            String[]    names       = new String[descriptorTable.size()];
+            String[]    ids       = new String[descriptorTable.size()];
+            Enumeration enumeration = descriptorTable.keys();
+            for (int i = 0; enumeration.hasMoreElements(); i++) {
+                names[i] = enumeration.nextElement().toString();
+                ids[i] = descriptorTable.get(names[i]).toString();
+            }
+            //Arrays.sort(names);
+            setDescriptors( ids);
+            setState(STATE_CONNECTED);
+        } catch (Exception e) {
+            handleConnectionError(e);
+        }
+    }
+
+    protected String getDescriptorFromSelection(String selection) {
+        if (descriptorTable == null) {
+            return null;
+        }
+        if (selection == null) {
+            return null;
+        }
+        Enumeration enumeration = descriptorTable.keys();
+        for (int i = 0; enumeration.hasMoreElements(); i++) {
+            String names = enumeration.nextElement().toString();
+            String id = descriptorTable.get(names).toString();
+            if(id.equals(selection)){
+                return id;
+            }
+        }
+        return null;
+    }
 
     /**
      * Check if we are ready to read times
@@ -382,17 +402,17 @@ public class AddeRadarChooser extends AddeImageChooser {
                 String name       = (String) iter.next();
                 String descriptor = ((String) dtable.get(name)).toLowerCase();
                 if (group.indexOf("tdw") >= 0 && descriptor.equals("tr0")) {
-                    descrForIds = name;
+                    descrForIds = ((String) dtable.get(name));
                     break;
-                } else if (descriptor.equals("n0q") 
-                		|| descriptor.equals("n0r")
+                } else if (descriptor.equals("daa")
+                		|| descriptor.equals("eet")
                         || descriptor.startsWith("bref")) {
-                    descrForIds = name;
+                    descrForIds = ((String) dtable.get(name));
                     break;
                 }
             }
             appendKeyValue(buff, PROP_DESCR,
-                           getDescriptorFromSelection(descrForIds));
+                           descrForIds);
             appendKeyValue(buff, PROP_ID, VALUE_LIST);
             if (archiveDay != null) {
                 appendKeyValue(buff, PROP_DAY, archiveDay);
