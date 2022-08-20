@@ -8,13 +8,9 @@
     <urlmap
         type="opendap"
         old="motherlode.ucar.edu:8080/thredds/"
-        new="threddsrc.ucar.edu/thredds/"/>
+        new="thredds.ucar.edu/thredds/"/>
     <urlmap
         type="opendap"
         old="motherlode.ucar.edu/thredds/"
-        new="threddsrc.ucar.edu/thredds/"/>
-    <urlmap
-        type="opendap"
-        old="thredds.ucar.edu/thredds/"
-        new="threddsrc.ucar.edu/thredds/"/>
+        new="thredds.ucar.edu/thredds/"/>
 </urlmaps>
