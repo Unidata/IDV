@@ -2103,11 +2103,11 @@ public class TextPointDataSource extends PointDataSource {
      * @return list of categories
      */
     protected List getPointCategories() {
-        if(hasLatLon)
+        //if(hasLatLon)
             return super.getPointCategories();
-        else
-            return DataCategory.parseCategories("display:timeseries"   + ";" + "display:obslistcontrol" ,
-                            false);
+        //else
+        //    return DataCategory.parseCategories("display:timeseries"   + ";" + "display:obslistcontrol" ,
+        //                    false);
     }
 
 
@@ -2635,7 +2635,7 @@ public class TextPointDataSource extends PointDataSource {
                 DataChoice dc = (DataChoice)choices.get(0);
                 Hashtable ht = dc.getProperties();
                 ht.put("haslatlon", hasLatLon);
-                for (String varname : varNames) {
+             /*   for (String varname : varNames) {
                     DirectDataChoice subChoice = new DirectDataChoice(this,
                             (String) sources.get(0),
                             getDescription(), varname,
@@ -2643,7 +2643,7 @@ public class TextPointDataSource extends PointDataSource {
                             ht);
                     addDataChoice(subChoice);
                 }
-
+*/
             }
             DataChoice dataChoice = (DataChoice) getDataChoices().get(0);
             //Sample the data to see if we need to show the metadata gui
