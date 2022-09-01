@@ -1118,8 +1118,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         showWaitCursor();
         for (int i = 0; i < newChoices.size(); i++) {
             ProbeRowInfo info = new ProbeRowInfo(this);
-            if(newChoices.get(i) instanceof DirectDataChoice)
-                info.setPointParameter(((DirectDataChoice) newChoices.get(i)).getDescription());
             newInfos.add(info);
             DataChoice dc = (DataChoice) newChoices.get(i);
             initRowInfo(info, dc);
@@ -2163,9 +2161,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         final List<ProbeRowInfo> rowInfos = new ArrayList();
         List                     choices  = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
-            ProbeRowInfo probeRowInfo = getRowInfo(i);
-            if(choices.get(i) instanceof DirectDataChoice)
-                probeRowInfo.setPointParameter(((DirectDataChoice) choices.get(i)).getDescription());
             rowInfos.add(getRowInfo(i));
         }
         if (showSunriseSunset) {
@@ -2229,8 +2224,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         for (int i = 0; i < choices.size(); i++) {
             Real         theValue     = null;
             ProbeRowInfo info         = getRowInfo(i);
-            if(choices.get(i) instanceof DirectDataChoice)
-                info.setPointParameter(((DirectDataChoice) choices.get(i)).getDescription());
             DataInstance dataInstance = info.getDataInstance();
             List         reals        = new ArrayList();
             Real         theReal      = info.getRealValue();
@@ -2729,8 +2722,6 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         List               choices = getDataChoices();
         for (int i = 0; i < choices.size(); i++) {
             ProbeRowInfo info = getRowInfo(i);
-            if(choices.get(i) instanceof DirectDataChoice)
-                info.setPointParameter(((DirectDataChoice) choices.get(i)).getDescription());
             Data[]       d    = getSampleAt(info, elt, aniValue, step, true);
             if (d == null) {
                 continue;
