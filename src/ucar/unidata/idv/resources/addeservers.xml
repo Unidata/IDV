@@ -16,7 +16,8 @@ they essentially get it from their container type tag.
 
   <server name="adde.ucar.edu" active="true">
     <group
-       names="RTGOESR,RTGOESS,NPGOESR,NPGOESS,L2GOESR,L2GOESS,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+       names="RTIMAGES,EAST,EASTALL,WEST,WESTALL,NPGWEST,NPGWALL,NPGEAST,NPGEALL,
+       L2GEAST,L2GEALL,L2GWEST,L2GWALL,NEXRCOMP,TOPO,GLOBAL,IMAGEALL,NEXRCALL"
        type="image"/>
     <group
        names="RTNEXRAD, NEXRALL"
@@ -24,10 +25,8 @@ they essentially get it from their container type tag.
     <group
        names="RTWXTEXT"
        type="wxtext"/>
-    <group
-       names="RTGOESR,RTGOESS"
-       type="point"/>
   </server>
+  <!--
   <server name="atm.ucar.edu" active="true">
     <group
             names="RTGOESR,RTGOESS,NPGOESR,NPGOESS,L2GOESR,L2GOESS,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
@@ -39,9 +38,11 @@ they essentially get it from their container type tag.
             names="RTWXTEXT"
             type="wxtext"/>
   </server>
+  -->
   <server name="adde.ssec.wisc.edu" active="true">
     <group
-            names="RTGOESR,RTGOESS,NPGOESR,NPGOESS,RTIMAGES,BLIZZARD,CIMSS,GINIEAST,GINIWEST,GINICOMP,NEXRCOMP,TOPO,GLOBAL, GINIALL, IMAGEALL, NEXRCALL"
+            names="RTIMAGES,IMAGEALL,EAST,EASTALL,WEST,WESTALL,L2GEAST,L2GEALL,L2GWEST,L2GWALL,
+            NPGWEST,NPGWALL,NPGEAST,NPGEALL,BLIZZARD,CIMSS,NEXRCOMP,TOPO,GLOBAL,GINIALL,NEXRCALL"
             type="image"/>
     <group
             names="RTNEXRAD, NEXRALL"
@@ -136,6 +137,7 @@ they essentially get it from their container type tag.
        type="image"/>
   </server>
   -->
+  <!--
   <server name="goessouth.unidata.ucar.edu">
     <group
        names="SOUTH"
@@ -151,6 +153,7 @@ they essentially get it from their container type tag.
                 names="WEST"
                 type="image"/>
   </server>
+  -->
     <!--
   <server name="nanuk.eosdis.nasa.gov">
     <group
