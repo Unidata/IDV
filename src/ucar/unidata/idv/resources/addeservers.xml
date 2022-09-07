@@ -21,7 +21,7 @@ they essentially get it from their container type tag.
        type="image"/>
     <group
        names="RTNEXRAD, NEXRALL"
-       type="radar"/>
+       type="radar"/> 
     <group
        names="RTWXTEXT"
        type="wxtext"/>
