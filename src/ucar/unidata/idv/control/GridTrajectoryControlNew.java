@@ -1149,8 +1149,10 @@ public class GridTrajectoryControlNew extends DrawingControl {
          */
         public void setLevels(Object[] levels) {
 
-            if (levels == null) {
+            if (levels == null && getGridDataInstance() != null) {
                 levels = getGridDataInstance().getLevels();
+            } else{
+                return;
             }
 
             setOkToFireEvents(false);
