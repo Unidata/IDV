@@ -404,7 +404,7 @@ public class DrawingControl extends DisplayControlImpl {
         initDisplayUnit();
         displayHolder = new CompositeDisplayable();
         displayHolder.setUseTimesInAnimation(getUseTimesInAnimation());
-        addDisplayable(displayHolder, FLAG_COLORTABLE);
+        addDisplayable(displayHolder);
 
         List oldGlyphs = glyphs;
         glyphs = new ArrayList();
@@ -782,7 +782,7 @@ public class DrawingControl extends DisplayControlImpl {
             //DisplayMaster if needed
             Displayable displayable = glyph.getDisplayable();
             displayable.setUseTimesInAnimation(getUseTimesInAnimation());
-            addDisplayable(displayable, FLAG_COLORTABLE);
+            displayHolder.addDisplayable(displayable);
             if ( !glyph.initFinal()) {
                 return false;
             }

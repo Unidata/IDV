@@ -1238,7 +1238,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
                             max = Math.max(compRange.getMax(), max);
                             min = Math.min(compRange.getMin(), min);
                         } else {
-                            for (int i = startComp; i < numComps; i++) {
+                            for (int i = startComp; i < ranges.length; i++) {
                                 Range compRange = ranges[i];
                                 max = Math.max(compRange.getMax(), max);
                                 //min = Math.min(compRange.getMin(), min);
