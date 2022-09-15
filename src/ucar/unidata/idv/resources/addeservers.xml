@@ -17,11 +17,11 @@ they essentially get it from their container type tag.
   <server name="adde.ucar.edu" active="true">
     <group
        names="RTIMAGES,EAST,EASTALL,WEST,WESTALL,NPGWEST,NPGWALL,NPGEAST,NPGEALL,
-       L2GEAST,L2GEALL,L2GWEST,L2GWALL,NEXRCOMP,TOPO,GLOBAL,IMAGEALL,NEXRCALL"
+       L2GEAST,L2GEALL,L2GWEST,L2GWALL,NEXRCOMP,TOPO,GLOBAL,IMAGEALL,NEXRCALL,RTGEOC,GEOCALL,RTDDST,DDSTALL"
        type="image"/>
     <group
        names="RTNEXRAD, NEXRALL"
-       type="radar"/> 
+       type="radar"/>
     <group
        names="RTWXTEXT"
        type="wxtext"/>
@@ -42,7 +42,7 @@ they essentially get it from their container type tag.
   <server name="adde.ssec.wisc.edu" active="true">
     <group
             names="RTIMAGES,IMAGEALL,EAST,EASTALL,WEST,WESTALL,L2GEAST,L2GEALL,L2GWEST,L2GWALL,
-            NPGWEST,NPGWALL,NPGEAST,NPGEALL,BLIZZARD,CIMSS,NEXRCOMP,TOPO,GLOBAL,GINIALL,NEXRCALL"
+            NPGWEST,NPGWALL,NPGEAST,NPGEALL,BLIZZARD,CIMSS,NEXRCOMP,TOPO,GLOBAL,GINIALL,NEXRCALL,RTGEOC,GEOCALL,RTDDST,DDSTALL"
             type="image"/>
     <group
             names="RTNEXRAD, NEXRALL"
