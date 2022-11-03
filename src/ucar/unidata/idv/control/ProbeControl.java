@@ -298,6 +298,10 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         // make sure user has selected at least two times.
         // can't do a time series with less
         boolean singleTime = true;
+        if(choices.get(0) instanceof CompositeDataChoice){
+            choices = ((CompositeDataChoice) choices.get(0)).getDataChoices();
+            setDataChoices(choices);
+        }
         for (int i = 0; i < choices.size(); i++) {
             ProbeRowInfo info = getRowInfo(i);
             Data         data = info.getDataInstance().getData();
@@ -2120,8 +2124,11 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         GuiUtils.invokeInSwingThread(new Runnable() {
                                          public void run() {
                                              try {
-                                                 updatePositionInSwingThread(
-                                                 position);
+                                                 //Misc.sleep(500);
+                                                 synchronized (INFO_MUTEX) {
+                                                     updatePositionInSwingThread(
+                                                             position);
+                                                 }
                                              } catch (Exception exc) {
                                                  logException(
                                                  "Updating chart", exc);
@@ -2168,6 +2175,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         } else {
             getChart().setLocation(null);
         }
+        Misc.sleep(500);
         getChart().setProbeSamples(rowInfos);
     }
 
@@ -3377,7 +3385,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * _more_
      */
     public void viewpointChanged() {
-        System.out.println("viewpointChanged");
+        //System.out.println("viewpointChanged");
         //super.viewpointChanged();
         if (getMatchDisplayRegion()) {
             if (reloadFromBounds) {
