@@ -229,13 +229,12 @@ public class WmsSelection {
         String bbox = boundsToUse.getMinLon() + "," + boundsToUse.getMinLat()
                       + "," + boundsToUse.getMaxLon() + ","
                       + boundsToUse.getMaxLat();
-        url = url + "version=" + version + "&request=GetMap" + "&service=WMS"
-              +
-        //          "&Exceptions=se_xml" +
-        "&Styles=" + "" + "&format=" + HtmlUtil.urlEncode(format) + "&SRS="
-                   + srs + "&CRS=" + srs + "&Layers=" + layer + "&BBOX="
-                   + bbox + "&width=" + imageWidth + "&height=" + imageHeight
-                   + "&reaspect=false";
+        url = url + "service=WMS" + "&VERSION=" + version + "&REQUEST=GetMap&LAYERS=" + layer
+            + "&CRS=" + srs +
+            //          "&Exceptions=se_xml" +
+            "&STYLES=&SRS=" + srs + "&FORMAT=" + HtmlUtil.urlEncode(format) + "&BBOX="
+            + bbox + "&WIDTH=" + imageWidth + "&HEIGHT=" + imageHeight;
+              // + "&REASPECT=false";
         // may need to add service=WMS
         if (opaque == 0) {
             url += "&transparent=TRUE";
