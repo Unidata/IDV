@@ -580,7 +580,7 @@ public class PublishManager extends IdvManager {
                 if (ctor == null) {
                     continue;
                 }
-                Object obj = ctor.newInstance(new Object[] { idv, child });
+                //Object obj = ctor.newInstance(new Object[] { idv, child });
                 IdvPublisher idvPublisher =
                     (IdvPublisher) ctor.newInstance(new Object[] { idv,
                         child });
