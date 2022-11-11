@@ -98,33 +98,38 @@
          layer="fixed-etopoland"
          title="World Etopo Land - Static"/>
 -->
-
+  <wms
+      server="https://ows.terrestris.de/osm/service"
+      layer="OSM-WMS"
+      title="World Roads (OpenStreetMap)"
+      srs="EPSG:4326"
+      format="image/png"
+      version="1.1.1"
+      bbox="89.000000,-179.999996,-89.000000,179.999996"/>
 
   <wms
-     server="https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
-     layer="0"
-     title="USGS Global Topography - Dynamic"
-     srs="EPSG:4326"
-     format="image/png24"
-     version="1.1.0"
-     bbox="89.000000,-179.999996,-89.000000,179.999996"/>
-
-
+      server="https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
+      layer="0"
+      title="USGS Topo Map - Dynamic"
+      srs="CRS:84"
+      format="image/png32"
+      version="1.1.1"
+      bbox="89.000000,-179.999996,-89.000000,179.999996"/>
   <wms
       server="https://basemap.nationalmap.gov/arcgis/services/USGSImageryOnly/MapServer/WMSServer"
       layer="0"
-      title="USGS Orthoimagery"
-      srs="EPSG:4326"
-      format="image/png24"
+      title="USGS Imagery"
+      srs="CRS:84"
+      format="image/png32"
       version="1.1.1"
       bbox="89.000000,-179.999996,-89.000000,179.999996"/>
 
   <wms
       server="https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WMSServer"
       layer="0"
-      title="USGS Imagery Topography"
-      srs="EPSG:4326"
-      format="image/png"
+      title="USGS Imagery Topo"
+      srs="CRS:84"
+      format="image/png32"
       version="1.1.1"
       bbox="89.000000,-179.999996,-89.000000,179.999996"/>
 
@@ -132,8 +137,8 @@
       server="https://basemap.nationalmap.gov/arcgis/services/USGSShadedReliefOnly/MapServer/WMSServer"
       layer="0"
       title="USGS Shaded Relief"
-      srs="EPSG:4326"
-      format="image/png24"
+      srs="CRS:84"
+      format="image/png32"
       version="1.1.1"
       bbox="83.999861, -179.999989, -88.261376, 179.999996"/>
 
@@ -141,8 +146,8 @@
      server="https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WMSServer"
      layer="0"
      title="USGS National Hydrography Dataset"
-     srs="EPSG:4326"
-     format="image/png24"
+     srs="CRS:84"
+     format="image/png32"
      version="1.1.1"
      bbox="89.000000,-179.999996,-89.000000,179.999996"/>
 
