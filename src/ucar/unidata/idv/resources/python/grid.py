@@ -378,6 +378,29 @@ def substitute(data, low, high, newValue):
         rangeObject.setSamples(values,1);
     return newData;
 
+def substituteMissing(data, newValue):
+    """change values in data  between low/high to newvalue """
+    from java.lang import Float
+    newData = data.clone();
+    if (GridUtil.isTimeSequence(newData)):
+        for t in range(newData.getDomainSet().getLength()):
+            rangeObject = newData.getSample(t)
+            values = rangeObject.getFloats(0);
+            for i in range(len(values)):
+               for j in range(len(values[0])):
+		           if Float.isNaN(values[i][j]):
+		               values[i][j] = newValue;
+            rangeObject.setSamples(values,1);
+    else:
+        rangeObject = newData;
+        values = rangeObject.getFloats(0);
+        for i in range(len(values)):
+          for j in range(len(values[0])):
+             if Float.isNaN(values[i][j]):
+                values[i][i] = newValue;
+        rangeObject.setSamples(values,1);
+    return newData;
+
 def maskGrid(grid, mask, value=0,resample=0):
     """mask one grid by the values in the other.  value is the masking value"""
     return DerivedGridFactory.mask(grid, mask, value, resample)
