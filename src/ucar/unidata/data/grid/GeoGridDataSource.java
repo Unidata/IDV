@@ -33,6 +33,7 @@ import ucar.nc2.Group;
 import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
+import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.*;
 import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
@@ -1169,6 +1170,17 @@ public class GeoGridDataSource extends GridDataSource {
         //Make sythetic data ncml file
         if (sources.size() > 1) {
             String       timeName = getProperty(PROP_TIMEVAR, "time");
+            if(timeName.equals("time")){
+                try {
+                    if (GridDataset.open(file).getGrids() != null){
+                        List grids = GridDataset.open(file).getGrids();
+                        GeoGrid geoGrid0 = (GeoGrid)grids.get(0);
+                        if(geoGrid0.getTimeDimension() != null)
+                            timeName = geoGrid0.getTimeDimension().getName();
+                    }
+                } catch (Exception ddd){}
+            }
+
             StringBuffer sb       = new StringBuffer();
             sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             sb.append(
