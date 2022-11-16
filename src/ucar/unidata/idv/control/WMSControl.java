@@ -190,7 +190,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
     private String writeFile;
 
     /** The size scale */
-    private double scale = 1.0;
+    private double scale = 1.5;
 
     /** scale property widget */
     private JSlider scaleSlider;
