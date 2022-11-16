@@ -29,10 +29,7 @@ import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.ft.DsgFeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
-import ucar.nc2.ft.point.standard.PointDatasetStandardFactory;
-import ucar.nc2.ft.point.standard.StandardStationCollectionImpl;
 import ucar.unidata.data.*;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.LatLonRect;
@@ -218,32 +215,39 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         List<DateTime> times = new ArrayList<DateTime>();
         Trace.call1("NetcdfPointDatasource:makeObs");
         if (obs == null) {
-             FeatureDatasetPoint pods = getDataset(source);
-            if (pods == null) {
-                return null;
-            }
-            DateSelection ds =
-                    (DateSelection) getProperty(DataSelection.PROP_DATESELECTION);
-            if(ds == null && subset != null) {
-                ds = new DateSelection();
-                List subsettimes = getSelectedTimes(dataChoice, subset);
-                ds.setTimes(subsettimes);
-            } else {
-                NetcdfDataset dataset = (NetcdfDataset)pods.getNetcdfFile();
-                CoordinateAxis1D timeAxis0 = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Time);
-                Array timeArray = timeAxis0.getOriginalVariable().read();
-                ArrayDouble.D1 timeValue1D = null;
-                if(timeArray != null) {
-                    timeValue1D = (ArrayDouble.D1) timeArray;
-                    for (int j = 0; j < timeArray.getSize(); j++) {
-                        DateTime dtt = new DateTime(timeValue1D.get(j), DataUtil.parseUnit(timeAxis0.getUnitsString()));
-                        times.add(dtt);
+            for(int ii = 0; ii < sources.size(); ii++) {
+                FeatureDatasetPoint pods = getDataset((String)sources.get(ii));
+                if (pods == null) {
+                    return null;
+                }
+                DateSelection ds =
+                        (DateSelection) getProperty(DataSelection.PROP_DATESELECTION);
+                if (ds == null && subset != null) {
+                    ds = new DateSelection();
+                    List subsettimes = getSelectedTimes(dataChoice, subset);
+                    ds.setTimes(subsettimes);
+                } else {
+                    NetcdfDataset dataset = (NetcdfDataset) pods.getNetcdfFile();
+                    CoordinateAxis1D timeAxis0 = (CoordinateAxis1D) dataset.findCoordinateAxis(AxisType.Time);
+                    Array timeArray = timeAxis0.getOriginalVariable().read();
+                    double[] timeValue1D = null;
+                    if (timeArray != null) {
+                        int len = (int) timeArray.getSize();
+                        timeValue1D = new double[len];
+                        for (int i = 0; i < len; i++) {
+                            timeValue1D[i] = (double) timeArray.getInt(i);
+                        }
+                        for (int j = 0; j < len; j++) {
+                            DateTime dtt = new DateTime(timeValue1D[j], DataUtil.parseUnit(timeAxis0.getUnitsString()));
+                            times.add(dtt);
+                        }
                     }
-                    timeList = times;
                 }
             }
+            timeList = getUniqueTimes(times);
             //obs = PointObFactory.makePointObs(pods, dataChoice, getBinRoundTo(),
              //       getBinWidth(), bbox, ds, sample);
+            FeatureDatasetPoint pods = getDataset(source);
             if (super.fixedDataset == null) {
                 pods.close();
             }
@@ -372,65 +376,97 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
 
 
         try {
-            FeatureDatasetPoint pods = getDataset(source);
-            NetcdfDataset dataset = (NetcdfDataset)pods.getNetcdfFile();
-            String name = dataChoice.getName();
-            Variable dataVar = dataset.findVariable(name);
-            Unit varUnit = DataUtil.parseUnit(dataVar.getUnitsString());
-            //List<ucar.ma2.Range> vrange = dataVar.getRanges();
-            ArrayFloat.D2 dataValue = (ArrayFloat.D2)dataVar.read();
-
-            ArrayDouble.D1 timeValue1D = null;
-            CoordinateAxis timeAxis0 = dataset.findCoordinateAxis(AxisType.Time);
-            Array timeArray = timeAxis0.getOriginalVariable().read();
-            List alltimes = dataChoice.getAllDateTimes();
-            List subsetTimes = getSelectedTimes(dataChoice, dataSelection);
-            List subsetIdx = Misc.getIndexList(subsetTimes, alltimes);
-            //CoordinateAxis1D timeAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Time);
-            CoordinateAxis1D latAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Lat);
-            CoordinateAxis1D lonAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Lon);
-            CoordinateAxis1D altAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Height);
-            int [] datashape = dataVar.getShape();
-            double [] latValue = latAxis.getCoordValues();
-            double [] lonValue = lonAxis.getCoordValues();
-            double [] altValue = altAxis.getCoordValues();
-
-            int stalen = datashape[0];
-            // test real point clouds
-            float[][] pts = new float[4][stalen];
-            pts[0] = Misc.toFloat(altValue);
-            pts[1] = Misc.toFloat(lonValue);
-            pts[2] = Misc.toFloat(latValue);
-            RealType  rt = Util.makeRealType(name, varUnit);
-            MathType type = new RealTupleType(RealType.Altitude, RealType.Longitude,
-                    RealType.Latitude, rt);
-            //Integer1DSet sTimes = new Integer1DSet(RealTupleType.Time1DTuple,
-            //        numDays, null,
-            //        new Unit[] { CLIMATE_UNITS }, null);
-            FlatField[] grids = new FlatField[subsetIdx.size()];
-
-            if ((id instanceof String)
-                    && (id.toString().startsWith("pointcloud:"))) {
-                for (int i = 0; i < subsetIdx.size(); i++) {
-                    int idx = (int) subsetIdx.get(i);
-                    for (int j = 0; j < stalen; j++)
-                        pts[3][j] = dataValue.get(j, idx);
-                    grids[i] = makeField(type, pts);
+            FlatField[] grids = new FlatField[sources.size()];
+            List<DateTime> times = new ArrayList<DateTime>();
+            for(int ii = 0; ii < sources.size(); ii++) {
+                FeatureDatasetPoint pods = getDataset((String)sources.get(ii));
+                NetcdfDataset dataset = (NetcdfDataset) pods.getNetcdfFile();
+                String name = dataChoice.getName();
+                Variable dataVar = dataset.findVariable(name);
+                String unitStr = dataVar.getUnitsString();
+                if(unitStr.contains("meter^") || unitStr.contains("m^")) {
+                    unitStr = unitStr.replaceAll("\\s", "");
                 }
-            } else {
-                for (int i = 0; i < subsetIdx.size(); i++) {
-                    int idx = (int) subsetIdx.get(i);
-                    for (int j = 0; j < stalen; j++)
-                        pts[3][j] = dataValue.get(j, idx);
-                    grids[i] = (FlatField)makeGrid(pts, null, false, false);
+
+                Unit varUnit = DataUtil.parseUnit(unitStr);
+                //List<ucar.ma2.Range> vrange = dataVar.getRanges();
+                Array dataValueRaw = dataVar.read();
+                ArrayFloat.D2 dataValue = null;
+                ArrayFloat.D1 dataValue1 = null;
+                if (dataValueRaw instanceof ArrayFloat.D2)
+                    dataValue = (ArrayFloat.D2) dataValueRaw;
+                else if (dataValueRaw instanceof ArrayFloat.D1)
+                    dataValue1 = (ArrayFloat.D1) dataValueRaw;
+                ArrayDouble.D1 timeValue1D = null;
+                CoordinateAxis timeAxis0 = dataset.findCoordinateAxis(AxisType.Time);
+                Array timeArray = timeAxis0.getOriginalVariable().read();
+                List alltimes = dataChoice.getAllDateTimes();
+                List subsetTimes = getSelectedTimes(dataChoice, dataSelection);
+                times.addAll(subsetTimes);
+                List subsetIdx = Misc.getIndexList(subsetTimes, alltimes);
+                //CoordinateAxis1D timeAxis = (CoordinateAxis1D)dataset.findCoordinateAxis(AxisType.Time);
+                CoordinateAxis1D latAxis = (CoordinateAxis1D) dataset.findCoordinateAxis(AxisType.Lat);
+                CoordinateAxis1D lonAxis = (CoordinateAxis1D) dataset.findCoordinateAxis(AxisType.Lon);
+                CoordinateAxis1D altAxis = (CoordinateAxis1D) dataset.findCoordinateAxis(AxisType.Height);
+                int[] datashape = dataVar.getShape();
+                double[] latValue = latAxis.getCoordValues();
+                double[] lonValue = lonAxis.getCoordValues();
+                double[] altValue = altAxis.getCoordValues();
+
+                int stalen = datashape[0];
+                // test real point clouds
+                float[][] pts = new float[4][stalen];
+                pts[0] = Misc.toFloat(altValue);
+                pts[1] = Misc.toFloat(lonValue);
+                pts[2] = Misc.toFloat(latValue);
+                RealType rt = Util.makeRealType(name, varUnit);
+                MathType type = new RealTupleType(RealType.Altitude, RealType.Longitude,
+                        RealType.Latitude, rt);
+                //Integer1DSet sTimes = new Integer1DSet(RealTupleType.Time1DTuple,
+                //        numDays, null,
+                //        new Unit[] { CLIMATE_UNITS }, null);
+
+                if (dataValue != null && ii == 0)
+                    grids = new FlatField[subsetIdx.size()];
+
+                if ((id instanceof String)
+                        && (id.toString().startsWith("pointcloud:"))) {
+                    if (dataValue != null)
+                        for (int i = 0; i < subsetIdx.size(); i++) {
+                            int idx = (int) subsetIdx.get(i);
+                            for (int j = 0; j < stalen; j++)
+                                pts[3][j] = dataValue.get(j, idx);
+                            grids[i] = makeField(type, pts);
+                        }
+                    else if (dataValue1 != null) {
+                        for (int j = 0; j < stalen; j++)
+                            pts[3][j] = dataValue1.get(j);
+                        grids[ii] = makeField(type, pts);
+
+                    }
+                } else {
+                    if (dataValue != null)
+                        for (int i = 0; i < subsetIdx.size(); i++) {
+                            int idx = (int) subsetIdx.get(i);
+                            for (int j = 0; j < stalen; j++)
+                                pts[3][j] = dataValue.get(j, idx);
+                            grids[i] = (FlatField) makeGrid(pts, null, false, false);
+                        }
+                    else if (dataValue1 != null) {
+                        for (int j = 0; j < stalen; j++)
+                            pts[3][j] = dataValue1.get(j);
+
+                        grids[ii] =(FlatField) makeGrid(pts, null, false, false);
+                    }
                 }
             }
             // make timeSet the domain of the final FieldImpl;
             // one for each  height-obs groupreturn grids[0];
             double[][] timesetdoubles = new double[1][grids.length];
+            List<DateTime> times0 = getUniqueTimes(times);
             for (int j = 0; j < grids.length; j++) {
                 timesetdoubles[0][j] =
-                    ((DateTime) subsetTimes.get(j)).getReal().getValue();
+                    ((DateTime) times0.get(j)).getReal().getValue();
             }
             QuickSort.sort(timesetdoubles[0]);
             Gridded1DDoubleSet timeset =// }
@@ -656,5 +692,24 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         return angles;
     }
 
+    public static List getUniqueTimes(List<DateTime> timelist)
+            throws VisADException, RemoteException {
 
+        List uniqueTimes = new ArrayList();
+        int numObs = timelist.size();
+
+        Hashtable timeToObs = new Hashtable();
+        // loop through and find all the unique times
+
+        Hashtable seenTime = new Hashtable();
+        for (int i = 0; i < numObs; i++) {
+            DateTime dttm = timelist.get(i);
+            Double dValue = new Double(dttm.getValue());
+            boolean contains = (seenTime.put(dValue, dValue) != null);
+            if (!contains) {
+                uniqueTimes.add(dttm);
+            }
+        }
+        return uniqueTimes;
+    }
 }
