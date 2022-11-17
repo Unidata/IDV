@@ -112,7 +112,7 @@
       layer="0"
       title="USGS Topo Map - Dynamic"
       srs="CRS:84"
-      format="image/png32"
+      format="image/jpeg"
       version="1.1.1"
       bbox="89.000000,-179.999996,-89.000000,179.999996"/>
   <wms
@@ -120,7 +120,7 @@
       layer="0"
       title="USGS Imagery"
       srs="CRS:84"
-      format="image/png32"
+      format="image/jpeg"
       version="1.1.1"
       bbox="89.000000,-179.999996,-89.000000,179.999996"/>
 
@@ -129,7 +129,7 @@
       layer="0"
       title="USGS Imagery Topo"
       srs="CRS:84"
-      format="image/png32"
+      format="image/jpeg"
       version="1.1.1"
       bbox="89.000000,-179.999996,-89.000000,179.999996"/>
 
@@ -138,7 +138,7 @@
       layer="0"
       title="USGS Shaded Relief"
       srs="CRS:84"
-      format="image/png32"
+      format="image/jpeg"
       version="1.1.1"
       bbox="83.999861, -179.999989, -88.261376, 179.999996"/>
 
@@ -147,7 +147,7 @@
      layer="0"
      title="USGS National Hydrography Dataset"
      srs="CRS:84"
-     format="image/png32"
+     format="image/jpeg"
      version="1.1.1"
      bbox="89.000000,-179.999996,-89.000000,179.999996"/>
 
