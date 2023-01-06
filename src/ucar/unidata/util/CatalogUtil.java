@@ -413,7 +413,7 @@ public class CatalogUtil {
             if ( !Misc.equals(XmlUtil.getAttribute(serviceNode, ATTR_NAME,
                     NULL_STRING), serviceName)) {
                 // check if it's a compound service and ours is inside.
-                if ( !Misc.equals(serviceType, SERVICE_COMPOUND)) {
+                if ( !Misc.equals(serviceType, SERVICE_COMPOUND) &&  !Misc.equals(serviceType, "compound") ) {
                     continue;
                 }
                 for (Element child : (List<Element>) XmlUtil.findChildren(
@@ -427,7 +427,7 @@ public class CatalogUtil {
             }
 
             //Here the name matched. If its a compound service then include all of the children
-            if (Misc.equals(serviceType, SERVICE_COMPOUND)) {
+            if (Misc.equals(serviceType, SERVICE_COMPOUND) || Misc.equals(serviceType, "compound")) {
                 for (Element child : (List<Element>) XmlUtil.findChildren(
                         serviceNode, TAG_SERVICE)) {
                     nodes.add(child);
