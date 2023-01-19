@@ -47,6 +47,7 @@ import visad.georef.EarthLocationTuple;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
@@ -63,8 +64,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Hashtable;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -101,6 +104,17 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
     /** cycle level checkbox */
     private JCheckBox cycleLevelsCbx;
+
+    /** Slider to forward through levels */
+    private JSlider forwardLevels;
+
+    private JLabel forward;
+
+    private JTextField forwardText;
+
+    private float forwardValue = 1.0f;
+
+    private JPanel levelsPanel;
 
     /** list of current levels */
     protected Object[] currentLevels;
@@ -226,6 +240,22 @@ public abstract class PlanViewControl extends GridDisplayControl {
      */
     protected FieldImpl getCurrentSlice() throws Exception {
         return currentSlice;
+    }
+
+    /**
+     * Needed for bundles/persistence - pressure levels dwell rate slider and text box
+     * @return
+     */
+    public float getForwardValue() {
+        return forwardValue;
+    }
+
+    /**
+     * Needed for bundles/persistence - pressure levels dwell rate slider and text box
+     * @param forwardValue
+     */
+    public void setForwardValue(float forwardValue) {
+        this.forwardValue = forwardValue;
     }
 
     /**
@@ -461,7 +491,65 @@ public abstract class PlanViewControl extends GridDisplayControl {
             }
         });
 
+        forward = new JLabel("Dwell (seconds): ");
 
+        forwardLevels = new JSlider(500, 10000, (int) forwardValue * 1000);
+        Hashtable<Integer, JComponent> sliderTicks = new Hashtable<>();
+        sliderTicks.put(500, new JLabel("0.5"));
+        sliderTicks.put(2500, new JLabel("2.5"));
+        sliderTicks.put(5000, new JLabel("5"));
+        sliderTicks.put(7500, new JLabel("7.5"));
+        sliderTicks.put(10000, new JLabel("10"));
+
+        forwardLevels.setLabelTable(sliderTicks);
+        forwardLevels.setPaintTicks(true);
+        forwardLevels.setPaintLabels(true);
+        forwardLevels.setSnapToTicks(true);
+        forwardLevels.setMinorTickSpacing(500);
+        forwardLevels.setToolTipText("Time in seconds to cycle between levels");
+        forwardLevels.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (forwardLevels.getValueIsAdjusting()) {
+                    return;
+                }
+                forwardValue = ((float) forwardLevels.getValue() / 1000.0f);
+                forwardText.setText(Float.toString(forwardValue));
+            }});
+
+        forwardText = new JTextField(3);
+        forwardText.setText(Float.toString(forwardValue));
+        forwardLevels.setValue((int) forwardValue * 1000);
+        forwardText.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String s = forwardText.getText();
+                if (s != null) {
+                    try {
+                        float newForwardVal = Float.parseFloat(s);
+                        if ((newForwardVal < (float) forwardLevels.getMinimum() / 1000) ||
+                            (newForwardVal > (float) forwardLevels.getMaximum() / 1000)) {
+                            JOptionPane.showMessageDialog(null,
+                                            "Invalid value, must be within slider range.");
+                        } else {
+                            forwardLevels.setValue((int) (newForwardVal * 1000));
+                            forwardValue = newForwardVal;
+                        }
+                    } catch (NumberFormatException nfe) {
+                        // just reset to last valid number
+                        forwardText.setText(Float.toString((float) forwardLevels.getValue() / 1000.0f));
+                    }
+                }
+            }
+        });
+
+        levelsPanel  = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        levelsPanel.add(levelReadout);
+        levelsPanel.add(Box.createHorizontalStrut(10));
+        levelsPanel.add(cycleLevelsCbx);
+        levelsPanel.add(Box.createHorizontalStrut(10));
+        levelsPanel.add(forward);
+        levelsPanel.add(forwardText);
+        levelsPanel.add(forwardLevels);
 
         // create the actual displayable; see code in sub class
         planDisplay = createPlanDisplay();
@@ -860,7 +948,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             }
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(forwardLevels.getValue());
             } catch (InterruptedException ie) {
                 return;
             }
@@ -907,6 +995,10 @@ public abstract class PlanViewControl extends GridDisplayControl {
         levelDownBtn.setEnabled(levelEnabled);
         levelLabel.setEnabled(levelEnabled);
         cycleLevelsCbx.setEnabled(levelEnabled);
+        forward.setEnabled(levelEnabled);
+        forwardText.setEnabled(levelEnabled);
+        forwardLevels.setEnabled(levelEnabled);
+
 
         if (levels == null) {
             setLevelReadoutLabel(formatLevel(null));
@@ -1333,7 +1425,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
             }
         }
 
-        setLevelReadoutLabel("Current level: " + formatLevel(level));
+        setLevelReadoutLabel(formatLevel(level));
         String dlTemplate = getDisplayListTemplate();
         if (dlTemplate.contains(MACRO_LEVEL)) {
             updateLegendAndList();
@@ -1657,9 +1749,8 @@ public abstract class PlanViewControl extends GridDisplayControl {
                                        levelBox,
                                        levelUpDown }, 2, GuiUtils.WT_N,
                                            GuiUtils.WT_N);
-            controlWidgets.add(new WrapperWidget(this, levelLabel,
-                    GuiUtils.left(levelSelector),
-                    GuiUtils.centerRight(levelReadout, cycleLevelsCbx)));
+            controlWidgets.add(new WrapperWidget(this, GuiUtils.rLabel(levelLabel.getText()),
+                    GuiUtils.left(GuiUtils.hbox(levelSelector, levelsPanel))));
         }
         if (getParameterIsTopography()) {
             if (verticalRange == null) {
