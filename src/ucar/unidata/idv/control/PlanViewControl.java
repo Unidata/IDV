@@ -493,7 +493,7 @@ public abstract class PlanViewControl extends GridDisplayControl {
 
         forward = new JLabel("Dwell (seconds): ");
 
-        forwardLevels = new JSlider(500, 10000, (int) forwardValue * 1000);
+        forwardLevels = new JSlider(500, 10000, (int) (forwardValue * 1000));
         Hashtable<Integer, JComponent> sliderTicks = new Hashtable<>();
         sliderTicks.put(500, new JLabel("0.5"));
         sliderTicks.put(2500, new JLabel("2.5"));
