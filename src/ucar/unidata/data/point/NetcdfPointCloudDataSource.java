@@ -450,13 +450,13 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
                             int idx = (int) subsetIdx.get(i);
                             for (int j = 0; j < stalen; j++)
                                 pts[3][j] = dataValue.get(j, idx);
-                            grids[i] = (FlatField) makeGrid(pts, null, false, false);
+                            grids[i] = (FlatField) makeGrid(pts, rt, false, false);
                         }
                     else if (dataValue1 != null) {
                         for (int j = 0; j < stalen; j++)
                             pts[3][j] = dataValue1.get(j);
 
-                        grids[ii] =(FlatField) makeGrid(pts, null, false, false);
+                        grids[ii] =(FlatField) makeGrid(pts, rt, false, false);
                     }
                 }
             }
@@ -574,8 +574,6 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
                     hillShadeAngle);
         } else if (pointCount) {
             type = Util.makeRealType("pointcount" + (typeCnt++), null);
-        } else {
-            type = RealType.Altitude;
         }
 
         float[][] gridValues = GridUtil.makeGrid(latLonGrid, numCols,
