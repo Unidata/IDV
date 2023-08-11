@@ -230,7 +230,52 @@ example:
     displaycategory="Radar Displays"
     properties="windowVisible=true;smoothed=false;" />
  -->
-
+  <control
+          id="radargridvolume"
+          categories="RADAR_GRID_VOLUME"
+          class="ucar.unidata.idv.control.VolumeRenderControl"
+          label="Radar Grid Volume Rendering"
+          displaycategory="Radar Grid Displays"
+          properties=""/>
+  <control
+          id="radargridcrosssection"
+          categories="RADAR_GRID_VOLUME"
+          class="ucar.unidata.idv.control.ContourCrossSectionControl"
+          label="Radar Grid Contour Cross Section"
+          displaycategory="Radar Grid Displays"
+          properties=""/>
+  <control
+          id="radargridcrosssectionfilled"
+          categories="RADAR_GRID_VOLUME"
+          class="ucar.unidata.idv.control.ContourCrossSectionControl"
+          label="Radar Grid Color filled Contour Cross Section"
+          displaycategory="Radar Grid Displays"
+          properties="colorFill=true;"/>
+  <control
+          id="radargridisosurface"
+          categories="RADAR_GRID_VOLUME"
+          class="ucar.unidata.idv.control.ThreeDSurfaceControl"
+          label="Radar Grid IsoSurface"
+          displaycategory="Radar Grid Displays"
+          properties=""/>
+  <control
+          id="radargridplanview"
+          categories="RADAR_GRID_VOLUME"
+          class="ucar.unidata.idv.control.ContourPlanViewControl"
+          label="Radar Grid Contour Plan View"
+          doeslevels="true"
+          levels="1000[m],2000[m],3000[m],4000[m],5000[m],6000[m],7000[m],8000[m],9000[m],10000[m],12000[m],14000[m],16000[m]"
+          displaycategory="Radar Grid Displays"
+          properties=""/>
+  <control
+          id="radargridplanviewcolorfilled"
+          categories="RADAR_GRID_VOLUME"
+          class="ucar.unidata.idv.control.ContourPlanViewControl"
+          label="Radar Grid Color-Filled Contour Plan View"
+          doeslevels="true"
+          levels="1000[m],2000[m],3000[m],4000[m],5000[m],6000[m],7000[m],8000[m],9000[m],10000[m],12000[m],14000[m],16000[m]"
+          displaycategory="Radar Grid Displays"
+          properties="colorFill=true;"/>
   <control
      id="radarvolumescan"
      categories="RADAR_VOLUME"
@@ -1087,7 +1132,7 @@ Since this is confusing and needs more work lets remove this for now
 
   <control
      id="probe"
-     categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;POINT;StationPlot;PointPlot;*-flowvector-*"
+     categories="*-3D-*;*-2D-*;IMAGE-BAND-*;RGBIMAGE;POINT;StationPlot;PointPlot;*-flowvector-*;IMAGE-*-*; "
      class="ucar.unidata.idv.control.ProbeControl"
      label="Data Probe/Time Series"
      displaycategory="Probes"
