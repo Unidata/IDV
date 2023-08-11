@@ -42,6 +42,7 @@ import ucar.visad.display.VolumeDisplayable;
 
 import visad.*;
 
+import visad.Set;
 import visad.georef.MapProjection;
 
 import visad.meteorology.SingleBandedImage;
@@ -61,10 +62,7 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
 import javax.swing.*;
@@ -105,12 +103,23 @@ public class VolumeRenderControl extends GridDisplayControl {
     private float alpha = 1.0f;
     private JSlider qualitySlider = null;
     private int volumeQuality = 75;
+
+    /** old smoothing type */
+    private String OldSmoothingType = LABEL_NONE;
+
+    HashMap<String, FieldImpl> dataMap;
+
+    /** old smoothing factor */
+    private int OldSmoothingFactor = 0;
+
+    /** property for radar volume */
+    public static final String GRID_VOLUME = "Grid Volume Rendering";
     /**
      * Default constructor; does nothing.
      */
     public VolumeRenderControl() {
         setAttributeFlags(FLAG_COLORTABLE | FLAG_DATACONTROL
-                          | FLAG_DISPLAYUNIT | FLAG_SELECTRANGE );
+                          | FLAG_DISPLAYUNIT | FLAG_SELECTRANGE | FLAG_SMOOTHING );
     }
 
 
@@ -141,6 +150,7 @@ public class VolumeRenderControl extends GridDisplayControl {
 
         myDisplay.setPointSize(getPointSize());
         addDisplayable(myDisplay, getAttributeFlags());
+        dataMap = new HashMap<>();
 
         //Now, set the data. Return false if it fails.
         if ( !setData(dataChoice)) {
@@ -151,6 +161,77 @@ public class VolumeRenderControl extends GridDisplayControl {
         return true;
     }
 
+
+    protected Hashtable getRequestProperties() {
+        if (requestProperties == null) {
+            requestProperties =
+                    Misc.newHashtable(GRID_VOLUME,
+                            new Float(0.0f));
+        }
+        return requestProperties;
+    }
+
+    /**
+     * This reset data api need to apply smoothing, otherwise, no more smoothing
+     *
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    VisAD problem
+     */
+    protected void resetData() throws VisADException, RemoteException {
+        super.resetData();
+        OldSmoothingType = LABEL_NONE;
+        applySmoothing();
+    }
+    /**
+     *  Use the value of the smoothing type and weight to subset the data.
+     *
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  VisAD problem
+     */
+    protected void applySmoothing() throws VisADException, RemoteException {
+        if (checkFlag(FLAG_SMOOTHING)) {
+            if (myDisplay != null) {
+                if ( !getSmoothingType().equalsIgnoreCase(LABEL_NONE)
+                        || !OldSmoothingType.equalsIgnoreCase(LABEL_NONE)) {
+                    if ( !getSmoothingType().equals(OldSmoothingType)
+                            || (getSmoothingFactor() != OldSmoothingFactor)) {
+                        OldSmoothingType   = getSmoothingType();
+                        OldSmoothingFactor = getSmoothingFactor();
+                        if(dataMap.get(getSmoothingType()+getSmoothingFactor()) == null)
+                            try {
+                                FieldImpl none6Data = dataMap.get("None6");
+                                FieldImpl sdata = GridUtil.smooth(none6Data, getSmoothingType(),
+                                        getSmoothingFactor());
+                                dataMap.put(getSmoothingType()+getSmoothingFactor(), sdata);
+                                myDisplay.loadData(sdata);
+                            } catch (Exception ve) {
+                                logException("applySmoothing", ve);
+                            }
+                        else {
+                            FieldImpl sdata = dataMap.get(getSmoothingType()+getSmoothingFactor());
+                            myDisplay.loadData(sdata);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * Make the requester Hastable of properties that is carried along with
+     * the data instance; this one tells Level2Adapter to call the
+     * getVolume method.
+     */
+    protected void setRequestProperties() {
+        if (requestProperties == null) {
+            requestProperties =
+                    Misc.newHashtable(GRID_VOLUME,
+                            new Float(0.0f));
+        } else {
+            requestProperties.clear();
+            requestProperties.put(GRID_VOLUME,
+                    new Float(0.0f));
+        }
+    }
     /**
      * Make a grid with a Linear3DSet for the volume rendering
      *
@@ -558,6 +639,7 @@ public class VolumeRenderControl extends GridDisplayControl {
             //showNormalCursor();
         }
         Trace.call1("VRC.loadVolumeData.loadData");
+        dataMap.put(getSmoothingType()+getSmoothingFactor(), newGrid);
         myDisplay.loadData(newGrid);
         Trace.call2("VRC.loadVolumeData.loadData");
         Trace.call2("loadVolumeData");
