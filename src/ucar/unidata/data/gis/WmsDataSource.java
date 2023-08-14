@@ -50,6 +50,7 @@ import java.awt.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URL;
@@ -157,6 +158,14 @@ public class WmsDataSource extends DataSourceImpl {
         initWmsDataSource();
     }
 
+    public WmsDataSource(DataSourceDescriptor descriptor,
+                          String filename, Hashtable properties)
+            throws IOException {
+        super(descriptor, "WMS data source", "WMS data source", properties);
+        this.wmsSelections = new ArrayList();
+        this.wmsSelections.add(filename);
+        initWmsDataSource();
+    }
     /**
      * _more_
      *
@@ -301,9 +310,9 @@ public class WmsDataSource extends DataSourceImpl {
             String writeFile = (String) requestProperties.get(PROP_WRITEFILE);
 
             int imageWidth = Misc.getProperty(requestProperties,
-                                 PROP_IMAGEWIDTH, 800);
+                                 PROP_IMAGEWIDTH, 1200);
             int imageHeight = Misc.getProperty(requestProperties,
-                                  PROP_IMAGEHEIGHT, -1);
+                                  PROP_IMAGEHEIGHT, 900);
             double resolution = Misc.getProperty(requestProperties,
                                     PROP_RESOLUTION, (float) 1.0);
 
@@ -438,7 +447,7 @@ public class WmsDataSource extends DataSourceImpl {
                 }
                 long tt1 = System.currentTimeMillis();
 
-                xyData = ucar.visad.Util.makeField(image, 0, false, true);
+                xyData = ucar.visad.Util.makeField(image, -1, true, true);
                 long tt2 = System.currentTimeMillis();
                 //      System.err.println("time to make field:" + (tt2-tt1));
             } catch (Exception iexc) {
