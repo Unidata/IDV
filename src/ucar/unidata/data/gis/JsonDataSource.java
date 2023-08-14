@@ -719,6 +719,7 @@ public class JsonDataSource extends FilesDataSource {
             HashMap ploygoncoordsSevere = new HashMap();
             HashMap ploygoncoordsWind = new HashMap();
             HashMap ploygoncoordsTor = new HashMap();
+            int ii = 0;
             // Parcours de tous les features
             for (Object feat : features) {
                 // Creation de la balise <PlaceMark>
@@ -759,6 +760,15 @@ public class JsonDataSource extends FilesDataSource {
                     }
                 } else {
                     String name1 = (String) featJSON.get("name");
+                    if(name1 == null){
+                        Object obj1 = featJSON.get("OBJECTID");
+                        if(obj1 != null)
+                            name1 = obj1.toString();
+                        else {
+                            name1 = jsonUrl + ii;
+                            ii++;
+                        }
+                    }
                     if (type.equals("Polygon") || type.equals("MultiPolygon")) {
                         ploygoncoords.put(name1, getCoordinates(coords));
                     } else {
@@ -825,8 +835,10 @@ public class JsonDataSource extends FilesDataSource {
                     dts = dp.getDateTime();
                 }
             }
-
-            timeList.add(dts);
+            if(dts != null)
+                timeList.add(dts);
+            else
+                parseJSON(jsonUrl);
         } catch (IOException | ParseException | ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -1603,6 +1615,10 @@ public class JsonDataSource extends FilesDataSource {
                 StringBuffer sb = new StringBuffer("<shapes>\n");
                 sb = sb.append(coordsStr);
                 sb.append("</shapes>");
+                int idx = sb.indexOf("polygon");
+                String name = dataChoice.getName();
+                String nameStr = "name=\"" + name + "\" ";
+                sb.insert(idx + 8, nameStr);
                 //System.out.println(" ss " + sb);
                 return new visad.Text(sb.toString());
             } else {
