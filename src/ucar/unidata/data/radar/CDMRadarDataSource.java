@@ -23,12 +23,7 @@ package ucar.unidata.data.radar;
 
 import ucar.nc2.units.DateUnit;
 
-import ucar.unidata.data.CompositeDataChoice;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSelection;
-import ucar.unidata.data.DataSourceDescriptor;
-import ucar.unidata.data.DataUtil;
-import ucar.unidata.data.DirectDataChoice;
+import ucar.unidata.data.*;
 import ucar.unidata.metdata.NamedStation;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.metdata.NamedStationTable;
@@ -454,6 +449,11 @@ public class CDMRadarDataSource extends RadarDataSource {
         // Add a DataChoice for each parameter we have available
         //
         try {
+            List level2GridCats =
+                    DataCategory.parseCategories("Level II Grid; RADAR_GRID_VOLUME;", true);
+
+            CompositeDataChoice gridChoice = null;
+
             for (int i = 0; i < paramTypes.length; i++) {
                 // internally used name
                 String rtName = paramTypes[i].getName();
@@ -506,7 +506,9 @@ public class CDMRadarDataSource extends RadarDataSource {
                 // sweepCategories, DataChoice.NULL_PROPERTIES));
                 double[]            angles = da.getAngles(paramName);
                 Hashtable           compositeProperties;
+                Hashtable           compositePropertiesG;
                 CompositeDataChoice momentChoice;
+               // CompositeDataChoice gridChoice;
 
                 if (da.isRHI()) {
                     compositeProperties = Misc.newHashtable(PROP_AZIMUTHS,
@@ -524,15 +526,34 @@ public class CDMRadarDataSource extends RadarDataSource {
                     compositeProperties = Misc.newHashtable(PROP_ANGLES,
                             angles, STATION_LOCATION, namedStation,
                             PROP_VOLUMEORSWEEP, VALUE_VOLUME);
+                    compositePropertiesG = Misc.newHashtable( STATION_LOCATION, namedStation);
 
                     compositeProperties.put(DataChoice.PROP_ICON,
                                             "/auxdata/ui/icons/Radar.gif");
-
+                    compositePropertiesG.put(DataChoice.PROP_ICON,
+                                            "/auxdata/ui/icons/3D.gif");
                     momentChoice = new CompositeDataChoice(
                         this, new ObjectArray(
                             momentObj, paramName, rtName, RadarConstants
                                 .VALUE_3D), stationID + " "
                                     + paramName, paramName, categories, compositeProperties);
+                 /*   if(gridChoice == null) {
+                        String cName = "Level II Grid";
+                        gridChoice = new CompositeDataChoice(
+                                this, new ObjectArray(
+                                momentObj, cName, rtName, RadarConstants
+                                .VALUE_3D), stationID + " "
+                                + cName, cName, level2GridCats, compositePropertiesG);
+                    }
+
+                  */
+                    addDataChoice(
+                            new DirectDataChoice(
+                                    this, new ObjectArray(
+                                    momentObj, paramName, rtName, RadarConstants
+                                    .VALUE_3D), stationID + " "
+                                    + paramName, paramName, level2GridCats, compositePropertiesG));
+                    //addDataChoice(gridChoice);
                 }
                 // make a DirectDataChoice for 2D plots
                 // for every tilt ("angle") above horizontal;
