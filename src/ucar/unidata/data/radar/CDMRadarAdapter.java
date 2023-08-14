@@ -39,9 +39,13 @@ import ucar.nc2.dt.grid.GridCoordSys;
 import ucar.nc2.units.DateUnit;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.unidata.data.*;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.geoloc.Bearing;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.idv.control.ColorRadarVolumeControl;
+import ucar.unidata.idv.control.DisplayControlImpl;
+import ucar.unidata.idv.control.VolumeRenderControl;
 import ucar.unidata.metdata.NamedStationImpl;
 import ucar.unidata.util.*;
 
@@ -51,6 +55,7 @@ import ucar.visad.Util;
 
 import ucar.visad.data.*;
 
+import ucar.visad.quantities.CommonUnits;
 import visad.*;
 
 
@@ -69,6 +74,8 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 import java.util.*;
+
+import static ucar.unidata.idv.IdvConstants.PREF_SAMPLINGMODE;
 
 
 /**
@@ -177,6 +184,18 @@ public class CDMRadarAdapter implements RadarAdapter {
     /** _more_ */
     int number_of_bins;
 
+     double  _searchResAz = 0.1;
+     double  _searchResEl = 0.1;
+     double  _searchAzOverlapDeg = 20.0;
+     double  _searchAzOverlapHalf =  _searchAzOverlapDeg / 2.0;
+
+     double DEG_TO_RAD = 0.017453292519943295;
+     double RAD_TO_DEG = 57.29577951308232;
+     double TINY_ANGLE = 1.e-4;
+     double TINY_FLOAT = 1.e-10;
+     double _earthRadiusKm = 6375.636;
+
+    boolean nearest = true;
 
     /**
      * Zero-argument constructor for construction via unpersistence.
@@ -1786,7 +1805,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
             } else if (requestProperties.containsKey(PROP_AZIMUTH)) {
                 float rhiAzimuth = ((Float) requestProperties.get(
-                                       PROP_AZIMUTH)).floatValue();
+                        PROP_AZIMUTH)).floatValue();
                 //System.out.println("getting rhi at azimuth " + rhiAzimuth);
 
                 try {
@@ -1794,9 +1813,15 @@ public class CDMRadarAdapter implements RadarAdapter {
                 } catch (IOException ex) {
                     LogUtil.logException("getRHI", ex);
                 }
-            } else {
+            } else if (requestProperties.containsKey(ColorRadarVolumeControl.RADAR_VOLUME)) {
                 try {
                     fi = getVolume(moment, rn);
+                } catch (IOException ex) {
+                    LogUtil.logException("getGridVolume", ex);
+                }
+            } else {
+                try {
+                     fi = getGridVolume(moment, rn);
                 } catch (IOException ex) {
                     LogUtil.logException("getVolume", ex);
                 }
@@ -3035,6 +3060,32 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     *  the number of ray maybe different among sweep;
+     *
+     *
+     *  @param sweepVar
+     *
+     *  @return the maximum of ray number
+     */
+    private int getRayNumberMax(RadialDatasetSweep.RadialVariable sweepVar) {
+        int numSweep = sweepVar.getNumSweeps();
+        int numRay   = sweepVar.getSweep(0).getRadialNumber();
+
+        if (numSweep == 1) {
+            return numRay;
+        } else {
+            for (int i = 0; i < numSweep; i++) {
+                int num = sweepVar.getSweep(i).getRadialNumber();
+
+                if (num > numRay) {
+                    numRay = num;
+                }
+            }
+        }
+
+        return numRay;
+    }
+    /**
      * get radar gate number
      *
      * @param sweepVar radar variable
@@ -4096,6 +4147,297 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @param moment moment
      * @param varName variable name
      *
+     * @return gridded volume as a FieldImpl
+     *
+     * @throws IOException     Problem reading data
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  Couldn't create VisAD Object
+     */
+    public FieldImpl getGridVolume(int moment, String varName)
+            throws VisADException, IOException {
+
+        ObjectPair cacheKey =
+                new ObjectPair(new ObjectPair(radarLocation, baseTime),
+                        new ObjectPair(new Integer(moment),
+                                "grid vol"));
+        FlatField retField = (FlatField) getCache(cacheKey);
+
+        if (retField != null) {
+            return retField;
+        }
+
+        FlatField rfi = getVolumeG(moment, varName);
+
+        //FlatField fi = (FlatField) resampleToLatLonAltGrid(rfi,
+        //        moment);
+        //FlatField fii = (FlatField) GridUtil.smooth(fi, "SM5S", 6);
+        //putCache(cacheKey, fii);
+        return rfi;
+    }
+
+    // resample the 3D range-az-elev volume
+    // to a new 3D lat, lon, altitude in meters, grid
+    // spans 460 km square box in 100 steps;
+    // takes very roughly 15 seconds for a typical Level II file to
+    // be resampled.
+    // Too slow for real use; but kept here for future reference or use
+
+    /**
+     * Resample the sweep to a lat/lon/alt grid
+     *
+     * @param retField field to resample
+     * @param moment  moment (REFLECTIVITY, VELOCITY, SPECTRUM_WIDTH) of data
+     *
+     * @return  resampled grid
+     *
+     * @throws RemoteException  couldn't create remote object
+     * @throws VisADException  couldn't create VisAD object
+     */
+    private Field resampleToLatLonAltGrid(FlatField retField, int moment)
+            throws VisADException, RemoteException {
+        ObjectPair cacheKey =
+                new ObjectPair(new ObjectPair(radarLocation, baseTime),
+                        new ObjectPair(new Integer(moment),
+                                new String("latlonalt grid")));
+        Field cacheField = (dataSource == null)
+                ? null
+                : (Field) dataSource.getCache(cacheKey);
+        if (cacheField != null) {
+            return cacheField;
+        }
+        int xyDim = 100;
+        int zDim  = 14;
+        //long t1 = System.currentTimeMillis ();
+        RadarMapProjection radarCS =
+                new RadarMapProjection(radarLocation.getLatLonPoint(), xyDim,
+                        xyDim);
+        Linear2DSet l2dset = new Linear2DSet(-180.0, 280.0, xyDim, -180.0,
+                280.0, xyDim);
+        float[][] gridlocs = l2dset.getSamples();
+        float[][] latLonLocs = radarCS.toReference(gridlocs,
+                new Unit[] { CommonUnits.KILOMETER,
+                        CommonUnits.KILOMETER });
+        float[][] domainVals = new float[3][xyDim * xyDim * zDim];
+        int       kk         = 0;
+        for (int zi = 0; zi < zDim; zi++) {
+            int jj = 0;
+            for (int yi = 0; yi < xyDim; yi++) {
+                for (int xi = 0; xi < xyDim; xi++) {
+                    domainVals[0][kk] = latLonLocs[0][jj];
+                    domainVals[1][kk] = latLonLocs[1][jj];
+                    domainVals[2][kk] = 1000.0f * zi + 500.0f;
+                    jj++;
+                    kk++;
+                }
+            }
+        }
+        RealTupleType tt = new RealTupleType(RealType.Latitude,
+                RealType.Longitude,
+                RealType.Altitude);
+        Gridded3DSet g3Dset = new Gridded3DSet(tt, domainVals, xyDim, xyDim,
+                zDim);
+        Field rsfield = retField.resample(g3Dset, Data.NEAREST_NEIGHBOR,
+                Data.NO_ERRORS);
+        //long t2 = System.currentTimeMillis ();
+        if (dataSource != null) {
+            dataSource.putCache(cacheKey, rsfield);
+        }
+        return (FlatField) rsfield;
+    }
+
+    /**
+     *  Makes a field of all data from one common data model radar adapter;
+     *
+     *
+     * @param moment moment
+     * @param varName variable name
+     *
+     * @return gridded volume as a FieldImpl
+     *
+     * @throws IOException     Problem reading data
+     * @throws RemoteException Java RMI problem
+     * @throws VisADException  Couldn't create VisAD Object
+     */
+    public FlatField getVolumeG(int moment, String varName)
+            throws VisADException, IOException {
+
+        int       numCols     = 100;
+        int       numRows     = 100;
+        int       numLevels     = 14;
+
+        int xyDim = 100;
+        int zDim  = 14;
+        //long t1 = System.currentTimeMillis ();
+        RadarMapProjection radarCS =
+                new RadarMapProjection(radarLocation.getLatLonPoint(), xyDim,
+                        xyDim);
+        Linear2DSet l2dset = new Linear2DSet(-180.0, 280.0, xyDim, -180.0,
+                280.0, xyDim);
+        float[][] gridlocs = l2dset.getSamples();
+        float[][] latLonLocs = radarCS.toReference(gridlocs,
+                new Unit[] { CommonUnits.KILOMETER,
+                        CommonUnits.KILOMETER });
+
+        float [] lats = new float[xyDim];
+        float [] lons = new float[xyDim];
+        float [] levels = new float[zDim];
+        for (int i = 0; i < xyDim; i++){
+            lats[i] = latLonLocs[0][i*xyDim];
+            lons[i] = latLonLocs[1][i];
+        }
+        for (int zi = 0; zi < zDim; zi++){
+            levels[zi] =  1000.0f * zi + 500.0f;
+        }
+
+        GridLoc [][][] gridLocs = computeGridRow(numCols, numRows, numLevels, lats, lons, levels );
+
+        RadialDatasetSweep.RadialVariable sweepVar =
+                getRadialVariable(varName);
+
+        Object[] cut           = getCutIdx(sweepVar);
+        int      numberOfSweeps = cut.length;
+        int      numberOfRay    = getRayNumberMax(sweepVar);
+
+        RadialDatasetSweep.Sweep s0 = sweepVar.getSweep(numberOfSweeps - 1);
+        range_to_first_gate = s0.getRangeToFirstGate() / 1000.0;
+        range_step          = s0.getGateSize() / 1000.0;
+        float beamWidth           = s0.getBeamWidth();
+        double halfBeamWidth;
+
+        halfBeamWidth = beamWidth / 2;
+        double[][] myAziArray  = new double[numberOfSweeps][numberOfRay];
+        int[][]   aziArrayIdx = new int[numberOfSweeps][numberOfRay];
+        double[] elevs = new double[numberOfSweeps];
+        double [][][] allData = new double[numLevels][numRows][numCols];
+
+        Ray[][] allRays = getRays(sweepVar, numberOfRay, elevs, myAziArray);
+
+        for (int b = 0; b < numberOfSweeps; b++) {
+            aziArrayIdx[b] =sortFloatArrayWithNaNAndIndices(myAziArray[b]);
+            myAziArray[b] = removeNaNfromSortedArray(myAziArray[b]);
+        }
+
+        for (int iz = 0; iz < numLevels; iz++) {
+            for (int iy = 0; iy < numRows; iy++) {
+                double[] rowData = interpGridRow(iz, iy, gridLocs, allRays, elevs, myAziArray, aziArrayIdx);
+                allData[iz][iy] = rowData;
+            } // iy
+        } //
+
+        FlatField                retField;
+
+        float[][] domainVals = new float[3][xyDim * xyDim * zDim];
+        float[][] signalVals = new float[1][xyDim * xyDim * zDim];
+        int       kk         = 0;
+        for (int zi = 0; zi < zDim; zi++) {
+            int jj = 0;
+            for (int yi = 0; yi < xyDim; yi++) {
+                for (int xi = 0; xi < xyDim; xi++) {
+                    domainVals[0][kk] = latLonLocs[0][jj];
+                    domainVals[1][kk] = latLonLocs[1][jj];
+                    domainVals[2][kk] = 1000.0f * zi + 500.0f;
+                    jj++;
+                    kk++;
+                }
+            }
+        }
+
+        int k = 0;
+
+        for (int zi = 0; zi < zDim; zi++) {
+            double[][] _data2      = allData[zi];
+            for (int yi = 0; yi < xyDim; yi++) {
+                double[] __data2   = _data2[yi];
+                for (int xi = 0; xi < xyDim; xi++) {
+                    signalVals[0][k] = (float)__data2[xi];
+                    k++;
+                }
+            }
+        }
+
+
+        RealTupleType tt = new RealTupleType(RealType.Latitude,
+                RealType.Longitude,
+                RealType.Altitude);
+        Gridded3DSet g3Dset = new Gridded3DSet(tt, domainVals, xyDim, xyDim,
+                zDim);
+        Unit          u               = getUnit(sweepVar);
+        FunctionType functionType = new FunctionType(tt,
+                getMomentType(varName, u));
+        retField = new FlatField(functionType, g3Dset,
+                (CoordinateSystem) null, (Set[]) null,
+                new Unit[] { u });
+        retField.setSamples(signalVals, false);
+
+
+        return retField;
+
+    }
+    /**
+     * the sorted array may have some NaN at the end of the array
+     *
+     * @param sortedArr _more_
+     */
+    public static double[] removeNaNfromSortedArray(double[] sortedArr) {
+        int n = sortedArr.length - 1;
+
+        while(Double.isNaN(sortedArr[n])){
+           n--;
+        }
+        double [] noNaNArray = new double[n+1];
+        System.arraycopy(sortedArr, 0, noNaNArray, 0, n+1);
+        return noNaNArray;
+    }
+
+    /**
+     * This is api by chatgpt to sort an array and put the NaN at its end
+     *
+     * @param arr _more_
+     */
+    public static int[] sortFloatArrayWithNaNAndIndices(double[] arr) {
+        // Create an array of indices
+        Integer[] indices = new Integer[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            indices[i] = i;
+        }
+
+        // Sort the indices array based on the corresponding float values in the input array
+        Arrays.sort(indices, (a, b) -> {
+            if (Double.isNaN(arr[a]) && Double.isNaN(arr[b])) {
+                return 0; // Both are NaN values, considered equal
+            } else if (Double.isNaN(arr[a])) {
+                return 1; // NaN is considered greater than any other value
+            } else if (Double.isNaN(arr[b])) {
+                return -1; // NaN is considered greater than any other value
+            } else {
+                return Double.compare(arr[a], arr[b]); // Regular comparison for non-NaN values
+            }
+        });
+
+        // Create the sorted float array with NaN values at the end
+        double[] sortedArray = new double[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            sortedArray[i] = arr[indices[i]];
+        }
+
+        // Create the array of original positions
+        int[] originalPositions = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            originalPositions[i] = indices[i];
+        }
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = sortedArray[i];
+        }
+        return originalPositions;
+    }
+
+    /**
+     *  Makes a field of all data from one common data model radar adapter;
+     *
+     *
+     * @param moment moment
+     * @param varName variable name
+     *
      * @return volume as a FieldImpl
      *
      * @throws IOException     Problem reading data
@@ -4466,4 +4808,980 @@ public class CDMRadarAdapter implements RadarAdapter {
         } catch (IOException ioe) {}
     }
 
+    /**
+     * Ray is the class used to store all information associated with each ray.
+     */
+    class Ray {
+        public int rayIndex;
+        public int sweepIndex;
+        public double el;
+        public double az;
+        public int nGates;
+        public float [] data;
+
+        public Ray(int sweepIndex, int rayIndex, int nGates, double el, double az, float [] data){
+            this.sweepIndex = sweepIndex;
+            this.rayIndex = rayIndex;
+            this.nGates = nGates;
+            this.el = el;
+            this.az = az;
+            this.data = data;
+        }
+    };
+
+    /**
+     * SearchPoint is the class used to store all information associated with each ray.
+     */
+    class SearchPoint {
+        public int level;
+        public int elDist;
+        public int azDist;
+
+        public   Ray ray;
+        public double rayEl; // el in search matrix coords
+        public double rayAz; // az in search matrix coords
+        public double interpEl; // el used for interp
+        public double interpAz; // az used for interp
+
+        public SearchPoint(int level, int elDist, int azDist, double rayEl,
+                           double rayAz, double interpAz, double interpEl, Ray ray){
+            this.level = level;
+            this.elDist = elDist;
+            this.azDist = azDist;
+            this.rayEl = rayEl;
+            this.rayAz = rayAz;
+            this.interpAz = interpAz;
+            this.interpEl = interpEl;
+            this.ray = ray;
+        }
+
+        public void clear() {
+            level = 0;
+            elDist = 0;
+            azDist = 0;
+            ray = null;
+            rayEl = 0.0;
+            rayAz = 0.0;
+            interpEl = 0.0;
+            interpAz = 0.0;
+        }
+    };
+    /**
+     * Neighbors is the class used to store values of 8 points near any grid point.
+     */
+    class Neighbors {
+        public double ll_inner;
+        public double ll_outer;
+        public double ul_inner;
+        public double ul_outer;
+        public double lr_inner;
+        public double lr_outer;
+        public double ur_inner;
+        public double ur_outer;
+
+        public Neighbors(double ll_inner, double ll_outer, double ul_inner, double ul_outer,
+                         double lr_inner, double lr_outer, double ur_inner, double ur_outer){
+            this.ll_inner = ll_inner;
+            this.ll_outer = ll_outer;
+            this.ul_inner = ul_inner;
+            this.ul_outer = ul_outer;
+            this.lr_inner = lr_inner;
+            this.lr_outer = lr_outer;
+            this.ur_inner = ur_inner;
+            this.ur_outer = ur_outer;
+        }
+    };
+    /**
+     * GridLoc is the class used to store both radial and grid coordinate information of
+     * any grid point.
+     */
+    class GridLoc {
+        public double elev;
+        public double az;
+        public double dist;
+        public double lat;
+        public double lon;
+        public double alt;
+        public GridLoc(double elev, double az, double dist, double lat, double lon, double alt) {
+            this.elev = elev;
+            this.az = az;
+            this.dist = dist;
+            this.lat = lat;
+            this.lon = lon;
+            this.alt = alt;
+        }
+    };
+
+    /**
+     * latLon2RTheta calculate r and theta of two latlon points
+     *
+     */
+    public void latLon2RTheta(double lat1, double lon1,
+                          double lat2, double lon2,
+                          double[] r,  double[] theta)
+    {
+
+        double darc, colat1, colat2, delon, denom, therad;
+        double [] cos_colat1= new double[1], sin_colat1 = new double[1];
+        double [] cos_colat2= new double[1], sin_colat2= new double[1];
+        double xx;
+        double[] sin_darc=new double[1], cos_darc=new double[1];
+
+        colat1 = (90.0 - lat1) * DEG_TO_RAD;
+        colat2 = (90.0 - lat2) * DEG_TO_RAD;
+        delon = (lon2 - lon1) * DEG_TO_RAD;
+
+        if (delon < -M_PI) {
+            delon += 2.0 * M_PI;
+        }
+
+        if (delon > M_PI) {
+            delon -= 2.0 * M_PI;
+        }
+
+        ta_sincos(colat1, sin_colat1, cos_colat1);
+        ta_sincos(colat2, sin_colat2, cos_colat2);
+
+        xx = cos_colat1[0] * cos_colat2[0] + sin_colat1[0] * sin_colat2[0] * Math.cos(delon);
+        if (xx < -1.0) xx = -1.0;
+        if (xx > 1.0) xx = 1.0;
+        darc = Math.acos(xx);
+        ta_sincos(darc, sin_darc, cos_darc);
+
+        r[0] = darc * _earthRadiusKm;
+
+        denom = sin_colat1[0] * sin_darc[0];
+        if ((Math.abs(colat1) <= TINY_ANGLE) || (Math.abs(denom) <= TINY_FLOAT)) {
+            therad = 0.0;
+        } else {
+            xx = (cos_colat2[0] - cos_colat1[0] * cos_darc[0]) / denom;
+            if (xx < -1.0) xx = -1.0;
+            if (xx > 1.0) xx = 1.0;
+            therad = Math.acos(xx);
+        }
+
+        if ((delon < 0.0) || (delon > M_PI))
+            therad *= -1.0;
+
+        theta[0] = therad * RAD_TO_DEG;
+
+    }
+
+    /**
+     * ta_sincos calculate sin and cos of a radians
+     *
+     */
+    void ta_sincos(double radians, double [] sinVal, double [] cosVal)
+
+    {
+
+        double cosv, sinv, interval;
+
+        /* compute cosine */
+        cosv = Math.cos(radians);
+        cosVal[0] = cosv;
+
+        /* compute sine magnitude */
+        sinv = Math.sqrt(1.0 - cosv * cosv);
+
+        /* set sine sign from location relative to PI */
+        interval = Math.floor(radians / M_PI);
+        if (Math.abs(fmod(interval, 2.0)) == 0) {
+            sinVal[0] = sinv;
+        } else {
+            sinVal[0] = -1.0 * sinv;
+        }
+
+    }
+
+    /**
+     * fmod calculate modulus for float/double
+     *
+     */
+    public static double fmod(double a, double b) {
+        int result = (int) Math.floor(a / b);
+        return a - result * b;
+    }
+
+    /**
+     * computeGridRow calculate gridloc for each grid point
+     *
+     */
+    public GridLoc [][][] computeGridRow(int numCols, int numRows, int numLevels, float[] latRows, float[] lonCols, float[] altLevels)
+
+    {
+        float _radarLat = (float) radarLocation.getLatitude().getValue();
+        float _radarLon = (float) radarLocation.getLongitude().getValue();
+
+
+        GridLoc [][][] gridLocs = new GridLoc[numLevels][numRows][numCols];
+
+        for (int iz = 0; iz < numLevels; iz++) {
+            double zz = altLevels[iz]/1000.0;
+            for (int iy = 0; iy < numRows; iy++) {
+                double gridLat = latRows[iy];
+
+                for (int ix = 0; ix < numCols; ix++) {
+                    // get the latlon of the (x,y) point in the output grid
+                    double gridLon = lonCols[ix];
+                    // get the azimuth and distance from the radar
+
+                    double[] gndRange = new double[1];
+                    double[] azimuth = new double[1];
+                    latLon2RTheta(_radarLat, _radarLon,
+                            gridLat, gridLon,
+                            gndRange, azimuth);
+                    if (azimuth[0] < 0) {
+                        azimuth[0] += 360.0;
+                    }
+                    double distt = Math.sqrt(zz*zz + gndRange[0]*gndRange[0]);
+                    // compute elevation
+                    double elevDeg = computeElevationDeg(zz, gndRange[0]);
+                    gridLocs[iz][iy][ix] = new GridLoc(elevDeg, azimuth[0], distt, gridLat, gridLon, zz);
+
+                } // ix
+            }
+        }
+
+
+
+        return gridLocs;
+
+    }
+    /**
+     * computeElevationDeg calculate elevation
+     *
+     */
+    double computeElevationDeg(double htKm, double gndRangeKm)
+    {
+        double _gndRangeKm = gndRangeKm;
+        double _htKm;
+        if (htKm == 0.0) {
+            // prevent degenerative case
+            _htKm = 0.00001;
+        } else {
+            _htKm = htKm;
+        }
+        // cannot solve directly, we use the secant gradient search
+        // method
+
+        double xx_n_2 = Math.atan2(_htKm, _gndRangeKm);
+        return xx_n_2 * RAD_TO_DEG;
+    }
+
+    /**
+     * angDist calculate sqrt of deltaEL and AZ
+     *
+     */
+    double angDist(double deltaEl, double deltaAz) {
+        double dist = Math.sqrt(deltaAz * deltaAz + deltaEl * deltaEl);
+        if (dist == 0) {
+            dist = 1.0e-6;
+        }
+        return dist;
+    }
+
+    /**
+     * loadWtsFor2ValidRays calculate neighbour values
+     *
+     */
+    Neighbors getWtsFor2ValidRays(GridLoc loc,
+                               SearchPoint ll,
+                               SearchPoint ul,
+                               SearchPoint lr,
+                               SearchPoint ur,
+                               double wtInner,
+                               double wtOuter)
+
+    {
+        double ll_inner;
+        double ll_outer;
+        double ul_inner;
+        double ul_outer;
+        double lr_inner;
+        double lr_outer;
+        double ur_inner;
+        double ur_outer;
+
+
+        double az = loc.az;
+
+        // compute 'distance' in el/az space from ray to grid location
+        // compute weights based on inverse of
+        // distances from grid pt to surrounding rays multiplied
+        // by weight for range
+
+        if (ll != null) {
+            double dist_ll = angDist(loc.elev - ll.rayEl, az - ll.rayAz);
+            double wtDist = 1.0 / dist_ll;
+            ll_inner = wtDist * wtInner;
+            ll_outer = wtDist * wtOuter;
+        } else {
+            ll_inner = 0.0;
+            ll_outer = 0.0;
+        }
+
+        if (ul != null) {
+            double dist_ul = angDist(loc.elev - ul.rayEl, az - ul.rayAz);
+            double wtDist = 1.0 / dist_ul;
+            ul_inner = wtDist * wtInner;
+            ul_outer = wtDist * wtOuter;
+        } else {
+            ul_inner = 0.0;
+            ul_outer = 0.0;
+        }
+
+        if (lr != null) {
+            double dist_lr = angDist(loc.elev - lr.rayEl, az - lr.rayAz);
+            double wtDist = 1.0 / dist_lr;
+            lr_inner = wtDist * wtInner;
+            lr_outer = wtDist * wtOuter;
+        } else {
+            lr_inner = 0.0;
+            lr_outer = 0.0;
+        }
+
+        if (ur != null) {
+            double dist_ur = angDist(loc.elev - ur.rayEl, az - ur.rayAz);
+            double wtDist = 1.0 / dist_ur;
+            ur_inner = wtDist * wtInner;
+            ur_outer = wtDist * wtOuter;
+        } else {
+            ur_inner = 0.0;
+            ur_outer = 0.0;
+        }
+
+        return new Neighbors(ll_inner, ll_outer,ul_inner, ul_outer,
+                lr_inner, lr_outer, ur_inner, ur_outer);
+
+    }
+
+    /**
+     * getWtsFor3Or4ValidRays calculate neighbour values
+     *
+     */
+    Neighbors getWtsFor3Or4ValidRays(GridLoc loc,
+                                 SearchPoint ll,
+                                 SearchPoint ul,
+                                 SearchPoint lr,
+                                 SearchPoint ur,
+                                 double wtInner,
+                                 double wtOuter)
+
+    {
+        double ll_inner;
+        double ll_outer;
+        double ul_inner;
+        double ul_outer;
+        double lr_inner;
+        double lr_outer;
+        double ur_inner;
+        double ur_outer;
+
+
+        double az = loc.az;
+
+        // compute wts for interpolating based on azimuth lower
+
+        double dazLower = lr.interpAz - ll.interpAz;
+        double wtAzLr = 0.5;
+        if (dazLower != 0.0) {
+            wtAzLr = (az - ll.interpAz) / dazLower;
+        }
+        double wtAzLl = 1.0 - wtAzLr;
+        double elLowerInterp = ll.interpEl * wtAzLl + lr.interpEl * wtAzLr;
+
+        // compute wts for interpolating based on azimuth upper
+
+        double dazUpper = ur.interpAz - ul.interpAz;
+        double wtAzUr = 0.5;
+        if (dazUpper != 0.0) {
+            wtAzUr = (az - ul.interpAz) / dazUpper;
+        }
+        double wtAzUl = 1.0 - wtAzUr;
+        double elUpperInterp = ul.interpEl * wtAzUl + ur.interpEl * wtAzUr;
+
+        // compute wts for interpolating based on interpolated elevation
+
+        double dEl = elUpperInterp - elLowerInterp;
+        double wtElUpper = 0.5;
+        if (dEl != 0) {
+            wtElUpper = (loc.elev - elLowerInterp) / dEl;
+        }
+        double wtElLower = 1.0 - wtElUpper;
+
+        // compute final wts as product of these weights
+
+        if (ll != null) {
+            double wtAng = wtAzLl * wtElLower;
+            ll_inner = wtAng * wtInner;
+            ll_outer = wtAng * wtOuter;
+        } else {
+            ll_inner = 0.0;
+            ll_outer = 0.0;
+        }
+
+        if (ul != null) {
+            double wtAng = wtAzUl * wtElUpper;
+            ul_inner = wtAng * wtInner;
+            ul_outer = wtAng * wtOuter;
+        } else {
+            ul_inner = 0.0;
+            ul_outer = 0.0;
+        }
+
+        if (lr != null) {
+            double wtAng = wtAzLr * wtElLower;
+            lr_inner = wtAng * wtInner;
+            lr_outer = wtAng * wtOuter;
+        } else {
+            lr_inner = 0.0;
+            lr_outer = 0.0;
+        }
+
+        if (ur != null) {
+            double wtAng = wtAzUr * wtElUpper;
+            ur_inner = wtAng * wtInner;
+            ur_outer = wtAng * wtOuter;
+        } else {
+            ur_inner = 0.0;
+            ur_outer = 0.0;
+        }
+
+        return new Neighbors(ll_inner, ll_outer,ul_inner, ul_outer,
+                lr_inner, lr_outer, ur_inner, ur_outer);
+    }
+
+    /**
+     * loadNearestGridPt return the nearest radial point
+     *
+     */
+    double loadNearestGridPt(int igateInner,
+                                int igateOuter,
+                                SearchPoint ll,
+                                SearchPoint ul,
+                                SearchPoint lr,
+                                SearchPoint ur,
+                                Neighbors wts)
+
+    {
+
+        // find value with highest weight - that will be closest
+
+        double[] maxWt = {0.0};
+        double[] closestVal = {0.0};
+        int[] nContrib = {0};
+
+        if (ll!= null) {
+            calculateNearest(ll.ray,  igateInner, igateOuter,
+                    wts.ll_inner, wts.ll_outer, closestVal, maxWt, nContrib);
+        }
+
+        if (ul!= null) {
+            calculateNearest(ul.ray,  igateInner, igateOuter,
+                    wts.ul_inner, wts.ul_outer, closestVal, maxWt, nContrib);
+        }
+
+        if (lr!= null) {
+            calculateNearest(lr.ray,igateInner, igateOuter,
+                    wts.lr_inner, wts.lr_outer, closestVal, maxWt, nContrib);
+        }
+
+        if (ur!= null) {
+            calculateNearest(ur.ray,  igateInner, igateOuter,
+                    wts.ur_inner, wts.ur_outer, closestVal, maxWt, nContrib);
+        }
+
+        // compute weighted mean
+
+        if (nContrib[0] >= 1) {
+            return closestVal[0];
+        } else {
+            return Float.NaN;
+        }
+       // return nContrib;
+
+    }
+
+    /**
+     * calculateNearest return the nearest radial point
+     *
+     */
+    void calculateNearest(Ray ray,
+                       int igateInner,
+                       int igateOuter,
+                       double wtInner,
+                       double wtOuter,
+                       double [] closestVal,
+                       double [] maxWt,
+                       int [] nContrib)
+
+    {
+        if (ray.data != null) {
+
+            int nGates = ray.nGates;
+            float missing = Float.NaN;
+
+            if (igateInner >= 0 && igateInner < nGates) {
+                float val = ray.data[igateInner];
+                if (val != missing) {
+                    if (wtInner > maxWt[0]) {
+                        closestVal[0] = val;
+                        maxWt[0] = wtInner;
+                    }
+                    nContrib[0]++;
+                }
+            }
+
+            if (igateOuter >= 0 && igateOuter < nGates) {
+                float val = ray.data[igateOuter];
+                if (val != missing) {
+                    if (wtOuter > maxWt[0]) {
+                        closestVal[0] = val;
+                        maxWt[0] = wtOuter;
+                    }
+                    nContrib[0]++;
+                }
+            }
+        } // if (ray->fldData)
+    }
+
+    /**
+     * loadInterpGridPt calculate each grid point value with 8
+     * nearby radial point and return the interporated value
+     *
+     */
+    double loadInterpGridPt(
+                            int igateInner,
+                            int igateOuter,
+                            SearchPoint ll,
+                            SearchPoint ul,
+                            SearchPoint lr,
+                            SearchPoint ur,
+                            Neighbors wts)
+
+    {
+
+        // sum up weighted vals
+        double[] sumVals = {0.0};
+        double[] sumWts = {0.0};
+        int[] nContrib = {0};
+
+        if (ll!= null) {
+            calAccumInterp(ll.ray,  igateInner, igateOuter,
+                    wts.ll_inner, wts.ll_outer, sumVals, sumWts, nContrib);
+        }
+
+        if (ul!= null) {
+            calAccumInterp(ul.ray,  igateInner, igateOuter,
+                    wts.ul_inner, wts.ul_outer, sumVals, sumWts, nContrib);
+        }
+
+        if (lr!= null) {
+            calAccumInterp(lr.ray,   igateInner, igateOuter,
+                    wts.lr_inner, wts.lr_outer, sumVals, sumWts, nContrib);
+        }
+
+        if (ur!= null) {
+            calAccumInterp(ur.ray,  igateInner, igateOuter,
+                    wts.ur_inner, wts.ur_outer, sumVals, sumWts, nContrib);
+        }
+
+        // compute weighted mean
+
+        if (nContrib[0] >= 2) {
+            double interpVal = Double.NaN;
+            if (sumWts[0] > 0) {
+                interpVal = sumVals[0] / sumWts[0];
+            }
+            return  interpVal;
+        } else {
+            return Double.NaN;
+        }
+    }
+
+    /**
+     * calAccumInterp return the interporate grid point value with
+     * the nearby radial points on the same ray
+     *
+     */
+    void  calAccumInterp(  Ray ray,
+                        int igateInner,
+                        int igateOuter,
+                        double wtInner,
+                        double wtOuter,
+                        double [] sumVals,
+                        double [] sumWts,
+                        int [] nContrib)
+
+    {
+        if (ray.data != null) {
+            int nGates = ray.nGates;
+            float missing = Float.NaN;
+
+            if (igateInner >= 0 && igateInner < nGates) {
+                float val = ray.data[igateInner];
+                if (val != missing) {
+                    sumVals[0] += val * wtInner;
+                    sumWts[0] += wtInner;
+                    nContrib[0]++;
+                }
+            }
+
+            if (igateOuter >= 0 && igateOuter < nGates) {
+                float val = ray.data[igateOuter];
+                if (val != missing) {
+                    sumVals[0] += val * wtOuter;
+                    sumWts[0] += wtOuter;
+                    nContrib[0]++;
+                }
+            }
+        } // if (ray->fldData)
+
+    }
+
+    /**
+     * getRays return the whole volume data as 2d rays structure
+     *
+     */
+    Ray[][] getRays(RadialDatasetSweep.RadialVariable sweepVar,
+                           int numberOfRay, double[] elevs, double[][] azims)
+            throws IOException {
+
+        Object[] cut            = getCutIdx(sweepVar);
+        int      numberOfSweeps = cut.length;
+
+        Ray[][] rays = new Ray[numberOfSweeps][numberOfRay];
+
+        for (int sweepIdx = 0; sweepIdx < numberOfSweeps; sweepIdx++) {
+            //float[][]                _data2 = data2[sweepIdx];
+            int sb = Integer.parseInt(cut[sweepIdx].toString());
+            RadialDatasetSweep.Sweep s1     = sweepVar.getSweep(sb);
+            int rnumber = s1.getRadialNumber();
+            elevs[sweepIdx] = s1.getMeanElevation();
+            float[] s1data = s1.readData();
+            int gnum = s1.getGateNumber();
+            for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
+                //int si = rayIndex[sweepIdx][rayIdx];
+                float[] data2 = new float[gnum];
+                if (rayIdx < rnumber) {
+                    double az = s1.getAzimuth(rayIdx);
+                    double el = s1.getElevation(rayIdx);
+                    azims[sweepIdx][rayIdx] = az;
+                    //int     rnumber = rNum[sweepIdx];
+                    data2 = s1.readData(rayIdx);
+
+                    rays[sweepIdx][rayIdx] = new Ray(sweepIdx, rayIdx, gnum, el, az, data2);
+                } else {
+                    //data2 = getFloatNaN(numBin);
+                    azims[sweepIdx][rayIdx] = Float.NaN;
+                    rays[sweepIdx][rayIdx] = null;
+                }
+
+                //rays[sweepIdx][rayIdx] = new Ray(sweepIdx, rayIdx, numBin, el, az, data2);
+            }
+
+        }
+
+        return rays;
+
+    }
+
+    /**
+     * interpRow return each row data
+     * For each grid point use radial coordinate information in the gridloc to find the
+     * neighbour rays, calculate the neighbour values, and finally calculate the value
+     * of the grid point.
+     *
+     */
+    double [] interpGridRow(int iz, int iy, GridLoc [][][]loc, Ray[][] rays, double[] elevs, double[][] azims, int[][] azidx)
+    {
+        int Nx = 100;
+        double [] rowVals = new double[Nx];
+
+        for (int ix = 0; ix < Nx; ix++) {
+            GridLoc lloc = loc[iz][iy][ix];
+
+            double elevation = lloc.elev;
+            double azimuth = lloc.az;
+            double alt = lloc.alt;
+
+            int [][] nears = getNeighborRays(azimuth, elevation, elevs, azims, azidx);
+            // SearchPoint(int level, int elDist, int azDist, double rayEl,
+            //           double rayAz, double interpAz, double interpEl, Ray ray)
+            SearchPoint ll ;
+            SearchPoint ul ;
+            SearchPoint lr ;
+            SearchPoint ur ;
+            int nAvail = 0;
+
+            if(nears[0][0] == -999)
+                ll = null;
+            else {
+                nAvail++;
+                Ray ray = rays[nears[0][0]][nears[0][1]];
+                ll = new SearchPoint(0, 0, 0, elevation, azimuth,ray.az, ray.el, ray);
+            }
+
+            if(nears[1][0] == -999)
+                lr = null;
+            else {
+                nAvail++;
+                Ray ray = rays[nears[1][0]][nears[1][1]];
+                lr = new SearchPoint(0, 0, 0, elevation, azimuth,ray.az, ray.el, ray);
+            }
+
+            if(nears[2][0] == -999)
+                ul = null;
+            else {
+                nAvail++;
+                Ray ray = rays[nears[2][0]][nears[2][1]];
+                ul = new SearchPoint(0, 0, 0, elevation, azimuth,ray.az, ray.el, ray);
+            }
+
+            if(nears[3][0] == -999)
+                ur = null;
+            else {
+                nAvail++;
+                Ray ray = rays[nears[3][0]][nears[3][1]];
+                ur = new SearchPoint(0, 0, 0, elevation, azimuth,ray.az, ray.el, ray);
+            }
+            // get gate indices, compute weights based on range
+            double rangeKm = lloc.dist;
+            double dgate = (rangeKm - range_to_first_gate) / range_step;
+            int igateInner = (int) Math.floor(dgate);
+            int igateOuter = igateInner + 1;
+            double wtOuter = dgate - igateInner;
+            double wtInner = 1.0 - wtOuter;
+            Neighbors wts = null;
+
+            if(nAvail == 2){
+                wts = getWtsFor2ValidRays(lloc, ll, ul, lr, ur, wtInner, wtOuter);
+            } else {
+                wts = getWtsFor3Or4ValidRays(lloc, ll, ul, lr, ur, wtInner, wtOuter);
+            }
+
+// normalize weights
+
+            double sumWt = 0.0;
+            sumWt += wts.ll_inner;
+            sumWt += wts.ll_outer;
+            sumWt += wts.ul_inner;
+            sumWt += wts.ul_outer;
+            sumWt += wts.lr_inner;
+            sumWt += wts.lr_outer;
+            sumWt += wts.ur_inner;
+            sumWt += wts.ur_outer;
+            if (sumWt == 0) {
+                sumWt = 1.0;
+            }
+
+            wts.ll_inner /= sumWt;
+            wts.ll_outer /= sumWt;
+            wts.ul_inner /= sumWt;
+            wts.ul_outer /= sumWt;
+            wts.lr_inner /= sumWt;
+            wts.lr_outer /= sumWt;
+            wts.ur_inner /= sumWt;
+            wts.ur_outer /= sumWt;
+
+
+            // interpolate fields
+            if(false){
+                rowVals[ix] = loadNearestGridPt(igateInner, igateOuter, ll, ul, lr, ur, wts);
+            } else {
+                rowVals[ix] = loadInterpGridPt( igateInner, igateOuter, ll, ul, lr, ur, wts);
+            }
+        }
+        return rowVals;
+    }
+    /**
+     * this is API for finding the neighboring's ray of given az and elev
+     * the returns of the ray index of ll = 0, lr = 1, ul = 2, ur = 3
+     * @param azims is sorted azimuths with original idex in azidx
+     *
+     *
+     */
+    int [][] getNeighborRays(double az, double elev, double[] elevs, double[][] azims, int[][] azidx){
+        int [][] neighbors = new int[4][2];
+
+        int MM = elevs.length;
+        int j = findIndexToBeInserted(elevs, elev, 0, MM-1);
+        double deltaAz = azims[j][1] - azims[j][0];
+        //int i = (int)Math.floor((az - azims[j][0])/deltaAz);
+        //int i  = getAzIndex(az, azims[j], deltaAz);
+        int i  =  findInsertIndex(azims[j], az);
+
+        if (elev < elevs[0]) {
+            int jel = 0;
+            int jaz = i;
+            int NN = azims[jel].length;
+            neighbors[0][0] = -999; //ll
+            neighbors[0][1] = -999; //ll
+            neighbors[1][0] = -999;  //lr
+            neighbors[1][1] = -999;  //lr
+            if(az <= azims[jel][0]){
+                neighbors[2][0] = 0; //ul elev idx
+                neighbors[2][1] = azidx[j][NN-1]; //ul zimuths idx
+                neighbors[3][0] = 0; //ur
+                neighbors[3][1] = azidx[j][0]; //ur
+                return neighbors;
+            } else if(az >= azims[jel][NN-1]){
+                neighbors[2][0] = 0; //ul
+                neighbors[2][1] = azidx[j][NN-1]; //ul
+                neighbors[3][0] = 0; //ur
+                neighbors[3][1] = azidx[j][0]; //ur
+                return neighbors;
+            }
+            for (int ii = 0; ii < 2; ii++) {
+                if((azims[jel][jaz-1] <= az) && (azims[jel][jaz] >= az)){
+                    neighbors[2][0] = 0; //ul elev idx
+                    neighbors[2][1] = azidx[j][jaz-1]; //ul zimuths idx
+                    neighbors[3][0] = 0; //ur
+                    neighbors[3][1] = azidx[j][jaz]; //ur
+                    break;
+                } else if ((azims[jel][jaz-1] > az) && (jaz > 0)) {
+                    jaz--;
+                } else if ((azims[jel][jaz] < az) && (jaz < NN)) {
+                    jaz++;
+                } else {
+                    System.out.println("Stop for check");
+                }
+            } // ii
+            return neighbors;
+        }
+
+        if (elev > elevs[MM-1]) {
+            int jel = MM-1;
+            int jaz = i;
+            int NN = azims[jel].length;
+            neighbors[2][0] = -999; //ul
+            neighbors[2][1] = -999; //ul
+            neighbors[3][0] = -999;  //ur
+            neighbors[3][1] = -999;  //ur
+            if(az <= azims[jel][0]){
+                neighbors[0][0] = jel; //ul elev idx
+                neighbors[0][1] = azidx[j][NN-1]; //ul zimuths idx
+                neighbors[1][0] = jel; //ur
+                neighbors[1][1] = azidx[j][0]; //ur
+                return neighbors;
+            } else if(az >= azims[jel][NN-1]){
+                neighbors[0][0] = 0; //ul
+                neighbors[0][1] = azidx[j][NN-1]; //ul
+                neighbors[1][0] = 0; //ur
+                neighbors[1][1] = azidx[j][0]; //ur
+                return neighbors;
+            }
+            for (int ii = 0; ii < 2; ii++) {
+                if((azims[jel][jaz-1] <= az) && (azims[jel][jaz] >= az)) {
+                    neighbors[0][0] = MM-1;//ll
+                    neighbors[0][1] = azidx[j][jaz-1]; //ll
+                    neighbors[1][0] = MM-1;//lr
+                    neighbors[1][1] = azidx[j][jaz]; //lr
+                    break;
+                } else if ((azims[jel][jaz-1] > az) && (jaz > 0)) {
+                    jaz--;
+                } else if ((azims[jel][jaz] < az) && (jaz < NN)) {
+                    jaz++;
+                } else   {
+                    System.out.println("Stop for check");
+                }
+            } // ii
+            return neighbors;
+        }
+
+        int jel = j;
+        int jaz = i;
+        int NN = azims[jel].length;
+
+        if(az <= azims[jel][0] || az >= azims[jel][NN-1]){
+            neighbors[0][0] = jel; //ll elev idx
+            neighbors[0][1] = azidx[j][NN-1]; //ll zimuths idx
+            neighbors[1][0] = jel; //lr
+            neighbors[1][1] = azidx[j][0]; //lr
+        } else {
+            for (int ii = 0; ii < 2; ii++) {
+                if((azims[jel][jaz-1] <= az) && (azims[jel][jaz] >= az)) {
+                    neighbors[0][0] = jel; //ll elev idx
+                    neighbors[0][1] = azidx[jel][jaz-1]; //ll zimuths idx
+                    neighbors[1][0] = jel; //lr
+                    neighbors[1][1] = azidx[jel][jaz]; //lr
+                    break;
+                } else if ((azims[jel][jaz-1] > az) && (jaz > 0)) {
+                    jaz--;
+                } else if ((azims[jel][jaz] < az) && (jaz < NN)) {
+                    jaz++;
+                } else {
+                    System.out.println("Stop for check");
+                }
+            } // ii
+        }
+
+        jel = j + 1;
+        i  =  findInsertIndex(azims[jel], az);
+        jaz = i;
+        NN = azims[jel].length;
+        if(az <= azims[jel][0] || az >= azims[jel][NN-1]){
+            neighbors[2][0] = jel; //ul elev idx
+            neighbors[2][1] = azidx[jel][NN-1]; //ul zimuths idx
+            neighbors[3][0] = jel; //ur
+            neighbors[3][1] = azidx[jel][0]; //ur
+        } else {
+            for (int ii = 0; ii < 2; ii++) {
+                if((azims[jel][jaz-1] <= az) && (azims[jel][jaz] >= az)) {
+                    neighbors[2][0] = jel; //ul
+                    neighbors[2][1] = azidx[jel][jaz-1]; //ul
+                    neighbors[3][0] = jel;  //ur
+                    neighbors[3][1] = azidx[jel][jaz];  //ur
+                    break;
+                } else if ((azims[jel][jaz-1] > az) && (jaz > 0)) {
+                    jaz--;
+                } else if ((azims[jel][jaz] < az) && (jaz < NN)) {
+                    jaz++;
+                } else  {
+                    System.out.println("Stop for check");
+                }
+            } // ii
+        }
+        return neighbors;
+    }
+
+    /**
+     * findInsertIndex return the inserting index
+     * this is used for the azimuth arrays
+     */
+    public static int findInsertIndex(double[] sortedArray, double value) {
+        int insertIndex = Arrays.binarySearch(sortedArray, value);
+
+        // If the value is found, binarySearch returns the index of the value.
+        // If not found, it returns a negative value indicating the insert point.
+        // We need to convert this negative value to the actual insert index.
+        if (insertIndex < 0) {
+            insertIndex = -(insertIndex + 1);
+        }
+
+        return insertIndex;
+    }
+
+    /**
+     * findIndexToBeInserted return the inserting index
+     * this is used for the elevation arrays
+     *
+     */
+    static int findIndexToBeInserted(double[] arr, double k, int start, int end) {
+        if (k == 0 || k <= arr[0])
+            return 0;
+        if(k >= arr[end])
+            return end;
+
+        int mid = (start + end) / 2;
+
+        if (k > arr[mid] && k < arr[mid + 1])
+            return mid;
+
+        if (arr[mid] < k)
+            return findIndexToBeInserted(arr, k, mid + 1, end);
+
+        return findIndexToBeInserted(arr, k, start, mid - 1);
+    }
 }
