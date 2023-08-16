@@ -20,6 +20,7 @@
 
 package ucar.unidata.util;
 
+import javax.net.ssl.*;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1335,14 +1336,71 @@ public class IOUtil {
                 return connection.getInputStream();
             }
         } catch (Exception exc) {
-            throw new IOException("Could not load resource:" + filename
-                                  + " error:" + exc);
+            if(exc instanceof SSLHandshakeException) {
+                URL url = getURL(filename, origin);
+                try {
+                    URLConnection URL1 = openConnection(url);
+                    return URL1.getInputStream();
+                } catch (Exception ec) {
+                    throw new IOException("Could not load resource:" + filename
+                            + " error:" + ec);
+                }
+            }
         }
         throw new FileNotFoundException("Could not load resource:"
                                         + filename);
     }
 
+    protected static URLConnection openConnection(final URL url) throws IOException {
 
+        final URLConnection urlConnection = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile()).openConnection();
+
+        // adapated from
+        // https://stackoverflow.com/questions/2893819/accept-servers-self-signed-ssl-certificate-in-java-client
+        if (urlConnection instanceof HttpsURLConnection) {
+            final HttpsURLConnection conHttps = (HttpsURLConnection) urlConnection;
+
+            try {
+                // Set up a Trust all manager
+                final TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    @Override
+                    public void checkClientTrusted(final java.security.cert.X509Certificate[] certs, final String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(final java.security.cert.X509Certificate[] certs, final String authType) {
+                    }
+                } };
+
+                // Get a new SSL context
+                final SSLContext sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                // Set our connection to use this SSL context, with the "Trust all" manager in place.
+                conHttps.setSSLSocketFactory(sc.getSocketFactory());
+                // Also force it to trust all hosts
+                final HostnameVerifier allHostsValid = new HostnameVerifier() {
+                    @Override
+                    public boolean verify(final String hostname, final SSLSession session) {
+                        return true;
+                    }
+                };
+
+                // and set the hostname verifier.
+                conHttps.setHostnameVerifier(allHostsValid);
+
+            } catch (Exception ec) {
+            }
+
+        }
+
+        return urlConnection;
+    }
 
 
     /** _more_ */
