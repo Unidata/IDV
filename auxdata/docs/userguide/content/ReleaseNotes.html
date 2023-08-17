@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 6.0 release.
+The items below reflect changes since the 6.1 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -40,26 +40,44 @@ The items below reflect changes since the 6.0 release.
   </p>
 </faqitem>
 
-<faqitem id="darkmode" q="IDV Appearance Mode">
 
-  <p>
-    In macOS and Linux users can choose to adopt a light, dark, or IDV regular appearance. The dark appearance,
-    known as Dark Mode, implements an interface style that many apps already adopt. Users can edit the user
-    preference and can choose their interface appearance mode based on ambient lighting conditions.
-  </p>
-</faqitem>
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem id="ProbSevere" q="ProbSevere Statistical Model Display" >
+<faqitem id="radargriddisplay" q="Level II Radar Grid Displays">
   <p>
-    The IDV has developed a new data source type to create a time series display of the ProbSevere Statistical
-    models output that provide probabilistic guidance to forecasters on the likelihood of severe weather
-    occurrence for convection in the near term. Algorithms of ProbSevere incorporate multiple datasets
-    from satellite, radar, total lightning, and NWP into easy-to interpret products. With a direct connection
-    to the NCEP ProbSevere web page to retrieve data of the last 24 hours and the time matching feature
-    of the IDV, it is  very easy to integrate ProbSevere model data with other data source types and
-    to assist forecasters in severe weather situations.
+    New enhanced feature of level 2 radar grid display reads parameters from the level 2 volume scan radial dataset and
+    interpolates onto a regular 3D Cartesian grid. The IDV performs an 8-point weighted interpolation. The 8 possible
+    valid number of data points from 4 possible surrounding rays are identified through the efficient searching algorithms.
+    The resulting 3D Cartesian grid can be displayed as volume rendering, iso surface, cross section and plan view displays.
+  </p>
+</faqitem>
+
+<faqitem id="pointcloudsngrids" q="Point Clouds and Point Grids" >
+  <p>
+    The IDV added a new data source type "Point Cloud Data" for CF netCDF station time series feature data and provides
+    time series point clouds and point grids display for this type of point feature data. The IDV point cloud display
+    shows large number (e.g. millions) point data as a set of points colored by parameter. The point grid efficiently
+    interpolates the point station data onto the 2D regular grid and provide all 2D grided data visualization and analysis
+    functions to this high dimensional data, including the scatter display and associated statistical analysis.
+  </p>
+</faqitem>
+
+<faqitem id="addeupdate" q="ADDE Update">
+  <p>
+    We updated our ADDE services and moved towards making ADDE a service that can be moved to new systems while
+    keeping the same service name adde.ucar.edu. We reduced and redefined some of ADDE dataset definitions that we
+    maintain on all of our public-facing ADDE servers to increase the usability and persistence of dataset.
+  </p>
+</faqitem>
+
+<faqitem id="wmsupdate" q="IDV WMS Update">
+
+  <p>
+    There was a problem of connecting to the USGS WMS server in the past few releases with the error message of
+    SSLHandshakeException. We identified the problem of the trustedCerts from the Unidata web server and remove
+    the conflict of the SSLHandshake specification in the bundle libraries and create the new ramadda jar file.
+    The new updated libraries in this release will provide accesses to many WMS servers in the IDV.
   </p>
 </faqitem>
 
@@ -72,20 +90,6 @@ The items below reflect changes since the 6.0 release.
   </p>
 </faqitem>
 
-<faqitem id="texthtmldisplay" q="Text Html Display">
-  <p>
-    New enhanced Text/Html display avaiable under Displays > Special for displaying straight text or HTML, the display
-    can be added to the view window legend panel for descriptive text about the display.
-  </p>
-</faqitem>
-
-<faqitem id="displayimagequality" q="Image Capture Quality">
-  <p>
-    When doing the image capture we replaced the original screen capture APIs with Java Canvas3D “OffScreenRendering”
-    to improve the image quality. Keep Java Robot screen capture APIs only when the IDV legend and Full window is needed.
-    Replaced JPEG with PNG as the base image format for the animated movie.
-  </p>
-</faqitem>
 
 
 
