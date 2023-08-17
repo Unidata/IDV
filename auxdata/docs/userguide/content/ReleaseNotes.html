@@ -48,7 +48,7 @@ The items below reflect changes since the 6.1 release.
   <p>
     New enhanced feature of level 2 radar grid display reads parameters from the level 2 volume scan radial dataset and
     interpolates onto a regular 3D Cartesian grid. The IDV performs an 8-point weighted interpolation. The 8 possible
-    valid number of data points from 4 possible surrounding rays are identified through the efficient searching algorithms.
+    valid number of data points from 4 possible surrounding rays are identified through efficient searching algorithms.
     The resulting 3D Cartesian grid can be displayed as volume rendering, iso surface, cross section and plan view displays.
   </p>
 </faqitem>
@@ -60,6 +60,16 @@ The items below reflect changes since the 6.1 release.
     shows large number (e.g. millions) point data as a set of points colored by parameter. The point grid efficiently
     interpolates the point station data onto the 2D regular grid and provide all 2D grided data visualization and analysis
     functions to this high dimensional data, including the scatter display and associated statistical analysis.
+  </p>
+</faqitem>
+
+<faqitem id="nongeotimeseries" q="Non Geo Point Data" >
+  <p>
+    The IDV added support of non geo-located dataset. We added the support of displaying non-geolocated time series dataset.
+    Furthermore, many statistical analyses of the current IDV formulas such as:  area average, level average, max, min, mean,
+    percentile, and sum, the outputs of these analyses can now be generated as non geo-located data and exported as
+    CSV or netCDF data formats. This new feature allows users to take advantage of the IDV flexible access of many data
+    servers and prepare the data for purposes of machine learning and other scientific usages.
   </p>
 </faqitem>
 
@@ -78,15 +88,6 @@ The items below reflect changes since the 6.1 release.
     SSLHandshakeException. We identified the problem of the trustedCerts from the Unidata web server and remove
     the conflict of the SSLHandshake specification in the bundle libraries and create the new ramadda jar file.
     The new updated libraries in this release will provide accesses to many WMS servers in the IDV.
-  </p>
-</faqitem>
-
-<faqitem id="ADT" q="ADT Integration and Development">
-  <p>
-    The Advanced Dvorak Technique (ADT) utilizes longwave-infrared, temperature measurements from geostationary
-    satellites to estimate tropical cyclone (TC) intensity. The Dvorak Technique continues to be the standard
-    method for estimating TC intensity. The ADT is still experimental, and we are keep working on the integration and
-    enhancement of the ADT functionalities for the IDV community.
   </p>
 </faqitem>
 
