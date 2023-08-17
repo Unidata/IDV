@@ -300,6 +300,103 @@
                 </object>
             </property>
             <property name="ScaleFactor">
+                <parray class="float" length="16">1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0</parray>
+            </property>
+            <property name="Name">
+                <string><![CDATA[Reflectivity Transparent]]></string>
+            </property>
+            <property name="Id">
+                <string><![CDATA[Reflectivity Transparent]]></string>
+            </property>
+            <property name="Category">
+                <string><![CDATA[Transparent]]></string>
+            </property>
+            <property name="Table">
+                <array class="[F" length="4">
+                    <parray class="float" length="16">0.0,0.0,0.5294118,0.0,0.0,0.19607843,0.13333334,0.93333334,0.93333334,0.93333334,1.0,0.6901961,0.6901961,0.7294118,1.0,1.0</parray>
+                    <parray class="float" length="16">0.0,1.0,0.80784315,0.0,1.0,0.8039216,0.54509807,0.93333334,0.8627451,0.4627451,0.1882353,0.1882353,0.1882353,0.33333334,0.0,1.0</parray>
+                    <parray class="float" length="16">0.0,1.0,0.92156863,1.0,0.0,0.19607843,0.13333334,0.0,0.50980395,0.12941177,0.1882353,0.3764706,0.3764706,0.827451,1.0,1.0</parray>
+                    <parray class="float" length="16">0.0,0.0,0.019607844,0.007843138,0.047058824,0.047058824,0.02745098,0.06666667,0.10980392,0.0,0.0,0.0,0.27450982,0.3137255,0.35686275,1.0</parray>
+                </array>
+            </property>
+            <property name="Breakpoints">
+                <object class="java.util.ArrayList">
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint"/>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.9341894060995185</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>1.0</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.24719101123595505</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.15730337078651685</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.42696629213483145</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.05457463884430177</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.7447833065810594</double>
+                            </property>
+                        </object>
+                    </method>
+                    <method name="add">
+                        <object class="ucar.unidata.util.ColorTable$Breakpoint">
+                            <property name="Value">
+                                <double>0.593900481540931</double>
+                            </property>
+                        </object>
+                    </method>
+                </object>
+            </property>
+        </object>
+    </method>
+    <method name="add">
+        <object class="ucar.unidata.util.ColorTable">
+            <property name="Range">
+                <object class="ucar.unidata.util.Range">
+                    <property name="Max">
+                        <double>80.0</double>
+                    </property>
+                    <field name="min">
+                        <java.lang.Double>0.0</java.lang.Double>
+                    </field>
+                </object>
+            </property>
+            <property name="ScaleFactor">
                 <parray class="float">rO0ABXVyAAJbRgucgYki4AxCAgAAeHAAAABGP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAD+AAAA/gAAAP4AAAA==</parray>
             </property>
             <property name="Name">
