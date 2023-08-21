@@ -128,8 +128,17 @@ def wrf_thetaE(P, PB, T, QVAPOR):
   return thetaE
 
 def wrf_SatThetaE(P, PB, T):
-   # T is perturbation temperature
-   temp = T + 300
-   press = P + PB
-   thetaESat = DerivedGridFactory.createSatEquivalentPotentialTemperature(temp, press)
-   return thetaESat
+  # T is perturbation temperature
+  temp = T + 300
+  press = P + PB
+  thetaESat = DerivedGridFactory.createSatEquivalentPotentialTemperature(temp, press)
+  return thetaESat
+
+def wrf_mslp(PSFC, HGT, T2):
+  temp = noUnit(T2) + 6.5 * noUnit(HGT)/1000.
+  pUnit = GridUtil.getParamType(PSFC).getRealComponents()[0].getDefaultUnit()
+  ee = 9.81/(287.0*temp)* noUnit(HGT)
+  exp1 = GridMath.applyFunctionOverGridsExt(ee,"exp")
+  msl = noUnit(PSFC)*exp1*0.01 + (6.7 *  noUnit(HGT)  / 1000)
+  mslp = newUnit(msl, "MSLP", "hPa")
+  return mslp
