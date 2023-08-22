@@ -785,3 +785,8 @@ def multiply3D2Dgrid(grid3d, grid2d):
   for i in range(len(grid3d)):
      tempFI.setSample(i,twoDthreeDMultiply(grid3d.getSample(i),grid2d.getSample(i)),0)
   return tempFI
+
+def GalvezDavisonIndex(temp, rh):
+  """ calculate Galvez-Davison Index
+  """
+  return GridMath.createGalvezDavisonIndex(temp, rh)
