@@ -7392,4 +7392,169 @@ public class DerivedGridFactory {
 
     }
 
+    /**
+     * Calculate the Galvez-Davison Index
+     *
+     * @param rhFI  relative humidity
+     * @param temperFI  temperature
+     *
+     * @return  the gdi
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl createGalvezDavisonIndex(
+            FieldImpl temperFI, FieldImpl rhFI)
+            throws VisADException, RemoteException {
+
+         // Calculate mixing ratio
+        FieldImpl mixRatioFI = createMixingRatio(temperFI, rhFI);
+
+        FieldImpl potentialTemp = createPotentialTemperature(  temperFI);
+
+         // Convert temperature before interpolation
+         // temperature_k = temperature.to('kelvin')
+        // potential_temp_k = potential_temp.to('kelvin')
+        Unit newunit = Util.parseUnit("kelvin");
+        RealType newTypeTemp = Util.makeRealType("temperautre", newunit);
+        FieldImpl temperature =  GridUtil.setParamType(temperFI, newTypeTemp, false);
+        RealType newTypeTheta = Util.makeRealType("theta", newunit);
+        FieldImpl theta = GridUtil.setParamType(potentialTemp, newTypeTheta, false);
+        Unit newunit0 = Util.parseUnit("kg/kg");
+        RealType newTypeTemp0 = Util.makeRealType("mixingratio", newunit0);
+        FieldImpl mixRatio =  GridUtil.setParamType(mixRatioFI, newTypeTemp0, false);
+
+        // Interpolate to find temperature and mixing ratio at 950, 850, 700, and 500 hPa
+        Unit  unitAlt = Util.parseUnit("hPa");
+        Real altitude950 = new Real(AirPressure.getRealType(), 950.0, unitAlt);
+        FieldImpl T950 = GridUtil.sliceAtLevel(temperature, altitude950);
+        FieldImpl TH950 = GridUtil.sliceAtLevel(theta, altitude950);
+        FieldImpl MR950 = GridUtil.sliceAtLevel(mixRatio, altitude950);
+
+        Real altitude850 = new Real(AirPressure.getRealType(), 850.0, unitAlt);
+        FieldImpl T850 = GridUtil.sliceAtLevel(temperature, altitude850);
+        FieldImpl TH850 = GridUtil.sliceAtLevel(theta, altitude850);
+        FieldImpl MR850 = GridUtil.sliceAtLevel(mixRatio, altitude850);
+
+        Real altitude700 = new Real(AirPressure.getRealType(), 700.0, unitAlt);
+        FieldImpl T700 = GridUtil.sliceAtLevel(temperature, altitude700);
+        FieldImpl TH700 = GridUtil.sliceAtLevel(theta, altitude700);
+        FieldImpl MR700 = GridUtil.sliceAtLevel(mixRatio, altitude700);
+
+        Real altitude500 = new Real(AirPressure.getRealType(), 500.0, unitAlt);
+        FieldImpl T500 = GridUtil.sliceAtLevel(temperature, altitude500);
+        FieldImpl TH500 = GridUtil.sliceAtLevel(theta, altitude500);
+        FieldImpl MR500 = GridUtil.sliceAtLevel(mixRatio, altitude500);
+
+        FieldImpl th_a = TH950;
+        FieldImpl r_a = MR950;
+
+        FieldImpl th_b = (FieldImpl) GridMath.add(TH850, TH700).multiply(new Real(0.5));
+        FieldImpl r_b = (FieldImpl) GridMath.add(MR850, MR700).multiply(new Real(0.5));
+
+        FieldImpl th_c = TH500;
+        FieldImpl r_c = MR500;
+
+        // Empirical adjustment
+        float alpha = -10;
+
+        //Latent heat of vaporization of water
+        double Lo = 2.69E6;
+        double Cp_d = 1005.7;
+        // Temperature math from here on requires kelvin units
+        FieldImpl a = GridMath.divide((FieldImpl)r_a.__mul__(Lo), (FieldImpl)T850.__mul__(Cp_d));
+        FieldImpl eptp_a = GridMath.multiply(th_a, GridMath.applyFunctionOverGridsExt(a,"exp"));
+        FieldImpl b = GridMath.divide((FieldImpl)r_b.__mul__(Lo), (FieldImpl)T850.__rmul__(Cp_d));
+        FieldImpl eptp_b0 = GridMath.multiply(th_b, GridMath.applyFunctionOverGridsExt(b,"exp"));
+        FieldImpl eptp_b = (FieldImpl)eptp_b0.add(new Real(alpha));
+        FieldImpl c = GridMath.divide((FieldImpl)r_c.__rmul__(Lo), (FieldImpl)T850.__rmul__(Cp_d));
+        FieldImpl eptp_c0 = GridMath.multiply(th_c, GridMath.applyFunctionOverGridsExt(c,"exp"));
+        FieldImpl eptp_c = (FieldImpl)eptp_c0.add(new Real(alpha));
+
+        // Calculate C.B.I.
+        // Empirical adjustment
+        float beta = 303;
+        // Low-troposphere EPT
+        FieldImpl l_e = (FieldImpl)eptp_a.__sub__(beta);
+        // Mid-troposphere EPT
+        FieldImpl m_e = (FieldImpl)eptp_c.__sub__(beta);
+
+        // Gamma unit - likely a typo from the paper, should be units of K^(-2) to
+        //  result in dimensionless CBI
+        double gamma = 6.5e-2; // (1 / units.kelvin)
+        float zero_kelvin = 0 ;
+
+        // Replace conditional in paper for array compatibility.
+        // Will set CBI for any l_e < 0 to 0
+        l_e = GridMath.replaceNegativeValue(l_e, 0);
+
+        FieldImpl column_buoyancy_index = (FieldImpl)GridMath.multiply(l_e, m_e).__mul__(gamma);
+        // Convert to magnitude and dimensionless to avoid unit issue from typo
+        //column_buoyancy_index = column_buoyancy_index.magnitude
+
+        // Calculate Mid-tropospheric Warming Index
+        double tau = 263.15; //   units.kelvin  # Threshhold
+        double mu = -7; //  (1 / units.kelvin)  # Empirical adjustment
+
+        FieldImpl t_diff = (FieldImpl)T500.__sub__(tau);
+
+        t_diff = GridMath.replaceNegativeValue(t_diff, 0);
+
+        // mid_tropospheric_warming_index = mu * t_diff
+        FieldImpl mid_tropospheric_warming_index = (FieldImpl) t_diff.__mul__(mu);
+        //mid_tropospheric_warming_index = mid_tropospheric_warming_index.magnitude
+
+        // Calculate Inversion Index
+        double sigma = 1.5; //   (1 / units.kelvin)  # Empirical scaling constant
+        FieldImpl s = GridMath.subs(T950 , T700);
+        FieldImpl s0 = removeUnit(s);
+        FieldImpl d =  GridMath.subs(eptp_b , eptp_a);
+        FieldImpl d0 =removeUnit(d);
+
+        FieldImpl inv_sum = GridMath.add(s0 , d0);
+
+        inv_sum  = GridMath.replacePositiveValue(inv_sum, 0);
+
+        FieldImpl inversion_index =  (FieldImpl)inv_sum.__mul__(sigma);
+        // inversion_index = inversion_index.magnitude
+
+        // Calculate Terrain Correction
+        //float p_3 = 18;
+        //float p_2 = 9000; //   units.hectopascal
+        //float p_1 = 500; //  units.hectopascal
+        //p_sfc = pressure[0]
+        //terrain_correction = p_3 - (p_2 / (p_sfc - p_1))
+
+        // Convert all to 'dimensionless'
+        RealType rt = GridUtil.getParamType(column_buoyancy_index).getRealComponents()[0];
+        RealType newType = Util.makeRealType(rt.getName(), visad.CommonUnit.promiscuous);
+        FieldImpl CBI = GridUtil.setParamType(column_buoyancy_index, newType, false);
+        RealType rt1 = GridUtil.getParamType(mid_tropospheric_warming_index).getRealComponents()[0];
+        RealType newType1 = Util.makeRealType(rt1.getName(), visad.CommonUnit.promiscuous);
+        FieldImpl MTWI = GridUtil.setParamType(mid_tropospheric_warming_index, newType1, false);
+        RealType rt2 = GridUtil.getParamType(inversion_index).getRealComponents()[0];
+        RealType newType2 = Util.makeRealType(rt2.getName(), visad.CommonUnit.promiscuous);
+        FieldImpl II = GridUtil.setParamType(inversion_index, newType2, false);
+
+        FieldImpl GDI = GridMath.add(CBI , GridMath.add(MTWI, II));
+
+        return GDI;
+    }
+
+    /**
+     * remove unit
+     *
+     * @param field
+     *
+     * @return  the new field
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl removeUnit(FieldImpl field) throws VisADException {
+        RealType rt = GridUtil.getParamType(field).getRealComponents()[0];
+        RealType newType = Util.makeRealType(rt.getName(), visad.CommonUnit.promiscuous);
+        FieldImpl newField = GridUtil.setParamType(field, newType, false);
+
+        return newField;
+    }
+
 }
