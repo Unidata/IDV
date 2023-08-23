@@ -7541,6 +7541,97 @@ public class DerivedGridFactory {
     }
 
     /**
+     * Calculate the Column Buoyancy Index
+     *
+     * @param rhFI  relative humidity
+     * @param temperFI  temperature
+     *
+     * @return  the gdi
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl createColumnBuoyancyIndex(
+            FieldImpl temperFI, FieldImpl rhFI)
+            throws VisADException, RemoteException {
+
+        // Calculate mixing ratio
+        FieldImpl mixRatioFI = createMixingRatio(temperFI, rhFI);
+
+        FieldImpl potentialTemp = createPotentialTemperature(  temperFI);
+
+        // Convert temperature before interpolation
+        // temperature_k = temperature.to('kelvin')
+        // potential_temp_k = potential_temp.to('kelvin')
+        Unit newunit = Util.parseUnit("kelvin");
+        RealType newTypeTemp = Util.makeRealType("temperautre", newunit);
+        FieldImpl temperature =  GridUtil.setParamType(temperFI, newTypeTemp, false);
+        RealType newTypeTheta = Util.makeRealType("theta", newunit);
+        FieldImpl theta = GridUtil.setParamType(potentialTemp, newTypeTheta, false);
+        Unit newunit0 = Util.parseUnit("kg/kg");
+        RealType newTypeTemp0 = Util.makeRealType("mixingratio", newunit0);
+        FieldImpl mixRatio =  GridUtil.setParamType(mixRatioFI, newTypeTemp0, false);
+
+        // Interpolate to find temperature and mixing ratio at 950, 850, 700, and 500 hPa
+        Unit  unitAlt = Util.parseUnit("hPa");
+        Real altitude950 = new Real(AirPressure.getRealType(), 950.0, unitAlt);
+        FieldImpl TH950 = GridUtil.sliceAtLevel(theta, altitude950);
+        FieldImpl MR950 = GridUtil.sliceAtLevel(mixRatio, altitude950);
+
+        Real altitude850 = new Real(AirPressure.getRealType(), 850.0, unitAlt);
+        FieldImpl T850 = GridUtil.sliceAtLevel(temperature, altitude850);
+
+        Real altitude500 = new Real(AirPressure.getRealType(), 500.0, unitAlt);
+        FieldImpl TH500 = GridUtil.sliceAtLevel(theta, altitude500);
+        FieldImpl MR500 = GridUtil.sliceAtLevel(mixRatio, altitude500);
+
+        FieldImpl th_a = TH950;
+        FieldImpl r_a = MR950;
+
+
+        FieldImpl th_c = TH500;
+        FieldImpl r_c = MR500;
+
+        // Empirical adjustment
+        float alpha = -10;
+
+        //Latent heat of vaporization of water
+        double Lo = 2.69E6;
+        double Cp_d = 1005.7;
+        // Temperature math from here on requires kelvin units
+        FieldImpl a = GridMath.divide((FieldImpl)r_a.__mul__(Lo), (FieldImpl)T850.__mul__(Cp_d));
+        FieldImpl eptp_a = GridMath.multiply(th_a, GridMath.applyFunctionOverGridsExt(a,"exp"));
+        FieldImpl c = GridMath.divide((FieldImpl)r_c.__rmul__(Lo), (FieldImpl)T850.__rmul__(Cp_d));
+        FieldImpl eptp_c0 = GridMath.multiply(th_c, GridMath.applyFunctionOverGridsExt(c,"exp"));
+        FieldImpl eptp_c = (FieldImpl)eptp_c0.add(new Real(alpha));
+
+        // Calculate C.B.I.
+        // Empirical adjustment
+        float beta = 303;
+        // Low-troposphere EPT
+        FieldImpl l_e = (FieldImpl)eptp_a.__sub__(beta);
+        // Mid-troposphere EPT
+        FieldImpl m_e = (FieldImpl)eptp_c.__sub__(beta);
+
+        // Gamma unit - likely a typo from the paper, should be units of K^(-2) to
+        //  result in dimensionless CBI
+        double gamma = 6.5e-2; // (1 / units.kelvin)
+
+
+        // Replace conditional in paper for array compatibility.
+        // Will set CBI for any l_e < 0 to 0
+        l_e = GridMath.replaceNegativeValue(l_e, 0);
+
+        FieldImpl column_buoyancy_index = (FieldImpl)GridMath.multiply(l_e, m_e).__mul__(gamma);
+
+
+        // Convert all to 'dimensionless'
+        RealType rt = GridUtil.getParamType(column_buoyancy_index).getRealComponents()[0];
+        RealType newType = Util.makeRealType(rt.getName(), visad.CommonUnit.promiscuous);
+        FieldImpl CBI = GridUtil.setParamType(column_buoyancy_index, newType, false);
+
+        return CBI;
+    }
+    /**
      * remove unit
      *
      * @param field
