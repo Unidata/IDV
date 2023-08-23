@@ -7505,9 +7505,9 @@ public class DerivedGridFactory {
 
         // Calculate Inversion Index
         double sigma = 1.5; //   (1 / units.kelvin)  # Empirical scaling constant
-        FieldImpl s = GridMath.subs(T950 , T700);
+        FieldImpl s = GridMath.subtract(T950 , T700);
         FieldImpl s0 = removeUnit(s);
-        FieldImpl d =  GridMath.subs(eptp_b , eptp_a);
+        FieldImpl d =  GridMath.subtract(eptp_b , eptp_a);
         FieldImpl d0 =removeUnit(d);
 
         FieldImpl inv_sum = GridMath.add(s0 , d0);
