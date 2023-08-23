@@ -789,4 +789,4 @@ def multiply3D2Dgrid(grid3d, grid2d):
 def GalvezDavisonIndex(temp, rh):
   """ calculate Galvez-Davison Index
   """
-  return GridMath.createGalvezDavisonIndex(temp, rh)
+  return DerivedGridFactory.createGalvezDavisonIndex(temp, rh)
