@@ -34,13 +34,18 @@ import visad.*;
 
 import visad.georef.MapProjection;
 
+import visad.python.JPythonMethods;
 import visad.util.DataUtility;
 
 
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static ucar.unidata.data.grid.GridUtil.DEFAULT_ERROR_MODE;
 
 
 /**
@@ -59,6 +64,8 @@ public class GridMath {
 
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_PRCNTL = "ensemblePercentile";
+
+    public static final String PRCNTL = "percentile";
 
     /** function for the applyFunctionOverTime routine */
     public static final String FUNC_UPROB = "ensembleUProbability";
@@ -1494,6 +1501,17 @@ public class GridMath {
                     }
                 }
             }
+
+            if (function.equals(FUNC_PRCNTL)) {
+
+                for (int i = 0; i < values.length; i++) {
+                    for (int j = 0; j < values[i].length; j++) {
+                        if(Math.exp(values[i][j]) < 0)
+                            System.out.print(1);
+                        values[i][j] = (float) Math.exp(values[i][j]);
+                    }
+                }
+            }
             newGrid.setSamples(values, false);
             return newGrid;
         } catch (CloneNotSupportedException cnse) {
@@ -1978,8 +1996,125 @@ public class GridMath {
         }
 
     }
+    /**
+     * Apply the function to the 2D grid.
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
+     *
+     * @param function One of the FUNC_ enums
+     *
+     * @return the new time series point field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionOverGrid2D(FieldImpl grid, String function, String statThreshold)
+            throws VisADException {
 
+        FieldImpl sampledFI = null;
+        try {
+            if (GridUtil.isTimeSequence(grid)) {
 
+                TupleType    rangeType  = null;
+                Gridded2DSet newDomain  = null;
+                Set sequenceDomain = Util.getDomainSet(grid);
+                for (int timeStepIdx = 0;
+                     timeStepIdx < sequenceDomain.getLength(); timeStepIdx++) {
+                    FlatField sample = (FlatField)grid.getSample(timeStepIdx);
+                    if (timeStepIdx == 0) {
+                        RealTuple point = GridUtil.getCenterPoint(grid);
+                        Data sample1 =
+                                ((FlatField) grid.getSample(0)).evaluate(point,
+                                        Data.NEAREST_NEIGHBOR, DEFAULT_ERROR_MODE);// set up the functiontype
+                        if(!(sample1 instanceof RealTuple) && (sample1 instanceof Real)){
+                            sample1 = new RealTuple(new Real[] { (Real) sample1 });
+                        }
+                        FunctionType sampledType1 =
+                                new FunctionType(
+                                        ((SetType) sequenceDomain.getType()).getDomain(),
+                                        sample1.getType());
+                        sampledFI = new FieldImpl(sampledType1,
+                                sequenceDomain);
+                    }
+
+                    Data   funcFF0 = applyFunctionOverGrid2DFF((FlatField) sample, function, statThreshold);
+
+                    if (funcFF0 == null) {
+                        continue;
+                    }
+                    sampledFI.setSample(timeStepIdx, funcFF0, false);
+                }
+            } else {
+                sampledFI = null;
+            }
+            return sampledFI;
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverLevels");
+        }
+
+    }
+
+    /**
+     * Evaluate the function of the grid and the function1 to the grid1.
+     *
+     * @param grid   2d grid to apply function (max, min, average)
+     * @param grid1  2d grid to apply function1 (percentile)
+     *
+     * @param function One of the FUNC_ enums
+     *
+     * @return the new time series point field
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl applyFunctionOverGrid2D(FieldImpl grid, String function, FieldImpl grid1,
+                                                    String function1, float percentile)
+            throws VisADException {
+        FieldImpl sampledFI = null;
+        try {
+            if (GridUtil.isTimeSequence(grid)) {
+                Set          timeDomain = grid.getDomainSet();
+
+                for (int timeStepIdx = 0;
+                     timeStepIdx < timeDomain.getLength(); timeStepIdx++) {
+                    FieldImpl sample =
+                            (FieldImpl) grid.getSample(timeStepIdx);
+                    FieldImpl sample1 =
+                            (FieldImpl) grid1.getSample(timeStepIdx);
+
+                    if (timeStepIdx == 0) {
+                        RealTuple point = GridUtil.getCenterPoint(grid);
+                        Data sample0 =
+                                ((FlatField) grid.getSample(0)).evaluate(point,
+                                        Data.NEAREST_NEIGHBOR, DEFAULT_ERROR_MODE);// set up the functiontype
+
+                        FunctionType sampledType1 =
+                                new FunctionType(
+                                        ((SetType) timeDomain.getType()).getDomain(),
+                                        sample0.getType());
+                        sampledFI = new FieldImpl(sampledType1,
+                                timeDomain);
+                    }
+                    if (sample == null) {
+                        continue;
+                    }
+
+                    Real  funcFF = applyFunctionOverGrid2DFF((FlatField) sample,
+                                        function, (FlatField) sample1, function1, percentile);
+
+                    sampledFI.setSample(timeStepIdx, funcFF, false);
+                }
+            } else {
+                sampledFI = null;
+            }
+            return sampledFI;
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverLevels");
+        }
+
+    }
     /**
      * Apply the function to a single time step of a grid over the levels.
      * The function is one of the FUNC_ enums
@@ -1998,6 +2133,7 @@ public class GridMath {
             throws VisADException {
         final boolean doMax = function.equals(FUNC_MAX);
         final boolean doMin = function.equals(FUNC_MIN);
+        final boolean doPer = function.equals(FUNC_PRCNTL);
         if (newRangeType == null) {
             newRangeType =
                 GridUtil.makeNewParamType(GridUtil.getParamType(grid),
@@ -2019,36 +2155,42 @@ public class GridMath {
             for (int np = 0; np < samples.length; np++) {
                 float[] paramVals = samples[np];
                 float[] newVals   = newValues[np];
-                for (int j = 0; j < sizeY; j++) {
-                    for (int i = 0; i < sizeX; i++) {
-                        int   numNonMissing = 0;
-                        float result        = Float.NaN;
-                        for (int k = 0; k < sizeZ; k++) {
-                            int   index = k * sizeX * sizeY + j * sizeX + i;
-                            float value = paramVals[index];
-                            if (value != value) {
-                                continue;
-                            }
-                            if (result != result) {  // first non-missing
-                                result = value;
-                                numNonMissing++;
-                            } else {
-                                if (doMax) {
-                                    result = Math.max(result, value);
-                                } else if (doMin) {
-                                    result = Math.min(result, value);
-                                } else {
-                                    result += value;
+                if(doPer){
+                    int len = paramVals.length;
+                    float result = evaluatePercentile(paramVals,0, len,95.0);
+                    Arrays.fill(newVals, result);
+                } else {
+                    for (int j = 0; j < sizeY; j++) {
+                        for (int i = 0; i < sizeX; i++) {
+                            int numNonMissing = 0;
+                            float result = Float.NaN;
+                            for (int k = 0; k < sizeZ; k++) {
+                                int index = k * sizeX * sizeY + j * sizeX + i;
+                                float value = paramVals[index];
+                                if (value != value) {
+                                    continue;
+                                }
+                                if (result != result) {  // first non-missing
+                                    result = value;
                                     numNonMissing++;
+                                } else {
+                                    if (doMax) {
+                                        result = Math.max(result, value);
+                                    } else if (doMin) {
+                                        result = Math.min(result, value);
+                                    } else {
+                                        result += value;
+                                        numNonMissing++;
+                                    }
                                 }
                             }
+                            if (function.equals(FUNC_AVERAGE)
+                                    && (numNonMissing != 0)) {
+                                result = result / numNonMissing;
+                            }
+                            int newindex = j * sizeX + i;
+                            newVals[newindex] = result;
                         }
-                        if (function.equals(FUNC_AVERAGE)
-                                && (numNonMissing != 0)) {
-                            result = result / numNonMissing;
-                        }
-                        int newindex = j * sizeX + i;
-                        newVals[newindex] = result;
                     }
                 }
             }
@@ -2065,6 +2207,151 @@ public class GridMath {
             throw new VisADException("RemoteException checking missing data");
         }
         return newField;
+
+    }
+    /**
+     * Apply the function to the 2D grid.
+     *
+     * @param grid   grid to average
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
+     *
+     * @param function One of the FUNC_ enums
+     *
+     * @return the new time series point field
+     *
+     * @throws VisADException  On badness
+     */
+    private static Data applyFunctionOverGrid2DFF(FlatField grid, String function, String statThreshold)
+            throws VisADException {
+        final boolean doMax = function.equals(FUNC_MAX);
+        final boolean doMin = function.equals(FUNC_MIN);
+        final boolean doAve = function.equals(FUNC_AVERAGE);
+        final boolean doPer = function.equals(FUNC_PRCNTL) || function.equals(PRCNTL);
+
+        TupleType    newRangeType = GridUtil.getParamType(grid);
+
+        Data data = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            float[][] samples   = grid.getFloats(false);
+
+            float result = 0.0f;
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+
+                int len = paramVals.length;
+                if(doPer){
+                    float percent = Float.valueOf(statThreshold);
+                    result = evaluatePercentile(paramVals,0, len,percent);
+                } else {
+                    result = 0.0f;
+                    int numCount = 0;
+                    float resultp0 = evaluatePercentile(paramVals,0, len,25);
+                    float resultp1 = evaluatePercentile(paramVals,0, len,75);
+                    for (int k = 0; k < len; k++) {
+                        float value = paramVals[k];
+                        if (value != value) {
+                            continue;
+                        }
+
+                        if (doMax) {
+                            result = Math.max(result, value);
+                        } else if (doMin) {
+                            result = Math.min(result, value);
+                        } else {
+                            if(value >= resultp0 && value <=resultp1 ) {
+                                result += value;
+                                numCount++;
+                            }
+                        }
+
+                    }
+                    if (doAve) {
+                        result = result / numCount;
+                    }
+                }
+            }
+
+            Real real = new Real(newRangeType.getRealComponents()[0], (double)result);
+            data = new RealTuple(new Real[] { (Real) real });
+            //newField = new FlatField(newFT, newDomain);
+            //newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return data;
+
+    }
+
+    /**
+     * Evaluate the function1 of the grid1 and Apply the function to the grid.
+     *
+     * @param grid   2d grid to apply function (max, min, average)
+     * @param grid1  2d grid to apply function1 (percentile)
+     *
+     * @return the new time series point field
+     *
+     * @throws VisADException  On badness
+     */
+    private static Real applyFunctionOverGrid2DFF(FlatField grid, String function, FlatField grid1,
+                                                       String function1, float percentile)
+            throws VisADException {
+        final boolean doMax = function.equals(FUNC_MAX);
+        final boolean doMin = function.equals(FUNC_MIN);
+        final boolean doAve = function.equals(FUNC_AVERAGE);
+        final boolean doPer1 = function1.equals(FUNC_PRCNTL);
+
+        TupleType  newRangeType = GridUtil.getParamType(grid);
+        Real real = null;
+        try {
+            float[][] samples   = grid.getFloats(false);
+            float[][] samples1   = grid1.getFloats(false);
+
+            float result = 0;
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+                float[] paramVals1 = samples1[np];
+
+                if(doPer1){
+                    int len = paramVals1.length;
+                    float resultP = evaluatePercentile(paramVals1,0, len,percentile);
+                    result = 0;
+
+                    int numCount = 0;
+                    for (int k = 0; k < len; k++) {
+                        float value = paramVals[k];
+                        float value1 = paramVals1[k];
+                        if (value != value) {
+                            continue;
+                        }
+                        if(value1 > resultP) {
+                            if (doMax) {
+                                result = Math.max(result, value);
+                            } else if (doMin) {
+                                result = Math.min(result, value);
+                            } else {
+                                result += value;
+                                numCount++;
+                            }
+                        }
+                    }
+                    if (doAve) {
+                        result = result / numCount;
+                    }
+                }
+            }
+
+            real = new Real(newRangeType.getRealComponents()[0], (double)result);
+
+        } catch (VisADException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return real;
 
     }
 
@@ -2172,6 +2459,7 @@ public class GridMath {
             throws VisADException {
         final boolean doMax = function.equals(FUNC_MAX);
         final boolean doMin = function.equals(FUNC_MIN);
+        final boolean doPerc = function.equals(FUNC_PRCNTL);
         if (newRangeType == null) {
             newRangeType =
                 GridUtil.makeNewParamType(GridUtil.getParamType(grid),
@@ -2496,6 +2784,14 @@ public class GridMath {
         return partial(grid, rt);
     }
 
+    public static FieldImpl partial(FieldImpl grid )
+            throws VisADException, RemoteException {
+        //SampledSet ss = GridUtil.getSpatialDomain(grid);
+        //RealType   rt =
+        //        (RealType) ((SetType) ss.getType()).getDomain().getComponent(domainIndex);
+        return (FlatField)grid.__add__(10.0);
+    }
+
     /**
      * Take the partial for the spatial domain of a grid.
      *
@@ -2668,6 +2964,56 @@ public class GridMath {
         return lower + dif * (upper - lower);
     }
 
+    public static float evaluatePercentile(final float[][] values,
+                                           final double p)
+            throws VisADException {
+
+        float [] newValues =  twoDConvert(values);
+        int length = size(values);
+        return evaluatePercentile(newValues, 0, length, p);
+    }
+
+    public static float evaluatePercentile(final float[] values,
+                                           final double p)
+            throws VisADException {
+        float ave = 0.0f;
+        int tt = 0;
+        float sum = 0.0f;
+        int length = values.length;
+        float pt =  evaluatePercentile(values, 0, length, p);
+        for(int i = 0; i < length; i++){
+            if(values[i] >= pt){
+                sum = sum + values[i];
+                tt = tt + 1;
+            }
+        }
+        ave = sum/tt;
+        return ave;
+    }
+    public static float[] twoDConvert(float[][] nums) {
+        float[] combined = new float[size(nums)];
+
+        if (combined.length <= 0) {
+            return combined;
+        }
+        int index = 0;
+
+        for (int row = 0; row < nums.length; row++) {
+            for (int column = 0; column < nums[row].length; column++) {
+                combined[index++] = nums[row][column];
+            }
+        }
+        return combined;
+    }
+
+    private static int size(float[][] values) {
+        int size = 0;
+
+        for (int index = 0; index < values.length; index++) {
+            size += values[index].length;
+        }
+        return size;
+    }
     /**
      * evaluate mode value
      *
@@ -3048,7 +3394,28 @@ public class GridMath {
         }
 
     }
+    /**
+     * Calculate XY  area average of a grid
+     *
+     * @param grid grid
+     * @return the new field
+     *
+     * @throws VisADException  On badness
+     */
+    private static float areaAverage(FieldImpl grid) throws VisADException, RemoteException{
+        float avg = 0;
+        FieldImpl areaW = JPythonMethods.createAreaField(grid);
+        double areaSum= Arrays.stream(areaW.getValues()[0]).sum();
 
+        FieldImpl areaWeights = (FieldImpl)areaW.divide(new Real(areaSum));
+
+        FieldImpl summ  =  multiply(grid, areaWeights);
+        FieldImpl summ1  =   GridMath.applyFunctionToAxis(summ, GridMath.FUNC_SUM, GridMath.AXIS_X);
+        FieldImpl summ2  =   GridMath.applyFunctionToAxis(summ1, GridMath.FUNC_SUM, GridMath.AXIS_Y);
+        FlatField summFF = (FlatField)summ2.getSample(0);
+        float  avg1 = (float)summFF.getValues()[0][0];
+        return avg1;
+    }
 
     /**
      * Calculate Helicity to a single time step of a grid
@@ -3134,4 +3501,253 @@ public class GridMath {
         return newField;
 
     }
+
+    /**
+     * substractExt subtract a grid2d from each level of the 3d grid
+     *
+     * @param grid   3d grid
+     * @param grid2d   2d grid
+     *
+     * @return the new 3d grid
+     *
+     * @throws VisADException  On badness
+     */
+    public static FieldImpl subtractExt(FieldImpl grid, FieldImpl grid2d)
+            throws VisADException, RemoteException {
+        boolean   isSequence = GridUtil.isTimeSequence(grid);
+        FieldImpl retField   = null;
+        if (isSequence) {
+            Set          s         = GridUtil.getTimeSet(grid);
+            for (int i = 0; i < s.getLength(); i++) {
+
+                FlatField f = applySubtractFunctionOverLevelsFF(((FlatField) grid.getSample(i)),
+                        ((FlatField) grid2d.getSample(i)));
+                if (i == 0) {
+                    FunctionType ftype =
+                            new FunctionType(
+                                    ((SetType) s.getType()).getDomain(),
+                                    f.getType());
+                    retField = new FieldImpl(ftype, s);
+                }
+                retField.setSample(i, f, false);
+            }
+
+
+        } else {
+            retField = applySubtractFunctionOverLevelsFF(((FlatField) grid), ((FlatField) grid2d));
+        }
+        return retField;
+    }
+
+
+    /**
+     * substractExt subtract a grid2d from each level of the 3d grid
+     *
+     * @param grid   3d grid
+     * @param grid2d   2d grid
+     *
+     * @return the new 3d grid
+     *
+     * @throws VisADException  On badness
+     */
+    private static FlatField applySubtractFunctionOverLevelsFF(FlatField grid,  FlatField grid2d)
+            throws VisADException {
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[][] samples   = grid.getFloats(false);
+            float[][] samples2d   = grid2d.getFloats(false);
+            float[][] newValues = new float[samples.length][sizeX * sizeY  * sizeZ];
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+                float[] paramVals2d = samples2d[np];
+                float[] newVals   = newValues[np];
+                for (int j = 0; j < sizeY; j++) {
+                    for (int i = 0; i < sizeX; i++) {
+                        int   numNonMissing = 0;
+                        float result        = Float.NaN;
+                        int   index2d = j * sizeX + i;
+                        float value2d = paramVals2d[index2d];
+                        for (int k = 0; k < sizeZ; k++) {
+                            int   index = k * sizeX * sizeY + j * sizeX + i;
+                            float value = paramVals[index];
+                            if (value != value) {
+                                newVals[index] =  result;
+                            }  else
+                                newVals[index] = value - value2d;
+                        }
+                    }
+                }
+            }
+
+            FunctionType newFT = (FunctionType)grid.getType();
+
+            newField = new FlatField(newFT, domainSet);
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
+
+    public static FieldImpl replaceNegativeValue(FieldImpl grid, float newValue)
+            throws VisADException, RemoteException {
+        boolean   isSequence = GridUtil.isTimeSequence(grid);
+        FieldImpl retField   = null;
+        if (isSequence) {
+            Set          s         = GridUtil.getTimeSet(grid);
+            for (int i = 0; i < s.getLength(); i++) {
+                FieldImpl funcFF = null;
+
+                FlatField f = replaceNegativeValueFF(((FlatField) grid.getSample(i)),
+                        newValue);
+                if (i == 0) {
+                    FunctionType ftype =
+                            new FunctionType(
+                                    ((SetType) s.getType()).getDomain(),
+                                    f.getType());
+                    retField = new FieldImpl(ftype, s);
+                }
+                retField.setSample(i, f, false);
+            }
+
+
+        } else {
+            retField = replaceNegativeValueFF(((FlatField) grid), newValue);
+        }
+        return retField;
+    }
+
+    private static FlatField replaceNegativeValueFF(FlatField grid,  float newValue)
+            throws VisADException {
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[][] samples   = grid.getFloats(false);
+
+            float[][] newValues = new float[samples.length][sizeX * sizeY  * sizeZ];
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+                float[] newVals   = newValues[np];
+                for (int j = 0; j < sizeY; j++) {
+                    for (int i = 0; i < sizeX; i++) {
+                        for (int k = 0; k < sizeZ; k++) {
+                            int   index = k * sizeX * sizeY + j * sizeX + i;
+                            float value = paramVals[index];
+                            if (value <= 0) {
+                                newVals[index] =  newValue;
+                            }  else
+                                newVals[index] = value;
+                        }
+                    }
+                }
+            }
+
+            FunctionType newFT = (FunctionType)grid.getType();
+
+            newField = new FlatField(newFT, domainSet);
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
+
+
+    public static FieldImpl replacePositiveValue(FieldImpl grid, float newValue)
+            throws VisADException, RemoteException {
+        boolean   isSequence = GridUtil.isTimeSequence(grid);
+        FieldImpl retField   = null;
+        if (isSequence) {
+            Set          s         = GridUtil.getTimeSet(grid);
+            for (int i = 0; i < s.getLength(); i++) {
+                FieldImpl funcFF = null;
+
+                FlatField f = replacePositiveValueFF(((FlatField) grid.getSample(i)),
+                        newValue);
+                if (i == 0) {
+                    FunctionType ftype =
+                            new FunctionType(
+                                    ((SetType) s.getType()).getDomain(),
+                                    f.getType());
+                    retField = new FieldImpl(ftype, s);
+                }
+                retField.setSample(i, f, false);
+            }
+
+
+        } else {
+            retField = replacePositiveValueFF(((FlatField) grid), newValue);
+        }
+        return retField;
+    }
+
+    private static FlatField replacePositiveValueFF(FlatField grid,  float newValue)
+            throws VisADException {
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[][] samples   = grid.getFloats(false);
+
+            float[][] newValues = new float[samples.length][sizeX * sizeY  * sizeZ];
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+                float[] newVals   = newValues[np];
+                for (int j = 0; j < sizeY; j++) {
+                    for (int i = 0; i < sizeX; i++) {
+                        for (int k = 0; k < sizeZ; k++) {
+                            int   index = k * sizeX * sizeY + j * sizeX + i;
+                            float value = paramVals[index];
+                            if (value < 0) {
+                                newVals[index] =  newValue;
+                            }  else
+                                newVals[index] = value;
+                        }
+                    }
+                }
+            }
+
+            FunctionType newFT = (FunctionType)grid.getType();
+
+            newField = new FlatField(newFT, domainSet);
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
+
 }
