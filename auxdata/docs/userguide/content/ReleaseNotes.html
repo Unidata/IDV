@@ -92,20 +92,29 @@ The items below reflect changes since the 6.1 release.
 </faqitem>
 
 
-
-
 <faqitem cat="Jython Changes"></faqitem>
 
 
-<faqitem id="wrfformulas" q="WRF NetCDF Formulas">
+<faqitem id="gdiformulas" q="Galvez-Davison Index">
   <p>
-    The original WRF netCDF output is in sigma coordinate. The current grid diagnostic formulas are mostly
-    designed for the isobaric surface parameters. The newly added WRF derived formulas provide functions
-    to directly create the derived parameters such as: Equivalent potential temperature, relative humidity,
-    Saturated Equivalent potential temperature, dewpoint, and others.
+    The Gálvez-Davison Index (GDI) is a stability index developed to improve the prediction of
+    thunderstorms and shallower types of moist convection in the tropics. The newly added formula calculate
+    GDI from the temperature and relative humidity 3D grid fields.
   </p>
 </faqitem>
 
+<faqitem id="dryformulas" q="Dry Static Energy">
+  <p>
+    The new grid diagnostics formula calculates Dry Static Energy with Temperature and Geopotential
+    Height 3D grid fields.
+  </p>
+</faqitem>
+
+<faqitem id="2d3dgrid" q="3D and 2D grid subtract and multiply">
+  <p>
+    The new grid diagnostics formula calculates computes a vertical subtract/multiply of a 2D grid from 3D grid.
+  </p>
+</faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
