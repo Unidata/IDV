@@ -80,17 +80,14 @@ Then (see below):
 
 ********************************************************************************
 
-Update the downloads toc.xml page
+Update the document page
 
-On conan:
+On robin:
 
-cd /content/downloads/idv
-edit the toc.xml
-  - change the %version% property value
-  - change where the current and previous point to
+cd /web/docs/idv
 
 change the current link to point to the new release.
-cd /content/downloads/idv
+cd /web/docs/idv
    rm current
    ln -s <current IDV version> current
 
@@ -98,21 +95,24 @@ cd /content/downloads/idv
 
 Expand the javadoc
 
-cd /web/docs/idv
-mkdir <release>
-cd /content/software/idv/<release>/docs
-jar xvf ~ftp/pub/idv/<release_dir>/idv_javadoc_<version>.jar
-cd docs
-mv javadoc /web/docs/idv/<release>/.
-cd ..
-mv userguide /web/docs/idv/<release>/.
-mv workshop /web/docs/idv/<release>/.
-rm -rf META-INF/ docs
+On robin:
+    cd /web/docs/idv/<release>
+    keep index.html and remove everything else
 
-cd /we/docs/idv
-rm docs
-ln -s <release> docs
-edit index.html
+On fserv:
+
+cd /share/idv/build*******/docs
+
+    jar cf userguide.jar userguide
+    jar cf workshop.jar workshop
+    scp userguide.jar robin:/web/docs/idv/<release>
+    scp workshop.jar robin:/web/docs/idv/<release>
+
+On robin:
+    cd /we/docs/idv/<release>
+    jar xvf userguide.jar
+    jar xvf workshop.jar
+
 ********************************************************************************
 
 Generate the PDFs
