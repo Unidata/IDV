@@ -90,6 +90,8 @@ change the current link to point to the new release.
 cd /web/docs/idv
    rm current
    ln -s <current IDV version> current
+   rm nightly
+   ln -s <current IDV version> nightly
 
 ********************************************************************************
 
@@ -97,9 +99,9 @@ Expand the javadoc
 
 On robin:
     cd /web/docs/idv/<release>
-    keep index.html and remove everything else
+    check javadoc, workshop, and userguide folders and contents
 
-On fserv:
+if any folder missing go to fserv:
 
 cd /share/idv/build*******/docs
 
