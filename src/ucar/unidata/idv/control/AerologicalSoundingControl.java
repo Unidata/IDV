@@ -1074,10 +1074,15 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             altEndIdx = altData.length-1;
             while (Float.isNaN(altData[altStartIdx]) || altData[altStartIdx] > 5000) {
                 altStartIdx++;
+                if(altStartIdx >= altEndIdx)
+                    break;
             }
         } else {
+            altStartIdx = altData.length-1;
             while (Float.isNaN(altData[altEndIdx]) || altData[altEndIdx] < 5000) {
                 altEndIdx++;
+                if(altEndIdx >= altStartIdx)
+                    break;
             }
         }
         FlatField dtempdp = (FlatField)tempPros.derivative(0);
