@@ -21,6 +21,8 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.HodographViewManager;
 import ucar.unidata.idv.SoundingViewManager;
@@ -1059,13 +1061,49 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      * Provides blh based on the temperature profile.
      */
     public float computeBLH(FlatField tempPros) throws VisADException, RemoteException {
-        float blh = 0.0f;
-        Set              domain     = tempPros.getDomainSet();
-        CoordinateSystem cs         = domain.getCoordinateSystem();
 
+        float blh = 0.0f;
+        if(tempPros.isMissing())
+            return Float.NaN;
+
+        if(Double.isNaN(Arrays.stream(tempPros.getValues()[0]).sum()))
+            return Float.NaN;
+
+        Set              domain     = tempPros.getDomainSet();
+        Unit[] vtu = domain.getSetUnits();
         float[][] domSamples = domain.getSamples(false);
+        int size = domSamples[0].length;
+
+        boolean    isPressure             = false;
+        boolean    isGeopotentialAltitude = false;
+        if ( !Unit.canConvert(vtu[0], CommonUnit.meter)) {  // other than height
+            if (Unit.canConvert(vtu[0], CommonUnits.MILLIBAR)) {
+                isPressure = true;
+            } else if (Unit.canConvert(
+                    vtu[0], GeopotentialAltitude.getGeopotentialMeter())) {
+                isGeopotentialAltitude = true;
+            } else {
+                throw new VisADException("unknown vertical coordinate");
+            }
+        }
+
         float[][] domFloats = Set.copyFloats(domSamples);
-        float[] altData = cs.toReference(domFloats)[0];
+        float[] refVals = Set.copyFloats(domSamples)[0];
+        if (isPressure) {  // convert to altitude using standard atmos
+            CoordinateSystem vcs =DataUtil.getPressureToHeightCS( DataUtil.STD_ATMOSPHERE);
+            refVals = vcs.toReference(new float[][] {
+                    refVals
+            }, new Unit[] { vtu[0] })[0];
+            vtu[0]        = vcs.getReferenceUnits()[0];
+        } else if (isGeopotentialAltitude) {
+            refVals = GeopotentialAltitude.toAltitude(refVals, vtu[0],
+                    Gravity.newReal(), refVals, CommonUnit.meter,
+                    false);
+            vtu[0] = CommonUnit.meter;
+        }
+
+        //float[][] domFloats = Set.copyFloats(domSamples);
+        float[] altData = refVals; //cs.toReference(domFloats)[0];
         int altStartIdx = 0;
         int altEndIdx = 0;
         // pressure value domFloats smaller is higher
