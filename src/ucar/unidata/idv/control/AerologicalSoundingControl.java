@@ -1085,6 +1085,9 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                     break;
             }
         }
+
+        if(altStartIdx == altEndIdx)
+            return  Float.NaN;
         FlatField dtempdp = (FlatField)tempPros.derivative(0);
         float [] tempgrd = Arrays.copyOfRange(dtempdp.getFloats()[0], altStartIdx, altEndIdx);
         float [] alt = Arrays.copyOfRange(altData, altStartIdx, altEndIdx);
