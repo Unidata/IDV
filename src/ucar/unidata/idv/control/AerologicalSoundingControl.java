@@ -1062,32 +1062,34 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      */
     public float computeBLH(FlatField tempPros) throws VisADException, RemoteException {
 
-        float blh = 0.0f;
+        //float blh = 0.0f;
         if(tempPros.isMissing())
             return Float.NaN;
 
         if(Double.isNaN(Arrays.stream(tempPros.getValues()[0]).sum()))
             return Float.NaN;
 
-        Set              domain     = tempPros.getDomainSet();
+        Set  domain = tempPros.getDomainSet();
         Unit[] vtu = domain.getSetUnits();
         float[][] domSamples = domain.getSamples(false);
-        int size = domSamples[0].length;
-
+        boolean isDescending = false;
         boolean    isPressure             = false;
         boolean    isGeopotentialAltitude = false;
         if ( !Unit.canConvert(vtu[0], CommonUnit.meter)) {  // other than height
             if (Unit.canConvert(vtu[0], CommonUnits.MILLIBAR)) {
                 isPressure = true;
+                // pressure value domSamples smaller is higher
+                isDescending = domSamples[0][0] < domSamples[0][1];
             } else if (Unit.canConvert(
                     vtu[0], GeopotentialAltitude.getGeopotentialMeter())) {
                 isGeopotentialAltitude = true;
+                // altitude value domSamples smaller is lower
+                isDescending = domSamples[0][0] > domSamples[0][1];
             } else {
                 throw new VisADException("unknown vertical coordinate");
             }
         }
 
-        float[][] domFloats = Set.copyFloats(domSamples);
         float[] refVals = Set.copyFloats(domSamples)[0];
         if (isPressure) {  // convert to altitude using standard atmos
             CoordinateSystem vcs =DataUtil.getPressureToHeightCS( DataUtil.STD_ATMOSPHERE);
@@ -1107,7 +1109,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         int altStartIdx = 0;
         int altEndIdx = 0;
         // pressure value domFloats smaller is higher
-        boolean isDescending = domFloats[0][0] < domFloats[0][1];
+        //boolean isDescending = domFloats[0][0] < domFloats[0][1];
         if(isDescending){
             altEndIdx = altData.length-1;
             while (Float.isNaN(altData[altStartIdx]) || altData[altStartIdx] > 5000) {
@@ -1133,7 +1135,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         int[] sortedIdx = QuickSort.sort(tempgrd);
         int index = 0;
         //if(Math.abs(tempgrd[0]) < tempgrd[sortedIdx.length-1])
-         //   index = sortedIdx.length-1;
+        //   index = sortedIdx.length-1;
 
         return alt[sortedIdx[index]];
     }
