@@ -74,6 +74,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import static ucar.unidata.idv.IdvConstants.PREF_SAMPLINGMODE;
 
@@ -176,10 +177,10 @@ public class CDMRadarAdapter implements RadarAdapter {
     private HashMap cutmap = null;
 
     /** _more_ */
-    private double range_step;
+    private static double range_step;
 
     /** _more_ */
-    private double range_to_first_gate;
+    private static double range_to_first_gate;
 
     /** _more_ */
     int number_of_bins;
@@ -4316,13 +4317,42 @@ public class CDMRadarAdapter implements RadarAdapter {
             aziArrayIdx[b] =sortFloatArrayWithNaNAndIndices(myAziArray[b]);
             myAziArray[b] = removeNaNfromSortedArray(myAziArray[b]);
         }
-
+        //long              start    = System.currentTimeMillis();
+        //System.out.println("Time used to grid interpolate = "
+        //        + start);
+        /*
         for (int iz = 0; iz < numLevels; iz++) {
             for (int iy = 0; iy < numRows; iy++) {
                 double[] rowData = interpGridRow(iz, iy, gridLocs, allRays, elevs, myAziArray, aziArrayIdx);
                 allData[iz][iy] = rowData;
             } // iy
         } //
+
+        */
+
+        ExecutorService executor = Executors.newFixedThreadPool(8);
+        final List<double[][]> result   = new ArrayList<double[][]>();
+        List<Future>          pthreads = new ArrayList<Future>();
+        for (int iz = 0; iz < numLevels; iz++) {
+            Callable pt = new levelThredds(iz, numCols, numRows, gridLocs, allRays, elevs, myAziArray, aziArrayIdx);
+            Future<Object> future = executor.submit(pt);
+            pthreads.add(iz, future);
+        }
+
+        for (Future<Object> o : pthreads) {
+            try {
+                int z = pthreads.indexOf(o);
+                allData[z] = (double[][]) o.get();
+                //result.add((double[][]) o.get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (ExecutionException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
+        //System.out.println("Time used to grid interpolate = "
+        //        + (System.currentTimeMillis() - start) / 1000.0);
 
         FlatField                retField;
 
@@ -4832,7 +4862,7 @@ public class CDMRadarAdapter implements RadarAdapter {
     /**
      * SearchPoint is the class used to store all information associated with each ray.
      */
-    class SearchPoint {
+    public static class SearchPoint {
         public int level;
         public int elDist;
         public int azDist;
@@ -4869,7 +4899,7 @@ public class CDMRadarAdapter implements RadarAdapter {
     /**
      * Neighbors is the class used to store values of 8 points near any grid point.
      */
-    class Neighbors {
+    public static class Neighbors {
         public double ll_inner;
         public double ll_outer;
         public double ul_inner;
@@ -5073,7 +5103,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * angDist calculate sqrt of deltaEL and AZ
      *
      */
-    double angDist(double deltaEl, double deltaAz) {
+    public static double angDist(double deltaEl, double deltaAz) {
         double dist = Math.sqrt(deltaAz * deltaAz + deltaEl * deltaEl);
         if (dist == 0) {
             dist = 1.0e-6;
@@ -5085,7 +5115,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * loadWtsFor2ValidRays calculate neighbour values
      *
      */
-    Neighbors getWtsFor2ValidRays(GridLoc loc,
+    public static Neighbors getWtsFor2ValidRays(GridLoc loc,
                                SearchPoint ll,
                                SearchPoint ul,
                                SearchPoint lr,
@@ -5160,7 +5190,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * getWtsFor3Or4ValidRays calculate neighbour values
      *
      */
-    Neighbors getWtsFor3Or4ValidRays(GridLoc loc,
+    public static Neighbors getWtsFor3Or4ValidRays(GridLoc loc,
                                  SearchPoint ll,
                                  SearchPoint ul,
                                  SearchPoint lr,
@@ -5256,7 +5286,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * loadNearestGridPt return the nearest radial point
      *
      */
-    double loadNearestGridPt(int igateInner,
+    public static double loadNearestGridPt(int igateInner,
                                 int igateOuter,
                                 SearchPoint ll,
                                 SearchPoint ul,
@@ -5307,7 +5337,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * calculateNearest return the nearest radial point
      *
      */
-    void calculateNearest(Ray ray,
+   public static void calculateNearest(Ray ray,
                        int igateInner,
                        int igateOuter,
                        double wtInner,
@@ -5351,7 +5381,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * nearby radial point and return the interporated value
      *
      */
-    double loadInterpGridPt(
+   public static double loadInterpGridPt(
                             int igateInner,
                             int igateOuter,
                             SearchPoint ll,
@@ -5405,7 +5435,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * the nearby radial points on the same ray
      *
      */
-    void  calAccumInterp(  Ray ray,
+   public static void  calAccumInterp(  Ray ray,
                         int igateInner,
                         int igateOuter,
                         double wtInner,
@@ -5461,15 +5491,17 @@ public class CDMRadarAdapter implements RadarAdapter {
             elevs[sweepIdx] = s1.getMeanElevation();
             float[] s1data = s1.readData();
             int gnum = s1.getGateNumber();
+            float[] azimuths = s1.getAzimuth();
+            float[] elevations = s1.getElevation();
             for (int rayIdx = 0; rayIdx < numberOfRay; rayIdx++) {
                 //int si = rayIndex[sweepIdx][rayIdx];
                 float[] data2 = new float[gnum];
                 if (rayIdx < rnumber) {
-                    double az = s1.getAzimuth(rayIdx);
-                    double el = s1.getElevation(rayIdx);
+                    double az = azimuths[rayIdx];
+                    double el = elevations[rayIdx];
                     azims[sweepIdx][rayIdx] = az;
-                    //int     rnumber = rNum[sweepIdx];
-                    data2 = s1.readData(rayIdx);
+                    int     srcPos = rayIdx * gnum;
+                    System.arraycopy(s1data, srcPos, data2, 0, gnum);
 
                     rays[sweepIdx][rayIdx] = new Ray(sweepIdx, rayIdx, gnum, el, az, data2);
                 } else {
@@ -5487,6 +5519,65 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     }
 
+    public static class levelThredds implements Callable<double [][]> {
+        /** _more_ */
+        int[][] azidx;
+        /** _more_ */
+        double[][] azims;
+        /** _more_ */
+        double[] elevs;
+        /** _more_ */
+        Ray[][] rays;
+        /** _more_ */
+        GridLoc [][][] loc;
+        /** _more_ */
+        int iz;
+        /** _more_ */
+        int numCols;
+        /** _more_ */
+        int numRows;
+
+        /**
+         * _more_
+         *
+         *
+         */
+        public levelThredds(int iz, int numCols, int numRows, GridLoc [][][]loc, Ray[][] rays, double[] elevs, double[][] azims, int[][] azidx) {
+            this.iz           = iz;
+            this.numCols      = numCols;
+            this.numRows      = numRows;
+            this.loc          = loc;
+            this.rays         = rays;
+            this.elevs        = elevs;
+            this.azims        = azims;
+            this.azidx        = azidx;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public double [][]  call() {
+            double [][]  ff = interpGridLevel(iz, numCols, numRows, loc, rays, elevs, azims, azidx);
+            //System.out.println("Thredds = " + i);
+            return ff;
+        }
+
+        public int iz(){
+            return iz;
+        }
+    }
+    static double [][] interpGridLevel(int iz, int numCols, int numRows, GridLoc [][][]loc, Ray[][] rays,
+                                       double[] elevs, double[][] azims, int[][] azidx)
+    {
+        double [][] levelData = new double[numRows][numCols];
+        for (int iy = 0; iy < numRows; iy++) {
+            double[] rowData = interpGridRow(iz, iy, loc, rays, elevs, azims, azidx);
+            levelData[iy] = rowData;
+        } // iy
+        return levelData;
+    }
     /**
      * interpRow return each row data
      * For each grid point use radial coordinate information in the gridloc to find the
@@ -5494,7 +5585,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * of the grid point.
      *
      */
-    double [] interpGridRow(int iz, int iy, GridLoc [][][]loc, Ray[][] rays, double[] elevs, double[][] azims, int[][] azidx)
+    public static double [] interpGridRow(int iz, int iy, GridLoc [][][]loc, Ray[][] rays, double[] elevs, double[][] azims, int[][] azidx)
     {
         int Nx = 100;
         double [] rowVals = new double[Nx];
@@ -5602,7 +5693,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      *
      */
-    int [][] getNeighborRays(double az, double elev, double[] elevs, double[][] azims, int[][] azidx){
+   public static int [][] getNeighborRays(double az, double elev, double[] elevs, double[][] azims, int[][] azidx){
         int [][] neighbors = new int[4][2];
 
         int MM = elevs.length;
