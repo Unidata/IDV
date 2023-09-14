@@ -1,7 +1,7 @@
 /*
  * $Id: CaptureManager.java,v 1.16 2005/10/20 20:46:39 jeffmc Exp $
  *
- * Copyright  1997-2022 Unidata Program Center/University Corporation for
+ * Copyright  1997-2023 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

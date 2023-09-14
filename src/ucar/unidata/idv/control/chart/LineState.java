@@ -1,7 +1,7 @@
 /*
  * $Id: LineState.java,v 1.23 2007/07/23 20:10:23 dmurray Exp $
  *
- * Copyright 1997-2022 Unidata Program Center/University Corporation for
+ * Copyright 1997-2023 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

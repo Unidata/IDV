@@ -1,7 +1,7 @@
 /*
  * $Id: SoundingAdapterImpl.java,v 1.11 2007/06/13 22:34:36 dmurray Exp $
  *
- * Copyright  1997-2022 Unidata Program Center/University Corporation for
+ * Copyright  1997-2023 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

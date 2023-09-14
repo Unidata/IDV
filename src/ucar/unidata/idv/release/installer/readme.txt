@@ -1,6 +1,6 @@
 IDV Copyright:
 
-Copyright 1997-2022 Unidata Program Center/University Corporation
+Copyright 1997-2023 Unidata Program Center/University Corporation
 for Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
 support-idv@unidata.ucar.edu.
 

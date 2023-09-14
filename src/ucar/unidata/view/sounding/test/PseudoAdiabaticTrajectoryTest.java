@@ -1,7 +1,7 @@
 /*
  * $Id: PseudoAdiabaticTrajectoryTest.java,v 1.4 2005/05/13 18:33:43 jeffmc Exp $
  *
- * Copyright  1997-2022 Unidata Program Center/University Corporation for
+ * Copyright  1997-2023 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

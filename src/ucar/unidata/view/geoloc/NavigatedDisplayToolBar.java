@@ -1,7 +1,7 @@
 /*
  * $Id: NavigatedDisplayToolBar.java,v 1.14 2007/06/11 21:28:20 jeffmc Exp $
  *
- * Copyright  1997-2022 Unidata Program Center/University Corporation for
+ * Copyright  1997-2023 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
