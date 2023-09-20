@@ -1,0 +1,93 @@
+
+<html>
+<head>
+<title>Level II Volume Grid Display</title>
+</head>
+
+<body>
+
+<div class="overview">
+<p>The IDV Level 2 radar grid display reads radial parameters from the Level 2 volume scan dataset
+and automatically generates 3D Cartesian grid parameters. The Integrated Data Viewer (IDV) employs
+an 8-point weighted interpolation method for this purpose. Efficient search algorithms are utilized to
+identify the 8 potential valid numbers of data points from 4 available surrounding rays. The resultant 3D
+Cartesian grid parameters can be showcased through various visualization techniques such as volume rendering,
+iso-surface representation, cross-sectional display, and plan-view presentations.
+</p>
+</div>
+
+<p>
+
+If necessary, select Level II data and times as described in
+[ht::popup "LoadingLevelIIData.html" "Accessing WSR-88D Level II Radar Data"].
+
+<p>
+
+<ol class="step">
+
+<li>[ht::clearDisplays]
+
+<li>Select one of the times for this dataset.
+  <ul class="substep">
+    <li>[ht::editDataSourceProperties [ht::dataset {Level II Radar Data (DVN)}]]
+    <li>From the [ht::tab Times] tab,
+        select [ht::param {1998-06-29 14:06:21Z}] time.</li>
+    <li>Click the [ht::button OK] button.
+    </li>
+  </ul>
+</li>
+
+The data source [ht::dataset Level II Radar (KDVN)]
+appears in the [ht::command Data Sources] list in the
+[ht::dialog Field Selector].
+<p></p>
+<div class="cimg"><img src="images/LevelIIDataSource1.png"></div>
+<p></p>
+
+<li>In the [ht::dialog Fields] window, there is a list of radar parameters under
+     the tab [ht::param Level II Grid].
+     <li> Click on the tab to expand the list containing the 3D grid fields and select the
+     the [ht::param Reflectivity] field, the list of displays that are
+     applicable to this field are Volume Rendering, Cross Section, IsoSurface, and Plan View displays.
+     <li> In the [ht::dialog Displays] window select a
+          [ht::display Radar Grid Volume Rendering] display and create a display.
+</li>
+
+
+<li>See the display in 3D.</li>
+  <ul class="substep">
+    <li>The 3D volume rendering display of [ht::param Reflectivity] appears in the  main  window.
+
+  <p>
+  <div class="cimg"><img src="images/LevelIIVolumeRendering1.png"></div>
+  <p>
+
+  In this display, each grid point's value is represented by a single pixel, colored according to
+  its value. Since the 3D grid fields are solid images, it requires a level of transparency. You can edit
+  the color table or choose a semi-transparent color table by clicking on the color bar to initiate the
+  Color Table Editor. This drop down menu also enables you to modify the range, select other color tables in the
+  category of "Transparent," and make necessary adjustments.
+
+  <p>
+    <div class="cimg"><img src="images/LevelIIVolumeRendering2.png"></div>
+  <p>
+
+    <li>Rotate to see the display in 3D.
+
+    <li> Bring up the display control window for the [ht::display VolumeRendering] display and
+    adjust the [ht::command Resolution] to increase or decrease the number of the grid points in
+    the main display.
+
+    <li>In the display control window you can also apply different [ht::command Smoothing] algorithms to
+    the display.
+
+  </ul>
+</li>
+
+<p>
+
+
+</ol>
+
+</body>
+</html>
