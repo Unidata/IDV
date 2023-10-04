@@ -110,6 +110,10 @@ cd /share/idv/build*******/docs
     scp userguide.jar robin:/web/docs/idv/<release>
     scp workshop.jar robin:/web/docs/idv/<release>
 
+Or: scp -r javadoc robin:/web/docs/idv/<release>/.
+    scp -r  userguide robin:/web/docs/idv/<release>/.
+    scp -r workshop robin:/web/docs/idv/<release>/.
+
 On robin:
     cd /we/docs/idv/<release>
     jar xvf userguide.jar
