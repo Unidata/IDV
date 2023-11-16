@@ -161,31 +161,33 @@ public class AccountManager implements CredentialsProvider,
      */
     public Credentials getCredentials(AuthScope scope) {
         //TODO: What should this do?
-        if (scope == null) {
-            throw new IllegalArgumentException(
-                "Authentication scope may not be null");
-        }
-
-        if (currentCredentials == null) {
-            String host = scope.getHost();
-            int    port = scope.getPort();
-
-            String key  = host + ":" + port + ":" + scope.getRealm();
-            //        System.err.println ("got auth call " + key);
-
-            UserInfo userInfo = getUserNamePassword(key,
-                                    "The server " + host + ":" + port
-                                    + " requires a username/password");
-            if (userInfo == null) {
-                return null;
+        synchronized (this) {
+            if (scope == null) {
+                throw new IllegalArgumentException(
+                        "Authentication scope may not be null");
             }
 
-            currentCredentials =
-                new UsernamePasswordCredentials(userInfo.getUserId(),
-                    userInfo.getPassword());
-            currentKey = key;
+            if (currentCredentials == null) {
+                String host = scope.getHost();
+                int port = scope.getPort();
+
+                String key = host + ":" + port + ":" + scope.getRealm();
+                //        System.err.println ("got auth call " + key);
+
+                UserInfo userInfo = getUserNamePassword(key,
+                        "The server " + host + ":" + port
+                                + " requires a username/password");
+                if (userInfo == null) {
+                    return null;
+                }
+
+                currentCredentials =
+                        new UsernamePasswordCredentials(userInfo.getUserId(),
+                                userInfo.getPassword());
+                currentKey = key;
+            }
+            return currentCredentials;
         }
-        return currentCredentials;
     }
 
     /**
