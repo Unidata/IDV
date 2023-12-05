@@ -121,6 +121,17 @@ On robin:
 
 ********************************************************************************
 
+Update the downloads page
+    download release_info.json from artifact server
+    https://artifacts.unidata.ucar.edu/#browse/browse:downloads-idv
+
+    edit release_info.json to point to the right version information
+
+    upload the release_info.json to artifact server
+    curl -u yuanho:XXXXXXXXX --upload-file release_info.json  https://artifacts.unidata.ucar.edu/repository/downloads-idv/release_info.json
+
+
+********************************************************************************
 Generate the PDFs
 
 You  need to build the userguide.pdf and workshop.pdf files.
