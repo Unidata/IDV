@@ -1304,7 +1304,9 @@ abstract public class DisplayMaster {
      *                 2.0 and .5 seems to work well.
      */
     public void zoom(double factor) {
-        zoom(factor, factor, factor);
+        double factorZ = 1.0 + (factor - 1.0) * (myAspect[2]/myAspect[0]);
+        zoom(factor, factor, factorZ);
+
     }
 
 
