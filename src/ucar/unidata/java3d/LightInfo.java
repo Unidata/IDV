@@ -41,6 +41,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.media.j3d.*;
 import javax.vecmath.*;
+//import org.jogamp.java3d.*;
+//import org.jogamp.vecmath.*;
 
 
 
@@ -106,6 +108,11 @@ public class LightInfo {
     public void getPropertyComponents(List comps,final ObjectListener listener) {
         visibleCbx= new JCheckBox(getName(), visible);
         float[]rgb = color.get().getRGBComponents(null);
+        //int var1 = Math.round(color.x * 255.0F);
+        //int var2 = Math.round(color.y * 255.0F);
+        //int var3 = Math.round(color.z * 255.0F);
+        //Color color3 = new Color(var1,var2,var3);
+        //float[]rgb = color3.getRGBComponents(null);
         slider = new JSlider(0,100,(int)(rgb[0]*100));
 
 
@@ -163,6 +170,11 @@ public class LightInfo {
 
     public void brighter() {
         float[]rgb = color.get().getRGBComponents(null);
+        //int var1 = Math.round(color.x * 255.0F);
+        //int var2 = Math.round(color.y * 255.0F);
+        //int var3 = Math.round(color.z * 255.0F);
+        //Color color3 = new Color(var1,var2,var3);
+        //loat[]rgb = color3.getRGBComponents(null);
         rgb[0] = (float)Math.min(rgb[0]+0.1, 1.0);
         rgb[1] = (float)Math.min(rgb[1]+0.1, 1.0);
         rgb[2] = (float)Math.min(rgb[2]+0.1, 1.0);
@@ -238,6 +250,11 @@ public class LightInfo {
         setColor(value);
         if(updateGui && slider!=null) {
             float[]rgb = getColor().get().getRGBComponents(null);
+            //int var1 = Math.round(color.x * 255.0F);
+            //int var2 = Math.round(color.y * 255.0F);
+            //int var3 = Math.round(color.z * 255.0F);
+            //Color color3 = new Color(var1,var2,var3);
+            //float[]rgb = color3.getRGBComponents(null);
             int sliderValue = (int)(100*rgb[0]);
             slider.setValue(sliderValue);
         }
