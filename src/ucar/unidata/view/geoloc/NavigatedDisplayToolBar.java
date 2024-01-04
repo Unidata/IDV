@@ -61,7 +61,7 @@ public class NavigatedDisplayToolBar extends JToolBar {
     public static final double TRANSLATE_FACTOR = 0.1;
 
     /** default zoom factor */
-    public static final double ZOOM_FACTOR = 1.01;
+    public static final double ZOOM_FACTOR = 1.1;
 
     /**
      * Construct a NavigatedDisplayToolBar for the navDisplay.
