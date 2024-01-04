@@ -1,7 +1,7 @@
 /*
  * $Id: ColorTableCanvas.java,v 1.30 2007/05/25 16:39:15 dmurray Exp $
  *
- * Copyright  1997-2023 Unidata Program Center/University Corporation for
+ * Copyright  1997-2024 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

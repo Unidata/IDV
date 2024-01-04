@@ -1,7 +1,7 @@
 /**
  * $Id: HelpActionLabel.java,v 1.2 2006/12/27 19:56:55 jeffmc Exp $
  *
- * Copyright  1997-2023 Unidata Program Center/University Corporation for
+ * Copyright  1997-2024 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
