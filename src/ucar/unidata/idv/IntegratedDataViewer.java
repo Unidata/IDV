@@ -614,8 +614,10 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         //        LogUtil.logException ("test1",new IllegalArgumentException ("xxx"));
         //        LogUtil.logException ("test2",new IllegalArgumentException ("xxx"));
 
-
-        getIdvUIManager().init();
+        new Thread(() -> {
+            getIdvUIManager().init();
+        }).start();
+        //getIdvUIManager().init();
 
         loadDataFiles(argsManager.initDataFiles);
         getArgsManager().processInitialBundles();
