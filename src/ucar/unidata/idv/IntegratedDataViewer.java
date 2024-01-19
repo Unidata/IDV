@@ -80,15 +80,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -614,9 +606,14 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
         //        LogUtil.logException ("test1",new IllegalArgumentException ("xxx"));
         //        LogUtil.logException ("test2",new IllegalArgumentException ("xxx"));
 
-        new Thread(() -> {
-            getIdvUIManager().init();
-        }).start();
+        try {
+            SwingUtilities.invokeAndWait(() -> getIdvUIManager().init());
+        } catch(Exception exc) {
+            logException ("Starting the metadata server", exc);
+        }
+        //new Thread(() -> {
+        //    getIdvUIManager().init();
+        //}).start();
         //getIdvUIManager().init();
 
         loadDataFiles(argsManager.initDataFiles);

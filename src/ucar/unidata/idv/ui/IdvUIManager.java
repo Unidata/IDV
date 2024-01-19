@@ -683,9 +683,10 @@ public class IdvUIManager extends IdvManager {
         for (int i = 0; i < skins.size(); i++) {
             String skin = (String) skins.get(i);
             try {
-                new Thread(() -> {
-                    createNewWindow(new ArrayList(), skin);
-                }).start();
+                SwingUtilities.invokeLater(() -> createNewWindow(new ArrayList(), skin));
+                //new Thread(() -> {
+                //    createNewWindow(new ArrayList(), skin);
+                //}).start();
                 //createNewWindow(new ArrayList(), skin);
             } catch (Throwable exc) {
                 logException("Creating UI from skin:" + skin, exc);
