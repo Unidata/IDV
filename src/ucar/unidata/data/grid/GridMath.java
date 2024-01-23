@@ -87,6 +87,9 @@ public class GridMath {
 
     public static final String FUNC_EXP = "exp";
 
+    /** function for the applyFunctionOverTime 10 base pow routine */
+    public static final String FUNC_POW = "pow";
+
     /** function for the timeStepFunc routine */
     public static final String FUNC_DIFFERENCE = "difference";
 
@@ -1495,23 +1498,24 @@ public class GridMath {
             if (function.equals(FUNC_EXP)) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
-                        if(Math.exp(values[i][j]) < 0)
-                            System.out.print(1);
-                        values[i][j] = (float) Math.exp(values[i][j]);
+                        if (values[i][j] == values[i][j]) { //check missing value
+                            values[i][j] = (float) Math.exp(values[i][j]);
+                        }
                     }
                 }
             }
 
-            if (function.equals(FUNC_PRCNTL)) {
 
+            if (function.equals(FUNC_POW)) {
                 for (int i = 0; i < values.length; i++) {
                     for (int j = 0; j < values[i].length; j++) {
-                        if(Math.exp(values[i][j]) < 0)
-                            System.out.print(1);
-                        values[i][j] = (float) Math.exp(values[i][j]);
+                        if (values[i][j] == values[i][j]) { // check missing value
+                            values[i][j] = (float) Math.pow(10, values[i][j]);
+                        }
                     }
                 }
             }
+
             newGrid.setSamples(values, false);
             return newGrid;
         } catch (CloneNotSupportedException cnse) {
@@ -3230,18 +3234,27 @@ public class GridMath {
     public static FieldImpl applyFunctionOverGridsExt(FieldImpl field,  String function)  throws VisADException  {
         FieldImpl fi = field;
         boolean doExp   = function.equals(FUNC_EXP);
-
-        if(!doExp)
+        boolean doPow   = function.equals(FUNC_POW);
+        if(!doExp && !doPow)
             return null;
         try {
 
             Set timeSet = GridUtil.getTimeSet(field);
             fi = new FieldImpl((FunctionType) field.getType(), timeSet);
-            for (int i = 0; i < timeSet.getLength(); i++) {
-                FlatField data    = (FlatField) field.getSample(i, false);
-                FlatField data1 = GridMath.applyFunctionOverGrids0(new FlatField[] {data},
-                        FUNC_EXP);
-                fi.setSample(i, data1, false);
+            if(doExp) {
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    FlatField data = (FlatField) field.getSample(i, false);
+                    FlatField data1 = GridMath.applyFunctionOverGrids0(new FlatField[]{data},
+                            FUNC_EXP);
+                    fi.setSample(i, data1, false);
+                }
+            } else {
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    FlatField data = (FlatField) field.getSample(i, false);
+                    FlatField data1 = GridMath.applyFunctionOverGrids0(new FlatField[]{data},
+                            FUNC_POW);
+                    fi.setSample(i, data1, false);
+                }
             }
         } catch (RemoteException re) {}
 
