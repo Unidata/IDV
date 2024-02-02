@@ -790,3 +790,18 @@ def GalvezDavisonIndex(temp, rh):
   """ calculate Galvez-Davison Index
   """
   return DerivedGridFactory.createGalvezDavisonIndex(temp, rh)
+
+def ComputePrecipRatesDbz(reflectivity):
+  """ input 3d gridded reflectivity
+      calculate hourly precip rate by inch/hour
+  """
+  ref1000 = getSliceAtAltitude(reflectivity, 1000)
+  return DerivedGridFactory.ComputePrecipRatesDbz(ref1000)
+
+def ComputePrecipRatesZZDR(reflectivity, DifferentialReflectivity):
+  """ input 3d gridded reflectivity
+      calculate hourly precip rate by inch/hour
+  """
+  z1000 = getSliceAtAltitude(reflectivity, 1000)
+  zdr1000 = getSliceAtAltitude(DifferentialReflectivity, 1000)
+  return DerivedGridFactory.ComputePrecipRatesZZDR(z1000, zdr1000)
