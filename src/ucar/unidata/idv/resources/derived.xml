@@ -1493,7 +1493,36 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands categories=""/>
   </derived>
-
+  <derived description="Calculates Frontogenesis function from theta and the wind" formula="frnt(Theta,V)" id="Frontogenesis" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Diagnostics"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Calculates Ellrod turbulence index" formula="EllrodIndex(u, v, z, top, bottom, unit)" id="Ellrod Index" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Diagnostics"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Calculates helicity in pressure coordinate, top and bottom unit is meter" formula="StormRelativeHelicity(u, v, bottom, top, user_ux_of_Layer[default=0], user_vy_of_Layer[default=0])" id="Storm Helicity" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Diagnostics"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="Calculates Dry Static Energy with Temperature and Geopotential Height" formula="dryStaticEnergy(T, Z)" id="Dry Static Energy" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Diagnostics"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived description="calculate Galvez-Davison Index based on temperature and relative humidity" formula="GalvezDavisonIndex(T, RH)" id="GDI" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="Grids-Diagnostics"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
 
   <!-- Adding derived ABI True Color formula - RMC - INQ 2822 - Oct 2019 -->
   <derived description="ABI True Color RGB" formula="ABITruColRGB(D1[label=Band 2], D2[label=Band 3], D3[label=Band 1])" id="abitrucol" isdefault="true" isenduser="true">
