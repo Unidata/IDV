@@ -7631,6 +7631,256 @@ public class DerivedGridFactory {
 
         return CBI;
     }
+
+    /**
+     * Calculate the radar precip rate based on Marshall-Palmer drop size distribution
+     *
+     * @param field  radar reflectivity
+     *
+     * @return  the rain rate (inches/hour)
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl ComputePrecipRatesDbz(FieldImpl field)  throws VisADException  {
+        FieldImpl fi = field;
+        try {
+
+            Set timeSet = GridUtil.getTimeSet(field);
+            fi = new FieldImpl((FunctionType) field.getType(), timeSet);
+
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                FlatField data = (FlatField) field.getSample(i, false);
+                FlatField data0 = GridUtil.medianFilter(data, 10, 10);
+                FlatField data1 = ComputePrecipRatesDbzFF(new FlatField[]{data0});
+                fi.setSample(i, data1, false);
+            }
+            RealType newType = Util.makeRealType("Precipitation", DataUtil.parseUnit("inches/hour"));
+            FieldImpl rrate = GridUtil.setParamType(fi, newType, false);
+            return rrate;
+
+        } catch (RemoteException re) {}
+
+        return null;
+    }
+
+    //RR = C 10^(0.0625 Z), C = 0.036 mm/hr
+    public static FlatField ComputePrecipRatesDbzFF(FlatField[] grids)
+            throws VisADException {
+
+        try {
+            int       numGrids = grids.length;
+            FlatField newGrid  = null;
+            // (= 0.036 mm/hr) x (1 cm/10 mm) x (1 in/2.54 cm)
+            double C = 0.036 * 0.1 * (1.0/2.54);
+            // initialize min/max valid precip rate (mm/hr)
+            float min_valid_rate = 0.002f;
+            float max_valid_rate = 12.0f;
+            float max_valid_dbz = 53.0f;
+            float _zh_aa = 0.0262f;
+            float _zh_bb = 0.687f;
+            float _zzdr_aa = 0.00786f;
+            float _zzdr_bb = 0.967f;
+            float _zzdr_cc = -4.98f;
+            if (numGrids == 0) {
+                newGrid = (FlatField) grids[0].clone();
+                newGrid.setSamples(grids[0].getFloats(false), true);
+                return newGrid;
+            }
+
+            float[][]     values  = null;
+
+
+            for (int gridIdx = 0; gridIdx < numGrids; gridIdx++) {
+                FieldImpl sample     = (FieldImpl) grids[gridIdx];
+                float[][] gridValues = sample.getFloats(false);
+                // be careful about missing grids
+                if (Misc.isNaN(gridValues)) {
+                    continue;
+                }
+                if (values == null) {  // first pass through
+                    values = Misc.cloneArray(gridValues);
+
+                    newGrid = (FlatField) sample.clone();
+                    continue;
+                }
+
+            }
+            // all grids were missing
+            if (newGrid == null) {
+                return null;
+            }
+
+
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[i].length; j++) {
+                    if (values[i][j] == values[i][j]) {// check missing value
+                       /* double p = 0.0625 * values[i][j];
+                        float value = (float) (C * Math.pow(10, p));
+                        if(value > max_valid_rate)
+                            value = max_valid_rate;
+
+                        */
+                        double zh = Math.pow(10.0, values[i][j] / 10.0);
+                        double rateZh = _zh_aa * Math.pow(zh, _zh_bb);
+                        float value = (float)rateZh /20.54f;
+                        if(value > max_valid_rate)
+                            value = max_valid_rate;
+
+                        values[i][j] = value;
+                    } else {
+                        values[i][j] = Float.NaN;
+                    }
+                }
+            }
+
+
+            newGrid.setSamples(values, false);
+            return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverTime");
+        }
+
+    }
+
+    /**
+     * Calculate the radar precip rate based on
+     * www.chill.colostate.edu/w/Differential_Reflectivity_from_Raindrops_and_WSR-88D_Rainfall_Estimation
+     * @param gridz  radar reflectivity
+     * @param gridzdr  radar differential reflectivity
+     *
+     * @return  the rain rate (inches/hour)
+     *
+     * @throws VisADException bad input or problem creating fields
+     */
+    public static FieldImpl ComputePrecipRatesZZDR(FieldImpl gridz, FieldImpl gridzdr)  throws VisADException  {
+        FieldImpl fi = gridz;
+        try {
+
+            Set timeSet = GridUtil.getTimeSet(gridz);
+            fi = new FieldImpl((FunctionType) gridz.getType(), timeSet);
+
+            for (int i = 0; i < timeSet.getLength(); i++) {
+                FlatField dataz = (FlatField) gridz.getSample(i, false);
+                FlatField dataz0 = GridUtil.medianFilter(dataz, 10, 10);
+                FlatField datazdr = (FlatField) gridzdr.getSample(i, false);
+                FlatField datazdr0 = GridUtil.medianFilter(datazdr, 10, 10);
+                FlatField data1 = ComputePrecipRatesZZDRFF(new FlatField[]{dataz0}, new FlatField[]{datazdr0});
+                fi.setSample(i, data1, false);
+            }
+            RealType newType = Util.makeRealType("Precipitation", DataUtil.parseUnit("inches/hour"));
+            FieldImpl rrate = GridUtil.setParamType(fi, newType, false);
+            return rrate;
+
+        } catch (RemoteException re) {}
+
+        return null;
+    }
+
+    //{\displaystyle R={\frac {0.0067Z^{0.93}}/{10^{0.343}Z_{dr}}}} = (mm/hr)
+    // the return R x (1 cm/10 mm) x (1 in/2.54 cm) is inches/Hr
+    public static FlatField ComputePrecipRatesZZDRFF(FlatField[] gridz, FlatField[] gridzdr)
+            throws VisADException {
+
+        try {
+            int       numGrids = gridz.length;
+            FlatField newGrid  = null;
+
+            double C = 0.0067;
+            double B = 2.20292646305; //10^0.343
+            // initialize min/max valid precip rate (mm/hr)
+            float min_valid_rate = 0.001f;
+            float max_valid_rate = 12.0f;
+            float max_valid_dbz = 53.0f;
+            float _zh_aa = 0.0262f;
+            float _zh_bb = 0.687f;
+            float _zzdr_aa = 0.00786f;
+            float _zzdr_bb = 0.967f;
+            float _zzdr_cc = -4.98f;
+
+            if (numGrids == 0) {
+                newGrid = (FlatField) gridz[0].clone();
+                newGrid.setSamples(gridz[0].getFloats(false), true);
+                return newGrid;
+            }
+
+            float[][]     zvalues  = null;
+            float[][]     zdrvalues  = null;
+
+            for (int gridIdx = 0; gridIdx < numGrids; gridIdx++) {
+                FieldImpl sample     =  gridz[gridIdx];
+                FieldImpl sample1     = gridzdr[gridIdx];
+
+                float[][] gridzValues = sample.getFloats(false);
+                float[][] gridzdrValues = sample1.getFloats(false);
+                // be careful about missing grids
+                if (Misc.isNaN(gridzValues)) {
+                    continue;
+                }
+                if (zvalues == null) {  // first pass through
+                    zvalues = Misc.cloneArray(gridzValues);
+                    zdrvalues = Misc.cloneArray(gridzdrValues);
+                    newGrid = (FlatField) sample.clone();
+                    continue;
+                }
+
+            }
+            // all grids were missing
+            if (newGrid == null) {
+                return null;
+            }
+
+
+            for (int i = 0; i < zvalues.length; i++) {
+                for (int j = 0; j < zvalues[i].length; j++) {
+                    if (zvalues[i][j] == zvalues[i][j] && zdrvalues[i][j] == zdrvalues[i][j]) {// check missing value
+                     /*   double p = C * Math.pow(zvalues[i][j], 0.93);
+                        float value = (float) (p/(B*zdrvalues[i][j]));
+                        //  x (1 cm/10 mm) x (1 in/2.54 cm)
+                        value = value /20.54f;
+                        //if(value < min_valid_rate)
+                        //    value = Float.NaN;
+                        if(value > max_valid_rate)
+                            value = max_valid_rate;
+                        zvalues[i][j] = value;
+                    */
+                        if(zvalues[i][j] > max_valid_dbz)
+                            zvalues[i][j] = max_valid_dbz;
+                        double zh = Math.pow(10.0, zvalues[i][j] / 10.0);
+                        double zdr = Math.pow(10.0, zdrvalues[i][j] / 10.0);
+                        double rateZh = _zh_aa * Math.pow(zh, _zh_bb);
+                        double rateZZdr;
+                        if(zdrvalues[i][j] < 0.1){
+                            rateZZdr = rateZh;
+                        } else {
+                            rateZZdr =
+                                    _zzdr_aa * Math.pow(zh, _zzdr_bb) * Math.pow(zdr, _zzdr_cc);
+                        }
+                        float value = (float)rateZZdr /20.54f;
+                        //if(value < min_valid_rate)
+                        //    value = Float.NaN;
+                        if(value > 2)
+                            value = 2;
+                        zvalues[i][j] = value;
+                    } else {
+                        zvalues[i][j] = Float.NaN;
+                    }
+                }
+            }
+
+
+            newGrid.setSamples(zvalues, false);
+            return newGrid;
+        } catch (CloneNotSupportedException cnse) {
+            throw new VisADException("Cannot clone field");
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverTime");
+        }
+
+    }
     /**
      * remove unit
      *
