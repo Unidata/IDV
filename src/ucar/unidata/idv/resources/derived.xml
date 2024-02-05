@@ -1487,7 +1487,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands categories=""/>
   </derived>
-  <derived description="Rectagular hor. smoothing, in grid increments" formula="smooth3d(S, &quot;rect&quot;,D[isuser=true,default=2])" id="rectangular smoother (S, D)" isdefault="false" isenduser="true">
+  <derived description="Rectangular hor. smoothing, in grid increments" formula="smooth3d(S, &quot;rect&quot;,D[isuser=true,default=2])" id="rectangular smoother (S, D)" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-MapesCollection-3D Scalar Field Horizontal Smoothing"/>
     </categories>
@@ -1517,7 +1517,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands categories=""/>
   </derived>
-  <derived description="calculate Galvez-Davison Index based on temperature and relative humidity" formula="GalvezDavisonIndex(T, RH)" id="GDI" isdefault="false" isenduser="true">
+  <derived description="Calculate Galvez-Davison Index based on temperature and relative humidity" formula="GalvezDavisonIndex(T, RH)" id="GDI" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="Grids-Diagnostics"/>
     </categories>
