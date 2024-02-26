@@ -90,6 +90,7 @@ import java.net.URL;
 
 import java.rmi.RemoteException;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import javax.media.j3d.GraphicsConfigTemplate3D;
@@ -180,6 +181,7 @@ public class GlobeDisplay extends NavigatedDisplay {
     /** Earth Radius (m) */
     public static final double EARTH_RADIUS = 6371229.;
 
+    private double[] savedProjectionMatrix = null;
     /**
      * Constructs a new GlobeDisplay.
      *
@@ -544,6 +546,28 @@ public class GlobeDisplay extends NavigatedDisplay {
             setDisplayActive();
         }
 
+    }
+    /**
+     * Zoom in on the display
+     *
+     * @param  scale  x zoom factor
+     *
+     *
+     * ( > 1 = zoom in, 1 > zoom > 0 =  zoom out).  using
+     * 2.0 and .5 seems to work well.
+     */
+    public void resetClipDistance(double scale)  {
+
+        //System.out.println("Current zoom = " +scale);
+        if(scale > 400) {
+            setClipDistanceFront(CLIP_FRONT_DEFAULT);
+            setClipDistanceBack(CLIP_BACK_DEFAULT);
+        }
+        else {
+            setClipDistanceFront(super.defaultClipDistanceFront);
+            setClipDistanceBack(super.defaultClipDistanceBack);
+        }
+       // System.out.println("Scale = " + getView().getFrameNumber() + " Front = " + getClipDistanceFront() + "Rear = " + getClipDistanceBack());
     }
 
     /**
