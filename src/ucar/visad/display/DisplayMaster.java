@@ -62,10 +62,7 @@ import java.io.File;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -1304,8 +1301,8 @@ abstract public class DisplayMaster {
      *                 2.0 and .5 seems to work well.
      */
     public void zoom(double factor) {
-        double factorZ = 1.0 + (factor - 1.0) * (myAspect[2]/myAspect[0]);
-        zoom(factor, factor, factorZ);
+       //double factorZ = 1.0 + (factor - 1.0) * (myAspect[2]/myAspect[0]);
+        zoom(factor, factor, factor);
 
     }
 
@@ -1328,7 +1325,13 @@ abstract public class DisplayMaster {
         double[] currentMatrix = getProjectionMatrix();
         scaleMatrix = getMouseBehavior().multiply_matrix(scaleMatrix,
                 currentMatrix);
+        double[] trans         = { 0.0, 0.0, 0.0 };
+        double[] rot           = { 0.0, 0.0, 0.0 };
+        double[] scale         = { 0.0, 0.0, 0.0 };
+        getMouseBehavior().instance_unmake_matrix(rot, scale, trans,
+                scaleMatrix);
 
+        resetClipDistance( scale[0]);
         try {
             setProjectionMatrix(scaleMatrix);
             //      setProjectionMatrix(xscaleMatrix);
@@ -1338,6 +1341,9 @@ abstract public class DisplayMaster {
 
     }
 
+    public void resetClipDistance(double scale){
+
+    }
 
     /**
      * Get the scaling factor for probes and such. The scaling is
