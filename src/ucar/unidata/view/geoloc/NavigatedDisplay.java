@@ -164,8 +164,11 @@ public abstract class NavigatedDisplay extends DisplayMaster {
     /** the back clip distance */
     private double clipDistanceBack = CLIP_BACK_DEFAULT;
 
+    protected double defaultClipDistanceBack = 0;
     /** the front clip distance */
     private double clipDistanceFront = CLIP_FRONT_DEFAULT;
+
+    protected double defaultClipDistanceFront = 0;
 
     /** flag for auto-rotation */
     private boolean autoRotate = false;
@@ -2521,6 +2524,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void setClipDistanceBack(double value) {
         this.clipDistanceBack = value;
+        if(defaultClipDistanceBack == 0)
+            defaultClipDistanceBack = value;
     }
 
     /**
@@ -2539,6 +2544,8 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      */
     public void setClipDistanceFront(double value) {
         this.clipDistanceFront = value;
+        if(defaultClipDistanceFront == 0)
+            defaultClipDistanceFront = value;
     }
 
     /**
@@ -2623,5 +2630,28 @@ public abstract class NavigatedDisplay extends DisplayMaster {
                 vertMap.setRange(min, max);
             }
         }
+    }
+
+    /**
+     * Zoom in on the display
+     *
+     * @param  scale  x zoom factor
+     *
+     * ( > 1 = zoom in, 1 > zoom > 0 =  zoom out).  using
+     * 2.0 and .5 seems to work well.
+     */
+    public void resetClipDistance(double scale)  {
+
+        //System.out.println("Current zoom = " + scale);
+        if(scale > 40) {
+            setClipDistanceFront(CLIP_FRONT_DEFAULT);
+            setClipDistanceBack(CLIP_BACK_DEFAULT);
+        }
+        else {
+            setClipDistanceFront(defaultClipDistanceFront);
+            setClipDistanceBack(defaultClipDistanceBack);
+        }
+        //System.out.println("Scale = " + scale + " Front = " + getClipDistanceFront() + "Rear = " + getClipDistanceBack());
+
     }
 }
