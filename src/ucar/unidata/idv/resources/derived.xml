@@ -1524,260 +1524,364 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories=""/>
   </derived>
 
-  <!-- Adding derived ABI True Color formula - RMC - INQ 2822 - Oct 2019 -->
-  <derived description="ABI True Color RGB" formula="ABITruColRGB(D1[label=Band 2], D2[label=Band 3], D3[label=Band 1])" id="abitrucol" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_TruCol"/>
-    </operands>
-  </derived>
-  <!-- Adding derived ABI RGB and band subtraction formulas - RMC - INQ 2836 - Oct 2019 -->
-  <derived description="ABI Airmass RGB" formula="ABIAirmassRGB(D1[label=Band 8T], D2[label=Band 10T], D3[label=Band 12T], D4[label=Band 13T])" id="abiairmass" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_Airmass"/>
-    </operands>
-  </derived>
-  <derived description="ABI SO2 RGB" formula="ABISo2RGB(D1[label=Band 9T], D2[label=Band 10T], D3[label=Band 11T], D4[label=Band 13T])" id="abiso2" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_SO2"/>
-    </operands>
-  </derived>
-  <derived description="ABI Day Cloud Phase Distinction RGB" formula="ABIDayCloudPhaseRGB(D1[label=Band 2A], D2[label=Band 5A], D3[label=Band 13T])" id="abidaycloudphase" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_DayCloudPhase"/>
-    </operands>
-  </derived>
-  <derived description="ABI Ash RGB" formula="ABIAshRGB(D1[label=Band 11T], D2[label=Band 13T], D3[label=Band 14T], D4[label=Band 15T])" id="abiash" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_ASH"/>
-    </operands>
-  </derived>
-  <derived description="ABI Day Land Cloud RGB" formula="ABIDayLandCloudRGB(D1[label=Band 2A], D2[label=Band 3A], D3[label=Band 5A])" id="abidaylandcloud" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_DayLandCloud"/>
-    </operands>
-  </derived>
-  <derived description="ABI Day Land Cloud Fire RGB" formula="ABIDayLandCloudFireRGB(D1[label=Band 2A], D2[label=Band 3A], D3[label=Band 6A])" id="abidaylandcloudfire" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_DayLandCloudFire"/>
-    </operands>
-  </derived>
-  <derived description="ABI Nighttime Microphysics RGB" formula="ABINightMicrophysicsRGB(D1[label=Band 7T], D2[label=Band 13T], D3[label=Band 15T])" id="abinighttime" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_NightMicrophysics"/>
-    </operands>
-  </derived>
-  <derived description="ABI Simple Water Vapor RGB" formula="ABISimpleWaterVaporRGB(D1[label=Band 8T], D2[label=Band 10T], D3[label=Band 13T])" id="abisimplewatervapor" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_SimpleWaterVapor"/>
-    </operands>
-  </derived>
-  <derived description="ABI Split Ozone Difference" formula="ABIOzoneDifference(D1[label=Band 12T], D2[label=Band 13T])" id="abisplitozone" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI Channel Differences"/>
-      <category value="display:planviewcontourfilled"/>
-      <category value="display:imagedisplayoverz"/>
-      <category value="display:imagedisplay"/>
-      <category value="display:planviewcontour"/>
-      <category value="display:planviewcolor"/>
-      <category value="display:valuedisplay"/>
-    </categories>
-    <operands categories="">
-      <params categories="" p1="186_Band12_TEMP" p2="186_Band13_TEMP"/>
-      <params categories="" p1="188_Band12_TEMP" p2="188_Band13_TEMP"/>
-      <params categories="" p1="190_Band12_TEMP" p2="190_Band13_TEMP"/>
-      <params categories="" p1="192_Band12_TEMP" p2="192_Band13_TEMP"/>
-    </operands>
-  </derived>
-  <derived description="ABI Split Water Vapor Difference" formula="ABISplitWaterVaporDifference(D1[label=Band 8T], D2[label=Band 10T])" id="abisplitwatervapor" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI Channel Differences"/>
-      <category value="display:planviewcontour"/>
-      <category value="display:imagedisplay"/>
-      <category value="display:imagedisplayoverz"/>
-      <category value="display:planviewcontourfilled"/>
-      <category value="display:valuedisplay"/>
-      <category value="display:planviewcolor"/>
-    </categories>
-    <operands categories="">
-      <params categories="" p1="186_Band8_TEMP" p2="186_Band10_TEMP"/>
-      <params categories="" p1="188_Band8_TEMP" p2="188_Band10_TEMP"/>
-      <params categories="" p1="190_Band8_TEMP" p2="190_Band10_TEMP"/>
-      <params categories="" p1="192_Band8_TEMP" p2="192_Band10_TEMP"/>
-    </operands>
-  </derived>
-  <derived description="ABI Split Snow Difference" formula="ABISplitSnowDifference(D1[label=Band 5B], D2[label=Band 2B])" id="abisplitsnow" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI Channel Differences"/>
-      <category value="display:planviewcontour"/>
-      <category value="display:valuedisplay"/>
-      <category value="display:planviewcontourfilled"/>
-      <category value="display:imagedisplayoverz"/>
-      <category value="display:imagedisplay"/>
-      <category value="display:planviewcolor"/>
-    </categories>
-    <operands categories="">
-      <params categories="" p1="186_Band5_BRIT" p2="186_Band2_BRIT"/>
-      <params categories="" p1="188_Band5_BRIT" p2="188_Band2_BRIT"/>
-      <params categories="" p1="190_Band5_BRIT" p2="190_Band2_BRIT"/>
-      <params categories="" p1="192_Band5_BRIT" p2="192_Band2_BRIT"/>
-    </operands>
-  </derived>
-  <derived description="ABI Split Cloud Phase Difference" formula="ABISplitCloudPhaseDifference(D1[label=Band 14T], D2[label=Band 11T])" id="abisplitcloudphase" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI Channel Differences"/>
-      <category value="display:planviewcolor"/>
-      <category value="display:planviewcontour"/>
-      <category value="display:imagedisplayoverz"/>
-      <category value="display:imagedisplay"/>
-      <category value="display:valuedisplay"/>
-      <category value="display:planviewcontourfilled"/>
-    </categories>
-    <operands categories="">
-      <params categories="" p1="186_Band14_TEMP" p2="186_Band11_TEMP"/>
-      <params categories="" p1="188_Band14_TEMP" p2="188_Band11_TEMP"/>
-      <params categories="" p1="190_Band14_TEMP" p2="190_Band11_TEMP"/>
-      <params categories="" p1="192_Band14_TEMP" p2="192_Band11_TEMP"/>
-    </operands>
-  </derived>
-  <derived description="ABI Split Window Difference" formula="ABISplitWindowDifference(D1[label=Band 15T], D2[label=Band 13T])" id="abisplitwindow" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI Channel Differences"/>
-      <category value="display:planviewcontour"/>
-      <category value="display:planviewcontourfilled"/>
-      <category value="display:valuedisplay"/>
-      <category value="display:imagedisplayoverz"/>
-      <category value="display:planviewcolor"/>
-      <category value="display:imagedisplay"/>
-    </categories>
-    <operands categories="">
-      <params categories="" p1="186_Band15_TEMP" p2="186_Band13_TEMP"/>
-      <params categories="" p1="188_Band15_TEMP" p2="188_Band13_TEMP"/>
-      <params categories="" p1="190_Band15_TEMP" p2="190_Band13_TEMP"/>
-      <params categories="" p1="192_Band15_TEMP" p2="192_Band13_TEMP"/>
-    </operands>
-  </derived>
-  <derived description="ABI Night Fog Difference" formula="ABINightFogDifference(D1[label=Band 13T], D2[label=Band 7T])" id="abinightfog" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI Channel Differences"/>
-      <category value="display:planviewcolor"/>
-      <category value="display:planviewcontourfilled"/>
-      <category value="display:imagedisplayoverz"/>
-      <category value="display:imagedisplay"/>
-      <category value="display:planviewcontour"/>
-      <category value="display:valuedisplay"/>
-    </categories>
-    <operands categories="">
-      <params categories="" p1="186_Band13_TEMP" p2="186_Band7_TEMP"/>
-      <params categories="" p1="188_Band13_TEMP" p2="188_Band7_TEMP"/>
-      <params categories="" p1="190_Band13_TEMP" p2="190_Band7_TEMP"/>
-      <params categories="" p1="192_Band13_TEMP" p2="192_Band7_TEMP"/>
-    </operands>
-  </derived>
-  <derived description="ABI Day Snow Fog RGB" formula="ABIDaySnowFogRGB(D1[label=Band 3A], D2[label=Band 5A], D3[label=Band 7T], D4[label=Band 13T])" id="abidaysnowfog" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands>
-      <paramgroup name="ABI_RGB_DaySnowFog"/>
-    </operands>
-  </derived>
-  <derived description="ABI Day Cloud Convection RGB" formula="ABIDayCloudConvectionRGB(D1[label=Band 2A], D2[label=Band 13T])" id="abidaycloudconvection" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands>
-      <paramgroup name="ABI_RGB_DayCloudConvection"/>
-    </operands>
-  </derived>
-  <derived description="ABI Fire Temperature RGB" formula="ABIFireTemperatureRGB(D1[label=Band 5A], D2[label=Band 6A], D3[label=Band 7T])" id="abifiretemperature" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands>
-      <paramgroup name="ABI_RGB_FireTemperature"/>
-    </operands>
-  </derived>
-  <derived description="ABI Dust RGB" formula="ABIDustRGB(D1[label=Band 11T], D2[label=Band 13T], D3[label=Band 14T], D4[label=Band 15T])" id="abidust" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands>
-      <paramgroup name="ABI_RGB_Dust"/>
-    </operands>
-  </derived>
-  <derived description="ABI Differential Water Vapor RGB" formula="ABIDifferentialWaterVaporRGB(D1[label=Band 8T], D2[label=Band 10T])" id="abidifferentialwatervapor" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands>
-      <paramgroup name="ABI_RGB_DifferentialWaterVapor"/>
-    </operands>
-  </derived>
-  <derived description="ABI Day Convection RGB" formula="ABIDayConvectionRGB(D1[label=Band 2A], D2[label=Band 5A], D3[label=Band 7T], D4[label=Band 8T], D5[label=Band 10T], D6[label=Band 13T])" id="abidayconvection" isdefault="true" isenduser="true">
-    <categories>
-      <category display="true" value="Satellite-ABI RGBs"/>
-      <category value="display:imagecontrol"/>
-      <category value="display:rgbcomposite"/>
-    </categories>
-    <operands categories="">
-      <paramgroup categories="" name="ABI_RGB_DayConvection"/>
-    </operands>
-  </derived>
+ <!-- Adding derived ABI RGB and band subtraction formulas - RMC - INQ 2836 - Oct 2019 -->
+    <!-- Reorganized formulas to be under Imagery - RMC - INQ 2872 - Jan 2020 -->
+    <derived description="ABI Night Fog Difference" formula="ABINightFogDifference(D1[label=Band 13 Temperature], D2[label=Band 7 Temperature])" id="abinightfog" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagedisplay"/>
+            <category value="display:planviewcolor"/>
+            <category value="display:planviewcontour"/>
+            <category value="display:imagedisplayoverz"/>
+            <category value="display:planviewcontourfilled"/>
+            <category value="display:valuedisplay"/>
+            <category value="display:probe"/>
+            <category value="display:dataxs"/>
+            <category value="display:gridtablecontrol"/>
+            <category value="display:timelatshade"/>
+            <category value="display:timelatcontour"/>
+            <category value="display:timelonshade"/>
+            <category value="display:timeloncontour"/>
+            <category value="display:imagecontour"/>
+        </categories>
+        <operands categories="">
+            <params categories="" p1="186_Band13_TEMP" p2="186_Band7_TEMP"/>
+            <params categories="" p1="188_Band13_TEMP" p2="188_Band7_TEMP"/>
+            <params categories="" p1="190_Band13_TEMP" p2="190_Band7_TEMP"/>
+            <params categories="" p1="192_Band13_TEMP" p2="192_Band7_TEMP"/>
+            <params categories="" p1="CMI_C13" p2="CMI_C07"/>
+            <params categories="" p1="temp_10_4um_nom" p2="temp_3_9um_nom"/>
+        </operands>
+    </derived>
+    <derived description="ABI Split Cloud Phase Difference" formula="ABISplitCloudPhaseDifference(D1[label=Band 14 Temperature], D2[label=Band 11 Temperature])" id="abisplitcloudphase" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagedisplay"/>
+            <category value="display:valuedisplay"/>
+            <category value="display:planviewcolor"/>
+            <category value="display:planviewcontourfilled"/>
+            <category value="display:planviewcontour"/>
+            <category value="display:imagedisplayoverz"/>
+            <category value="display:probe"/>
+            <category value="display:dataxs"/>
+            <category value="display:gridtablecontrol"/>
+            <category value="display:timelatshade"/>
+            <category value="display:timelatcontour"/>
+            <category value="display:timelonshade"/>
+            <category value="display:timeloncontour"/>
+            <category value="display:imagecontour"/>
+        </categories>
+        <operands categories="">
+            <params categories="" p1="186_Band14_TEMP" p2="186_Band11_TEMP"/>
+            <params categories="" p1="188_Band14_TEMP" p2="188_Band11_TEMP"/>
+            <params categories="" p1="190_Band14_TEMP" p2="190_Band11_TEMP"/>
+            <params categories="" p1="192_Band14_TEMP" p2="192_Band11_TEMP"/>
+            <params categories="" p1="CMI_C14" p2="CMI_C11"/>
+            <params categories="" p1="temp_11_0um_nom" p2="temp_8_5um_nom"/>
+        </operands>
+    </derived>
+    <derived description="ABI Split Ozone Difference" formula="ABIOzoneDifference(D1[label=Band 12 Temperature], D2[label=Band 13 Temperature])" id="abisplitozone" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagedisplayoverz"/>
+            <category value="display:planviewcolor"/>
+            <category value="display:planviewcontourfilled"/>
+            <category value="display:valuedisplay"/>
+            <category value="display:planviewcontour"/>
+            <category value="display:imagedisplay"/>
+            <category value="display:probe"/>
+            <category value="display:dataxs"/>
+            <category value="display:gridtablecontrol"/>
+            <category value="display:timelatshade"/>
+            <category value="display:timelatcontour"/>
+            <category value="display:timelonshade"/>
+            <category value="display:timeloncontour"/>
+            <category value="display:imagecontour"/>
+        </categories>
+        <operands categories="">
+            <params categories="" p1="186_Band12_TEMP" p2="186_Band13_TEMP"/>
+            <params categories="" p1="188_Band12_TEMP" p2="188_Band13_TEMP"/>
+            <params categories="" p1="190_Band12_TEMP" p2="190_Band13_TEMP"/>
+            <params categories="" p1="192_Band12_TEMP" p2="192_Band13_TEMP"/>
+            <params categories="" p1="CMI_C12" p2="CMI_C13"/>
+            <params categories="" p1="temp_9_7um_nom" p2="temp_10_4um_nom"/>
+        </operands>
+    </derived>
+    <derived description="ABI Split Snow Difference" formula="ABISplitSnowDifference(D1[label=Band 5 Reflectance], D2[label=Band 2 Reflectance])" id="abisplitsnow" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagedisplayoverz"/>
+            <category value="display:valuedisplay"/>
+            <category value="display:imagedisplay"/>
+            <category value="display:planviewcontourfilled"/>
+            <category value="display:planviewcontour"/>
+            <category value="display:planviewcolor"/>
+            <category value="display:probe"/>
+            <category value="display:dataxs"/>
+            <category value="display:gridtablecontrol"/>
+            <category value="display:timelatshade"/>
+            <category value="display:timelatcontour"/>
+            <category value="display:timelonshade"/>
+            <category value="display:timeloncontour"/>
+            <category value="display:imagecontour"/>
+        </categories>
+        <operands categories="">
+            <params categories="" p1="CMI_C05" p2="CMI_C02"/>
+            <params categories="" p1="refl_1_60um_nom" p2="refl_0_65um_nom"/>
+        </operands>
+    </derived>
+    <derived description="ABI Split Water Vapor Difference" formula="ABISplitWaterVaporDifference(D1[label=Band 8 Temperature], D2[label=Band 10 Temperature])" id="abisplitwatervapor" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:planviewcontour"/>
+            <category value="display:imagedisplayoverz"/>
+            <category value="display:valuedisplay"/>
+            <category value="display:planviewcolor"/>
+            <category value="display:imagedisplay"/>
+            <category value="display:planviewcontourfilled"/>
+            <category value="display:probe"/>
+            <category value="display:dataxs"/>
+            <category value="display:gridtablecontrol"/>
+            <category value="display:timelatshade"/>
+            <category value="display:timelatcontour"/>
+            <category value="display:timelonshade"/>
+            <category value="display:timeloncontour"/>
+            <category value="display:imagecontour"/>
+        </categories>
+        <operands categories="">
+            <params categories="" p1="186_Band8_TEMP" p2="186_Band10_TEMP"/>
+            <params categories="" p1="188_Band8_TEMP" p2="188_Band10_TEMP"/>
+            <params categories="" p1="190_Band8_TEMP" p2="190_Band10_TEMP"/>
+            <params categories="" p1="192_Band8_TEMP" p2="192_Band10_TEMP"/>
+            <params categories="" p1="CMI_C08" p2="CMI_C10"/>
+            <params categories="" p1="temp_6_2um_nom" p2="temp_7_3um_nom"/>
+        </operands>
+    </derived>
+    <derived description="ABI Split Window Difference" formula="ABISplitWindowDifference(D1[label=Band 15 Temperature], D2[label=Band 13 Temperature])" id="abisplitwindow" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagedisplay"/>
+            <category value="display:planviewcolor"/>
+            <category value="display:planviewcontour"/>
+            <category value="display:valuedisplay"/>
+            <category value="display:imagedisplayoverz"/>
+            <category value="display:planviewcontourfilled"/>
+            <category value="display:probe"/>
+            <category value="display:dataxs"/>
+            <category value="display:gridtablecontrol"/>
+            <category value="display:timelatshade"/>
+            <category value="display:timelatcontour"/>
+            <category value="display:timelonshade"/>
+            <category value="display:timeloncontour"/>
+            <category value="display:imagecontour"/>
+        </categories>
+        <operands categories="">
+            <params categories="" p1="186_Band15_TEMP" p2="186_Band13_TEMP"/>
+            <params categories="" p1="188_Band15_TEMP" p2="188_Band13_TEMP"/>
+            <params categories="" p1="190_Band15_TEMP" p2="190_Band13_TEMP"/>
+            <params categories="" p1="192_Band15_TEMP" p2="192_Band13_TEMP"/>
+            <params categories="" p1="CMI_C15" p2="CMI_C13"/>
+            <params categories="" p1="temp_12_0um_nom" p2="temp_10_4um_nom"/>
+        </operands>
+    </derived>
+    <derived description="ABI Airmass RGB" formula="ABIAirmassRGB(D1[label=Band 8 Temperature], D2[label=Band 10 Temperature], D3[label=Band 12 Temperature], D4[label=Band 13 Temperature])" id="abiairmass" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_Airmass"/>
+        </operands>
+    </derived>
+    <derived description="ABI Ash RGB" formula="ABIAshRGB(D1[label=Band 11 Temperature], D2[label=Band 13 Temperature], D3[label=Band 14 Temperature], D4[label=Band 15 Temperature])" id="abiash" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_ASH"/>
+        </operands>
+    </derived>
+    <derived description="ABI Day Cloud Convection RGB" formula="ABIDayCloudConvectionRGB(D1[label=Band 2 Albedo], D2[label=Band 13 Temperature])" id="abidaycloudconvection" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DayCloudConvection"/>
+        </operands>
+    </derived>
+    <derived description="ABI Day Cloud Phase Distinction RGB" formula="ABIDayCloudPhaseRGB(D1[label=Band 2 Albedo], D2[label=Band 5 Albedo], D3[label=Band 13 Temperature])" id="abidaycloudphase" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DayCloudPhase"/>
+        </operands>
+    </derived>
+    <derived description="ABI Day Convection RGB" formula="ABIDayConvectionRGB(D1[label=Band 2 Albedo], D2[label=Band 5 Albedo], D3[label=Band 7 Temperature], D4[label=Band 8 Temperature], D5[label=Band 10 Temperature], D6[label=Band 13 Temperature])" id="abidayconvection" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DayConvection"/>
+        </operands>
+    </derived>
+    <derived description="ABI Day Fire RGB" formula="ABIDayFireRGB(D1[label=Band 2 Albedo], D2[label=Band 3 Albedo], D3[label=Band 6 Albedo])" id="abidaylandcloudfire" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DayFire"/>
+        </operands>
+    </derived>
+    <derived description="ABI Day Land Cloud RGB" formula="ABIDayLandCloudRGB(D1[label=Band 2 Albedo], D2[label=Band 3 Albedo], D3[label=Band 5 Albedo])" id="abidaylandcloud" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DayLandCloud"/>
+        </operands>
+    </derived>
+    <derived description="ABI Day Snow Fog RGB" formula="ABIDaySnowFogRGB(D1[label=Band 3 Albedo], D2[label=Band 5 Albedo], D3[label=Band 7 Temperature], D4[label=Band 13 Temperature])" id="abidaysnowfog" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DaySnowFog"/>
+        </operands>
+    </derived>
+    <derived description="ABI Differential Water Vapor RGB" formula="ABIDifferentialWaterVaporRGB(D1[label=Band 8 Temperature], D2[label=Band 10 Temperature])" id="abidifferentialwatervapor" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DifferentialWaterVapor"/>
+        </operands>
+    </derived>
+    <derived description="ABI Dust RGB" formula="ABIDustRGB(D1[label=Band 11 Temperature], D2[label=Band 13 Temperature], D3[label=Band 14 Temperature], D4[label=Band 15 Temperature])" id="abidust" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_Dust"/>
+        </operands>
+    </derived>
+    <derived description="ABI Fire Temperature RGB" formula="ABIFireTemperatureRGB(D1[label=Band 5 Albedo], D2[label=Band 6 Albedo], D3[label=Band 7 Temperature])" id="abifiretemperature" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_FireTemperature"/>
+        </operands>
+    </derived>
+    <derived description="ABI Nighttime Microphysics RGB" formula="ABINightMicrophysicsRGB(D1[label=Band 7 Temperature], D2[label=Band 13 Temperature], D3[label=Band 15 Temperature])" id="abinighttime" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_NightMicrophysics"/>
+        </operands>
+    </derived>
+    <derived description="ABI Simple Water Vapor RGB" formula="ABISimpleWaterVaporRGB(D1[label=Band 8 Temperature], D2[label=Band 10 Temperature], D3[label=Band 13 Temperature])" id="abisimplewatervapor" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_SimpleWaterVapor"/>
+        </operands>
+    </derived>
+    <derived description="ABI SO2 RGB" formula="ABISo2RGB(D1[label=Band 9 Temperature], D2[label=Band 10 Temperature], D3[label=Band 11 Temperature], D4[label=Band 13 Temperature])" id="abiso2" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontroloverz"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_SO2"/>
+        </operands>
+    </derived>
+    <derived description="ABI True Color RGB" formula="ABITruColRGB(D1[label=Band 2 Brightness], D2[label=Band 3 Brightness], D3[label=Band 1 Brightness])" id="abitrucol" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontrol"/>
+            <category value="display:imagecontroloverz"/>
+            <category value="display:rgbcomposite"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_TruCol"/>
+        </operands>
+    </derived>
+    <derived description="ABI Cloud Type RGB" formula="ABICloudTypeRGB(D1[label=Band 4 Albedo], D2[label=Band 2 Albedo], D3[label=Band 5 Albedo])" id="abicloudtype" isdefault="true" isenduser="true" override="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontroloverz"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+        </categories>
+        <operands>
+            <paramgroup name="ABI_RGB_CloudType"/>
+        </operands>
+    </derived>
+    <derived description="ABI Day Rocket Plume RGB" formula="ABIDayRocketRGB(D1[label=Band 2 Albedo], D2[label=Band 7 Temperature], D3[label=Band 8 Temperature])" id="abidayrocket" isdefault="true" isenduser="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontroloverz"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_DayRocketPlume"/>
+        </operands>
+    </derived>
+    <derived description="ABI Night Rocket Plume RGB" formula="ABINightRocketRGB(D1[label=Band 7 Temperature], D2[label=Band 8 Temperature], D3[label=Band 10 Temperature])" id="abinightrocket" isdefault="true" isenduser="true">
+        <categories>
+            <category display="true" value="Imagery-ABI Functions"/>
+            <category value="display:imagecontroloverz"/>
+            <category value="display:rgbcomposite"/>
+            <category value="display:imagecontrol"/>
+        </categories>
+        <operands categories="">
+            <paramgroup categories="" name="ABI_RGB_NightRocketPlume"/>
+        </operands>
+    </derived>
   <derived description="AHI Airmass RGB" formula="AHIAirmassRGB(D1[label=Band 8 Temperature], D2[label=Band 10 Temperature], D3[label=Band 12 Temperature], D4[label=Band 13 Temperature])" id="ahiairmass" isdefault="true" isenduser="true">
     <categories>
       <category display="true" value="Satellite-AHI RGBs"/>
