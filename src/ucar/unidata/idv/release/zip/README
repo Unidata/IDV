@@ -6,6 +6,7 @@ programs. It should contain the following files:
     auxdata.jar           - supporting data files (maps, icons)
     external.jar          - external packages (e.g. JDOM, JAI, IJ, JH, JMF, etc)
     jython.jar            - Jython
+    java3d.jar            - include 4 j3d related jar file
     local-visad.jar       - UPC mods to VisAD not yet in visad.jar
     visad.jar             - VisAD
     ncIdv.jar             - netcdf-Java 4.0 library
