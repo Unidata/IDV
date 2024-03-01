@@ -3439,9 +3439,46 @@ public final class Util {
         return fi;
     }
 
+    /**
+     * Make a time field
+     *
+     * @param ranges ranges for each time
+     * @param time  list of times
+     *
+     * @return  the time field
+     *
+     * @throws RemoteException  Java RMI problem
+     * @throws VisADException   VisAD problem
+     */
+    public static FieldImpl[] makeTimeField(Data[] ranges, Object time) // List times)
+            throws VisADException, RemoteException {
+        FieldImpl [] fi         = new FieldImpl[ranges.length];
+        List times = Arrays.asList(time);
+        Set      timeSet = makeTimeSet(times);
+        int      setSize = ranges.length;
 
+        Object   obj     = times.get(0);
+        DateTime dttm    = null;
+        if (obj instanceof DateTime) {
+            dttm = (DateTime) obj;
+        } else if (obj instanceof Date) {
+            dttm = new CalendarDateTime((Date) obj);
+        } else {
+            throw new IllegalArgumentException("Unknown date type:" + obj);
+        }
 
-
+        for (int i = 0; i < setSize; i++) {
+            Data   range = ranges[i];
+            if (range == null) {
+                continue;
+            }
+            FieldImpl fii = new FieldImpl(new FunctionType(dttm.getType(),
+                        range.getType()), timeSet);
+            fii.setSample(i, range, false, false);
+            fi[i] = fii;
+        }
+        return fi;
+    }
 
     /**
      * This makes a field of T->range for the times in the list.
