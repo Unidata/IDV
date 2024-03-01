@@ -1818,13 +1818,13 @@ public class CDMRadarAdapter implements RadarAdapter {
                 try {
                     fi = getVolume(moment, rn);
                 } catch (IOException ex) {
-                    LogUtil.logException("getGridVolume", ex);
+                    LogUtil.logException("getVolume", ex);
                 }
             } else {
                 try {
                      fi = getGridVolume(moment, rn);
                 } catch (IOException ex) {
-                    LogUtil.logException("getVolume", ex);
+                    LogUtil.logException("getGridVolume", ex);
                 }
             }
         } else {
