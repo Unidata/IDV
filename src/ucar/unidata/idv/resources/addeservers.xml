@@ -39,7 +39,7 @@ they essentially get it from their container type tag.
             type="wxtext"/>
   </server>
   -->
-  <server name="adde.ssec.wisc.edu" active="true">
+  <!--server name="adde.ssec.wisc.edu" active="true">
     <group
             names="RTIMAGES,IMAGEALL,EAST,EASTALL,WEST,WESTALL,L2GEAST,L2GEALL,L2GWEST,L2GWALL,
             NPGWEST,NPGWALL,NPGEAST,NPGEALL,BLIZZARD,CIMSS,NEXRCOMP,TOPO,GLOBAL,GINIALL,NEXRCALL,RTGEOC,GEOCALL,RTDDST,DDSTALL"
@@ -50,7 +50,7 @@ they essentially get it from their container type tag.
     <group
             names="RTWXTEXT"
             type="wxtext"/>
-  </server>
+  </server-->
   <server name="stratus.al.noaa.gov">
     <group
        names="RTIMAGES,CIMSS,GINIEAST,GINIWEST,GINCOMP,TOPO"
