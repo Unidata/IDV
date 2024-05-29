@@ -81,7 +81,7 @@ public class ContourCrossSectionControl extends CrossSectionControl {
                                            + paramName, true, isColorFill);
         addAttributedDisplayable(display,
                                  FLAG_CONTOUR | FLAG_COLORTABLE
-                                 | FLAG_DISPLAYUNIT | FLAG_COLORTABLE | FLAG_SMOOTHING);
+                                 | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
         return display;
     }
 
