@@ -12391,7 +12391,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @return the smoothing widget
      */
-    private JComponent doMakeSmoothingWidget() {
+    protected JComponent doMakeSmoothingWidget() {
         sww = new ValueSliderWidget(
             this, 1, 19, "smoothingFactor", "Factor", 1.0f, true,
             "Amount of smoothing or radius in grid units (larger number = greater smoothing");
