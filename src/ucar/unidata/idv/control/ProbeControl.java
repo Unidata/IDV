@@ -51,18 +51,7 @@ import ucar.visad.display.PointProbe;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.display.SelectorPoint;
 
-import visad.Data;
-import visad.FieldImpl;
-import visad.Real;
-import visad.RealTuple;
-import visad.RealTupleType;
-import visad.RealType;
-import visad.Set;
-import visad.SetType;
-import visad.TupleType;
-import visad.Unit;
-import visad.VisADException;
-import visad.VisADRay;
+import visad.*;
 
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
@@ -378,7 +367,11 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             }
         };
         latLonWidget = new LatLonWidget("Lat: ", "Lon: ", "Alt: ",
-                                        llListener);
+                                        llListener){
+            protected String formatLatLonString(String latOrLon) {
+                return latOrLon;
+            }
+        };
 
 
         timeLabel = new JLabel("   ");
@@ -2032,6 +2025,13 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             String stationName = rowInfo.getStationName();
             if ((stationName != null) && (stationName.length() > 0)) {
                 return rowInfo.getPointParameter() + "@" + stationName;
+            } else if(rowInfo.getDataInstance() != null){
+                try {
+                    Data data = rowInfo.getDataInstance().getData();
+                    FunctionType ftype = (FunctionType)data.getType();
+                    return ftype.getRange().toString();
+                } catch (Exception ee){}
+
             }
             return rowInfo.getPointParameter();
         }
@@ -2547,37 +2547,48 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             if (pointObs == null) {
                 return null;
             }
-            int     numObs      = pointObs.getDomainSet().getLength();
-            List    obs         = new ArrayList();
+            int numObs = pointObs.getDomainSet().getLength();
+            List obs = new ArrayList();
 
-            PointOb closest     = null;
-            double  minDistance = 0;
-
-            for (int i = 0; i < numObs; i++) {
-                PointOb ob = (PointOb) pointObs.getSample(i);
-                double distance =
-                    ucar.visad.Util.bearingDistance(ob.getEarthLocation(),
-                        elt).getValue();
-                if ((closest == null) || (distance < minDistance)) {
-                    closest     = ob;
-                    minDistance = distance;
+            PointOb closest = null;
+            double minDistance = 0;
+            if (pointObs.getSample(0) instanceof PointOb) {
+                for (int i = 0; i < numObs; i++) {
+                    PointOb ob = (PointOb) pointObs.getSample(i);
+                    double distance =
+                            ucar.visad.Util.bearingDistance(ob.getEarthLocation(),
+                                    elt).getValue();
+                    if ((closest == null) || (distance < minDistance)) {
+                        closest = ob;
+                        minDistance = distance;
+                    }
                 }
-            }
-            if (closest == null) {
-                return null;
-            }
-
-            EarthLocation closestEL = closest.getEarthLocation();
-            for (int i = 0; i < numObs; i++) {
-                PointOb ob = (PointOb) pointObs.getSample(i);
-                if (ob.getEarthLocation().equals(closestEL)) {
-                    obs.add(ob);
+                if (closest == null) {
+                    return null;
                 }
+
+                EarthLocation closestEL = closest.getEarthLocation();
+                for (int i = 0; i < numObs; i++) {
+                    PointOb ob = (PointOb) pointObs.getSample(i);
+                    if (ob.getEarthLocation().equals(closestEL)) {
+                        obs.add(ob);
+                    }
+                }
+                sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0,
+                        info.getPointIndex());
+            } else {
+                obs.add(pointObs);
+                sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0, 0);
+                //return sample;
             }
-            sample = PointObFactory.makeTimeSequenceOfPointObs(obs, 0,
-                    info.getPointIndex());
-            if (useRowInfoCache) {
+            if (useRowInfoCache && obs.get(0) instanceof PointOb) {
                 info.setStationName((PointOb) obs.get(0), this);
+                info.setPointSample(sample, elt);
+                setTimesForAnimation();
+            } else {
+                FunctionType ftype = (FunctionType)pointObs.getType();
+                String tname =  ftype.getRange().toString();
+                info.setPointParameter(tname);
                 info.setPointSample(sample, elt);
                 setTimesForAnimation();
             }
@@ -3427,5 +3438,92 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
             return false;
         }
     }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doExport(String what, String filename) throws Exception {
+        try {
+            Animation animation = getInternalAnimation();
+            Set       aniSet    = animation.getSet();
+            Real[]    times     = Animation.getDateTimeArray(aniSet);
 
+
+            if (filename == null) {
+                return;
+            }
+
+            if (what.contains("netcdf")){
+                filename = filename + ".nc";
+            } else if(what.contains("xls")){
+                filename = filename + ".xls";
+            } else {
+                filename = filename + ".csv";
+            }
+
+            amExporting = true;
+            List choices = getDataChoices();
+
+            if (times.length == 0) {
+                LogUtil.userMessage("No times to export");
+                return;
+            }
+
+            //Force the sampling. This sets the sample at the current location, time set, etc.
+            setData(times[0], 0);
+            List rows = new ArrayList();
+            List cols;
+            cols = Misc.newList("Time");
+            for (int row = 0; row < choices.size(); row++) {
+                ProbeRowInfo info = getRowInfo(row);
+                cols.add(getFieldName(row));
+            }
+            rows.add(cols);
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                cols = Misc.newList("" + aniValue);
+                rows.add(cols);
+            }
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                for (int row = 0; row < choices.size(); row++) {
+                    cols = (List) rows.get(timeIdx + 1);
+                    ProbeRowInfo info    = getRowInfo(row);
+                    Set          timeSet = info.getTimeSet();
+                    Data         rt      = null;
+                    FieldImpl    sample  = info.getPointSample();
+                    if ((sample != null) && (timeSet != null)) {
+                        rt = sample.evaluate(aniValue,
+                                info.getSamplingMode(),
+                                Data.NO_ERRORS);
+                    } else {
+                        rt = info.getPointSample().getSample(0);
+                    }
+
+                    if (rt == null) {
+                        cols.add("missing");
+                    } else {
+                        if (info.getUnit() != null) {
+                            Real real = null;
+                            if (rt instanceof Real) {
+                                real = (Real) rt;
+                            } else {
+                                real = (Real) ((RealTuple) rt).getComponent(
+                                        0);
+                            }
+                            cols.add(real.getValue(info.getUnit()));
+                        } else {
+                            cols.add(rt.toString());
+                        }
+                    }
+                }
+            }
+            DataUtil.writeCsv(filename, rows);
+            amExporting = false;
+        } catch (Exception exc) {
+            logException("Exporting to csv", exc);
+        }
+    }
 }
