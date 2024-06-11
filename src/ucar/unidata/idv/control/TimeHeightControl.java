@@ -218,6 +218,8 @@ public class TimeHeightControl extends LineProbeControl {
                     "Need more than one time to create a TimeHeight Cross Section");
         }
 
+        RealTuple ss = getGridCenterPosition();
+        setProbePosition(ss);
         setXAxisLabels((SampledSet) fieldImpl.getDomainSet());
 
         timeHeightView.setShowDisplayList(false);
