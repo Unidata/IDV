@@ -69,6 +69,7 @@ import java.beans.PropertyChangeEvent;
 
 import java.beans.PropertyChangeListener;
 
+import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 
 import java.util.*;
@@ -76,6 +77,8 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
+
+import static javax.swing.JOptionPane.getRootFrame;
 
 
 /**
@@ -331,9 +334,26 @@ public class TimeHeightControl extends LineProbeControl {
                 myTimeHeightControl.initDone();
                 addDisplayable(myTimeHeightControl.contourDisplay, timeHeightView);
                 myTimeHeightControl.setMySmoothType(mySmoothingType);
-                controlPane.add(myTimeHeightControl.doMakeContents());
-                myTimeHeightControl.setMyColor(myColor);
-                myTimeHeightControl.setMyContourInfo(myContourInfo);
+                //controlPane.add(myTimeHeightControl.doMakeContents());
+                JButton btn = new JButton(dc.getName());
+                controlPane.add(btn);
+                btn.addActionListener(new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)  {
+                        try {
+                            JFrame frame = new JFrame();
+                            frame.add(myTimeHeightControl.doMakeContents());
+                            myTimeHeightControl.setMySmoothType(myTimeHeightControl.getSmoothingType());
+                            myTimeHeightControl.setMyColor(myColor);
+                            myTimeHeightControl.setMyContourInfo(myContourInfo);
+                            showFrameAsDialog(controlPane, frame);
+                        } catch (Exception ee){}
+
+                    }
+                });
+                //myTimeHeightControl.setMyColor(myColor);
+                //myTimeHeightControl.setMyContourInfo(myContourInfo);
             } catch (Exception ee){}
         }
     }
@@ -677,7 +697,7 @@ public class TimeHeightControl extends LineProbeControl {
             //double averageTickSpacing = (end-start)/(double)(numSteps);
             double averageTickSpacing = (end - start);
             xScale.setMajorTickSpacing(averageTickSpacing * step);
-            xScale.setMinorTickSpacing(averageTickSpacing);
+            xScale.setMinorTickSpacing(averageTickSpacing * (1.0f/numSteps));
             xScale.setLabelTable(timeLabels);
             //xScale.setTitle("Time (" + dt.getFormatTimeZone().getDisplayName() + ")");
             xScale.setTitle("Time ("
@@ -829,14 +849,79 @@ public class TimeHeightControl extends LineProbeControl {
         myTimeHeightControl.setPosition(position);
         myTimeHeightControl.initDone();
         addDisplayable(myTimeHeightControl.contourDisplay, timeHeightView);
-        controlPane.add(myTimeHeightControl.doMakeContents());
+        //controlPane.add(myTimeHeightControl.doMakeContents());
+        JButton btn = new JButton(dc.getName());
+        controlPane.add(btn);
+        btn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)  {
+                try {
+                    JFrame frame = new JFrame();
+                    frame.add(myTimeHeightControl.doMakeContents());
+                    myTimeHeightControl.setMySmoothType(myTimeHeightControl.getSmoothingType());
+                    myTimeHeightControl.setMyColor(myTimeHeightControl.getColor());
+                    myTimeHeightControl.setMyContourInfo(myTimeHeightControl.getContourInfo());
+                    showFrameAsDialog(controlPane, frame);
+                } catch (Exception ee){}
 
+            }
+        });
         showNormalCursor();
         appendDataChoices(newChoices);
 
         //doMoveProbe();
     }
 
+    /**
+     * popup but a modal dialog with input Jframe
+     * @return
+     */
+    public static void showFrameAsDialog(Component parentComponent, JFrame frame)
+    {
+        try
+        {
+            JOptionPane pane = new JOptionPane(frame.getContentPane(), JOptionPane.PLAIN_MESSAGE,
+                    JOptionPane.NO_OPTION, null,
+                    new Object[]
+                            {
+                            }, null);
+
+            pane.setComponentOrientation(((parentComponent == null)
+                    ? getRootFrame() : parentComponent).getComponentOrientation());
+
+            int style = JRootPane.PLAIN_DIALOG;
+
+            Method method = pane.getClass().getDeclaredMethod("createDialog", Component.class, String.class, int.class);
+            method.setAccessible(true);
+            Object objDialog = method.invoke(pane, parentComponent, frame.getTitle(), style);
+
+            JDialog dialog = (JDialog) objDialog;
+            if (frame.getWidth() > dialog.getWidth() || frame.getHeight() > dialog.getHeight())
+            {
+                dialog.setSize(frame.getWidth(), frame.getHeight());
+                dialog.setLocationRelativeTo(parentComponent);
+            }
+
+            frame.addWindowListener(new java.awt.event.WindowAdapter()
+            {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent windowEvent)
+                {
+                    dialog.dispose();
+                }
+            });
+
+            dialog.show();
+            dialog.dispose();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    /**
+     * remove all widget associated with additional parameter
+     * @return
+     */
     private void removeField(int idx) {
         if (idx < 0) {
             return;
