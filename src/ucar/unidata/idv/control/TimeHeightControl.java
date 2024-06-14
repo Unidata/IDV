@@ -347,7 +347,7 @@ public class TimeHeightControl extends LineProbeControl {
                             myTimeHeightControl.setMySmoothType(myTimeHeightControl.getSmoothingType());
                             myTimeHeightControl.setMyColor(myColor);
                             myTimeHeightControl.setMyContourInfo(myContourInfo);
-                            showFrameAsDialog(controlPane, frame);
+                            GuiUtils.showFrameAsDialog(controlPane, frame);
                         } catch (Exception ee){}
 
                     }
@@ -862,7 +862,7 @@ public class TimeHeightControl extends LineProbeControl {
                     myTimeHeightControl.setMySmoothType(myTimeHeightControl.getSmoothingType());
                     myTimeHeightControl.setMyColor(myTimeHeightControl.getColor());
                     myTimeHeightControl.setMyContourInfo(myTimeHeightControl.getContourInfo());
-                    showFrameAsDialog(controlPane, frame);
+                    GuiUtils.showFrameAsDialog(controlPane, frame);
                 } catch (Exception ee){}
 
             }
@@ -873,51 +873,7 @@ public class TimeHeightControl extends LineProbeControl {
         //doMoveProbe();
     }
 
-    /**
-     * popup but a modal dialog with input Jframe
-     * @return
-     */
-    public static void showFrameAsDialog(Component parentComponent, JFrame frame)
-    {
-        try
-        {
-            JOptionPane pane = new JOptionPane(frame.getContentPane(), JOptionPane.PLAIN_MESSAGE,
-                    JOptionPane.NO_OPTION, null,
-                    new Object[]
-                            {
-                            }, null);
 
-            pane.setComponentOrientation(((parentComponent == null)
-                    ? getRootFrame() : parentComponent).getComponentOrientation());
-
-            int style = JRootPane.PLAIN_DIALOG;
-
-            Method method = pane.getClass().getDeclaredMethod("createDialog", Component.class, String.class, int.class);
-            method.setAccessible(true);
-            Object objDialog = method.invoke(pane, parentComponent, frame.getTitle(), style);
-
-            JDialog dialog = (JDialog) objDialog;
-            if (frame.getWidth() > dialog.getWidth() || frame.getHeight() > dialog.getHeight())
-            {
-                dialog.setSize(frame.getWidth(), frame.getHeight());
-                dialog.setLocationRelativeTo(parentComponent);
-            }
-
-            frame.addWindowListener(new java.awt.event.WindowAdapter()
-            {
-                @Override
-                public void windowClosed(java.awt.event.WindowEvent windowEvent)
-                {
-                    dialog.dispose();
-                }
-            });
-
-            dialog.show();
-            dialog.dispose();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
     /**
      * remove all widget associated with additional parameter
      * @return
