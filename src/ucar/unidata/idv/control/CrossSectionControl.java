@@ -186,7 +186,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     private double[] displayMatrix;
 
     /** animation info for the crossSectionView */
-    private AnimationInfo animationInfo = new AnimationInfo();
+    protected AnimationInfo animationInfo = new AnimationInfo();
 
     /** transform to altitude */
     protected CoordinateSystem coordTrans;
@@ -246,7 +246,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     private Transect lastTransect;
 
     /** range for Y axis */
-    private Range verticalAxisRange = null;
+    protected Range verticalAxisRange = null;
 
     /** start lat/lon widget */
     LatLonWidget startLLW;
@@ -278,6 +278,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** _more_ */
     Range dataVerticalRange = null;
 
+    /** _more_ */
+    protected JPanel controlPane;
+
+    ArrayList<CrossSectionControl> controlList = null;
     /**
      * Default constructor.  Sets the appropriate attribute flags.
      */
@@ -428,7 +432,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         levelsList  = dataChoice.getAllLevels(null);
         xsDisplay   = createXSDisplay();
         vcsDisplay  = createVCSDisplay();
-
+        controlList = new ArrayList<>();
         //Now set the data (which uses the displayables  above).
         if ( !setData(dataChoice)) {
             return false;
@@ -455,6 +459,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                 csvxsDisplay.setProjectionMatrix(displayMatrix);
             }
         }
+        crossSectionView.setShowDisplayList(false);
         XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
 
         //getIdv().getVMManager().addViewManager(crossSectionView);
@@ -951,10 +956,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     public Container doMakeContents() {
         try {
             JTabbedPane tab = new MyTabbedPane();
+            controlPane = new JPanel();
             tab.add("Display", GuiUtils.inset(getDisplayTabComponent(), 5));
-            tab.add("Settings",
+            tab.add("Settings", GuiUtils.hsplit(
                     GuiUtils.inset(GuiUtils.top(doMakeWidgetComponent()),
-                                   5));
+                                   5), controlPane));
             //Set this here so we don't get odd crud on the screen
             //When the MyTabbedPane goes to paint itself the first time it
             //will set the tab back to 0
@@ -966,7 +972,6 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
         return null;
     }
-
 
     /**
      * Get edit menu item
@@ -1616,6 +1621,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             CrossSectionSelector cs = getCrossSectionSelector();
             doShare(SHARE_XSLINE, new Object[] { cs.getStartPoint(),
                     cs.getEndPoint() });
+            if(controlList.size() >=1){
+                for(CrossSectionControl csc: controlList){
+                    csc.loadDataFromLine();
+                }
+            }
         } catch (Exception exc) {
             logException("Error in crossSectionChanged ", exc);
         }
@@ -1674,6 +1684,16 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             csvMenu.setText(getCrossSectionViewLabel());
             menus.add(csvMenu);
         }
+        List paramItems = new ArrayList();
+        JMenuItem addParamItem = doMakeChangeParameterMenuItem();
+
+        paramItems.add(addParamItem);
+        List choices = getDataChoices();
+        for (int i = 0; i < choices.size(); i++) {
+            paramItems.addAll(getParameterMenuItems(i));
+        }
+
+        menus.add(GuiUtils.makeMenu("Parameters", paramItems));
     }
 
     /**
@@ -2743,6 +2763,78 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         initLon1 = value;
     }
 
+    /**
+     * Return the appropriate label text for the menu.
+     * @return  the label text
+     */
+    protected String getChangeParameterLabel() {
+        return "Add Parameter...";
+    }
+
+    protected void addNewData(List newChoices)
+            throws VisADException, RemoteException {
+        processNewData(newChoices);
+        doShare(SHARE_CHOICES, newChoices);
+    }
+
+    protected void processNewData(List newChoices)
+            throws VisADException, RemoteException {
+
+    }
 
 
+
+    private List getParameterMenuItems(final int row) {
+        List               items   = new ArrayList();
+        DataChoice dc = (DataChoice)getDataChoices().get(row);
+        JMenu paramMenu = new JMenu("Parameter " + dc.getName());
+        items.add(paramMenu);
+        JMenuItem jmi;
+
+        // change unit choice
+
+        // Remove this parameter
+        jmi = new JMenuItem("Remove");
+        if(dc.getName() != paramName)
+            paramMenu.add(jmi);
+        jmi.addActionListener(new ActionListener() {
+            public void actionPerformed(
+                    ActionEvent ev) {
+                removeField(row);
+                updateLegendLabel();
+            }
+        });
+
+        return items;
+    }
+    private void removeField(int idx) {
+        if (idx < 0) {
+            return;
+        }
+        try {
+            removeDisplayable(idx);
+            controlPane.remove(idx-1);
+            removeControl(idx);
+        } catch (Exception ee){}
+
+
+        List choices = getDataChoices();
+        DataChoice dc = (DataChoice) choices.get(idx);
+        if (dc != null) {
+            removeDataChoice(dc);
+        }
+
+        //fireStructureChanged();
+        try {
+            loadDataFromLine();  // update the side legend label if needed
+        } catch (Exception ff){}
+    }
+
+    public void removeDisplayable(int idx)
+            throws RemoteException, VisADException {
+    }
+
+    public void removeControl(int idx)
+            throws RemoteException, VisADException {
+    }
 }
