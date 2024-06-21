@@ -836,6 +836,15 @@ public class TimeHeightControl extends LineProbeControl {
         doShare(SHARE_CHOICES, newChoices);
     }
 
+    /**
+     * Override base class method which is called when the user has selected
+     * new data choices.
+     *
+     * @param newChoices    new list of choices
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
     protected void processNewData(List newChoices)
             throws VisADException, RemoteException {
         DataChoice dc = (DataChoice) newChoices.get(0);
