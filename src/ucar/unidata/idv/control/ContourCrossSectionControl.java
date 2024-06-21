@@ -22,16 +22,21 @@ package ucar.unidata.idv.control;
 
 
 import ucar.unidata.data.DataChoice;
-import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.data.grid.GridDataInstance;
+import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.idv.*;
 
 import ucar.unidata.util.ContourInfo;
 
+import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
-import ucar.visad.display.Contour2DDisplayable;
-import ucar.visad.display.DisplayableData;
+import ucar.unidata.util.Range;
+import ucar.visad.display.*;
 
-import visad.VisADException;
+import visad.*;
+import visad.georef.EarthLocation;
+import visad.georef.LatLonPoint;
 
 import java.awt.*;
 
@@ -62,6 +67,7 @@ public class ContourCrossSectionControl extends CrossSectionControl {
     /** flag for color file */
     boolean isColorFill = false;
 
+   // MyContourCrossSectionControl myContourCrossSectionControl;
     /**
      * Default constructor.
      */
@@ -165,5 +171,286 @@ public class ContourCrossSectionControl extends CrossSectionControl {
      */
     public boolean getIsRaster() {
         return isColorFill;
+    }
+
+    /**
+     * Override base class method which is called when the user has selected
+     * new data choices.
+     *
+     * @param newChoices    new list of choices
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected void processNewData(List newChoices)
+            throws VisADException, RemoteException {
+        DataChoice dc = (DataChoice) newChoices.get(0);
+        MyContourCrossSectionControl myContourCrossSectionControl  = new ContourCrossSectionControl.MyContourCrossSectionControl(this);
+        myContourCrossSectionControl.controlContext = getControlContext();
+
+        myContourCrossSectionControl.init(dc, csSelector);
+
+
+        addDisplayable(myContourCrossSectionControl.xsDisplay);
+        addDisplayable(myContourCrossSectionControl.vcsDisplay, crossSectionView);
+        //controlPane.add(myTimeHeightControl.doMakeContents());
+        JButton btn = new JButton(dc.getName());
+        controlPane.add(btn);
+        btn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)  {
+                try {
+                    JFrame frame = new JFrame();
+                    frame.add(myContourCrossSectionControl.doMakeContents());
+
+                    GuiUtils.showFrameAsDialog(controlPane, frame);
+                } catch (Exception ee){}
+
+            }
+        });
+        showNormalCursor();
+        controlList.add(myContourCrossSectionControl);
+        appendDataChoices(newChoices);
+
+        //doMoveProbe();
+    }
+
+    /**
+     * Remove a <code>Displayable</code>
+     *
+     * @param idx   displayable to remove
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    Problem in VisAD
+     */
+    public void removeDisplayable(int idx)
+            throws RemoteException, VisADException {
+        MyContourCrossSectionControl my = (MyContourCrossSectionControl)controlList.get(idx-1);
+        if (my != null) {
+            removeDisplayable(my.xsDisplay);
+            removeDisplayable(my.vcsDisplay);
+            my.removeDisplayable(my.xsDisplay);
+            my.removeDisplayable(my.vcsDisplay);
+        }
+    }
+
+    public void removeControl(int idx)
+            throws RemoteException, VisADException {
+        controlList.remove(idx-1);
+    }
+
+
+    static public class MyContourCrossSectionControl extends ContourCrossSectionControl {
+
+        ContourCrossSectionControl contourCrossSectionControl;
+        Unit displayunit = null;
+        private Range colorRange = null;
+
+        ContourInfo contourInfo;
+
+        private Color color;
+
+
+        public MyContourCrossSectionControl() {
+            this.isColorFill = false;
+            setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE
+                    | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
+        }
+        public MyContourCrossSectionControl(ContourCrossSectionControl contourCrossSectionControlc) {
+            this.contourCrossSectionControl = contourCrossSectionControl;
+            this.isColorFill = false;
+            setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE
+                    | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
+        }
+
+        /**
+         * Construct the display, frame, and controls
+         *
+         * @param dataChoice the data to use
+         *
+         * @return  true if successful
+         *
+         * @throws RemoteException  Java RMI error
+         * @throws VisADException   VisAD Error
+         */
+        public boolean init(DataChoice dataChoice, CrossSectionSelector crossSectionSelector)
+                throws VisADException, RemoteException {
+
+            crossSectionView = new CrossSectionViewManager(getViewContext(),
+                    new ViewDescriptor("CrossSectionView" + paramName),
+                    "showControlLegend=false;showScales=true", animationInfo);
+
+            csSelector = crossSectionSelector;
+            xsDisplay  = new Contour2DDisplayable("vcs_"
+                    + paramName, true, false);
+            addAttributedDisplayable(xsDisplay,
+                    FLAG_CONTOUR | FLAG_COLORTABLE
+                            | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
+
+            vcsDisplay = new Contour2DDisplayable("vcs_"
+                    + paramName, true, false);
+            addAttributedDisplayable(vcsDisplay,
+                    FLAG_CONTOUR | FLAG_COLORTABLE
+                            | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
+
+
+            if ( !setData(dataChoice)) {
+                return false;
+            }
+
+
+            vcsDisplay.setVisible(true);
+            xsDisplay.setVisible(true);
+            XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
+
+            //getIdv().getVMManager().addViewManager(crossSectionView);
+            addViewManager(crossSectionView);
+            setYAxisRange(csvxsDisplay, verticalAxisRange);
+            csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
+            csvxsDisplay.setYDisplayUnit(csvxsDisplay.getYDisplayUnit());
+            //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
+            if (haveMultipleFields()) {
+                addDisplayable(vcsDisplay, crossSectionView,
+                        FLAG_COLORTABLE | FLAG_COLORUNIT);
+            } else {
+                addDisplayable(vcsDisplay, crossSectionView,
+                        FLAG_COLORTABLE | FLAG_CONTOUR | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
+            }
+
+
+            if (displayIs3D) {
+                if (haveMultipleFields()) {
+                    //If we have multiple fields then we want both the
+                    //color unit and the display unit
+                    addDisplayable(xsDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
+                } else {
+                    addDisplayable(xsDisplay);
+                }
+            }
+
+            loadDataFromLine();
+
+            return true;
+        }
+
+        /**
+         * Has this control been initialized
+         *
+         * @return Is this control initialized
+         */
+        public boolean getHaveInitialized() {
+            return true;
+        }
+
+
+        /**
+         * Make the UI contents for this control window.
+         *
+         * @return  UI container
+         *
+         * @throws RemoteException  Java RMI error
+         * @throws VisADException   VisAD Error
+         */
+        public Container doMakeContents()
+         {
+
+            // TODO:  This is what should be done - however legends don't show up.
+
+            return doMakeWidgetComponent();
+
+            //return GuiUtils.centerBottom(profileDisplay.getComponent(),
+            //                             doMakeWidgetComponent());
+        }
+        /**
+         * make widgets for check box for latest data time on left of x axis.
+         *
+         * @param controlWidgets to fill
+         *
+         * @throws RemoteException  Java RMI error
+         * @throws VisADException   VisAD Error
+         */
+        public void getControlWidgets(List controlWidgets)
+                throws VisADException, RemoteException {
+            controlWidgets.add(contourWidget = new ContourWidget(this,
+                    getContourInfo()));
+            addRemovable(contourWidget);
+
+            controlWidgets.add(getColorTableWidget(getRangeForColorTable()));
+
+            controlWidgets.add(new WrapperWidget(this,
+                    GuiUtils.rLabel("Smoothing:"), doMakeSmoothingWidget()));
+
+        }
+
+        /**
+         * Return the label that is to be used for the color widget
+         * This allows derived classes to override this and provide their
+         * own name,
+         *
+         * @return Label used for the color widget
+         */
+        public String getColorWidgetLabel() {
+            return "Color";
+        }
+        /**
+         * User has asked to see a different new parameter in this existing display.
+         * Do everything needed to load display with new kind of parameter.
+         *
+         * @param dataChoice    choice for data
+         * @return  true if successfule
+         *
+         * @throws RemoteException  Java RMI error
+         * @throws VisADException   VisAD Error
+         */
+        protected boolean setData(DataChoice dataChoice)
+                throws VisADException, RemoteException {
+            super.setData(dataChoice);
+            paramName = dataChoice.getName();
+            GridDataInstance di = (GridDataInstance)doMakeDataInstance(dataChoice);
+            contourInfo = getContourInfo();
+            colorRange = di.getRange(0);
+            displayunit = ((GridDataInstance) di).getRawUnit(0);
+
+
+            return true;
+        }
+
+        /**
+         * Get the range for the color table.
+         *
+         * @return range being used
+         * @throws RemoteException  some RMI exception occured
+         * @throws VisADException  error getting the range in VisAD
+         */
+        public Range getRangeForColorTable()
+                throws RemoteException, VisADException {
+            return colorRange;
+        }
+        /**
+         * Get the unit for the data display.
+         * @return  unit to use for displaying the data
+         */
+        public Unit getDisplayUnit() {
+            Unit unit = displayunit;
+
+            setDisplayUnit(unit);
+
+            return unit;
+        }
+
+
+        /**
+         *  Use the value of the smoothing type and weight to subset the data.
+         *
+         * @throws RemoteException Java RMI problem
+         * @throws VisADException  VisAD problem
+         */
+        protected void applySmoothing() throws VisADException, RemoteException {
+            if (checkFlag(FLAG_SMOOTHING)) {
+                GridDataInstance gdi = getGridDataInstance();
+                if(gdi != null)
+                    super.applySmoothing();
+            }
+        }
     }
 }
