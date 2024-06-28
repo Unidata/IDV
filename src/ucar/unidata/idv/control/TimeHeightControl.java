@@ -143,7 +143,7 @@ public class TimeHeightControl extends LineProbeControl {
     /** the control for second variable */
     private MyTimeHeightControl myTimeHeightControl;
     /** the color for second variable */
-    private Color myColor;
+    private ColorTable myColorTable;
     /** the contour info for second variable */
     private ContourInfo myContourInfo;
     /** the smoothing type for second variable */
@@ -334,7 +334,9 @@ public class TimeHeightControl extends LineProbeControl {
                 myTimeHeightControl.initDone();
                 addDisplayable(myTimeHeightControl.contourDisplay, timeHeightView);
                 myTimeHeightControl.setMySmoothType(mySmoothingType);
-                //controlPane.add(myTimeHeightControl.doMakeContents());
+                myTimeHeightControl.setMyColorTable(myColorTable);
+                myTimeHeightControl.setMyContourInfo(myContourInfo);
+
                 JButton btn = new JButton(dc.getName());
                 controlPane.add(btn);
                 btn.addActionListener(new ActionListener()
@@ -344,16 +346,13 @@ public class TimeHeightControl extends LineProbeControl {
                         try {
                             JFrame frame = new JFrame();
                             frame.add(myTimeHeightControl.doMakeContents());
-                            myTimeHeightControl.setMySmoothType(myTimeHeightControl.getSmoothingType());
-                            myTimeHeightControl.setMyColor(myColor);
-                            myTimeHeightControl.setMyContourInfo(myContourInfo);
+
                             GuiUtils.showFrameAsDialog(controlPane, frame);
                         } catch (Exception ee){}
 
                     }
                 });
-                //myTimeHeightControl.setMyColor(myColor);
-                //myTimeHeightControl.setMyContourInfo(myContourInfo);
+
             } catch (Exception ee){}
         }
     }
@@ -773,11 +772,20 @@ public class TimeHeightControl extends LineProbeControl {
 
         items.add(GuiUtils.makeMenu("Parameters", paramItems));
     }
-
+    /**
+     * A hook to allow derived classes to have their own label in the menu
+     * for the change data call.
+     *
+     * @return Menu label for the change data call.
+     */
     protected String getChangeParameterLabel() {
         return "Add Parameter...";
     }
-
+    /**
+     * Utility to make the menu item for changing the data choice
+     *
+     * @return The menu item
+     */
     protected JMenuItem doMakeChangeParameterMenuItem() {
         final JMenuItem selectChoices =
                 new JMenuItem(getChangeParameterLabel());
@@ -818,9 +826,6 @@ public class TimeHeightControl extends LineProbeControl {
 
         return items;
     }
-    protected void updatePosition(){
-
-    }
 
     /**
      * Called when the user chooses new data for this display
@@ -858,7 +863,6 @@ public class TimeHeightControl extends LineProbeControl {
         myTimeHeightControl.setPosition(position);
         myTimeHeightControl.initDone();
         addDisplayable(myTimeHeightControl.contourDisplay, timeHeightView);
-        //controlPane.add(myTimeHeightControl.doMakeContents());
         JButton btn = new JButton(dc.getName());
         controlPane.add(btn);
         btn.addActionListener(new ActionListener()
@@ -868,9 +872,6 @@ public class TimeHeightControl extends LineProbeControl {
                 try {
                     JFrame frame = new JFrame();
                     frame.add(myTimeHeightControl.doMakeContents());
-                    myTimeHeightControl.setMySmoothType(myTimeHeightControl.getSmoothingType());
-                    myTimeHeightControl.setMyColor(myTimeHeightControl.getColor());
-                    myTimeHeightControl.setMyContourInfo(myTimeHeightControl.getContourInfo());
                     GuiUtils.showFrameAsDialog(controlPane, frame);
                 } catch (Exception ee){}
 
@@ -1054,10 +1055,10 @@ public class TimeHeightControl extends LineProbeControl {
      *
      * @return the background color
      */
-    public Color getMyColor() {
+    public ColorTable getMyColorTable() {
         if(myTimeHeightControl != null) {
-            myColor = myTimeHeightControl.getColor();
-            return myColor;
+            myColorTable = myTimeHeightControl.getColorTable();
+            return myColorTable;
         } else
             return null;
     }
@@ -1067,8 +1068,8 @@ public class TimeHeightControl extends LineProbeControl {
      *
      * @param color   new color
      */
-    public void setMyColor(Color color) throws RemoteException, VisADException {
-        this.myColor = color;
+    public void setMyColorTable(ColorTable color) throws RemoteException, VisADException {
+        this.myColorTable = color;
     }
 
     /**
@@ -1153,11 +1154,11 @@ public class TimeHeightControl extends LineProbeControl {
         private int OldSmoothingFactor = 0;
 
         public MyTimeHeightControl() {
-            setAttributeFlags(FLAG_DATACONTROL | FLAG_COLORTABLE );
+            setAttributeFlags(FLAG_COLORTABLE | FLAG_CONTOUR | FLAG_DISPLAYUNIT | FLAG_SMOOTHING );
         }
         public MyTimeHeightControl(TimeHeightControl thc) {
             this.timeHeightControl = thc;
-            setAttributeFlags(FLAG_DATACONTROL | FLAG_COLORTABLE );
+            setAttributeFlags(FLAG_COLORTABLE | FLAG_CONTOUR | FLAG_DISPLAYUNIT | FLAG_SMOOTHING );
         }
 
         /**
@@ -1186,11 +1187,13 @@ public class TimeHeightControl extends LineProbeControl {
             //Call doMakeProbe here so we link to the right ViewManager
             //If we do it after the addViewManager then we screw up persistence
             //doMakeProbe();
-            contourDisplay = new Contour2DDisplayable("th_contour_"
-                    + paramName);
+            contourDisplay = new Contour2DDisplayable("th_color_" + paramName,
+                    true, false);
+            contourDisplay.setVisible(true);
+
             contourDisplay.setVisible(true);
             addDisplayable(contourDisplay, timeHeightView,
-                    FLAG_COLOR | FLAG_CONTOUR | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
+                    FLAG_COLORTABLE | FLAG_CONTOUR | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
 
             if ( !setData(dataChoice)) {
                 return false;
@@ -1390,13 +1393,7 @@ public class TimeHeightControl extends LineProbeControl {
                     getContourInfo()));
             addRemovable(contourWidget);
 
-            if (color == null) {
-                color = getColor();
-            }
-
-            controlWidgets.add(new WrapperWidget(this,
-                    GuiUtils.rLabel(getColorWidgetLabel() + ":"),
-                    GuiUtils.left(doMakeColorControl(color))));
+            controlWidgets.add(getColorTableWidget(getRangeForColorTable()));
 
             controlWidgets.add(new WrapperWidget(this,
                     GuiUtils.rLabel("Smoothing:"), doMakeSmoothingWidget()));
@@ -1449,15 +1446,15 @@ public class TimeHeightControl extends LineProbeControl {
             return unit;
         }
 
-        public void setMyColor(Color color) throws RemoteException, VisADException {
-            super.setColor(color);
+        public void setMyColorTable(ColorTable color) throws RemoteException, VisADException {
+            setColorTable(color);
         }
         public void setMyContourInfo(ContourInfo contourInfo) throws RemoteException, VisADException {
-            super.setContourInfo(contourInfo);
+            setContourInfo(contourInfo);
         }
 
         public void setMySmoothType(String smoothType)  {
-            super.setSmoothingType(smoothType);
+            setSmoothingType(smoothType);
         }
     }
 }
