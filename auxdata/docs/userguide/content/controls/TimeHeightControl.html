@@ -5,12 +5,23 @@ A time-height display
 is a display of samples of a 3D parameter along a vertical
 profile line from top to bottom of the available data, with time as the
 independent coordinate (x axis).
-You can choose both a contour time height display and a color shaded
-time height display.
+You can choose both a contour time height display, a color filled and a color shaded
+time height display. After created the time height display of the first variable, you
+can add a contour time height display of the second variable.
 
-[ht::cimg images/TimeHeightControlGui.gif]
+[ht::cimg images/TimeHeightControlGui.png]
 
+You can add new parameters a number of ways:
+<ul>
+    <li> Through the  [ug::menu Edit {Add Parameter...}] menu.
+    <li> Through the  [ug::menu View Parameters {Add Parameter...}] menu.
+</ul>
 
+The design only allows two time height displays. The newly added parameter has a remove action that can be applied:
+
+<ul>
+    <li> [ug::menu {Remove}]. Remove the selected parameter.
+</ul>
 
 The map position of the
 vertical profile is indicated by the "Lat: Long:" readout 
@@ -38,5 +49,8 @@ pressing the left mouse button.
 
 [ug::colortable]
 
+[ug::smoothing]
+
 {{Latest Data on Left} {This checkbox  reorders the x axis of the display.}}
 
+{{Newly added Parameter} {This checkbox  is a modal dialog and has all control widgets associated with this newly added paramter.}}
