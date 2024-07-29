@@ -21,6 +21,7 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
@@ -36,7 +37,9 @@ import ucar.visad.display.*;
 
 import visad.*;
 import visad.georef.EarthLocation;
+import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
+import visad.georef.MapProjection;
 
 import java.awt.*;
 
@@ -45,6 +48,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.*;
 
+import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
 import java.util.ArrayList;
@@ -57,7 +61,7 @@ import javax.swing.*;
 
 
 /**
- * A cross section control for displaying contours.
+ * A crosssection control for displaying contours.
  *
  * @author IDV Development Team
  * @version $Revision: 1.31 $
@@ -110,6 +114,25 @@ public class ContourCrossSectionControl extends CrossSectionControl {
         return display;
     }
 
+    /**
+     * Called after all initialization is finished. This sets the end points
+     * of the csSelector to the correct position and adds this as a property
+     * change listener to the csSelector.
+     */
+    public void initDone() {
+        super.initDone();
+        try {
+
+            List categories = getCategories();
+            DataCategory categories1 = DataCategory.createCategory("*-flowvector-*");
+            categories.add(categories1);
+            setCategories(categories);
+        } catch (Exception e) {
+            logException("Initializing the csSelector", e);
+        }
+        // when user moves position of the Selector line, call crossSectionChanged
+
+    }
     /**
      * Set the data for this control
      *
@@ -173,66 +196,6 @@ public class ContourCrossSectionControl extends CrossSectionControl {
         return isColorFill;
     }
 
-    /**
-     * Override base class method which is called when the user has selected
-     * new data choices.
-     *
-     * @param newChoices    new list of choices
-     *
-     * @throws RemoteException  Java RMI error
-     * @throws VisADException   VisAD Error
-     */
-    protected void processNewData(List newChoices)
-            throws VisADException, RemoteException {
-        DataChoice dc = (DataChoice) newChoices.get(0);
-        MyContourCrossSectionControl myContourCrossSectionControl  = new ContourCrossSectionControl.MyContourCrossSectionControl(this);
-        myContourCrossSectionControl.controlContext = getControlContext();
-
-        myContourCrossSectionControl.init(dc, csSelector);
-
-
-        addDisplayable(myContourCrossSectionControl.xsDisplay);
-        addDisplayable(myContourCrossSectionControl.vcsDisplay, crossSectionView);
-        //controlPane.add(myTimeHeightControl.doMakeContents());
-        JButton btn = new JButton(dc.getName());
-        controlPane.add(btn);
-        btn.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)  {
-                try {
-                    JFrame frame = new JFrame();
-                    frame.add(myContourCrossSectionControl.doMakeContents());
-
-                    GuiUtils.showFrameAsDialog(controlPane, frame);
-                } catch (Exception ee){}
-
-            }
-        });
-        showNormalCursor();
-        controlList.add(myContourCrossSectionControl);
-        appendDataChoices(newChoices);
-
-        //doMoveProbe();
-    }
-
-    /**
-     * Remove a <code>Displayable</code>
-     *
-     * @param idx   displayable to remove
-     * @throws RemoteException   Java RMI problem
-     * @throws VisADException    Problem in VisAD
-     */
-    public void removeDisplayable(int idx)
-            throws RemoteException, VisADException {
-        MyContourCrossSectionControl my = (MyContourCrossSectionControl)controlList.get(idx-1);
-        if (my != null) {
-            removeDisplayable(my.xsDisplay);
-            removeDisplayable(my.vcsDisplay);
-            my.removeDisplayable(my.xsDisplay);
-            my.removeDisplayable(my.vcsDisplay);
-        }
-    }
 
     public void removeControl(int idx)
             throws RemoteException, VisADException {
@@ -256,7 +219,7 @@ public class ContourCrossSectionControl extends CrossSectionControl {
             setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE
                     | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
         }
-        public MyContourCrossSectionControl(ContourCrossSectionControl contourCrossSectionControlc) {
+        public MyContourCrossSectionControl(ContourCrossSectionControl contourCrossSectionControl) {
             this.contourCrossSectionControl = contourCrossSectionControl;
             this.isColorFill = false;
             setAttributeFlags(FLAG_CONTOUR | FLAG_COLORTABLE
@@ -452,5 +415,7 @@ public class ContourCrossSectionControl extends CrossSectionControl {
                     super.applySmoothing();
             }
         }
+
+
     }
 }

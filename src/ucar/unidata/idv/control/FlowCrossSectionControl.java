@@ -23,29 +23,27 @@ package ucar.unidata.idv.control;
 
 import ucar.unidata.collab.Sharable;
 
+import ucar.unidata.data.DataCategory;
 import ucar.unidata.data.DataChoice;
 
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 
-import ucar.unidata.idv.DisplayConventions;
+import ucar.unidata.idv.*;
 
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.Trace;
+import ucar.unidata.util.*;
 
-import ucar.visad.display.CrossSectionSelector;
-import ucar.visad.display.DisplayableData;
-import ucar.visad.display.FlowDisplayable;
-import ucar.visad.display.WindBarbDisplayable;
+import ucar.visad.display.*;
 
 
 import visad.*;
 
+import java.awt.*;
 import java.awt.event.*;
 
 import java.rmi.RemoteException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -91,6 +89,89 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
     public FlowCrossSectionControl() {
         setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH | FLAG_SMOOTHING);
     }
+
+    public boolean init(DataChoice dataChoice)
+            throws VisADException, RemoteException {
+
+        //Are we in 3d?
+        displayIs3D = isDisplay3D();
+        levelsList  = dataChoice.getAllLevels(null);
+        xsDisplay   = createXSDisplay();
+        vcsDisplay  = createVCSDisplay();
+        controlList = new ArrayList<>();
+        //Now set the data (which uses the displayables  above).
+        if ( !setData(dataChoice)) {
+            return false;
+        }
+
+
+        vcsDisplay.setVisible(true);
+        if (crossSectionView != null) {
+            //If the ViewManager is non-null it means we have been unpersisted.
+            //If so, we initialie the VM with the IDV
+            crossSectionView.initAfterUnPersistence(getIdv());
+        } else {
+            //We are new (or are unpersisted from an old bundle)
+            //Create the new ViewManager
+            crossSectionView = new CrossSectionViewManager(getViewContext(),
+                    new ViewDescriptor("CrossSectionView"),
+                    "showControlLegend=false;showScales=true", animationInfo);
+            crossSectionView.setIsShared(false);
+            crossSectionView.setAniReadout(false);
+            //This will only be non-null if we have been unpersisted from an old
+            //(prior to the persistence of the ViewManager) bundle
+            if (displayMatrix != null) {
+                XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
+                csvxsDisplay.setProjectionMatrix(displayMatrix);
+            }
+        }
+        crossSectionView.setShowDisplayList(false);
+        XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
+
+        //getIdv().getVMManager().addViewManager(crossSectionView);
+        addViewManager(crossSectionView);
+        setYAxisRange(csvxsDisplay, verticalAxisRange);
+        csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
+        csvxsDisplay.setYDisplayUnit(csvxsDisplay.getYDisplayUnit());
+        //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
+        if (haveMultipleFields()) {
+            addDisplayable(vcsDisplay, crossSectionView,
+                    FLAG_COLORTABLE | FLAG_COLORUNIT);
+        } else {
+            addDisplayable(vcsDisplay, crossSectionView);
+        }
+
+
+        if (displayIs3D) {
+            if (haveMultipleFields()) {
+                //If we have multiple fields then we want both the
+                //color unit and the display unit
+                addDisplayable(xsDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
+            } else {
+                addDisplayable(xsDisplay);
+            }
+        }
+
+        ViewManager vm = getViewManager();
+        createCrossSectionSelector();
+        //Now create the selector (which needs the state from the setData call)
+        if (vm instanceof MapViewManager) {
+            if (csSelector != null) {
+                csSelector.setPointSize(getDisplayScale());
+                csSelector.setAutoSize(true);
+                csSelector.setVisible(lineVisible);
+                addDisplayable(csSelector, getSelectorAttributeFlags());
+            } else {
+                System.err.println("NO CS SELECTOR " + getClass().getName());
+            }
+        } else if (vm instanceof TransectViewManager) {
+            xsDisplay.setAdjustFlow(false);
+            setUseFastRendering(true);
+        }
+        loadDataFromLine();
+        return true;
+    }
+
 
     /**
      * Actions to perform after init().
@@ -583,4 +664,146 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
     }
 
 
+
+    public void removeControl(int idx)
+            throws RemoteException, VisADException {
+        controlList.remove(idx-1);
+    }
+
+    static public class MyFlowCrossSectionControl extends FlowCrossSectionControl {
+
+        FlowCrossSectionControl flowCrossSectionControl;
+        Unit displayunit = null;
+        private Range colorRange = null;
+
+
+
+        public MyFlowCrossSectionControl() {
+            setAttributeFlags(FLAG_LINEWIDTH | FLAG_LINEWIDTH | FLAG_SMOOTHING);
+        }
+        public MyFlowCrossSectionControl(FlowCrossSectionControl flowCrossSectionControl) {
+            this.flowCrossSectionControl = flowCrossSectionControl;
+            setAttributeFlags(FLAG_LINEWIDTH | FLAG_LINEWIDTH | FLAG_SMOOTHING);
+        }
+
+        /**
+         * Construct the display, frame, and controls
+         *
+         * @param dataChoice the data to use
+         *
+         * @return  true if successful
+         *
+         * @throws RemoteException  Java RMI error
+         * @throws VisADException   VisAD Error
+         */
+        public boolean init(DataChoice dataChoice, CrossSectionSelector crossSectionSelector)
+                throws VisADException, RemoteException {
+
+            csSelector = crossSectionSelector;
+            super.init(dataChoice);
+
+            return true;
+        }
+
+        /**
+         * Has this control been initialized
+         *
+         * @return Is this control initialized
+         */
+        public boolean getHaveInitialized() {
+            return true;
+        }
+
+
+        /**
+         * Make the UI contents for this control window.
+         *
+         * @return  UI container
+         *
+         * @throws RemoteException  Java RMI error
+         * @throws VisADException   VisAD Error
+         */
+        public Container doMakeContents()
+        {
+
+            // TODO:  This is what should be done - however legends don't show up.
+
+            return doMakeWidgetComponent();
+
+            //return GuiUtils.centerBottom(profileDisplay.getComponent(),
+            //                             doMakeWidgetComponent());
+        }
+
+        /**
+         * Return the label that is to be used for the color widget
+         * This allows derived classes to override this and provide their
+         * own name,
+         *
+         * @return Label used for the color widget
+         */
+        public String getColorWidgetLabel() {
+            return "Color";
+        }
+        /**
+         * User has asked to see a different new parameter in this existing display.
+         * Do everything needed to load display with new kind of parameter.
+         *
+         * @param dataChoice    choice for data
+         * @return  true if successfule
+         *
+         * @throws RemoteException  Java RMI error
+         * @throws VisADException   VisAD Error
+         */
+        protected boolean setData(DataChoice dataChoice)
+                throws VisADException, RemoteException {
+            super.setData(dataChoice);
+            paramName = dataChoice.getName();
+            GridDataInstance di = (GridDataInstance)doMakeDataInstance(dataChoice);
+            contourInfo = getContourInfo();
+            colorRange = di.getRange(0);
+            displayunit = ((GridDataInstance) di).getRawUnit(0);
+
+
+            return true;
+        }
+
+        /**
+         * Get the range for the color table.
+         *
+         * @return range being used
+         * @throws RemoteException  some RMI exception occured
+         * @throws VisADException  error getting the range in VisAD
+         */
+        public Range getRangeForColorTable()
+                throws RemoteException, VisADException {
+            return colorRange;
+        }
+        /**
+         * Get the unit for the data display.
+         * @return  unit to use for displaying the data
+         */
+        public Unit getDisplayUnit() {
+            Unit unit = displayunit;
+
+            setDisplayUnit(unit);
+
+            return unit;
+        }
+
+
+        /**
+         *  Use the value of the smoothing type and weight to subset the data.
+         *
+         * @throws RemoteException Java RMI problem
+         * @throws VisADException  VisAD problem
+         */
+        protected void applySmoothing() throws VisADException, RemoteException {
+            if (checkFlag(FLAG_SMOOTHING)) {
+                GridDataInstance gdi = getGridDataInstance();
+                if(gdi != null)
+                    super.applySmoothing();
+            }
+        }
+
+    }
 }
