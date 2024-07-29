@@ -2788,6 +2788,27 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     }
 
     /**
+     * Utility to make the menu item for changing the data choice
+     *
+     * @return The menu item
+     */
+    protected JMenuItem doMakeChangeParameterMenuItem() {
+        final JMenuItem selectChoices =
+                new JMenuItem(getChangeParameterLabel());
+        selectChoices.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                popupDataDialog("<html>Choose Parameter</html>",
+                        selectChoices);
+            }
+        });
+        List choices = getDataChoices();
+        if(choices.size() > 2)
+            selectChoices.setEnabled(false);
+        else
+            selectChoices.setEnabled(true);
+        return selectChoices;
+    }
+    /**
      * Override base class method which is called when the user has selected
      * new data choices.
      *
