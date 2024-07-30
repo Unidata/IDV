@@ -195,6 +195,10 @@ public class TimeHeightControl extends LineProbeControl {
             addDisplayable(contourDisplay, timeHeightView,
                     FLAG_COLORTABLE | FLAG_CONTOUR | FLAG_DISPLAYUNIT | FLAG_SMOOTHING);
 
+        } else if (this instanceof FlowTimeHeightControl){
+            dataDisplay = createDataDisplay();
+            addDisplayable(dataDisplay, timeHeightView,
+                    getDataDisplayFlags());
         } else {
             dataDisplay = new Grid2DDisplayable("th_color_" + paramName,
                     true);
@@ -457,6 +461,9 @@ public class TimeHeightControl extends LineProbeControl {
         FlatField profile = new FlatField(newFieldType, newDomain);
 
         profile.setSamples(newRangeVals, false);
+        if(dataDisplay == null)
+            dataDisplay = createDataDisplay();
+        ((GridDisplayable) dataDisplay).loadData(profile);
 
         if (showAsContours) {  // add in the color filled type
             RealType[] origTypes = parmType.getRealComponents();
@@ -480,8 +487,6 @@ public class TimeHeightControl extends LineProbeControl {
                 contourDisplay.setLabeling(true);
 
             contourDisplay.loadData(profileOther);
-        } else {
-            ((GridDisplayable) dataDisplay).loadData(profile);
         }
     }  // end method displayTHForCoord
 
