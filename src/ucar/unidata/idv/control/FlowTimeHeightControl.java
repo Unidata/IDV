@@ -341,7 +341,64 @@ public class FlowTimeHeightControl extends TimeHeightControl implements FlowDisp
      */
     protected void displayTHForCoord(FieldImpl fi, int NN)
             throws VisADException, RemoteException {
-        ((FlowDisplayable) getDataDisplay()).loadData(fi);
+        //((FlowDisplayable) getDataDisplay()).loadData(fi);
+        Set        timeSet  = fi.getDomainSet();
+        double[][] timeVals = timeSet.getDoubles();
+
+        RealTupleType newDomainType = new RealTupleType(RealType.Altitude,
+                RealType.Time);
+        TupleType    parmType     = GridUtil.getParamType(fi);
+        int          numParms     = parmType.getNumberOfRealComponents();
+
+        FunctionType newFieldType = new FunctionType(newDomainType, parmType);
+
+        SampledSet   ss           = GridUtil.getSpatialDomain(fi);
+        RealType height =
+                (RealType) ((SetType) ss.getType()).getDomain().getComponent(NN);
+        float[][] latlonalt = ss.getSamples();
+        Unit      zUnit     = ss.getSetUnits()[NN];
+        if ( !height.equals(RealType.Altitude)) {
+            CoordinateSystem cs = ss.getCoordinateSystem();
+            latlonalt = cs.toReference(latlonalt, ss.getSetUnits());
+            zUnit = cs
+                    .getReferenceUnits()[cs.getReference().getIndex(RealType.Altitude)];
+        }
+
+        int        numTimes      = timeVals[0].length;
+        int        numAlts       = ss.getLength();
+
+        double[][] newDomainVals = new double[2][numTimes * numAlts];
+        int        l             = 0;
+        for (int j = 0; j < numTimes; j++) {
+            for (int i = 0; i < numAlts; i++) {
+                newDomainVals[0][l] = latlonalt[NN][i];
+                newDomainVals[1][l] = timeVals[0][j];
+                l++;
+            }
+        }
+        Gridded2DDoubleSet newDomain = new Gridded2DDoubleSet(newDomainType,
+                newDomainVals, numAlts, numTimes,
+                (CoordinateSystem) null,
+                new Unit[] { zUnit,
+                        timeSet.getSetUnits()[0] }, (ErrorEstimate[]) null);
+
+        float[][] newRangeVals = new float[numParms][numTimes * numAlts];
+        int       index        = 0;
+        for (int i = 0; i < numTimes; i++) {
+            FlatField ff   = (FlatField) fi.getSample(i);
+            float[][] vals = ff.getFloats(false);
+            for (int j = 0; j < numParms; j++) {
+                System.arraycopy(vals[j], 0, newRangeVals[j], index, numAlts);
+            }
+            index += numAlts;
+        }
+
+        FlatField profile = new FlatField(newFieldType, newDomain);
+
+        profile.setSamples(newRangeVals, false);
+        //((GridDisplayable) dataDisplay).loadData(profile);
+        ((FlowDisplayable) getDataDisplay()).loadData(profile);
+
     }
 
 }
