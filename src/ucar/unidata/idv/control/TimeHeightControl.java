@@ -1152,12 +1152,6 @@ public class TimeHeightControl extends LineProbeControl {
 
         ContourInfo contourInfo;
 
-        private Color color;
-
-        private String OldSmoothingType = LABEL_NONE;
-
-        private int OldSmoothingFactor = 0;
-
         public MyTimeHeightControl() {
             setAttributeFlags(FLAG_COLORTABLE | FLAG_CONTOUR | FLAG_DISPLAYUNIT | FLAG_SMOOTHING );
         }
@@ -1344,22 +1338,7 @@ public class TimeHeightControl extends LineProbeControl {
 
         }  // end method displayTHForCoord
 
-        /**
-         *  Use the value of the smoothing type and weight to subset the data.
-         *
-         * @throws RemoteException Java RMI problem
-         * @throws VisADException  VisAD problem
-         */
-        protected void applySmoothing() throws VisADException, RemoteException {
-            if (checkFlag(FLAG_SMOOTHING)) {
-                if ( !getSmoothingType().equals(OldSmoothingType)
-                        || (getSmoothingFactor() != OldSmoothingFactor)) {
-                    OldSmoothingType   = getSmoothingType();
-                    OldSmoothingFactor = getSmoothingFactor();
-                    loadProfile(getPosition());
-                }
-            }
-        }
+
         protected String getTitle() {
             //Use the bottom legend text as the window title
             return " ";
