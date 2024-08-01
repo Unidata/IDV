@@ -73,6 +73,7 @@ import visad.georef.*;
 import visad.util.DataUtility;
 
 import static ucar.unidata.idv.IdvConstants.PROP_USE_DISPLAYAREA;
+import static ucar.unidata.util.Misc.newList;
 import static ucar.unidata.util.Misc.normalizeLongitude;
 
 
@@ -375,6 +376,23 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             setEndPoint(null);
         }
         super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
+
+        List choices = getDataChoices();
+        if(choices.size() > 1) {
+            try {
+                for(int i = 1; i < choices.size(); i++){
+                    DataChoice dc = (DataChoice)choices.get(i);
+
+                    if(dc instanceof DerivedDataChoice &&
+                            ((String) dc.getId()).contains("windvectors"))
+                        processNewDataV(newList(dc));
+                    else
+                        processNewData(newList(dc));
+                }
+
+            } catch (Exception e) {
+            }
+        }
     }
 
 
@@ -2784,6 +2802,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             processNewDataV(newChoices);
         else
             processNewData(newChoices);
+        appendDataChoices(newChoices);
         doShare(SHARE_CHOICES, newChoices);
     }
 
@@ -2853,7 +2872,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         });
         showNormalCursor();
         controlList.add(myFlowCrossSectionControl);
-        appendDataChoices(newChoices);
+        //appendDataChoices(newChoices);
 
         //doMoveProbe();
 
@@ -2897,7 +2916,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         });
         showNormalCursor();
         controlList.add(myContourCrossSectionControl);
-        appendDataChoices(newChoices);
+        //appendDataChoices(newChoices);
 
         //doMoveProbe();
     }
