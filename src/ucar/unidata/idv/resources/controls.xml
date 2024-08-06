@@ -1145,7 +1145,13 @@ Since this is confusing and needs more work lets remove this for now
      label="Time/Height Display (Contours)"
      displaycategory="Probes"
      properties="windowVisible=true;showAsContours=true;"/>
-
+  <control
+     id="timeheightcf"
+     categories="GRID-3D-TIME-*"
+     class="ucar.unidata.idv.control.TimeHeightControl"
+     label="Time/Height Display (Color-Filled)"
+     displaycategory="Probes"
+     properties="windowVisible=true;colorFill=true;showAsContours=true;"/>
   <control
      id="timeheightshade"
      categories="GRID-3D-TIME-*"
