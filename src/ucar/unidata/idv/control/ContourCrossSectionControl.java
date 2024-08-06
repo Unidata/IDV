@@ -197,9 +197,13 @@ public class ContourCrossSectionControl extends CrossSectionControl {
     }
 
 
-    public void removeControl(int idx)
+    /**
+     * Remove the datachoice with name as dcName
+     *
+     */
+    public void removeControl(String dcName)
             throws RemoteException, VisADException {
-        controlList.remove(idx-1);
+        controlList.remove(dcName);
     }
 
 
