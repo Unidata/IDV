@@ -98,7 +98,6 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         levelsList  = dataChoice.getAllLevels(null);
         xsDisplay   = createXSDisplay();
         vcsDisplay  = createVCSDisplay();
-        controlList = new ArrayList<>();
         //Now set the data (which uses the displayables  above).
         if ( !setData(dataChoice)) {
             return false;
