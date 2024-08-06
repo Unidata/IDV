@@ -66,6 +66,7 @@ import ucar.visad.quantities.*;  // for AirPressure CoordinateSystem
 
 import visad.*;
 
+import visad.Set;
 import visad.data.units.Parser;
 
 import visad.georef.*;
@@ -94,9 +95,7 @@ import java.beans.PropertyChangeListener;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
@@ -279,7 +278,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /** _more_ */
     protected JPanel controlPane;
 
-    ArrayList<CrossSectionControl> controlList = null;
+    /** _more_ */
+    HashMap<String, CrossSectionControl> controlList = null;
+
+    /** _more_ */
+    boolean isBundle = false;
     /**
      * Default constructor.  Sets the appropriate attribute flags.
      */
@@ -356,7 +359,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
                                        List preSelectedDataChoices) {
 
         //Before 2.2 we had the zPosition set to -1 but did not use it
-        //Now we use it for the cross section selector position so need to fix it
+        //Now we use it for the cross-section selector position so need to fix it
         if (version < 2.2) {
             if (getZPosition() == -1) {
                 try {
@@ -382,12 +385,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             try {
                 for(int i = 1; i < choices.size(); i++){
                     DataChoice dc = (DataChoice)choices.get(i);
-
+                    CrossSectionControl csc = controlList.get(dc.getName());
                     if(dc instanceof DerivedDataChoice &&
                             ((String) dc.getId()).contains("windvectors"))
-                        processNewDataV(newList(dc));
+                        processNewDataV(dc, csc);
                     else
-                        processNewData(newList(dc));
+                        processNewData(dc, csc);
                 }
 
             } catch (Exception e) {
@@ -447,7 +450,9 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         levelsList  = dataChoice.getAllLevels(null);
         xsDisplay   = createXSDisplay();
         vcsDisplay  = createVCSDisplay();
-        controlList = new ArrayList<>();
+        isBundle = getIdv().getStateManager().isLoadingXml();
+        if(!isBundle)
+            controlList = new HashMap<>();
         //Now set the data (which uses the displayables  above).
         if ( !setData(dataChoice)) {
             return false;
@@ -1637,7 +1642,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             doShare(SHARE_XSLINE, new Object[] { cs.getStartPoint(),
                     cs.getEndPoint() });
             if(controlList.size() >=1){
-                for(CrossSectionControl csc: controlList){
+                for(CrossSectionControl csc: controlList.values()){
                     csc.csSelector = csSelector;
                     csc.loadDataFromLine();
                 }
@@ -2846,14 +2851,121 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
         myFlowCrossSectionControl.controlContext = getControlContext();
         myFlowCrossSectionControl.paramName = dc.getName();
-        myFlowCrossSectionControl.crossSectionView =  new CrossSectionViewManager(getViewContext(),
-                new ViewDescriptor("CrossSectionView" + myFlowCrossSectionControl.paramName),
-                "showControlLegend=false;showScales=true", animationInfo);
-
+        myFlowCrossSectionControl.crossSectionView = crossSectionView;
         myFlowCrossSectionControl.init(dc, csSelector);
         myFlowCrossSectionControl.initDone();
+
         addDisplayable(myFlowCrossSectionControl.xsDisplay);
         addDisplayable(myFlowCrossSectionControl.vcsDisplay, crossSectionView);
+        //controlPane.add(myTimeHeightControl.doMakeContents());
+        JButton btn = new JButton(dc.getName());
+        controlPane.add(btn);
+
+        btn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)  {
+                try {
+                    JFrame frame = new JFrame();
+
+                    myFlowCrossSectionControl.setName(dc.getName());
+                    frame.add(myFlowCrossSectionControl.doMakeWidgetComponent());
+
+                    GuiUtils.showFrameAsDialog(controlPane, frame);
+                } catch (Exception ee){}
+
+            }
+        });
+        showNormalCursor();
+        controlList.put(dc.getName(), myFlowCrossSectionControl);
+        //doMoveProbe();
+
+    }
+
+    /**
+     * Override base class method which is called when the user has selected
+     * new data choices.
+     *
+     * @param dc    new datachoice
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public void processNewDataV(DataChoice dc, CrossSectionControl csc)
+            throws VisADException, RemoteException {
+        FlowCrossSectionControl.MyFlowCrossSectionControl myFlowCrossSectionControl
+                = (FlowCrossSectionControl.MyFlowCrossSectionControl)csc;
+
+        myFlowCrossSectionControl.controlContext = getControlContext();
+        myFlowCrossSectionControl.paramName = dc.getName();
+        myFlowCrossSectionControl.crossSectionView = crossSectionView;
+        myFlowCrossSectionControl.init(dc, csSelector);
+        myFlowCrossSectionControl.initDone();
+
+        addDisplayable(myFlowCrossSectionControl.xsDisplay);
+        addDisplayable(myFlowCrossSectionControl.vcsDisplay, crossSectionView);
+        //controlPane.add(myTimeHeightControl.doMakeContents());
+        JButton btn = new JButton(dc.getName());
+        controlPane.add(btn);
+
+        btn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)  {
+                try {
+                    JFrame frame = new JFrame();
+                    frame.add(getControlWidgets(dc.getName()));
+                    GuiUtils.showFrameAsDialog(controlPane, frame);
+                } catch (Exception ee){}
+
+            }
+        });
+        showNormalCursor();
+        if(!isBundle)
+            controlList.put(paramName, myFlowCrossSectionControl);
+    }
+
+    /**
+     * Utility to retrive the control widgets from controlList
+     *
+     * @return The JComponent item
+     */
+    JComponent getControlWidgets(String cname){
+        CrossSectionControl csc = controlList.get(cname);
+        List controlwidgets = new ArrayList();
+
+        try {
+            csc.getControlWidgets(controlwidgets);
+            List widgetComponents = ControlWidget.fillList(controlwidgets);
+            GuiUtils.tmpInsets = new Insets(4, 8, 4, 8);
+            GuiUtils.tmpFill   = GridBagConstraints.HORIZONTAL;
+            JPanel p = GuiUtils.doLayout(widgetComponents, 2, GuiUtils.WT_NY,
+                    GuiUtils.WT_N);
+            return p;
+        } catch (Exception exc) {
+            logException("Making the widget component", exc);
+            return new JLabel("Error");
+        }
+    }
+
+    /**
+     * Override base class method which is called when the user has selected
+     * new data choices.
+     *
+     * @param dc    new choice
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    protected void processNewData(DataChoice dc , CrossSectionControl csc)
+            throws VisADException, RemoteException {
+        ContourCrossSectionControl.MyContourCrossSectionControl myContourCrossSectionControl  =
+                (ContourCrossSectionControl.MyContourCrossSectionControl)csc;
+
+        myContourCrossSectionControl.init(dc, csSelector);
+
+        addDisplayable(myContourCrossSectionControl.xsDisplay);
+        addDisplayable(myContourCrossSectionControl.vcsDisplay, crossSectionView);
         //controlPane.add(myTimeHeightControl.doMakeContents());
         JButton btn = new JButton(dc.getName());
         controlPane.add(btn);
@@ -2863,18 +2975,13 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             public void actionPerformed(ActionEvent e)  {
                 try {
                     JFrame frame = new JFrame();
-                    frame.add(myFlowCrossSectionControl.doMakeWidgetComponent());
-
+                    frame.add(getControlWidgets(dc.getName()));
                     GuiUtils.showFrameAsDialog(controlPane, frame);
                 } catch (Exception ee){}
 
             }
         });
         showNormalCursor();
-        controlList.add(myFlowCrossSectionControl);
-        //appendDataChoices(newChoices);
-
-        //doMoveProbe();
 
     }
 
@@ -2882,7 +2989,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * Override base class method which is called when the user has selected
      * new data choices.
      *
-     * @param newChoices    new list of choices
+     * @param newChoices    new choice
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
@@ -2915,13 +3022,17 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             }
         });
         showNormalCursor();
-        controlList.add(myContourCrossSectionControl);
+        controlList.put(dc.getName(), myContourCrossSectionControl);
         //appendDataChoices(newChoices);
 
         //doMoveProbe();
     }
 
-
+    /**
+     * Utility to make the menu item for changing the data choice
+     *
+     * @return The menu item
+     */
     private List getParameterMenuItems(final int row) {
         List               items   = new ArrayList();
         DataChoice dc = (DataChoice)getDataChoices().get(row);
@@ -2938,21 +3049,26 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         jmi.addActionListener(new ActionListener() {
             public void actionPerformed(
                     ActionEvent ev) {
-                removeField(row);
+                removeField(row, dc.getName());
                 updateLegendLabel();
             }
         });
 
         return items;
     }
-    private void removeField(int idx) {
+
+    /**
+     * Remove the datachoice from control
+     *
+     */
+    private void removeField(int idx, String name) {
         if (idx < 0) {
             return;
         }
         try {
-            removeDisplayables(idx);
+            removeDisplayables(name);
             controlPane.remove(idx-1);
-            removeControl(idx);
+            removeControl(name);
         } catch (Exception ee){}
 
 
@@ -2962,21 +3078,48 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             removeDataChoice(dc);
         }
 
-        //fireStructureChanged();
         try {
             loadDataFromLine();  // update the side legend label if needed
         } catch (Exception ff){}
     }
 
-    public void removeDisplayables(int idx)
+    /**
+     * Remove the naming displays from control
+     *
+     */
+    public void removeDisplayables(String dcName)
             throws RemoteException, VisADException {
-        CrossSectionControl my = (CrossSectionControl)controlList.get(idx-1);
+        CrossSectionControl my = (CrossSectionControl)controlList.get(dcName);
         removeDisplayable(my.vcsDisplay);
         removeDisplayable(my.xsDisplay);
         my.removeDisplayables();
     }
 
-    public void removeControl(int idx)
+    /**
+     * Remove the datachoice from control
+     *
+     */
+    public void removeControl(String name)
             throws RemoteException, VisADException {
     }
+
+
+    /**
+     * get the controlList property.
+     *
+     * @return controlList
+     */
+    public HashMap<String, CrossSectionControl> getControlList(){
+        return controlList;
+    }
+
+    /**
+     * Set the controlList property.
+     *
+     * @param cList The new value for controlList
+     */
+    public void setControlList(HashMap<String, CrossSectionControl> cList){
+        controlList = cList;
+    }
+
 }
