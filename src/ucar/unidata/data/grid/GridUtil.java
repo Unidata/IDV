@@ -55,13 +55,7 @@ import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.control.DrawingControl;
 import ucar.unidata.idv.control.drawing.DrawingGlyph;
 import ucar.unidata.idv.control.drawing.PolyGlyph;
-import ucar.unidata.util.FileManager;
-import ucar.unidata.util.JobManager;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Parameter;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.Trace;
+import ucar.unidata.util.*;
 
 import ucar.unidata.xml.XmlUtil;
 import ucar.visad.GeoUtils;
@@ -8916,6 +8910,13 @@ public class GridUtil {
         return filtField;
     }
 
+    /**
+     * Process medianFilter
+     *
+     * @param fltFld
+     * @param window_lenx default value is 10
+     * @param window_leny default value is 10
+     */
     public static FlatField medianFilter(FlatField fltFld, int window_lenx, int window_leny) throws VisADException, RemoteException {
         GriddedSet domSet = (GriddedSet) fltFld.getDomainSet();
         FlatField filtFld = new FlatField((FunctionType)fltFld.getType(), domSet);
@@ -8954,6 +8955,13 @@ public class GridUtil {
         return filtFld;
     }
 
+    /**
+     * Process medianFilter
+     *
+     * @param A array of float
+     * @param lenx x dimension
+     * @param leny y dimension
+     */
     public static float[] medianFilter(float[] A, int lenx, int leny, int window_lenx, int window_leny)
             throws VisADException {
         float[] result =  new float[A.length];
@@ -9230,5 +9238,116 @@ public class GridUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * Process classifier
+     *
+     * @param field
+     * @param classifierStr input string of classifier
+     * @param  outFileName output file name
+     */
+    public static FieldImpl classifier(FieldImpl field, String classifierStr, String outFileName) throws VisADException, RemoteException, Exception  {
+        List<String> classifyList = StringUtil.split(classifierStr, ";");
+        for(String classifyItem: classifyList){
+            List<String> itemList = StringUtil.split(classifyItem, " ");
+            float low = Float.parseFloat(itemList.get(0));
+            float high = Float.parseFloat(itemList.get(1));
+            float classify = Float.parseFloat(itemList.get(2));
+            field = replaceRangeValues(field, low, high, classify);
+        }
+
+        exportGridToNetcdf(field,outFileName);
+        return field;
+    }
+
+    /**
+     * Process classifier
+     *
+     * @param grid
+     * @param low lower range
+     * @param  high higher range
+     * @param newValue replace value
+     */
+    public static FieldImpl replaceRangeValues(FieldImpl grid, float low, float high, float newValue)
+            throws VisADException, RemoteException {
+        boolean   isSequence = GridUtil.isTimeSequence(grid);
+        FieldImpl retField   = null;
+        if (isSequence) {
+            Set          s         = GridUtil.getTimeSet(grid);
+            for (int i = 0; i < s.getLength(); i++) {
+                FieldImpl funcFF = null;
+
+                FlatField f = replaceRangeValuesFF(((FlatField) grid.getSample(i)),
+                        low, high, newValue);
+                if (i == 0) {
+                    FunctionType ftype =
+                            new FunctionType(
+                                    ((SetType) s.getType()).getDomain(),
+                                    f.getType());
+                    retField = new FieldImpl(ftype, s);
+                }
+                retField.setSample(i, f, false);
+            }
+
+
+        } else {
+            retField = replaceRangeValuesFF(((FlatField) grid), low, high,newValue);
+        }
+        return retField;
+    }
+
+    /**
+     * Process classifier
+     *
+     * @param grid
+     * @param low lower range
+     * @param  high higher range
+     * @param newValue replace value
+     */
+    private static FlatField replaceRangeValuesFF(FlatField grid,  float low, float high, float newValue)
+            throws VisADException {
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[][] samples   = grid.getFloats(false);
+
+            float[][] newValues = new float[samples.length][sizeX * sizeY  * sizeZ];
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+                float[] newVals   = newValues[np];
+                for (int j = 0; j < sizeY; j++) {
+                    for (int i = 0; i < sizeX; i++) {
+                        for (int k = 0; k < sizeZ; k++) {
+                            int   index = k * sizeX * sizeY + j * sizeX + i;
+                            float value = paramVals[index];
+                            if (value >= low && value <= high) {
+                                newVals[index] =  newValue;
+                            }  else
+                                newVals[index] = value;
+                        }
+                    }
+                }
+            }
+
+            FunctionType newFT = (FunctionType)grid.getType();
+
+            newField = new FlatField(newFT, domainSet);
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
     }
 }
