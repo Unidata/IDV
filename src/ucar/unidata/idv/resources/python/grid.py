@@ -401,6 +401,29 @@ def substituteMissing(data, newValue):
         rangeObject.setSamples(values,1);
     return newData;
 
+def substituteWithMissing(data, missingValue):
+    """change values in data  between low/high to newvalue """
+    from java.lang import Float
+    newData = data.clone();
+    if (GridUtil.isTimeSequence(newData)):
+        for t in range(newData.getDomainSet().getLength()):
+            rangeObject = newData.getSample(t)
+            values = rangeObject.getFloats(0);
+            for i in range(len(values)):
+                for j in range(len(values[0])):
+		            if (values[i][j] == missingValue):
+		               values[i][j] = float("NaN");
+            rangeObject.setSamples(values,1);
+    else:
+        rangeObject = newData;
+        values = rangeObject.getFloats(0);
+        for i in range(len(values)):
+            for j in range(len(values[0])):
+                if (values[i][j] == missingValue):
+                    values[i][i] = float("NaN");
+        rangeObject.setSamples(values,1);
+    return newData;
+
 def maskGrid(grid, mask, value=0,resample=0):
     """mask one grid by the values in the other.  value is the masking value"""
     return DerivedGridFactory.mask(grid, mask, value, resample)
@@ -496,3 +519,15 @@ def virtualTemperature(p, t, dp):
 
 def virtualPotentialTemperature(p, t, dp):
   return DerivedGridFactory.createVirtualPotentialTemperature(p, t, dp)
+
+def meanFilter(grid, missingValue, window_lenx=10, window_leny=10):
+  """ calculate mean filter, need to replace the missingValue if it is not NaN
+  """
+  grid0 = substituteWithMissing(grid, missingValue)
+  return GridUtil.medianFilter(grid0, window_lenx, window_leny)
+
+def classifier(grid, classifierStr, outFileName):
+  """classifierStr is a string of a set of classifier info with format:
+        "low1 high1 value1; low2 high2 value2; low3 high3 value3;...""
+  """
+  return GridUtil.classifier(grid, classifierStr, outFileName)
