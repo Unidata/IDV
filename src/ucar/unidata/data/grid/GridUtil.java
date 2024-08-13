@@ -8887,7 +8887,8 @@ public class GridUtil {
     }
 
     /**
-     * Process medianFilter
+     * Process medianFilter mean filtering is simply to replace each pixel value
+     * in an image with the mean (average) value of its neighbors, including itself
      *
      * @param field
      * @param window_lenx default value is 10
@@ -9241,7 +9242,8 @@ public class GridUtil {
     }
 
     /**
-     * Process classifier
+     *  A classifier in machine learning is an algorithm that automatically orders or
+     *  categorizes data into one or more of a set of “classes.”
      *
      * @param field
      * @param classifierStr input string of classifier
