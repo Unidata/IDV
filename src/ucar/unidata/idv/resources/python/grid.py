@@ -527,7 +527,14 @@ def meanFilter(grid, missingValue, window_lenx=10, window_leny=10):
   return GridUtil.medianFilter(grid0, window_lenx, window_leny)
 
 def classifier(grid, classifierStr, outFileName):
-  """classifierStr is a string of a set of classifier info with format:
-        "low1 high1 value1; low2 high2 value2; low3 high3 value3;...""
+  """ classifierStr is a string of a set of classifier info with format:
+        "low1 high1 value1; low2 high2 value2; low3 high3 value3;..."
   """
   return GridUtil.classifier(grid, classifierStr, outFileName)
+
+def applyFunctionOverGrid2D(grid, function, statThreshold):
+  """  apply spatial Max, Min, Average, Percentile over 2D grid:
+        function: "max", "max", "average", "percentile"
+        statThreshold is string format numerical value
+  """
+  return GridUtil.applyFunctionOverGrid2D(grid, function, statThreshold)
