@@ -8,6 +8,7 @@ title:Display Controls
 >>FlowPlanViewControl.html
 >>ValuePlanViewControl.html
 >>CrossSectionControl.html
+>>MultiVarsCrossSectionControl.html
 >>ThreeDSurfaceControl.html
 >>VolumeRenderControl.html
 >>PointVolumeControl.html
