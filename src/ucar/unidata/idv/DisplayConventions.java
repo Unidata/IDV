@@ -821,7 +821,32 @@ public class DisplayConventions extends IdvManager {
         return GuiUtils.getEditableBox(unitList, current);
     }
 
-
+    /**
+     * When I need to add the alt unit to have option of pressure unit
+     *
+     * @param unit The current unit
+     * @param unit1 The unit of pressure
+     * @param defaultUnit The default unit to return if the user  chooses "Default"
+     * @return The new unit or null on a cancel or an error
+     */
+    public JComboBox makeUnitBox(Unit unit, Unit unit1, Unit defaultUnit) {
+        TwoFacedObject current = null;
+        if (unit != null) {
+            current = new TwoFacedObject(unit.toString(), unit);
+        }
+        String unitName = ((unit == null)
+                ? null
+                : unit.toString());
+        List   unitList = null;
+        if (unit != null) {
+            unitList = new ArrayList();
+            unitList.add(new TwoFacedObject(unit.toString(), unit));
+            if(unit1 != null){
+                unitList.add(new TwoFacedObject(unit1.toString(), unit1));
+            }
+        }
+        return GuiUtils.getEditableBox(unitList, current);
+    }
 
     /**
      * Popup a unit selection gui. This will also save off
@@ -857,8 +882,41 @@ public class DisplayConventions extends IdvManager {
         }
         return null;
     }
-
-
+    /**
+     * Popup a unit selection gui. This will also save off
+     * persistently any new unit names typed in.
+     *
+     * @param unit The current unit
+     * @param unit1 The next unit
+     * @param defaultUnit The default unit to return if the user  chooses "Default"
+     * @return The new unit or null on a cancel or an error
+     */
+    public Unit selectUnit(Unit unit, Unit unit1, Unit defaultUnit) {
+        JComboBox ufld  = makeUnitBox(unit, unit1, defaultUnit);
+        Component panel = GuiUtils.label(" New unit:  ", ufld);
+        if ( !GuiUtils.showOkCancelDialog(null, "Change unit",
+                GuiUtils.inset(panel, 5), null,
+                Misc.newList(ufld))) {
+            return null;
+        }
+        Object selected = ufld.getSelectedItem();
+        String unitName = TwoFacedObject.getIdString(selected);
+        if (unitName == null) {
+            return defaultUnit;
+        }
+        try {
+            Unit newUnit = Util.parseUnit(unitName);
+            if ( !(selected instanceof TwoFacedObject)) {
+                selected = new TwoFacedObject(selected.toString(), newUnit);
+            }
+            addToUnitList(selected);
+            return newUnit;
+        } catch (Exception exc) {
+            LogUtil.userMessage("Error parsing unit:" + unitName + "\n"
+                    + exc);
+        }
+        return null;
+    }
 
     /**
      * Add the given object to the list of units
