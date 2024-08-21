@@ -2795,7 +2795,24 @@ public final class Util {
                                       new Real(RealType.Altitude, 0.0));
     }
 
-
+    /**
+     * Utility to make an earth location with a altitude
+     *
+     * @param lat latitude
+     * @param lon longitude
+     * @param alt longitude
+     *
+     * @return earth location
+     *
+     *
+     * @throws Exception problem creating earth location
+     */
+    public static EarthLocation makeEarthLocation(double lat, double lon, double alt)
+            throws Exception {
+        return new EarthLocationTuple(new Real(RealType.Latitude, lat),
+                new Real(RealType.Longitude, lon),
+                new Real(RealType.Altitude, alt));
+    }
     /**
      * Utility to make an earth location with a 0 altitude
      *
@@ -3308,15 +3325,23 @@ public final class Util {
             List<String> toks =
                 ucar.unidata.util.StringUtil.split(value.toString(), ",",
                     true, true);
-            if (toks.size() != 2) {
+            if (toks.size() == 2) {
+                double lat = Double.parseDouble(toks.get(0));
+                double lon = Double.parseDouble(toks.get(1));
+                EarthLocation earthLocation =
+                        ucar.visad.Util.makeEarthLocation(lat, lon);
+                argument = earthLocation;
+            } else if (toks.size() == 3) {
+                double lat = Double.parseDouble(toks.get(0));
+                double lon = Double.parseDouble(toks.get(1));
+                double alt = Double.parseDouble(toks.get(2));
+                EarthLocation earthLocation =
+                        ucar.visad.Util.makeEarthLocation(lat, lon, alt);
+                argument = earthLocation;
+            } else {
                 throw new IllegalArgumentException("Bad EarthLocation value:"
                         + value);
             }
-            double lat = Double.parseDouble(toks.get(0));
-            double lon = Double.parseDouble(toks.get(1));
-            EarthLocation earthLocation =
-                ucar.visad.Util.makeEarthLocation(lat, lon);
-            argument = earthLocation;
         } else if (paramType.equals(RealTuple.class)
                    && (name.endsWith("StartPoint")
                        || name.endsWith("EndPoint"))) {
