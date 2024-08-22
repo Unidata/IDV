@@ -483,4 +483,16 @@ public class DataTransectControl extends CrossSectionControl {
     public int getLineWidth() {
         return lineWidth;
     }
+
+    /**
+     * Remove a <code>Displayable</code>
+     *
+     *
+     * @throws RemoteException   Java RMI problem
+     * @throws VisADException    Problem in VisAD
+     */
+    public void removeDisplayableAll( )
+            throws RemoteException, VisADException {
+
+    }
 }
