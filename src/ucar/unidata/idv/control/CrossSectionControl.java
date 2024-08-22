@@ -397,6 +397,12 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             } catch (Exception e) {
             }
         }
+
+        if(altUnit != null){
+            try {
+                reSetTimeHeightAltitudeUnit(altUnit);
+            }catch (Exception d){}
+        }
     }
 
 
@@ -3281,5 +3287,23 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         return labelTable;
         // set the field here in case there was an error.
 
+    }
+
+    /**
+     * get the altUnit property.
+     *
+     * @return unit
+     */
+    public Unit getAltUnit() {
+        return altUnit;
+    }
+
+    /**
+     * set the altUnit property.
+     *
+     * @return void
+     */
+    public void setAltUnit(Unit unit) {
+        altUnit = unit;
     }
 }
