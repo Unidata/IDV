@@ -41,11 +41,7 @@ import ucar.unidata.idv.ViewManager;
 
 import ucar.unidata.ui.LatLonWidget;
 
-import ucar.unidata.util.Coord;
-import ucar.unidata.util.GuiUtils;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Range;
-import ucar.unidata.util.ThreeDSize;
+import ucar.unidata.util.*;
 
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 
@@ -283,6 +279,11 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
     /** _more_ */
     boolean isBundle = false;
+
+    private Unit altUnit = null;
+
+    float[][] latlonalt = null;
+
     /**
      * Default constructor.  Sets the appropriate attribute flags.
      */
@@ -1700,6 +1701,28 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         super.getViewMenuItems(menus, forMenuBar);
         menus.add(GuiUtils.MENU_SEPARATOR);
 
+        JMenuItem jmj;
+        jmj = new JMenuItem("Change Altitude Unit...");
+        jmj.addActionListener(new ObjectListener(new Integer(0)) {
+            public void actionPerformed(
+                    ActionEvent ev) {
+                Unit newUnit =
+                        getDisplayConventions().selectUnit(
+                                CommonUnit.meter, CommonUnits.HECTOPASCAL, null);
+                altUnit = newUnit;
+                if (newUnit != null) {
+                    try {
+                        reSetTimeHeightAltitudeUnit(
+                                altUnit);
+                    } catch (Exception exc) {
+                        logException(
+                                "After changing units", exc);
+                    }
+                }
+
+            }
+        });
+        menus.add(jmj);
         if (forMenuBar) {
             JMenu csvMenu = crossSectionView.makeViewMenu();
             csvMenu.setText(getCrossSectionViewLabel());
@@ -3122,4 +3145,141 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         controlList = cList;
     }
 
+    /**
+     * This gets called by changing the altitude unit
+     *
+     * @param aUnit _more_
+     */
+    protected void reSetTimeHeightAltitudeUnit(Unit aUnit) throws VisADException {
+        if(aUnit.isConvertible(CommonUnits.HECTOPASCAL)){
+            setYAxisPressureLabels();
+        } else{
+            try {
+                setYAxisLabels(getDataVerticalRange());
+            } catch (Exception dd){}
+        }
+        updateLegendLabel();
+    }
+    /**
+     * Set y (altitude) axis values from the data set supplied.
+     *
+     * @param range   alt array to use
+     *
+     * @throws VisADException   VisAD error
+     */
+    private void setYAxisLabels(Range range) throws VisADException {
+        if (range == null) {
+            return;
+        }
+        int step =8;
+        double start = range.min;
+        double    end = range.max;
+
+        if(end >= 1000.0)
+            end = Math.round(end /1000)*1000.0;
+        if(start < 200)
+            start = 0.0;
+        double    values[]   = new double[5];
+        Hashtable labelTable = new Hashtable();
+        String [] labels = new String[5];
+        double averageTickSpacing = (end-start)/(double)(step);
+        if(averageTickSpacing >= 1000){
+            averageTickSpacing =  Math.round(averageTickSpacing /1000)*1000.0;
+        } else if(averageTickSpacing >= 100){
+            averageTickSpacing =  Math.round(averageTickSpacing /100)*100.0;
+        } else if(averageTickSpacing >= 10){
+            averageTickSpacing =  Math.round(averageTickSpacing /10)*10.0;
+        }
+        for (int i = 4; i >= 0; i--) {
+            double value = end - (4 - i) * averageTickSpacing * 2;
+            values[i] = value;
+            labels[i] = String.valueOf(value);
+        }
+
+        for (int i = 0; i <= 4; i++) {
+            labelTable.put(new Double(values[i]), labels[i]);
+        }
+        AxisScale yScale = (crossSectionView.getXSDisplay()).getYAxisScale();
+        yScale.setTickBase(start);
+
+
+        //double averageTickSpacing = (end - start);
+        yScale.setMajorTickSpacing(averageTickSpacing);
+
+        //yScale.setMinorTickSpacing(averageTickSpacing * (1.0f/step));
+        yScale.setLabelTable(labelTable);
+        yScale.setMajorTicks(values);
+        //xScale.setTitle("Time (" + dt.getFormatTimeZone().getDisplayName() + ")");
+
+
+    }
+
+    /**
+     * Set y (altitude) axis pressure values
+     *
+     * @throws VisADException   VisAD error
+     */
+    private void setYAxisPressureLabels() throws VisADException {
+        // try {
+        /** default pressure labels */
+        String[] DEFAULT_PRESSURE_LABELS = new String[] {
+                "1000",  "700", "500",  "250",   "100"
+        };
+
+        /** pressure labels being used */
+        String[] pressureLabels = DEFAULT_PRESSURE_LABELS;
+        Hashtable table = getPressureLabels(pressureLabels);
+        AxisScale yScale = ((VerticalXSDisplay) crossSectionView.getXSDisplay()).getYAxisScale();
+        RealType yAxisType = ((VerticalXSDisplay) crossSectionView.getXSDisplay()).getYAxisType();
+        java.util.Set keys = table.keySet();
+        Iterator iterator = keys.iterator();
+        double [] hkeys =  new double [keys.size()];
+        int i = 0;
+        for(Object d: keys){
+            hkeys[i++] = ((Double)d).doubleValue();
+        }
+        yScale.setMajorTicks(hkeys);
+        yScale.setLabelTable(table);
+        yScale.setTitle(yAxisType.toString() + " (" + CommonUnits.HECTOPASCAL + ")");
+        //double averageTickSpacing = (end-start)/(double)(numSteps);
+
+        //xScale.setTitle("Time (" + dt.getFormatTimeZone().getDisplayName() + ")");
+
+
+        // } catch (IOException re) {}  // can't happen
+    }
+    /**
+     * get y (altitude) axis pressure values hashtable
+     *
+     * @param labels   pressure labels
+     *
+     * @throws VisADException   VisAD error
+     */
+    public Hashtable getPressureLabels(String[] labels) throws VisADException {
+        int       numLabels  = labels.length;
+        double    value      = Double.NaN;
+        double    values[]   = new double[labels.length];
+        Hashtable labelTable = new Hashtable();
+        for (int i = 0; i < numLabels; i++) {
+            try {
+                value = Misc.parseNumber(labels[i]);
+            } catch (NumberFormatException ne) {
+                value = Double.NaN;
+            }
+            values[i] = value;
+        }
+        double[] heights =
+                AirPressure.getStandardAtmosphereCS().toReference(new double[][] {
+                        values
+                })[0];
+
+
+        for (int i = 0; i < numLabels; i++) {
+            labelTable.put(new Double(heights[i]), labels[i]);
+        }
+
+        return labelTable;
+        // set the field here in case there was an error.
+
+    }
 }
