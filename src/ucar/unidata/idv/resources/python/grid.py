@@ -520,8 +520,8 @@ def virtualTemperature(p, t, dp):
 def virtualPotentialTemperature(p, t, dp):
   return DerivedGridFactory.createVirtualPotentialTemperature(p, t, dp)
 
-def meanFilter(grid, missingValue, window_lenx=10, window_leny=10):
-  """ calculate mean filter, need to replace the missingValue if it is not NaN
+def medianFilter(grid, missingValue, window_lenx=10, window_leny=10):
+  """ calculate median filter, need to replace the missingValue if it is not NaN
   """
   grid0 = substituteWithMissing(grid, missingValue)
   return GridUtil.medianFilter(grid0, window_lenx, window_leny)
@@ -537,4 +537,4 @@ def applyFunctionOverGrid2D(grid, function, statThreshold):
         function: "max", "max", "average", "percentile"
         statThreshold is string format numerical value
   """
-  return GridUtil.applyFunctionOverGrid2D(grid, function, statThreshold)
+  return GridMath.applyFunctionOverGrid2D(grid, function, statThreshold)
