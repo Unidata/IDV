@@ -1118,10 +1118,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                     break;
             }
         } else {
-            altStartIdx = altData.length-1;
+            altStartIdx = 0;
             while (Float.isNaN(altData[altEndIdx]) || altData[altEndIdx] < 5000) {
                 altEndIdx++;
-                if(altEndIdx >= altStartIdx)
+                if(altEndIdx >= (altData.length-1))
                     break;
             }
         }
