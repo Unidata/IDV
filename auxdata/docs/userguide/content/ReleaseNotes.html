@@ -11,7 +11,7 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 6.1 release.
+The items below reflect changes since the 6.2 release.
 
 <faq qlabel=" " alabel=" ">
 
@@ -44,61 +44,51 @@ The items below reflect changes since the 6.1 release.
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem id="radargriddisplay" q="Level II Radar Grid Displays">
+<faqitem id="radargriddisplay1" q="More with Level II Radar Grid Displays">
   <p>
-    The new and enhanced feature of the Level 2 radar grid display reads radial parameters from the Level 2
-    volume scan dataset and automatically generates 3D Cartesian grid parameters. The Integrated Data Viewer (IDV)
-    employs an 8-point weighted interpolation method for this purpose. Efficient search algorithms are utilized to
-    identify the 8 potential valid numbers of data points from 4 available surrounding rays. These algorithms
-    significantly contribute to expediting the process. The resultant 3D Cartesian grid parameters can be
-    showcased through various visualization techniques such as volume rendering, iso-surface representation,
-    cross-sectional display, and plan-view presentations.
+    With the newly developed Level 2 radar grid display feature, we've expanded its capabilities by
+    incorporating derived formulas to calculate radar precipitation rates. These calculations are based
+    on two key approaches: the Marshall-Palmer drop size distribution and dual polarization radar data.
+    The Marshall-Palmer method provides a traditional estimate of precipitation rates using reflectivity,
+    while the dual polarization approach enhances accuracy by factoring in both reflectivity and
+    differential reflectivity. These advancements allow for more precise and varied precipitation rate
+    calculations, improving radar data interpretation and weather analysis.
+
   </p>
 </faqitem>
 
-<faqitem id="pointcloudsngrids" q="Point Clouds and Point Grids" >
+<faqitem id="multiVarsCrossSection" q="Multi Variables Cross-Section Display" >
   <p>
-    The IDV has introduced a novel data source type named "Point Cloud Data" exclusively tailored for CF netCDF
-    station time series feature data. This innovation facilitates the presentation of time series point clouds
-    and point grids for such point feature data. The IDV's point cloud display effectively visualizes substantial
-    quantities of point data (often numbering in the millions) by portraying them as a collection of points,
-    each colored based on its corresponding parameter. Additionally, the point grid function adeptly interpolates
-    the point station data onto a 2D regular grid, thereby furnishing a comprehensive array of visualization and
-    analytical tools for this multidimensional dataset. This includes scatter displays as well as associated
-    statistical analyses.
+    After creating the first vertical cross-sections display, you can add a contour cross-section display
+    for a second variable as well as a wind vector cross-section display for a derived variable. When
+    working multi variables cross-section displays, we recommend using a color-filled contour display or
+    a color-shaded display, and contour displays for the second or the third variables. Multi-variable cross-section
+    displays offer several advantages in data visualization and analysis, such as enhanced data comparisons,
+    comprehensive analysis, and efficient use of screen space. Additionally, you can now switch the vertical
+    coordinate scale from meters to pressure in hPa, providing greater flexibility in interpreting the data.
   </p>
 </faqitem>
 
-<faqitem id="nongeotimeseries" q="Non Geo Point Data" >
+<faqitem id="timeheightdisplay" q="Two Variables Time Height Display" >
   <p>
-    The IDV has incorporated support for displaying non-geolocated time series datasets. Furthermore, the IDV offers
-    a range of statistical analysis formulas, encompassing area averages, level averages, maximum, minimum, mean,
-    percentiles, and summations. The results of these analyses can now be produced as non-geolocated data and
-    exported in formats such as CSV or netCDF. This newly introduced feature empowers users to leverage the IDV's
-    versatile access to multiple data servers, enabling them to preprocess data for applications including machine
-    learning and other scientific uses.
+    A time-height display shows samples of a 3D parameter along a vertical profile from top to bottom of
+    the available data, with time as the independent coordinate (x-axis). You can choose between contour,
+    color-filled, and color-shaded time-height displays. After creating the time-height display for the
+    first variable, you can add a contour time-height display for a second variable. This setup allows
+    for a more detailed and layered analysis of vertical atmospheric data over time. Additionally, you can
+    now switch the vertical coordinate scale from meters to pressure in hPa, providing greater flexibility
+    in interpreting the data.
   </p>
 </faqitem>
 
-<faqitem id="addeupdate" q="ADDE Update">
+<faqitem id="zoomenhancement" q="Zoom Enhancement">
   <p>
-    We have undertaken a comprehensive update of our ADDE services, with a primary focus on transforming ADDE into a
-    service that can seamlessly transition to new systems while retaining its original service name, adde.ucar.edu.
-    As part of this initiative, we have strategically diminished and redefined certain ADDE dataset definitions that
-    we oversee across all of our public-facing ADDE servers. This strategic adjustment is aimed at enhancing both
-    the usability and long-term continuity of these datasets.
-  </p>
-</faqitem>
-
-<faqitem id="wmsupdate" q="IDV WMS Update">
-
-  <p>
-    In recent releases, there had been an issue concerning connectivity to the USGS WMS server, resulting in
-    SSLHandshakeException error messages. We have successfully pinpointed the root cause as the trustedCerts
-    configuration from the Unidata web server. To address this, we have taken measures to eliminate the conflict
-    arising from the SSLHandshake specification within the bundle libraries, and subsequently generated a new
-    ramadda jar file. With these adjustments in place, the updated libraries included in this release now enable
-    seamless access to a multitude of WMS servers within the IDV.
+    We have updated the algorithm responsible for calculating the clip distance during zoom operations in
+    both map and globe views. This enhancement ensures that users can now zoom in to street level without
+    experiencing the disappearance of 3D objects, improving the overall user experience. The refined
+    algorithm dynamically adjusts the clip distance based on zoom levels, allowing for seamless and
+    detailed visualization at various scales. This update is particularly beneficial for users requiring
+    precise close-up views in 3D environments, making the zoom functionality more reliable and effective.
   </p>
 </faqitem>
 
@@ -106,24 +96,32 @@ The items below reflect changes since the 6.1 release.
 <faqitem cat="Jython Changes"></faqitem>
 
 
-<faqitem id="gdiformulas" q="Galvez-Davison Index">
+<faqitem id="classifierformulas" q="Classifier">
   <p>
-    The Gálvez-Davison Index (GDI) is a stability index developed to enhance the accuracy of thunderstorm predictions
-    and predict shallower forms of moist convection in tropical regions. The newly introduced formula calculates GDI
-    using temperature and relative humidity 3D grid fields.
+    Data classification helps in organizing data into categories based on sensitivity, importance, or other
+    criteria. In machine learning, classification involves assigning a class label to a given input data example.
+    The Jython Classifier formula provides a simple method to label 2D gridded data values with numbers.
+    This basic classification algorithm is used to sort data points into different classes, allowing machine
+    learning applications to train on existing data and predict the classification of new data points.
   </p>
 </faqitem>
 
-<faqitem id="dryformulas" q="Dry Static Energy">
+<faqitem id="medianfilterformulas" q="Median Filter">
   <p>
-    The new grid diagnostics formula calculates Dry Static Energy with Temperature and Geopotential
-    Height 3D grid fields.
+    A median filter is a non-linear digital filtering technique widely used in image processing to reduce noise.
+    It works by replacing the center pixel in a neighborhood with the median value of that surrounding window.
+    This technique is particularly effective at removing Gaussian, random, and salt-and-pepper noise from images.
+    Due to its effectiveness, the median filter is commonly used in the data preprocessing stage of machine
+    learning applications.
   </p>
 </faqitem>
 
-<faqitem id="2d3dgrid" q="3D and 2D grid subtract and multiply">
+<faqitem id="2dfunctiongrid" q="2D function over grid">
   <p>
-    The new grid diagnostics formula performs a vertical subtraction/multiplication of a 2D grid from a 3D grid.
+    Applying spatial functions like Max, Min, Average, and Percentile over a 2D grid allows you to generate
+    a new time series point field. By applying these functions to the 2D grid, you transform spatial data into
+    a time series that reflects specific statistical properties, offering new insights into the data’s temporal
+    dynamics and preprocessing the data of machine learning applications.
   </p>
 </faqitem>
 

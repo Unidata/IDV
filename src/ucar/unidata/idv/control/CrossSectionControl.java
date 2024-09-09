@@ -3097,6 +3097,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         try {
             removeDisplayables(name);
             controlPane.remove(idx-1);
+            controlPane.repaint();
             removeControl(name);
         } catch (Exception ee){}
 

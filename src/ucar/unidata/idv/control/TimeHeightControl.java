@@ -21,6 +21,7 @@
 package ucar.unidata.idv.control;
 
 
+import org.apache.avalon.framework.component.Component;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
@@ -1070,6 +1071,7 @@ public class TimeHeightControl extends LineProbeControl {
         try {
             removeDisplayable(myTimeHeightControl.contourDisplay);
             controlPane.remove(idx-1);
+            controlPane.repaint();
         } catch (Exception ee){}
         //fireStructureChanged();
         doMoveProbe();  // update the side legend label if needed
