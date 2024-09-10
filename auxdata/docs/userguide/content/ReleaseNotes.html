@@ -64,7 +64,8 @@ The items below reflect changes since the 6.2 release.
     working multi variables cross-section displays, we recommend using a color-filled contour display or
     a color-shaded display, and contour displays for the second or the third variables. Multi-variable cross-section
     displays offer several advantages in data visualization and analysis, such as enhanced data comparisons,
-    comprehensive analysis, and efficient use of screen space.
+    comprehensive analysis, and efficient use of screen space. Additionally, you can now switch the vertical
+    coordinate scale from meters to pressure in hPa, providing greater flexibility in interpreting the data.
   </p>
 </faqitem>
 
@@ -74,7 +75,9 @@ The items below reflect changes since the 6.2 release.
     the available data, with time as the independent coordinate (x-axis). You can choose between contour,
     color-filled, and color-shaded time-height displays. After creating the time-height display for the
     first variable, you can add a contour time-height display for a second variable. This setup allows
-    for a more detailed and layered analysis of vertical atmospheric data over time.
+    for a more detailed and layered analysis of vertical atmospheric data over time. Additionally, you can
+    now switch the vertical coordinate scale from meters to pressure in hPa, providing greater flexibility
+    in interpreting the data.
   </p>
 </faqitem>
 
@@ -93,24 +96,32 @@ The items below reflect changes since the 6.2 release.
 <faqitem cat="Jython Changes"></faqitem>
 
 
-<faqitem id="gdiformulas" q="Galvez-Davison Index">
+<faqitem id="classifierformulas" q="Classifier">
   <p>
-    The Gálvez-Davison Index (GDI) is a stability index developed to enhance the accuracy of thunderstorm predictions
-    and predict shallower forms of moist convection in tropical regions. The newly introduced formula calculates GDI
-    using temperature and relative humidity 3D grid fields.
+    Data classification helps in organizing data into categories based on sensitivity, importance, or other
+    criteria. In machine learning, classification involves assigning a class label to a given input data example.
+    The Jython Classifier formula provides a simple method to label 2D gridded data values with numbers.
+    This basic classification algorithm is used to sort data points into different classes, allowing machine
+    learning applications to train on existing data and predict the classification of new data points.
   </p>
 </faqitem>
 
-<faqitem id="dryformulas" q="Dry Static Energy">
+<faqitem id="medianfilterformulas" q="Median Filter">
   <p>
-    The new grid diagnostics formula calculates Dry Static Energy with Temperature and Geopotential
-    Height 3D grid fields.
+    A median filter is a non-linear digital filtering technique widely used in image processing to reduce noise.
+    It works by replacing the center pixel in a neighborhood with the median value of that surrounding window.
+    This technique is particularly effective at removing Gaussian, random, and salt-and-pepper noise from images.
+    Due to its effectiveness, the median filter is commonly used in the data preprocessing stage of machine
+    learning applications.
   </p>
 </faqitem>
 
-<faqitem id="2d3dgrid" q="3D and 2D grid subtract and multiply">
+<faqitem id="2dfunctiongrid" q="2D function over grid">
   <p>
-    The new grid diagnostics formula performs a vertical subtraction/multiplication of a 2D grid from a 3D grid.
+    Applying spatial functions like Max, Min, Average, and Percentile over a 2D grid allows you to generate
+    a new time series point field. By applying these functions to the 2D grid, you transform spatial data into
+    a time series that reflects specific statistical properties, offering new insights into the data’s temporal
+    dynamics and preprocessing the data of machine learning applications.
   </p>
 </faqitem>
 
