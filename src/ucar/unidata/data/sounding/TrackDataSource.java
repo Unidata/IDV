@@ -73,7 +73,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import static org.python.core.imp.CodeImport.source;
+//import static org.python.core.imp.CodeImport.source;
 import static ucar.unidata.idv.IdvPersistenceManager.PROP_BUNDLEPATH;
 
 
