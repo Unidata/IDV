@@ -21,7 +21,6 @@
 package ucar.unidata.idv.control;
 
 
-import org.apache.avalon.framework.component.Component;
 import ucar.unidata.collab.Sharable;
 
 import ucar.unidata.data.DataChoice;
