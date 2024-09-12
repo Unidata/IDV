@@ -1523,7 +1523,36 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands categories=""/>
   </derived>
-
+  <derived description="Classifier" formula="classifier(grid, classifierStr, outFileName)" id="ML Classifier" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Median Filter" formula="medianFilter(grid, missingValue, window_lenx=10, window_leny=10)" id="ML MedianFilter" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Normal Distribution" formula="fillGridNormal(templategrid,user_mean,user_std,user_units=default)" id="ML Normal Distribution Transform" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Uniform Distribution" formula="fillGridUniform(templategrid,user_min,user_max,user_units=default)" id="ML Uniform Distribution Transform" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Apply spatial Max, Min, Average, Percentile over 2D grid" formula="applyFunctionOverGrid2D(grid, function, statThreshold)" id="ML 2D Functions" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing"/>
+    </categories>
+    <operands/>
+  </derived>
  <!-- Adding derived ABI RGB and band subtraction formulas - RMC - INQ 2836 - Oct 2019 -->
     <!-- Reorganized formulas to be under Imagery - RMC - INQ 2872 - Jan 2020 -->
     <derived description="ABI Night Fog Difference" formula="ABINightFogDifference(D1[label=Band 13 Temperature], D2[label=Band 7 Temperature])" id="abinightfog" isdefault="true" isenduser="true" override="true">
