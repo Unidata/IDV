@@ -962,13 +962,13 @@ def zonal_filter_fft(grid,minwave,maxwave):
     else:
         raise VisADError('Not a valid 2d or 3d grid')
     return filtered_grid
-def fillGridUniform(templategrid,user_min,user_max,user_units="default"):
+def fillGridUniform(templategrid,user_min,user_max):
     """ Returns a grid with values sampled from uniform distrubuition(
         user_min,user_max). user_units can be change units of returned grid.
         This also serves as a template code for creating grids sampled from
         different distributions.
     """
-
+    from visad import FlatField
     minvalue=float(user_min)
     maxvalue=float(user_max)
 
@@ -1000,15 +1000,15 @@ def fillGridConstant(templategrid,user_value):
         newgrid=replace(grid,Double(value))
 
     return newgrid
-def fillGridNormal(templategrid,user_mean,user_std,user_units="default"):
+def fillGridNormal(templategrid,user_mean,user_std):
     """ Returns a grid with values sampled from normal distrubuition(
         user_mean,user_std). user_units can be change units of returned grid.
         This also serves as a template code for creating grids sampled from
         different distributions.
     """
-
-    minvalue=float(user_min)
-    maxvalue=float(user_max)
+    from visad import FlatField
+    minvalue=float(user_mean)
+    maxvalue=float(user_std)
 
     def fillNormal(gridFF,minvalue,maxvalue):
         import random
