@@ -538,3 +538,71 @@ def applyFunctionOverGrid2D(grid, function, statThreshold):
         statThreshold is string format numerical value
   """
   return GridMath.applyFunctionOverGrid2D(grid, function, statThreshold)
+
+def gridNormalDistribution(grid,user_mean=None,user_std=None):
+  """ Returns a grid with values sampled from normal distrubuition(
+      user_mean,user_std). user_units can be change units of returned grid.
+      This also serves as a template code for creating grids sampled from
+      different distributions.
+  """
+  from visad import FlatField
+  import random
+  import edu.wisc.ssec.mcidasv.data.hydra.Statistics
+
+  def fillNormal(gridFF,user_mean,user_std):
+      mean = user_mean
+      std = user_std
+      if user_mean == None or user_mean =="":
+        statistics = GridMath.statisticsFF(gridFF)
+        mean = (statistics.mean()).getValue()
+        std = (statistics.standardDeviation()).getValue()
+      else:
+        mean = float(user_mean)
+        std = float(user_std)
+      tempFF=FlatField(gridFF.getType(),gridFF.getDomainSet())
+      vals=[random.gauss(mean,std) for itm in range(len(gridFF.getFloats()[0]))]
+      tempFF.setSamples([vals])
+      return tempFF
+  if GridUtil.isTimeSequence(grid):
+      uniformG=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+          uniformG.setSample(j,fillNormal(grid.getSample(j),user_mean,user_std))
+      return uniformG
+  else:
+      return fillNormal(grid,user_mean,user_std)
+
+def gridUniformDistribution(grid,user_min=None,user_max=None):
+  """ Returns a grid with values sampled from uniform distrubuition(
+        user_min,user_max). user_units can be change units of returned grid.
+        This also serves as a template code for creating grids sampled from
+        different distributions.
+  """
+  from visad import FlatField
+  import random
+  import edu.wisc.ssec.mcidasv.data.hydra.Statistics
+
+  def fillUniform(gridFF,user_min,user_max):
+      import random
+      min = user_min
+      max = user_max
+
+        #also fun the return by input grid
+      if user_min == None or user_min =="":
+          statistics = GridMath.statisticsFF(gridFF)
+          min = (statistics.min()).getValue()
+          max = (statistics.max()).getValue()
+      else:
+          min = float(user_min)
+          max = float(user_max)
+      tempFF=FlatField(gridFF.getType(),gridFF.getDomainSet())#put units here
+      vals=[random.uniform(min,max) for itm in range(len(gridFF.getFloats()[0]))]
+      tempFF.setSamples([vals])
+      return tempFF
+
+  if GridUtil.isTimeSequence(grid):
+      uniformG=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+            uniformG.setSample(j,fillUniform(grid.getSample(j),user_min,user_max))
+      return uniformG
+  else:
+      return fillUniform(grid,user_min,user_max)
