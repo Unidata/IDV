@@ -36,7 +36,7 @@ import visad.georef.MapProjection;
 
 import visad.python.JPythonMethods;
 import visad.util.DataUtility;
-
+import edu.wisc.ssec.mcidasv.data.hydra.Statistics;
 
 import java.rmi.RemoteException;
 
@@ -3763,4 +3763,16 @@ public class GridMath {
 
     }
 
+    public static Statistics statisticsFF(FlatField grid)
+            throws VisADException {
+
+        Statistics s = null;
+        try {
+             s = new Statistics(grid);
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return s;
+
+    }
 }
