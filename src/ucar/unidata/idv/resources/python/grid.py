@@ -606,3 +606,80 @@ def gridUniformDistribution(grid,user_min=None,user_max=None):
       return uniformG
   else:
       return fillUniform(grid,user_min,user_max)
+
+def gridStandardScaler(grid,user_mean=None,user_std=None):
+  """ StandardScaler standardizes grid values by removing the mean and scaling to
+      variance using statistics on the samples to improve the performance and
+      convergence of machine learning models, particularly those sensitive to
+      feature scales,
+  """
+  from visad import FlatField
+  import random
+  import edu.wisc.ssec.mcidasv.data.hydra.Statistics
+
+  def fillStandardScaler(gridFF,user_mean,user_std):
+      import random
+      mean = user_mean
+      std = user_std
+
+        #also fun the return by input grid
+      if user_mean == None or user_mean =="":
+          statistics = GridMath.statisticsFF(gridFF)
+          mean = (statistics.mean()).getValue()
+          std = (statistics.standardDeviation()).getValue()
+      else:
+          mean = float(user_mean)
+          std = float(user_std)
+      tempFF=FlatField(gridFF.getType(),gridFF.getDomainSet())#put units here
+      values = gridFF.getFloats()[0]
+      vals=[(values[itm] - mean)/std for itm in range(len(gridFF.getFloats()[0]))]
+
+      tempFF.setSamples([vals])
+      return tempFF
+
+  if GridUtil.isTimeSequence(grid):
+      standardScaler=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+            standardScaler.setSample(j,fillStandardScaler(grid.getSample(j),user_mean,user_std))
+      return standardScaler
+  else:
+      return fillStandardScaler(grid,user_mean,user_std)
+
+def gridMinMaxScaler(grid,user_min,user_max):
+  """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
+      it is also known as min-max normalization
+  """
+  from visad import FlatField
+  import random
+  import edu.wisc.ssec.mcidasv.data.hydra.Statistics
+
+  def fillMinMaxScaler(gridFF,user_min,user_max):
+      import random
+
+      statistics = GridMath.statisticsFF(gridFF)
+      min = (statistics.min()).getValue()
+      max = (statistics.max()).getValue()
+        #also fun the return by input grid
+      if user_min == None or user_min =="":
+          user_max = max
+          user_min = min
+      else:
+          user_min = float(user_min)
+          user_max = float(user_max)
+      tempFF=FlatField(gridFF.getType(),gridFF.getDomainSet())#put units here
+      values = gridFF.getFloats()[0]
+      vals=[(user_max-user_min)*(values[itm]-min)/(max-min) + user_min for itm in range(len(gridFF.getFloats()[0]))]
+      tempFF.setSamples([vals])
+      #print "values = " , values[0]
+      #print "min = ", min
+      #print "man = ", max
+      #print "vals = " , vals[0]
+      return tempFF
+
+  if GridUtil.isTimeSequence(grid):
+      scalerG=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+            scalerG.setSample(j,fillMinMaxScaler(grid.getSample(j),user_min,user_max))
+      return scalerG
+  else:
+      return fillMinMaxScaler(grid,user_min,user_max)
