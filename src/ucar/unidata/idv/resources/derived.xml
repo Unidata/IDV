@@ -1529,6 +1529,18 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands/>
   </derived>
+  <derived description="Standard Scaler Data Transform" formula="gridStandardScaler(grid,user_mean[default=None],user_std[default=None])" id="ML Standard Scaler Transform" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Grid MinMax Scaler Data Transform" formula="gridMinMaxScaler(grid,user_min,user_max)" id="ML MinMax Scaler Transform" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing"/>
+    </categories>
+    <operands/>
+  </derived>
   <derived description="Median Filter" formula="medianFilter(grid, missingValue, window_lenx=10, window_leny=10)" id="ML MedianFilter" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="ML Preprocessing"/>
