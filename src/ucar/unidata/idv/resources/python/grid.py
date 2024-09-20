@@ -683,3 +683,62 @@ def gridMinMaxScaler(grid,user_min,user_max):
       return scalerG
   else:
       return fillMinMaxScaler(grid,user_min,user_max)
+
+def gridQuantileTransform(grid):
+  """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
+      it is also known as min-max normalization
+  """
+  from visad import FlatField
+
+  def fillQuantileTransform(gridFF):
+
+      tempFF=GridMath.quantileTransformerFF(gridFF)#put units here
+      return tempFF
+
+  if GridUtil.isTimeSequence(grid):
+      scalerG=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+            scalerG.setSample(j,fillQuantileTransform(grid.getSample(j)))
+      return scalerG
+  else:
+      return fillQuantileTransform(grid)
+
+def gridPowerTransform(grid, user_lambda):
+  """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
+      it is also known as min-max normalization
+  """
+  from visad import FlatField
+
+  def fillPowerTransform(gridFF, user_lambda):
+      if user_lambda == None or user_lambda =="":
+          data = gridFF.getFloats()[0]
+          user_lambda = GridUtil.findOptimalLambda(data, -5, 5, 0.1)
+
+      tempFF=GridMath.powerTransformerFF(gridFF, user_lambda)#put units here
+      return tempFF
+
+  if GridUtil.isTimeSequence(grid):
+      scalerG=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+            scalerG.setSample(j,fillPowerTransform(grid.getSample(j), user_lambda))
+      return scalerG
+  else:
+      return fillPowerTransform(grid, user_lambda)
+
+def gridRobustScaler(grid):
+  """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
+      it is also known as min-max normalization
+  """
+  from visad import FlatField
+
+  def fillRobustScaler(gridFF):
+      tempFF=GridMath.robustScalerFF(gridFF)#put units here
+      return tempFF
+
+  if GridUtil.isTimeSequence(grid):
+      scalerG=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+            scalerG.setSample(j,fillRobustScaler(grid.getSample(j)))
+      return scalerG
+  else:
+      return fillRobustScaler(grid)
