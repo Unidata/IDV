@@ -20,7 +20,6 @@
 
 package ucar.unidata.data.grid;
 
-
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
@@ -3773,6 +3772,109 @@ public class GridMath {
             throw new VisADException("RemoteException checking missing data");
         }
         return s;
+
+    }
+
+    public static FlatField quantileTransformerFF(FlatField grid)
+            throws VisADException {
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[] samples   = grid.getFloats()[0];
+
+            float[][] newValues = new float[1][sizeX * sizeY  * sizeZ];
+            GridUtil.QuantileTransformer qt = new GridUtil.QuantileTransformer(samples.length, samples.length);
+            qt.fit(samples);
+
+// Get the quantiles
+            float[] x_transformed = qt.transform(samples, float[].class, true);
+            qt.shutdown();
+            FunctionType newFT = (FunctionType)grid.getType();
+            newValues[0] = x_transformed;
+            newField = new FlatField(newFT, grid.getDomainSet());
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
+
+    public static FlatField powerTransformerFF(FlatField grid, double lambda)
+            throws VisADException {
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[] samples   = grid.getFloats()[0];
+
+            float[][] newValues = new float[1][sizeX * sizeY  * sizeZ];
+
+// Get the quantiles
+            float[] x_transformed = GridUtil.yeoJohnsonTransform(samples, lambda);
+
+            FunctionType newFT = (FunctionType)grid.getType();
+            newValues[0] = x_transformed;
+            newField = new FlatField(newFT, grid.getDomainSet());
+            newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
+
+    }
+
+    public static FlatField robustScalerFF(FlatField grid)
+            throws VisADException {
+
+        FlatField newField = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            int   sizeZ   = ((lengths.length == 2)
+                    || (domainSet.getManifoldDimension() == 2))
+                    ? 1
+                    : lengths[2];
+            float[][] samples   = grid.getFloats();
+
+            float[][] newValues = new float[1][sizeX * sizeY  * sizeZ];
+            GridUtil.RobustScaler scaler = new GridUtil.RobustScaler();
+            scaler.fit(samples);  // Compute medians and IQR
+
+            // Transform the data
+            float[][] scaledData = scaler.transform(samples);
+
+            FunctionType newFT = (FunctionType)grid.getType();
+
+            newField = new FlatField(newFT, grid.getDomainSet());
+            newField.setSamples(scaledData, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return newField;
 
     }
 }
