@@ -1648,7 +1648,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             CrossSectionSelector cs = getCrossSectionSelector();
             doShare(SHARE_XSLINE, new Object[] { cs.getStartPoint(),
                     cs.getEndPoint() });
-            if(controlList.size() >=1){
+            if(controlList != null && controlList.size() >=1){
                 for(CrossSectionControl csc: controlList.values()){
                     csc.csSelector = csSelector;
                     csc.loadDataFromLine();
@@ -1890,24 +1890,26 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
 
         GridDataInstance gdi = getGridDataInstance();
-        FieldImpl slice = gdi.sliceAlongLatLonLine(
-                              points,
-                              getSamplingModeValue(
-                                  getObjectStore().get(PREF_SAMPLING_MODE,
-                                          DEFAULT_SAMPLING_MODE)));
-        // apply smoothing
-        if (checkFlag(FLAG_SMOOTHING)
-                && !getSmoothingType().equals(LABEL_NONE)) {
-            slice = GridUtil.smooth(slice, getSmoothingType(),
-                                    getSmoothingFactor());
+        if(gdi != null) {
+            FieldImpl slice = gdi.sliceAlongLatLonLine(
+                    points,
+                    getSamplingModeValue(
+                            getObjectStore().get(PREF_SAMPLING_MODE,
+                                    DEFAULT_SAMPLING_MODE)));
+            // apply smoothing
+            if (checkFlag(FLAG_SMOOTHING)
+                    && !getSmoothingType().equals(LABEL_NONE)) {
+                slice = GridUtil.smooth(slice, getSmoothingType(),
+                        getSmoothingFactor());
+            }
+            // apply skip factor
+            if (getSkipValue() > 0) {
+                slice = GridUtil.subset(slice, getSkipValue() + 1, 1);
+            }
+            showWaitCursor();
+            loadData(slice);
+            showNormalCursor();
         }
-        // apply skip factor
-        if (getSkipValue() > 0) {
-            slice = GridUtil.subset(slice, getSkipValue() + 1, 1);
-        }
-        showWaitCursor();
-        loadData(slice);
-        showNormalCursor();
     }
 
 
@@ -2882,7 +2884,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         myFlowCrossSectionControl.paramName = dc.getName();
         myFlowCrossSectionControl.crossSectionView = crossSectionView;
         myFlowCrossSectionControl.init(dc, csSelector);
-        myFlowCrossSectionControl.initDone();
+        //myFlowCrossSectionControl.initDone();
 
         addDisplayable(myFlowCrossSectionControl.xsDisplay);
         addDisplayable(myFlowCrossSectionControl.vcsDisplay, crossSectionView);
