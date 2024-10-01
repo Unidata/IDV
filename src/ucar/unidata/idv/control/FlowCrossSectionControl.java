@@ -90,86 +90,8 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         setAttributeFlags(FLAG_COLOR | FLAG_LINEWIDTH | FLAG_SMOOTHING);
     }
 
-    public boolean init(DataChoice dataChoice)
-            throws VisADException, RemoteException {
-
-        //Are we in 3d?
-        displayIs3D = isDisplay3D();
-        levelsList  = dataChoice.getAllLevels(null);
-        xsDisplay   = createXSDisplay();
-        vcsDisplay  = createVCSDisplay();
-        //Now set the data (which uses the displayables  above).
-        if ( !setData(dataChoice)) {
-            return false;
-        }
 
 
-        vcsDisplay.setVisible(true);
-        if (crossSectionView != null) {
-            //If the ViewManager is non-null it means we have been unpersisted.
-            //If so, we initialie the VM with the IDV
-            crossSectionView.initAfterUnPersistence(getIdv());
-        } else {
-            //We are new (or are unpersisted from an old bundle)
-            //Create the new ViewManager
-            crossSectionView = new CrossSectionViewManager(getViewContext(),
-                    new ViewDescriptor("CrossSectionView"),
-                    "showControlLegend=false;showScales=true", animationInfo);
-            crossSectionView.setIsShared(false);
-            crossSectionView.setAniReadout(false);
-            //This will only be non-null if we have been unpersisted from an old
-            //(prior to the persistence of the ViewManager) bundle
-            if (displayMatrix != null) {
-                XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
-                csvxsDisplay.setProjectionMatrix(displayMatrix);
-            }
-        }
-        crossSectionView.setShowDisplayList(false);
-        XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
-
-        //getIdv().getVMManager().addViewManager(crossSectionView);
-        addViewManager(crossSectionView);
-        setYAxisRange(csvxsDisplay, verticalAxisRange);
-        csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
-        csvxsDisplay.setYDisplayUnit(csvxsDisplay.getYDisplayUnit());
-        //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
-        if (haveMultipleFields()) {
-            addDisplayable(vcsDisplay, crossSectionView,
-                    FLAG_COLORTABLE | FLAG_COLORUNIT);
-        } else {
-            addDisplayable(vcsDisplay, crossSectionView);
-        }
-
-
-        if (displayIs3D) {
-            if (haveMultipleFields()) {
-                //If we have multiple fields then we want both the
-                //color unit and the display unit
-                addDisplayable(xsDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
-            } else {
-                addDisplayable(xsDisplay);
-            }
-        }
-
-        ViewManager vm = getViewManager();
-        createCrossSectionSelector();
-        //Now create the selector (which needs the state from the setData call)
-        if (vm instanceof MapViewManager) {
-            if (csSelector != null) {
-                csSelector.setPointSize(getDisplayScale());
-                csSelector.setAutoSize(true);
-                csSelector.setVisible(lineVisible);
-                addDisplayable(csSelector, getSelectorAttributeFlags());
-            } else {
-                System.err.println("NO CS SELECTOR " + getClass().getName());
-            }
-        } else if (vm instanceof TransectViewManager) {
-            xsDisplay.setAdjustFlow(false);
-            setUseFastRendering(true);
-        }
-        loadDataFromLine();
-        return true;
-    }
 
 
     /**
@@ -698,9 +620,71 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
         public boolean init(DataChoice dataChoice, CrossSectionSelector crossSectionSelector)
                 throws VisADException, RemoteException {
 
+            //Are we in 3d?
+            displayIs3D = isDisplay3D();
+            levelsList  = dataChoice.getAllLevels(null);
+            xsDisplay   = createXSDisplay();
+            vcsDisplay  = createVCSDisplay();
+            //Now set the data (which uses the displayables  above).
             csSelector = crossSectionSelector;
-            super.init(dataChoice);
+            if ( !setData(dataChoice)) {
+                return false;
+            }
 
+
+            vcsDisplay.setVisible(true);
+
+            //We are new (or are unpersisted from an old bundle)
+            //Create the new ViewManager
+            crossSectionView = new CrossSectionViewManager(getViewContext(),
+                    new ViewDescriptor("CrossSectionView"),
+                    "showControlLegend=false;showScales=true", animationInfo);
+
+
+            crossSectionView.setShowDisplayList(false);
+            XSDisplay csvxsDisplay = crossSectionView.getXSDisplay();
+
+            //getIdv().getVMManager().addViewManager(crossSectionView);
+            addViewManager(crossSectionView);
+            setYAxisRange(csvxsDisplay, verticalAxisRange);
+            csvxsDisplay.setXDisplayUnit(getDefaultDistanceUnit());
+            csvxsDisplay.setYDisplayUnit(csvxsDisplay.getYDisplayUnit());
+            //crossSectionView.getMaster ().addDisplayable (vcsDisplay);
+            if (haveMultipleFields()) {
+                addDisplayable(vcsDisplay, crossSectionView,
+                        FLAG_COLORTABLE | FLAG_COLORUNIT);
+            } else {
+                addDisplayable(vcsDisplay, crossSectionView);
+            }
+
+
+            if (displayIs3D) {
+                if (haveMultipleFields()) {
+                    //If we have multiple fields then we want both the
+                    //color unit and the display unit
+                    addDisplayable(xsDisplay, FLAG_COLORTABLE | FLAG_COLORUNIT);
+                } else {
+                    addDisplayable(xsDisplay);
+                }
+            }
+
+            ViewManager vm = getViewManager();
+
+            //Now create the selector (which needs the state from the setData call)
+            if (vm instanceof MapViewManager) {
+                if (csSelector != null) {
+                    csSelector.setPointSize(getDisplayScale());
+                    csSelector.setAutoSize(true);
+                    csSelector.setVisible(lineVisible);
+                    addDisplayable(csSelector, getSelectorAttributeFlags());
+                } else {
+                    System.err.println("NO CS SELECTOR " + getClass().getName());
+                }
+            } else if (vm instanceof TransectViewManager) {
+                xsDisplay.setAdjustFlow(false);
+                setUseFastRendering(true);
+            }
+            loadDataFromLine();
             return true;
         }
 
