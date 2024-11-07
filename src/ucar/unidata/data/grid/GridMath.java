@@ -3877,4 +3877,20 @@ public class GridMath {
         return newField;
 
     }
+
+    public static float calculateL2Norm(float[] vector) {
+        float sum = 0.0f;
+        for (float v : vector) {
+            sum += v * v;
+        }
+        return (float)Math.sqrt(sum);
+    }
+
+    public static float calculateL1Norm(float[] vector) {
+        float sum = 0.0f;
+        for (float v : vector) {
+            sum += Math.abs(v);
+        }
+        return sum;
+    }
 }
