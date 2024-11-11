@@ -10281,6 +10281,87 @@ public class GridUtil {
         }
     }
 
+    public static class Normalize2DArray {
+
+        // Method to normalize a 2D array with NaN handling
+        public static double[][] normalize(double[][] data) {
+            int rows = data.length;
+            int cols = data[0].length;
+
+            // Step 1: Find the minimum and maximum values, ignoring NaN values
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (!Double.isNaN(data[i][j])) {  // Ignore NaN
+                        if (data[i][j] < min) {
+                            min = data[i][j];
+                        }
+                        if (data[i][j] > max) {
+                            max = data[i][j];
+                        }
+                    }
+                }
+            }
+
+            // Step 2: Normalize the array using the formula: (value - min) / (max - min)
+            double range = max - min;
+            double[][] normalizedData = new double[rows][cols];
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (Double.isNaN(data[i][j])) {
+                        normalizedData[i][j] = Double.NaN;  // Keep NaN as it is
+                    } else {
+                        normalizedData[i][j] = (data[i][j] - min) / range;
+                    }
+                }
+            }
+
+            return normalizedData;
+        }
+
+        public static float[][] normalize(float[][] data) {
+            int rows = data.length;
+            int cols = data[0].length;
+
+            // Step 1: Find the minimum and maximum values, ignoring NaN values
+            float min = Float.MAX_VALUE;
+            float max = Float.MIN_VALUE;
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (!Double.isNaN(data[i][j])) {  // Ignore NaN
+                        if (data[i][j] < min) {
+                            min = data[i][j];
+                        }
+                        if (data[i][j] > max) {
+                            max = data[i][j];
+                        }
+                    }
+                }
+            }
+
+            // Step 2: Normalize the array using the formula: (value - min) / (max - min)
+            float range = max - min;
+            float[][] normalizedData = new float[rows][cols];
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (Float.isNaN(data[i][j])) {
+                        normalizedData[i][j] = Float.NaN;  // Keep NaN as it is
+                    } else {
+                        normalizedData[i][j] = (data[i][j] - min) / range;
+                    }
+                }
+            }
+
+            return normalizedData;
+        }
+
+        // Main method to test normalization with NaN values
+    }
 
     public static double[] yeoJohnsonTransform(double[] data, double lambda) {
         double[] transformedData = new double[data.length];
