@@ -37,22 +37,15 @@ import ucar.nc2.time.CalendarDate;
 
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
+import ucar.unidata.idv.control.ProbeControl;
+import ucar.unidata.idv.control.ProbeRowInfo;
 import ucar.unidata.util.*;
 
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
 
-import visad.CoordinateSystem;
-import visad.Data;
-import visad.DateTime;
-import visad.FieldImpl;
-import visad.FlatField;
-import visad.Real;
-import visad.RealType;
-import visad.TextType;
-import visad.Tuple;
-import visad.Unit;
-import visad.VisADException;
+import ucar.visad.display.Animation;
+import visad.*;
 
 
 import java.io.FileOutputStream;
@@ -517,6 +510,62 @@ public class DataUtil {
         return getFlatField(((FieldImpl) field).getSample(0, false));
     }
 
+    /**
+     * Write a csv file for a time series point data
+     *
+     * @param filename file to write to
+     * @param field data
+     */
+    public static void exportCsvAllTimes(FieldImpl field, String filename) {
+        try {
+            List rows = fieldToRows(field);
+            writeCsv(filename, rows);
+        } catch (Exception exc) {
+            LogUtil.logException("Exporting to csv", exc);
+        }
+    }
+
+    /**
+     * output a list for a time series point data
+     *
+     * @param field data
+     */
+    public static List fieldToRows(FieldImpl field) {
+        List rows = new ArrayList();
+        try {
+            Set timeSet = field.getDomainSet();
+            int numTimes = timeSet.getLength();
+            DateTime[] times   = Animation.getDateTimeArray(timeSet);
+            //Real[]    times     = Animation.getDateTimeArray(aniSet);
+            List cols;
+            cols = Misc.newList("Time");
+            MathType type = field.getType();
+            String name = ((FunctionType) type).getRange().toString();
+            cols.add("name");
+
+            rows.add(cols);
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                cols = Misc.newList("" + aniValue);
+                Data data = field.getSample(timeIdx);
+                //rows.add(cols);
+                Real real = null;
+                if (data instanceof Real) {
+                    real = (Real) data;
+                } else {
+                    real = (Real) ((RealTuple) data).getComponent(
+                            0);
+                }
+                cols.add(real.getValue());
+                rows.add(cols);
+            }
+
+        } catch (Exception exc) {
+            LogUtil.logException("Exporting to csv", exc);
+        }
+        return rows;
+    }
 
     /**
      * Write a csv file. The rows list contains lists. We take the toString value of each list element
