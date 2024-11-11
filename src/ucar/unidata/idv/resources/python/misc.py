@@ -22,7 +22,13 @@ def idveval(formula):
     ddc = DerivedDataChoice(idv,formula)
     return ddc;
   except DataCancelException, dce:
-    return None;    
+    return None;
+
+def exportTimeSeriesToCSV(field,filename):
+    """Write out the field data to CSV file"""
+    from ucar.unidata.data import DataUtil
+    DataUtil.exportCsvAllTimes(field,filename)
+    return field
 
 
 
