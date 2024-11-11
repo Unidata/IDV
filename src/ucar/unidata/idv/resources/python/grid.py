@@ -520,11 +520,14 @@ def virtualTemperature(p, t, dp):
 def virtualPotentialTemperature(p, t, dp):
   return DerivedGridFactory.createVirtualPotentialTemperature(p, t, dp)
 
-def medianFilter(grid, missingValue, window_lenx=10, window_leny=10):
+def medianFilter(grid, user_missingValue=None, window_lenx=10, window_leny=10):
   """ calculate median filter, need to replace the missingValue if it is not NaN
   """
-  grid0 = substituteWithMissing(grid, missingValue)
-  return GridUtil.medianFilter(grid0, window_lenx, window_leny)
+  if user_missingValue == None or user_missingValue =="":
+    return GridUtil.medianFilter(grid, window_lenx, window_leny)
+  else:
+    grid0 = substituteWithMissing(grid, missingValue)
+    return GridUtil.medianFilter(grid0, window_lenx, window_leny)
 
 def classifier(grid, classifierStr, outFileName):
   """ classifierStr is a string of a set of classifier info with format:
@@ -611,7 +614,8 @@ def gridStandardScaler(grid,user_mean=None,user_std=None):
   """ StandardScaler standardizes grid values by removing the mean and scaling to
       variance using statistics on the samples to improve the performance and
       convergence of machine learning models, particularly those sensitive to
-      feature scales,
+      feature scales. It is sensitive to outliers, and the features may scale
+      differently from each other in the presence of outliers.
   """
   from visad import FlatField
   import random
@@ -647,7 +651,9 @@ def gridStandardScaler(grid,user_mean=None,user_std=None):
 
 def gridMinMaxScaler(grid,user_min,user_max):
   """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
-      it is also known as min-max normalization
+      it is also known as min-max normalization. It doesn’t reduce the effect of outliers, but it linearly scales
+      them down into a fixed range, where the largest occurring data point corresponds to the maximum value
+      and the smallest one corresponds to the minimum value.
   """
   from visad import FlatField
   import random
@@ -704,8 +710,11 @@ def gridQuantileTransform(grid):
       return fillQuantileTransform(grid)
 
 def gridPowerTransform(grid, user_lambda):
-  """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
-      it is also known as min-max normalization
+  """ Power transforms are a family of parametric, monotonic transformations that are applied
+      to make data more Gaussian-like. This is useful for modeling issues related to
+      heteroscedasticity (non-constant variance), or other situations where normality is desired.
+      Currently, power_transform supports the Yeo-Johnson transform and Yeo-Johnson supports
+      both positive or negative data..
   """
   from visad import FlatField
 
@@ -728,6 +737,11 @@ def gridPowerTransform(grid, user_lambda):
 def gridRobustScaler(grid):
   """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
       it is also known as min-max normalization
+      This Scaler removes the median and scales the data according to the quantile range
+      (defaults to IQR: Interquartile Range). The IQR is the range between the 1st quartile (25th quantile) and
+      the 3rd quartile (75th quantile).
+      However, outliers can often influence the sample mean / variance in a negative way. In such cases,
+      using the median and the interquartile range often give better results.
   """
   from visad import FlatField
 
@@ -742,3 +756,52 @@ def gridRobustScaler(grid):
       return scalerG
   else:
       return fillRobustScaler(grid)
+
+def gridNormalizer(grid, user_norm="Max"):
+  """ Normalize samples individually to unit norm.
+      Each sample (i.e. each row of the data matrix) with at least one non zero component
+      is rescaled independently of other samples so that its norm (l1, l2 or inf) equals one.
+  """
+  from java.lang import Float
+  from visad import FlatField
+  import edu.wisc.ssec.mcidasv.data.hydra.Statistics
+
+  def fillNormalizer(gridFF):
+        #also fun the return by input grid
+      tempFF=FlatField(gridFF.getType(),gridFF.getDomainSet())#put units here
+      values = gridFF.getFloats()[0]
+      if user_norm == "l1":
+          norm = GridMath.calculateL1Norm(values)
+          for itm in range(len(gridFF.getFloats()[0])):
+              if not Float.isNaN(values[itm]):
+                  values[itm] = values[itm]/norm
+      elif user_norm == "l2":
+          norm = GridMath.calculateL2Norm(values)
+          for itm in range(len(gridFF.getFloats()[0])):
+              if not Float.isNaN(values[itm]):
+                  values[itm] = values[itm]/norm
+      else:
+          # vals=[(values[itm]-min)/(max-min) for itm in range(len(gridFF.getFloats()[0]))]
+          statistics = GridMath.statisticsFF(gridFF)
+          min = (statistics.min()).getValue()
+          max = (statistics.max()).getValue()
+          for itm in range(len(gridFF.getFloats()[0])):
+              if not Float.isNaN(values[itm]):
+                  values[itm] = (values[itm]-min)/(max-min)
+
+      # tempFF.setSamples([vals])
+      #print "values = " , values[0]
+
+      tempFF.setSamples([values])
+      #print "min = ", min
+      #print "man = ", max
+      #print "vals = " , vals[0]
+      return tempFF
+
+  if GridUtil.isTimeSequence(grid):
+      scalerG=grid.clone()
+      for j,time in enumerate(grid.domainEnumeration()):
+            scalerG.setSample(j,fillNormalizer(grid.getSample(j)))
+      return scalerG
+  else:
+      return fillNormalizer(grid)
