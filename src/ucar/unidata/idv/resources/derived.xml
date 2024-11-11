@@ -1523,47 +1523,118 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     </categories>
     <operands categories=""/>
   </derived>
+  <!-- Adding ML preprocessing functions  -->
   <derived description="ML Classifier " formula="classifier(grid, classifierStr, outFileName)" id="classifierStr: low1 high1 value1; low2 high2 value2; low3 high3 value3;..." isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="ML Preprocessing"/>
     </categories>
     <operands/>
   </derived>
-  <derived description="Standard Scaler Data Transform" formula="gridStandardScaler(grid,user_mean[default=None],user_std[default=None])" id="ML Standard Scaler Transform" isdefault="false" isenduser="true">
+  <derived description="Grid Standard Scaler" formula="gridStandardScaler(grid,user_mean[default=None],user_std[default=None])" id="ML Standard Scaler" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Scaler"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Grid MinMax Scaler" formula="gridMinMaxScaler(grid,user_min,user_max)" id="ML MinMax Scaler" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Scaler"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Grid Quantile Data Transform" formula="gridQuantileTransform(grid)" id="ML Grid Quantile Data Transform" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Transformer"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Grid Power Data Transform" formula="gridPowerTransform(grid, user_lambda)" id="ML Power Data Transform" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Transformer"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Grid Robust Scaler" formula="gridRobustScaler(grid)" id="ML Robust Scaler" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Scaler"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Median Filter" formula="medianFilter(grid, user_missingValue, window_lenx=10, window_leny=10)" id="ML MedianFilter" isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="ML Preprocessing"/>
     </categories>
     <operands/>
   </derived>
-  <derived description="Grid MinMax Scaler Data Transform" formula="gridMinMaxScaler(grid,user_min,user_max)" id="ML MinMax Scaler Transform" isdefault="false" isenduser="true">
+  <derived description="Grid Normalizer" formula="gridNormalizer(grid, user_norm[default=Max])" id="ML Normalizer" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="ML Preprocessing"/>
-    </categories>
-    <operands/>
-  </derived>
-  <derived description="Median Filter" formula="medianFilter(grid, missingValue, window_lenx=10, window_leny=10)" id="ML MedianFilter" isdefault="false" isenduser="true">
-    <categories>
-      <category display="true" value="ML Preprocessing"/>
+      <category display="true" value="ML Preprocessing - Transformer"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Normal Distribution Data Mapping" formula="gridNormalDistribution(grid,user_mean[default=None],user_std[default=None])" id="ML Normal Distribution Transform" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="ML Preprocessing"/>
+      <category display="true" value="ML Preprocessing - Transformer"/>
     </categories>
     <operands/>
   </derived>
   <derived description="Uniform Distribution Data Mapping" formula="gridUniformDistribution(templategrid,user_min[default=None],user_max[default=None])" id="ML Uniform Distribution Transform" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="ML Preprocessing"/>
+      <category display="true" value="ML Preprocessing - Transformer"/>
     </categories>
     <operands/>
   </derived>
-  <derived description="Apply spatial Max, Min, Average, Percentile over 2D grid" formula="applyFunctionOverGrid2D(grid, function, statThreshold)" id="ML 2D Functions" isdefault="false" isenduser="true">
+  <derived description="Apply spatial Max over 2D grid" formula="applyFunctionOverGrid2D(grid, &quot;max&quot;, &quot;none&quot;)" id="ML 2D Functions" isdefault="false" isenduser="true">
     <categories>
-      <category display="true" value="ML Preprocessing"/>
+      <category display="true" value="ML Preprocessing - Grid2Point"/>
+      <category value="display:probe"/>
     </categories>
     <operands/>
+  </derived>
+  <derived description="Apply spatial Min over 2D grid" formula="applyFunctionOverGrid2D(grid, &quot;min&quot;, &quot;none&quot;)" id="ML 2D Functions" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Grid2Point"/>
+      <category value="display:probe"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Apply spatial Average over 2D grid" formula="applyFunctionOverGrid2D(grid, &quot;average&quot;, &quot;none&quot;)" id="ML 2D Functions" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Grid2Point"/>
+      <category value="display:probe"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived description="Apply spatial Percentile over 2D grid" formula="applyFunctionOverGrid2D(grid, &quot;percentile&quot;, user_statThreshold)" id="ML 2D Functions" isdefault="false" isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Grid2Point"/>
+      <category value="display:probe"/>
+    </categories>
+    <operands/>
+  </derived>
+  <derived
+          description="Export Point Time Series to CSV"
+          formula="exportTimeSeriesToCSV(field,file[type=file,isuser=true,label=csv File,filepattern=\.csv:CSV Files])"
+          id="writeTSToCsv"
+          isdefault="false"
+          isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Grid2Point"/>
+      <category value="display:probe"/>
+    </categories>
+    <operands categories=""/>
+  </derived>
+  <derived
+          description="Export Point Time Series to Excel"
+          formula="exportTimeSeriesToCSV(field,file[type=file,isuser=true,label=Excel File,filepattern=\.xls:Excel Files])"
+          id="writeTSToXls"
+          isdefault="false"
+          isenduser="true">
+    <categories>
+      <category display="true" value="ML Preprocessing - Grid2Point"/>
+      <category value="display:probe"/>
+    </categories>
+    <operands categories=""/>
   </derived>
  <!-- Adding derived ABI RGB and band subtraction formulas - RMC - INQ 2836 - Oct 2019 -->
     <!-- Reorganized formulas to be under Imagery - RMC - INQ 2872 - Jan 2020 -->
