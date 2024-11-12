@@ -9,7 +9,7 @@
       <variable name="JREDIR" value="/share/idv" />
     </variables>
     <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" windowsEnabled="false" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u432-b06" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u302-b08" />
   </application>
   <files>
     <filesets>
