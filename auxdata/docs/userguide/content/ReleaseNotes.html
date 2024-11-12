@@ -46,12 +46,15 @@ The items below reflect changes since the 6.2 release.
 
 <faqitem id="MLprepostprocess" q="Pre/Post process data for applications including ML">
   <p>
-    The IDV offers a wide range of statistical analysis tools, including area and level averages,
-    maximum, minimum, mean, percentiles, median filter, classifier, normal distribution and uniform
-    distribution. The results of these analyses can now be exported in formats such as CSV or netCDF.
-    This new feature allows users to take advantage of the IDV's broad access to multiple data servers,
-    enabling efficient data preprocessing for applications like machine learning and other scientific
-    uses.
+    The IDV provides a suite of tools for transforming raw datasets, making them suitable for applications
+    like machine learning. Users can apply various scalers (Standard, Robust, Min-Max), transformers (Quantile, Power),
+    and normalizers to improve data quality and align distributions with model requirements. The platform also
+    includes statistical tools for calculating averages, percentiles, and distribution transformations, helping
+    users visualize and refine data as needed.
+
+    Results can be exported in formats like CSV or netCDF, making it easy to integrate IDV-processed data into
+    workflows for machine learning, scientific modeling, and more. This flexibility allows users to efficiently
+    prepare data for diverse analytical needs.
   </p>
 </faqitem>
 
@@ -106,6 +109,32 @@ The items below reflect changes since the 6.2 release.
 
 <faqitem cat="Jython Changes"></faqitem>
 
+  <faqitem id="scalerformulas" q="Scalers">
+    <p>
+      Scalers are applied as linear transformers to standardize or normalize dataset distributions. The
+      available scalers: Standard Scaler, Robust Scaler, and Min-Max Scaler—offer tailored solutions for
+      different data types and characteristics. The Standard Scaler standardizes features by removing the mean
+      and scaling to unit variance, which is effective for data that generally follows a normal distribution.
+      The Robust Scaler, on the other hand, is ideal for datasets with outliers as it scales based on the median
+      and interquartile range, reducing the influence of extreme values. Min-Max Scaler scales features to a
+      specified range, typically [0, 1], which is helpful for algorithms that require normalized data within
+      bounded values. These scaling options provide flexibility for preparing datasets and ensuring that feature
+      distributions align with model assumptions and can improve algorithm performance.
+    </p>
+  </faqitem>
+
+  <faqitem id="transformerformulas" q="Transformers">
+    <p>
+      Transformers provides non-linear transformations to a dataset into a representation that is more suitable
+      for the downstream applications. The available transformers: Quantile Transformer, Power Transformer, and
+      Normalizer tailored solutions for different data types and characteristics. Quantile Transformer provides
+      non-linear transformations in which distances between marginal outliers and inliers are shrunk. Power
+      transforms are a family of parametric transformations that aim to map data from any distribution to as
+      close to a Gaussian distribution. These transformers add versatility to data preprocessing workflows,
+      helping to align feature distributions with model assumptions, improving algorithmic performance in
+      areas such as machine learning.
+    </p>
+  </faqitem>
 
 <faqitem id="classifierformulas" q="Classifier">
   <p>
