@@ -4816,7 +4816,7 @@ public class GridUtil {
      *          May be missing if conversion can't happen.
      *
      *
-     * @throws VisADException
+     * @throws VisADException for bad
      */
     public static Real getLevel(FieldImpl grid, Real altitude)
             throws VisADException {
@@ -6219,6 +6219,7 @@ public class GridUtil {
      *
      * @param grid grid  to write
      * @param filename  filename
+     * @param fxgrfName xgrf filename
      *
      * @throws Exception  problem writing grid
      */
@@ -8849,7 +8850,7 @@ public class GridUtil {
     /**
      * Process the glyph to Unionset.
      *
-     * @param domainSet
+     * @param domainSet domain set
      * @param glyphs list of polygon glyph
      * @throws Exception for bad
      *
@@ -8900,6 +8901,7 @@ public class GridUtil {
      *
      * @throws VisADException for bad
      * @throws RemoteException for bad
+     * @throws CloneNotSupportedException for bad
      * @return the filtered field
      */
     public static FieldImpl medianFilter(FieldImpl field, int window_lenx, int window_leny) throws VisADException, RemoteException, CloneNotSupportedException  {
@@ -8922,7 +8924,7 @@ public class GridUtil {
     /**
      * Process medianFilter
      *
-     * @param fltFld
+     * @param fltFld input ff
      * @param window_lenx default value is 10
      * @param window_leny default value is 10
      *
