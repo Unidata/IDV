@@ -9,7 +9,7 @@
       <variable name="JREDIR" value="/share/idv" />
     </variables>
     <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" windowsEnabled="false" />
-    <jreBundles release="openjdk8/jdk8u422-b05" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u302-b08" />
   </application>
   <files>
     <filesets>
@@ -1048,11 +1048,7 @@ return console.askYesNo(message, true);
         <entry location="runIDV.bat" />
         <entry filesetId="835" />
       </exclude>
-      <jreBundle release="openjdk8/jdk8u422-b05" platform="linux-amd64" overrideJdkRelease="true">
-        <modules>
-         <jmodDirectory location="/share/idv/jre/" />
-        </modules>
-      </jreBundle>
+      <jreBundle jreBundleSource="generated" />
     </unixInstaller>
 
     <windows name="Windows 64" id="580" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true">
@@ -1068,11 +1064,7 @@ return console.askYesNo(message, true);
       <exclude>
         <entry filesetId="835" />
       </exclude>
-      <jreBundle release="openjdk8/jdk8u422-b05" platform="windows-amd64" overrideJdkRelease="true">
-        <modules>
-         <jmodDirectory location="/share/idv/jre/" />
-        </modules>
-      </jreBundle>
+      <jreBundle jreBundleSource="generated" />
     </windows>
     <macosFolder name="Mac OS X" id="12" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32">
       <excludedLaunchers>
@@ -1095,11 +1087,7 @@ return console.askYesNo(message, true);
       <exclude>
         <entry location="runIDV.bat" />
       </exclude>
-      <jreBundle release="openjdk8/jdk8u422-b05" platform="macos-amd64" overrideJdkRelease="true">
-          <modules>
-           <jmodDirectory location="/share/idv/jre/" />
-          </modules>
-        </jreBundle>
+      <jreBundle jreBundleSource="generated" />
     </macosFolder>
     <unixInstaller name="Solaris 32/64" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
       <excludedComponents>
@@ -1126,11 +1114,7 @@ return console.askYesNo(message, true);
         <entry location="runIDV.bat" />
         <entry filesetId="835" />
       </exclude>
-      <jreBundle release="openjdk8/jdk8u422-b05" platform="solaris-amd64" overrideJdkRelease="true">
-                <modules>
-                 <jmodDirectory location="/share/idv/jre/" />
-                </modules>
-              </jreBundle>
+      <jreBundle jreBundleSource="generated" platform="solaris-amd64" />
     </unixInstaller>
     <unixInstaller name="Generic Unix (no JVM)" id="59" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_${compiler:NOJRE}_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
       <excludedComponents>
