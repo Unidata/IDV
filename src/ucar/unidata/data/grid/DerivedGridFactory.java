@@ -5483,7 +5483,8 @@ public class DerivedGridFactory {
      *
      * @param theta _more_
      * @param theta0 _more_
-     *
+     * @param z _more_
+     * @param isDec _more_
      *
      * @return _more_
      */
@@ -5604,6 +5605,7 @@ public class DerivedGridFactory {
      * @param other _more_
      * @param z _more_
      * @param theta0 _more_
+     * @param isDec _more_
      *
      * @return _more_
      */
@@ -5650,7 +5652,8 @@ public class DerivedGridFactory {
      * @param grid _more_
      * @param ii _more_
      *
-     *
+     * @throws VisADException for bad
+     * @throws RemoteException for bad
      * @return _more_
      */
     public static float[][][] convert3Darray(FlatField grid, int ii) throws VisADException, RemoteException{
@@ -5691,7 +5694,8 @@ public class DerivedGridFactory {
      * @param grid _more_
      * @param ii _more_
      *
-     *
+     * @throws VisADException for bad
+     * @throws RemoteException for bad
      * @return _more_
      */
     public static float[][] convert2Darray(FlatField grid, int ii) throws VisADException, RemoteException{
@@ -5923,8 +5927,8 @@ public class DerivedGridFactory {
      * @return extracted grid of latitudes at the grid points
      *
      * @deprecated  use createLatitudeGrid(FieldImpl)
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException for bad
+     * @throws VisADException for bad
      */
     public static FieldImpl getLatitudeGrid(FieldImpl fi)
             throws VisADException, RemoteException {
@@ -5939,8 +5943,8 @@ public class DerivedGridFactory {
      *
      * @return extracted grid of latitudes at the grid points
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException for bad
+     * @throws VisADException for bad
      */
     public static FieldImpl createLatitudeGrid(FieldImpl fi)
             throws VisADException, RemoteException {
@@ -5956,8 +5960,8 @@ public class DerivedGridFactory {
      *
      * @return extracted grid of latitudes or coriolis at the grid points
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException for bad
+     * @throws VisADException for bad
      */
     private static FieldImpl createLatitudeGrid(FieldImpl fi,
             boolean makeCoriolis)
@@ -6089,8 +6093,8 @@ public class DerivedGridFactory {
      *
      * @return extracted grid of longitudes at the grid points
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException for bad
+     * @throws VisADException for bad
      */
     public static FieldImpl createLongitudeGrid(FieldImpl fi)
             throws VisADException, RemoteException {
@@ -6763,10 +6767,13 @@ public class DerivedGridFactory {
      * @param gridu  wind
      * @param gridv  wind
      * @param gridw  wind
+     * @param value1 value
+     * @param lUnit unit
      *
      * @return  the angle
      *
      * @throws VisADException bad input or problem creating fields
+     * @throws RemoteException for bad
      */
     public static FieldImpl createSurfaceWindAngle(FieldImpl gridu, FieldImpl gridv,FieldImpl gridw,
                                                   double value1, String lUnit)
@@ -6814,7 +6821,7 @@ public class DerivedGridFactory {
      *
      * @return computed layer difference
      *
-     * @throws RemoteException  Java RMI error
+     *
      * @throws VisADException   VisAD Error
      */
     public static FieldImpl timeStepAccumulatedPrecip(FieldImpl grid)
@@ -6910,13 +6917,14 @@ public class DerivedGridFactory {
     /**
      * Calculate the VirtualPotentialTemperature
      *
-     * @param pressFI  wind
-     * @param temperFI  wind
-     * @param dewPtFI  wind
+     * @param pressFI  pressure
+     * @param temperFI  temperature
+     * @param dewPtFI  dewPT
      *
      * @return  the angle
      *
      * @throws VisADException bad input or problem creating fields
+     * @throws RemoteException for bad
      */
     public static FieldImpl createVirtualPotentialTemperature(
             FieldImpl pressFI, FieldImpl temperFI, FieldImpl dewPtFI)
@@ -7038,6 +7046,7 @@ public class DerivedGridFactory {
      * @return  the angle
      *
      * @throws VisADException bad input or problem creating fields
+     * @throws RemoteException for bad
      */
     public static FieldImpl createVirtualTemperature(
             FieldImpl pressFI, FieldImpl temperFI, FieldImpl dewPtFI)
@@ -7287,6 +7296,7 @@ public class DerivedGridFactory {
      * @return  the angle
      *
      * @throws VisADException bad input or problem creating fields
+     * @throws RemoteException for bad
      */
     public static FieldImpl createAirDensity(
             FieldImpl pressFI, FieldImpl temperFI)
@@ -7401,6 +7411,7 @@ public class DerivedGridFactory {
      * @return  the gdi
      *
      * @throws VisADException bad input or problem creating fields
+     * @throws RemoteException for bad
      */
     public static FieldImpl createGalvezDavisonIndex(
             FieldImpl temperFI, FieldImpl rhFI)
@@ -7549,6 +7560,7 @@ public class DerivedGridFactory {
      * @return  the gdi
      *
      * @throws VisADException bad input or problem creating fields
+     * @throws RemoteException for bad
      */
     public static FieldImpl createColumnBuoyancyIndex(
             FieldImpl temperFI, FieldImpl rhFI)
@@ -7884,7 +7896,7 @@ public class DerivedGridFactory {
     /**
      * remove unit
      *
-     * @param field
+     * @param field input field
      *
      * @return  the new field
      *
