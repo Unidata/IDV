@@ -44,6 +44,8 @@ public class WrfUtil extends  ucar.unidata.data.grid.GridUtil {
      * Find min and max of range data in any VisAD FieldImpl
      *
      * @param grid       a VisAD FlatField.  Cannot be null
+     * @param min       double value
+     * @param max       double value
      * @return  the range of the data as point obs
      *
      * @throws RemoteException  Java RMI error
@@ -99,6 +101,8 @@ public class WrfUtil extends  ucar.unidata.data.grid.GridUtil {
      * Find min and max of range data in any VisAD FieldImpl
      *
      * @param grid0       a VisAD FlatField.  Cannot be null
+     * @param level      level value
+     * @param value      float
      * @return  the range of the data as point obs
      *
      * @throws RemoteException  Java RMI error
@@ -542,7 +546,8 @@ public class WrfUtil extends  ucar.unidata.data.grid.GridUtil {
      *
      * @param timeStep     the grid
      * @param dt           the timestep for the grid
-     *
+     * @param val   float value
+     * @param function name string
      * @return   a Field of PointObs
      *
      * @throws RemoteException   Java RMI problem
@@ -748,9 +753,10 @@ public class WrfUtil extends  ucar.unidata.data.grid.GridUtil {
     }
 
     /**
-     *      * Find min and max of range data in any VisAD FlatField
-     *      *
-     *      * @param field       a VisAD FlatField.  Cannot be null
+     *   Find min and max of range data in any VisAD FlatField
+     *
+     * @param field       a VisAD FlatField.  Cannot be null
+     * @param function   function name
      * @return  the range of the data.  Dimension is the number of parameters
      *          in the range of the flat field
      *
@@ -916,7 +922,8 @@ public class WrfUtil extends  ucar.unidata.data.grid.GridUtil {
      *
      * @param timeStep     the grid
      * @param dt           the timestep for the grid
-     *
+     * @param val  the value
+     * @param function name of function
      * @return   a Field of PointObs
      *
      * @throws RemoteException   Java RMI problem
@@ -1094,6 +1101,8 @@ public class WrfUtil extends  ucar.unidata.data.grid.GridUtil {
      *
      *
      * @param points List of points. Either double array or EarthLocation
+     * @param IDX_LAT idx
+     * @param IDX_LON idx
      * @return lat/lons
      *
      * @throws RemoteException On badness
