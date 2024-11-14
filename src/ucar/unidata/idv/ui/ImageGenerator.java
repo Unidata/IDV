@@ -3984,7 +3984,15 @@ public class ImageGenerator extends IdvManager {
         s = StringUtil.applyMacros(s, getStateManager().getProperties(),
                                    false);
         if (s.indexOf("${") >= 0) {
-            throw new BadIslException("Undefined macro in: " + s);
+            Hashtable optionArgs = getIdv().getArgsManager().getOptionalArgs();
+            if(optionArgs.size() > 0){
+                s = StringUtil.applyMacros(s, optionArgs,
+                        false);
+                if(s.indexOf("${") >= 0) {
+                    throw new BadIslException("Undefined macro in: " + s);
+                }
+            } else
+                throw new BadIslException("Undefined macro in: " + s);
         }
 
         if (s.startsWith("jython:")) {
