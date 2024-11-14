@@ -2066,7 +2066,7 @@ public class GridMath {
      * @param grid1  2d grid to apply function1 (percentile)
      *
      * @param function One of the FUNC_ enums
-     *
+     * @param function1 another function name
      * @return the new time series point field
      *
      * @throws VisADException  On badness
@@ -3049,13 +3049,13 @@ public class GridMath {
     }
 
     /**
-     * evaluate univariate probability of "variable with n ensemble values" < pValue
+     * evaluate univariate probability of "variable with n ensemble values" smaller than pValue
      *
      * code from $NAWIPS/gempak/source/diaglib/de/decprb.c used to make this function.
      *
      * @param values the values, within the userspecified range, at a given grid point
      *        from an ensemble model run
-     * @param pValue the threshold used in the probability calculation - P(value < pValue)
+     * @param pValue the threshold used in the probability calculation - P(value smaller than pValue)
      * @param length  number of ensemble members (might not be the same as values.length)
      *
      * @return prob the univariate probability that the value at the grid point is less than pValue
@@ -3267,6 +3267,8 @@ public class GridMath {
      * @param gridv   v component grid
      * @param bottom   in meter
      * @param top   in meter
+     * @param ux   average u wind
+     * @param vy   average v wind
      * @return the new field
      *
      * @throws VisADException  On badness
@@ -3523,6 +3525,7 @@ public class GridMath {
      * @return the new 3d grid
      *
      * @throws VisADException  On badness
+     * @throws RemoteException for bad
      */
     public static FieldImpl subtractExt(FieldImpl grid, FieldImpl grid2d)
             throws VisADException, RemoteException {
