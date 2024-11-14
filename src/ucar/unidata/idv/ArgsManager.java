@@ -48,12 +48,7 @@ import java.io.File;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 
 /**
@@ -349,7 +344,8 @@ public class ArgsManager extends IdvManager {
     /** Holds the set files arguments */
     protected List fileMappingFiles = new ArrayList();
 
-
+    /** Holds the optional arguments of ISL file */
+    protected Hashtable islOptionalArgs = new Hashtable<>(50);
     /**
      * Create the manager with the given idv and command line arguments.
      * This just sets some state, it does not yet parse the arguments.
@@ -369,6 +365,14 @@ public class ArgsManager extends IdvManager {
         //TODO:        commandLineArgs = preprocessArgs(args);
     }
 
+    /**
+     * Get the very original command line arguments. The ones before we pre-process them.
+     *
+     * @return The command line args
+     */
+    public Hashtable getOptionalArgs() {
+        return islOptionalArgs;
+    }
 
     /**
      * Get the very original command line arguments. The ones before we pre-process them.
@@ -946,6 +950,16 @@ public class ArgsManager extends IdvManager {
             scriptingFiles.add(arg);
             if ( !islInteractive) {
                 setIsOffScreen(true);
+            }
+            if(args.length > 1){
+                while ((idx +1)< args.length) {
+                    String argStr = args[idx++];
+                    String argValue = args[idx++];
+                    if(argStr.startsWith("-")) {
+                        String idd = argStr.substring(1);
+                        islOptionalArgs.put(idd, argValue);
+                    }
+                }
             }
         } else if (isXidvFile(arg)) {
             argXidvFiles.add(arg);
