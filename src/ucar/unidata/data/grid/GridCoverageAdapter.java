@@ -143,6 +143,7 @@ public class GridCoverageAdapter {
      *
      * @param dataSource  source of this GeoGrid
      * @param geoGrid     the GeoGrid in question
+     * @param params     subset parameter
      *
      * @throws VisADException  unable to create one of the VisAD objects
      */
@@ -159,6 +160,7 @@ public class GridCoverageAdapter {
      *
      * @param dataSource  source of this GeoGrid
      * @param geoGrid     the GeoGrid in question
+     * @param params   the subset parameter
      * @param paramName   name of the parameter
      *
      * @throws VisADException  unable to create one of the VisAD objects
@@ -177,7 +179,7 @@ public class GridCoverageAdapter {
      * @param dataSource  source of this GeoGrid
      * @param geoGrid     the GeoGrid in question
      * @param ncFile      file that the GeoGrid data is coming from
-     *
+     * @param params     the subset parameter
      * @throws VisADException  unable to create one of the VisAD objects
      */
     public GridCoverageAdapter(GridCoverageDataSource dataSource, Coverage geoGrid, SubsetParams params,
@@ -193,6 +195,7 @@ public class GridCoverageAdapter {
      * @param dataSource  source of this GeoGrid
      * @param geoGrid     the GeoGrid in question
      * @param paramName   name of the parameter
+     * @param params  the subset parameter
      * @param ncFile      file that the GeoGrid data is coming from
      *
      * @throws VisADException  unable to create one of the VisAD objects
@@ -211,6 +214,7 @@ public class GridCoverageAdapter {
      *
      * @param dataSource  source of this GeoGrid
      * @param geoGrid     the GeoGrid in question
+     * @param params      the subset parameter
      * @param paramName   name of the parameter
      * @param ncFile      file that the GeoGrid data is coming from
      * @param extraCacheKey Extra key to use when caching
