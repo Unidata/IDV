@@ -132,7 +132,7 @@ public class AddeImageDataSource extends ImageDataSource {
      *  @param  image ADDE Url
      *  @param properties The properties for this data source.
      *
-     * @throws VisADException
+     * @throws VisADException for bad
      */
     public AddeImageDataSource(DataSourceDescriptor descriptor, String image,
                                Hashtable properties)
@@ -147,7 +147,7 @@ public class AddeImageDataSource extends ImageDataSource {
      *  @param  images Array of  ADDE urls.
      *  @param properties The properties for this data source.
      *
-     * @throws VisADException
+     * @throws VisADException for bad
      */
 
     public AddeImageDataSource(DataSourceDescriptor descriptor,
@@ -163,7 +163,7 @@ public class AddeImageDataSource extends ImageDataSource {
      *  @param  images Array of  ADDE urls.
      *  @param properties The properties for this data source.
      *
-     * @throws VisADException
+     * @throws VisADException for bad
      */
 
     public AddeImageDataSource(DataSourceDescriptor descriptor, List images,
@@ -180,7 +180,7 @@ public class AddeImageDataSource extends ImageDataSource {
      *  @param  ids The dataset.
      *  @param properties The properties for this data source.
      *
-     * @throws VisADException
+     * @throws VisADException for bad
      */
     public AddeImageDataSource(DataSourceDescriptor descriptor,
                                ImageDataset ids, Hashtable properties)
