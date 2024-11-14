@@ -178,7 +178,7 @@ public class ImageXmlDataSource extends FilesDataSource {
      *                      points to the actual data source.
      * @param properties General properties used in the base class
      *
-     * idv    * @throws VisADException   problem getting the data
+     * @throws VisADException   problem getting the data
      */
     public ImageXmlDataSource(DataSourceDescriptor descriptor,
                               String filename, Hashtable properties)
