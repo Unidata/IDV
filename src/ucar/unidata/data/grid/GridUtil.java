@@ -2095,8 +2095,8 @@ public class GridUtil {
      * @param grid  the grid
      * @param levelValue the level value
      * @param levelUnit the level unit
-     * @return
-     * @throws VisADException
+     * @return new grid
+     * @throws VisADException for bad
      */
     public static FieldImpl addLevelToGrid(FieldImpl grid, double levelValue,
                                            String levelUnit)
@@ -8796,8 +8796,8 @@ public class GridUtil {
     /**
      * respond to the read data call and return list of Glyph
      *
-     * @throws RemoteException On badness
-     * @throws VisADException On badness
+     * @param filename input file name
+     * @return list of drawinglyph
      */
     public static List<DrawingGlyph> read(String filename) {
         List<DrawingGlyph> lglyph = null;
@@ -8820,6 +8820,8 @@ public class GridUtil {
      *
      * @throws RemoteException When bad things happen
      * @throws VisADException When bad things happen
+     *
+     * @return list of glyph
      */
     public static List parseXml(Element root, boolean initialXml)
             throws VisADException, RemoteException {
@@ -8849,7 +8851,9 @@ public class GridUtil {
      *
      * @param domainSet
      * @param glyphs list of polygon glyph
+     * @throws Exception for bad
      *
+     * @return unionset
      */
     public static UnionSet glyphsToMap(GriddedSet domainSet, List glyphs) throws Exception {
         MapMaker mapMaker = new MapMaker();
@@ -8890,9 +8894,13 @@ public class GridUtil {
      * Process medianFilter mean filtering is simply to replace each pixel value
      * in an image with the mean (average) value of its neighbors, including itself
      *
-     * @param field
+     * @param field input
      * @param window_lenx default value is 10
      * @param window_leny default value is 10
+     *
+     * @throws VisADException for bad
+     * @throws RemoteException for bad
+     * @return the filtered field
      */
     public static FieldImpl medianFilter(FieldImpl field, int window_lenx, int window_leny) throws VisADException, RemoteException, CloneNotSupportedException  {
         Set dSet = field.getDomainSet();
@@ -8917,6 +8925,10 @@ public class GridUtil {
      * @param fltFld
      * @param window_lenx default value is 10
      * @param window_leny default value is 10
+     *
+     * @throws VisADException for bad
+     * @throws RemoteException for bad
+     * @return the median filtered flatfield
      */
     public static FlatField medianFilter(FlatField fltFld, int window_lenx, int window_leny) throws VisADException, RemoteException {
         GriddedSet domSet = (GriddedSet) fltFld.getDomainSet();
@@ -8962,9 +8974,14 @@ public class GridUtil {
      * @param A array of float
      * @param lenx x dimension
      * @param leny y dimension
+     * @param window_lenx x dimension length
+     * @param window_leny y dimension length
+     *
+     * @throws VisADException for bad
+     * @return float array
      */
     public static float[] medianFilter(float[] A, int lenx, int leny, int window_lenx, int window_leny)
-            throws VisADException {
+            throws  VisADException {
         float[] result =  new float[A.length];
         float[] window =  new float[window_lenx*window_leny];
         float[] sortedWindow =  new float[window_lenx*window_leny];
@@ -9245,11 +9262,13 @@ public class GridUtil {
      *  A classifier in machine learning is an algorithm that automatically orders or
      *  categorizes data into one or more of a set of “classes.”
      *
-     * @param field
+     * @param field the input field
      * @param classifierStr input string of classifier
      * @param  outFileName output file name
+     * @throws  Exception for bad
+     * @return the classifier fieldimpl
      */
-    public static FieldImpl classifier(FieldImpl field, String classifierStr, String outFileName) throws VisADException, RemoteException, Exception  {
+    public static FieldImpl classifier(FieldImpl field, String classifierStr, String outFileName) throws Exception  {
         List<String> classifyList = StringUtil.split(classifierStr, ";");
         for(String classifyItem: classifyList){
             List<String> itemList = StringUtil.split(classifyItem, " ");
@@ -9264,12 +9283,15 @@ public class GridUtil {
     }
 
     /**
-     * Process classifier
+     * Process for classifier
      *
-     * @param grid
+     * @param grid the input field
      * @param low lower range
      * @param  high higher range
      * @param newValue replace value
+     * @throws  VisADException for bad
+     * @throws  RemoteException for bad
+     * @return the field with new values
      */
     public static FieldImpl replaceRangeValues(FieldImpl grid, float low, float high, float newValue)
             throws VisADException, RemoteException {
@@ -9306,6 +9328,8 @@ public class GridUtil {
      * @param low lower range
      * @param  high higher range
      * @param newValue replace value
+     * @throws VisADException for bad
+     * @return the flatfield with new values
      */
     private static FlatField replaceRangeValuesFF(FlatField grid,  float low, float high, float newValue)
             throws VisADException {
