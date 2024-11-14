@@ -63,7 +63,7 @@ public class CDOGTextPointDataSource extends TextPointDataSource {
 
     /**
      * Create a new data source
-     * @throws VisADException
+     * @throws VisADException for bad
      */
     public CDOGTextPointDataSource() throws VisADException {
     }
@@ -71,7 +71,7 @@ public class CDOGTextPointDataSource extends TextPointDataSource {
     /**
      * Create a new data source
      * @param source  the source file
-     * @throws VisADException
+     * @throws VisADException for bad
      */
     public CDOGTextPointDataSource(String source) throws VisADException {
         super(source);
