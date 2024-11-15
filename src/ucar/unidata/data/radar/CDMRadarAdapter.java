@@ -2619,8 +2619,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      *
      * @return lat lon point
      *
-     * @throws RemoteException
-     * @throws VisADException
+     * @throws RemoteException for bad
+     * @throws VisADException for bad
      */
     public LatLonPoint setCrossSectionLinePosition(float azi)
             throws VisADException, RemoteException {
@@ -3165,7 +3165,7 @@ public class CDMRadarAdapter implements RadarAdapter {
     /**
      * Create the initial spatial domain
      *
-     * @param moment
+     * @param moment idx
      * @param varName variable name
      *
      * @return The initial spatial domain
@@ -4407,6 +4407,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * the sorted array may have some NaN at the end of the array
      *
      * @param sortedArr _more_
+     * @return sorted array with valid value
      */
     public static double[] removeNaNfromSortedArray(double[] sortedArr) {
         int n = sortedArr.length - 1;
@@ -4423,6 +4424,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * This is api by chatgpt to sort an array and put the NaN at its end
      *
      * @param arr _more_
+     * @return int array
      */
     public static int[] sortFloatArrayWithNaNAndIndices(double[] arr) {
         // Create an array of indices
@@ -4944,6 +4946,12 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * latLon2RTheta calculate r and theta of two latlon points
+     * @param lat1 latitude
+     * @param lat2 latitude
+     * @param lon1 longitude
+     * @param lon2 longitude
+     * @param r radius
+     * @param theta angle
      *
      */
     public void latLon2RTheta(double lat1, double lon1,
@@ -5026,7 +5034,9 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * fmod calculate modulus for float/double
-     *
+     * @param a any double
+     * @param b any double
+     * @return fmod
      */
     public static double fmod(double a, double b) {
         int result = (int) Math.floor(a / b);
@@ -5035,7 +5045,14 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * computeGridRow calculate gridloc for each grid point
+     * @param numCols column
+     * @param numRows row
+     * @param numLevels level
+     * @param latRows latitude
+     * @param lonCols longitude
+     * @param altLevels altitude
      *
+     * @return grid location
      */
     public GridLoc [][][] computeGridRow(int numCols, int numRows, int numLevels, float[] latRows, float[] lonCols, float[] altLevels)
 
@@ -5101,7 +5118,9 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * angDist calculate sqrt of deltaEL and AZ
-     *
+     * @param deltaAz  azimuth diff
+     * @param deltaEl elevation diff
+     * @return angle distance
      */
     public static double angDist(double deltaEl, double deltaAz) {
         double dist = Math.sqrt(deltaAz * deltaAz + deltaEl * deltaEl);
@@ -5113,7 +5132,13 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * loadWtsFor2ValidRays calculate neighbour values
-     *
+     * @param loc grid location
+     * @param ll point
+     * @param ul point
+     * @param lr point
+     * @param ur point
+     * @param wtInner  inner weight
+     * @param wtOuter outer weight
      */
     public static Neighbors getWtsFor2ValidRays(GridLoc loc,
                                SearchPoint ll,
@@ -5188,6 +5213,14 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * getWtsFor3Or4ValidRays calculate neighbour values
+     * @param loc grid location
+     *
+     * @param ll point
+     * @param ul point
+     * @param lr point
+     * @param ur point
+     * @param wtInner neighbors
+     * @param wtOuter neighbors
      *
      */
     public static Neighbors getWtsFor3Or4ValidRays(GridLoc loc,
@@ -5284,7 +5317,15 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     /**
      * loadNearestGridPt return the nearest radial point
+     * @param igateInner gate
+     * @param igateOuter gare
+     * @param ll point
+     * @param ul point
+     * @param lr point
+     * @param ur point
+     * @param wts neighbors
      *
+     * @return nearest point
      */
     public static double loadNearestGridPt(int igateInner,
                                 int igateOuter,
