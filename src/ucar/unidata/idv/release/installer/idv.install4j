@@ -8,8 +8,8 @@
       <variable name="SRCDIR" value="/share/idv" />
       <variable name="JREDIR" value="/share/idv" />
     </variables>
-    <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" windowsEnabled="false" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u302-b08" />
+    <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u422-b05" />
   </application>
   <files>
     <filesets>
