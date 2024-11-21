@@ -1185,7 +1185,17 @@ public class DerivedGridFactory {
             throws VisADException, RemoteException {
         TupleType tt        = GridUtil.getParamType(pressureVelField);
         RealType  rt        = tt.getRealComponents()[0];
+        String unitStr = rt.getDefaultUnit().toString();
+        Unit newUnit = rt.getDefaultUnit();
         Unit      pressUnit = rt.getDefaultUnit().multiply(CommonUnit.second);
+        if(unitStr.contains("pa s-1") || unitStr.contains("pa_s-1")){
+            newUnit = Util.parseUnit("Pa/s");
+            pressUnit = newUnit.multiply(CommonUnit.second);
+            String newName = removeUnitString(rt.getName());
+            RealType newType = Util.makeRealType(newName, newUnit);
+
+            pressureVelField = GridUtil.setParamType(pressureVelField, newType);
+        }
         if (Unit.canConvert(pressUnit, CommonUnit.meter)) {
             return pressureVelField;
         } else if ( !(Unit.canConvert(pressUnit, CommonUnits.MILLIBAR)
@@ -1235,6 +1245,13 @@ public class DerivedGridFactory {
         return heightGrid;
     }
 
+    private static String removeUnitString(String name) {
+        if ((name.indexOf("[") > -1) && (name.indexOf("]") > -1)) {
+            return name.substring(0, name.indexOf("[")).trim();
+        } else {
+            return name;
+        }
+    }
     /**
      * Make a FieldImpl of wind vectors from u and v components.
      *
