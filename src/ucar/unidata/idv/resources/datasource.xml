@@ -210,7 +210,12 @@
        name="icon"
        value="/auxdata/ui/icons/3D.gif"/>
   </datasource>
-
+  <!--datasource
+          id="HRIT"
+          factory="ucar.unidata.data.imagery.HRITDataSource"
+          fileselection="true"
+          doesmultiples="true"
+          label="HRIT data source"/-->
   <datasource
           id="FILE.RADAR"
           patterns="swp\..*_$,.*dorade.*,Level3.*\.nids$,6500.*$,7000.*$,.*\.raw$"
@@ -238,12 +243,25 @@
   <datasource
      id="WMS"
      factory="ucar.unidata.data.gis.WmsDataSource"
-     label="WMS image data">
-     patterns="\.wms$/>
+     label="WMS image data"
+     fileselection="true"
+     doesmultiples="false"
+     patterns="\.wms$">
     <property
        name="default_display"
        value="wmscontrol"/>
   </datasource>
+  <!--datasource
+          id="WMTS"
+          factory="ucar.unidata.data.gis.WmtsDataSource"
+          label="WMTS image data"
+          fileselection="true"
+          doesmultiples="false"
+          patterns="\.wmts$">
+    <property
+            name="default_display"
+            value="wmscontrol"/>
+  </datasource-->
 
   <datasource
      id="KML"
