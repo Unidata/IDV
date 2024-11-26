@@ -623,6 +623,8 @@ public class TimeSeriesChart extends XYChartManager {
                             lineState.setNameMacro(MACRO_PARAMETER);
                         }
                         String pointParam = info.getPointParameterName();
+                        if(pointParam == null)
+                            pointParam = info.toString();
                         if (lineState.getNameMacro() != null) {
                             String macro = lineState.getNameMacro();
                             macro = macro.replace(MACRO_PARAMETER,
