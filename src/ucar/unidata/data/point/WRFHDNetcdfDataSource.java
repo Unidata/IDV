@@ -215,7 +215,7 @@ public class WRFHDNetcdfDataSource extends NetcdfPointDataSource {
                 DataCategory.parseCategories("Point Cloud;pointcloud", true);
             for (VariableSimpleIF var : varNames) {
                 String varname = var.getShortName();
-                if (varname.equalsIgnoreCase("streamflow")) {
+                if (varname.toLowerCase().contains("streamflow")) {
                     DataChoice choice = new DirectDataChoice(this,
                                             "pointcloud:" + varname, varname,
                                             varname, cloudCats, props);
