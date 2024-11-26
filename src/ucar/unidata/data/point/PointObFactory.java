@@ -3181,7 +3181,10 @@ public class PointObFactory {
 
             // now make types
             if (isVarNumeric[varIdx]) {  // RealType
-                Unit unit = DataUtil.parseUnit(var.getUnitsString().replaceAll("\\s", ""));
+                String unitStr = var.getUnitsString();
+                if(unitStr != null)
+                    unitStr = unitStr.replace("\\s", "");
+                Unit unit = DataUtil.parseUnit(unitStr);
                 types[varIdx] = DataUtil.makeRealType(var.getShortName(),
                         unit);
                 varUnits[varIdx] = unit;
