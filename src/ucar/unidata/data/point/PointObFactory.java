@@ -43,12 +43,11 @@ import ucar.nc2.dt.StationObsDatatype;
 import ucar.nc2.dt.point.CFPointObWriter;
 import ucar.nc2.dt.point.PointObVar;
 import ucar.nc2.ft.*;
-import ucar.nc2.ft.point.PointIteratorFiltered;
-import ucar.nc2.ft.point.StationFeature;
-import ucar.nc2.ft.point.StationFeatureImpl;
-import ucar.nc2.ft.point.StationTimeSeriesCollectionImpl;
+import ucar.nc2.ft.point.*;
 import ucar.nc2.ft.point.standard.PointDatasetStandardFactory;
+import ucar.nc2.ft.point.standard.StandardProfileCollectionImpl;
 import ucar.nc2.ft.point.standard.StandardStationCollectionImpl;
+import ucar.nc2.ft.point.standard.StandardStationProfileCollectionImpl;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
@@ -59,6 +58,7 @@ import ucar.nc2.util.IOIterator;
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.grid.GridUtil;
+import ucar.unidata.data.sounding.CDMProfileFeatureTypeInfo;
 import ucar.unidata.data.sounding.CDMTrajectoryFeatureTypeInfo;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
@@ -68,6 +68,7 @@ import ucar.unidata.util.*;
 import ucar.visad.GeoUtils;
 import ucar.visad.Util;
 import ucar.visad.data.CalendarDateTime;
+import ucar.visad.data.CalendarDateTimeSet;
 import ucar.visad.physics.Speed;
 import ucar.visad.quantities.CommonUnits;
 import ucar.visad.quantities.GeopotentialAltitude;
@@ -345,38 +346,72 @@ public class PointObFactory {
                 " " + lumpMinutes + " component " + componentIndex
                         + ", num obs:" + numObs);
         Hashtable seenTime = new Hashtable();
-        for (int i = 0; i < numObs; i++) {
-            PointObTuple ob = (PointObTuple) pointObs.get(i);
-            if (i == 0) {
-                if (componentIndex < 0) {
-                    obType = ob.getType();
-                } else {
-                    obType = ((Tuple) ob.getData()).getComponent(
-                            componentIndex).getType();
+        if(pointObs.get(0) instanceof PointObTuple) {
+            for (int i = 0; i < numObs; i++) {
+                PointObTuple ob = (PointObTuple) pointObs.get(i);
+                if (i == 0) {
+                    if (componentIndex < 0) {
+                        obType = ob.getType();
+                    } else {
+                        obType = ((Tuple) ob.getData()).getComponent(
+                                componentIndex).getType();
+                    }
                 }
-            }
-            DateTime dttm = ob.getDateTime();
+                DateTime dttm = ob.getDateTime();
 
-            if (dttm.isMissing()) {
-                continue;
-            }
+                if (dttm.isMissing()) {
+                    continue;
+                }
 
-            if (lumpMinutes > 0) {
-                double seconds = dttm.getValue();
-                seconds = seconds - seconds % (lumpMinutes * 60);
-                dttm = new DateTime(seconds);
+                if (lumpMinutes > 0) {
+                    double seconds = dttm.getValue();
+                    seconds = seconds - seconds % (lumpMinutes * 60);
+                    dttm = new DateTime(seconds);
+                }
+                Double dValue = new Double(dttm.getValue());
+                List obs = null;
+                boolean contains = (seenTime.put(dValue, dValue) != null);
+                if (!contains) {
+                    uniqueTimes.add(dttm);
+                    obs = new ArrayList();
+                    timeToObs.put(dValue, obs);
+                } else {
+                    obs = (List) timeToObs.get(dValue);
+                }
+                obs.add(ob);
             }
-            Double dValue = new Double(dttm.getValue());
-            List obs = null;
-            boolean contains = (seenTime.put(dValue, dValue) != null);
-            if (!contains) {
-                uniqueTimes.add(dttm);
-                obs = new ArrayList();
-                timeToObs.put(dValue, obs);
-            } else {
-                obs = (List) timeToObs.get(dValue);
+        } else {
+            FieldImpl pointF = (FieldImpl)pointObs.get(0);
+            CalendarDateTimeSet timeSet = (CalendarDateTimeSet)pointF.getDomainSet();
+            double[][]   times        = timeSet.getDoubles(false);
+            ucar.nc2.time.Calendar cal = ((CalendarDateTimeSet) timeSet).getCalendar();
+
+            numObs = ((FieldImpl) pointObs.get(0)).getLength();
+            for (int i = 0; i < numObs; i++) {
+                Data ob = pointF.getSample(i);
+                if (i == 0) {
+                    obType = ob.getType();
+                }
+                CalendarDateTime dttm = new CalendarDateTime(times[0][i],
+                        cal);
+                //DateTime dttm = timeSet.get.getDateTime();
+
+                if (dttm.isMissing()) {
+                    continue;
+                }
+
+                Double dValue = new Double(dttm.getValue());
+                List obs = null;
+                boolean contains = (seenTime.put(dValue, dValue) != null);
+                if (!contains) {
+                    uniqueTimes.add(dttm);
+                    obs = new ArrayList();
+                    timeToObs.put(dValue, obs);
+                } else {
+                    obs = (List) timeToObs.get(dValue);
+                }
+                obs.add(ob);
             }
-            obs.add(ob);
         }
         Trace.call2("makeTimeSequence-loop1",
                 " #times:" + uniqueTimes.size());
@@ -412,9 +447,15 @@ public class PointObFactory {
                 //obs = (Data[]) v.toArray(new PointOb[v.size()]);
             } else {
                 obs = new Data[v.size()];
-                for (int obIdx = 0; obIdx < v.size(); obIdx++) {
-                    obs[obIdx] = ((Tuple) ((PointOb) v.get(
-                            obIdx)).getData()).getComponent(componentIndex);
+                if(v.get(0) instanceof PointOb) {
+                    for (int obIdx = 0; obIdx < v.size(); obIdx++) {
+                        obs[obIdx] = ((Tuple) ((PointOb) v.get(
+                                obIdx)).getData()).getComponent(componentIndex);
+                    }
+                } else {
+                    for (int obIdx = 0; obIdx < v.size(); obIdx++) {
+                        obs[obIdx] =   (Data)v.get(obIdx);
+                    }
                 }
             }
             Integer1DSet set = new Integer1DSet(index, v.size());
@@ -2252,6 +2293,9 @@ public class PointObFactory {
         }
         DsgFeatureCollection fc = collectionList.get(0);
         PointFeatureCollection collection = null;
+        StandardProfileCollectionImpl collectionp = null;
+        StandardStationCollectionImpl collectionss = null;
+        StationProfileCollectionImpl collectionsp = null;
         // System.out.println("llr = " + llr);
         CalendarDateRange dateRange = null;
         if (dateSelection != null) {
@@ -2278,6 +2322,33 @@ public class PointObFactory {
             if ((llr != null) || (dateRange != null)) {
                 collection = collection.subset(llr, dateRange);
             }
+        } else if (fc instanceof StandardProfileCollectionImpl) {
+            collectionp =
+                    (StandardProfileCollectionImpl) fc;
+
+            //if (llr != null) {
+            //    npfc = npfc.subset(llr);
+            //}
+
+        } else if (fc instanceof StandardStationProfileCollectionImpl) {
+            collectionsp =
+                    (StationProfileCollectionImpl) fc;
+
+            //if (llr != null) {
+            //    npfc = npfc.subset(llr);
+            //}
+
+        } else if (fc instanceof StandardStationCollectionImpl) {
+            collectionss =
+                    (StandardStationCollectionImpl) fc;
+           // if ((llr != null) || (dateRange != null)) {
+                collection = collectionss.flatten(llr, dateRange);
+
+           // }
+            //if (llr != null) {
+            //    npfc = npfc.subset(llr);
+            //}
+
         } else if (fc instanceof PointFeatureCC) {
             PointFeatureCC npfc =
                     (PointFeatureCC) fc;
@@ -2464,7 +2535,338 @@ public class PointObFactory {
             tuples.add(tuple);
             times.add(new DateTime(0));
             elts.add(elt);
-        } else {
+        } else if(collection == null && collectionp != null) {
+            for (ProfileFeature profile : collectionp) {
+                CDMProfileFeatureTypeInfo.ProfileFeatureBean bean  = new CDMProfileFeatureTypeInfo.ProfileFeatureBean(profile);
+                ProfileFeature profileFeature      = bean.pfc;
+
+                List       latList  = new ArrayList();
+                List       lonList  = new ArrayList();
+                List       altList  = new ArrayList();
+
+                List       timeList = new ArrayList();
+                List       uSpdList = new ArrayList();
+                List       vSpdList = new ArrayList();
+
+                for (PointFeature pf : profileFeature) {
+                    CalendarDate   dt = pf.getObservationTimeAsCalendarDate();
+                    StructureData sd   = pf.getFeatureData();
+                    float         uspd = sd.convertScalarFloat("uComponent");
+                    float         vspd = sd.convertScalarFloat("vComponent");
+                    if ((uspd != McIDASUtil.MCMISSING)
+
+                            && (vspd != McIDASUtil.MCMISSING)
+                            ) {
+                        latList.add(pf.getLocation().getLatitude());
+                        lonList.add(pf.getLocation().getLongitude());
+                        altList.add(pf.getLocation().getAltitude());
+                        timeList.add( pf.getObservationTime());
+                        uSpdList.add((double) uspd);
+                        vSpdList.add((double) vspd);
+                    }
+
+                }
+                //CDMProfileFeatureTypeInfo.ProfileFeatureBean bean = new CDMProfileFeatureTypeInfo.ProfileFeatureBean(profile);
+                int ii = 10;
+                PointFeature po = (PointFeature) bean.pf;
+                iammissing = false;
+                obIdx++;
+                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+                CoordinateSystem pressToHeightCS =
+                        DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
+                Double eld = (Double)altList.get(ii);
+                float[][] hvals = pressToHeightCS.toReference(new float[][]{new float[]{eld.floatValue()}});
+                   //altUnit.toThis(alts, vUnit);
+
+                elt = new EarthLocationLite(
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(hvals[0][0]));
+                double us = ((Double)uSpdList.get(ii)).doubleValue();
+                double vs = ((Double)vSpdList.get(ii)).doubleValue();
+
+                double[] realArray = {0.0, us, vs};;
+                String[] stringArray = ((numStrings == 0)
+                        ? null
+                        : new String[numStrings]);
+
+                // make the VisAD data object
+                //if (obIdx % 10 == 0) {
+                    Tuple tuple = (allReals
+                            ? (Tuple) new DoubleTuple(
+                            (RealTupleType) allTupleType, realArray,
+                            allUnits)
+                            : new DoubleStringTuple(allTupleType,
+                            realArray, stringArray, allUnits));
+
+                    tuples.add(tuple);
+                    times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
+                    elts.add(elt);
+                //}
+                if (obIdx % NUM == 0) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+                /*
+                ii = 2;
+
+                el = po.getLocation();
+
+                eld = (Double)altList.get(ii);
+                hvals = pressToHeightCS.toReference(new float[][]{new float[]{eld.floatValue()}});
+                //altUnit.toThis(alts, vUnit);
+
+                elt = new EarthLocationLite(
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(hvals[0][0]));
+                us = ((Double)uSpdList.get(ii)).doubleValue();
+                vs = ((Double)vSpdList.get(ii)).doubleValue();
+
+                double[] realArray1 = {0.0, us, vs};;
+                String[] stringArray1 = ((numStrings == 0)
+                        ? null
+                        : new String[numStrings]);
+
+                // make the VisAD data object
+                if (obIdx % 10 == 0) {
+                    Tuple tuple1 = (allReals
+                            ? (Tuple) new DoubleTuple(
+                            (RealTupleType) allTupleType, realArray1,
+                            allUnits)
+                            : new DoubleStringTuple(allTupleType,
+                            realArray1, stringArray1, allUnits));
+
+                    tuples.add(tuple1);
+                    times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
+                    elts.add(elt);
+                }
+                if (obIdx % NUM == 0) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+                ii = 25;
+
+                el = po.getLocation();
+
+                eld = (Double)altList.get(ii);
+                hvals = pressToHeightCS.toReference(new float[][]{new float[]{eld.floatValue()}});
+                //altUnit.toThis(alts, vUnit);
+
+                elt = new EarthLocationLite(
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(hvals[0][0]));
+                us = ((Double)uSpdList.get(ii)).doubleValue();
+                vs = ((Double)vSpdList.get(ii)).doubleValue();
+
+                double[] realArray2 = {0.0, us, vs};;
+                String[] stringArray2 = ((numStrings == 0)
+                        ? null
+                        : new String[numStrings]);
+
+                // make the VisAD data object
+                if (obIdx % 10 == 0) {
+                    Tuple tuple1 = (allReals
+                            ? (Tuple) new DoubleTuple(
+                            (RealTupleType) allTupleType, realArray2,
+                            allUnits)
+                            : new DoubleStringTuple(allTupleType,
+                            realArray2, stringArray2, allUnits));
+
+                    tuples.add(tuple1);
+                    times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
+                    elts.add(elt);
+                }
+                if (obIdx % NUM == 0) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+
+                 */
+            }
+            Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
+                    "found " + ismissing + "/" + missing
+                            + " missing out of " + obIdx);
+
+        } else if(collection == null && collectionsp != null) {
+            Iterator iterator = collectionsp.iterator();
+            while (iterator.hasNext()) {
+                StationProfileFeature sprofile = (StationProfileFeature) iterator.next();
+                for (ProfileFeature profile : sprofile) {
+                    CDMProfileFeatureTypeInfo.ProfileFeatureBean bean = new CDMProfileFeatureTypeInfo.ProfileFeatureBean(profile);
+                    ProfileFeature profileFeature = bean.pfc;
+
+                    List latList = new ArrayList();
+                    List lonList = new ArrayList();
+                    List altList = new ArrayList();
+
+                    List timeList = new ArrayList();
+                    List uSpdList = new ArrayList();
+                    List vSpdList = new ArrayList();
+
+                    for (PointFeature pf : profileFeature) {
+                        CalendarDate dt = pf.getObservationTimeAsCalendarDate();
+                        StructureData sd = pf.getFeatureData();
+                        float uspd = sd.convertScalarFloat("uComponent");
+                        float vspd = sd.convertScalarFloat("vComponent");
+                        if ((uspd != McIDASUtil.MCMISSING)
+
+                                && (vspd != McIDASUtil.MCMISSING)
+                        ) {
+                            latList.add(pf.getLocation().getLatitude());
+                            lonList.add(pf.getLocation().getLongitude());
+                            altList.add(pf.getLocation().getAltitude());
+                            timeList.add(pf.getObservationTime());
+                            uSpdList.add((double) uspd);
+                            vSpdList.add((double) vspd);
+                        }
+
+                    }
+                    //CDMProfileFeatureTypeInfo.ProfileFeatureBean bean = new CDMProfileFeatureTypeInfo.ProfileFeatureBean(profile);
+                    int ii = 10;
+                    PointFeature po = (PointFeature) bean.pf;
+                    iammissing = false;
+                    obIdx++;
+                    ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+                    CoordinateSystem pressToHeightCS =
+                            DataUtil.getPressureToHeightCS(DataUtil.STD_ATMOSPHERE);
+                    Double eld = (Double) altList.get(ii);
+                    float[][] hvals = pressToHeightCS.toReference(new float[][]{new float[]{eld.floatValue()}});
+                    //altUnit.toThis(alts, vUnit);
+
+                    elt = new EarthLocationLite(
+                            lat.cloneButValue(el.getLatitude()),
+                            lon.cloneButValue(el.getLongitude()),
+                            alt.cloneButValue(hvals[0][0]));
+                    double us = ((Double) uSpdList.get(ii)).doubleValue();
+                    double vs = ((Double) vSpdList.get(ii)).doubleValue();
+
+                    double[] realArray = {0.0, us, vs};
+                    ;
+                    String[] stringArray = ((numStrings == 0)
+                            ? null
+                            : new String[numStrings]);
+
+                    // make the VisAD data object
+                    //if (obIdx % 10 == 0) {
+                    Tuple tuple = (allReals
+                            ? (Tuple) new DoubleTuple(
+                            (RealTupleType) allTupleType, realArray,
+                            allUnits)
+                            : new DoubleStringTuple(allTupleType,
+                            realArray, stringArray, allUnits));
+
+                    tuples.add(tuple);
+                    times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
+                    elts.add(elt);
+                    //}
+                    if (obIdx % NUM == 0) {
+                        if (!JobManager.getManager().canContinue(loadId)) {
+                            LogUtil.message("");
+                            return null;
+                        }
+                        LogUtil.message("Read " + obIdx + " observations");
+                    }
+                /*
+                ii = 2;
+
+                el = po.getLocation();
+
+                eld = (Double)altList.get(ii);
+                hvals = pressToHeightCS.toReference(new float[][]{new float[]{eld.floatValue()}});
+                //altUnit.toThis(alts, vUnit);
+
+                elt = new EarthLocationLite(
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(hvals[0][0]));
+                us = ((Double)uSpdList.get(ii)).doubleValue();
+                vs = ((Double)vSpdList.get(ii)).doubleValue();
+
+                double[] realArray1 = {0.0, us, vs};;
+                String[] stringArray1 = ((numStrings == 0)
+                        ? null
+                        : new String[numStrings]);
+
+                // make the VisAD data object
+                if (obIdx % 10 == 0) {
+                    Tuple tuple1 = (allReals
+                            ? (Tuple) new DoubleTuple(
+                            (RealTupleType) allTupleType, realArray1,
+                            allUnits)
+                            : new DoubleStringTuple(allTupleType,
+                            realArray1, stringArray1, allUnits));
+
+                    tuples.add(tuple1);
+                    times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
+                    elts.add(elt);
+                }
+                if (obIdx % NUM == 0) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+                ii = 25;
+
+                el = po.getLocation();
+
+                eld = (Double)altList.get(ii);
+                hvals = pressToHeightCS.toReference(new float[][]{new float[]{eld.floatValue()}});
+                //altUnit.toThis(alts, vUnit);
+
+                elt = new EarthLocationLite(
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(hvals[0][0]));
+                us = ((Double)uSpdList.get(ii)).doubleValue();
+                vs = ((Double)vSpdList.get(ii)).doubleValue();
+
+                double[] realArray2 = {0.0, us, vs};;
+                String[] stringArray2 = ((numStrings == 0)
+                        ? null
+                        : new String[numStrings]);
+
+                // make the VisAD data object
+                if (obIdx % 10 == 0) {
+                    Tuple tuple1 = (allReals
+                            ? (Tuple) new DoubleTuple(
+                            (RealTupleType) allTupleType, realArray2,
+                            allUnits)
+                            : new DoubleStringTuple(allTupleType,
+                            realArray2, stringArray2, allUnits));
+
+                    tuples.add(tuple1);
+                    times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
+                    elts.add(elt);
+                }
+                if (obIdx % NUM == 0) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+
+                 */
+                }
+            }
+            Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
+                    "found " + ismissing + "/" + missing
+                            + " missing out of " + obIdx);
+            //dataIterator.close();
+        }else {
             PointFeatureIterator dataIterator =
                     //collection.getPointFeatureIterator(-1);
                     collection.getPointFeatureIterator();
@@ -2737,7 +3139,7 @@ public class PointObFactory {
                 numVars--;
                 continue;
             }
-            if (!shortName.equals("streamflow")
+            if (!shortName.contains("streamflow")
                     && !shortName.equals("order")) {
                 numVars--;
                 continue;
@@ -2745,7 +3147,12 @@ public class PointObFactory {
                 varIdx = 0;
             } else if (shortName.equals("streamflow")) {
                 varIdx = 1;
+            } else if (shortName.equals("acc_streamflowMax")) {
+                varIdx = 2;
+            } else if (shortName.equals("streamflowMax")) {
+                varIdx = 3;
             }
+
             // make sure data is either numeric or string
             if (!((var.getDataType() == DataType.BYTE)
                     || (var.getDataType() == DataType.SHORT)
@@ -2774,7 +3181,7 @@ public class PointObFactory {
 
             // now make types
             if (isVarNumeric[varIdx]) {  // RealType
-                Unit unit = DataUtil.parseUnit(var.getUnitsString());
+                Unit unit = DataUtil.parseUnit(var.getUnitsString().replaceAll("\\s", ""));
                 types[varIdx] = DataUtil.makeRealType(var.getShortName(),
                         unit);
                 varUnits[varIdx] = unit;
