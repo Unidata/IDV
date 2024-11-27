@@ -482,9 +482,14 @@ public class ProbeRowInfo {
         if (numObs == 0) {
             return null;
         }
-        PointOb ob = (PointOb) pointObs.getSample(0);
-        tupleType = (TupleType) ((Tuple) ob.getData()).getType();
-        return tupleType;
+        Data data = pointObs.getSample(0);
+        if(data instanceof PointOb) {
+            PointOb ob = (PointOb) pointObs.getSample(0);
+            tupleType = (TupleType) ((Tuple) ob.getData()).getType();
+            return tupleType;
+        } else {
+            return null;
+        }
     }
 
 
