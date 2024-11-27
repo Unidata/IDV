@@ -59,6 +59,7 @@ import ucar.unidata.idv.ui.IdvTimeline;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.util.Range;
 import ucar.visad.Util;
 import ucar.visad.display.Animation;
 
@@ -804,9 +805,9 @@ public class TimeSeriesChart extends XYChartManager {
                             timeSeriesList.add(series);
                         }
                         boolean first = true;
+                        Range rr = new ucar.unidata.util.Range(min, max);
                         if (lineState.getRange() == null) {
-                            lineState.setRange(
-                                new ucar.unidata.util.Range(min, max));
+                            lineState.setRange( rr);
                         }
                         for (MyTimeSeries tmp : timeSeriesList) {
                             addSeries(tmp, lineState, paramIdx, null, true,
