@@ -5006,6 +5006,11 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * @param radians _more_
+     * @param sinVal _more_
+     * @param cosVal _more_
+     *
+     *
      * ta_sincos calculate sin and cos of a radians
      *
      */
@@ -5096,6 +5101,10 @@ public class CDMRadarAdapter implements RadarAdapter {
 
     }
     /**
+     * @param htKm _more_
+     * @param gndRangeKm _more_
+     *
+     * @return elev
      * computeElevationDeg calculate elevation
      *
      */
@@ -5139,6 +5148,8 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @param ur point
      * @param wtInner  inner weight
      * @param wtOuter outer weight
+     *
+     * @return neighbors
      */
     public static Neighbors getWtsFor2ValidRays(GridLoc loc,
                                SearchPoint ll,
@@ -5221,7 +5232,7 @@ public class CDMRadarAdapter implements RadarAdapter {
      * @param ur point
      * @param wtInner neighbors
      * @param wtOuter neighbors
-     *
+     * @return neighbors
      */
     public static Neighbors getWtsFor3Or4ValidRays(GridLoc loc,
                                  SearchPoint ll,
@@ -5375,6 +5386,16 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * @param ray _more_
+     * @param igateOuter _more_
+     * @param igateInner _more_
+     * @param wtInner _more_
+     * @param wtOuter _more_
+     * @param closestVal _more_
+     * @param maxWt _more_
+     * @param nContrib _more_
+     *
+     * @return interporated val
      * calculateNearest return the nearest radial point
      *
      */
@@ -5418,6 +5439,15 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * @param igateOuter _more_
+     * @param igateInner _more_
+     * @param ll _more_
+     * @param ul _more_
+     * @param ur _more_
+     * @param lr _more_
+     * @param wts _more_
+     *
+     * @return interporated val
      * loadInterpGridPt calculate each grid point value with 8
      * nearby radial point and return the interporated value
      *
@@ -5472,6 +5502,16 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * @param ray _more_
+     * @param igateInner _more_
+     * @param igateOuter _more_
+     * @param wtInner _more_
+     * @param wtOuter _more_
+     * @param sumVals _more_
+     * @param sumWts _more_
+     * @param nContrib _more_
+     *
+     *
      * calAccumInterp return the interporate grid point value with
      * the nearby radial points on the same ray
      *
@@ -5512,6 +5552,12 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * @param sweepVar _more_
+     * @param numberOfRay _more_
+     * @param elevs _more_
+     * @param azims _more_
+     *
+     * @return rays
      * getRays return the whole volume data as 2d rays structure
      *
      */
@@ -5579,7 +5625,14 @@ public class CDMRadarAdapter implements RadarAdapter {
         int numRows;
 
         /**
-         * _more_
+         * @param numCols _more_
+         * @param numRows _more_
+         * @param iz _more_
+         * @param loc _more_
+         * @param rays _more_
+         * @param elevs _more_
+         * @param azidx _more_
+         * @param azims _more_
          *
          *
          */
@@ -5609,6 +5662,25 @@ public class CDMRadarAdapter implements RadarAdapter {
             return iz;
         }
     }
+
+    /**
+     * @param numCols _more_
+     * @param numRows _more_
+     * @param iz _more_
+     * @param loc _more_
+     * @param rays _more_
+     * @param elevs _more_
+     * @param azidx _more_
+     * @param azims _more_
+     *
+     * @return interprow
+     *
+     * interpRow return each row data
+     * For each grid point use radial coordinate information in the gridloc to find the
+     * neighbour rays, calculate the neighbour values, and finally calculate the value
+     * of the grid point.
+     *
+     */
     static double [][] interpGridLevel(int iz, int numCols, int numRows, GridLoc [][][]loc, Ray[][] rays,
                                        double[] elevs, double[][] azims, int[][] azidx)
     {
@@ -5620,6 +5692,16 @@ public class CDMRadarAdapter implements RadarAdapter {
         return levelData;
     }
     /**
+     * @param iy _more_
+     * @param iz _more_
+     * @param loc _more_
+     * @param rays _more_
+     * @param elevs _more_
+     * @param azidx _more_
+     * @param azims _more_
+     *
+     * @return interprow
+     *
      * interpRow return each row data
      * For each grid point use radial coordinate information in the gridloc to find the
      * neighbour rays, calculate the neighbour values, and finally calculate the value
@@ -5728,6 +5810,15 @@ public class CDMRadarAdapter implements RadarAdapter {
         return rowVals;
     }
     /**
+     *
+     * @param az _more_
+     * @param elev _more_
+     * @param elevs _more_
+     * @param azidx _more_
+     * @param azims _more_
+     *
+     * @return rays
+     *
      * this is API for finding the neighboring's ray of given az and elev
      * the returns of the ray index of ll = 0, lr = 1, ul = 2, ur = 3
      * @param azims is sorted azimuths with original idex in azidx
@@ -5879,6 +5970,10 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * @param sortedArray _more_
+     * @param value _more_
+     * @return idx index
+     *
      * findInsertIndex return the inserting index
      * this is used for the azimuth arrays
      */
@@ -5896,6 +5991,12 @@ public class CDMRadarAdapter implements RadarAdapter {
     }
 
     /**
+     * @param arr __more__
+     * @param k __more__
+     * @param start __more__
+     * @param end __more__
+     *
+     * @return index
      * findIndexToBeInserted return the inserting index
      * this is used for the elevation arrays
      *
