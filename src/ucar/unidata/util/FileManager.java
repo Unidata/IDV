@@ -954,6 +954,9 @@ public class FileManager {
     /** Suffix for JAR files */
     public static final String SUFFIX_ZIP = ".zip";
 
+    /** Suffix for JAR files */
+    public static final String SUFFIX_SHP = ".shp";
+
     /** null accessory */
     private static final JComponent NULL_ACCESSORY = null;
 
@@ -1036,6 +1039,11 @@ public class FileManager {
             new PatternFileFilter(".+\\.mp4",
                     "MPEG-4 files (*.mp4)",
                     SUFFIX_MP4);
+
+    public static final PatternFileFilter FILTER_SHP =
+            new PatternFileFilter(".+\\.shp",
+                    "shapefile files (*.shp)",
+                    SUFFIX_SHP);
 
     /** Filter for ZIP files */
     public static final PatternFileFilter FILTER_ZIP =
