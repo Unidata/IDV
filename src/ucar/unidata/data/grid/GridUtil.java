@@ -2609,6 +2609,39 @@ public class GridUtil {
      * Sample the grid at the position defined by the EarthLocation
      *
      * @param  grid   grid to sample (must be a valid 3D grid)
+     * @param  lat  EarthLocation to sample at.
+     * @param  lon  EarthLocation to sample at.
+     *
+     * @return  grid representing the values of the original grid at the
+     *          point defined by location.  If this is a sequence of grids
+     *          it will be a sequence of the values.
+     *
+     * @throws  VisADException  invalid point or some other problem
+     */
+    public static FieldImpl sample(FieldImpl grid, float lat, float lon )
+            throws VisADException, RemoteException{
+        EarthLocation location = new EarthLocationTuple(lat,
+                lon, 8000);
+        RealTuple point = null;
+
+        try {
+            if (isLatLonOrder(grid)) {
+                point = new RealTuple(new Real[] { location.getLatitude(),
+                        location.getLongitude(), location.getAltitude() });
+            } else {
+                point = new RealTuple(new Real[] { location.getLongitude(),
+                        location.getLatitude(), location.getAltitude() });
+            }
+        } catch (RemoteException re) {
+            throw new VisADException("Can't get position from point");
+        }
+        return sampleAtPoint(grid, point, NEAREST_NEIGHBOR, Data. DEPENDENT);
+    }
+
+    /**
+     * Sample the grid at the position defined by the EarthLocation
+     *
+     * @param  grid   grid to sample (must be a valid 3D grid)
      * @param  location  EarthLocation to sample at.
      * @param  samplingMode Data.WEIGHTED_AVERAGE or NEAREST_NEIGHBOR
      *
