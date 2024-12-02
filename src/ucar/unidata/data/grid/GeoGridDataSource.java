@@ -39,6 +39,7 @@ import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.grid.CFGridWriter2;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridDataset;
+import ucar.nc2.ncml.NcMLReader;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
@@ -1229,6 +1230,10 @@ public class GeoGridDataSource extends GridDataSource {
                 file = DODSNetcdfFile.canonicalURL(file);
             } else if(file.startsWith("dods:") && file.endsWith("ncml")){
                 file = file.replace("dods:","https:");
+            } else if(file.endsWith("ncml")){
+                file = "file:" + file;
+                NetcdfDataset ncd = NcMLReader.readNcML(file, null);
+                GridDataset gds = new GridDataset(ncd);
             }
             if (file.contains(":443")) {
                 file = file.replace(":443","");
