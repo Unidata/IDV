@@ -296,7 +296,7 @@ public class DemDataSource extends FilesDataSource {
         public MyDemFamily() {
             super("dem");
             forms.add(new UsgsDemForm());
-            forms.add(new ArcAsciiGridForm(RealTupleType.SpatialEarth2DTuple));
+            forms.add(new ArcAsciiGridForm(RealTupleType.SpatialCartesian2DTuple)); //.SpatialEarth2DTuple));
         }
 
         /**
