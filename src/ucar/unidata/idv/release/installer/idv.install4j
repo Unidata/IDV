@@ -8,7 +8,21 @@
       <variable name="SRCDIR" value="/share/idv" />
       <variable name="JREDIR" value="/share/idv" />
     </variables>
-    <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" />
+    <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" macNotarize="true" appleId="chastang@ucar.edu">
+      <macAdditionalBinaries>
+        <entry>*.dylib</entry>
+        <entry>*.so</entry>
+        <entry>*.jnilib</entry>
+        <entry>j3d.zip</entry>
+      </macAdditionalBinaries>
+      <macSearchedJars>
+        <entry>jna-*</entry>
+        <entry>swt-*</entry>
+        <entry>javafx-*</entry>
+        <entry>jython*</entry>
+        <entry>ncIdv*</entry>
+      </macSearchedJars>
+    </codeSigning>
     <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u422-b05" />
   </application>
   <files>
@@ -1076,7 +1090,6 @@ return console.askYesNo(message, true);
       </exclude>
       <jreBundle jreBundleSource="generated" />
     </unixInstaller>
-
     <windows name="Windows 64" id="580" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true">
       <excludedComponents>
         <component id="909" />
