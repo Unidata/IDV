@@ -21,6 +21,8 @@
         <entry>javafx-*</entry>
         <entry>jython*</entry>
         <entry>ncIdv*</entry>
+        <entry>j3d.zip</entry>
+        <entry>jogamp-all-2.5.0.jar</entry>
       </macSearchedJars>
     </codeSigning>
     <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u422-b05" />
