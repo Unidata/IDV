@@ -1025,57 +1025,6 @@ return console.askYesNo(message, true);
     </styles>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Linux 32" id="3" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux-i386_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
-      <excludedComponents>
-        <component id="909" />
-      </excludedComponents>
-      <excludedLaunchers>
-        <launcher id="7" />
-        <launcher id="4" />
-        <launcher id="9" />
-        <launcher id="49" />
-      </excludedLaunchers>
-      <excludedBeans>
-        <bean refId="1451" />
-        <bean refId="707" />
-        <bean refId="1019" />
-        <bean refId="1035" />
-        <bean refId="1281" />
-        <bean refId="1503" />
-        <bean refId="1505" />
-      </excludedBeans>
-      <exclude>
-        <entry location="runIDV.bat" />
-        <entry location="simpleIDV.bat" />
-        <entry filesetId="835" />
-      </exclude>
-      <jreBundle jreBundleSource="generated" />
-    </unixInstaller>
-    <unixInstaller name="Linux 64" id="117" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_linux64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
-      <excludedComponents>
-        <component id="909" />
-      </excludedComponents>
-      <excludedLaunchers>
-        <launcher id="7" />
-        <launcher id="4" />
-        <launcher id="9" />
-        <launcher id="49" />
-      </excludedLaunchers>
-      <excludedBeans>
-        <bean refId="1451" />
-        <bean refId="707" />
-        <bean refId="1019" />
-        <bean refId="1035" />
-        <bean refId="1281" />
-        <bean refId="1503" />
-        <bean refId="1505" />
-      </excludedBeans>
-      <exclude>
-        <entry location="runIDV.bat" />
-        <entry filesetId="835" />
-      </exclude>
-      <jreBundle jreBundleSource="generated" />
-    </unixInstaller>
     <windows name="Windows 64" id="580" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true">
       <excludedComponents>
         <component id="909" />
@@ -1114,58 +1063,6 @@ return console.askYesNo(message, true);
       </exclude>
       <jreBundle jreBundleSource="generated" />
     </macosFolder>
-    <unixInstaller name="Solaris 32/64" id="56" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_solaris-x86_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
-      <excludedComponents>
-        <component id="909" />
-      </excludedComponents>
-      <excludedLaunchers>
-        <launcher id="7" />
-        <launcher id="4" />
-        <launcher id="9" />
-        <launcher id="49" />
-      </excludedLaunchers>
-      <excludedBeans>
-        <bean refId="1451" />
-        <bean refId="704" />
-        <bean refId="706" />
-        <bean refId="707" />
-        <bean refId="1512" />
-        <bean refId="1019" />
-        <bean refId="1035" />
-        <bean refId="1281" />
-        <bean refId="1412" />
-      </excludedBeans>
-      <exclude>
-        <entry location="runIDV.bat" />
-        <entry filesetId="835" />
-      </exclude>
-      <jreBundle jreBundleSource="generated" platform="solaris-amd64" />
-    </unixInstaller>
-    <unixInstaller name="Generic Unix (no JVM)" id="59" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_${compiler:NOJRE}_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" customInstallBaseDir="~">
-      <excludedComponents>
-        <component id="909" />
-      </excludedComponents>
-      <excludedLaunchers>
-        <launcher id="7" />
-        <launcher id="4" />
-        <launcher id="9" />
-        <launcher id="49" />
-      </excludedLaunchers>
-      <excludedBeans>
-        <bean refId="1451" />
-        <bean refId="707" />
-        <bean refId="1512" />
-        <bean refId="1019" />
-        <bean refId="1035" />
-        <bean refId="1281" />
-        <bean refId="1412" />
-      </excludedBeans>
-      <exclude>
-        <entry location="runIDV.bat" />
-        <entry location="simpleIDV.bat" />
-        <entry filesetId="835" />
-      </exclude>
-    </unixInstaller>
   </mediaSets>
   <buildIds>
     <mediaSet refId="12" />
