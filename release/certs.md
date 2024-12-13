@@ -359,7 +359,7 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
 
 -   Background
 
-    On MacOS, Apple now requires DMGs to be "notarized". This process involves XCode tools (so you'll need to install that on MacOS), therefore this step cannot be done automatically as part of the regular IDV build process. Moreover, the current IDV build is closely tied to the hardware it is running on. As a result, notarization will just have to be a "one-off" performed on MacOS at IDV release time. Note the DMG will need to already be signed by the regular build process, so this will be the last step before the release. You'll need a Apple Developer ID. Contact CISL Help Desk to have your Apple ID be part of the UCAR Apple developer organization. Beyond that, here are the steps required to notarize the IDV.
+    On MacOS, Apple now requires `.dmg` files to be "notarized". This process involves XCode tools (so you'll need to install that on MacOS), therefore this step cannot be done automatically as part of the regular IDV build process. Moreover, the current IDV build is closely tied to the hardware it is running on. As a result, notarization will just have to be a "one-off" performed on MacOS at IDV release time. Note the `.dmg` will need to already be signed by the regular build process, so this will be the last step before the release. You'll need a Apple Developer ID. Contact CISL Help Desk to have your Apple ID be part of the UCAR Apple developer organization. Beyond that, here are the steps required to notarize the IDV.
 
 -   Preparation
 
@@ -369,96 +369,53 @@ Examine the contents of the output (e.g., `codesign0` )for signature expiration 
         scp user@web:/web/content/downloads/idv/current/ftp/\*.dmg .
         ```
 
-    -   Primary Bundle ID
+    -   app-specific Password and Team ID
 
-        Open the DMG you just fetched. This step will mount it into `/Volumes/idv`. Obtain the `primary-bundle-id` from `/Volumes/idv/Integrated\ Data\ Viewer\ Installer.app/Contents/Info.plist`, `CFBundleIdentifier` element. (I actually do not know if an accurate `primary-bundle-id` matters, but this is what I did and it worked.)
+        Obtain an app-specific password and the Team ID at <https://appleid.apple.com/> (see under the security section).
 
-    -   app-specific Password
+-   Upload `.dmg` to Notarization Server
 
-        Obtain an app-specific password at <https://appleid.apple.com/> (see under the security section).
-
--   Upload DMG to Notarization Server
-
-    At this point, you are ready to upload the DMG to Apple for a notarization attempt.
+    At this point, you are ready to upload the `.dmg` to Apple for a notarization attempt.
 
     ```shell
-    xcrun altool --notarize-app --primary-bundle-id <bundle ID> --file <idv>.dmg \
-          -u <email> -p <app-specific password>
+    xcrun notarytool submit <idv>.dmg --apple-id <email> --team-id <team id> \
+          --password <app-specific password> --wait
     ```
 
-    If this command was successful, you will get a message with a `RequestUUID` that looks something like this:
+    You have to wait for a bit while the `.dmg` gets uploaded and is scanned by Apple. If there was a problem, you can examine the log with the command below. The log ID will be provided by the last command, if there is a failure.
 
     ```shell
-    No errors uploading '/tmp/idv_5_7u1_macos_installer.dmg'.
-    RequestUUID = e8d76646-d018-468d-bb0f
+    xcrun notarytool log <log id> --apple-id <email> --team-id <team id> \
+          --password <app-specific password>
     ```
 
-    If the upload attempt was not successful, you will get a lengthy error log with some obscure error codes. In that case, just try again. Sometimes, you'll have to try a few times before it works. Hopefully, after a few minutes you will get an email saying "Your Mac software was successfully notarized".
+-   Common Problems
 
-    -   Notarization Failures
+    You may encounter errors related to unsigned files (e.g., `*.jnilib`, `*.dylib`) within `.jar` files (e.g., `jogamp-all-2.5.0.jar` found inside `j3d.zip`, or `jython.jar`). Evidently, install4j does not handle this situation. In that case, you can remove (expired, bogus) signatures (via unpacking, fixing and repacking the jars with `jar xf <jar file>` and `jar cf <jar file> *`) with:
 
-        After upload to Apple, if there are notarization failures you will see an email from Apple Developer titled "Your Mac software was not notarized". In this case you will have to access the notarization failure with:
+    ```shell
+    find . -regex '.*\.\(jnilib\|dylib\)$' | xargs codesign --remove-signature
+    ```
 
-        ```shell
-        xcrun altool --notarization-info <RequestUUID> -u <email> -p \
-              <app-specific password>
-        ```
+    You can add a valid signature by first importing the `mac.p12` file into your MacOS key chain:
 
-        This command will return a message that contains a URL where you can find the error log. **Note** notarization failures are considered by Apple as "upload" failures. This language is somewhat confusing since the DMG may have uploaded to Apple without problems, but when the notarization process fails, it is **still** considered an "upload" failure.
+    ```shell
+    security import mac.p12 -k ~/Library/Keychains/login.keychain-db
+    ```
 
-    -   Common Problems
+    and then:
 
-        The most common problem you may encounter is 32-bit code which the notarization process will reject:
+    ```shell
+    find . -regex '.*\.\(jnilib\|dylib\)$' | xargs codesign --sign "Developer ID Application: University Corporation for Atmospheric Research (<team id>)" --timestamp --options runtime
+    ```
 
-        ```yaml
-        {
-          "logFormatVersion": 1,
-          "jobId": "7c91ddea",
-          "status": "Invalid",
-          "statusSummary": "Archive contains critical validation errors",
-          "statusCode": 4000,
-          "archiveFilename": "idv_6_0_macos_installer.dmg",
-          "uploadDate": "2021-07-08T18:50:09Z",
-          "sha256": "e5d0afa",
-          "ticketContents": null,
-          "issues": [
-            {
-              "severity": "error",
-              "code": null,
-              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
-              "message": "The binary is not signed.",
-              "docUrl": null,
-              "architecture": "i386"
-            },
-            {
-              "severity": "error",
-              "code": null,
-              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
-              "message": "The signature does not include a secure timestamp.",
-              "docUrl": null,
-              "architecture": "i386"
-            },
-            {
-              "severity": "error",
-              "code": null,
-              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
-              "message": "The binary is not signed.",
-              "docUrl": null,
-              "architecture": "x86_64"
-            },
-            {
-              "severity": "error",
-              "code": null,
-              "path": "idv_6_0_macos_installer.dmg/Integrated Data Viewer Installer.app/Contents/Resources/app/67.dat/ncIdv.jar/com/sun/jna/darwin/libjnidispatch.jnilib",
-              "message": "The signature does not include a secure timestamp.",
-              "docUrl": null,
-              "architecture": "x86_64"
-            }
-          ]
-        }
-        ```
+    Hint: when trying to deal with all of this, it is easier just to run install4j directly than going through the IDV build. For example:
 
-        In this case, make sure you obtain an `ncIdv.jar` from the THREDDS group that does not contain 32-bit code when building the IDV.
+    ```shell
+    /share/install4j8.0.11/bin/install4jc ./installers/idv.install4j \
+        --release="6.3" -D SRCDIR=".." --mac-keystore-password="xxx" \
+        --win-keystore-password="xxx"
+    ```
 
 -   Stapling After Successful Notarization
 
