@@ -908,4 +908,82 @@ Print out the values of the sounding data</p>
 <meta name="jhid" value="printSoundings">
 <p><a name="printSoundings"></a><code class="command">printSoundings(d):</code><p style="padding:0;margin-left:20;margin-top:0">
 Print out the values of the set of sounding data</p>
+
+
+<h2> Module: ML Preprocessing</h2>
+A suite of tools for transforming raw datasets, making them suitable for applications like machine learning.
+<hr>
+   <p><a name="gridNormalizer"></a><code class="command">gridNormalizer(grid, user_norm):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Normalize samples individually to unit norm.
+   Each sample (i.e. each row of the data matrix) with at least one non zero component
+   is rescaled independently of other samples so that its norm (l1, l2 or inf) equals one. The default user_norm is set
+   to Max.</p>
+   <p><a name="gridRobustScaler"></a><code class="command">gridRobustScaler(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Rescale the grid values individually to a common range (user_min, user_max) linearly using statistics and
+   it is also known as min-max normalization
+   This Scaler removes the median and scales the data according to the quantile range
+   (defaults to IQR: Interquartile Range). The IQR is the range between the 1st quartile (25th quantile) and
+   the 3rd quartile (75th quantile).
+   However, outliers can often influence the sample mean/variance in a negative way. In such cases,
+   using the median and the interquartile range often give better results.</p>
+   <p><a name="gridMinMaxScaler"></a><code class="command">gridMinMaxScaler(grid,user_min,user_max):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Rescale the grid values individually to a common range (user_min, user_max) linearly using statistics and
+   it is also known as min-max normalization. It doesn’t reduce the effect of outliers, but it linearly scales
+   them down into a fixed range, where the largest occurring data point corresponds to the maximum value
+   and the smallest one corresponds to the minimum value.</p>
+   <p><a name="gridStandardScaler"></a><code class="command">gridStandardScaler(grid,user_mean=None,user_std=None):</code><p style="padding:0;margin-left:20;margin-top:0">
+   StandardScaler standardizes grid values by removing the mean and scaling to
+   variance using statistics on the samples to improve the performance and
+   convergence of machine learning models, particularly those sensitive to
+   feature scales. It is sensitive to outliers, and the features may scale
+   differently from each other in the presence of outliers.</p>
+   <p><a name="gridPowerTransform"></a><code class="command">gridPowerTransform(grid, user_lambda):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Power transforms are a family of parametric, monotonic transformations that are applied
+   to make data more Gaussian-like. This is useful for modeling issues related to
+   heteroscedasticity (non-constant variance), or other situations where normality is desired.
+   Currently, power_transform supports the Yeo-Johnson transform and Yeo-Johnson supports
+   both positive or negative data.</p>
+   <p><a name="gridQuantileTransform"></a><code class="command">gridQuantileTransform(grid):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Rescale the grid values individually to a common range (user_min, user_max) linearly using statistics and
+   it is also known as min-max normalization.</p>
+   <p><a name="gridPowerTransform"></a><code class="command">gridPowerTransform(grid, user_lambda):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Power transforms are a family of parametric, monotonic transformations that are applied
+   to make data more Gaussian-like. This is useful for modeling issues related to
+   heteroscedasticity (non-constant variance), or other situations where normality is desired.
+   Currently, power_transform supports the Yeo-Johnson transform and Yeo-Johnson supports
+   both positive or negative data.</p>
+
+
+   <p><a name="gridUniformDistribution"></a><code class="command">gridUniformDistribution(grid,user_min=None,user_max=None):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Returns a grid with values sampled from uniform distrubuition(
+   user_min,user_max). user_units can be change units of returned grid.
+   This also serves as a template code for creating grids sampled from
+   different distributions.</p>
+
+   <p><a name="medianFilter"></a><code class="command">medianFilter(grid, user_missingValue=None, window_lenx=10, window_leny=10):</code><p style="padding:0;margin-left:20;margin-top:0">
+   calculate median filter, need to replace the missingValue if it is not NaN.</p>
+   <p><a name="classifier"></a><code class="command">classifier(grid, classifierStr, outFileName):</code><p style="padding:0;margin-left:20;margin-top:0">
+   classifierStr is a string of a set of classifier info with format:
+   low1 high1 value1; low2 high2 value2; low3 high3 value3;....</p>
+
+   <p><a name="applyFunctionOverGrid2D-Average"></a><code class="command">applyFunctionOverGrid2D(grid, "average", "none"):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Apply spatial Average over 2D grid and return time series point data.</p>
+
+   <p><a name="applyFunctionOverGrid2D-Max"></a><code class="command">applyFunctionOverGrid2D(grid, "max", "none"):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Apply spatial Max over 2D grid and return time series point data.</p>
+
+   <p><a name="applyFunctionOverGrid2D-Min"></a><code class="command">applyFunctionOverGrid2D(grid, "min", "none"):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Apply spatial Min over 2D grid and return time series point data.</p>
+
+   <p><a name="applyFunctionOverGrid2D-Percentile"></a><code class="command">applyFunctionOverGrid2D(grid, "percentile", user_statThreshold):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Apply spatial Average over 2D grid and return time series point data.</p>
+
+   <p><a name="exportTimeSeriesToCSV"></a><code class="command">exportTimeSeriesToCSV(field,file\[type=file,isuser=true,label=csv File,filepattern=.csv:CSV Files\]):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Export Point Time Series to CSV.</p>
+
+   <p><a name="exportTimeSeriesToExcel"></a><code class="command">exportTimeSeriesToCSV(field,file\[type=file,isuser=true,label=Excel File,filepattern=.xls:Excel Files\]):</code><p style="padding:0;margin-left:20;margin-top:0">
+   Export Point Time Series to Excel.</p>
+
+
+
 [ug::foot]
