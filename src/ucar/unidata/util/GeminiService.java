@@ -25,12 +25,20 @@ public class GeminiService {
     }
 
     public GeminiResponse generateContent(GeminiRequest request, String model) throws IOException {
+        return generateContent(request,model,null);
+    }
+
+    public GeminiResponse generateContent(GeminiRequest request, String model, String systemInstruction) throws IOException {
         URL url = new URL(baseUrl + model + ":generateContent?key=" + apiKey);
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
         con.setDoOutput(true);
+
+        if(systemInstruction != null && !systemInstruction.isEmpty()) {
+            request.setContents(systemInstruction + "\n" + request.getContents());
+        }
 
         String requestBody = mapper.writeValueAsString(request);
 
@@ -57,6 +65,10 @@ public class GeminiService {
 
 
     public GeminiCountResponse countTokens(GeminiRequest request, String model) throws IOException {
+        return countTokens(request,model,null);
+    }
+
+    public GeminiCountResponse countTokens(GeminiRequest request, String model, String systemInstruction) throws IOException {
 
         URL url = new URL(baseUrl + model + ":countTokens?key=" + apiKey);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -64,6 +76,9 @@ public class GeminiService {
         con.setRequestProperty("Content-Type", "application/json");
         con.setDoOutput(true);
 
+        if(systemInstruction != null && !systemInstruction.isEmpty()) {
+            request.setContents(systemInstruction + "\n" + request.getContents());
+        }
         String requestBody = mapper.writeValueAsString(request);
 
         try (OutputStream os = con.getOutputStream()) {
@@ -87,6 +102,10 @@ public class GeminiService {
     }
 
     public GeminiResponse getCompletionWithImage(GeminiRequestWithImage request, String model) throws IOException {
+        return getCompletionWithImage(request,model, null);
+    }
+
+    public GeminiResponse getCompletionWithImage(GeminiRequestWithImage request, String model, String systemInstruction) throws IOException {
         // construct URL
         URL url = new URL(baseUrl + model + ":generateContent?key=" + apiKey);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -95,6 +114,9 @@ public class GeminiService {
         con.setDoOutput(true);
 
         //Convert request into JSON
+        if(systemInstruction != null && !systemInstruction.isEmpty()) {
+            request.setTextPrompt(systemInstruction + "\n" + request.getTextPrompt());
+        }
         String requestBody = mapper.writeValueAsString(request);
         try (OutputStream os = con.getOutputStream()) {
             byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
@@ -179,7 +201,7 @@ public class GeminiService {
 
     }
 
-    public static void main1(String[] args) {
+    public static void testImage(String[] args) {
         String apiKey = "YOUR_API_KEY"; // Replace with your actual API key
         String baseUrl = "https://generative-ai.googleapis.com/v1beta/models/"; // Replace with the Gemini API base URL
         String modelName = "gemini-1.0-pro-vision"; // Make sure this model supports image input
