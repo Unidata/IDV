@@ -557,9 +557,9 @@ abstract public class DisplayMaster {
      *
      * @throws Throwable if an error occurs during finalization.
      */
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
+    //protected void finalize() throws Throwable {
+    //    super.finalize();
+    //}
 
 
     /**
