@@ -825,7 +825,7 @@ public class AnimationPropertiesDialog extends JDialog implements ActionListener
         if (t.length() == 0) {
             return 0.0;
         }
-        return new Double(t).doubleValue();
+        return Double.parseDouble(t);
     }
 
 
