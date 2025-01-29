@@ -964,10 +964,10 @@ abstract public class DisplayMaster {
             throws VisADException, RemoteException {
 
         GraphicsModeControl gmc          = display.getGraphicsModeControl();
-        Boolean             oldPointMode = new Boolean(gmc.getPointMode());
+        Boolean             oldPointMode = Boolean.valueOf(gmc.getPointMode());
 
         gmc.setPointMode(usePoints);
-        firePropertyChange(POINT_MODE, oldPointMode, new Boolean(usePoints));
+        firePropertyChange(POINT_MODE, oldPointMode, Boolean.valueOf(usePoints));
     }
 
     /**
