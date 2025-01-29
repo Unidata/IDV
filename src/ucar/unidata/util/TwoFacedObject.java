@@ -71,7 +71,7 @@ public class TwoFacedObject implements Comparable {
      * @param id id
      */
     public TwoFacedObject(Object label, int id) {
-        this(label, new Integer(id));
+        this(label, Integer.valueOf(id));
     }
 
     /**
