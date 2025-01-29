@@ -232,7 +232,7 @@ public class BooleanProperty {
      * @throws Exception
      */
     public void setValueInner(boolean newValue) throws Exception {
-        value                       = new Boolean(newValue);
+        value                       = Boolean.valueOf(newValue);
         okToPropagatePropertyChange = false;
         for (int i = 0; i < menuItems.size(); i++) {
             ((JCheckBoxMenuItem) menuItems.get(i)).setSelected(newValue);
