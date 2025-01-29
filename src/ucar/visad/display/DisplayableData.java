@@ -308,7 +308,7 @@ public class DisplayableData extends Displayable {
         if (this.manipulable != manipulable) {
             Boolean oldValue;
             synchronized (this) {
-                oldValue         = new Boolean(this.manipulable);
+                oldValue         = Boolean.valueOf(this.manipulable);
                 this.manipulable = manipulable;
                 if (renderer != null) {
                     removeDataReferences();
@@ -317,7 +317,7 @@ public class DisplayableData extends Displayable {
             }
 
             firePropertyChange(MANIPULABLE, oldValue,
-                               new Boolean(this.manipulable));
+                               Boolean.valueOf(this.manipulable));
         }
     }
 
@@ -344,7 +344,7 @@ public class DisplayableData extends Displayable {
 
         Boolean oldValue;
         synchronized (this) {
-            oldValue = new Boolean(getVisible());
+            oldValue = Boolean.valueOf(getVisible());
             super.setVisible(visible);
 
             if (renderer != null) {
@@ -352,7 +352,7 @@ public class DisplayableData extends Displayable {
             }
         }
 
-        firePropertyChange(VISIBLE, oldValue, new Boolean(getVisible()));
+        firePropertyChange(VISIBLE, oldValue, Boolean.valueOf(getVisible()));
     }
 
     /**
