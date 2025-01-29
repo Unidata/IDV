@@ -285,7 +285,7 @@ public class DateSelection {
         if (s == null) {
             return dflt;
         }
-        return new Double(s).doubleValue();
+        return Double.parseDouble(s);
     }
 
 
@@ -1213,17 +1213,17 @@ public class DateSelection {
         if (times != null) {
             hashCode ^= times.hashCode();
         }
-        return hashCode ^ new Double(this.startMode).hashCode()
-               ^ new Double(this.endMode).hashCode()
-               ^ new Double(this.startFixedTime).hashCode()
-               ^ new Double(this.endFixedTime).hashCode()
-               ^ new Double(this.startOffset).hashCode()
-               ^ new Double(this.endOffset).hashCode()
-               ^ new Double(this.skip).hashCode()
-               ^ new Double(this.postRange).hashCode()
-               ^ new Double(this.preRange).hashCode()
-               ^ new Double(this.interval).hashCode()
-               ^ new Double(this.roundTo).hashCode() ^ this.numTimesInRange
+        return hashCode ^ Double.valueOf(this.startMode).hashCode()
+               ^ Double.valueOf(this.endMode).hashCode()
+               ^ Double.valueOf(this.startFixedTime).hashCode()
+               ^ Double.valueOf(this.endFixedTime).hashCode()
+               ^ Double.valueOf(this.startOffset).hashCode()
+               ^ Double.valueOf(this.endOffset).hashCode()
+               ^ Double.valueOf(this.skip).hashCode()
+               ^ Double.valueOf(this.postRange).hashCode()
+               ^ Double.valueOf(this.preRange).hashCode()
+               ^ Double.valueOf(this.interval).hashCode()
+               ^ Double.valueOf(this.roundTo).hashCode() ^ this.numTimesInRange
                ^ this.count;
     }
 
