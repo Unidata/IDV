@@ -279,10 +279,10 @@ public class DateSelectionGui extends JPanel {
             dateSelection.setCount(DateSelection.MAX_COUNT);
         } else {
             dateSelection.setCount(
-                new Integer(countFld.getText().trim()).intValue());
+                Integer.parseInt(countFld.getText().trim()));
         }
         dateSelection.setSkip(
-            new Integer(skipFld.getText().trim()).intValue());
+            Integer.parseInt(skipFld.getText().trim()));
 
 
         if (interval != interval) {
