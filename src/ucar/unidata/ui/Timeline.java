@@ -1212,7 +1212,7 @@ public class Timeline extends JPanel implements MouseListener,
                     == currentInterval)
                     ? "-" + lbl + "-"
                     : " " + lbl + " "), this, "setInterval",
-                                        new Double(intervals[i])));
+                                        Double.valueOf(intervals[i])));
 
         }
 
@@ -1230,7 +1230,7 @@ public class Timeline extends JPanel implements MouseListener,
                 subItems.add(MenuUtil.makeMenuItem((isCurrent
                         ? "-" + lbl + "-"
                         : " " + lbl + " "), this, "setPreRange",
-                                            new Double(intervals[i])));
+                                            Double.valueOf(intervals[i])));
 
             }
             items.add(MenuUtil.makeMenu("Before Range", subItems));
@@ -1246,7 +1246,7 @@ public class Timeline extends JPanel implements MouseListener,
                 subItems.add(MenuUtil.makeMenuItem((isCurrent
                         ? "-" + lbl + "-"
                         : " " + lbl + " "), this, "setPostRange",
-                                            new Double(intervals[i])));
+                                            Double.valueOf(intervals[i])));
 
             }
             items.add(MenuUtil.makeMenu("After Range", subItems));
@@ -1265,7 +1265,7 @@ public class Timeline extends JPanel implements MouseListener,
             subItems.add(MenuUtil.makeMenuItem(((skips[i] == currentSkip)
                     ? "-" + skips[i] + "-"
                     : " " + skips[i] + " "), this, "setSkipFactor",
-                                             new Integer(skips[i])));
+                                             Integer.valueOf(skips[i])));
         }
         items.add(MenuUtil.makeMenu("Skip Factor", subItems));
 
@@ -1286,7 +1286,7 @@ public class Timeline extends JPanel implements MouseListener,
             }
             subItems.add(MenuUtil.makeMenuItem(((cnt == currentCount)
                     ? "-" + lbl + "-"
-                    : " " + lbl + " "), this, "setCount", new Integer(cnt)));
+                    : " " + lbl + " "), this, "setCount", Integer.valueOf(cnt)));
         }
         items.add(MenuUtil.makeMenu("Count", subItems));
 
