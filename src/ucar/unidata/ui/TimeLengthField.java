@@ -189,7 +189,7 @@ public class TimeLengthField {
         if (t.length() == 0) {
             return 0.0;
         }
-        return new Double(t).doubleValue();
+        return Double.parseDouble(t);
     }
 
 
@@ -259,8 +259,8 @@ public class TimeLengthField {
                 break;
             }
         }
-        changeListeners.firePropertyChange("time", new Double(oldTime),
-                                           new Double(time));
+        changeListeners.firePropertyChange("time", Double.valueOf(oldTime),
+                                           Double.valueOf(time));
         return true;
     }
 
