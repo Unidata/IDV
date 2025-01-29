@@ -741,7 +741,7 @@ public class AnimatedGifEncoder {
                 colorTab[k + 2] = (byte) m.getGreen(i);
             }
         }
-        m.finalize();
+        //m.finalize();
 
     }
 
