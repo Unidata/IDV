@@ -411,7 +411,7 @@ public abstract class XmlUtil {
         if (value == null) {
             return dflt;
         }
-        return new Boolean(value).booleanValue();
+        return Boolean.parseBoolean(value);
     }
 
 
@@ -668,7 +668,7 @@ public abstract class XmlUtil {
         Node n = attrs.getNamedItem(name);
         return ((n == null)
                 ? dflt
-                : new Integer(n.getNodeValue()).intValue());
+                : Integer.parseInt(n.getNodeValue()));
     }
 
     /**
@@ -688,7 +688,7 @@ public abstract class XmlUtil {
         Node n = attrs.getNamedItem(name);
         return ((n == null)
                 ? dflt
-                : new Float(n.getNodeValue()).floatValue());
+                : Float.parseFloat(n.getNodeValue()));
     }
 
     /**
@@ -708,7 +708,7 @@ public abstract class XmlUtil {
         Node n = attrs.getNamedItem(name);
         return ((n == null)
                 ? dflt
-                : new Double(n.getNodeValue()).doubleValue());
+                : Double.parseDouble(n.getNodeValue()));
     }
 
     /**
@@ -728,7 +728,7 @@ public abstract class XmlUtil {
         Node n = attrs.getNamedItem(name);
         return ((n == null)
                 ? dflt
-                : new Boolean(n.getNodeValue()).booleanValue());
+                : Boolean.parseBoolean(n.getNodeValue()));
     }
 
     /**
@@ -1723,7 +1723,7 @@ public abstract class XmlUtil {
         if (text.length() == 0) {
             return dflt;
         }
-        return new Double(text).doubleValue();
+        return Double.parseDouble(text);
     }
 
 
