@@ -440,7 +440,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
                 } else if ((code == KeyEvent.VK_P) && e.isControlDown()) {
                     actionPerformed(CMD_PROPS);
                 } else if (Character.isDigit(c)) {
-                    int step = new Integer("" + c).intValue() - 1;
+                    int step = Integer.parseInt("" + c) - 1;
                     if (step < 0) {
                         step = 0;
                     }
@@ -834,7 +834,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
             anime.setAnimating(state);
         }
         if ( !state) {
-            doShare(CMD_STARTSTOP, new Boolean(state));
+            doShare(CMD_STARTSTOP, Boolean.valueOf(state));
         }
         shareValue();
         updateRunButton();
@@ -875,7 +875,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * Share the index of the animation step.
      */
     protected void shareIndex() {
-        doShare(SHARE_INDEX, new Integer(anime.getCurrent()));
+        doShare(SHARE_INDEX, Integer.valueOf(anime.getCurrent()));
     }
 
 
