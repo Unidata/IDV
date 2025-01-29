@@ -6065,15 +6065,15 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (checkFlag(FLAG_LINEWIDTH)) {
-            dsd.addPropertyValue(new Integer(lineWidth), "lineWidth",
+            dsd.addPropertyValue(Integer.valueOf(lineWidth), "lineWidth",
                                  "Line Width", SETTINGS_GROUP_DISPLAY);
         }
         if (checkFlag(FLAG_SKIPFACTOR)) {
-            dsd.addPropertyValue(new Integer(skipValue), "skipValue",
+            dsd.addPropertyValue(Integer.valueOf(skipValue), "skipValue",
                                  "Skip Value", SETTINGS_GROUP_DISPLAY);
         }
         if (checkFlag(FLAG_ZPOSITION) && useZPosition()) {
-            dsd.addPropertyValue(new Double(getZPosition()), "zPosition",
+            dsd.addPropertyValue(Double.valueOf(getZPosition()), "zPosition",
                                  "Vertical Position", SETTINGS_GROUP_DISPLAY);
         }
         if (checkFlag(FLAG_COLOR) && (color != null)) {
@@ -6082,48 +6082,48 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         }
 
         if (checkFlag(FLAG_TEXTUREQUALITY)) {
-            dsd.addPropertyValue(new Integer(textureQuality),
+            dsd.addPropertyValue(Integer.valueOf(textureQuality),
                                  "textureQuality", getTextureQualityLabel(),
                                  SETTINGS_GROUP_DISPLAY);
         }
         if (checkFlag(FLAG_SMOOTHING)) {
             dsd.addPropertyValue(getSmoothingType(), "smoothingType",
                                  "Smoothing Type", SETTINGS_GROUP_DISPLAY);
-            dsd.addPropertyValue(new Integer(getSmoothingFactor()),
+            dsd.addPropertyValue(Integer.valueOf(getSmoothingFactor()),
                                  "smoothingFactor", "Smoothing Factor",
                                  SETTINGS_GROUP_DISPLAY);
         }
 
-        dsd.addPropertyValue(new Boolean(getDisplayVisibility()),
+        dsd.addPropertyValue(Boolean.valueOf(getDisplayVisibility()),
                              "displayVisibility", "Visibility",
                              SETTINGS_GROUP_FLAGS);
-        dsd.addPropertyValue(new Boolean(getLockVisibilityToggle()),
+        dsd.addPropertyValue(Boolean.valueOf(getLockVisibilityToggle()),
                              "lockVisibilityToggle",
                              "Lock Visibility Toggle", SETTINGS_GROUP_FLAGS);
-        dsd.addPropertyValue(new Boolean(getShowInDisplayList()),
+        dsd.addPropertyValue(Boolean.valueOf(getShowInDisplayList()),
                              "showInDisplayList", "Show In Display List",
                              SETTINGS_GROUP_FLAGS);
-        dsd.addPropertyValue(new Boolean(getUseFastRendering()),
+        dsd.addPropertyValue(Boolean.valueOf(getUseFastRendering()),
                              "useFastRendering", "Use Fast Rendering",
                              SETTINGS_GROUP_FLAGS);
-        dsd.addPropertyValue(new Boolean(getUseTimesInAnimation()),
+        dsd.addPropertyValue(Boolean.valueOf(getUseTimesInAnimation()),
                              "useTimesInAnimation", "Use Times In Animation",
                              SETTINGS_GROUP_FLAGS);
 
-        dsd.addPropertyValue(new Boolean(getDoCursorReadout()),
+        dsd.addPropertyValue(Boolean.valueOf(getDoCursorReadout()),
                              "doCursorReadout", "Include In Cursor Readout",
                              SETTINGS_GROUP_FLAGS);
-        dsd.addPropertyValue(new Boolean(getCanDoRemoveAll()),
+        dsd.addPropertyValue(Boolean.valueOf(getCanDoRemoveAll()),
                              "canDoRemoveAll", "Remove on Remove All",
                              SETTINGS_GROUP_FLAGS);
-        dsd.addPropertyValue(new Boolean(getShowNoteText()), "showNoteText",
+        dsd.addPropertyValue(Boolean.valueOf(getShowNoteText()), "showNoteText",
                              "Show Note Text", SETTINGS_GROUP_FLAGS);
         if (getIdv().getUseTimeDriver()) {
-            dsd.addPropertyValue(new Boolean(getIsTimeDriver()),
+            dsd.addPropertyValue(Boolean.valueOf(getIsTimeDriver()),
                                  "isTimeDriver",
                                  "Drive Times with this Display",
                                  SETTINGS_GROUP_FLAGS);
-            dsd.addPropertyValue(new Boolean(getUsesTimeDriver()),
+            dsd.addPropertyValue(Boolean.valueOf(getUsesTimeDriver()),
                                  "usesTimeDriver", "Use Time Driver Times",
                                  SETTINGS_GROUP_FLAGS);
         }
@@ -6343,7 +6343,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
                 Method theMethod = Misc.findMethod(getClass(), key,
                                        new Class[] { Boolean.TYPE });
 
-                theMethod.invoke(this, new Object[] { new Boolean(flag) });
+                theMethod.invoke(this, new Object[] { Boolean.valueOf(flag) });
             }
         } catch (Exception exc) {
             throw new IllegalArgumentException("Error:" + exc);
@@ -7828,9 +7828,9 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
             textureSlider = GuiUtils.makeSlider(1, 21, textureQuality, this,
                     "setTextureQuality");
             Hashtable labels = new Hashtable();
-            labels.put(new Integer(1), GuiUtils.lLabel("High"));
-            labels.put(new Integer(10), GuiUtils.cLabel("Medium"));
-            labels.put(new Integer(21), GuiUtils.rLabel("Low"));
+            labels.put(Integer.valueOf(1), GuiUtils.lLabel("High"));
+            labels.put(Integer.valueOf(10), GuiUtils.cLabel("Medium"));
+            labels.put(Integer.valueOf(21), GuiUtils.rLabel("Low"));
             textureSlider.setLabelTable(labels);
             textureSlider.setPaintLabels(true);
         }
@@ -12212,7 +12212,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
         skipValue = value;
         if (getHaveInitialized()) {
             applySkipFactor();
-            doShare(SHARE_SKIPVALUE, new Integer(skipValue));
+            doShare(SHARE_SKIPVALUE, Integer.valueOf(skipValue));
         }
     }
 
