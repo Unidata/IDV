@@ -140,7 +140,7 @@ public class Converter {
             int    col        = 0;
             String state      = cols.get(col++);
             String region     = cols.get(col++);
-            double population = new Double(cols.get(col++)).doubleValue();
+            double population = Double.parseDouble(cols.get(col++));
             //      System.err.println ("line:"+i);
             LatLonPoint llp = GeoUtils.getLocationFromAddress(region + ","
                                   + state + "," + country, null);
@@ -164,7 +164,7 @@ public class Converter {
                 if (value.trim().length() == 0) {
                     value = "-9999.9";
                 }
-                System.out.println(new Double(value).doubleValue());
+                System.out.println(Double.parseDouble(value));
             }
         }
     }
