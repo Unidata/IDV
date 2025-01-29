@@ -419,32 +419,32 @@ public class ContourInfo {
                 String name  = subToks.get(0).toString().trim();
                 String value = subToks.get(1).toString().trim();
                 if (name.equals("interval")) {
-                    interval = new Float(value).floatValue();
+                    interval = Float.parseFloat(value);
                 } else if(name.equals("levels")) {
                     value = value.replaceAll(",",";");
                     setLevelsString(value);
                 } else if (name.equals("min")) {
-                    min = new Float(value).floatValue();
+                    min = Float.parseFloat(value);
                 } else if (name.equals("max")) {
-                    max = new Float(value).floatValue();
+                    max = Float.parseFloat(value);
                 } else if (name.equals("base")) {
-                    base = new Float(value).floatValue();
+                    base = Float.parseFloat(value);
                 } else if (name.equals("dashed")) {
-                    dashOn = new Boolean(value).booleanValue();
+                    dashOn = Boolean.parseBoolean(value);
                 } else if (name.equals("width")) {
-                    lineWidth = new Integer(value).intValue();
+                    lineWidth = Integer.parseInt(value);
                 } else if (name.equals("labels")) {
-                    isLabeled = new Boolean(value).booleanValue();
+                    isLabeled = Boolean.parseBoolean(value);
                 } else if (name.equals("labelsize")) {
-                    labelSize = new Integer(value).intValue();
+                    labelSize = Integer.parseInt(value);
                 } else if (name.equals("labelfreq")) {
-                    labelFreq = new Integer(value).intValue();
+                    labelFreq = Integer.parseInt(value);
                 } else if (name.equals("labellineskip")) {
-                    labelLineSkip = new Integer(value).intValue();
+                    labelLineSkip = Integer.parseInt(value);
                 } else if (name.equals("font")) {
                     //TODO: what should go here?
                 } else if (name.equals("align")) {
-                    alignLabels = new Boolean(value).booleanValue();
+                    alignLabels = Boolean.parseBoolean(value);
                 } else {
                     throw new IllegalArgumentException(
                         "Unknown ContourInfo parameter:" + name);
@@ -457,10 +457,10 @@ public class ContourInfo {
                     "Bad ContourInfo parameters:" + params
                     + "\n Needs to be of the form interval;base;min;max");
             }
-            interval = new Float(toks.get(0).toString()).floatValue();
-            base     = new Float(toks.get(1).toString()).floatValue();
-            min      = new Float(toks.get(2).toString()).floatValue();
-            max      = new Float(toks.get(3).toString()).floatValue();
+            interval = Float.parseFloat(toks.get(0).toString());
+            base     = Float.parseFloat(toks.get(1).toString());
+            min      = Float.parseFloat(toks.get(2).toString());
+            max      = Float.parseFloat(toks.get(3).toString());
         }
     }
 
