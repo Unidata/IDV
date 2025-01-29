@@ -316,9 +316,9 @@ public class MenuUtil {
                     } else {
                         theMethod.invoke(object, ((arg == null)
                                 ? new Object[] {
-                                    new Boolean(cbx.isSelected()) }
+                                    Boolean.valueOf(cbx.isSelected()) }
                                 : new Object[] {
-                                    new Boolean(cbx.isSelected()),
+                                    Boolean.valueOf(cbx.isSelected()),
                                     arg }));
                     }
                 } catch (Exception exc) {
