@@ -526,9 +526,9 @@ public class StateManager extends IdvManager {
             for (int i = 0; i < cds.size(); i++) {
                 ControlDescriptor cd = (ControlDescriptor) cds.get(i);
                 if (oldControlMap.get(cd.getControlId()) != null) {
-                    newControlMap.put(cd.getControlId(), new Boolean(true));
+                    newControlMap.put(cd.getControlId(), Boolean.valueOf(true));
                 } else {
-                    newControlMap.put(cd.getControlId(), new Boolean(false));
+                    newControlMap.put(cd.getControlId(), Boolean.valueOf(false));
                 }
             }
             getStore().put(PROP_CONTROLDESCRIPTORS, newControlMap);
@@ -551,9 +551,9 @@ public class StateManager extends IdvManager {
             (String) getProperty(IdvObjectStore.PROP_TMPDIR));
 
         FileManager.setFileHidingEnabled(
-             !new Boolean(
+             !Boolean.parseBoolean(
                  getPreferenceOrProperty(
-                     PREF_SHOWHIDDENFILES, "false")).booleanValue());
+                     PREF_SHOWHIDDENFILES, "false")));
 
     }
 
@@ -564,9 +564,9 @@ public class StateManager extends IdvManager {
      */
     protected void applyPreferences() {
         FileManager.setFileHidingEnabled(
-             !new Boolean(
+             !Boolean.parseBoolean(
                  getPreferenceOrProperty(
-                     PREF_SHOWHIDDENFILES, "false")).booleanValue());
+                     PREF_SHOWHIDDENFILES, "false")));
     }
 
     /**
@@ -648,7 +648,7 @@ public class StateManager extends IdvManager {
     public boolean getProperty(String name, boolean dflt) {
         String v = (String) getProperty(name);
         if (v != null) {
-            return new Boolean(v.trim()).booleanValue();
+            return Boolean.parseBoolean(v.trim());
         }
         return dflt;
     }
@@ -665,7 +665,7 @@ public class StateManager extends IdvManager {
     public int getProperty(String name, int dflt) {
         String v = (String) getProperty(name);
         if (v != null) {
-            return new Integer(v.trim()).intValue();
+            return Integer.parseInt(v.trim());
         }
         return dflt;
     }
@@ -681,7 +681,7 @@ public class StateManager extends IdvManager {
     public double getProperty(String name, double dflt) {
         String v = (String) getProperty(name);
         if (v != null) {
-            return new Double(v.trim()).doubleValue();
+            return Double.parseDouble(v.trim());
         }
         return dflt;
     }
@@ -1065,7 +1065,7 @@ public class StateManager extends IdvManager {
     public double getPreferenceOrProperty(String pref, double dflt) {
         Object o = getPreferenceOrProperty(pref);
         if (o != null && !o.toString().isEmpty()) {
-            return new Double(o.toString()).doubleValue();
+            return Double.parseDouble(o.toString());
         }
         return dflt;
     }
@@ -1083,7 +1083,7 @@ public class StateManager extends IdvManager {
     public boolean getPreferenceOrProperty(String pref, boolean dflt) {
         Object o = getPreferenceOrProperty(pref);
         if (o != null && !o.toString().isEmpty()) {
-            return new Boolean(o.toString()).booleanValue();
+            return Boolean.parseBoolean(o.toString());
         }
         return dflt;
     }
@@ -1219,8 +1219,8 @@ public class StateManager extends IdvManager {
      * @return number version
      */
     public double getNumberVersion() {
-        return new Double(getVersionMajor()).doubleValue()
-               + new Double(getVersionMinor()).doubleValue() * 0.1;
+        return Double.parseDouble(getVersionMajor())
+               + Double.parseDouble(getVersionMinor()) * 0.1;
     }
 
     /**
