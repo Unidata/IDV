@@ -3322,7 +3322,7 @@ public class ImageGenerator extends IdvManager {
                 List times = new ArrayList();
                 for (String tok :
                         StringUtil.split(timeString, ",", true, true)) {
-                    times.add(Integer.parseInt(tok));
+                    times.add(Integer.valueOf(Integer.parseInt(tok)));
                 }
                 dataSelection.setTimes(times);
             }
