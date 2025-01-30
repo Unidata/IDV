@@ -136,7 +136,7 @@ public class Client {
         List l = StringUtil.split(hostname, ":");
         if (l.size() > 1) {
             hostname = (String) l.get(0);
-            port     = new Integer((String) l.get(1)).intValue();
+            port     = Integer.parseInt((String) l.get(1));
         } else {
             port = thePort;
         }
