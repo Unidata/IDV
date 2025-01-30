@@ -437,7 +437,7 @@ public class DataManager {
                                                       && dh.startsWith("0")) {
                                                   dh = dh.substring(1);
                                               }
-                                              double hours = new Double(dh);
+                                              double hours = Double.parseDouble(dh);
                                               String HH    = "" + (int) hours;
                                               String mm =
                                                   "" + (int) (60
@@ -1312,7 +1312,7 @@ public class DataManager {
             name = "#0";
         }
         if (name.startsWith("#")) {
-            int index = new Integer(name.substring(1).trim()).intValue();
+            int index = Integer.parseInt(name.substring(1).trim());
             if ((index >= 0) && (index < dataSources.size())) {
                 return dataSources.get(index);
             }
@@ -1802,7 +1802,7 @@ public class DataManager {
         if (v == null) {
             return dflt;
         }
-        return new Boolean(v).booleanValue();
+        return Boolean.parseBoolean(v);
     }
 
     /**
