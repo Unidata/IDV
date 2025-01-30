@@ -1157,7 +1157,7 @@ public class XmlUi implements ActionListener, ItemListener {
         if (v == null) {
             return dflt;
         }
-        return new Boolean(v).booleanValue();
+        return Boolean.parseBoolean(v);
     }
 
 
@@ -1335,12 +1335,12 @@ public class XmlUi implements ActionListener, ItemListener {
             if (fontSizeStr != null) {
                 if (fontSizeStr.startsWith("+")) {
                     fontSize +=
-                        new Integer(fontSizeStr.substring(1)).intValue();
+                        Integer.parseInt(fontSizeStr.substring(1));
                 } else if (fontSizeStr.startsWith("-")) {
                     fontSize -=
-                        new Integer(fontSizeStr.substring(1)).intValue();
+                        Integer.parseInt(fontSizeStr.substring(1));
                 } else {
-                    fontSize = new Integer(fontSizeStr).intValue();
+                    fontSize = Integer.parseInt(fontSizeStr);
                 }
             }
             if (fontStyleStr != null) {
@@ -1685,7 +1685,7 @@ public class XmlUi implements ActionListener, ItemListener {
         if (ht == null) {
             ht = new Hashtable();
         }
-        ht.put(o, new Integer(value));
+        ht.put(o, Integer.valueOf(value));
         return ht;
     }
 
