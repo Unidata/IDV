@@ -327,7 +327,7 @@ public class PluginManager extends IdvManager {
                     GuiUtils.makeImageButton("/auxdata/ui/icons/Save16.gif",
                                              this, "viewPluginFile",
                                              new Object[] { jarFile,
-                        entry, new Boolean(true) });
+                        entry, Boolean.valueOf(true) });
                 exportBtn.setToolTipText("Export this file");
 
                 Insets     btnInsets = new Insets(1, 1, 1, 5);
@@ -1218,7 +1218,7 @@ public class PluginManager extends IdvManager {
                                        + ".propwidth");
                     if (width != null) {
                         pi.widget = new JTextField(text,
-                                new Integer(width.trim()).intValue());
+                                Integer.parseInt(width.trim()));
                         ((JTextField) pi.widget).setCaretPosition(0);
                         pi.outerWidget = GuiUtils.left(pi.widget);
                     } else {
@@ -2077,7 +2077,7 @@ public class PluginManager extends IdvManager {
                     String versionStr = XmlUtil.getAttribute(pluginNode,
                                             ATTR_VERSION, "" + version);
                     try {
-                        plugin.version = new Double(versionStr).doubleValue();
+                        plugin.version = Double.parseDouble(versionStr);
                     } catch (NumberFormatException nfe) {
                         plugin.version = version;
                     }
@@ -2360,7 +2360,7 @@ public class PluginManager extends IdvManager {
         if (show == null) {
             show = Boolean.FALSE;
         } else {
-            show = new Boolean( !show.booleanValue());
+            show = Boolean.valueOf( !show.booleanValue());
         }
         categoryToggle.put(category, show);
         updatePlugins(false);
@@ -2426,7 +2426,7 @@ public class PluginManager extends IdvManager {
                 + "');\"><img alt='Import Plugin into Plugin Creator' src=\"idvresource:/auxdata/ui/icons/DocumentOpen16.png\" border=\"0\"></a>";
             String sizeString = "";
             if (plugin.size != null) {
-                int s = new Integer(plugin.size).intValue();
+                int s = Integer.parseInt(plugin.size);
                 sizeString = "&nbsp;" + HtmlUtil.b((s / 1000) + "KB");
             }
 
@@ -2508,7 +2508,7 @@ public class PluginManager extends IdvManager {
             StringBuffer catBuff  = (StringBuffer) catBuffs.get(category);
             Boolean      show     = (Boolean) categoryToggle.get(category);
             if (show == null) {
-                show = new Boolean(false);
+                show = Boolean.valueOf(false);
                 categoryToggle.put(category, show);
             }
             String toggleHref =
