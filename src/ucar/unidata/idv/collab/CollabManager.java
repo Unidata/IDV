@@ -395,7 +395,7 @@ public class CollabManager extends IdvManager implements SharableListener {
         if (portFld != null) {
             String s = portFld.getText().trim();
             try {
-                port = new Integer(s).intValue();
+                port = Integer.parseInt(s);
             } catch (NumberFormatException nfe) {
                 LogUtil.userMessage("Invalid format:" + s);
             }
