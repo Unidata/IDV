@@ -307,7 +307,7 @@ public class StationLocationMap extends JPanel {
                 }
                 JPopupMenu popup = new JPopupMenu();
                 JMenuItem  mi    = new JMenuItem("Select All");
-                mi.setAccelerator(KeyStroke.getKeyStroke(new Character('A'),
+                mi.setAccelerator(KeyStroke.getKeyStroke(Character.valueOf('A'),
                         InputEvent.CTRL_MASK));
                 mi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
