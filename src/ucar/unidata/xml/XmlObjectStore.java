@@ -476,7 +476,7 @@ public class XmlObjectStore implements PersistentStore {
      *  @param value The value to store.
      */
     public void put(String key, boolean value) {
-        put(key, new Boolean(value));
+        put(key, Boolean.valueOf(value));
     }
 
     /**
@@ -485,7 +485,7 @@ public class XmlObjectStore implements PersistentStore {
      *  @param value The value to store.
      */
     public void put(String key, char value) {
-        put(key, new Character(value));
+        put(key, Character.valueOf(value));
     }
 
     /**
@@ -494,7 +494,7 @@ public class XmlObjectStore implements PersistentStore {
      *  @param value The value to store.
      */
     public void put(String key, short value) {
-        put(key, new Short(value));
+        put(key, Short.valueOf(value));
     }
 
     /**
@@ -503,7 +503,7 @@ public class XmlObjectStore implements PersistentStore {
      *  @param value The value to store.
      */
     public void put(String key, int value) {
-        put(key, new Integer(value));
+        put(key, Integer.valueOf(value));
     }
 
     /**
@@ -512,7 +512,7 @@ public class XmlObjectStore implements PersistentStore {
      *  @param value The value to store.
      */
     public void put(String key, float value) {
-        put(key, new Float(value));
+        put(key, Float.valueOf(value));
     }
 
     /**
@@ -521,7 +521,7 @@ public class XmlObjectStore implements PersistentStore {
      *  @param value The value to store.
      */
     public void put(String key, long value) {
-        put(key, new Long(value));
+        put(key, Long.valueOf(value));
     }
 
     /**
@@ -530,7 +530,7 @@ public class XmlObjectStore implements PersistentStore {
      *  @param value The value to store.
      */
     public void put(String key, double value) {
-        put(key, new Double(value));
+        put(key, Double.valueOf(value));
     }
 
     /**
@@ -618,7 +618,7 @@ public class XmlObjectStore implements PersistentStore {
         if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
-        return new Boolean(value.toString()).booleanValue();
+        return Boolean.parseBoolean(value.toString());
     }
 
     /**
@@ -646,7 +646,7 @@ public class XmlObjectStore implements PersistentStore {
         if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
-        return new Short(value.toString()).shortValue();
+        return Short.parseShort(value.toString());
     }
 
     /**
@@ -660,7 +660,7 @@ public class XmlObjectStore implements PersistentStore {
         if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
-        return new Integer(value.toString()).intValue();
+        return Integer.parseInt(value.toString());
     }
 
     /**
@@ -674,7 +674,7 @@ public class XmlObjectStore implements PersistentStore {
         if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
-        return new Float(value.toString()).floatValue();
+        return Float.parseFloat(value.toString());
     }
 
     /**
@@ -688,7 +688,7 @@ public class XmlObjectStore implements PersistentStore {
         if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
-        return new Long(value.toString()).longValue();
+        return Long.parseLong(value.toString());
     }
 
     /**
@@ -702,7 +702,7 @@ public class XmlObjectStore implements PersistentStore {
         if (value == null || value.toString().isEmpty()) {
             return dflt;
         }
-        return new Double(value.toString()).doubleValue();
+        return Double.parseDouble(value.toString());
     }
 
 
