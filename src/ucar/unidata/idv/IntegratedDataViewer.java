@@ -740,7 +740,7 @@ public class IntegratedDataViewer extends IdvBase implements ControlContext,
                     try {
                         idvMonitor = new IdvMonitor(
                             IntegratedDataViewer.this,
-                            new Integer(monitorPort).intValue());
+                            Integer.parseInt(monitorPort));
                         idvMonitor.init();
                     } catch (Exception exc) {
                         LogUtil.consoleMessage(
