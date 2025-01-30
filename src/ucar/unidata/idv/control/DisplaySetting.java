@@ -271,7 +271,7 @@ public class DisplaySetting {
                     continue;
                 }
             }
-            return new Object[] { name, new Boolean(cbx.isSelected()) };
+            return new Object[] { name, Boolean.valueOf(cbx.isSelected()) };
         }
 
 
@@ -422,7 +422,7 @@ public class DisplaySetting {
      */
     public void setOnlyApplicableTo(ControlDescriptor cd) {
         applicableToControls = new Hashtable();
-        applicableToControls.put(cd.getControlId(), new Boolean(true));
+        applicableToControls.put(cd.getControlId(), Boolean.valueOf(true));
     }
 
 
