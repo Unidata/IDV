@@ -1203,7 +1203,7 @@ public class IdvChooserManager extends IdvManager {
             }
             try {
                 newPollingInterval =
-                    new Integer(intervalField.getText().trim()).intValue();
+                    Integer.parseInt(intervalField.getText().trim());
                 keepTrying = false;
             } catch (Exception exc) {
                 LogUtil.userErrorMessage(log_,
