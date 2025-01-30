@@ -336,8 +336,8 @@ public class DisplayCanvas extends JPanel {
                                                      Integer.TYPE });
                 if (ctor != null) {
                     g = (Glyph) ctor.newInstance(new Object[]{ this,
-                                                               new Integer(x),
-                                                               new Integer(
+                                                               Integer.valueOf(x),
+                                                               Integer.valueOf(
                                                                y) });
                 }
             } catch (NoSuchMethodException nsme) {}
@@ -354,8 +354,8 @@ public class DisplayCanvas extends JPanel {
                 ctor = c.getConstructor(new Class[]{ Integer.TYPE,
                                                      Integer.TYPE });
                 if (ctor != null) {
-                    g = (Glyph) ctor.newInstance(new Object[]{ new Integer(x),
-                                                               new Integer(
+                    g = (Glyph) ctor.newInstance(new Object[]{ Integer.valueOf(x),
+                                                               Integer.valueOf(
                                                                y) });
                 }
             } catch (NoSuchMethodException nsme) {}
