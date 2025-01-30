@@ -738,7 +738,7 @@ public class DerivedDataChoice extends ListDataChoice {
             requestProperties = new Hashtable();
         }
         Object tmpProperty = requestProperties.get(PROP_FROMDERIVED);
-        requestProperties.put(PROP_FROMDERIVED, new Boolean(true));
+        requestProperties.put(PROP_FROMDERIVED, Boolean.valueOf(true));
 
         Trace.call1("DerivedData.getData");
         //First, collect the DataOperand-s. This also sets the "constructedCode" member
