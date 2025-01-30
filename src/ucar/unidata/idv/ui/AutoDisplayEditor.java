@@ -183,7 +183,7 @@ public class AutoDisplayEditor extends IdvManager {
                 ParamDisplay pd         = (ParamDisplay) paramDisplays.get(i);
                 String       paramLabel = pd.paramId;
                 if (pd.paramId.startsWith("#")) {
-                    int nth = new Integer(pd.paramId.substring(1)).intValue();
+                    int nth = Integer.parseInt(pd.paramId.substring(1));
                     if (nth < ordinalNames.length) {
                         paramLabel = ordinalNames[nth] + " parameter";
                     } else {
