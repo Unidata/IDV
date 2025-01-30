@@ -444,10 +444,10 @@ public class IdvXmlUi extends XmlUi {
             MemoryMonitor monitor =
                 new MemoryMonitor(
                     80,
-                    new Boolean(
+                    Boolean.parseBoolean(
                         idv.getStateManager().getPreferenceOrProperty(
                             IdvConstants.PROP_SHOWCLOCK_DASH,
-                            "true")).booleanValue());
+                            "true")));
             memoryMonitors.add(monitor);
             return monitor;
         }
@@ -456,10 +456,10 @@ public class IdvXmlUi extends XmlUi {
             MemoryMonitor monitor =
                 new MemoryMonitor(
                     80,
-                    new Boolean(
+                    Boolean.parseBoolean(
                         idv.getStateManager().getPreferenceOrProperty(
                             IdvConstants.PROP_SHOWCLOCK_VIEW,
-                            "true")).booleanValue());
+                            "true")));
             memoryMonitors.add(monitor);
             return monitor;
         }
