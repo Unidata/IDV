@@ -1127,11 +1127,11 @@ public class DisplaySettingsDialog {
                 }
                 Object newValue = newString.trim();
                 if (value instanceof Double) {
-                    newValue = Double.parseDouble(newString);
+                    newValue = Double.valueOf(Double.parseDouble(newString));
                 } else if (value instanceof Float) {
-                    newValue = Float.parseFloat(newString);
+                    newValue = Float.valueOf(Float.parseFloat(newString));
                 } else if (value instanceof Integer) {
-                    newValue = Integer.parseInt(newString);
+                    newValue = Integer.valueOf(Integer.parseInt(newString));
                 }
                 propertyValue.setValue(newValue);
             } else if (value instanceof Unit) {
