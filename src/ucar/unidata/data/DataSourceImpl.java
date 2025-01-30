@@ -920,7 +920,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (o == null) {
             return dflt;
         }
-        return new Long(o.toString()).longValue();
+        return Long.parseLong(o.toString());
     }
 
     /**
@@ -936,7 +936,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (o == null) {
             return dflt;
         }
-        return new Integer(o.toString()).intValue();
+        return Integer.parseInt(o.toString());
     }
 
     /**
@@ -986,7 +986,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (o == null) {
             return dflt;
         }
-        return new Boolean(o.toString()).booleanValue();
+        return Boolean.parseBoolean(o.toString());
     }
 
 
@@ -1000,7 +1000,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (properties == null) {
             properties = new Hashtable();
         }
-        properties.put(prop, new Boolean(value));
+        properties.put(prop, Boolean.valueOf(value));
     }
 
 
@@ -1685,7 +1685,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
 
         if (asString.startsWith("#")) {
             try {
-                int index = new Integer(asString.substring(1)).intValue();
+                int index = Integer.parseInt(asString.substring(1));
                 if ((index < choices.size()) && (index >= 0)) {
                     return Misc.newList(choices.get(index));
                 }
@@ -3403,8 +3403,8 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
         if (cacheDataToDiskCbx != null) {
             setCacheDataToDisk(cacheDataToDiskCbx.isSelected());
             setCacheClearDelay((long) (1000
-                                       * new Double(cacheClearDelayFld
-                                           .getText().trim()).doubleValue()));
+                                       * Double.parseDouble(cacheClearDelayFld
+                                           .getText().trim())));
         }
 
         boolean useDisplayArea =  false;
