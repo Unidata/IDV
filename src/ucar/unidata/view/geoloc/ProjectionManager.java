@@ -1259,7 +1259,7 @@ public class ProjectionManager implements ActionListener {
                 // fetch the value from the projection object
                 try {
                     String   valstr = pp.getTextField().getText();
-                    Double   valdub = new Double(valstr);
+                    Double   valdub = Double.valueOf(Double.parseDouble(valstr));
                     Object[] args   = { valdub };
                     if (debugBeans) {
                         System.out.println(
