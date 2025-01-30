@@ -2262,7 +2262,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
         Vector tCnt2 = new Vector();
 
         for (int i = 1; i <= 25; i++) {
-            tCnt2.add(new Integer(i));
+            tCnt2.add(Integer.valueOf(i));
         }
 
         JComboBox timeStrideFld = new JComboBox(tCnt2);
