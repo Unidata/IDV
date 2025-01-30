@@ -397,7 +397,7 @@ public class HttpServer {
             byte[] content       = null;
             if (contentLength != null) {
                 content = new byte[100000];
-                int    len       = new Integer(contentLength).intValue();
+                int    len       = Integer.parseInt(contentLength);
                 byte[] buffer    = new byte[100000];
                 int    totalRead = 0;
                 while (totalRead < len) {
