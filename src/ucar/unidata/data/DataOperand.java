@@ -456,7 +456,8 @@ public class DataOperand {
         List timeStrings = StringUtil.split(timeString, ";", true, true);
         List timeIndices = new ArrayList();
         for (int timeIdx = 0; timeIdx < timeStrings.size(); timeIdx++) {
-            timeIndices.add(new Integer(timeStrings.get(timeIdx).toString()));
+            int primitiveInt = Integer.parseInt(timeStrings.get(timeIdx).toString()); // This is the most explicit method for parsing string to int
+            timeIndices.add(Integer.valueOf(primitiveInt));
         }
         return timeIndices;
     }
