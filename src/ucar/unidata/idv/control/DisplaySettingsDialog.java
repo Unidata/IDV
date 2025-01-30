@@ -982,9 +982,9 @@ public class DisplaySettingsDialog {
             if (v instanceof Boolean) {
                 Boolean b = (Boolean) v;
                 if (b.booleanValue()) {
-                    changeValueTo(new Boolean(false));
+                    changeValueTo(Boolean.valueOf(false));
                 } else {
-                    changeValueTo(new Boolean(true));
+                    changeValueTo(Boolean.valueOf(true));
                 }
                 cbx.setSelected(true);
                 return;
@@ -1127,11 +1127,11 @@ public class DisplaySettingsDialog {
                 }
                 Object newValue = newString.trim();
                 if (value instanceof Double) {
-                    newValue = new Double(newString);
+                    newValue = Double.parseDouble(newString);
                 } else if (value instanceof Float) {
-                    newValue = new Float(newString);
+                    newValue = Float.parseFloat(newString);
                 } else if (value instanceof Integer) {
-                    newValue = new Integer(newString);
+                    newValue = Integer.parseInt(newString);
                 }
                 propertyValue.setValue(newValue);
             } else if (value instanceof Unit) {
