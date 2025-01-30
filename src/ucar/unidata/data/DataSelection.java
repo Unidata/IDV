@@ -612,7 +612,7 @@ public class DataSelection {
         if (o == null) {
             return dflt;
         }
-        return new Boolean(o.toString()).booleanValue();
+        return  Boolean.parseBoolean(o.toString());
     }
 
     /**
