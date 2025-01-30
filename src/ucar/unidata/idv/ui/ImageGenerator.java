@@ -1740,8 +1740,8 @@ public class ImageGenerator extends IdvManager {
         if (XmlUtil.hasAttribute(node, ATTR_VALUE)) {
             by = applyMacros(node, ATTR_VALUE);
         }
-        double num = new Double(value).doubleValue()
-                     + new Double(by).doubleValue();
+        double num = Double.parseDouble(value)
+                     + Double.parseDouble(by);
         ht.put(name, "" + num);
         return true;
     }
@@ -2113,8 +2113,8 @@ public class ImageGenerator extends IdvManager {
         if ((width != null) && (height != null)) {
             getIdv().getStateManager().setViewSize(
                 new Dimension(
-                    new Integer(width).intValue(),
-                    new Integer(height).intValue()));
+                    Integer.parseInt(width),
+                    Integer.parseInt(height)));
         }
 
         if (vms.size() == 0) {
@@ -2159,7 +2159,7 @@ public class ImageGenerator extends IdvManager {
         boolean end         = indexString.equals("end");
         boolean step        = indexString.equals("step");
         if ( !end && !step) {
-            index = new Integer(indexString).intValue();
+            index = Integer.parseInt(indexString);
         }
         for (ViewManager viewManager : getViewManagers(node)) {
             AnimationWidget animationWidget =
@@ -2559,8 +2559,8 @@ public class ImageGenerator extends IdvManager {
         if ((width != null) && (height != null)) {
             getIdv().getStateManager().setViewSize(
                 new Dimension(
-                    new Integer(width).intValue(),
-                    new Integer(height).intValue()));
+                     Integer.parseInt(width),
+                     Integer.parseInt(height)));
         }
         String  bundleFile = applyMacros(node, ATTR_FILE, (String) null);
         boolean doRemove   = applyMacros(node, ATTR_CLEAR, true);
@@ -2937,7 +2937,7 @@ public class ImageGenerator extends IdvManager {
                 }
             }
             sleepTime = (long) (multiplier
-                                * new Double(sleepString).doubleValue());
+                                * Double.parseDouble(sleepString));
         }
         for (int i = 0; i < loopTimes; i++) {
             currentLoopIndex = i;
@@ -3322,7 +3322,7 @@ public class ImageGenerator extends IdvManager {
                 List times = new ArrayList();
                 for (String tok :
                         StringUtil.split(timeString, ",", true, true)) {
-                    times.add(new Integer(tok));
+                    times.add(Integer.parseInt(tok));
                 }
                 dataSelection.setTimes(times);
             }
@@ -3737,7 +3737,7 @@ public class ImageGenerator extends IdvManager {
             double percent = Misc.toDouble(s.substring(0, s.length() - 1));
             return (percent / 100.0) * baseValue;
         }
-        return new Double(s).doubleValue();
+        return Double.parseDouble(s);
     }
 
 
@@ -3812,7 +3812,7 @@ public class ImageGenerator extends IdvManager {
         if (value == null) {
             return dflt;
         }
-        return new Boolean(applyMacros(value)).booleanValue();
+        return Boolean.parseBoolean(applyMacros(value));
     }
 
 
@@ -4037,7 +4037,7 @@ public class ImageGenerator extends IdvManager {
      * @param v  the index
      */
     public void putIndex(Hashtable props, String name, int v) {
-        props.put(name, new Integer(v));
+        props.put(name, Integer.valueOf(v));
         props.put(name + "_alpha", getLetter(v).toLowerCase());
         props.put(name + "_ALPHA", getLetter(v).toUpperCase());
         
@@ -4075,7 +4075,7 @@ public class ImageGenerator extends IdvManager {
         for (int i = 0; i < viewManagers.size(); i++) {
             ViewManager viewManager = (ViewManager) viewManagers.get(i);
             if (viewId.startsWith("#")) {
-                int viewIndex = new Integer(viewId.substring(1)).intValue();
+                int viewIndex = Integer.parseInt(viewId.substring(1));
                 if (viewIndex == i) {
                     goodOnes.add(viewManager);
                     //                    System.err.println("\tskipping index");
@@ -4904,7 +4904,7 @@ public class ImageGenerator extends IdvManager {
                                     ",");
                             for (int valueIdx = 0; valueIdx < valueArray.length;
                                  valueIdx++) {
-                                values.add(new Double(valueArray[valueIdx]));
+                                values.add(Double.valueOf(valueArray[valueIdx]));
                             }
                         } else if (ticks > 0) {
                             int spacing = ((ticks == 1)
@@ -4917,13 +4917,13 @@ public class ImageGenerator extends IdvManager {
                                         ? (double) tickIdx / (double) (ticks - 1)
                                         : 0.0);
                                 values.add(
-                                        new Double(range.getValueOfPercent(percent)));
+                                        Double.valueOf(range.getValueOfPercent(percent)));
                             }
                         } else if (interval > 0) {
                             double value = range.getMin();
                             double max = range.getMax();
                             while (value <= max) {
-                                values.add(new Double(value));
+                                values.add(Double.valueOf(value));
                                 value += interval;
                             }
                         }
@@ -5187,15 +5187,15 @@ public class ImageGenerator extends IdvManager {
                             lr[1] = tmp;
                         }
                         imageProps.put(ATTR_NORTH,
-                                new Double(ulEl.getLatitude().getValue()));
+                                Double.valueOf(ulEl.getLatitude().getValue()));
                         imageProps.put(
                                 ATTR_WEST,
-                                new Double(ulEl.getLongitude().getValue()));
+                                Double.valueOf(ulEl.getLongitude().getValue()));
                         imageProps.put(ATTR_SOUTH,
-                                new Double(lrEl.getLatitude().getValue()));
+                                Double.valueOf(lrEl.getLatitude().getValue()));
                         imageProps.put(
                                 ATTR_EAST,
-                                new Double(lrEl.getLongitude().getValue()));
+                                Double.valueOf(lrEl.getLongitude().getValue()));
                     } else if ((viewManager != null)
                             && XmlUtil.hasAttribute(child, ATTR_NORTH)) {
                         NavigatedDisplay display =
@@ -5211,13 +5211,13 @@ public class ImageGenerator extends IdvManager {
                         lr = display.getScreenCoordinates(
                                 display.getSpatialCoordinates(el2, null));
                         imageProps.put(ATTR_NORTH,
-                                new Double(el1.getLatitude().getValue()));
+                                Double.valueOf(el1.getLatitude().getValue()));
                         imageProps.put(ATTR_WEST,
-                                new Double(el1.getLongitude().getValue()));
+                                Double.valueOf(el1.getLongitude().getValue()));
                         imageProps.put(ATTR_SOUTH,
-                                new Double(el2.getLatitude().getValue()));
+                                Double.valueOf(el2.getLatitude().getValue()));
                         imageProps.put(ATTR_EAST,
-                                new Double(el2.getLongitude().getValue()));
+                                Double.valueOf(el2.getLongitude().getValue()));
                     } else if (XmlUtil.hasAttribute(child, ATTR_LEFT)) {
                         ul = new int[]{
                                 (int) toDouble(child, ATTR_LEFT, imageWidth),
@@ -5251,7 +5251,7 @@ public class ImageGenerator extends IdvManager {
                         String kmlAttr = "kml." + attr;
                         if (XmlUtil.hasAttribute(child, kmlAttr)) {
                             imageProps.put(attr,
-                                    new Double(applyMacros(child, kmlAttr,
+                                    Double.valueOf(applyMacros(child, kmlAttr,
                                             0.0)));
                         }
                     }
@@ -5280,9 +5280,9 @@ public class ImageGenerator extends IdvManager {
                         for (int col = 0; col < cols; col++) {
                             pushProperties();
                             Hashtable myprops = new Hashtable();
-                            putProperty("row", new Integer(row));
-                            putProperty("column", new Integer(col));
-                            putProperty("count", new Integer(++cnt));
+                            putProperty("row", Integer.valueOf(row));
+                            putProperty("column", Integer.valueOf(col));
+                            putProperty("count", Integer.valueOf(++cnt));
                             String realFile = applyMacros(file, myprops);
                             Image splitImage = image.getSubimage(hSpace * col,
                                     vSpace * row, hSpace, vSpace);
@@ -5901,7 +5901,7 @@ public class ImageGenerator extends IdvManager {
             ViewManager viewManager =
                 getIdv().getVMManager().getLastActiveViewManager();
 
-            getProperties().put(PROP_VIEWINDEX, new Integer(0));
+            getProperties().put(PROP_VIEWINDEX, Integer.valueOf(0));
             String name = viewManager.getName();
             if (name == null) {
                 name = "view" + 0;
@@ -5935,7 +5935,7 @@ public class ImageGenerator extends IdvManager {
             for (int i = 0; i < viewManagers.size(); i++) {
                 ViewManager viewManager = viewManagers.get(i);
 
-                getProperties().put(PROP_VIEWINDEX, new Integer(i));
+                getProperties().put(PROP_VIEWINDEX, Integer.valueOf(i));
                 String name = viewManager.getName();
                 if (name == null) {
                     name = "view" + i;
