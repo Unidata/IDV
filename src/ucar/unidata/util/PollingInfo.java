@@ -510,7 +510,7 @@ public class PollingInfo implements Cloneable {
                     label = "Use Most Recent " + values[i] + " Files";
                 }
                 TwoFacedObject tfo = new TwoFacedObject(label,
-                                         new Integer(values[i]));
+                                         Integer.valueOf(values[i]));
                 if (values[i] == fileCount) {
                     selected = tfo;
                 }
@@ -519,7 +519,7 @@ public class PollingInfo implements Cloneable {
             fileCountWidget = new JComboBox(items);
             if (selected == null) {
                 selected = new TwoFacedObject("Use Most Recent " + fileCount
-                        + " Files", new Integer(fileCount));
+                        + " Files", Integer.valueOf(fileCount));
             }
             fileCountWidget.setSelectedItem(selected);
         }
@@ -573,16 +573,16 @@ public class PollingInfo implements Cloneable {
         setName(getNameWidget().getText().trim());
         setIsActive(getActiveWidget().isSelected());
         try {
-            setInterval((long) (new Double(getIntervalWidget().getText()
-                .trim()).doubleValue() * 60000));
+            setInterval((long) (Double.parseDouble(getIntervalWidget().getText()
+                .trim()) * 60000));
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Bad number format:"
                                      + getIntervalWidget().getText());
             return false;
         }
         try {
-            setDateRange((long) (new Double(getDateRangeWidget().getText()
-                .trim()).doubleValue() * 60000));
+            setDateRange((long) (Double.parseDouble(getDateRangeWidget().getText()
+                .trim()) * 60000));
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Bad number format:"
                                      + getDateRangeWidget().getText());
