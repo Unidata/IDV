@@ -608,7 +608,7 @@ public class IdvUIManager extends IdvManager {
         if (iconSize != null) {
             String tmpSize = iconSize.toString().trim();
             if (tmpSize.length() > 0) {
-                GuiUtils.setDefaultIconSize(new Integer(tmpSize).intValue());
+                GuiUtils.setDefaultIconSize(Integer.parseInt(tmpSize));
             }
         }
 
@@ -624,7 +624,7 @@ public class IdvUIManager extends IdvManager {
                 "PasswordField", "TextPane", "TextArea", "EditorPane",
                 "TitledBorder", "Toolbar", "ToolTip", "tree"
             };
-            int  size     = new Integer(fontSize).intValue();
+            int  size     = Integer.parseInt(fontSize);
             Font dfltFont = tmp.getFont().deriveFont((float) size);
             GuiUtils.setDefaultFont(dfltFont);
 
@@ -2181,7 +2181,7 @@ public class IdvUIManager extends IdvManager {
             mi.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     ActionEvent action =
-                        new ActionEvent(new Integer(skinIndex), 0, "");
+                        new ActionEvent(Integer.valueOf(skinIndex), 0, "");
                     listener.actionPerformed(action);
                 }
             });
@@ -2664,7 +2664,7 @@ public class IdvUIManager extends IdvManager {
                 fileMenu.add(menu);
                 mi = new JMenuItem("Remove");
                 menu.add(mi);
-                mi.addActionListener(new ObjectListener(new Integer(i)) {
+                mi.addActionListener(new ObjectListener(Integer.valueOf(i)) {
                     public void actionPerformed(ActionEvent ae) {
                         int  index       = ((Integer) theObject).intValue();
                         List historyList = getIdv().getHistory();
@@ -3178,7 +3178,7 @@ public class IdvUIManager extends IdvManager {
      * @param bundleType What is the type of the bundle we are showing an edit dialog for
      */
     public void showBundleDialog(final int bundleType) {
-        Object     key  = new Integer(bundleType);
+        Object     key  = Integer.valueOf(bundleType);
         BundleTree tree = (BundleTree) bundleTrees.get(key);
         if (tree == null) {
             tree = new BundleTree(this, bundleType);
@@ -5717,7 +5717,7 @@ public class IdvUIManager extends IdvManager {
                 if (dataSourceName.startsWith("#")) {
                     //It is an index into the list
                     int index =
-                        new Integer(dataSourceName.substring(1)).intValue()
+                        Integer.parseInt(dataSourceName.substring(1))
                         - 1;
                     List dataSources = getDataSourcesForGui();
                     if ((index < dataSources.size()) && (index >= 0)) {
@@ -5871,7 +5871,7 @@ public class IdvUIManager extends IdvManager {
                     if (rowString == null) {
                         rowString = "1";
                     }
-                    int rows = new Integer(rowString).intValue();
+                    int rows = Integer.parseInt(rowString);
                     if (rows == 1) {
                         field = new JTextField((dflt != null)
                                 ? dflt.toString()
@@ -5885,8 +5885,8 @@ public class IdvUIManager extends IdvManager {
                     break;
                 case FIELDTYPE_BOOLEAN:
                     field = new JCheckBox("", ((dflt != null)
-                            ? new Boolean(
-                            dflt.toString()).booleanValue()
+                            ? Boolean.parseBoolean(
+                            dflt.toString())
                             : true));
                     break;
                 case FIELDTYPE_CHOICE: {
@@ -5990,7 +5990,7 @@ public class IdvUIManager extends IdvManager {
             if (field instanceof JTextComponent) {
                 value = ((JTextComponent) field).getText().trim();
             } else if (field instanceof JCheckBox) {
-                value = new Boolean(((JCheckBox) field).isSelected());
+                value = Boolean.valueOf(((JCheckBox) field).isSelected());
             } else if (field instanceof JComboBox) {
                 value = ((JComboBox) field).getSelectedItem();
             } else if (field instanceof LatLonWidget) {
