@@ -220,7 +220,7 @@ public class FileChooser extends IdvChooser {
 
             }
             TwoFacedObject tfo = new TwoFacedObject(label,
-                                     new Integer(values[i]));
+                                     Integer.valueOf(values[i]));
             if (values[i] == value) {
                 selected = tfo;
             }
