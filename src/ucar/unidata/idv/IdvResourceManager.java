@@ -888,7 +888,7 @@ public class IdvResourceManager extends IdvManager implements HyperlinkListener 
             if (rc == null) {
                 return;
             }
-            int        index    = new Integer(split[1]).intValue();
+            int        index    = Integer.parseInt(split[1]);
             String     contents = rc.read(index);
             JComponent guiContents;
             JTextArea  text = new JTextArea(contents);
