@@ -153,7 +153,7 @@ public class CloudCoverageSymbol extends MetSymbol {
      * @return always returns the coverage as a <code>Double</code>
      */
     public Object getParamValue(int index) {
-        return new Double(coverage);
+        return Double.valueOf(coverage);
     }
 
     /**
@@ -166,7 +166,7 @@ public class CloudCoverageSymbol extends MetSymbol {
      * @see #setCoverage(double)
      */
     public void setParamValue(int index, Object v) {
-        setCoverage(new Double(v.toString()).doubleValue());
+        setCoverage(Double.parseDouble(v.toString()));
     }
 
 
