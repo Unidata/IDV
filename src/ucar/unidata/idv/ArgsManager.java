@@ -835,7 +835,7 @@ public class ArgsManager extends IdvManager {
         } else if (checkArg(arg, ARG_CONNECT, args, idx, 1)) {
             collabHostName = args[idx++];
         } else if (checkArg(arg, ARG_PORT, args, idx, 1)) {
-            collabPort = new Integer(args[idx++]).intValue();
+            collabPort = Integer.parseInt(args[idx++]);
         } else if (checkArg(arg, ARG_CATALOG, args, idx, 1)) {
             initCatalogs.add(args[idx++]);
         } else if (arg.equals(ARG_NOPLUGINS)) {
@@ -865,13 +865,13 @@ public class ArgsManager extends IdvManager {
             if (tmp.endsWith(".properties")) {
                 imageServerPropertyFile = tmp;
             } else {
-                imageServerPort = new Integer(tmp).intValue();
+                imageServerPort = Integer.parseInt(tmp);
             }
             setIsOffScreen(true);
         } else if (arg.equals(ARG_NOONEINSTANCE)) {
             noOneInstance = true;
         } else if (checkArg(arg, ARG_ONEINSTANCEPORT, args, idx, 1)) {
-            oneInstancePort = new Integer(args[idx++]).intValue();
+            oneInstancePort = Integer.parseInt(args[idx++]);
             persistentCommandLineArgs.add(arg);
             persistentCommandLineArgs.add("" + oneInstancePort);
         } else if (checkArg(arg, ARG_IMAGE, args, idx, 1)) {
