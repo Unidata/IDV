@@ -418,10 +418,10 @@ public class DataManager {
                                                   || format.endsWith("dh3")
                                                   || format.endsWith("dh4")) {
                                               int len =
-                                                  new Integer(
+                                                  Integer.parseInt(
                                                       format.substring(
                                                           format.length()
-                                                          - 1)).intValue();
+                                                          - 1));
                                               value = value.trim();
                                               int idx =
                                                   value.lastIndexOf(" ");
