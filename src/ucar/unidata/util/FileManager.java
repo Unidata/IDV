@@ -201,8 +201,8 @@ public class FileManager {
         }
 
         File            defaultDirectory = findDefaultDirectory(defaultDirs);
-        SecurityManager backup           = System.getSecurityManager();
-        System.setSecurityManager(null);
+        //SecurityManager backup           = System.getSecurityManager();
+        //System.setSecurityManager(null);
         try {
 
             chooser = new MyFileChooser(defaultDirectory);
@@ -287,7 +287,7 @@ public class FileManager {
                 null,
                 "Sorry, this Applet does not have disk read permission.");
         }
-        System.setSecurityManager(backup);
+        //System.setSecurityManager(backup);
 
     }
 
@@ -388,8 +388,8 @@ public class FileManager {
             chooser.setApproveButtonText(approveButtonText);
         }
 
-        SecurityManager backup = System.getSecurityManager();
-        System.setSecurityManager(null);
+        //SecurityManager backup = System.getSecurityManager();
+        //System.setSecurityManager(null);
         if (title != null) {
             chooser.setDialogTitle(title);
         }
@@ -450,7 +450,7 @@ public class FileManager {
 
 
 
-        System.setSecurityManager(backup);
+        //System.setSecurityManager(backup);
         File file = chooser.getSelectedFile();
         addToHistory(file);
 
