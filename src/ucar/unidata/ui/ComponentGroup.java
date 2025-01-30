@@ -861,12 +861,12 @@ public class ComponentGroup extends ComponentHolder {
             layout = TwoFacedObject.getIdString(layoutBox.getSelectedItem());
             if (rowBtn.isSelected()) {
                 setRowsColumns(
-                    new Integer(dimFld.getText().trim()).intValue(), 0);
+                    Integer.parseInt(dimFld.getText().trim()), 0);
             } else {
                 setRowsColumns(
-                    0, new Integer(dimFld.getText().trim()).intValue());
+                    0, Integer.parseInt(dimFld.getText().trim()));
             }
-            setGridColumns(new Integer(colFld.getText().trim()).intValue());
+            setGridColumns( Integer.parseInt(colFld.getText().trim()));
             redoLayout();
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Bad number format " + nfe);
