@@ -375,7 +375,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                     ((Integer) ((JComboBox) widget).getSelectedItem())
                         .intValue();
 
-                store.put(key, new Integer(value));
+                store.put(key, Integer.valueOf(value));
                 visad.util.ThreadManager.setGlobalMaxThreads(value);
 
                 continue;
@@ -386,7 +386,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                     ((Integer) ((JComboBox) widget).getSelectedItem())
                         .intValue();
 
-                store.put(key, new Integer(value));
+                store.put(key, Integer.valueOf(value));
 
                 continue;
             }
@@ -609,14 +609,14 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                         (ControlDescriptor) table.get(cbx);
 
                     controlDescriptorsToShow.put(cd.getControlId(),
-                            new Boolean(cbx.isSelected()));
+                            Boolean.valueOf(cbx.isSelected()));
                 }
 
                 showAllControls = useAllBtn.isSelected();
                 theStore.put(PROP_CONTROLDESCRIPTORS,
                              controlDescriptorsToShow);
                 theStore.put(PROP_CONTROLDESCRIPTORS_ALL,
-                             new Boolean(showAllControls));
+                             Boolean.valueOf(showAllControls));
             }
         };
 
@@ -681,25 +681,25 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
 
         for (int i = 1; i <= Runtime.getRuntime().availableProcessors();
                 i++) {
-            threadCnt.add(new Integer(i));
+            threadCnt.add(Integer.valueOf(i));
         }
 
         JComboBox maxRenderThreadsFld = new JComboBox(threadCnt);
 
         maxRenderThreadsFld.setSelectedItem(
-            new Integer(getIdv().getMaxRenderThreadCount()));
+            Integer.valueOf(getIdv().getMaxRenderThreadCount()));
         systemWidgets.put(PREF_THREADS_RENDER, maxRenderThreadsFld);
 
         Vector threadCnt2 = new Vector();
 
         for (int i = 1; i <= 12; i++) {
-            threadCnt2.add(new Integer(i));
+            threadCnt2.add(Integer.valueOf(i));
         }
 
         JComboBox maxDataThreadsFld = new JComboBox(threadCnt2);
 
         maxDataThreadsFld.setSelectedItem(
-            new Integer(getIdv().getMaxDataThreadCount()));
+            Integer.valueOf(getIdv().getMaxDataThreadCount()));
         systemWidgets.put(PREF_THREADS_DATA, maxDataThreadsFld);
         systemComps.add(GuiUtils.left(cacheCbx));
         systemComps.add(GuiUtils.filler());
@@ -917,12 +917,12 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                     JCheckBox chooserCB = (JCheckBox) table.get(chooserId);
 
                     newToShow.put(chooserId,
-                                  new Boolean(chooserCB.isSelected()));
+                                  Boolean.valueOf(chooserCB.isSelected()));
                 }
 
                 choosersToShow = newToShow;
                 theStore.put(PROP_CHOOSERS_ALL,
-                             new Boolean(useAllBtn.isSelected()));
+                             Boolean.valueOf(useAllBtn.isSelected()));
                 theStore.put(PROP_CHOOSERS, choosersToShow);
             }
         };
@@ -1583,7 +1583,7 @@ public class IdvPreferenceManager extends IdvManager implements ActionListener {
                             controlDescriptorsToShow = new Hashtable();
                         }
 
-                        controlDescriptorsToShow.put(name, new Boolean(true));
+                        controlDescriptorsToShow.put(name, Boolean.valueOf(true));
                     }
                 }
             }
