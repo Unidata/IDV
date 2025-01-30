@@ -290,8 +290,8 @@ public class LineDrawing extends DisplayableData {
             myLineWidth = lineWidth;
         }
 
-        firePropertyChange(LINE_WIDTH, new Float(oldValue),
-                           new Float(myLineWidth));
+        firePropertyChange(LINE_WIDTH, Float.valueOf(oldValue),
+                           Float.valueOf(myLineWidth));
     }
 
     /**
@@ -316,8 +316,8 @@ public class LineDrawing extends DisplayableData {
             myLineStyle = lineStyle;
         }
 
-        firePropertyChange(LINE_STYLE, new Integer(oldValue),
-                           new Integer(myLineStyle));
+        firePropertyChange(LINE_STYLE, Integer.valueOf(oldValue),
+                           Integer.valueOf(myLineStyle));
     }
 
     /**
@@ -341,8 +341,8 @@ public class LineDrawing extends DisplayableData {
             myPointSize = pointSize;
         }
 
-        firePropertyChange(POINT_SIZE, new Float(oldValue),
-                           new Float(myPointSize));
+        firePropertyChange(POINT_SIZE, Float.valueOf(oldValue),
+                           Float.valueOf(myPointSize));
     }
 
     /**
