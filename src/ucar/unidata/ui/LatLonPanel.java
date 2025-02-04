@@ -104,7 +104,7 @@ public class LatLonPanel extends JPanel {
                     return;
                 }
                 latLonData.setSpacing(
-                    new Float(spacingField.getText()).floatValue());
+                    Float.parseFloat(spacingField.getText()));
             }
         });
         baseField = new JTextField(String.valueOf(latLonData.getBase()), 6);
@@ -115,7 +115,7 @@ public class LatLonPanel extends JPanel {
                     return;
                 }
                 latLonData.setBase(
-                    new Float(baseField.getText()).floatValue());
+                    Float.parseFloat(baseField.getText()));
             }
         });
 
@@ -242,8 +242,8 @@ public class LatLonPanel extends JPanel {
     public void applyStateToData() {
         // need to get the TextField values because people could type in a new value
         // without hitting return.  Other widgets should trigger a change
-        latLonData.setSpacing(new Float(spacingField.getText()).floatValue());
-        latLonData.setBase(new Float(baseField.getText()).floatValue());
+        latLonData.setSpacing(Float.parseFloat(spacingField.getText()));
+        latLonData.setBase(Float.parseFloat(baseField.getText()));
     }
 
 
