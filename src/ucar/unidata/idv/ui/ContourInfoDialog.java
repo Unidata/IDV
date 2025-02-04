@@ -126,9 +126,9 @@ public class ContourInfoDialog implements ActionListener {
 
     /** contour alignments */
     private TwoFacedObject[] aligns = { new TwoFacedObject("Along Contours",
-                                          new Boolean(true)),
+                                          Boolean.valueOf(true)),
                                         new TwoFacedObject("Horizontal",
-                                            new Boolean(false)) };
+                                            Boolean.valueOf(false)) };
 
     /** current action command */
     private String current_action_command = null;
@@ -253,11 +253,11 @@ public class ContourInfoDialog implements ActionListener {
         // Create the label table
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer,
                                                     JLabel>();
-        labelTable.put(new Integer(ContourControl.LABEL_FREQ_LO),
+        labelTable.put(Integer.valueOf(ContourControl.LABEL_FREQ_LO),
                        new JLabel("Lo"));
-        labelTable.put(new Integer(ContourControl.LABEL_FREQ_MED),
+        labelTable.put(Integer.valueOf(ContourControl.LABEL_FREQ_MED),
                        new JLabel("Med"));
-        labelTable.put(new Integer(ContourControl.LABEL_FREQ_HI),
+        labelTable.put(Integer.valueOf(ContourControl.LABEL_FREQ_HI),
                        new JLabel("Hi"));
         labelFreqSlider.setLabelTable(labelTable);
         labelFreqSlider.setPaintLabels(true);
@@ -271,10 +271,10 @@ public class ContourInfoDialog implements ActionListener {
         //  - Almost always, user will want a small integer value
 
         Integer defaultInterval =
-            new Integer(ContourControl.EVERY_NTH_DEFAULT);
-        Integer minInterval  = new Integer(1);
-        Integer maxInterval  = new Integer(ContourControl.EVERY_NTH_MAX);
-        Integer intervalStep = new Integer(1);
+            Integer.valueOf(ContourControl.EVERY_NTH_DEFAULT);
+        Integer minInterval  = Integer.valueOf(1);
+        Integer maxInterval  = Integer.valueOf(ContourControl.EVERY_NTH_MAX);
+        Integer intervalStep = Integer.valueOf(1);
         SpinnerNumberModel snm = new SpinnerNumberModel(defaultInterval,
                                      minInterval, maxInterval, intervalStep);
         js = new JSpinner(snm);
@@ -401,7 +401,7 @@ public class ContourInfoDialog implements ActionListener {
             boolean new_dash_on    = dashBtn.isSelected();
             boolean new_isLabelled = toggleBtn.isSelected();
             int new_line_width =
-                new Integer(widthBox.getSelectedItem().toString()).intValue();
+                Integer.parseInt(widthBox.getSelectedItem().toString());
             int new_dash_style = styleBox.getSelectedIndex() + 1;
             Object new_font =
                 ((TwoFacedObject) fontBox.getSelectedItem()).getId();
@@ -582,11 +582,11 @@ public class ContourInfoDialog implements ActionListener {
         dashBtn.setEnabled( !myInfo.getIsFilled());
         labelFreqSlider.setValue(transfer.getLabelFreq());
         js.setValue(transfer.getLabelLineSkip());
-        widthBox.setSelectedItem(new Integer(myInfo.getLineWidth()));
+        widthBox.setSelectedItem(Integer.valueOf(myInfo.getLineWidth()));
         styleBox.setSelectedIndex(myInfo.getDashedStyle() - 1);
         styleBox.setEnabled(myInfo.getDashOn());
         fontBox.setSelectedItem(makeTwoFacedFont(myInfo.getFont()));
-        fontSizeBox.setSelectedItem(new Integer(myInfo.getLabelSize()));
+        fontSizeBox.setSelectedItem(Integer.valueOf(myInfo.getLabelSize()));
         alignBox.setSelectedItem((myInfo.getAlignLabels())
                                  ? aligns[0]
                                  : aligns[1]);
