@@ -156,13 +156,13 @@ public class LightInfo {
         visible = visibleCbx.isSelected();
         float f = (float)(slider.getValue()/100.0f);
         color = new Color3f(f,f,f);
-        location = new Point3d(new Double(locationXFld.getText()).doubleValue(),
-                               new Double(locationYFld.getText()).doubleValue(),
-                               new Double(locationZFld.getText()).doubleValue());
+        location = new Point3d(Double.parseDouble(locationXFld.getText()),
+                               Double.parseDouble(locationYFld.getText()),
+                               Double.parseDouble(locationZFld.getText()));
 
-        direction = new Vector3f(new Float(directionXFld.getText()).floatValue(),
-                               new Float(directionYFld.getText()).floatValue(),
-                               new Float(directionZFld.getText()).floatValue());
+        direction = new Vector3f(Float.parseFloat(directionXFld.getText()),
+                               Float.parseFloat(directionYFld.getText()),
+                               Float.parseFloat(directionZFld.getText()));
 
 
         updateLight();
