@@ -266,9 +266,9 @@ public class ColorScaleInfo {
             String name  = subToks.get(0).toString().trim();
             String value = subToks.get(1).toString().trim();
             if (name.equals("visible")) {
-                this.isVisible = new Boolean(value).booleanValue();
+                this.isVisible = Boolean.parseBoolean(value);
             } else if (name.equals("labelvisible")) {
-                this.labelVisible = new Boolean(value).booleanValue();
+                this.labelVisible = Boolean.parseBoolean(value);
             } else if (name.equals("name")) {
                 this.name = name;
             } else if (name.equals("color")) {
