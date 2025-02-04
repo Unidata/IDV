@@ -1258,7 +1258,7 @@ public class MapViewManager extends NavigatedViewManager {
     public void initViewState(ViewState viewState) {
         super.initViewState(viewState);
         viewState.put(ViewState.PROP_GLOBE,
-                      new Boolean(getUseGlobeDisplay()));
+                      Boolean.valueOf(getUseGlobeDisplay()));
         if ( !getUseGlobeDisplay()) {
             viewState.put(ViewState.PROP_PROJECTION, getMainProjection());
         }
@@ -1512,26 +1512,26 @@ public class MapViewManager extends NavigatedViewManager {
         Object[][] miscObjects = {
             { "View:", null, null },
             { "Show Wireframe Box", PREF_WIREFRAME,
-              new Boolean(getWireframe()) },
+              Boolean.valueOf(getWireframe()) },
             { "Show Cursor Readout", PREF_SHOWCURSOR,
-              new Boolean(getShowCursor()) },
-            { "Clip View At Box", PREF_3DCLIP, new Boolean(getClipping()) },
+              Boolean.valueOf(getShowCursor()) },
+            { "Clip View At Box", PREF_3DCLIP, Boolean.valueOf(getClipping()) },
             { "Show Display List", PREF_SHOWDISPLAYLIST,
-              new Boolean(getShowDisplayList()) },
+              Boolean.valueOf(getShowDisplayList()) },
             { "Show Times In View", PREF_ANIREADOUT,
-              new Boolean(getAniReadout()) },
+              Boolean.valueOf(getAniReadout()) },
             { "Show Map Display Scales", PREF_SHOWSCALES,
-              new Boolean(getLabelsVisible()) },
+              Boolean.valueOf(getLabelsVisible()) },
             { "Show Transect Display Scales", PREF_SHOWTRANSECTSCALES,
-              new Boolean(getTransectLabelsVisible()) },
+              Boolean.valueOf(getTransectLabelsVisible()) },
             { "Show \"Please Wait\" Message", PREF_WAITMSG,
-              new Boolean(getWaitMessageVisible()) },
+              Boolean.valueOf(getWaitMessageVisible()) },
             { "Reset Projection With New Data", PREF_PROJ_USEFROMDATA },
             { PR_LABEL, PREF_USE_PROGRESSIVE_RESOLUTION,
-              new Boolean(getUseProgressiveResolution()) },
+              Boolean.valueOf(getUseProgressiveResolution()) },
             { "Use 3D View", PREF_DIMENSION },
             { "Show Globe Background", PREF_SHOWGLOBEBACKGROUND,
-              new Boolean(getStore().get(PREF_SHOWGLOBEBACKGROUND,
+              Boolean.valueOf(getStore().get(PREF_SHOWGLOBEBACKGROUND,
                                          defaultGlobeBackground)) }
         };
 
@@ -1539,27 +1539,27 @@ public class MapViewManager extends NavigatedViewManager {
         Object[][] legendObjects = {
             { "Legends:", null, null },
             { "Show Side Legend", PREF_SHOWSIDELEGEND,
-              new Boolean(getShowSideLegend()) },
+              Boolean.valueOf(getShowSideLegend()) },
             { "Show Bottom Legend", PREF_SHOWBOTTOMLEGEND,
-              new Boolean(getShowBottomLegend()) },
+              Boolean.valueOf(getShowBottomLegend()) },
             { "Show Animation Boxes", PREF_SHOWANIMATIONBOXES,
-              new Boolean(getShowAnimationBoxes()) },
+              Boolean.valueOf(getShowAnimationBoxes()) },
             { "Show Clock On Dashboard", IdvConstants.PROP_SHOWCLOCK_DASH,
-              new Boolean(
+                    Boolean.valueOf(Boolean.parseBoolean(
                   getStateManager().getPreferenceOrProperty(
-                      IdvConstants.PROP_SHOWCLOCK_DASH, "true")) },
+                      IdvConstants.PROP_SHOWCLOCK_DASH, "true"))) },
             { "Show Clock On View Windows", IdvConstants.PROP_SHOWCLOCK_VIEW,
-              new Boolean(
+                    Boolean.valueOf(Boolean.parseBoolean(
                   getStateManager().getPreferenceOrProperty(
-                      IdvConstants.PROP_SHOWCLOCK_VIEW, "true")) },
+                      IdvConstants.PROP_SHOWCLOCK_VIEW, "true"))) },
             { "Show Overview Map", PREF_SHOWPIP,
-              new Boolean(getStore().get(PREF_SHOWPIP, false)) }
+              Boolean.valueOf(getStore().get(PREF_SHOWPIP, false)) }
         };
 
         Object[][] toolbarObjects = {
             { "Toolbars:", null, null },
             { "Show Earth Navigation Panel", PREF_SHOWEARTHNAVPANEL,
-              new Boolean(getShowEarthNavPanel()) },
+              Boolean.valueOf(getShowEarthNavPanel()) },
             { "Show Viewpoint Toolbar", PREF_SHOWTOOLBAR + "perspective" },
             { "Show Zoom/Pan Toolbar", PREF_SHOWTOOLBAR + "zoompan" },
             { "Show Undo/Redo Toolbar", PREF_SHOWTOOLBAR + "undoredo" }
