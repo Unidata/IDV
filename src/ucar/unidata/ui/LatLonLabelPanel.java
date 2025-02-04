@@ -139,7 +139,7 @@ public class LatLonLabelPanel extends JPanel {
                     return;
                 }
                 latLonLabelData.setInterval(
-                    new Float(spacingField.getText()).floatValue());
+                    Float.parseFloat(spacingField.getText()));
             }
         });
 
@@ -152,7 +152,7 @@ public class LatLonLabelPanel extends JPanel {
                     return;
                 }
                 latLonLabelData.setBaseValue(
-                    new Float(baseField.getText()).floatValue());
+                    Float.parseFloat(baseField.getText()));
             }
         });
 
@@ -338,9 +338,9 @@ public class LatLonLabelPanel extends JPanel {
         // need to get the TextField values because people could type in a new value
         // without hitting return.  Other widgets should trigger a change
         latLonLabelData.setInterval(
-            new Float(spacingField.getText()).floatValue());
+            Float.parseFloat(spacingField.getText()));
         latLonLabelData.setBaseValue(
-            new Float(baseField.getText()).floatValue());
+            Float.parseFloat(baseField.getText()));
         latLonLabelData.setLabelsLineString(labelLinesField.getText());
     }
 
