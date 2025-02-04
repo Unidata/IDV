@@ -248,7 +248,7 @@ public class IslDialog {
         Element  root = doc.createElement(ImageGenerator.TAG_ISL);
         root.setAttribute(ImageGenerator.ATTR_LOOP, loopFld.getText().trim());
         double sleepMinutes =
-            new Double(sleepFld.getText().trim()).doubleValue();
+             Double.parseDouble(sleepFld.getText().trim());
         root.setAttribute(ImageGenerator.ATTR_SLEEP,
                           "" + (sleepMinutes) + "minutes");
         root.setAttribute(ImageGenerator.ATTR_OFFSCREEN,
