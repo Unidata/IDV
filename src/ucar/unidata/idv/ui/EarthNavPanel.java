@@ -121,7 +121,7 @@ public class EarthNavPanel extends JPanel implements MouseListener,
     public EarthNavPanel(MapViewManager viewManager) {
         String prop = viewManager.getSkinProperty(PROP_SHOWADDRESS);
         if (prop != null) {
-            showAddress = new Boolean(prop).booleanValue();
+            showAddress = Boolean.parseBoolean(prop);
         }
         init(viewManager);
     }
