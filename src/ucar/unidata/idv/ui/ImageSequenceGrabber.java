@@ -1357,8 +1357,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 double sleepTime = 1;
 
                 try {
-                    sleepTime = new Double(
-                        previewRateFld.getText().trim()).doubleValue();
+                    sleepTime = Double.parseDouble(
+                        previewRateFld.getText().trim());
                 } catch (Exception noop) {}
 
                 Misc.sleep((long) (sleepTime * 1000));
@@ -1553,8 +1553,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
             double captureRate = 2.0;
 
             try {
-                captureRate = (new Double(
-                    captureRateFld.getText().trim())).doubleValue();
+                captureRate = (Double.parseDouble(
+                    captureRateFld.getText().trim()));
             } catch (NumberFormatException nfe) {
                 stopCapturingAuto();
                 LogUtil.userErrorMessage(
@@ -2080,8 +2080,8 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
         }
 
         double displayRate =
-            (new Double(displayRateFld.getText())).doubleValue();
-        double endPause = (new Double(endPauseFld.getText())).doubleValue();
+            (Double.parseDouble(displayRateFld.getText()));
+        double endPause = (Double.parseDouble(endPauseFld.getText()));
 
         if (scriptingNode != null) {
             displayRate = imageGenerator.applyMacros(scriptingNode,
@@ -2313,9 +2313,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                 } else {
 
                     // System.err.println("mov:" + movieFile);
-                    SecurityManager backup = System.getSecurityManager();
+                    //SecurityManager backup = System.getSecurityManager();
 
-                    System.setSecurityManager(null);
+                    //System.setSecurityManager(null);
 
                     if (size == null) {
                         size = new Dimension(600, 400);
@@ -2324,7 +2324,7 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     JpegImagesToMovie.createMovie(movieFile, size.width,
                             size.height, (int) displayRate,
                             new Vector(ImageWrapper.makeFileList(images)));
-                    System.setSecurityManager(backup);
+                    //System.setSecurityManager(backup);
                 }
             } catch (NumberFormatException nfe) {
                 LogUtil.userErrorMessage("Bad number format");
