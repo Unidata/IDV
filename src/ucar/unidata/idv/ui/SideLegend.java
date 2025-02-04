@@ -306,7 +306,7 @@ public class SideLegend extends IdvLegend {
                 (CategoryPanel) categoryPanels.get(i);
             categoryToPanelOpen.put(
                 categoryPanel.category,
-                new Boolean(categoryPanel.getInnerVisible()));
+                Boolean.valueOf(categoryPanel.getInnerVisible()));
         }
 
         return categoryToPanelOpen;
@@ -570,7 +570,7 @@ public class SideLegend extends IdvLegend {
                 } else {
                     previousVisibilities.put(
                         control.getUniqueId(),
-                        new Boolean(control.getDisplayVisibility()));
+                        Boolean.valueOf(control.getDisplayVisibility()));
                     control.setDisplayVisibility(false);
                 }
             }
