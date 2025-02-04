@@ -236,8 +236,8 @@ public abstract class NavigatedViewManager extends ViewManager {
 
             if (toks.size() >= 2) {
                 tmpVerticalRange = new double[] {
-                    new Double(toks.get(0).toString()).doubleValue(),
-                    new Double(toks.get(1).toString()).doubleValue() };
+                    Double.parseDouble(toks.get(0).toString()),
+                    Double.parseDouble(toks.get(1).toString()) };
 
                 if (toks.size() == 3) {
                     try {
