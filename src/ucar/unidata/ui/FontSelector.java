@@ -253,9 +253,9 @@ public class FontSelector implements ItemListener, ListSelectionListener {
         // only update sizeSelector if the size has changed
         if (sizeChoice != fontSize) {
             if (uiType == COMBOBOX_UI) {
-                ((JComboBox) sizeSelector).setSelectedItem(new Integer(fontSize));
+                ((JComboBox) sizeSelector).setSelectedItem(Integer.valueOf(fontSize));
             } else {
-                ((JList) sizeSelector).setSelectedValue(new Integer(fontSize),
+                ((JList) sizeSelector).setSelectedValue(Integer.valueOf(fontSize),
                         true);
             }
             sizeChoice = fontSize;
@@ -434,7 +434,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
          * @param si font size
          */
         public void changeFont(String f, int st, int si) {
-            Integer newSize = new Integer(si);
+            Integer newSize = Integer.valueOf(si);
             int     size    = newSize.intValue();
             thisFont = new Font(f, st, size);
             setFont(thisFont);
