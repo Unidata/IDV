@@ -376,7 +376,7 @@ public class ValueSliderComponent implements Removable {
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
                 labelTable.put(
-                    new Integer((int) (values[i] * scaleFactor)),
+                    Integer.valueOf((int) (values[i] * scaleFactor)),
                     new JLabel(getDisplayConventions().format(values[i])));
             }
         }
