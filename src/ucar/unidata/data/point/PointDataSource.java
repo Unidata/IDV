@@ -553,16 +553,16 @@ public abstract class PointDataSource extends FilesDataSource {
             if (dataSelection != null) {
                 if ( !useDefaultCbx.isSelected()) {
                     dataSelection.putProperty(PROP_GRID_X,
-                            new Float(getGridX()));
+                            Float.valueOf(getGridX()));
                     dataSelection.putProperty(PROP_GRID_Y,
-                            new Float(getGridY()));
+                            Float.valueOf(getGridY()));
                     dataSelection.putProperty(PROP_GRID_UNIT, getGridUnit());
                     dataSelection.putProperty(PROP_GRID_NUMPASSES,
-                            new Integer(getNumGridPasses()));
+                            Integer.valueOf(getNumGridPasses()));
                     dataSelection.putProperty(PROP_GRID_GAIN,
-                            new Float(getGridGain()));
+                            Float.valueOf(getGridGain()));
                     dataSelection.putProperty(PROP_GRID_SEARCH_RADIUS,
-                            new Float(getGridSearchRadius()));
+                            Float.valueOf(getGridSearchRadius()));
                 } else {
                     dataSelection.removeProperty(PROP_GRID_X);
                     dataSelection.removeProperty(PROP_GRID_Y);
@@ -695,16 +695,16 @@ public abstract class PointDataSource extends FilesDataSource {
         binWidthField.setTime(binWidth);
         binRoundToField.setTime(binRoundTo);
         List roundToItems = Misc.toList(new Object[] {
-            new TwoFacedObject("Change", new Double(0)),
-            new TwoFacedObject("On the hour", new Double(60)),
-            new TwoFacedObject("5 after", new Double(5)),
-            new TwoFacedObject("10 after", new Double(10)),
-            new TwoFacedObject("15 after", new Double(15)),
-            new TwoFacedObject("20 after", new Double(20)),
-            new TwoFacedObject("30 after", new Double(30)),
-            new TwoFacedObject("45 after", new Double(45)),
-            new TwoFacedObject("10 to", new Double(50)),
-            new TwoFacedObject("5 to", new Double(55))
+            new TwoFacedObject("Change", Double.valueOf(0)),
+            new TwoFacedObject("On the hour", Double.valueOf(60)),
+            new TwoFacedObject("5 after", Double.valueOf(5)),
+            new TwoFacedObject("10 after", Double.valueOf(10)),
+            new TwoFacedObject("15 after", Double.valueOf(15)),
+            new TwoFacedObject("20 after", Double.valueOf(20)),
+            new TwoFacedObject("30 after", Double.valueOf(30)),
+            new TwoFacedObject("45 after", Double.valueOf(45)),
+            new TwoFacedObject("10 to", Double.valueOf(50)),
+            new TwoFacedObject("5 to", Double.valueOf(55))
         });
 
         roundToCbx = GuiUtils.makeComboBox(roundToItems, roundToItems.get(0),
@@ -712,17 +712,17 @@ public abstract class PointDataSource extends FilesDataSource {
                                            "setRoundToFromComboBox");
 
         List widthItems = Misc.toList(new Object[] {
-            new TwoFacedObject("Change", new Double(0)),
-            new TwoFacedObject("5 minutes", new Double(5)),
-            new TwoFacedObject("10 minutes", new Double(10)),
-            new TwoFacedObject("15 minutes", new Double(15)),
-            new TwoFacedObject("20 minutes", new Double(20)),
-            new TwoFacedObject("30 minutes", new Double(30)),
-            new TwoFacedObject("45 minutes", new Double(45)),
-            new TwoFacedObject("1 hour", new Double(60)),
-            new TwoFacedObject("6 hours", new Double(60 * 6)),
-            new TwoFacedObject("12 hours", new Double(60 * 12)),
-            new TwoFacedObject("1 day", new Double(60 * 24))
+            new TwoFacedObject("Change", Double.valueOf(0)),
+            new TwoFacedObject("5 minutes", Double.valueOf(5)),
+            new TwoFacedObject("10 minutes", Double.valueOf(10)),
+            new TwoFacedObject("15 minutes", Double.valueOf(15)),
+            new TwoFacedObject("20 minutes", Double.valueOf(20)),
+            new TwoFacedObject("30 minutes", Double.valueOf(30)),
+            new TwoFacedObject("45 minutes", Double.valueOf(45)),
+            new TwoFacedObject("1 hour", Double.valueOf(60)),
+            new TwoFacedObject("6 hours", Double.valueOf(60 * 6)),
+            new TwoFacedObject("12 hours", Double.valueOf(60 * 12)),
+            new TwoFacedObject("1 day", Double.valueOf(60 * 24))
         });
 
 
@@ -941,7 +941,7 @@ public abstract class PointDataSource extends FilesDataSource {
                     IOUtil.getFileTail(sources.get(i).toString());
             }
 
-            DataChoice choice = new DirectDataChoice(this, new Integer(i),
+            DataChoice choice = new DirectDataChoice(this, Integer.valueOf(i),
                                     dataChoiceDesc, dataChoiceName,
                                     getPointCategories(), properties);
 
@@ -1011,9 +1011,9 @@ public abstract class PointDataSource extends FilesDataSource {
                                 continue;
                             }
                             seenFields.put(name, name);
-                            List idList = Misc.newList(new Integer(i), type);
+                            List idList = Misc.newList(Integer.valueOf(i), type);
                             if (dataChoiceType == 1) {
-                                idList.add(new Boolean(true));
+                                idList.add(Boolean.valueOf(true));
                             }
                             DataChoice gridChoice =
                                 new DirectDataChoice(this, idList, name,
@@ -1184,7 +1184,7 @@ public abstract class PointDataSource extends FilesDataSource {
             List      datas    = new ArrayList();
             for (int i = 0; i < sources.size(); i++) {
                 DataChoice choice = new DirectDataChoice(this,
-                                        new Integer(i), "", "",
+                                        Integer.valueOf(i), "", "",
                                         dataChoice.getCategories(),
                                         properties);
                 pointObs = (FieldImpl) getDataInner(choice, category,
