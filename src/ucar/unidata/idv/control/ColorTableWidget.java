@@ -179,8 +179,8 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
      *
      * @param forMain         true if for the main display
      * @param legendType      type of legend
-     * @see DisplayControl#BOTTOM_LEGEND
-     * @see DisplayControl#SIDE_LEGEND
+     * see DisplayControl #BOTTOM_LEGEND
+     * see DisplayControl#SIDE_LEGEND
      *
      * @return The preview component
      */
@@ -689,7 +689,7 @@ public class ColorTableWidget extends ControlWidget implements PropertyChangeLis
         };
         for (int i = 0; i < values.length; i++) {
             transMenu.add(GuiUtils.makeMenuItem(values[i] + "%", this,
-                    "setTransparency", new Integer(values[i])));
+                    "setTransparency", Integer.valueOf(values[i])));
         }
 
 
