@@ -1265,7 +1265,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             public void run() {
                 try {
                     MeterPlot plot =
-                        new MeterPlot(new DefaultValueDataset(new Double(1)));
+                        new MeterPlot(new DefaultValueDataset(Double.valueOf(1)));
                     createChart(new XYSeriesCollection());
                 } catch (Exception ignore) {}
             }
@@ -1398,7 +1398,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
 
         DefaultValueDataset headingDataset =
-            new DefaultValueDataset(new Double(currentHeading));
+            new DefaultValueDataset(Double.valueOf(currentHeading));
 
         CompassPlot plot = new CompassPlot(headingDataset);
         plot.setSeriesNeedle(0);
@@ -2119,13 +2119,13 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
             throws VisADException, RemoteException {
         return makePoint(((latitude == null)
                           ? 0
-                          : new Double(
-                              latitude.trim()).doubleValue()), ((longitude
+                          : Double.parseDouble(
+                              latitude.trim())), ((longitude
                                   == null)
                 ? 0
-                : new Double(longitude.trim()).doubleValue()), ((alt == null)
+                : Double.parseDouble(longitude.trim())), ((alt == null)
                 ? 0
-                : new Double(alt.trim()).doubleValue()));
+                : Double.parseDouble(alt.trim())));
     }
 
 
@@ -2206,20 +2206,20 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                                                 KmlUtil.TAG_ALTITUDE)));
 
                     pt.setTiltX(
-                        -new Double(
+                        -Double.parseDouble(
                             XmlUtil.getGrandChildText(
                                 cameraNode, KmlUtil.TAG_TILT,
-                                "0")).doubleValue());
+                                "0")));
                     pt.setTiltY(
-                        new Double(
+                        Double.parseDouble(
                             XmlUtil.getGrandChildText(
                                 cameraNode, KmlUtil.TAG_HEADING,
-                                "0")).doubleValue());
+                                "0")));
                     pt.setTiltZ(
-                        new Double(
+                        Double.parseDouble(
                             XmlUtil.getGrandChildText(
                                 cameraNode, KmlUtil.TAG_ROLL,
-                                "0")).doubleValue());
+                                "0")));
 
                     thePoints.add(pt);
 
@@ -2302,7 +2302,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
                     double[] m = new double[toks.size()];
                     for (int tokIdx = 0; tokIdx < m.length; tokIdx++) {
                         m[tokIdx] =
-                            new Double(toks.get(tokIdx)).doubleValue();
+                            Double.parseDouble(toks.get(tokIdx));
                     }
                     pt.setMatrix(m);
                 }
@@ -3081,7 +3081,7 @@ public class Flythrough extends SharableImpl implements PropertyChangeListener,
 
             label.setFont(font);
             DefaultValueDataset dataset =
-                new DefaultValueDataset(new Double(v));
+                new DefaultValueDataset(Double.valueOf(v));
             MeterPlot plot = new MeterPlot(dataset);
             if (info.getRange() != null) {
                 Range range = info.getRange();
