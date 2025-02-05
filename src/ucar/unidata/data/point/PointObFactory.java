@@ -368,7 +368,7 @@ public class PointObFactory {
                     seconds = seconds - seconds % (lumpMinutes * 60);
                     dttm = new DateTime(seconds);
                 }
-                Double dValue = new Double(dttm.getValue());
+                Double dValue = Double.valueOf(dttm.getValue());
                 List obs = null;
                 boolean contains = (seenTime.put(dValue, dValue) != null);
                 if (!contains) {
@@ -400,7 +400,7 @@ public class PointObFactory {
                     continue;
                 }
 
-                Double dValue = new Double(dttm.getValue());
+                Double dValue = Double.valueOf(dttm.getValue());
                 List obs = null;
                 boolean contains = (seenTime.put(dValue, dValue) != null);
                 if (!contains) {
@@ -440,7 +440,7 @@ public class PointObFactory {
         for (int i = 0; i < times.length; i++) {
             DateTime dttm = times[i];
 
-            Double dValue = new Double(dttm.getValue());
+            Double dValue = Double.valueOf(dttm.getValue());
             List v = (List) timeToObs.get(dValue);
             Data[] obs = null;
             if (componentIndex < 0) {
@@ -757,12 +757,12 @@ public class PointObFactory {
         List<PointObVar> dataVars = new ArrayList<PointObVar>();
         HashSet skip = new HashSet();
         for (int i = 0; i < skipIndices.length; i++) {
-            skip.add(new Integer(skipIndices[i]));
+            skip.add(Integer.valueOf(skipIndices[i]));
         }
 
 
         for (int fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
-            if (skip.contains(new Integer(fieldIdx))) {
+            if (skip.contains(Integer.valueOf(fieldIdx))) {
                 continue;
             }
 
@@ -794,7 +794,7 @@ public class PointObFactory {
 
 
         for (int fieldIdx = 0; fieldIdx < lengths.length; fieldIdx++) {
-            if (skip.contains(new Integer(fieldIdx))) {
+            if (skip.contains(Integer.valueOf(fieldIdx))) {
                 continue;
             }
             if (!isText[fieldIdx]) {

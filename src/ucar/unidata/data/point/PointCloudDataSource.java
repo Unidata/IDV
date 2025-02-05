@@ -350,15 +350,15 @@ public class PointCloudDataSource extends FilesDataSource {
         if (skipFld == null) {
             return true;
         }
-        skip = new Integer(skipFld.getText().trim()).intValue();
-        gridWidth = new Integer(gridWidthFld.getText().trim()).intValue();
-        gridHeight = new Integer(gridHeightFld.getText().trim()).intValue();
+        skip = Integer.parseInt(skipFld.getText().trim());
+        gridWidth = Integer.parseInt(gridWidthFld.getText().trim());
+        gridHeight = Integer.parseInt(gridHeightFld.getText().trim());
         hillShadeAzimuth =
             Float.parseFloat(hillShadeAzimuthFld.getText().trim());
         hillShadeAngle = Float.parseFloat(hillShadeAngleFld.getText().trim());
 
         colorByIndex =
-            new Integer(colorByIndexFld.getText().trim()).intValue();
+            Integer.parseInt(colorByIndexFld.getText().trim());
 
         delimiter = delimiterFld.getText().trim();
         if (delimiter.length() == 0) {
