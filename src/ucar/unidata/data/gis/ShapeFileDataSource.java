@@ -169,7 +169,7 @@ public class ShapeFileDataSource extends FilesDataSource {
             };
             for (int i = 0; i < values.length; i++) {
                 TwoFacedObject tfo = new TwoFacedObject(names[i],
-                                         new Double(values[i]));
+                                         Double.valueOf(values[i]));
                 if (values[i] == coarseness) {
                     selected = tfo;
                 }
