@@ -595,10 +595,10 @@ public abstract class IdvChooser extends ChooserPanel implements IdvConstants {
         }
         LambertConformal proj =
             new LambertConformal(
-                new Integer(toks.get(0).toString()).intValue(),
-                new Integer(toks.get(1).toString()).intValue(),
-                new Integer(toks.get(2).toString()).intValue(),
-                new Integer(toks.get(3).toString()).intValue());
+                Integer.parseInt(toks.get(0).toString()),
+                Integer.parseInt(toks.get(1).toString()),
+                Integer.parseInt(toks.get(2).toString()),
+                Integer.parseInt(toks.get(3).toString()));
         proj.setDefaultMapArea(getDefaultProjectionRect());
         return proj;
     }
