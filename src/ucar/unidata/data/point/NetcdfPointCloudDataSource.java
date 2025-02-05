@@ -702,7 +702,7 @@ public class NetcdfPointCloudDataSource extends NetcdfPointDataSource{
         Hashtable seenTime = new Hashtable();
         for (int i = 0; i < numObs; i++) {
             DateTime dttm = timelist.get(i);
-            Double dValue = new Double(dttm.getValue());
+            Double dValue = Double.valueOf(dttm.getValue());
             boolean contains = (seenTime.put(dValue, dValue) != null);
             if (!contains) {
                 uniqueTimes.add(dttm);

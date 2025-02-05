@@ -680,7 +680,7 @@ public class AddePointDataSource extends PointDataSource {
             timesList.addAll((List) getProperty(AddeUtil.ABSOLUTE_TIMES));
         } else if (source.indexOf(AddeUtil.RELATIVE_TIME) >= 0) {
             Object tmp = getProperty(AddeUtil.NUM_RELATIVE_TIMES,
-                                     new Integer(0));
+                                     Integer.valueOf(0));
             int[] timeIndices;
             if (tmp instanceof Integer) {
                 int numTimes = ((Integer) tmp).intValue();

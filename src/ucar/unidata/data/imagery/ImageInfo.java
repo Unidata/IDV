@@ -266,7 +266,7 @@ public class ImageInfo {
             Real r = ucar.visad.Util.toReal(s);
             return r.getValue(CommonUnit.meter);
         } else {
-            return new Double(s).doubleValue();
+            return Double.parseDouble(s);
         }
     }
 
