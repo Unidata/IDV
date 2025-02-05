@@ -258,13 +258,13 @@ public class ArgsManager extends IdvManager {
 
     /**
      * A list of command line property files.
-     * These are defined with the  {@link IdvConstants.ARG_B64BUNDLE}
+     * These are defined with the  {@link IdvConstants ARG_B64BUNDLE}
      */
     List propertyFiles = new ArrayList();
 
     /**
      * You can override the application sitepath through the command line.
-     * This are defined with the  {@link IdvConstants.ARG_SITEPATH}
+     * This are defined with the  {@link IdvConstants ARG_SITEPATH}
      */
     String sitePathFromArgs = null;
 
@@ -333,7 +333,7 @@ public class ArgsManager extends IdvManager {
 
     /**
      * Should the collaboration server be started up.
-     * This are defined with the  {@link IdvConstants.ARG_SERVER}
+     * This are defined with the  {@link IdvConstants ARG_SERVER}
      */
     boolean doCollabServer = false;
 
