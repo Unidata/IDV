@@ -170,7 +170,7 @@ public abstract class TextProductDataSource extends FilesDataSource {
         Hashtable<String, Integer> ids = new Hashtable<String, Integer>();
         if ((stations != null) && (stations.size() > 0)) {
             for (NamedStationImpl station : stations) {
-                ids.put(station.getID(), new Integer(0));
+                ids.put(station.getID(), Integer.valueOf(0));
             }
         }
         return ids;

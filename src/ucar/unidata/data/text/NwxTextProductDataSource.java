@@ -766,7 +766,7 @@ public class NwxTextProductDataSource extends TextProductDataSource {
                 int num = ((Integer) ids.get(stationString)).intValue();
                 if (num < maxCount) {
                     products.add(new Product(stationString, product, date));
-                    ids.put(stationString, new Integer(num++));
+                    ids.put(stationString, Integer.valueOf(num++));
                 }
             }
         }

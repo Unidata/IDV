@@ -449,7 +449,7 @@ public class CMASoundingAdapter extends SoundingAdapterImpl implements SoundingA
         double lonvalue;
         double elevvalue;
         try {
-            wmoID = new Integer((int) getValue(tok.nextToken())).toString();
+            wmoID = Integer.valueOf((int) getValue(tok.nextToken())).toString();
             latvalue  = getValue(tok.nextToken());
             lonvalue  = getValue(tok.nextToken());
             elevvalue = getValue(tok.nextToken());
