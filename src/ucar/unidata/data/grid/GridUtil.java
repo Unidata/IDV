@@ -10108,9 +10108,9 @@ public class GridUtil {
          * if x[i] == val_x then set y[i] == val_y
          *
          * @param x
-         * @param lowerBoundX
-         * @param out
-         * @param LOWER_BOUND_Y
+         * @param val_x
+         * @param y
+         * @param val_y
          */
         private  void eqApply(double[] x, double val_x, double[] y, double val_y) {
             int len = x.length;
