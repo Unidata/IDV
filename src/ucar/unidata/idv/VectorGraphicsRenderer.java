@@ -187,7 +187,7 @@ public class VectorGraphicsRenderer implements Plotter.Plottable {
         if (GuiUtils.showOkCancelDialog(null, "Legend Label", comp, null)) {
             labelHtml  = ta.getText();
             labelPos   = TwoFacedObject.getIdString(posBox.getSelectedItem());
-            labelWidth = new Integer(widthFld.getText().trim()).intValue();
+            labelWidth = Integer.parseInt(widthFld.getText().trim());
             labelBG    = labelBGFld.getSwatchColor();
             preview    = previewCbx.isSelected();
 

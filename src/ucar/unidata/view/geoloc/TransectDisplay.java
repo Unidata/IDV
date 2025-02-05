@@ -960,7 +960,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                 txtLabel = "W" + i;
             }
 
-            labelTable.put(new Double(xyzPoints[0][i]), txtLabel);
+            labelTable.put(Double.valueOf(xyzPoints[0][i]), txtLabel);
         }
         latlonScale.setLabelTable(labelTable);
         latlonScale.setTickBase(xRange[0]);
@@ -1963,7 +1963,7 @@ public class TransectDisplay extends NavigatedDisplay implements DisplayListener
                 true);
 
         for (int i = 0; i < numLabels; i++) {
-            labelTable.put(new Double(heights[i]), labels[i]);
+            labelTable.put(Double.valueOf(heights[i]), labels[i]);
         }
         if (pressureScale != null) {
             pressureScale.setLabelTable(labelTable);

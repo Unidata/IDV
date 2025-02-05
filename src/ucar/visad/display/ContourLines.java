@@ -439,14 +439,14 @@ public abstract class ContourLines extends LineDrawing {
     public void setColorFill(boolean yesorno)
             throws VisADException, RemoteException {
         if (yesorno != colorFill) {
-            Boolean oldValue = new Boolean(colorFill);
+            Boolean oldValue = Boolean.valueOf(colorFill);
 
             this.colorFill = yesorno;
 
             if (contourControl != null) {
                 contourControl.setContourFill(colorFill);
             }
-            firePropertyChange(LABELING, oldValue, new Boolean(colorFill));
+            firePropertyChange(LABELING, oldValue, Boolean.valueOf(colorFill));
         }
     }
 
@@ -471,7 +471,7 @@ public abstract class ContourLines extends LineDrawing {
             throws VisADException, RemoteException {
 
         if (on != labeling) {
-            Boolean oldValue = new Boolean(labeling);
+            Boolean oldValue = Boolean.valueOf(labeling);
 
             this.labeling = on;
 
@@ -479,7 +479,7 @@ public abstract class ContourLines extends LineDrawing {
                 contourControl.enableLabels(labeling);
             }
 
-            firePropertyChange(LABELING, oldValue, new Boolean(labeling));
+            firePropertyChange(LABELING, oldValue, Boolean.valueOf(labeling));
         }
     }
 
