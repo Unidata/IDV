@@ -774,7 +774,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         Trace.call1("   getCAPPI", level.longString());
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(new ObjectPair(radarLocation,
-                baseTime), new ObjectPair(new Integer(moment),
+                baseTime), new ObjectPair(Integer.valueOf(moment),
                                           level)), "CAPPI");
         FieldImpl retField = (FieldImpl) getCache(cacheKey);
 
@@ -968,7 +968,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         Trace.call1("   rsl_getCAPPI", level.longString());
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(new ObjectPair(radarLocation,
-                baseTime), new ObjectPair(new Integer(moment),
+                baseTime), new ObjectPair(Integer.valueOf(moment),
                                           level)), "CAPPI");
         FieldImpl retField = (FieldImpl) getCache(cacheKey);
 
@@ -1884,7 +1884,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                         sIndex = getAngleIdx((double[]) anglesMap.get(vn),
                                              value);
                     } else {
-                        sIndex = (int) new Double(s.toString()).doubleValue();
+                        sIndex = (int) Double.parseDouble(s.toString());
                     }
                     //System.out.println("AZIMUTH angle is :" + value);
                     fi = getRHISweep(moment, value, rn, sIndex, true);
@@ -1943,7 +1943,7 @@ public class CDMRadarAdapter implements RadarAdapter {
                         sIndex = getAngleIdx((double[]) anglesMap.get(vn),
                                              value);
                     } else {
-                        sIndex = (int) new Double(s.toString()).doubleValue();
+                        sIndex = (int) Double.parseDouble(s.toString());
                     }
                     fi = getSweep(moment, value, rn, sIndex, !in2D);
                 } catch (IOException ex) {
@@ -3183,7 +3183,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         //List cacheKey = Misc.newList(varName, baseTime, stationName);
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(radarLocation, baseTime),
-                           new ObjectPair(new Integer(moment), varName));
+                           new ObjectPair(Integer.valueOf(moment), varName));
 
         FlatField retField = (FlatField) getCache(cacheKey);
 
@@ -3522,11 +3522,11 @@ public class CDMRadarAdapter implements RadarAdapter {
                                       new ObjectPair(
                                           radarLocation,
                                           baseTime), new ObjectPair(
-                                              new Integer(moment),
+                                              Integer.valueOf(moment),
                                               new ObjectPair(
-                                                  new Double(elevation),
-                                                  new Integer(
-                                                      idx)))), new Boolean(
+                                                  Double.valueOf(elevation),
+                                                  Integer.valueOf(
+                                                      idx)))), Boolean.valueOf(
                                                           want3D));
         FlatField retField = (FlatField) getCache(cacheKey);
 
@@ -3943,7 +3943,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(radarLocation, baseTime),
-                           new ObjectPair(new Integer(moment),
+                           new ObjectPair(Integer.valueOf(moment),
                                           "range-az vol"));
         FlatField retField = (FlatField) getCache(cacheKey);
 
@@ -4159,7 +4159,7 @@ public class CDMRadarAdapter implements RadarAdapter {
 
         ObjectPair cacheKey =
                 new ObjectPair(new ObjectPair(radarLocation, baseTime),
-                        new ObjectPair(new Integer(moment),
+                        new ObjectPair(Integer.valueOf(moment),
                                 "grid vol"));
         FlatField retField = (FlatField) getCache(cacheKey);
 
@@ -4198,7 +4198,7 @@ public class CDMRadarAdapter implements RadarAdapter {
             throws VisADException, RemoteException {
         ObjectPair cacheKey =
                 new ObjectPair(new ObjectPair(radarLocation, baseTime),
-                        new ObjectPair(new Integer(moment),
+                        new ObjectPair(Integer.valueOf(moment),
                                 new String("latlonalt grid")));
         Field cacheField = (dataSource == null)
                 ? null
@@ -4482,7 +4482,7 @@ public class CDMRadarAdapter implements RadarAdapter {
         //        Trace.call1("volume preamble");
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(radarLocation, baseTime),
-                           new ObjectPair(new Integer(moment),
+                           new ObjectPair(Integer.valueOf(moment),
                                           "range-az vol"));
         FlatField retField = (FlatField) getCache(cacheKey);
 

@@ -459,7 +459,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                 String rtName = paramTypes[i].getName();
                 //  what the user sees
                 String  paramName = Util.cleanTypeName(rtName);
-                Integer momentObj = new Integer(i);
+                Integer momentObj = Integer.valueOf(i);
 
                 // String  momentName = moments[i];
                 if (da.isVolume()) {
@@ -581,7 +581,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                         Hashtable dataChoiceProperties =
                             Misc.newHashtable(new Object[] {
                             PROP_AZIMUTHS, new double[] { angles[j] },
-                            PROP_AZIMUTH, new Double(j), PROP_VOLUMEORSWEEP,
+                            PROP_AZIMUTH, Double.valueOf(j), PROP_VOLUMEORSWEEP,
                             VALUE_3D
                         });
 
@@ -592,7 +592,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                         momentChoice.addDataChoice(
                             new DirectDataChoice(
                                 this, new ObjectArray(
-                                    momentObj, new Double(
+                                    momentObj, Double.valueOf(
                                         angles[j]), rtName, RadarConstants.VALUE_2D), stationID
                                             + " " + paramName, paramName
                                                 + " " + name, categories2D, dataChoiceProperties));
@@ -604,7 +604,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                         Hashtable dataChoiceProperties =
                             Misc.newHashtable(new Object[] {
                             PROP_ANGLES, new double[] { angles[j] },
-                            PROP_ANGLE, new Double(j), PROP_VOLUMEORSWEEP,
+                            PROP_ANGLE, Double.valueOf(j), PROP_VOLUMEORSWEEP,
                             VALUE_SWEEP
                         });
 
@@ -615,7 +615,7 @@ public class CDMRadarDataSource extends RadarDataSource {
                         momentChoice.addDataChoice(
                             new DirectDataChoice(
                                 this, new ObjectArray(
-                                    momentObj, new Double(
+                                    momentObj, Double.valueOf(
                                         angles[j]), rtName, RadarConstants.VALUE_2D), stationID
                                             + " " + paramName, paramName
                                                 + " " + name, categories2D, dataChoiceProperties));

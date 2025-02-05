@@ -1324,7 +1324,7 @@ public class TrackDataSource extends FilesDataSource {
         String text = "";
         try {
             text = strideFld.getText().trim();
-            setStride(new Integer(text).intValue());
+            setStride(Integer.parseInt(text));
             List adapters = getAdapters();
             if (adapters != null) {
                 for (int i = 0; i < adapters.size(); i++) {
@@ -1337,7 +1337,7 @@ public class TrackDataSource extends FilesDataSource {
             if (text.equals("all") || (text.length() == 0)) {
                 setLastNMinutes(-1);
             } else {
-                setLastNMinutes(new Integer(text).intValue());
+                setLastNMinutes(Integer.parseInt(text));
             }
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Bad " + what + " value:" + text);
