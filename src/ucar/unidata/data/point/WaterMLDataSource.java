@@ -230,9 +230,9 @@ public class WaterMLDataSource extends PointDataSource {
                 DateTime dttm = new DateTime(date);
 
 
-                double value = new Double(
+                double value = Double.parseDouble(
                                    XmlUtil.getChildText(
-                                       valueNode).trim()).doubleValue();
+                                       valueNode).trim());
                 double[] realArray   = new double[] { value };
                 String[] stringArray = new String[] { station };
                 Tuple tuple = new DoubleStringTuple(allTupleType, realArray,

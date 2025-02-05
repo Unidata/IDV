@@ -630,7 +630,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                             // load in reverse order so lower z values from
                             // low mode scan have preference over high mode values
                             for (int j = dsList.size() - 1; j >= 0; j--) {
-                                sortedlist.put(new Float(zsetfloats[0][j]),
+                                sortedlist.put(Float.valueOf(zsetfloats[0][j]),
                                         ds[j]);
                             }
 
@@ -779,7 +779,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
                     // load in reverse order so lower z values from
                     // low mode scan have preference over high mode values
                     for (int j = dsList.size() - 1; j >= 0; j--) {
-                        sortedlist.put(new Float(zsetfloats[0][j]), ds[j]);
+                        sortedlist.put(Float.valueOf(zsetfloats[0][j]), ds[j]);
                     }
 
                     // extract the sorted lists of z-s, and dir-spd tuples,
@@ -1399,7 +1399,7 @@ public class AddeProfilerDataSource extends DataSourceImpl {
             timesList.addAll((List) getProperty(AddeUtil.ABSOLUTE_TIMES));
         } else {
             Object tmp = getProperty(AddeUtil.NUM_RELATIVE_TIMES,
-                                     new Integer(0));
+                                     Integer.valueOf(0));
             int[] timeIndices;
             if (tmp instanceof Integer) {
                 int numTimes = ((Integer) tmp).intValue();

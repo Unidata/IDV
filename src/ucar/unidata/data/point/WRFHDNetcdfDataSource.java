@@ -259,7 +259,7 @@ public class WRFHDNetcdfDataSource extends NetcdfPointDataSource {
                 List      datas    = new ArrayList();
                 for (int i = 0; i < sources.size(); i++) {
                     DataChoice choice = new DirectDataChoice(this,
-                                            new Integer(i), "", "",
+                                            Integer.valueOf(i), "", "",
                                             dataChoice.getCategories(),
                                             properties);
                     pointObs = (FieldImpl) getDataInner(choice, category,

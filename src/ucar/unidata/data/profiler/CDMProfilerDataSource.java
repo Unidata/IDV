@@ -1460,7 +1460,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
                             // load in reverse order so lower z values from
                             // low mode scan have preference over high mode values
                             for (int j = dsList.size() - 1; j >= 0; j--) {
-                                sortedlist.put(new Float(zsetfloats[0][j]),
+                                sortedlist.put(Float.valueOf(zsetfloats[0][j]),
                                         ds[j]);
                             }
 
@@ -1610,7 +1610,7 @@ public class CDMProfilerDataSource extends FilesDataSource {
                     // load in reverse order so lower z values from
                     // low mode scan have preference over high mode values
                     for (int j = dsList.size() - 1; j >= 0; j--) {
-                        sortedlist.put(new Float(zsetfloats[0][j]), ds[j]);
+                        sortedlist.put(Float.valueOf(zsetfloats[0][j]), ds[j]);
                     }
 
                     // extract the sorted lists of z-s, and dir-spd tuples,
