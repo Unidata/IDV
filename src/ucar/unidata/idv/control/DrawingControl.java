@@ -2046,10 +2046,10 @@ public class DrawingControl extends DisplayControlImpl {
         };
         Vector values = new Vector();
         for (int i = 0; i < widths.length; i++) {
-            values.add(new Integer(widths[i]));
+            values.add(Integer.valueOf(widths[i]));
         }
         JComboBox box = new JComboBox(values);
-        box.setSelectedItem(new Integer(lineWidth));
+        box.setSelectedItem(Integer.valueOf(lineWidth));
         box.setToolTipText("Change width of lines");
         return box;
     }
