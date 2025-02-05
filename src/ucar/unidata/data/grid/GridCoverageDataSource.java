@@ -1365,7 +1365,7 @@ public class GridCoverageDataSource extends GridDataSource {
         iter = myDataset.getGrids().iterator();
         Hashtable timeToIndex = new Hashtable();
         for (int i = 0; i < myTimes.size(); i++) {
-            timeToIndex.put(myTimes.get(i), new Integer(i));
+            timeToIndex.put(myTimes.get(i), Integer.valueOf(i));
         }
         int cnt = 0;
         while (iter.hasNext()) {
@@ -2073,10 +2073,10 @@ public class GridCoverageDataSource extends GridDataSource {
         if (o instanceof String) {
             String s = (String) o;
             if (s.startsWith("#")) {
-                int index = new Integer(s.substring(1).trim()).intValue();
+                int index = Integer.parseInt(s.substring(1).trim());
                 return index;
             }
-            o = new Real(new Double(s).doubleValue());
+            o = new Real(Double.parseDouble(s));
         }
 
         if ((o instanceof Real) && (levels.size() > 0)
@@ -2531,7 +2531,7 @@ public class GridCoverageDataSource extends GridDataSource {
                 props = new Hashtable(twoDProps);
                 props.put(PROP_GRIDSIZE, new ThreeDSize(xLength, yLength));
                 if (geoTimes != null) {
-                    props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
+                    props.put(PROP_TIMESIZE, Integer.valueOf(geoTimes.size()));
                 }
               /*  if ((ensDim != null) && (ensDim.getLength() > 1)) {
                     //List             ensMembers = null;
@@ -2594,7 +2594,7 @@ public class GridCoverageDataSource extends GridDataSource {
                 props = new Hashtable(threeDProps);
                 props.put(PROP_GRIDSIZE, size);
                 if (geoTimes != null) {
-                    props.put(PROP_TIMESIZE, new Integer(geoTimes.size()));
+                    props.put(PROP_TIMESIZE, Integer.valueOf(geoTimes.size()));
                 }
                 /* if ((ensDim != null) && (ensDim.getLength() > 1)) {
                     List             ensMembers = null;

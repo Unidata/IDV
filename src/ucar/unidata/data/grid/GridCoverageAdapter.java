@@ -401,7 +401,7 @@ public class GridCoverageAdapter {
         Object timeStepKey = !isTimeDependent
                 ? (Object) gcs
                 : (Object) new ObjectPair(gcs,
-                new Integer(timeIndex));
+                Integer.valueOf(timeIndex));
         timeStepKey = Misc.newList(timeStepKey, extraCacheKey);
         GriddedSet domainSet = (GriddedSet) dataSource.getCache(timeStepKey,
                 true);
@@ -1788,10 +1788,10 @@ public class GridCoverageAdapter {
         if (o instanceof String) {
             String s = (String) o;
             if (s.startsWith("#")) {
-                int index = new Integer(s.substring(1).trim()).intValue();
+                int index = Integer.parseInt(s.substring(1).trim());
                 return index;
             }
-            o = new Real(new Double(s).doubleValue());
+            o = new Real(Double.parseDouble(s));
         }
 
         if ((o instanceof Real) && (levels.size() > 0)

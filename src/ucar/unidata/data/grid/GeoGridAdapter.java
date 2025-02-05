@@ -384,7 +384,7 @@ public class GeoGridAdapter {
         Object timeStepKey = !isTimeDependent
                              ? (Object) gcs
                              : (Object) new ObjectPair(gcs,
-                                 new Integer(timeIndex));
+                                 Integer.valueOf(timeIndex));
         timeStepKey = Misc.newList(timeStepKey, extraCacheKey);
         GriddedSet domainSet = (GriddedSet) dataSource.getCache(timeStepKey,
                                    true);
