@@ -235,7 +235,7 @@ public class NetcdfSweepfileAdapter implements RadarAdapter {
                         && prop2dOr3d.equals(RadarConstants.VALUE_3D);
         ObjectPair cacheKey = new ObjectPair(location,
                                              new ObjectPair(dataChoice,
-                                                 new Boolean(use3d)));
+                                                 Boolean.valueOf(use3d)));
         FlatField singleSweep = null;
         //TODO: Gotta figure out a better way to cache so that when the CacheManager flushes
         //its cache when memory is getting blown it also flushes  this cache.

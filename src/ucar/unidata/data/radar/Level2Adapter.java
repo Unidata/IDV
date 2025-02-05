@@ -390,9 +390,9 @@ public class Level2Adapter implements RadarAdapter {
                                       new ObjectPair(
                                           radarLocation,
                                           baseTime), new ObjectPair(
-                                              new Integer(moment),
-                                              new Double(
-                                                  elevation))), new Boolean(
+                                              Integer.valueOf(moment),
+                                              Double.valueOf(
+                                                  elevation))), Boolean.valueOf(
                                                       want3D));
         FlatField retField = (dataSource == null)
                              ? null
@@ -960,7 +960,7 @@ public class Level2Adapter implements RadarAdapter {
         //long t1 = System.currentTimeMillis ();
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(new ObjectPair(radarLocation,
-                baseTime), new ObjectPair(new Integer(moment),
+                baseTime), new ObjectPair(Integer.valueOf(moment),
                                           level)), new String("CAPPI"));
         FieldImpl retField = (dataSource == null)
                              ? null
@@ -1325,7 +1325,7 @@ public class Level2Adapter implements RadarAdapter {
         //long t1 = System.currentTimeMillis ();
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(radarLocation, baseTime),
-                           new ObjectPair(new Integer(moment),
+                           new ObjectPair(Integer.valueOf(moment),
                                           new String("range-az vol")));
         FlatField retField = (dataSource == null)
                              ? null
@@ -1479,7 +1479,7 @@ public class Level2Adapter implements RadarAdapter {
             throws VisADException, RemoteException {
         ObjectPair cacheKey =
             new ObjectPair(new ObjectPair(radarLocation, baseTime),
-                           new ObjectPair(new Integer(moment),
+                           new ObjectPair(Integer.valueOf(moment),
                                           new String("latlonalt grid")));
         Field cacheField = (dataSource == null)
                            ? null

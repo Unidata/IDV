@@ -398,7 +398,7 @@ public class DoradeAdapter implements RadarAdapter {
                         && prop2dOr3d.equals(RadarConstants.VALUE_3D);
         ObjectPair cacheKey = new ObjectPair(swpFileName,
                                              new ObjectPair(dataChoice,
-                                                 new Boolean(use3d)));
+                                                 Boolean.valueOf(use3d)));
         FieldImpl singleSweep = null;
         //TODO: Gotta figure out a better way to cache so that when the CacheManager flushes
         //its cache when memory is getting blown it also flushes  this cache.

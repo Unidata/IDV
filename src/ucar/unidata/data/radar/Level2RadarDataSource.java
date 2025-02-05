@@ -197,7 +197,7 @@ public class Level2RadarDataSource extends RadarDataSource {
         Hashtable properties;
         try {
             for (int moment = 0; moment < moments.length; moment++) {
-                Integer momentObj  = new Integer(moment);
+                Integer momentObj  = Integer.valueOf(moment);
                 String  momentName = moments[moment];
                 Hashtable compositeProperties =
                     Misc.newHashtable(PROP_ANGLES, angles, STATION_LOCATION,
@@ -219,7 +219,7 @@ public class Level2RadarDataSource extends RadarDataSource {
                     Hashtable dataChoiceProperties =
                         Misc.newHashtable(new Object[] {
                         PROP_ANGLES, new double[] { angles[i] }, PROP_ANGLE,
-                        new Double(angles[i]), PROP_VOLUMEORSWEEP, VALUE_SWEEP
+                        Double.valueOf(angles[i]), PROP_VOLUMEORSWEEP, VALUE_SWEEP
                     });
                     dataChoiceProperties.put(
                         DataChoice.PROP_ICON,
@@ -231,7 +231,7 @@ public class Level2RadarDataSource extends RadarDataSource {
                     momentChoice.addDataChoice(
                         new DirectDataChoice(
                             this, new ObjectArray(
-                                new Double(
+                                Double.valueOf(
                                     angles[i]), momentObj, RadarConstants.VALUE_2D), stationName
                                         + " " + momentName, momentName + " "
                                             + name, sweepCategories, dataChoiceProperties));
