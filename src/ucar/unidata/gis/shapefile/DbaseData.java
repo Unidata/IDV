@@ -278,14 +278,14 @@ public class DbaseData {
           case TYPE_NUMERIC :
               listData = new ArrayList();
               for (int i = 0; i < numeric.length; i++) {
-                  listData.add(new Double(numeric[i]));
+                  listData.add(Double.valueOf(numeric[i]));
               }
               return listData;
         }
 
         listData = new ArrayList();
         for (int i = 0; i < logical.length; i++) {
-            listData.add(new Boolean(logical[i]));
+            listData.add(Boolean.valueOf(logical[i]));
         }
         return listData;
     }
@@ -304,10 +304,10 @@ public class DbaseData {
               return character[i];
 
           case TYPE_NUMERIC :
-              return new Double(numeric[i]);
+              return Double.valueOf(numeric[i]);
 
           case TYPE_BOOLEAN :
-              return new Boolean(logical[i]);
+              return Boolean.valueOf(logical[i]);
         }
         return null;
     }
