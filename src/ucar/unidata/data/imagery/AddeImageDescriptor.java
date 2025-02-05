@@ -129,7 +129,7 @@ public class AddeImageDescriptor implements Comparable, XmlPersistable,
         Matcher matcher = pattern.matcher(imageSource.toLowerCase());
         if (matcher.find()) {
             String pos = matcher.group(1);
-            this.relativeIndex = Math.abs(new Integer(pos).intValue());
+            this.relativeIndex = Math.abs(Integer.parseInt(pos));
             isRelative         = true;
         }
 
