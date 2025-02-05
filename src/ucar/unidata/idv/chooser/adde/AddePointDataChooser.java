@@ -240,7 +240,7 @@ public class AddePointDataChooser extends AddeChooser {
             if (source.indexOf(AddeUtil.RELATIVE_TIME) >= 0) {
                 ht.put(AddeUtil.NUM_RELATIVE_TIMES, getRelativeTimeIndices());
                 ht.put(AddeUtil.RELATIVE_TIME_INCREMENT,
-                       new Float(getRelativeTimeIncrement()));
+                       Float.valueOf(getRelativeTimeIncrement()));
             }
             if (getDoAbsoluteTimes()) {
                 ht.put(AddeUtil.ABSOLUTE_TIMES, getSelectedAbsoluteTimes());
@@ -298,10 +298,10 @@ public class AddePointDataChooser extends AddeChooser {
         };
         List     l    = new ArrayList();
         for (int i = 0; i < nums.length; i++) {
-            l.add(new TwoFacedObject(nums[i], new Float(vals[i])));
+            l.add(new TwoFacedObject(nums[i], Float.valueOf(vals[i])));
         }
         relTimeIncBox = GuiUtils.getEditableBox(l,
-                new Float(relativeTimeIncrement));
+                Float.valueOf(relativeTimeIncrement));
         relTimeIncBox.addActionListener(listener);
         relTimeIncBox.setToolTipText(
             "Set the increment between most recent times");
@@ -629,7 +629,7 @@ public class AddePointDataChooser extends AddeChooser {
     public void setRelativeTimeIncrement(float increment) {
         relativeTimeIncrement = increment;
         if (relTimeIncBox != null) {
-            relTimeIncBox.setSelectedItem(new Float(relativeTimeIncrement));
+            relTimeIncBox.setSelectedItem(Float.valueOf(relativeTimeIncrement));
         }
     }
 

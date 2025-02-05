@@ -2592,7 +2592,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             if (lines.equalsIgnoreCase(ALL)) {
                 lines = "" + (int) baseNumLines;
             }
-            int    numLines = new Integer(lines.trim()).intValue();
+            int    numLines = Integer.parseInt(lines.trim());
 
             String elems    = (toks.size() > 1)
                               ? "" + toks.get(1)
@@ -2600,7 +2600,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             if (elems.equalsIgnoreCase(ALL)) {
                 elems = "" + baseNumElements;
             }
-            int numElements = new Integer(elems.trim()).intValue();
+            int numElements = Integer.parseInt(elems.trim());
             return new int[] { (int) Math.min(numLines, baseNumLines),
                                (int) Math.min(numElements, baseNumElements) };
         }
@@ -2738,8 +2738,8 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             } else if (prop.equals(PROP_MAG)) {
                 String[] pair = getPair(value);
                 if (pair != null) {
-                    setMagSliders(new Integer(pair[0]).intValue(),
-                                  new Integer(pair[1]).intValue());
+                    setMagSliders(Integer.parseInt(pair[0]),
+                                  Integer.parseInt(pair[1]));
                 } else {
                     setMagSliders(DEFAULT_MAG, DEFAULT_MAG);
                 }
@@ -2908,9 +2908,9 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
             return "Band: " + band;
         }
         Hashtable bandToName =
-            (Hashtable) sensorToBandToName.get(new Integer(ad.getSensorID()));
+            (Hashtable) sensorToBandToName.get(Integer.valueOf(ad.getSensorID()));
         String  name        = null;
-        Integer bandInteger = new Integer(band);
+        Integer bandInteger = Integer.valueOf(band);
 
         if (bandToName != null) {
             name = (String) bandToName.get(bandInteger);
@@ -3053,7 +3053,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
                 } catch (NumberFormatException nfe) {}
             }
             for (int j = 0; j < satIds.size(); j++) {
-                Integer sensorId = new Integer(satIds.get(j).toString());
+                Integer sensorId = Integer.valueOf(Integer.parseInt(satIds.get(j).toString()));
                 sensorToBandToName.put(sensorId, bandToName);
             }
         }

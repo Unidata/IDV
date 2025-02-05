@@ -238,7 +238,7 @@ public class Level2RadarChooser extends FileChooser {
         }
 
         if (recentCnt > 0) {
-            properties.put(DataSource.MOST_RECENT, new Integer(recentCnt));
+            properties.put(DataSource.MOST_RECENT, Integer.valueOf(recentCnt));
             tmpDataLoc = new String[] { directory.toString() };
             PollingInfo pollingInfo = new PollingInfo(directory.toString(),
                                           60000, pattern, false, false);
