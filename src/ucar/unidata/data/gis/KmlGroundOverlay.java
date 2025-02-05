@@ -153,20 +153,20 @@ public class KmlGroundOverlay extends KmlImageElement {
         Element tmpNode = XmlUtil.findChild(iconNode, TAG_VIEWBOUNDSCALE);
         if (tmpNode != null) {
             viewBoundScale =
-                new Double(XmlUtil.getChildText(tmpNode)).doubleValue();
+                Double.parseDouble(XmlUtil.getChildText(tmpNode));
         }
 
 
 
         Element latLonNode = XmlUtil.findChild(node, TAG_LATLONBOX);
-        north = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                                                                      TAG_NORTH))).doubleValue();
-            south = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                                                                      TAG_SOUTH))).doubleValue();
-            east = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                                                                     TAG_EAST))).doubleValue();
-            west = new Double(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
-                                                                     TAG_WEST))).doubleValue();
+        north = Double.parseDouble(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
+                                                                      TAG_NORTH)));
+            south = Double.parseDouble(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
+                                                                      TAG_SOUTH)));
+            east = Double.parseDouble(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
+                                                                     TAG_EAST)));
+            west = Double.parseDouble(XmlUtil.getChildText(XmlUtil.findChild(latLonNode,
+                                                                     TAG_WEST)));
     }
 
 

@@ -972,12 +972,12 @@ public class KmlUtil {
                     result = new double[3][numbers.size() / 3];
                     int cnt = 0;
                     for (int i = 0; i < numbers.size(); i += 3) {
-                        result[0][cnt] = new Double(
-                            numbers.get(i).toString()).doubleValue();
-                        result[1][cnt] = new Double(numbers.get(i
-                                + 1).toString()).doubleValue();
-                        result[2][cnt] = new Double(numbers.get(i
-                                + 2).toString()).doubleValue();
+                        result[0][cnt] = Double.parseDouble(
+                            numbers.get(i).toString());
+                        result[1][cnt] = Double.parseDouble(numbers.get(i
+                                + 1).toString());
+                        result[2][cnt] = Double.parseDouble(numbers.get(i
+                                + 2).toString());
                         cnt++;
                     }
                     return result;
@@ -989,8 +989,8 @@ public class KmlUtil {
                 result = new double[numbers.size()][tokens.size()];
             }
             for (int coordIdx = 0; (coordIdx < numbers.size()); coordIdx++) {
-                result[coordIdx][pointIdx] = new Double(
-                    numbers.get(coordIdx).toString()).doubleValue();
+                result[coordIdx][pointIdx] = Double.parseDouble(
+                    numbers.get(coordIdx).toString());
             }
         }
         return result;

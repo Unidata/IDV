@@ -187,10 +187,10 @@ public class PlaceFileDataSource extends FilesDataSource {
                 String[]subtoks = StringUtil.split(toks[1],",",3);
                 if(subtoks!=null) {
                     int fontStyle = 0;
-                    int flags =  new Integer(toks[2]).intValue();
+                    int flags =  Integer.parseInt(toks[2]);
                     if((flags&1)!=0) fontStyle|=Font.BOLD;
                     if((flags&2)!=0) fontStyle|=Font.ITALIC;
-                    Font f =new Font(toks[3], fontStyle, new Integer(toks[1]).intValue());
+                    Font f =new Font(toks[3], fontStyle, Integer.parseInt(toks[1]));
                     fonts.put(toks[0],f);
                 }
             } else if(toks[0].equals(SHAPE_TITLE)) {

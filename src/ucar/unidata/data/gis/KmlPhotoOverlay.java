@@ -178,7 +178,7 @@ public class KmlPhotoOverlay extends KmlImageElement {
     private double getValue(Element node, String childTag) {
         Element child  = XmlUtil.findChild(node,
                                            childTag);
-        if(child!=null) return new Double(XmlUtil.getChildText(child)).doubleValue();
+        if(child!=null) return Double.parseDouble(XmlUtil.getChildText(child));
         return 0.0;
     }
 
