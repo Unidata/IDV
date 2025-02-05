@@ -295,7 +295,7 @@ public class CompassLabels extends LineDrawing {
      * @return                  The hash code of this instance.
      */
     public int hashCode() {
-        return new Float(size).hashCode() ^ field.hashCode()
+        return Float.valueOf(size).hashCode() ^ field.hashCode()
                ^ super.hashCode();
     }
 

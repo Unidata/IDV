@@ -272,7 +272,7 @@ public class SpeedLabels extends PolarLineDrawing {
      * @return                  The hash code of this instance.
      */
     public int hashCode() {
-        return new Float(size).hashCode() ^ format.hashCode()
+        return Float.valueOf(size).hashCode() ^ format.hashCode()
                ^ field.hashCode() ^ super.hashCode();
     }
 

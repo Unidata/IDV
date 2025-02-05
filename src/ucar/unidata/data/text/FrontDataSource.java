@@ -219,7 +219,7 @@ public class FrontDataSource extends FilesDataSource {
             return false;
         }
         timeWindow =
-            new Double(timeWindowField.getText().trim()).doubleValue();
+            Double.parseDouble(timeWindowField.getText().trim());
         flushCache();
         return true;
     }
@@ -303,7 +303,7 @@ public class FrontDataSource extends FilesDataSource {
             int index2 = tok.indexOf("%");
             tok = tok.substring(0, index2);
             String deltas = tok.substring(4, index2);
-            int    delta  = new Integer(deltas).intValue();
+            int    delta  = Integer.parseInt(deltas);
             now.add(java.util.Calendar.DAY_OF_YEAR, -delta);
             String days = "" + now.get(java.util.Calendar.DAY_OF_YEAR);
             days = StringUtil.padLeft(days, 3, "0");
@@ -597,9 +597,9 @@ public class FrontDataSource extends FilesDataSource {
             splitIndex = 3;
             divisor    = 10.;
         }
-        double lat = new Double(s.substring(0, splitIndex)).doubleValue()
+        double lat = Double.parseDouble(s.substring(0, splitIndex))
                      / divisor;
-        double lon = -new Double(s.substring(splitIndex)).doubleValue()
+        double lon = -Double.parseDouble(s.substring(splitIndex))
                      / divisor;
         return new double[] { lat, lon };
     }
@@ -665,7 +665,7 @@ public class FrontDataSource extends FilesDataSource {
                 }
                 String pressure = (String) toks.get(i);
                 try {
-                    double pd = new Double(pressure).doubleValue();
+                    double pd = Double.parseDouble(pressure);
                     //Check for bad values
                     if ((pd < 800) || (pd > 1100)) {
                         warnings.add("Bad pressure data: " + pressure
