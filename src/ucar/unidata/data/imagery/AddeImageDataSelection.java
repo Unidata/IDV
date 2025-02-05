@@ -914,10 +914,10 @@ public class AddeImageDataSelection {
                     StringTokenizer tok = new StringTokenizer(cards[i]);
                     String          str = tok.nextToken();
                     str = tok.nextToken();
-                    Float flt = new Float(str);
+                    Float flt = Float.valueOf(Float.parseFloat(str));
                     res[0] = flt.floatValue();
                     str    = tok.nextToken();
-                    flt    = new Float(str);
+                    flt    = Float.valueOf(Float.parseFloat(str));
                     res[1] = flt.floatValue();
                     return res;
                 }
@@ -1368,7 +1368,7 @@ public class AddeImageDataSelection {
             fullResBtn =
                 GuiUtils.makeImageButton("/auxdata/ui/icons/arrow_out.png",
                                          this, "setToFullResolution",
-                                         new Boolean(true));
+                                         Boolean.valueOf(true));
             fullResBtn.setContentAreaFilled(false);
             fullResBtn.setToolTipText("Set fields to retrieve full image");
 
@@ -2655,7 +2655,7 @@ public class AddeImageDataSelection {
 
                 // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
                 if (isFull) {
-                    advancedPanel.setToFullResolution(new Boolean(false));
+                    advancedPanel.setToFullResolution(Boolean.valueOf(false));
                 } else if ( !hasCorner) {
                     advancedPanel.setLatitude(gInfo.getMaxLat());
                     advancedPanel.setLongitude(gInfo.getMinLon());
