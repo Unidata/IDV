@@ -643,10 +643,10 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
         };
         List     l    = new ArrayList();
         for (int i = 0; i < nums.length; i++) {
-            l.add(new TwoFacedObject(nums[i], new Float(vals[i])));
+            l.add(new TwoFacedObject(nums[i], Float.valueOf(vals[i])));
         }
         relTimeIncBox = GuiUtils.getEditableBox(l,
-                new Float(getRelativeTimeIncrement()));
+                Float.valueOf(getRelativeTimeIncrement()));
         relTimeIncBox.addActionListener(listener);
         relTimeIncBox.setToolTipText(
             "Set the increment between most recent times");
@@ -705,7 +705,7 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
             //ht.put(DATASET_NAME_KEY, getDatasetName());
             ht.put(DATA_NAME_KEY, getDataName());
             ht.put(AddeUtil.RELATIVE_TIME_INCREMENT,
-                    new Double(getRelativeTimeIncrement()/60.0));
+                    Double.valueOf(getRelativeTimeIncrement()/60.0));
             if (source.indexOf(AddeUtil.RELATIVE_TIME) >= 0) {
                 ht.put(AddeUtil.NUM_RELATIVE_TIMES, getRelativeTimeIndices());
             }

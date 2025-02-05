@@ -370,9 +370,9 @@ public class SoundingTable extends JTable {
         public Object getValueAt(int row, int col) {
             try {
                 if (col < numDomainCols) {
-                    return new Float(domainData[col][row]);
+                    return Float.valueOf(domainData[col][row]);
                 } else {
-                    return new Float(rangeData[col - numDomainCols][row]);
+                    return Float.valueOf(rangeData[col - numDomainCols][row]);
                 }
             } catch (Exception enr) {
                 return Float.NaN;
