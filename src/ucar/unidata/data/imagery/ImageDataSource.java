@@ -881,7 +881,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                     //timeSelect = new DataSelection (Misc.newList (imageTime));
                     //We will create the  data choice with an index, not with the actual time.
                     timeSelect =
-                        new DataSelection(Misc.newList(new Integer(cnt)));
+                        new DataSelection(Misc.newList(Integer.valueOf(cnt)));
                 }
             } else {
                 imageTimes.add(getRelativeTimeObject(aid));
@@ -1094,7 +1094,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
      */
     private Object getRelativeTimeObject(AddeImageDescriptor aid) {
         return new TwoFacedObject(aid.toString(),
-                                  new Integer(aid.getRelativeIndex()));
+                                  Integer.valueOf(aid.getRelativeIndex()));
     }
 
 
@@ -1170,7 +1170,7 @@ public abstract class ImageDataSource extends DataSourceImpl {
                         String bandString = aii.getBand();
                         if ((bandString != null)
                                 && !bandString.equals(aii.ALL)) {
-                            band = new Integer(bandString).intValue();
+                            band = Integer.parseInt(bandString);
                         }
                         //TODO: even though the band is non-zero we might only get back one band
                         band = 0;

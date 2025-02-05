@@ -640,7 +640,7 @@ public class AddeImagePreviewPanel extends DataSelectionComponent {
                 .setSelectedIndex(0);
             // set lat lon values   locateValue = Misc.format(maxLat) + " " + Misc.format(minLon);
             if(isFull){
-                imageDataSource.addeImageDataSelection.getAdvancedPanel().setToFullResolution(new Boolean(false));
+                imageDataSource.addeImageDataSelection.getAdvancedPanel().setToFullResolution(Boolean.valueOf(false));
             } else if ( !hasCorner) {
                 imageDataSource.addeImageDataSelection.getAdvancedPanel().setPlace("ULEFT");
                 imageDataSource.addeImageDataSelection.getAdvancedPanel().setLatitude(
