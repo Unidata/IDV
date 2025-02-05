@@ -140,7 +140,7 @@ public class PollingFileChooser extends FileChooser {
             if (s.equals("all")) {
                 fileCount = Integer.MAX_VALUE;
             } else {
-                fileCount = new Integer(s).intValue();
+                fileCount = Integer.parseInt(s);
             }
             pollingInfo.setFileCount(fileCount);
         }

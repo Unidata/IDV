@@ -292,19 +292,19 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
      */
     protected JComponent doMakeContents() {
         Vector rawsList = new Vector();
-        rawsList.add(new TwoFacedObject("NWS Only", new Integer(RAWS_NWS)));
+        rawsList.add(new TwoFacedObject("NWS Only", Integer.valueOf(RAWS_NWS)));
         rawsList.add(new TwoFacedObject("NWS and RAWS",
-                                        new Integer(RAWS_NWSANDRAWS)));
+                                        Integer.valueOf(RAWS_NWSANDRAWS)));
         rawsList.add(new TwoFacedObject("All Network",
-                                        new Integer(RAWS_ALL)));
+                                        Integer.valueOf(RAWS_ALL)));
         rawsBox    = new JComboBox(rawsList);
 
         minutesBox = new JComboBox(new Vector());
         Vector rangeList = new Vector();
-        rangeList.add(new TwoFacedObject("24 hours", new Integer(24)));
-        rangeList.add(new TwoFacedObject("12 hours", new Integer(12)));
-        rangeList.add(new TwoFacedObject("6 hours", new Integer(6)));
-        rangeList.add(new TwoFacedObject("2 hours", new Integer(2)));
+        rangeList.add(new TwoFacedObject("24 hours", Integer.valueOf(24)));
+        rangeList.add(new TwoFacedObject("12 hours", Integer.valueOf(12)));
+        rangeList.add(new TwoFacedObject("6 hours", Integer.valueOf(6)));
+        rangeList.add(new TwoFacedObject("2 hours", Integer.valueOf(2)));
         rangeBox = new JComboBox(rangeList);
         rangeBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -397,16 +397,16 @@ public class MesoWestChooser extends IdvChooser implements ActionListener {
         int    hours       = ((Integer) getId(rangeBox)).intValue();
         Object selected    = minutesBox.getSelectedItem();
         Vector minutesList = new Vector();
-        minutesList.add(new TwoFacedObject("60 Minutes", new Integer(60)));
+        minutesList.add(new TwoFacedObject("60 Minutes", Integer.valueOf(60)));
         if (hours < 24) {
             minutesList.add(new TwoFacedObject("30 Minutes",
-                    new Integer(30)));
+                    Integer.valueOf(30)));
             if (hours < 12) {
                 minutesList.add(new TwoFacedObject("15 Minutes",
-                        new Integer(15)));
+                        Integer.valueOf(15)));
                 if (hours < 6) {
                     minutesList.add(new TwoFacedObject("5 Minutes",
-                            new Integer(5)));
+                            Integer.valueOf(5)));
                 }
             }
         }

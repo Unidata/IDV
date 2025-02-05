@@ -537,7 +537,7 @@ public class AddeProfilerDataChooser extends AddeChooser {
             profilersourceHT.put(AddeUtil.NUM_RELATIVE_TIMES,
                                  getRelativeTimeIndices());
             profilersourceHT.put(AddeUtil.RELATIVE_TIME_INCREMENT,
-                                 new Float(getRelativeTimeIncrement()));
+                                 Float.valueOf(getRelativeTimeIncrement()));
             if (getDoAbsoluteTimes()) {
                 profilersourceHT.put(AddeUtil.ABSOLUTE_TIMES,
                                      getSelectedAbsoluteTimes());

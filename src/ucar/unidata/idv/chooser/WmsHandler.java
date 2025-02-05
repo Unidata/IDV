@@ -111,10 +111,10 @@ public class WmsHandler extends XmlHandler {
         String version = XmlUtil.getAttribute(root, WmsUtil.ATTR_VERSION);
         List   tokens  = StringUtil.split(version, ".");
         if (tokens.size() > 0) {
-            versionMajor = new Integer((String) tokens.get(0)).intValue();
+            versionMajor = Integer.parseInt((String) tokens.get(0));
         }
         if (tokens.size() > 1) {
-            versionMinor = new Integer((String) tokens.get(1)).intValue();
+            versionMinor = Integer.parseInt((String) tokens.get(1));
         }
     }
 
