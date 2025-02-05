@@ -1463,7 +1463,7 @@ public class TextPointDataSource extends PointDataSource {
                 String colspan = StringUtil.findPattern(extra,
                                      "colspan *= *\"([^\"]+)\"");
                 if (colspan != null) {
-                    skip = new Integer(colspan).intValue() - 1;
+                    skip = Integer.parseInt(colspan) - 1;
                 }
             }
             attrs  = attrs.trim();
@@ -2730,7 +2730,7 @@ public class TextPointDataSource extends PointDataSource {
                 List      datas    = new ArrayList();
                 for (int i = 0; i < sources.size(); i++) {
                     DataChoice choice = new DirectDataChoice(this,
-                                            new Integer(i), "", "",
+                                            Integer.valueOf(i), "", "",
                                             dataChoice.getCategories(),
                                             properties);
                     pointObs = (FieldImpl) getDataInner(choice, category,
@@ -2908,7 +2908,7 @@ public class TextPointDataSource extends PointDataSource {
                     return;
                 }
                 properties.put(TextPointDataSource.PROP_HEADER_SKIP,
-                               new Integer(args[argIdx + 1]));
+                               Integer.valueOf(Integer.parseInt(args[argIdx + 1])));
                 argIdx++;
             } else if (args[argIdx].equals("-stream")) {
                 doStream = true;

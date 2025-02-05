@@ -5816,7 +5816,7 @@ public class GridUtil {
                     if (indexLists[mapIdx] == null) {
                         indexLists[mapIdx] = new ArrayList<Integer>();
                     }
-                    indexLists[mapIdx].add(new Integer(i));
+                    indexLists[mapIdx].add(Integer.valueOf(i));
                     break;
                 }
             }
@@ -6880,7 +6880,7 @@ public class GridUtil {
                 } else {
                     if (param.getLength() == 1) {
                         attributes.add(new Attribute(param.getName(),
-                                new Double(param.getNumericValue())));
+                                Double.valueOf(param.getNumericValue())));
                     } else {
                         double[] data = param.getNumericValues();
                         attributes.add(new Attribute(param.getName(),
@@ -9563,7 +9563,7 @@ public class GridUtil {
             if (Double.class.equals(returnType) || double.class.equals(returnType)) {
                 return (T) result;
             } else if (Float.class.equals(returnType) || float.class.equals(returnType)) {
-                return (T) new Float(result.floatValue());
+                return (T) Float.valueOf(result.floatValue());
             } else {
                 throw new UnsupportedOperationException("The returnType " + returnType.getName() + " is not supported for this operation");
             }

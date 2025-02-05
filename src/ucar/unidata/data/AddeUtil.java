@@ -101,7 +101,7 @@ public final class AddeUtil {
         // figure out the time indices
         int[] timeIndices;
         Object tmp = datasource.getProperty(NUM_RELATIVE_TIMES,
-                                            new Integer(0));
+                                            Integer.valueOf(0));
         if (tmp instanceof Integer) {
             int numTimes = ((Integer) tmp).intValue();
             timeIndices = new int[numTimes];
@@ -160,7 +160,7 @@ public final class AddeUtil {
             if(checkglm.contains("GLM Lightning Data")) {
                 float timeInc =
                         ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
-                                new Float(1))).floatValue();
+                                Float.valueOf(1))).floatValue();
                 urls.addAll(makeAbsoluteTimesUrlsGLM(url, datasource, absTimes, timeInc));
             } else {
                 urls.addAll(makeAbsoluteTimesUrls(url, datasource, absTimes));
@@ -169,7 +169,7 @@ public final class AddeUtil {
            if(checkglm.contains("GLM Lightning Data")){
                float timeInc =
                        ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
-                               new Float(1))).floatValue();
+                               Float.valueOf(1))).floatValue();
                url = url.replaceAll("MAX=99999", "MAX=999999");
                url = url.replaceAll("POS=1", "POS=ALL");
                String[] times = makeRelativeTimesGLM(timeIndices, timeInc);
@@ -181,7 +181,7 @@ public final class AddeUtil {
            } else {
                float timeInc =
                        ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
-                               new Float(1))).floatValue();
+                               Float.valueOf(1))).floatValue();
 
                String[] times = makeRelativeTimes(timeIndices, timeInc);
                for (int i = 0; i < times.length; i++) {
@@ -342,7 +342,7 @@ public final class AddeUtil {
         // now build a list of possible times
         float timeInc =
             ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
-                                             new Float(1))).floatValue();
+                                             Float.valueOf(1))).floatValue();
         int            numTimes = (int) (24 / timeInc);
         List<DateTime> alltimes = new ArrayList<DateTime>();
         for (String today : uniqueDays) {
@@ -402,7 +402,7 @@ public final class AddeUtil {
         // now build a list of possible times
         float timeInc =
                 ((Number) datasource.getProperty(RELATIVE_TIME_INCREMENT,
-                        new Float(1))).floatValue();
+                        Float.valueOf(1))).floatValue();
         // only show 24 hours
         int            numTimes = (int) (24 / timeInc);
 

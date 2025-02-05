@@ -63,7 +63,7 @@ public class UtmInfo {
         isUtm = isUtmCbx.isSelected();
         isUtmNorth = isUtmNorthCbx.isSelected();
         isUtmMeters = isUtmMetersCbx.isSelected();
-        utmZone = new Integer(utmZoneFld.getText().trim()).intValue();
+        utmZone = Integer.parseInt(utmZoneFld.getText().trim());
         return true;
     }
 
