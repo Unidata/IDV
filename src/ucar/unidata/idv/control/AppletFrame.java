@@ -2,17 +2,17 @@
  * Copyright 1997-2024 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -21,32 +21,20 @@
 package ucar.unidata.idv.control;
 
 
-import java.applet.*;
-
-
 import java.awt.*;
-
 import java.io.*;
-
 import java.net.*;
-
 import java.util.*;
-
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 
-/**
- * Class for supporting applets.  Doesn't work yet
- *
- *
- * @author  IDV Development Team
- * @version $Revision: 1.8 $
- */
-public class AppletFrame extends JComponent implements AppletContext,
-        AppletStub {
+
+
+public class AppletFrame extends JPanel{
 
     /** the applet for the control */
-    Applet theApplet;
+    JPanel theApplet;
 
     /** base directory for the applet */
     private File baseDir;
@@ -64,7 +52,7 @@ public class AppletFrame extends JComponent implements AppletContext,
      * @param params         applet parameters
      *
      */
-    public AppletFrame(Applet a, int w, int h, String baseDirPath,
+    public AppletFrame(JPanel a, int w, int h, String baseDirPath,
                        Hashtable params) {
         theApplet   = a;
         this.params = params;
@@ -73,11 +61,12 @@ public class AppletFrame extends JComponent implements AppletContext,
         }
         params = null;
         setSize(w, h);
+        setPreferredSize(new Dimension(w,h));
         setLayout(new BorderLayout());
         add("Center", a);
-        a.setStub(this);
-        a.init();
-        a.start();
+        a.setSize(w,h);
+        a.setPreferredSize(new Dimension(w,h));
+        a.setVisible(true);
     }
 
 
@@ -105,13 +94,6 @@ public class AppletFrame extends JComponent implements AppletContext,
         validate();
     }
 
-    /**
-     * Get the applet's context
-     * @return  applet's context
-     */
-    public AppletContext getAppletContext() {
-        return this;
-    }
 
     /**
      * Get the code base
@@ -152,13 +134,6 @@ public class AppletFrame extends JComponent implements AppletContext,
         return (String) params.get(name);
     }
 
-    /**
-     * See if the applet is active
-     * @return  true
-     */
-    public boolean isActive() {
-        return true;
-    }
 
     // AppletContext methods
 
@@ -198,7 +173,7 @@ public class AppletFrame extends JComponent implements AppletContext,
      * @param name  name of the applet
      * @return null
      */
-    public Applet getApplet(String name) {
+    public JPanel getApplet(String name) {
         return null;
     }
 
@@ -216,7 +191,7 @@ public class AppletFrame extends JComponent implements AppletContext,
      * @param url   location of clip
      * @return  the clip
      */
-    public AudioClip getAudioClip(URL url) {
+    public Clip getAudioClip(URL url) {
         return null;
     }
 
