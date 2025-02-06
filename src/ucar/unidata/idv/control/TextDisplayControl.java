@@ -482,8 +482,8 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
         };
 
 
-        glyphWidthBox = new JComboBox(new Vector(Misc.newList(new Float(1.0),
-                new Float(2.0), new Float(3.0), new Float(4.0))));
+        glyphWidthBox = new JComboBox(new Vector(Misc.newList( Float.valueOf(1.0f),
+                 Float.valueOf(2.0f),  Float.valueOf(3.0f),  Float.valueOf(4.0f))));
         initColors();
         colorBox = new JComboBox(colorList);
 
@@ -1865,9 +1865,9 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
                 if (sname.equals("code")) {
                     code = value;
                 } else if (sname.equals("width")) {
-                    w = new Integer(value).intValue();
+                    w = Integer.parseInt(value);
                 } else if (sname.equals("height")) {
-                    h = new Integer(value).intValue();
+                    h = Integer.parseInt(value);
                 } else if (sname.equals("codebase")) {
                     codebase = value;
                 } else {
@@ -1881,7 +1881,7 @@ public class TextDisplayControl extends DisplayControlImpl implements HyperlinkL
 
             try {
                 if (codebase != null) {}
-                Applet a = (Applet) Class.forName(code).newInstance();
+                JPanel a = (JPanel) Class.forName(code).newInstance();
                 return new AppletFrame(a, w, h, baseDir, params);
             } catch (Exception e) {
                 e.printStackTrace();
