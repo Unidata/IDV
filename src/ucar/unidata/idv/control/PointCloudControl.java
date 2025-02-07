@@ -252,7 +252,7 @@ public class PointCloudControl extends DrawingControl {
                 return;
             }
 
-            LatLonPoint llp = timeMap.get(new Integer(index));
+            LatLonPoint llp = timeMap.get(Integer.valueOf(index));
             if (llp == null) {
                 //Find the center point of the bounding box of the points in the current time
                 EarthLocation el =
@@ -264,7 +264,7 @@ public class PointCloudControl extends DrawingControl {
                                                                         .Altitude,
                                                                             0.0));
                 llp = el.getLatLonPoint();
-                timeMap.put(new Integer(index), llp);
+                timeMap.put(Integer.valueOf(index), llp);
             }
             NavigatedDisplay navDisplay = getNavigatedDisplay();
             navDisplay.center(GeoUtils.toEarthLocation(llp), false);
@@ -1039,7 +1039,7 @@ public class PointCloudControl extends DrawingControl {
                                                                  - timeminX) / 2), new Real(
                                                                      RealType.Altitude,
                                                                              0.0));
-            timeMap.put(new Integer(j), el.getLatLonPoint());
+            timeMap.put(Integer.valueOf(j), el.getLatLonPoint());
             minX = Math.min(timeminX, minX);
             maxX = Math.max(timemaxX, maxX);
             minY = Math.min(timeminY, minY);
@@ -1298,9 +1298,9 @@ public class PointCloudControl extends DrawingControl {
                             //                                         obsReal.getUnit());
                             if (obsReal.getUnit() == null) {
                                 tmpValues[filterIdx] =
-                                    new Double(filterReal.getValue());
+                                    Double.valueOf(filterReal.getValue());
                             } else {
-                                tmpValues[filterIdx] = new Double(
+                                tmpValues[filterIdx] = Double.valueOf(
                                     filterReal.getValue(obsReal.getUnit()));
                             }
                             //System.err.println("value:" + tmpValues[filterIdx]);

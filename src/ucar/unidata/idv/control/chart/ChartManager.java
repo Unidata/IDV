@@ -782,7 +782,7 @@ public abstract class ChartManager implements ImageObserver {
 
         for (int i = 0; i < types.length; i++) {
             layoutMenu.add(mi = GuiUtils.makeMenuItem(names[i], this,
-                    "setLayoutType", new Integer(types[i])));
+                    "setLayoutType", Integer.valueOf(types[i])));
             if (types[i] == layout) {
                 mi.setEnabled(false);
             }

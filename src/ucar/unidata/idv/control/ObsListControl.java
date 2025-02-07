@@ -395,7 +395,7 @@ public class ObsListControl extends ObsDisplayControl {
      */
     private Object formatReal(Real r) {
         if (getShowDataRaw()) {
-            return new Double(r.getValue());
+            return Double.valueOf(r.getValue());
         } else {
             return new RealWrapper(
                 getDisplayConventions().format(r.getValue()), r);
@@ -414,7 +414,7 @@ public class ObsListControl extends ObsDisplayControl {
      */
     private Object formatLatLon(Real r) {
         if (getShowDataRaw()) {
-            return new Double(r.getValue());
+            return Double.valueOf(r.getValue());
         } else {
             return new RealWrapper(
                 getDisplayConventions().formatLatLon(r.getValue()), r);

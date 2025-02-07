@@ -730,7 +730,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         try {
-            dsd.addPropertyValue(new Boolean(getChart().getShowThumb()),
+            dsd.addPropertyValue(Boolean.valueOf(getChart().getShowThumb()),
                                  "showThumbNail", "Show Thumbnail", "Probe");
 
             dsd.addPropertyValue(getEarthLocationFromWidget(),
