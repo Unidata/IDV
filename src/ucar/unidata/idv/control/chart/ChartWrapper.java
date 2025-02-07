@@ -1065,13 +1065,13 @@ public abstract class ChartWrapper extends DisplayComponent implements KeyListen
             JButton downButton =
                 GuiUtils.getImageButton("/auxdata/ui/icons/Down16.gif",
                                         getClass());
-            downButton.addActionListener(new ObjectListener(new Integer(i)) {
+            downButton.addActionListener(new ObjectListener(Integer.valueOf(i)) {
                 public void actionPerformed(ActionEvent ae) {
                     moveFieldInProperties(((Integer) theObject).intValue(),
                                           true);
                 }
             });
-            upButton.addActionListener(new ObjectListener(new Integer(i)) {
+            upButton.addActionListener(new ObjectListener(Integer.valueOf(i)) {
                 public void actionPerformed(ActionEvent ae) {
                     moveFieldInProperties(((Integer) theObject).intValue(),
                                           false);

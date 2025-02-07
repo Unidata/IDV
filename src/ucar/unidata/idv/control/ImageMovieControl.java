@@ -842,12 +842,12 @@ public class ImageMovieControl extends DisplayControlImpl {
         indexBtn = new JRadioButton("Use animation index in list",
                                     dateType == DATETYPE_INDEX);
         GuiUtils.addActionListener(indexBtn, this, "dateTypeButtonPressed",
-                                   new Integer(DATETYPE_INDEX));
+                                   Integer.valueOf(DATETYPE_INDEX));
 
         JRadioButton nameBtn = new JRadioButton("Extract from filename",
                                    dateType == DATETYPE_FILENAME);
         GuiUtils.addActionListener(indexBtn, this, "dateTypeButtonPressed",
-                                   new Integer(DATETYPE_FILENAME));
+                                   Integer.valueOf(DATETYPE_FILENAME));
 
         GuiUtils.buttonGroup(indexBtn, nameBtn);
         patternFld.setToolTipText(
@@ -2032,9 +2032,9 @@ public class ImageMovieControl extends DisplayControlImpl {
                 continue;
             }
             zipcodes.put(toks.get(0),
-                         new double[] { new Double(toks.get(1)).doubleValue(),
-                                        new Double(
-                                            toks.get(2)).doubleValue() });
+                         new double[] { Double.parseDouble(toks.get(1)),
+                                        Double.parseDouble(
+                                            toks.get(2)) });
         }
 
         Hashtable<String, CameraInfo> seen = new Hashtable<String,
@@ -2087,7 +2087,7 @@ public class ImageMovieControl extends DisplayControlImpl {
                 if (cnt != null) {
                     //                    System.out.println("zip:" + zipCode);
                 } else {
-                    zips.put(zipCode, new Integer(1));
+                    zips.put(zipCode, Integer.valueOf(1));
                 }
 
 

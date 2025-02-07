@@ -422,7 +422,7 @@ public class HovmollerControl extends GridDisplayControl {
         super.addDisplaySettings(dsd);
         dsd.addPropertyValue(getTimeFormat(), "timeFormat",
                              "Time Label Format", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Boolean(getReverseTime()), "reverseTime",
+        dsd.addPropertyValue(Boolean.valueOf(getReverseTime()), "reverseTime",
                              "Latest Time at Bottom", SETTINGS_GROUP_DISPLAY);
     }
 
@@ -611,14 +611,14 @@ public class HovmollerControl extends GridDisplayControl {
                     majorTickSpacing = (time - start);
                 }
                 DateTime dt = new DateTime(r);
-                timeLabels.put(new Double(time),
+                timeLabels.put(Double.valueOf(time),
                                dt.formattedString(format,
                                    DateTime.getFormatTimeZone()));
             }
             // do this so we get the last one
             if (k - step < numSteps - step / 2) {
                 DateTime dt = new DateTime(endTime);
-                timeLabels.put(new Double(end),
+                timeLabels.put(Double.valueOf(end),
                                dt.formattedString(format,
                                    DateTime.getFormatTimeZone()));
             }
@@ -707,7 +707,7 @@ public class HovmollerControl extends GridDisplayControl {
 
         for (int k = 0; k < hilo.length; k++) {
             double val = hilo[k];
-            xLabels.put(new Double(val),
+            xLabels.put(Double.valueOf(val),
                         dc.formatLatLonCardinal(val, 1 - averageDim));
         }
         Font f    = hovmollerView.getDisplayListFont();

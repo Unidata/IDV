@@ -293,7 +293,7 @@ public class HistogramWrapper extends PlotWrapper {
             return false;
         }
         try {
-            bins = new Integer(binFld.getText().trim()).intValue();
+            bins = Integer.parseInt(binFld.getText().trim());
         } catch (NumberFormatException nfe) {
             LogUtil.userErrorMessage("Bad value for bins: "
                                      + binFld.getText());
