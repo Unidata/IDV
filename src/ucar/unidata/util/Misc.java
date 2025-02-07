@@ -588,7 +588,7 @@ public class Misc {
         } else {
             String value = objectValue.toString();
             if (paramType.equals(Integer.class)) {
-                argument = new Integer(value);
+                argument = Integer.valueOf(value);
             } else if (paramType.equals(String.class)) {
                 argument = value;
             } else if (paramType.equals(ContourInfo.class)) {
@@ -597,17 +597,17 @@ public class Misc {
                 int idx = value.indexOf(":");
                 if (idx >= 0) {
                     argument = new Range(
-                        new Double(value.substring(0, idx)).doubleValue(),
-                        new Double(value.substring(idx + 1)).doubleValue());
+                        Double.parseDouble(value.substring(0, idx)),
+                        Double.parseDouble(value.substring(idx + 1)));
                 }
             } else if (paramType.equals(Double.TYPE)) {
-                argument = new Double(value);
+                argument = Double.valueOf(value);
             } else if (paramType.equals(Integer.TYPE)) {
-                argument = new Integer(value);
+                argument = Integer.valueOf(value);
             } else if (paramType.equals(Float.TYPE)) {
-                argument = new Float(value);
+                argument = Float.valueOf(value);
             } else if (paramType.equals(Boolean.TYPE)) {
-                argument = new Boolean(value);
+                argument = Boolean.valueOf(value);
             } else if (paramType.equals(Rectangle2D.Float.class)) {
                 String[] toks = StringUtil.split(value, ",", 4);
                 argument = new Rectangle2D.Float(Float.parseFloat(toks[0]),
@@ -626,9 +626,9 @@ public class Misc {
             } else if (paramType.equals(Dimension.class)) {
                 int idx = value.indexOf(":");
                 if (idx >= 0) {
-                    argument = new Dimension(new Integer(value.substring(0,
-                            idx)).intValue(), new Integer(value.substring(idx
-                            + 1)).intValue());
+                    argument = new Dimension(Integer.parseInt(value.substring(0,
+                            idx)), Integer.parseInt(value.substring(idx
+                            + 1)));
                 }
             } else if (paramType.equals(Object.class)) {
                 argument = value;
@@ -678,7 +678,7 @@ public class Misc {
     public static boolean getBoolean(String stringValue, boolean dflt) {
         if (stringValue != null) {
             try {
-                dflt = new Boolean(stringValue).booleanValue();
+                dflt = Boolean.parseBoolean(stringValue);
             } catch (Exception exc) {}
         }
         return dflt;
@@ -788,7 +788,7 @@ public class Misc {
     public static List createIntervalList(int start, int end, int step) {
         List l = new ArrayList();
         for (int i = start; i <= end; i += step) {
-            l.add(new Integer(i));
+            l.add(Integer.valueOf(i));
         }
         return l;
     }
@@ -941,7 +941,7 @@ public class Misc {
         if (v == null) {
             return dflt;
         }
-        return new Boolean(v.toString()).booleanValue();
+        return Boolean.parseBoolean(v.toString());
     }
 
     /**
@@ -1850,7 +1850,7 @@ public class Misc {
             if (index < 0) {
                 continue;
             }
-            indices.add(new Integer(index));
+            indices.add(Integer.valueOf(index));
         }
         return indices;
     }
@@ -2966,7 +2966,7 @@ public class Misc {
         double[] values = computeTicks(max, min, base, increment);
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
-                labelTable.put(new Double(values[i]), format(values[i]));
+                labelTable.put(Double.valueOf(values[i]), format(values[i]));
             }
         }
         return labelTable;
@@ -4862,7 +4862,7 @@ public class Misc {
         double d  = 0;
 
         for (int i = 0; i < 10000000; i++) {
-            d = new Double("2.3").doubleValue();
+            d = Double.parseDouble("2.3");
             //      d = Double.parseDouble("2.3");
         }
         long t2 = System.currentTimeMillis();

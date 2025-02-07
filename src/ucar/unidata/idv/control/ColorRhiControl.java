@@ -915,7 +915,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      */
     protected Hashtable getRequestProperties() {
         Hashtable props = super.getRequestProperties();
-        props.put(RadarConstants.PROP_AZIMUTH, new Float(beamAz));
+        props.put(RadarConstants.PROP_AZIMUTH, Float.valueOf(beamAz));
         return props;
     }
 
@@ -925,7 +925,7 @@ public class ColorRhiControl extends ColorCrossSectionControl {
      */
     protected void setRequestProperties() {
         getRequestProperties().put(RadarConstants.PROP_AZIMUTH,
-                                   new Float(beamAz));
+                                   Float.valueOf(beamAz));
     }
 
     /**

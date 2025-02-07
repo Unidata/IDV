@@ -293,7 +293,7 @@ public class ColorRadarVolumeControl extends GridDisplayControl {
         if (requestProperties == null) {
             requestProperties =
                 Misc.newHashtable(ColorRadarVolumeControl.RADAR_VOLUME,
-                                  new Float(0.0f));
+                                  Float.valueOf(0.0f));
         }
         return requestProperties;
     }
@@ -307,11 +307,11 @@ public class ColorRadarVolumeControl extends GridDisplayControl {
         if (requestProperties == null) {
             requestProperties =
                 Misc.newHashtable(ColorRadarVolumeControl.RADAR_VOLUME,
-                                  new Float(0.0f));
+                                  Float.valueOf(0.0f));
         } else {
             requestProperties.clear();
             requestProperties.put(ColorRadarVolumeControl.RADAR_VOLUME,
-                                  new Float(0.0f));
+                                  Float.valueOf(0.0f));
         }
     }
 

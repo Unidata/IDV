@@ -187,9 +187,9 @@ public class FlatFieldTable extends JTable {
          */
         public Object getValueAt(int row, int col) {
             if (col < numDomainCols) {
-                return new Float(domainData[col][row]);
+                return Float.valueOf(domainData[col][row]);
             } else {
-                return new Double(rangeData[col - numDomainCols][row]);
+                return Double.valueOf(rangeData[col - numDomainCols][row]);
             }
         }
 
