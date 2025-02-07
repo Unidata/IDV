@@ -690,7 +690,7 @@ public class TrackControl extends GridDisplayControl {
         int       numFound = 0;
         Hashtable seenTime = new Hashtable();
         for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
-            Integer timeKey = new Integer((int) (times[timeIdx] / seconds));
+            Integer timeKey = Integer.valueOf((int) (times[timeIdx] / seconds));
             if ((timeIdx < numTimes - 1) && (seenTime.get(timeKey) != null)) {
                 continue;
             }
@@ -967,20 +967,20 @@ public class TrackControl extends GridDisplayControl {
             dsd.addPropertyValue(getDataTimeRange(), "dataTimeRange",
                                  "Time Mode", "Display");
         }
-        dsd.addPropertyValue(new Boolean(getUseTrackTimes()),
+        dsd.addPropertyValue(Boolean.valueOf(getUseTrackTimes()),
                              "useTrackTimes", "Use Track Times",
                              SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Boolean(getTimeDeclutterEnabled()),
+        dsd.addPropertyValue(Boolean.valueOf(getTimeDeclutterEnabled()),
                              "timeDeclutterEnabled", "Subset Times",
                              SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Float(getTimeDeclutterMinutes()),
+        dsd.addPropertyValue(Float.valueOf((float)getTimeDeclutterMinutes()),
                              "timeDeclutterMinutes", "Subset Interval (min)",
                              SETTINGS_GROUP_DISPLAY);
         dsd.addPropertyValue(getMarkerLayout(), "markerLayout",
                              "Marker Layout", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Float(markerScale), "markerScale",
+        dsd.addPropertyValue(Float.valueOf(markerScale), "markerScale",
                              "Marker Scale", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Integer(getLineWidth()), "lineWidth",
+        dsd.addPropertyValue(Integer.valueOf(getLineWidth()), "lineWidth",
                              "Line Width", SETTINGS_GROUP_DISPLAY);
     }
 

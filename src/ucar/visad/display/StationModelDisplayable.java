@@ -1211,8 +1211,8 @@ public class StationModelDisplayable extends DisplayableData {
                     double value = Double.NaN;
                     try {
                         if (workDataArray[0] instanceof Text) {
-                            value = new Double(
-                                workDataArray[0].toString()).doubleValue();
+                            value = Double.parseDouble(
+                                workDataArray[0].toString());
                         } else {
                             value = ((Real) workDataArray[0]).getValue();
                         }
@@ -2216,7 +2216,7 @@ public class StationModelDisplayable extends DisplayableData {
 
 
         if (lookingFor.startsWith("#")) {
-            int index = new Integer(lookingFor.substring(1)).intValue();
+            int index = Integer.parseInt(lookingFor.substring(1));
             if (index < names.length) {
                 return index;
             }
@@ -2312,7 +2312,7 @@ public class StationModelDisplayable extends DisplayableData {
             index = cachedIndex.intValue();
         } else {
             index = getIndex(typeNames, names);
-            nameToIndex.put(commaSeparatedNames, new Integer(index));
+            nameToIndex.put(commaSeparatedNames, Integer.valueOf(index));
         }
 
         if (index == INDEX_LAT) {

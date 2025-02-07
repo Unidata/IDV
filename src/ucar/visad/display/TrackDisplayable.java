@@ -129,8 +129,8 @@ public class TrackDisplayable extends RGBDisplayable {
             myLineWidth = lineWidth;
         }
 
-        firePropertyChange(LINE_WIDTH, new Float(oldValue),
-                           new Float(myLineWidth));
+        firePropertyChange(LINE_WIDTH, Float.valueOf(oldValue),
+                           Float.valueOf(myLineWidth));
     }
 
     /**

@@ -212,7 +212,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
     boolean trackArrowHead = false;
 
     /** _more_ */
-    Integer trackFormType = new Integer(0);
+    Integer trackFormType = Integer.valueOf(0);
 
     /** _more_ */
     float trackOffsetValue = 4.0f;
@@ -536,7 +536,7 @@ public class GridTrajectoryControlNew extends DrawingControl {
         JComponent trajFormComponent;
 
         /** default type */
-        private Integer trajFormType = new Integer(0);
+        private Integer trajFormType = Integer.valueOf(0);
 
         /** start level */
         private int trajStartLevel = 0;
