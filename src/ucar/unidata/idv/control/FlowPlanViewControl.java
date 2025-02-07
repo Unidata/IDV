@@ -182,7 +182,7 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
     JComponent trajFormComponent;
 
     /** default type */
-    private Integer trajFormType = new Integer(0);
+    private Integer trajFormType = Integer.valueOf(0);
 
     /** _more_ */
     private Range flowColorRange;
@@ -961,27 +961,27 @@ public class FlowPlanViewControl extends PlanViewControl implements FlowDisplayC
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Double(flowScaleValue), "flowScale",
+        dsd.addPropertyValue(Double.valueOf(flowScaleValue), "flowScale",
                              "Scale", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Double(trajOffsetValue), "trajOffset",
+        dsd.addPropertyValue(Double.valueOf(trajOffsetValue), "trajOffset",
                              "Offset Length", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Integer(trajFormType), "trajFormType",
+        dsd.addPropertyValue(Integer.valueOf(trajFormType), "trajFormType",
                              "Traj Form", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Integer(getSkipValue()), "skipValue",
+        dsd.addPropertyValue(Integer.valueOf(getSkipValue()), "skipValue",
                              "Skip Factor", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Double(getStreamlineDensity()),
+        dsd.addPropertyValue(Double.valueOf(getStreamlineDensity()),
                              "streamlineDensity", "Streamline Density",
                              SETTINGS_GROUP_DISPLAY);
 
         dsd.addPropertyValue(flowRange, "flowRange", "Flow Field Range",
                              SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Boolean(getStreamlines()), "streamlines",
+        dsd.addPropertyValue(Boolean.valueOf(getStreamlines()), "streamlines",
                              "Show Streamlines", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Boolean(getTrajectories()), "trajectory",
+        dsd.addPropertyValue(Boolean.valueOf(getTrajectories()), "trajectory",
                              "Show Trajectory", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Boolean(getCVectors()), "curlyvector",
+        dsd.addPropertyValue(Boolean.valueOf(getCVectors()), "curlyvector",
                              "Show Curly Vector", SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Boolean(getAutoSize()), "autoSize",
+        dsd.addPropertyValue(Boolean.valueOf(getAutoSize()), "autoSize",
                              "Autosize", SETTINGS_GROUP_DISPLAY);
 
 

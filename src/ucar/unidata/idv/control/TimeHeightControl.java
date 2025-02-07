@@ -696,13 +696,13 @@ public class TimeHeightControl extends LineProbeControl {
                     majorTickSpacing = (time - start);
                 }
                 DateTime dt = new DateTime(r);
-                timeLabels.put(new Double(time),
+                timeLabels.put(Double.valueOf(time),
                                dt.formattedString(format,
                                    dt.getFormatTimeZone()));
             }
             // do this so we get the last one
             DateTime dt = new DateTime(endTime);
-            timeLabels.put(new Double(end),
+            timeLabels.put(Double.valueOf(end),
                            dt.formattedString(format,
                                dt.getFormatTimeZone()));
 
@@ -770,7 +770,7 @@ public class TimeHeightControl extends LineProbeControl {
         }
 
         for (int i = 0; i <= 4; i++) {
-            labelTable.put(new Double(values[i]), labels[i]);
+            labelTable.put(Double.valueOf(values[i]), labels[i]);
         }
         AxisScale yScale = profileDisplay.getYAxisScale();
         yScale.setTickBase(start);
@@ -846,7 +846,7 @@ public class TimeHeightControl extends LineProbeControl {
 
 
         for (int i = 0; i < numLabels; i++) {
-            labelTable.put(new Double(heights[i]), labels[i]);
+            labelTable.put(Double.valueOf(heights[i]), labels[i]);
         }
 
         return labelTable;
@@ -911,7 +911,7 @@ public class TimeHeightControl extends LineProbeControl {
 
         JMenuItem jmj;
         jmj = new JMenuItem("Change Altitude Unit...");
-        jmj.addActionListener(new ObjectListener(new Integer(0)) {
+        jmj.addActionListener(new ObjectListener(Integer.valueOf(0)) {
             public void actionPerformed(
                     ActionEvent ev) {
                 Unit newUnit =

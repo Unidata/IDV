@@ -140,11 +140,11 @@ public class FlowCrossSectionControl extends CrossSectionControl implements Flow
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Double(flowScaleValue), "flowScale",
+        dsd.addPropertyValue(Double.valueOf(flowScaleValue), "flowScale",
                              "Scale", SETTINGS_GROUP_DISPLAY);
         dsd.addPropertyValue(flowRange, "flowRange", "Flow Field Range",
                              SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Integer(getSkipValue()), "skipValue",
+        dsd.addPropertyValue(Integer.valueOf(getSkipValue()), "skipValue",
                              "Skip Factor", SETTINGS_GROUP_DISPLAY);
     }
 
