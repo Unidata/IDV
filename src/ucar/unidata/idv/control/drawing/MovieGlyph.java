@@ -374,7 +374,7 @@ public class MovieGlyph extends DrawingGlyph {
 
 
         try {
-            Manager.setHint(Manager.PLUGIN_PLAYER, new Boolean(true));
+            Manager.setHint(Manager.PLUGIN_PLAYER, Boolean.valueOf(true));
             player = Manager.createRealizedPlayer(new URL(movieFile));
 
             Misc.run(new Runnable() {

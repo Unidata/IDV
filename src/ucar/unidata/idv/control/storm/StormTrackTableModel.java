@@ -221,7 +221,7 @@ public class StormTrackTableModel extends AbstractTableModel {
         } else {
             StormParam param    = params.get(column - 3);
             Real       r        = stp.getAttribute(param);
-            double     newValue = new Double(aValue.toString()).doubleValue();
+            double     newValue = Double.parseDouble(aValue.toString());
             //Set the value
             Real rr = null;
             try {

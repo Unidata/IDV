@@ -222,7 +222,7 @@ public class SymbolGlyph extends DrawingGlyph {
         String newSymbol = ((selectedSymbol != null)
                             ? (String) selectedSymbol.getId()
                             : symbol);
-        float  newScale  = new Float(scaleFld.getText().trim()).floatValue();
+        float  newScale  = Float.parseFloat(scaleFld.getText().trim());
         defaultScale = newScale;
         if ((newScale != scale) || !Misc.equals(newSymbol, symbol)) {
             symbol = newSymbol;

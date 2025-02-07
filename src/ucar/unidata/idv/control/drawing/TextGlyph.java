@@ -891,7 +891,7 @@ public class TextGlyph extends DrawingGlyph {
 
         JComboBox fontSizeBox = (JComboBox) compMap.get(ATTR_FONTSIZE);
         Object    selected    = fontSizeBox.getSelectedItem();
-        int       fontSize    = (new Integer(selected.toString())).intValue();
+        int       fontSize    = (Integer.parseInt(selected.toString()));
 
         setShowMarker(
             ((JCheckBox) compMap.get("showMarkerCbx")).isSelected());

@@ -269,7 +269,7 @@ public class StormTrackChart {
             }
             for (StormTrackPoint stormTrackPoint : track.getTrackPoints()) {
                 Integer forecastHour =
-                    new Integer(stormTrackPoint.getForecastHour());
+                    Integer.valueOf(stormTrackPoint.getForecastHour());
                 if (seenForecastHour.get(forecastHour) == null) {
                     seenForecastHour.put(forecastHour, forecastHour);
                     forecastHours.add(forecastHour);
@@ -949,7 +949,7 @@ public class StormTrackChart {
      * @param value The new value for ForecastHour
      */
     public void setForecastHour(int value) {
-        forecastHours = (List<Integer>) Misc.newList(new Integer(value));
+        forecastHours = (List<Integer>) Misc.newList(Integer.valueOf(value));
     }
 
     /**
