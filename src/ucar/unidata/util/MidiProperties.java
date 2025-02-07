@@ -221,8 +221,8 @@ public class MidiProperties {
         TwoFacedObject tfo = (TwoFacedObject) instrumentBox.getSelectedItem();
         instrumentName = tfo.toString();
         muted          = mutedCbx.isSelected();
-        lowNote        = new Integer(lowNoteFld.getText().trim()).intValue();
-        highNote       = new Integer(highNoteFld.getText().trim()).intValue();
+        lowNote        = Integer.parseInt(lowNoteFld.getText().trim());
+        highNote       = Integer.parseInt(highNoteFld.getText().trim());
         // allow for inverted range
         if (highNote < lowNote) {
             lowNote  = Math.max(lowNote, 0);
@@ -249,14 +249,14 @@ public class MidiProperties {
         Vector         v           = new Vector();
         Instrument[]   instruments = MidiManager.getInstrumentList();
 
-        TwoFacedObject selected = new TwoFacedObject("None", new Integer(-1));
+        TwoFacedObject selected = new TwoFacedObject("None", Integer.valueOf(-1));
         if(instruments!=null) {
             for (int i = 0; (i < instruments.length) && (i < 128); i++) {
                 if(instruments[i]==null) continue;
                 String name = instruments[i].getName();
                 if(name==null) continue;
                 TwoFacedObject tfo = new TwoFacedObject(name,
-                                                        new Integer(i));
+                                                        Integer.valueOf(i));
                 if (name.equals(instrumentName)) {
                     selected = tfo;
                 }

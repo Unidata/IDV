@@ -463,7 +463,7 @@ public class ImageSequenceControl extends BaseImageControl {
             //If we have a composite then we handle our own subsetting here, so
             //we create a DataSelection that says to use the first index
             //to trick the ImageDataSource 
-            selectionToUse = new DataSelection(Misc.newList(new Integer(0)));
+            selectionToUse = new DataSelection(Misc.newList(Integer.valueOf(0)));
         } else {
             selectionToUse = new DataSelection(getDataSelection());
         }
@@ -513,7 +513,7 @@ public class ImageSequenceControl extends BaseImageControl {
                 //Check if we ignore this one
                 if (hasComposite && (selectionTimes != null)
                         && (selectionTimes.size() > 0)) {
-                    if (selectionTimes.indexOf(new Integer(dataChoiceIdx))
+                    if (selectionTimes.indexOf(Integer.valueOf(dataChoiceIdx))
                             == -1) {
                         continue;
                     }

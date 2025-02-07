@@ -374,7 +374,7 @@ public class WayPoint extends ChartAnnotation {
         boolean different = (value != domainValue);
         domainValue = value;
         if (different) {
-            firePropertyChange(PROP_WAYPOINTVALUE, null, new Double(value));
+            firePropertyChange(PROP_WAYPOINTVALUE, null, Double.valueOf(value));
         }
     }
 
