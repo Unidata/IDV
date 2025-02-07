@@ -594,7 +594,7 @@ public class VerticalProfileControl extends LineProbeControl {
         JMenuItem jmi;
         jmi = new JMenuItem("Change Unit...");
         paramMenu.add(jmi);
-        jmi.addActionListener(new ObjectListener(new Integer(row)) {
+        jmi.addActionListener(new ObjectListener(Integer.valueOf(row)) {
                                   public void actionPerformed(
                                           ActionEvent ev) {
 
@@ -621,7 +621,7 @@ public class VerticalProfileControl extends LineProbeControl {
         // Remove this parameter
         jmi = new JMenuItem("Remove");
         paramMenu.add(jmi);
-        jmi.addActionListener(new ObjectListener(new Integer(row)) {
+        jmi.addActionListener(new ObjectListener(Integer.valueOf(row)) {
                                   public void actionPerformed(
                                           ActionEvent ev) {
                                       removeField(
@@ -1032,7 +1032,7 @@ public class VerticalProfileControl extends LineProbeControl {
         //
         JMenuItem jmj;
         jmj = new JMenuItem("Change Altitude Unit...");
-        jmj.addActionListener(new ObjectListener(new Integer(0)) {
+        jmj.addActionListener(new ObjectListener(Integer.valueOf(0)) {
                                   public void actionPerformed(
                                           ActionEvent ev) {
                                       Unit newUnit =

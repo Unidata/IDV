@@ -316,7 +316,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             new TwoFacedObject("48 Hours", 48), new TwoFacedObject("All", 0)
         };
         TwoFacedObject selectedTfo =
-            TwoFacedObject.findId(new Integer(hours),
+            TwoFacedObject.findId(Integer.valueOf(hours),
                                   Misc.toList(dateSelectionItems));
         dateSelectionCbx = new JComboBox(dateSelectionItems);
         if (selectedTfo != null) {
@@ -991,7 +991,7 @@ public class TextProductControl extends StationLocationControl implements Hyperl
             TwoFacedObject tfo =
                 (TwoFacedObject) dateSelectionCbx.getSelectedItem();
             if (tfo != null) {
-                hours = new Integer(tfo.getId().toString()).intValue();
+                hours = Integer.parseInt(tfo.getId().toString());
             }
         }
         return hours;

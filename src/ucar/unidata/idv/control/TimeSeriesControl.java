@@ -487,12 +487,12 @@ public class TimeSeriesControl extends LineProbeControl {
                 if (k == step) {
                     majorTickSpacing = (time - start);
                 }
-                timeLabels.put(new Double(time),
+                timeLabels.put(Double.valueOf(time),
                                UtcDate.formatUtcDate(new DateTime(r),
                                    "dd'/'HH"));
             }
             // do this so we get the last one
-            timeLabels.put(new Double(end),
+            timeLabels.put(Double.valueOf(end),
                            UtcDate.formatUtcDate(new DateTime(endTime),
                                "dd'/'HH"));
 

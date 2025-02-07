@@ -201,7 +201,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     JComponent trajFormComponent;
 
     /** default type */
-    private Integer trajFormType = new Integer(0);
+    private Integer trajFormType = Integer.valueOf(0);
 
     /** start level */
     private int trajStartLevel = 0;
@@ -216,7 +216,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
     JComponent streamLFormComponent;
 
     /** default type */
-    private Integer streamLFormType = new Integer(0);
+    private Integer streamLFormType = Integer.valueOf(0);
 
     /** start level */
     private int streamLStartLevel = 0;
@@ -2365,7 +2365,7 @@ public class VolumeVectorControl extends GridDisplayControl implements FlowDispl
             setLevels(null);
         }
 
-        doShare(SHARE_SKIPVALUE + "Z", new Integer(skipValueZ));
+        doShare(SHARE_SKIPVALUE + "Z", Integer.valueOf(skipValueZ));
 
         FlowDisplayable fd = getGridDisplay();
         if (fd != null) {

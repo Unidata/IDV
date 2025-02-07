@@ -166,7 +166,7 @@ public class VolumeRenderControl extends GridDisplayControl {
         if (requestProperties == null) {
             requestProperties =
                     Misc.newHashtable(GRID_VOLUME,
-                            new Float(0.0f));
+                            Float.valueOf(0.0f));
         }
         return requestProperties;
     }
@@ -225,11 +225,11 @@ public class VolumeRenderControl extends GridDisplayControl {
         if (requestProperties == null) {
             requestProperties =
                     Misc.newHashtable(GRID_VOLUME,
-                            new Float(0.0f));
+                            Float.valueOf(0.0f));
         } else {
             requestProperties.clear();
             requestProperties.put(GRID_VOLUME,
-                    new Float(0.0f));
+                    Float.valueOf(0.0f));
         }
     }
     /**
@@ -414,9 +414,9 @@ public class VolumeRenderControl extends GridDisplayControl {
             qualitySlider = GuiUtils.makeSlider(50, 100, volumeQuality, this,
                     "setQuality");
             Hashtable labels = new Hashtable();
-            labels.put(new Integer(100), GuiUtils.lLabel("High"));
-            labels.put(new Integer(75), GuiUtils.cLabel("Medium"));
-            labels.put(new Integer(50), GuiUtils.rLabel("Low"));
+            labels.put(Integer.valueOf(100), GuiUtils.lLabel("High"));
+            labels.put(Integer.valueOf(75), GuiUtils.cLabel("Medium"));
+            labels.put(Integer.valueOf(50), GuiUtils.rLabel("Low"));
             qualitySlider.setLabelTable(labels);
             qualitySlider.setPaintLabels(true);
         }

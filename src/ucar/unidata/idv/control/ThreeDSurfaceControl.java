@@ -601,7 +601,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
         myDisplay.setSurfaceValue((float) rawLevel);
         updateDisplayList();
         if (andDoShare) {
-            doShareExternal(SHARE_SURFACEVALUE, new Double(lastRawLevel));
+            doShareExternal(SHARE_SURFACEVALUE, Double.valueOf(lastRawLevel));
         }
     }
 
@@ -748,7 +748,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
             t.setTableArray(table);
             setColorTable(t);
             if (andDoShare) {
-                doShareExternal(SHARE_TRANSPARENCY, new Float(alpha));
+                doShareExternal(SHARE_TRANSPARENCY, Float.valueOf(alpha));
             }
         } catch (Exception exc) {
             logException("Change transparency", exc);
@@ -852,7 +852,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
             int       ispace  = (levelRange.getSpanInt()) / 4;
             Hashtable labels  = new Hashtable();
             for (int n = 0; n <= 4; n++) {
-                labels.put(new Integer(levelRange.getMinInt() + n * ispace),
+                labels.put(Integer.valueOf(levelRange.getMinInt() + n * ispace),
                            new JLabel(getDisplayConventions().format(fmin
                                + n * spacing)));
             }
@@ -876,7 +876,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Double(getSurfaceValue()),
+        dsd.addPropertyValue(Double.valueOf(getSurfaceValue()),
                              "levelWithRawValue", "Isosurface Value",
                              SETTINGS_GROUP_DISPLAY);
     }
