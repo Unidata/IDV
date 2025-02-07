@@ -1,11 +1,16 @@
 package ucar.unidata.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,7 +22,7 @@ public class GeminiService {
 
     private final String apiKey;
     private final String baseUrl;
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper;
 
     public GeminiService(String apiKey, String baseUrl) {
         this.apiKey = apiKey;
@@ -107,32 +112,46 @@ public class GeminiService {
 
     public GeminiResponse getCompletionWithImage(GeminiRequestWithImage request, String model, String systemInstruction) throws IOException {
         // construct URL
-        URL url = new URL(baseUrl + model + ":generateContent?key=" + apiKey);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json");
-        con.setDoOutput(true);
-
+        URL url = new URL(baseUrl + "?key=" + apiKey);
+        //HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        //con.setRequestMethod("POST");
+       // con.setRequestProperty("Content-Type", "application/json");
+       // con.setDoOutput(true);
+        mapper= new ObjectMapper();
         //Convert request into JSON
         if(systemInstruction != null && !systemInstruction.isEmpty()) {
             request.setTextPrompt(systemInstruction + "\n" + request.getTextPrompt());
         }
         String requestBody = mapper.writeValueAsString(request);
-        try (OutputStream os = con.getOutputStream()) {
-            byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
+        String requestBodyJson;
+        try {
+            requestBodyJson = mapper.writeValueAsString(request);
+        } catch (JsonProcessingException e) {
+            throw new IOException("Error serializing request to JSON", e);
         }
-        StringBuilder response = new StringBuilder();
-        try (InputStreamReader streamReader = new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8);
-             java.io.BufferedReader reader = new java.io.BufferedReader(streamReader)) {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url.toString()))
+                .header("Content-Type", "application/json")
+                // .header("Authorization", "Bearer ...") // If needed
+                .POST(HttpRequest.BodyPublishers.ofString(requestBodyJson))
+                .build();
+        System.out.println("API Request URL: " + url); // Log URL
+        System.out.println("Request Headers: " + httpRequest.headers().map()); // Log headers
+        System.out.println("Request Body (JSON): " + requestBodyJson); // Log request body
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response;
+        try {
+            response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("HTTP request interrupted", e);
         }
 
-        con.disconnect();
+        System.out.println("Response Code: " + response.statusCode()); // Log response code
+        System.out.println("Response Body: " + response.body()); // Log response body
+
+
         return mapper.readValue(response.toString(), GeminiResponse.class);
     }
 
@@ -202,7 +221,7 @@ public class GeminiService {
     }
 
     public static void testImage(String[] args) {
-        String apiKey = "YOUR_API_KEY"; // Replace with your actual API key
+        String apiKey = ""; // Replace with your actual API key
         String baseUrl = "https://generative-ai.googleapis.com/v1beta/models/"; // Replace with the Gemini API base URL
         String modelName = "gemini-1.0-pro-vision"; // Make sure this model supports image input
         String imagePath = "path/to/your/image.jpg"; // Replace with the actual path to your image file
