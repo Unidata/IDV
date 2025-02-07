@@ -490,17 +490,17 @@ public final class VisADMath {
                 set2TupleType.getIndex(set1TupleType.getComponent(set1Index));
 
             if (set2Index == -1) {
-                uniqueSet1Indexes.add(new Integer(set1Index));
+                uniqueSet1Indexes.add(Integer.valueOf(set1Index));
             } else {
-                commonSet1Indexes.add(new Integer(set1Index));
-                commonSet2Indexes.add(new Integer(set2Index));
+                commonSet1Indexes.add(Integer.valueOf(set1Index));
+                commonSet2Indexes.add(Integer.valueOf(set2Index));
             }
         }
 
         rank = set2TupleType.getDimension();
 
         for (int set2Index = 0; set2Index < rank; ++set2Index) {
-            Integer set2Integer = new Integer(set2Index);
+            Integer set2Integer = Integer.valueOf(set2Index);
 
             if ( !commonSet2Indexes.contains(set2Integer)) {
                 uniqueSet2Indexes.add(set2Integer);

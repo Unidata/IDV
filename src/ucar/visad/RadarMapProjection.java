@@ -205,8 +205,8 @@ public class RadarMapProjection extends AREACoordinateSystem implements XmlPersi
      * @return Element that represents this object.
      */
     public Element createElement(XmlEncoder encoder) {
-        List args = Misc.newList(new Double(lat), new Double(lon),
-                                 new Integer(width), new Integer(height));
+        List args = Misc.newList(Double.valueOf(lat), Double.valueOf(lon),
+                                 Integer.valueOf(width), Integer.valueOf(height));
         List types = Misc.newList(Double.TYPE, Double.TYPE, Integer.TYPE,
                                   Integer.TYPE);
         Element result      = encoder.createObjectElement(getClass());

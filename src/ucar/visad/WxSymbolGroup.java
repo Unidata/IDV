@@ -110,7 +110,7 @@ public class WxSymbolGroup {
         //        System.out.println ("<li> " + name +"<ul>");
         for (int i = 0; i < values.length; i++) {
             String  desc     = values[i][0];
-            Integer index    = new Integer(startIndex + i);
+            Integer index    = Integer.valueOf(startIndex + i);
             String  symbolId = prefix + (i + offset);
             //            System.out.println ("<li><b> " + symbolId+"</b> - "+ desc);
             symbols.add(new ucar.unidata.util.TwoFacedObject(desc, symbolId));

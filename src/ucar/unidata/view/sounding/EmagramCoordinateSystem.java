@@ -572,13 +572,13 @@ public final class EmagramCoordinateSystem
      */
     public int hashCode() {
 
-        return new Double(minX).hashCode() ^ new Double(maxX).hashCode()
-               ^ new Double(minY).hashCode() ^ new Double(maxY).hashCode()
-               ^ new Double(minP).hashCode() ^ new Double(maxP).hashCode()
-               ^ new Double(minT).hashCode() ^ new Double(maxT).hashCode()
-               ^ new Double(yPerLogP).hashCode()
-               ^ new Double(logMinP).hashCode()
-               ^ new Double(xPerT).hashCode() ^ minimumX.hashCode()
+        return Double.valueOf(minX).hashCode() ^ Double.valueOf(maxX).hashCode()
+               ^ Double.valueOf(minY).hashCode() ^ Double.valueOf(maxY).hashCode()
+               ^ Double.valueOf(minP).hashCode() ^ Double.valueOf(maxP).hashCode()
+               ^ Double.valueOf(minT).hashCode() ^ Double.valueOf(maxT).hashCode()
+               ^ Double.valueOf(yPerLogP).hashCode()
+               ^ Double.valueOf(logMinP).hashCode()
+               ^ Double.valueOf(xPerT).hashCode() ^ minimumX.hashCode()
                ^ maximumX.hashCode() ^ minimumY.hashCode()
                ^ maximumY.hashCode() ^ getReference().hashCode()
                ^ Arrays.asList(getCoordinateSystemUnits()).hashCode();
