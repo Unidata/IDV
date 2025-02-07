@@ -372,7 +372,7 @@ public class AreaImageFlatField extends CachedFlatField implements SingleBandedI
         if (aii != null) {
             String bandString = aii.getBand();
             if ((bandString != null) && !bandString.equals(aii.ALL)) {
-                band = new Integer(bandString).intValue();
+                band = Integer.parseInt(bandString);
             }
             bandNums[0] = band;
         } else {

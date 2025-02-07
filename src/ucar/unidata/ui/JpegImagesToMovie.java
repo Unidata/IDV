@@ -337,19 +337,19 @@ public class JpegImagesToMovie implements ControllerListener,
                 if (i >= args.length) {
                     prUsage();
                 }
-                width = new Integer(args[i]).intValue();
+                width = Integer.parseInt(args[i]);
             } else if (args[i].equals("-h")) {
                 i++;
                 if (i >= args.length) {
                     prUsage();
                 }
-                height = new Integer(args[i]).intValue();
+                height = Integer.parseInt(args[i]);
             } else if (args[i].equals("-f")) {
                 i++;
                 if (i >= args.length) {
                     prUsage();
                 }
-                frameRate = new Integer(args[i]).intValue();
+                frameRate = Integer.parseInt(args[i]);
             } else if (args[i].equals("-o")) {
                 i++;
                 if (i >= args.length) {

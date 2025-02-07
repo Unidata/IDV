@@ -282,7 +282,7 @@ public class SharableManager {
                     continue;
                 }
                 to.setReceiveShareTime(dataId,
-                                       new Long(System.currentTimeMillis()));
+                                       Long.valueOf(System.currentTimeMillis()));
                 to.receiveShareData(from, dataId, data);
             }
         } catch (Exception e) {

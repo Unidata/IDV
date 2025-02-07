@@ -1956,7 +1956,7 @@ public class ColorTableDefaults {
      */
     private static int toInt(Object o) {
         String s = o.toString().trim();
-        return (int) (new Double(s).doubleValue());
+        return (int) (Double.parseDouble(s));
     }
 
     /**

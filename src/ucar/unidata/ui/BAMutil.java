@@ -517,7 +517,7 @@ public class BAMutil {
          */
         public void actionPerformed(java.awt.event.ActionEvent e) {
             Boolean state = (Boolean) orgAct.getValue(STATE);
-            orgAct.putValue(STATE, new Boolean( !state.booleanValue()));
+            orgAct.putValue(STATE, Boolean.valueOf( !state.booleanValue()));
             if (debugToggle) {
                 System.out.println("toggleAction " + state);
             }

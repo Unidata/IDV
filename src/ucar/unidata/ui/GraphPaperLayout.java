@@ -691,7 +691,7 @@ public class GraphPaperLayout implements LayoutManager2 {
                              ? "deltaColumn"
                              : "deltaRow");
             JButton btn = GuiUtils.makeButton(lbl, this, method,
-                              new Integer(delta));
+                              Integer.valueOf(delta));
             if (forCol) {
                 btn.setToolTipText(((delta > 0)
                                     ? "Add"

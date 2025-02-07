@@ -257,7 +257,7 @@ public class Clause {
                 continue;
             }
             value = value.trim();
-            clauses.add(Clause.eq(colName, new Integer(value).intValue()));
+            clauses.add(Clause.eq(colName, Integer.parseInt(value)));
         }
         return clauses;
     }
@@ -383,7 +383,7 @@ public class Clause {
      * @return The new Clause
      */
     public static Clause le(String column, double value) {
-        return le(column, new Double(value));
+        return le(column, Double.valueOf(value));
     }
 
 
@@ -396,7 +396,7 @@ public class Clause {
      * @return The new Clause
      */
     public static Clause ge(String column, double value) {
-        return ge(column, new Double(value));
+        return ge(column, Double.valueOf(value));
     }
 
 
