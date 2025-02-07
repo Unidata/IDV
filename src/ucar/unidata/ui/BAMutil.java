@@ -384,9 +384,9 @@ public class BAMutil {
         }
         act.putValue(Action.SHORT_DESCRIPTION, action_name);
         act.putValue(Action.LONG_DESCRIPTION, action_name);
-        act.putValue(BAMutil.TOGGLE, new Boolean(is_toggle));
-        act.putValue(BAMutil.MNEMONIC, new Integer(mnemonic));
-        act.putValue(BAMutil.ACCEL, new Integer(accel));
+        act.putValue(BAMutil.TOGGLE, Boolean.valueOf(is_toggle));
+        act.putValue(BAMutil.MNEMONIC, Integer.valueOf(mnemonic));
+        act.putValue(BAMutil.ACCEL, Integer.valueOf(accel));
     }
 
     /*
@@ -446,7 +446,7 @@ public class BAMutil {
         public ActionToggle(Action oa, AbstractButton b) {
             this.orgAct = oa;
             this.button = b;
-            orgAct.putValue(STATE, new Boolean(true));  // state is kept with original action
+            orgAct.putValue(STATE, Boolean.valueOf(true));  // state is kept with original action
 
             orgAct.addPropertyChangeListener(
                 new java.beans.PropertyChangeListener() {
@@ -481,7 +481,7 @@ public class BAMutil {
          */
         public void actionPerformed(java.awt.event.ActionEvent e) {
             Boolean state = (Boolean) orgAct.getValue(BAMutil.STATE);
-            orgAct.putValue(STATE, new Boolean( !state.booleanValue()));
+            orgAct.putValue(STATE, Boolean.valueOf( !state.booleanValue()));
             orgAct.actionPerformed(e);
         }
     }
@@ -507,7 +507,7 @@ public class BAMutil {
          */
         toggleAction(Action orgAct) {
             this.orgAct = orgAct;
-            orgAct.putValue(STATE, new Boolean(false));  // state is kept with original action
+            orgAct.putValue(STATE, Boolean.valueOf(false));  // state is kept with original action
         }
 
         /**

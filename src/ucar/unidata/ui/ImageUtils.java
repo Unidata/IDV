@@ -469,11 +469,11 @@ public class ImageUtils {
         }
 
         if (places.size() > 1) {
-            dx = new Integer(places.get(1).toString()).intValue();
+            dx = Integer.parseInt(places.get(1).toString());
         }
 
         if (places.size() > 2) {
-            dy = new Integer(places.get(2).toString()).intValue();
+            dy = Integer.parseInt(places.get(2).toString());
         }
 
         Point2D placePoint = Glyph.getPointOnRect(place, r);
