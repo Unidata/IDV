@@ -119,7 +119,7 @@ public class Debug {
             if (debug) {
                 System.out.println("Debug.isSet new " + flagName);
             }
-            map.put(flagName, new Boolean(false));
+            map.put(flagName, Boolean.valueOf(false));
             changed = true;
             return false;
         }
@@ -138,7 +138,7 @@ public class Debug {
         if (null == (val = map.get(flagName))) {
             changed = true;
         }
-        map.put(flagName, new Boolean(value));
+        map.put(flagName, Boolean.valueOf(value));
     }
 
     /**
@@ -268,7 +268,7 @@ public class Debug {
             addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent evt) {
                     //System.out.println("MyMI "+getText()+" "+getState());
-                    map.put(fullname, new Boolean(getState()));
+                    map.put(fullname, Boolean.valueOf(getState()));
                 }
             });
         }

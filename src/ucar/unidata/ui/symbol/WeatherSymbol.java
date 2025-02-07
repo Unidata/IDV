@@ -327,7 +327,7 @@ public class WeatherSymbol extends MetSymbol implements ImageObserver {
      * @return  symbol code for this symbolType as an <code>Integer</code>
      */
     public Object getParamValue(int index) {
-        return new Integer(code);
+        return Integer.valueOf(code);
     }
 
     /**
@@ -337,7 +337,7 @@ public class WeatherSymbol extends MetSymbol implements ImageObserver {
      * @param v       value (String version of integer code)
      */
     public void setParamValue(int index, Object v) {
-        setCode(new Integer(v.toString()).intValue());
+        setCode(Integer.parseInt(v.toString()));
     }
 
 

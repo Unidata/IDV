@@ -301,7 +301,7 @@ public class CatalogUtil {
         while (version.indexOf(".") != version.lastIndexOf(".")) {
             version = version.substring(0, version.lastIndexOf("."));
         }
-        return new Double(version).doubleValue();
+        return Double.parseDouble(version);
     }
 
 

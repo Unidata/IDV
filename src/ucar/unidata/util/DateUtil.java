@@ -682,7 +682,7 @@ public class DateUtil {
                 factor = -1;
             }
 
-            delta = factor * new Integer(s).intValue();
+            delta = factor * Integer.parseInt(s);
             //            System.err.println ("factor:" + factor + " delta:" + delta);
         } catch (Exception exc) {
             throw new IllegalArgumentException(
