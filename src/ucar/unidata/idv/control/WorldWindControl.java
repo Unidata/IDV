@@ -190,7 +190,7 @@ public class WorldWindControl extends StationLocationControl {
      * @param layer the layer_
      */
     public void setLayerOn(boolean b, Layer layer) {
-        layerVisibility.put(layer.name, new Boolean(b));
+        layerVisibility.put(layer.name, Boolean.valueOf(b));
         loadData();
     }
 
@@ -374,11 +374,11 @@ public class WorldWindControl extends StationLocationControl {
             String name = XmlUtil.getChildText(XmlUtil.getElement(placename,
                               "Name"));
             double minRange =
-                new Double(XmlUtil.getChildText(XmlUtil.getElement(placename,
-                    TAG_MINIMUMDISPLAYRANGE))).doubleValue();
+                Double.parseDouble(XmlUtil.getChildText(XmlUtil.getElement(placename,
+                    TAG_MINIMUMDISPLAYRANGE)));
             double maxRange =
-                new Double(XmlUtil.getChildText(XmlUtil.getElement(placename,
-                    TAG_MAXIMUMDISPLAYRANGE))).doubleValue();
+                Double.parseDouble(XmlUtil.getChildText(XmlUtil.getElement(placename,
+                    TAG_MAXIMUMDISPLAYRANGE)));
             String path = XmlUtil.getChildText(XmlUtil.getElement(placename,
                               TAG_PLACENAMELISTFILEPATH));
             path = StringUtil.replace(path, "\\", "/");

@@ -1164,8 +1164,8 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
      * @param axisIndex  the axis index.
      */
     public void mapDatasetToDomainAxis(int index, int axisIndex) {
-        this.datasetToDomainAxisMap.put(new Integer(index),
-                                        new Integer(axisIndex));
+        this.datasetToDomainAxisMap.put(Integer.valueOf(index),
+                                        Integer.valueOf(axisIndex));
         // fake a dataset change event to update axes...
         datasetChanged(new DatasetChangeEvent(this, getDataset(index)));
     }
@@ -1178,8 +1178,8 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
      * @param axisIndex  the axis index.
      */
     public void mapDatasetToRangeAxis(int index, int axisIndex) {
-        this.datasetToRangeAxisMap.put(new Integer(index),
-                                       new Integer(axisIndex));
+        this.datasetToRangeAxisMap.put(Integer.valueOf(index),
+                                       Integer.valueOf(axisIndex));
         // fake a dataset change event to update axes...
         datasetChanged(new DatasetChangeEvent(this, getDataset(index)));
     }
@@ -1697,7 +1697,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
      * @param index  the renderer index.
      */
     public void clearDomainMarkers(int index) {
-        Integer key = new Integer(index);
+        Integer key = Integer.valueOf(index);
         if (this.backgroundDomainMarkers != null) {
             Collection markers =
                 (Collection) this.backgroundDomainMarkers.get(key);
@@ -1731,18 +1731,18 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
         Collection markers;
         if (layer == Layer.FOREGROUND) {
             markers = (Collection) this.foregroundDomainMarkers.get(
-                new Integer(index));
+                Integer.valueOf(index));
             if (markers == null) {
                 markers = new java.util.ArrayList();
-                this.foregroundDomainMarkers.put(new Integer(index), markers);
+                this.foregroundDomainMarkers.put(Integer.valueOf(index), markers);
             }
             markers.add(marker);
         } else if (layer == Layer.BACKGROUND) {
             markers = (Collection) this.backgroundDomainMarkers.get(
-                new Integer(index));
+                Integer.valueOf(index));
             if (markers == null) {
                 markers = new java.util.ArrayList();
-                this.backgroundDomainMarkers.put(new Integer(index), markers);
+                this.backgroundDomainMarkers.put(Integer.valueOf(index), markers);
             }
             markers.add(marker);
         }
@@ -1805,18 +1805,18 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
         Collection markers;
         if (layer == Layer.FOREGROUND) {
             markers = (Collection) this.foregroundRangeMarkers.get(
-                new Integer(index));
+                Integer.valueOf(index));
             if (markers == null) {
                 markers = new java.util.ArrayList();
-                this.foregroundRangeMarkers.put(new Integer(index), markers);
+                this.foregroundRangeMarkers.put(Integer.valueOf(index), markers);
             }
             markers.add(marker);
         } else if (layer == Layer.BACKGROUND) {
             markers = (Collection) this.backgroundRangeMarkers.get(
-                new Integer(index));
+                Integer.valueOf(index));
             if (markers == null) {
                 markers = new java.util.ArrayList();
-                this.backgroundRangeMarkers.put(new Integer(index), markers);
+                this.backgroundRangeMarkers.put(Integer.valueOf(index), markers);
             }
             markers.add(marker);
         }
@@ -1830,7 +1830,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
      * @param index  the renderer index.
      */
     public void clearRangeMarkers(int index) {
-        Integer key = new Integer(index);
+        Integer key = Integer.valueOf(index);
         if (this.backgroundRangeMarkers != null) {
             Collection markers =
                 (Collection) this.backgroundRangeMarkers.get(key);
@@ -2585,7 +2585,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
 
         ValueAxis valueAxis = null;
         Integer axisIndex =
-            (Integer) this.datasetToDomainAxisMap.get(new Integer(index));
+            (Integer) this.datasetToDomainAxisMap.get(Integer.valueOf(index));
         if (axisIndex != null) {
             valueAxis = getDomainAxis(axisIndex.intValue());
         } else {
@@ -2611,7 +2611,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
 
         ValueAxis valueAxis = null;
         Integer axisIndex =
-            (Integer) this.datasetToRangeAxisMap.get(new Integer(index));
+            (Integer) this.datasetToRangeAxisMap.get(Integer.valueOf(index));
         if (axisIndex != null) {
             valueAxis = getRangeAxis(axisIndex.intValue());
         } else {
@@ -2807,7 +2807,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
      */
     public Collection getDomainMarkers(int index, Layer layer) {
         Collection result = null;
-        Integer    key    = new Integer(index);
+        Integer    key    = Integer.valueOf(index);
         if (layer == Layer.FOREGROUND) {
             result = (Collection) this.foregroundDomainMarkers.get(key);
         } else if (layer == Layer.BACKGROUND) {
@@ -2830,7 +2830,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
      */
     public Collection getRangeMarkers(int index, Layer layer) {
         Collection result = null;
-        Integer    key    = new Integer(index);
+        Integer    key    = Integer.valueOf(index);
         if (layer == Layer.FOREGROUND) {
             result = (Collection) this.foregroundRangeMarkers.get(key);
         } else if (layer == Layer.BACKGROUND) {
@@ -2946,7 +2946,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
         List result = new ArrayList();
         for (int i = 0; i < this.datasets.size(); i++) {
             Integer mappedAxis =
-                (Integer) this.datasetToDomainAxisMap.get(new Integer(i));
+                (Integer) this.datasetToDomainAxisMap.get(Integer.valueOf(i));
             if (mappedAxis == null) {
                 if (axisIndex.equals(ZERO)) {
                     result.add(this.datasets.get(i));
@@ -2975,7 +2975,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
         List result = new ArrayList();
         for (int i = 0; i < this.datasets.size(); i++) {
             Integer mappedAxis =
-                (Integer) this.datasetToRangeAxisMap.get(new Integer(i));
+                (Integer) this.datasetToRangeAxisMap.get(Integer.valueOf(i));
             if (mappedAxis == null) {
                 if (axisIndex.equals(ZERO)) {
                     result.add(this.datasets.get(i));
@@ -3047,7 +3047,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
         if (domainIndex >= 0) {
             isDomainAxis = true;
             mappedDatasets.addAll(
-                getDatasetsMappedToDomainAxis(new Integer(domainIndex)));
+                getDatasetsMappedToDomainAxis(Integer.valueOf(domainIndex)));
         }
 
         // or is it a range axis?
@@ -3055,7 +3055,7 @@ public class MyXYPlot extends XYPlot implements ValueAxisPlot, Zoomable,
         if (rangeIndex >= 0) {
             isDomainAxis = false;
             mappedDatasets.addAll(
-                getDatasetsMappedToRangeAxis(new Integer(rangeIndex)));
+                getDatasetsMappedToRangeAxis(Integer.valueOf(rangeIndex)));
         }
 
         // iterate through the datasets that map to the axis and get the union

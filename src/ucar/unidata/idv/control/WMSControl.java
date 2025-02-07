@@ -747,7 +747,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
         TwoFacedObject resSelected = null;
         for (int i = 0; i < resValues.length; i++) {
             TwoFacedObject tfo = new TwoFacedObject(resNames[i],
-                                     new Double(resValues[i]));
+                                     Double.valueOf(resValues[i]));
             resItems.add(tfo);
             if (resValues[i] == resolution) {
                 resSelected = tfo;
@@ -965,14 +965,14 @@ public class WMSControl extends ImageControl implements ImageObserver {
             }
             if ( !inGlobe) {
                 requestProperties.put(WmsDataSource.PROP_RESOLUTION,
-                                      new Double(resolution));
+                                      Double.valueOf(resolution));
             }
             requestProperties.put(WmsDataSource.PROP_IMAGEWIDTH,
-                                  new Integer(imageWidth));
+                                  Integer.valueOf(imageWidth));
             //            System.err.println ("imageWidth:" + imageWidth + " imageHeight:" + imageHeight);
 
             requestProperties.put(WmsDataSource.PROP_IMAGEHEIGHT,
-                                  new Integer(imageHeight));
+                                  Integer.valueOf(imageHeight));
 
             //            theDataChoice.setFixedRequestProperties(requestProperties);
             if (writeFile != null) {
