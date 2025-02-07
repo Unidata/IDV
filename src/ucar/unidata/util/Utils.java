@@ -636,7 +636,7 @@ public class Utils {
             return dflt;
         }
 
-        return new Integer(attrValue).intValue();
+        return Integer.parseInt(attrValue);
     }
 
 
@@ -659,7 +659,7 @@ public class Utils {
             return dflt;
         }
 
-        return new Double(attrValue).doubleValue();
+        return Double.parseDouble(attrValue);
     }
 
     /**

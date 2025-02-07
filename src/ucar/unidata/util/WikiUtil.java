@@ -309,7 +309,7 @@ public class WikiUtil {
                            + label + "</div>";
             //            if(level==1)
             //                value = value+"<hr class=\"wiki-hr\">";
-            headings.add(new Object[] { new Integer(level), label });
+            headings.add(new Object[] { Integer.valueOf(level), label });
             s       = s.substring(0, start) + value + s.substring(end);
             matcher = pattern.matcher(s);
         }

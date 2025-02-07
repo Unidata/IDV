@@ -47,10 +47,11 @@ import java.lang.management.*;
 import java.lang.reflect.InvocationTargetException;
 
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.List;
-import java.util.Properties;
 
 import javax.swing.*;
 
@@ -662,7 +663,17 @@ public class LogUtil {
 
                 }
             });
+            JButton jsBtn = new JButton("run GEMINI");
+            jsBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    String filename = "/Users/yuanho/Downloads/";
 
+                    if (filename == null) {
+                        return;
+                    }
+                    runGemini(filename);
+                }
+            });
 
             JScrollPane sp =
                 new JScrollPane(
@@ -675,12 +686,47 @@ public class LogUtil {
                                   sp,
                                   LayoutUtil.wrap(
                                       LayoutUtil.hflow(
-                                          Misc.newList(clearBtn, writeBtn))));
+                                          Misc.newList(clearBtn, writeBtn, jsBtn))));
             consoleWindow = GuiUtils.makeWindow("Console", contents, 10, 10);
         }
         consoleWindow.setVisible(true);
     }
 
+    public static void runGemini(String imagePath) {
+        String apiKey = "AIzaSyDddWuiZIcbcm4O2NzSpQTrhevG4NGds2w"; // Replace with your actual API key
+        String baseUrl = "https://generative-ai.googleapis.com/v1beta/models/"; // Replace with the Gemini API base URL
+        String modelName = "gemini-pro-vision"; //""gemini-2.0-flash-exp"; // Make sure this model supports image input
+        //String imagePath = "path/to/your/image.jpg"; // Replace with the actual path to your image file
+        String apiEndpoint = baseUrl + modelName + "/generateContent";
+
+        GeminiService service = new GeminiService(apiKey, apiEndpoint);
+
+        try {
+            // Read image and encode to Base64
+            Path filePath = Paths.get(imagePath, "test.jpg");
+            if (!Files.exists(filePath)) {
+                System.out.println("File does not exist: " + filePath);
+                return;
+            }
+            byte[] imageData = Files.readAllBytes(filePath);
+            String base64Image = Base64.getEncoder().encodeToString(imageData);
+
+            // Create GeminiRequestWithImage object
+            GeminiService.GeminiRequestWithImage request = new GeminiService.GeminiRequestWithImage();
+            request.setTextPrompt("Describe the content of this image");
+            //request.setImage(base64Image);
+
+            // Make API call
+            GeminiService.GeminiResponse response = service.getCompletionWithImage(request, modelName);
+
+            // Print the result
+            System.out.println("Generated Content: " + response.getContent());
+            consoleMessage("Generated Content: " + response.getContent());
+        } catch (IOException e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        }
+
+    }
 
     /**
      *  Create the consoleText JTextArea if needed

@@ -212,10 +212,10 @@ public class VisADPersistence {
             public Element createElement(XmlEncoder e, Object o) {
                 ProjectionRect r = (ProjectionRect) o;
 
-                List args = Misc.newList(new Double(r.getMinX()),
-                                         new Double(r.getMinY()),
-                                         new Double(r.getMaxX()),
-                                         new Double(r.getMaxY()));
+                List args = Misc.newList(Double.valueOf(r.getMinX()),
+                                         Double.valueOf(r.getMinY()),
+                                         Double.valueOf(r.getMaxX()),
+                                         Double.valueOf(r.getMaxY()));
                 List types = Misc.newList(Double.TYPE, Double.TYPE,
                                           Double.TYPE, Double.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
@@ -229,7 +229,7 @@ public class VisADPersistence {
             public Element createElement(XmlEncoder e, Object o) {
                 Real r = (Real) o;
                 List args = Misc.newList(r.getType(),
-                                         new Double(r.getValue()),
+                                         Double.valueOf(r.getValue()),
                                          r.getUnit(), r.getError());
                 List types = Misc.newList(RealType.class, Double.TYPE,
                                           getUnitClass(r.getUnit()),
@@ -251,9 +251,9 @@ public class VisADPersistence {
             public Element createElement(XmlEncoder e, Object o) {
                 ErrorEstimate r    = (ErrorEstimate) o;
                 Unit          unit = r.getUnit();
-                List args = Misc.newList(new Double(r.getErrorValue()),
-                                         new Double(r.getMean()),
-                                         new Long(r.getNumberNotMissing()),
+                List args = Misc.newList(Double.valueOf(r.getErrorValue()),
+                                         Double.valueOf(r.getMean()),
+                                         Long.valueOf(r.getNumberNotMissing()),
                                          unit);
                 List types = Misc.newList(Double.TYPE, Double.TYPE,
                                           Long.TYPE,
@@ -274,9 +274,9 @@ public class VisADPersistence {
                         Double.POSITIVE_INFINITY };
                 boolean isRange = d.getRange(range);
                 List    args    = Misc.newList(new Object[] {
-                    d.getName(), new Boolean(d.isSingle()),
-                    new Double(range[0]), new Double(range[1]),
-                    new Double(d.getDefaultValue()), d.getDefaultUnit()
+                    d.getName(), Boolean.valueOf(d.isSingle()),
+                    Double.valueOf(range[0]), Double.valueOf(range[1]),
+                    Double.valueOf(d.getDefaultValue()), d.getDefaultUnit()
                 });
                 Element objectElement = e.createObjectElement(o.getClass());
                 Element listElement   = e.createElement(args);
@@ -331,7 +331,7 @@ public class VisADPersistence {
                 List args = Misc.newList(r.getOriginalName(),
                                          r.getDefaultUnit(),
                                          r.getDefaultSet(),
-                                         new Integer(r.getAttributeMask()));
+                                         Integer.valueOf(r.getAttributeMask()));
                 Element objectElement = e.createObjectElement(o.getClass());
                 Element listElement   = e.createElement(args);
                 objectElement.appendChild(listElement);
@@ -367,9 +367,9 @@ public class VisADPersistence {
         addDelegate(ErrorEstimate.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 ErrorEstimate r = (ErrorEstimate) o;
-                List args = Misc.newList(new Double(r.getErrorValue()),
-                                         new Double(r.getMean()),
-                                         new Long(r.getNumberNotMissing()),
+                List args = Misc.newList(Double.valueOf(r.getErrorValue()),
+                                         Double.valueOf(r.getMean()),
+                                         Long.valueOf(r.getNumberNotMissing()),
                                          r.getUnit());
                 List types = Misc.newList(Double.TYPE, Double.TYPE,
                                           Long.TYPE,
@@ -433,7 +433,7 @@ public class VisADPersistence {
                                 return unit;
                             }
                             String identifier = toks[1];
-                            double amount = new Double(toks[0]).doubleValue();
+                            double amount = Double.parseDouble(toks[0]);
                             Unit   theUnit    = Util.parseUnit(identifier);
                             scaledUnit = ScaledUnit.create(amount, theUnit);
                         } catch (Exception exc) {
@@ -503,7 +503,7 @@ public class VisADPersistence {
         addDelegate(CalendarDateTime.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 CalendarDateTime r = (CalendarDateTime) o;
-                List args = Misc.newList(new Double(r.getValue()),
+                List args = Misc.newList(Double.valueOf(r.getValue()),
                                          r.getCalendar());
                 List types = Misc.newList(Double.TYPE, Calendar.class);
                 return e.createObjectConstructorElement(o, args, types);
@@ -513,7 +513,7 @@ public class VisADPersistence {
         addDelegate(DateTime.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 DateTime r     = (DateTime) o;
-                List     args  = Misc.newList(new Double(r.getValue()));
+                List     args  = Misc.newList(Double.valueOf(r.getValue()));
                 List     types = Misc.newList(Double.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
             }
@@ -536,7 +536,7 @@ public class VisADPersistence {
                 int[]                dir = ac.getDirBlock();
                 List args = Misc.newList(dir, ac.getNavBlock(),
                                          ac.getAuxBlock(),
-                                         new Boolean(ac.getUseSpline()));
+                                         Boolean.valueOf(ac.getUseSpline()));
                 List types = Misc.newList(null, null, dir.getClass(),
                                           Boolean.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
@@ -707,10 +707,10 @@ public class VisADPersistence {
         addDelegate(Vis5DCoordinateSystem.class, new XmlDelegateImpl() {
             public Element createElement(XmlEncoder e, Object o) {
                 Vis5DCoordinateSystem vcs = (Vis5DCoordinateSystem) o;
-                List args = Misc.newList(new Integer(vcs.getProjection()),
+                List args = Misc.newList(Integer.valueOf(vcs.getProjection()),
                                          vcs.getProjectionParams(),
-                                         new Double(vcs.getRows()),
-                                         new Double(vcs.getColumns()));
+                                         Double.valueOf(vcs.getRows()),
+                                         Double.valueOf(vcs.getColumns()));
                 List types = Misc.newList(Integer.TYPE, null, Double.TYPE,
                                           Double.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
@@ -857,9 +857,9 @@ public class VisADPersistence {
             public Element createElement(XmlEncoder e, Object o) {
                 Color3f c   = (Color3f) o;
                 float[] rgb = c.get().getRGBComponents(null);
-                List args = Misc.newList(new Float(rgb[0]),
-                                         new Float(rgb[1]),
-                                         new Float(rgb[2]));
+                List args = Misc.newList(Float.valueOf(rgb[0]),
+                                         Float.valueOf(rgb[1]),
+                                         Float.valueOf(rgb[2]));
                 List types = Misc.newList(Float.TYPE, Float.TYPE, Float.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
             }
@@ -870,9 +870,9 @@ public class VisADPersistence {
                 Vector3f v   = (Vector3f) o;
                 float[]  xyz = new float[3];
                 v.get(xyz);
-                List args = Misc.newList(new Float(xyz[0]),
-                                         new Float(xyz[1]),
-                                         new Float(xyz[2]));
+                List args = Misc.newList(Float.valueOf(xyz[0]),
+                                         Float.valueOf(xyz[1]),
+                                         Float.valueOf(xyz[2]));
                 List types = Misc.newList(Float.TYPE, Float.TYPE, Float.TYPE);
                 return e.createObjectConstructorElement(o, args, types);
             }
@@ -884,9 +884,9 @@ public class VisADPersistence {
                 Point3d  p   = (Point3d) o;
                 double[] xyz = new double[3];
                 p.get(xyz);
-                List args = Misc.newList(new Double(xyz[0]),
-                                         new Double(xyz[1]),
-                                         new Double(xyz[2]));
+                List args = Misc.newList(Double.valueOf(xyz[0]),
+                                         Double.valueOf(xyz[1]),
+                                         Double.valueOf(xyz[2]));
                 List types = Misc.newList(Double.TYPE, Double.TYPE,
                                           Double.TYPE);
                 return e.createObjectConstructorElement(o, args, types);

@@ -211,7 +211,7 @@ public class Trace {
         Thread  t   = Thread.currentThread();
         Integer tab = (Integer) tabs.get(t);
         if (tab == null) {
-            tab = new Integer(0);
+            tab = Integer.valueOf(0);
             tabs.put(t, tab);
         }
         return tab;
@@ -272,7 +272,7 @@ public class Trace {
             return;
         }
         int v = getCurrentTab();
-        tabs.put(Thread.currentThread(), new Integer(v + delta));
+        tabs.put(Thread.currentThread(), Integer.valueOf(v + delta));
     }
 
 
@@ -395,8 +395,8 @@ public class Trace {
                 writeTrace(">" + m + " " + extra);
             }
             deltaCurrentTab(1);
-            ticks.put(m, new Long(System.currentTimeMillis()));
-            mems.put(m, new Long(Misc.usedMemory()));
+            ticks.put(m, Long.valueOf(System.currentTimeMillis()));
+            mems.put(m, Long.valueOf(Misc.usedMemory()));
         }
     }
 
@@ -640,7 +640,7 @@ public class Trace {
             return;
         }
         //        Long l = new Long(System.currentTimeMillis());
-        Long l = new Long(System.nanoTime());
+        Long l = Long.valueOf(System.nanoTime());
         accum1Table.put(name, l);
     }
 
@@ -663,16 +663,16 @@ public class Trace {
         long delta = time - l.longValue();
         Long total = (Long) accumTable.get(name);
         if (total == null) {
-            total = new Long(delta);
+            total = Long.valueOf(delta);
             accumList.add(name);
         } else {
-            total = new Long(total.longValue() + delta);
+            total = Long.valueOf(total.longValue() + delta);
         }
         Integer cnt = (Integer) accumCntTable.get(name);
         if (cnt == null) {
-            cnt = new Integer(1);
+            cnt = Integer.valueOf(1);
         } else {
-            cnt = new Integer(cnt.intValue() + 1);
+            cnt = Integer.valueOf(cnt.intValue() + 1);
         }
         accumCntTable.put(name, cnt);
         accumTable.put(name, total);
@@ -705,11 +705,11 @@ public class Trace {
     public static void count(String name) {
         Integer i = (Integer) counters.get(name);
         if (i == null) {
-            i = new Integer(0);
+            i = Integer.valueOf(0);
             counters.put(name, i);
             counterList.add(name);
         }
-        i = new Integer(i.intValue() + 1);
+        i = Integer.valueOf(i.intValue() + 1);
         counters.put(name, i);
     }
 
