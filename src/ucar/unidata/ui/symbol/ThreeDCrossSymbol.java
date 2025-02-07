@@ -168,7 +168,7 @@ public class ThreeDCrossSymbol extends MetSymbol {
      * @return always returns the magnitude as a <code>Double</code>
      */
     public Object getParamValue(int index) {
-        return new Double(0);
+        return Double.valueOf(0);
     }
 
     /**

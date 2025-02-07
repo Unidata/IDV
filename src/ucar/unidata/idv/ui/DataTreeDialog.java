@@ -257,7 +257,7 @@ public class DataTreeDialog implements ActionListener {
         dsw.updateSelectionTab(dataChoice);
 
         if (doubleClick) {
-            addMultiple(new Integer(index));
+            addMultiple(Integer.valueOf(index));
         }
     }
 
@@ -361,7 +361,7 @@ public class DataTreeDialog implements ActionListener {
                 multiScroller.setPreferredSize(new Dimension(250, 100));
                 JButton multiBtn = GuiUtils.makeButton("Add selected>>",
                                        this, "addMultiple",
-                                       new Integer(index));
+                                       Integer.valueOf(index));
                 multiComp = GuiUtils.topCenter(GuiUtils.left(multiBtn),
                         multiScroller);
                 //                treeContents = GuiUtils.vbox((treeContents, multiBtn), multiScroller);

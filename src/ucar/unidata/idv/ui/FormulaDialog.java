@@ -916,13 +916,13 @@ public class FormulaDialog extends JFrame implements ActionListener {
 
             childIndexCbx = new JComboBox(indices);
             TwoFacedObject tfo =
-                TwoFacedObject.findId(new Integer(cat.getChildIndex()),
+                TwoFacedObject.findId(Integer.valueOf(cat.getChildIndex()),
                                       indices);
             if (tfo != null) {
                 childIndexCbx.setSelectedItem(tfo);
             }
             catIndexCbx = new JComboBox(indices);
-            tfo = TwoFacedObject.findId(new Integer(cat.getCategoryIndex()),
+            tfo = TwoFacedObject.findId(Integer.valueOf(cat.getCategoryIndex()),
                                         indices);
             if (tfo != null) {
                 catIndexCbx.setSelectedItem(tfo);

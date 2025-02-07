@@ -893,7 +893,7 @@ public class ViewPanelImpl extends IdvManager implements ViewPanel {
         private void setCatOpen(boolean v) {
             if (viewManager != null) {
                 viewManager.putProperty("viewpanel.catgegory.open",
-                                        new Boolean(v));
+                                        Boolean.valueOf(v));
             }
             catOpen = v;
             categoryToggleBtn.setIcon(v
