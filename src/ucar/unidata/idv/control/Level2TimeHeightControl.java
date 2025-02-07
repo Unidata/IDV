@@ -109,7 +109,7 @@ public class Level2TimeHeightControl extends TimeHeightControl {
     protected Hashtable getRequestProperties() {
         Hashtable props = super.getRequestProperties();
         //System.out.println("  getRequestProperties  ");
-        props.put(RadarConstants.PROP_TIMEHEIGHT, new Boolean(true));
+        props.put(RadarConstants.PROP_TIMEHEIGHT, Boolean.valueOf(true));
         return props;
     }
 
@@ -121,6 +121,6 @@ public class Level2TimeHeightControl extends TimeHeightControl {
      */
     protected void setRequestProperties() {
         getRequestProperties().put(RadarConstants.PROP_TIMEHEIGHT,
-                                   new Boolean(true));
+                                   Boolean.valueOf(true));
     }
 }

@@ -1023,7 +1023,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
             String text = selected.toString();
             try {
                 text  = StringUtil.replace(text, "%", "").trim();
-                value = (int) new Float(text).floatValue();
+                value = (int) Float.parseFloat(text);
             } catch (Exception e) {
                 logException("Setting transparency", e);
             }
@@ -1064,7 +1064,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
         for (int i = 0; i < values.length; i++) {
 
             TwoFacedObject tfo = new TwoFacedObject(values[i] + "%",
-                                     new Integer(values[i]));
+                                     Integer.valueOf(values[i]));
             transparencyItems.add(tfo);
             if (values[i] == transInt) {
                 selectedTfo = tfo;
@@ -1072,7 +1072,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
         }
         if (selectedTfo == null) {
             selectedTfo = new TwoFacedObject(transInt + "%",
-                                             new Integer(transInt));
+                                             Integer.valueOf(transInt));
             transparencyItems.add(selectedTfo);
 
         }
@@ -1092,10 +1092,10 @@ public class LocationIndicatorControl extends DisplayControlImpl {
 
         Vector    lineWidths = new Vector();
         for (int i = 1; i <= 10; i++) {
-            lineWidths.add(new Integer(i));
+            lineWidths.add(Integer.valueOf(i));
         }
         JComponent widthComp = GuiUtils.makeComboBox(lineWidths,
-                                   new Integer(lineWidth), false, this,
+                                   Integer.valueOf(lineWidth), false, this,
                                    "lineWidthChanged");
 
 
@@ -1104,7 +1104,7 @@ public class LocationIndicatorControl extends DisplayControlImpl {
             new TwoFacedObject(StringUtil.shorten(font.getName(), 24), font),
             false, this, "fontChanged");
         fontSizeBox = GuiUtils.makeComboBox(GuiUtils.getFontSizeList(),
-                                            new Integer(font.getSize()),
+                                            Integer.valueOf(font.getSize()),
                                             false, this, "fontChanged");
 
 

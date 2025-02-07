@@ -236,7 +236,7 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
         try {
             Real r = (Real) data;
             if (getShowDataRaw()) {
-                return new Double(r.getValue());
+                return Double.valueOf(r.getValue());
             }
             double value;
             if (displayUnit != null) {
@@ -379,7 +379,7 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
             if (ob == null) {
                 continue;
             }
-            Integer timeKey = new Integer(((int) ob.getDateTime().getValue())
+            Integer timeKey = Integer.valueOf(((int) ob.getDateTime().getValue())
                                           / seconds);
             //Include the last time step
             if ((timeIdx < numTimes - 1) && (seenTime.get(timeKey) != null)) {
@@ -421,7 +421,7 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
      */
     Object getTimeKey(PointOb ob) {
         int seconds = (int) (timeDeclutterMinutes * 60);
-        return new Integer(((int) ob.getDateTime().getValue()) / seconds);
+        return Integer.valueOf(((int) ob.getDateTime().getValue()) / seconds);
     }
 
 
@@ -895,10 +895,10 @@ public abstract class ObsDisplayControl extends DisplayControlImpl {
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Boolean(getTimeDeclutterEnabled()),
+        dsd.addPropertyValue(Boolean.valueOf(getTimeDeclutterEnabled()),
                              "timeDeclutterEnabled", "Subset Times",
                              SETTINGS_GROUP_DISPLAY);
-        dsd.addPropertyValue(new Float(getTimeDeclutterMinutes()),
+        dsd.addPropertyValue(Float.valueOf((float)getTimeDeclutterMinutes()),
                              "timeDeclutterMinutes", "Subset Interval (min)",
                              SETTINGS_GROUP_DISPLAY);
     }

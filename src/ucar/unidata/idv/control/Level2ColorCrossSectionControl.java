@@ -213,7 +213,7 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
     protected Hashtable getRequestProperties() {
         Hashtable props = super.getRequestProperties();
         //System.out.println("  getRequestProperties PROP_VCS ");
-        props.put(RadarConstants.PROP_VCS, new Boolean(true));
+        props.put(RadarConstants.PROP_VCS, Boolean.valueOf(true));
         if ((startLocation != null) && (endLocation != null)) {
 
             props.put(RadarConstants.PROP_VCS_START, startLocation);
@@ -234,7 +234,7 @@ public class Level2ColorCrossSectionControl extends ColorCrossSectionControl {
     protected void setRequestProperties()
             throws VisADException, RemoteException {
         getRequestProperties().put(RadarConstants.PROP_VCS,
-                                   new Boolean(true));
+                                   Boolean.valueOf(true));
         if ((startLocation == null) || (endLocation == null)) {
             MapViewManager mm = getMapViewManager();
             RadarMapProjection rp =
