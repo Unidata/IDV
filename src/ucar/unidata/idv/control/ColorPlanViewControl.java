@@ -178,7 +178,7 @@ public class ColorPlanViewControl extends PlanViewControl {
      */
     protected void addDisplaySettings(DisplaySettingsDialog dsd) {
         super.addDisplaySettings(dsd);
-        dsd.addPropertyValue(new Boolean(isSmoothed), "smoothed",
+        dsd.addPropertyValue(Boolean.valueOf(isSmoothed), "smoothed",
                              "Colors Shaded", SETTINGS_GROUP_DISPLAY);
     }
 

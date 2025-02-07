@@ -629,13 +629,13 @@ public abstract class PlanViewControl extends GridDisplayControl {
         JComboBox polyModeCombo = new JComboBox();
         TwoFacedObject[] polyModes = { new TwoFacedObject(
                                          "Solid",
-                                         new Integer(
+                                           Integer.valueOf(
                                              Grid2DDisplayable.POLYGON_FILL)),
                                        new TwoFacedObject("Mesh",
-                                           new Integer(Grid2DDisplayable
+                                           Integer.valueOf(Grid2DDisplayable
                                                .POLYGON_LINE)),
                                        new TwoFacedObject("Points",
-                                           new Integer(Grid2DDisplayable
+                                           Integer.valueOf(Grid2DDisplayable
                                                .POLYGON_POINT)) };
         GuiUtils.setListData(polyModeCombo, polyModes);
         polyModeCombo.setSelectedIndex((getPolygonMode()

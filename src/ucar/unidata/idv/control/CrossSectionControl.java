@@ -547,7 +547,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         dsd.addPropertyValue(getVerticalAxisRange(), "verticalAxisRange",
                              "Vertical Scale", SETTINGS_GROUP_DISPLAY);
         if (getAllowAutoScale()) {
-            dsd.addPropertyValue(new Boolean(getAutoScaleYAxis()),
+            dsd.addPropertyValue(Boolean.valueOf(getAutoScaleYAxis()),
                                  "autoScaleYAxis", "Auto-Scale",
                                  SETTINGS_GROUP_DISPLAY);
         }
@@ -1709,7 +1709,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
         JMenuItem jmj;
         jmj = new JMenuItem("Change Altitude Unit...");
-        jmj.addActionListener(new ObjectListener(new Integer(0)) {
+        jmj.addActionListener(new ObjectListener(Integer.valueOf(0)) {
             public void actionPerformed(
                     ActionEvent ev) {
                 Unit newUnit =
@@ -3206,7 +3206,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         }
 
         for (int i = 0; i <= 4; i++) {
-            labelTable.put(new Double(values[i]), labels[i]);
+            labelTable.put(Double.valueOf(values[i]), labels[i]);
         }
         AxisScale yScale = (crossSectionView.getXSDisplay()).getYAxisScale();
         yScale.setTickBase(start);
@@ -3284,7 +3284,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
 
         for (int i = 0; i < numLabels; i++) {
-            labelTable.put(new Double(heights[i]), labels[i]);
+            labelTable.put(Double.valueOf(heights[i]), labels[i]);
         }
 
         return labelTable;
