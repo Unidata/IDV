@@ -158,7 +158,7 @@ public class RadarVWPControl extends WindTimeHeightControl {
      */
     protected Hashtable getRequestProperties() {
         Hashtable props = super.getRequestProperties();
-        props.put(RadarConstants.PROP_VWP, new Float(0.0));
+        props.put(RadarConstants.PROP_VWP, Float.valueOf(0.0f));
         return props;
     }
 

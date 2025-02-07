@@ -489,7 +489,7 @@ public class WindTimeHeightControl extends ProfilerControl {
             hr = dt.formattedString("HH:mm", TimeZone.getTimeZone("GMT"));
             // for only hours, use
             //  hr = dt.formattedString("HH", TimeZone.getTimeZone("GMT"));
-            timeLabels.put(new Double(time), hr);
+            timeLabels.put(Double.valueOf(time), hr);
         }
         xScale.setTickBase(time1);
         double averageTickSpacing = (time2 - time1) / (double) (numSteps - 1);

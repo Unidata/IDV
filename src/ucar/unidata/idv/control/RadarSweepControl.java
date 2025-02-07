@@ -201,11 +201,11 @@ public class RadarSweepControl extends ColorPlanViewControl {
         if (newAngle != currentAngle) {
             currentAngle = newAngle;
             getRequestProperties().put(RadarConstants.PROP_ANGLE,
-                                       new Double(currentAngle));
+                                       Double.valueOf(currentAngle));
             updateLegendAndList();
             try {
                 resetData();
-                doShare(SHARE_ANGLE, new Double(currentAngle));
+                doShare(SHARE_ANGLE, Double.valueOf(currentAngle));
             } catch (Exception exc) {
                 logException("Getting new angle", exc);
             }

@@ -633,7 +633,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
             return;
         }
         getRequestProperties().put(RadarConstants.PROP_AZIMUTH,
-                                   new Double(currentAngle));
+                                   Double.valueOf(currentAngle));
         getGridDataInstance().reInitialize();
         //getGridDataInstance().putRequestProperty(RadarConstants.PROP_AZIMUTH,
         //        new Double(currentAngle));
@@ -655,7 +655,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      */
     protected Hashtable getRequestProperties() {
         Hashtable props = super.getRequestProperties();
-        props.put(RadarConstants.PROP_AZIMUTH, new Double(currentAngle));
+        props.put(RadarConstants.PROP_AZIMUTH, Double.valueOf(currentAngle));
         return props;
     }
 
@@ -665,7 +665,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      */
     protected void setRequestProperties() {
         getRequestProperties().put(RadarConstants.PROP_AZIMUTH,
-                                   new Double(currentAngle));
+                                   Double.valueOf(currentAngle));
     }
 
     /**
