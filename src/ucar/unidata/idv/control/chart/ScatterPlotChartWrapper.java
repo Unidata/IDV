@@ -171,7 +171,7 @@ public class ScatterPlotChartWrapper extends PlotWrapper {
         if (minIdx < 0) {
             return EVENT_PASSON;
         }
-        firePropertyChange(PROP_SELECTEDTIME, null, new Double(minTime));
+        firePropertyChange(PROP_SELECTEDTIME, null, Double.valueOf(minTime));
         return EVENT_PASSON;
     }
 

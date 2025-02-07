@@ -283,7 +283,7 @@ public class StatisticsChartWrapper extends ChartWrapper {
                             / values.length));
                 }
 
-                stat.points = new Integer(values.length);
+                stat.points = Integer.valueOf(values.length);
                 stat.unit   = units[0];
                 stat.values.clear();
                 PythonInterpreter interpreter = getInterpreter();

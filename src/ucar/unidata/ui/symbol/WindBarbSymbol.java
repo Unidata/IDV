@@ -154,8 +154,8 @@ public class WindBarbSymbol extends MetSymbol {
      */
     public Object getParamValue(int index) {
         return ((index == 0)
-                ? new Double(windSpeed)
-                : new Double(windDirection));
+                ? Double.valueOf(windSpeed)
+                : Double.valueOf(windDirection));
     }
 
     /**
@@ -165,9 +165,9 @@ public class WindBarbSymbol extends MetSymbol {
      */
     public void setParamValue(int index, Object v) {
         if (index == 0) {
-            setWindSpeed(new Double(v.toString()).doubleValue());
+            setWindSpeed(Double.parseDouble(v.toString()));
         } else {
-            setWindDirection(new Double(v.toString()).doubleValue());
+            setWindDirection(Double.parseDouble(v.toString()));
         }
     }
 

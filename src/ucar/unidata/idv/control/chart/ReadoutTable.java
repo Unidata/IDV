@@ -195,7 +195,7 @@ public class ReadoutTable extends ChartWrapper {
                         }
 
                         if (showRawData) {
-                            return new Double(value);
+                            return Double.valueOf(value);
                         } else {
                             DisplayConventions dc =
                                 getDisplayControl().getDisplayConventions();

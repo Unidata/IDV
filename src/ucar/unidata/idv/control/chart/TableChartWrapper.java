@@ -168,7 +168,7 @@ public class TableChartWrapper extends ChartWrapper {
                 if (row < dataList.size()) {
                     return dataList.get(row);
                 }
-                return new Float(Float.NaN);
+                return Float.valueOf(Float.NaN);
             }
 
             public String getColumnName(int column) {
@@ -218,7 +218,7 @@ public class TableChartWrapper extends ChartWrapper {
                         if ((row >= 0) && (row < times.size())) {
                             Date dttm = (Date) times.get(row);
                             firePropertyChange(PROP_SELECTEDTIME, null,
-                                    new Double(dttm.getTime()));
+                                    Double.valueOf(dttm.getTime()));
                         }
 
                     }
@@ -333,7 +333,7 @@ public class TableChartWrapper extends ChartWrapper {
 
                 for (int i = 0; i < values.length; i++) {
                     if (showRawData) {
-                        dataList.add(new Double(values[i]));
+                        dataList.add(Double.valueOf(values[i]));
                     } else {
                         dataList.add(Misc.parseNumber(dc.format(values[i])));
                     }
