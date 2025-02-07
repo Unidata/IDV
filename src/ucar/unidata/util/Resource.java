@@ -207,7 +207,7 @@ public class Resource {
                     "  FileNotFoundException: Resource.getFile failed on "
                     + fullName);
             }
-        } catch (java.security.AccessControlException e) {
+        } catch (Exception e) {
             if (debug) {
                 System.out.println(
                     "  AccessControlException: Resource.getFile failed on "

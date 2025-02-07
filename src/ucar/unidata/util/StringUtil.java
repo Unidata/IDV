@@ -1203,16 +1203,16 @@ public class StringUtil {
         List subTokens = split(token, ":");
         if (subTokens.size() > 2) {
           stride =
-                  new Integer(subTokens.get(2).toString()).intValue();
+                  Integer.parseInt(subTokens.get(2).toString());
         }
         int start =
-                new Integer(subTokens.get(0).toString()).intValue();
-        int end = new Integer(subTokens.get(1).toString()).intValue();
+                Integer.parseInt(subTokens.get(0).toString());
+        int end = Integer.parseInt(subTokens.get(1).toString());
         for (int i = start; i <= end; i += stride) {
-          items.add(new Integer(i));
+          items.add(Integer.valueOf(i));
         }
       } else {
-        items.add(new Integer(token));
+        items.add(Integer.valueOf(token));
       }
     }
     return items;
@@ -1234,7 +1234,7 @@ public class StringUtil {
     List tokens = split(s, ",");
     for (int tokIdx = 0; tokIdx < tokens.size(); tokIdx++) {
       String token = (String) tokens.get(tokIdx);
-        items.add(new Float(token));
+        items.add(Float.valueOf(token));
     }
     return items;
   }
@@ -2191,7 +2191,7 @@ public class StringUtil {
    * @return long
    */
   private static long convert(String s) {
-    return new Long(s).longValue();
+    return Long.parseLong(s);
   }
 
   /**
@@ -2497,12 +2497,12 @@ public class StringUtil {
           result = new double[3][numbers.size() / 3];
           int cnt = 0;
           for (int i = 0; i < numbers.size(); i += 3) {
-            result[0][cnt] = new Double(
-                    numbers.get(i).toString()).doubleValue();
-            result[1][cnt] = new Double(numbers.get(i
-                    + 1).toString()).doubleValue();
-            result[2][cnt] = new Double(numbers.get(i
-                    + 2).toString()).doubleValue();
+            result[0][cnt] = Double.parseDouble(
+                    numbers.get(i).toString());
+            result[1][cnt] = Double.parseDouble(numbers.get(i
+                    + 1).toString());
+            result[2][cnt] = Double.parseDouble(numbers.get(i
+                    + 2).toString());
             cnt++;
           }
           return result;
@@ -2516,8 +2516,8 @@ public class StringUtil {
       for (int coordIdx = 0;
            (coordIdx < numbers.size()) && (coordIdx < 3);
            coordIdx++) {
-        result[coordIdx][pointIdx] = new Double(
-                numbers.get(coordIdx).toString()).doubleValue();
+        result[coordIdx][pointIdx] = Double.parseDouble(
+                numbers.get(coordIdx).toString());
       }
     }
     return result;

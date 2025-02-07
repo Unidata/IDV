@@ -60,6 +60,11 @@ public final class NaiveTrustProvider extends Provider {
         super(TRUST_PROVIDER_ID, (double) 0.1,
               "NaiveTrustProvider (provides all secure socket factories by ignoring problems in the chain of certificate trust)");
 
+        Security.setProperty("TrustManagerFactory."
+                + NaiveTrustManagerFactory
+                .getAlgorithm(), NaiveTrustManagerFactory.class
+                .getName());
+/**
         AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
                 put("TrustManagerFactory."
@@ -69,6 +74,7 @@ public final class NaiveTrustProvider extends Provider {
                 return null;
             }
         });
+ **/
     }
 
     /**

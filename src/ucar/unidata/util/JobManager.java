@@ -259,7 +259,7 @@ public class JobManager {
     public Object startLoad(final String name, final boolean showDialog,
                             final boolean modal) {
         synchronized (MUTEX) {
-            final Object id = new Integer(++objectCount);
+            final Object id = Integer.valueOf(++objectCount);
             loadMap.put(id, name);
             Misc.run(new Runnable() {
                 public void run() {
