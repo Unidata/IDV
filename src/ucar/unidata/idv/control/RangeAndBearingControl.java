@@ -500,7 +500,7 @@ public class RangeAndBearingControl extends DisplayControlImpl implements Action
 
             Hashtable fills = new Hashtable();
             fills.put(applyBtn,
-                      new Integer(java.awt.GridBagConstraints.NONE));
+                      Integer.valueOf(java.awt.GridBagConstraints.NONE));
             GuiUtils.setHFill();
 
             ArrayList list = new ArrayList();

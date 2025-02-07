@@ -671,7 +671,7 @@ public class StationModelControl extends ObsDisplayControl {
                 //                rangeColorPreview.setPreferred
                 rangeColorPreview.setRange(range);
                 Rectangle b = metSymbol.getBounds();
-                ctComps.add(new Object[] { new Integer(b.y),
+                ctComps.add(new Object[] { Integer.valueOf(b.y),
                                            GuiUtils
                                            .topCenter(GuiUtils
                                                .left(new JLabel(param
@@ -2200,9 +2200,9 @@ public class StationModelControl extends ObsDisplayControl {
                             //                                         obsReal.getUnit());
                             if (obsReal.getUnit() == null) {
                                 tmpValues[filterIdx] =
-                                    new Double(filterReal.getValue());
+                                    Double.valueOf(filterReal.getValue());
                             } else {
-                                tmpValues[filterIdx] = new Double(
+                                tmpValues[filterIdx] = Double.valueOf(
                                     filterReal.getValue(obsReal.getUnit()));
                             }
                             //System.err.println("value:" + tmpValues[filterIdx]);
@@ -2890,7 +2890,7 @@ public class StationModelControl extends ObsDisplayControl {
             dsd.addPropertyValue(getDataTimeRange(), "dataTimeRange",
                                  "Accumulation Times", "Display");
         }
-        dsd.addPropertyValue(new Boolean(getUseDataTimes()), "useDataTimes",
+        dsd.addPropertyValue(Boolean.valueOf(getUseDataTimes()), "useDataTimes",
                              "Use Data Times", SETTINGS_GROUP_DISPLAY);
 
         dsd.addPropertyValue(getStationModelName(), "stationModelName",
@@ -3034,8 +3034,8 @@ public class StationModelControl extends ObsDisplayControl {
             if ( !myDisplay.writeKmzFile(
                     new File(filename), currentStationData,
                     kmzNameFld.getText(),
-                    new Integer(kmzWidthFld.getText().trim()).intValue(),
-                    new Integer(kmzHeightFld.getText().trim()).intValue(),
+                    Integer.parseInt(kmzWidthFld.getText().trim()),
+                    Integer.parseInt(kmzHeightFld.getText().trim()),
                     kmzColorSwatch.getColor())) {
                 return;
             }

@@ -202,7 +202,7 @@ public abstract class IsoSurface extends RGBDisplayable {
             throws RemoteException, VisADException {
 
         if (value != surfaceValue) {
-            Float oldValue = new Float(surfaceValue);
+            Float oldValue = Float.valueOf(surfaceValue);
 
             if (contourControl != null) {
                 contourControl.setSurfaceValue(value, true /*setLevels*/);
@@ -211,7 +211,7 @@ public abstract class IsoSurface extends RGBDisplayable {
             surfaceValue = value;
 
             firePropertyChange(SURFACE_VALUE, oldValue,
-                               new Float(surfaceValue));
+                               Float.valueOf(surfaceValue));
         }
     }
 
