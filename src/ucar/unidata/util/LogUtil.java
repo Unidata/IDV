@@ -693,7 +693,7 @@ public class LogUtil {
     }
 
     public static void runGemini(String imagePath) {
-        String apiKey = "AIzaSyDddWuiZIcbcm4O2NzSpQTrhevG4NGds2w"; // Replace with your actual API key
+        String apiKey = "key"; // Replace with your actual API key
         String baseUrl = "https://generative-ai.googleapis.com/v1beta/models/"; // Replace with the Gemini API base URL
         String modelName = "gemini-pro-vision"; //""gemini-2.0-flash-exp"; // Make sure this model supports image input
         //String imagePath = "path/to/your/image.jpg"; // Replace with the actual path to your image file
