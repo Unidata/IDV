@@ -41,7 +41,7 @@ import visad.georef.EarthLocationTuple;
 import visad.georef.NamedLocation;
 import visad.georef.NamedLocationTuple;
 
-import java.*;
+//import java.*;
 
 import java.rmi.RemoteException;
 

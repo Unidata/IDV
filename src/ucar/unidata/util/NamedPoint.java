@@ -26,7 +26,7 @@ package ucar.unidata.util;
 
 
 
-import java.*;
+//import java.*;
 
 import java.util.Hashtable;
 

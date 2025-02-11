@@ -27,7 +27,7 @@ package ucar.unidata.metdata;
 import visad.Real;
 import visad.georef.NamedLocation;
 
-import java.*;
+//import java.*;
 
 
 
