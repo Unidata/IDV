@@ -126,7 +126,7 @@ public class XmlResourceCollection extends ResourceCollection {
      *  @param id The id or name of this collection.
      *  @param writableResource The resource path that the user can write to.
      *  @param resources The list of resource paths.
-     *  @deprecated not good anymore
+     *  deprecated not good anymore
      */
     public XmlResourceCollection(String id, String writableResource,
                                  List resources) {

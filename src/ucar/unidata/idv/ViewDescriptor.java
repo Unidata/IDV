@@ -56,7 +56,7 @@ public class ViewDescriptor {
 
     /**
      *   Instance for 3d view managers
-     *   @deprecated Use LASTACTIVE
+     *   deprecated Use LASTACTIVE
      */
     public static final ViewDescriptor NAME_MAIN3D = LASTACTIVE;
 
@@ -64,7 +64,7 @@ public class ViewDescriptor {
 
     /**
      *   Instance for 3d view managers
-     *   @deprecated Use LASTACTIVE
+     *   deprecated Use LASTACTIVE
      */
     public static final ViewDescriptor NAME_LASTACTIVE_3D = LASTACTIVE;
 
