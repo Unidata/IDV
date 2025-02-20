@@ -1,7 +1,7 @@
 /*
  * $Id: TextDataSource.java,v 1.28 2007/04/16 20:34:59 jeffmc Exp $
  *
- * Copyright 1997-2024 Unidata Program Center/University Corporation for
+ * Copyright 1997-2025 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

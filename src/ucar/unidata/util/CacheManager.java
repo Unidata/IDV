@@ -1,7 +1,7 @@
 /*
  * $Id: CacheManager.java,v 1.15 2007/04/12 18:55:39 jeffmc Exp $
  *
- * Copyright 1997-2024 Unidata Program Center/University Corporation for
+ * Copyright 1997-2025 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
