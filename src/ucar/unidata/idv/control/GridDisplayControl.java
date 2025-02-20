@@ -92,7 +92,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
 
     /**
      * For legacy code.
-     * @deprecated Should use getGridDataInstance
+     * deprecated Should use getGridDataInstance
      */
     protected GridDataInstance gridDataInstance;
 
@@ -510,7 +510,7 @@ public abstract class GridDisplayControl extends DisplayControlImpl {
 
     /**
      * Make and return a JButton which will summon a ContlevelDialog;
-     * @deprecated Don't use this, rely on the
+     * deprecated Don't use this, rely on the
      * @return  the action button
      */
     public JButton doMakeContourLevelControl() {

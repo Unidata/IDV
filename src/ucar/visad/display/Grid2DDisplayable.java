@@ -112,7 +112,7 @@ public class Grid2DDisplayable extends RGBDisplayable implements GridDisplayable
      * @param field a VisAD FlatField with a 2D nature
      * @exception VisADException  from construction of VisAd objects
      * @exception RemoteException from construction of VisAD objects
-     * @deprecated Should use setData now.
+     * deprecated Should use setData now.
      */
     public void setGrid2D(FieldImpl field)
             throws VisADException, RemoteException {

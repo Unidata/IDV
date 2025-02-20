@@ -834,7 +834,7 @@ public class DerivedGridFactory {
      *
      * @throws VisADException  VisAD problem
      * @throws RemoteException  remote problem
-     * @deprecated use #createFlowVectors(uGrid, vGrid)
+     * deprecated use #createFlowVectors(uGrid, vGrid)
      */
     public static FieldImpl createWindVectors(FieldImpl uGrid,
             FieldImpl vGrid)
@@ -5943,7 +5943,7 @@ public class DerivedGridFactory {
      *
      * @return extracted grid of latitudes at the grid points
      *
-     * @deprecated  use createLatitudeGrid(FieldImpl)
+     * deprecated  use createLatitudeGrid(FieldImpl)
      * @throws RemoteException for bad
      * @throws VisADException for bad
      */
@@ -6447,7 +6447,7 @@ public class DerivedGridFactory {
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
-     * @deprecated use GridMath.ddx(FieldImpl)
+     * deprecated use GridMath.ddx(FieldImpl)
      */
     public static FieldImpl ddx(FieldImpl grid)
             throws VisADException, RemoteException {
@@ -6461,7 +6461,7 @@ public class DerivedGridFactory {
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
-     * @deprecated use GridMath.ddy(FieldImpl)
+     * deprecated use GridMath.ddy(FieldImpl)
      */
     public static FieldImpl ddy(FieldImpl grid)
             throws VisADException, RemoteException {
@@ -6476,7 +6476,7 @@ public class DerivedGridFactory {
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD Error
-     * @deprecated use GridMath.partial(FieldImpl, int)
+     * deprecated use GridMath.partial(FieldImpl, int)
      */
     public static FieldImpl partial(FieldImpl grid, int domainIndex)
             throws VisADException, RemoteException {

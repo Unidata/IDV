@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  *
  *
  *
- * @deprecated use AddeImageChooser directly
+ * deprecated use AddeImageChooser directly
  * @author IDV development team
  * @version $Revision: 1.40 $Date: 2007/07/06 20:40:17 $
  */

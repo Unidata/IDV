@@ -23,7 +23,7 @@ package ucar.unidata.view.geoloc;
 
 /**
  * AxisScaleInfo JavaBean.  Only here so old bundles don't break
- * @deprecated
+ * deprecated
  * @see LatLonAxisScaleInfo
  */
 public class AxisScaleInfo extends LatLonAxisScaleInfo {

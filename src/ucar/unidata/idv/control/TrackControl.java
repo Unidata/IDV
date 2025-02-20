@@ -1189,7 +1189,7 @@ public class TrackControl extends GridDisplayControl {
      * Set the track width property.  Used by persistence
      *
      * @param width  width for track (pixels)
-     * @deprecated  use #setLineWidth(int)
+     * deprecated  use #setLineWidth(int)
      */
     public void setTrackWidth(int width) {
         setLineWidth(width);
@@ -1199,7 +1199,7 @@ public class TrackControl extends GridDisplayControl {
      * Set the track width property.  Used by persistence
      *
      * @param width  width for track (pixels)
-     * @deprecated  use #setLineWidth(int)
+     * deprecated  use #setLineWidth(int)
      */
     public void setLineWidth(int width) {
         trackWidth = width;
@@ -1338,7 +1338,7 @@ public class TrackControl extends GridDisplayControl {
      * Set the TimeSubsetMinutes property.
      *
      * @param value The new value for TimeSubsetMinutes
-     * @deprecated
+     * deprecated
      */
     public void setTimeSubsetMinutes(double value) {
         timeSubsetMinutes = value;
@@ -1348,7 +1348,7 @@ public class TrackControl extends GridDisplayControl {
     /**
      * Set the TimeSubsetEnabled property.
      *
-     * @deprecated
+     * deprecated
      * @param value The new value for TimeSubsetEnabled
      */
     public void setTimeSubsetEnabled(boolean value) {
@@ -1360,7 +1360,7 @@ public class TrackControl extends GridDisplayControl {
      * Set the useTrackTime property.
      *
      * @param value The new value for useTrackTime
-     * @deprecated
+     * deprecated
      */
     public void setUseTrackTime(boolean value) {
         useTrackTime = value;
@@ -1370,7 +1370,7 @@ public class TrackControl extends GridDisplayControl {
      * Set the useTrackTimes property.
      *
      * @param value The new value for useTrackTime
-     * @deprecated
+     * deprecated
      */
     public void setUseTrackTimes(boolean value) {
         useTrackTimes = value;
@@ -1388,7 +1388,7 @@ public class TrackControl extends GridDisplayControl {
      * Get the useTrackTime property.
      *
      * @return The new value for useTrackTime
-     * @deprecated
+     * deprecated
      */
     public boolean getUseTrackTimes() {
         return useTrackTimes;
@@ -1458,7 +1458,7 @@ public class TrackControl extends GridDisplayControl {
     /**
      * Set the MarkerText property.
      * @param value The new value for MarkerText
-     * @deprecated  now use #setMarkerLayout(StationModel)
+     * deprecated  now use #setMarkerLayout(StationModel)
      */
     public void setMarkerText(String value) {
         markerText    = value;
@@ -1469,7 +1469,7 @@ public class TrackControl extends GridDisplayControl {
     /**
      * Set the MarkerSymbol property.
      * @param value The new value for MarkerSymbol
-     * @deprecated  now use #setMarkerLayout(StationModel)
+     * deprecated  now use #setMarkerLayout(StationModel)
      */
     public void setMarkerSymbol(String value) {
         markerSymbol  = value;

@@ -631,7 +631,7 @@ public class Animation extends Displayable {
      * otherwise, each time value is the delay AFTER each loop step: the first
      * time in list is time delay AFTER the display of the first data.
      *
-     * @deprecated Use getFwdSteps
+     * deprecated Use getFwdSteps
      * @return Dwell delays in milliseconds or <code>null</code>.
      */
     public long[] getSteps() {
@@ -642,7 +642,7 @@ public class Animation extends Displayable {
      * Sets an integer array in milliseconds of time delay AFTER
      * display each loop step.
      *
-     * @deprecated Use setFwdSteps
+     * deprecated Use setFwdSteps
      * @param newTimes          Dwell delays in milliseconds.
      *
      */

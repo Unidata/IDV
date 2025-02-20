@@ -415,7 +415,7 @@ public abstract class RGBDisplayable extends DisplayableData {
      *
      * @param low    the minimun value
      * @param hi     the maximum value
-     * @deprecated   use setRangeForColor
+     * deprecated   use setRangeForColor
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
@@ -453,7 +453,7 @@ public abstract class RGBDisplayable extends DisplayableData {
      * Get the color range
      *
      * @return an array of the low and high values for the range
-     * @deprecated  use #getRangeForColor()
+     * deprecated  use #getRangeForColor()
      */
     public double[] getRangeforColor() {
         return getRangeForColor();

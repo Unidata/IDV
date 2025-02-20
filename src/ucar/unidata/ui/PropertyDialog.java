@@ -48,7 +48,7 @@ import javax.swing.*;
  *
  * @author John Caron
  * @version $Id: PropertyDialog.java,v 1.14 2007/07/06 20:45:32 jeffmc Exp $
- * @deprecated
+ * deprecated
  */
 public class PropertyDialog extends IndependentDialog {
 

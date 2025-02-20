@@ -30,7 +30,7 @@ import java.rmi.RemoteException;
 /**
  * <p>Creates an aerological Skew-T diagram for soundings from track (i.e.
  * aircraft) data.</p>
- * @deprecated  use TrackSoundingControl
+ * deprecated  use TrackSoundingControl
  *
  * @author IDV Development Team
  * @version $Revision: 1.15 $Date: 2006/12/01 20:16:39 $

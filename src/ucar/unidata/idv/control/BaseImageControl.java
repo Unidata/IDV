@@ -99,13 +99,13 @@ public abstract class BaseImageControl extends GridDisplayControl {
 
     /**
      * empty RGB image
-     * @deprecated  use public EMPTY_RGB_IMAGE
+     * deprecated  use public EMPTY_RGB_IMAGE
      */
     protected static FieldImpl emptyRGBImage = null;
 
     /**
      * empty sequence
-     * @deprecated  use public EMPTY_IMAGE
+     * deprecated  use public EMPTY_IMAGE
      */
     protected static FieldImpl emptyImage = null;
 

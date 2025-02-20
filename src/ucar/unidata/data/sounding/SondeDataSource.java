@@ -64,7 +64,7 @@ public class SondeDataSource extends TrackDataSource {
 
     /**
      * sonde locations
-     * @deprecated use ID_SONDESTARTLOCATIONS
+     * deprecated use ID_SONDESTARTLOCATIONS
      */
     public static final String ID_SONDELOCATIONS = "id.sondelocations";
 

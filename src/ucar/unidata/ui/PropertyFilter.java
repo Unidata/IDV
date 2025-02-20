@@ -599,7 +599,7 @@ public class PropertyFilter {
 
 
     /**
-     * @deprecated Keep around for bundles
+     * deprecated Keep around for bundles
      *
      * @param v _more_
      */

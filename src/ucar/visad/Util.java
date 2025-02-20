@@ -1625,7 +1625,7 @@ public final class Util {
      *                          one-dimensional.
      * @throws VisADException   Couldn't create necessary VisAD object.
      * @throws RemoteException  Java RMI failure.
-     * @deprecated  use visad.util.DataUtility.getSample() now
+     * deprecated  use visad.util.DataUtility.getSample() now
      */
     public static RealTuple getSample(Set set, int index)
             throws VisADException, RemoteException {
@@ -2219,7 +2219,7 @@ public final class Util {
      * @param dt DateTime object
      * @param pattern format pattern
      * @return formatted date.
-     * @deprecated  use UtcDate.formatUtcDate(DateTime, String)
+     * deprecated  use UtcDate.formatUtcDate(DateTime, String)
      */
     public static String formatUtcDate(DateTime dt, String pattern) {
         return UtcDate.formatUtcDate(dt, pattern);

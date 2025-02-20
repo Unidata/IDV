@@ -29,7 +29,7 @@ import java.rmi.RemoteException;
 
 /**
  * <p>A {@link SkewTControl} for RAOB data.</p>
- * @deprecated  use RaobSoundingControl
+ * deprecated  use RaobSoundingControl
  *
  * @author Unidata Development Team
  * @version $Revision: 1.27 $Date: 2006/12/01 20:16:37 $

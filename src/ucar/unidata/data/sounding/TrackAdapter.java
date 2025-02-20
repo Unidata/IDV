@@ -327,7 +327,7 @@ public abstract class TrackAdapter {
      * Get the base (starting) time of this track.
      *
      * @return starting time
-     * @deprecated use #getStartTime()
+     * deprecated use #getStartTime()
      */
     public DateTime getBaseTime() {
         return getStartTime();

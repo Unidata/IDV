@@ -937,7 +937,7 @@ public class ControlDescriptor {
      * @param properties properties
      * @param dataSelection The data selection that the user may have defined
      *                      to hold data subsetting information (e.g., times)
-     * @deprecated Use other initControl
+     * deprecated Use other initControl
      */
     public void initControl(DisplayControl control, List newDataChoices,
                             IntegratedDataViewer idv, String properties,

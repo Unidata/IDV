@@ -511,7 +511,7 @@ public abstract class NavigatedViewManager extends ViewManager {
 
     /**
      * handle a vertical scale change
-     * @deprecated see {@link #verticalRangeChanged()}
+     * deprecated see {@link #verticalRangeChanged()}
      */
     protected void verticalScaleChanged() {}
 

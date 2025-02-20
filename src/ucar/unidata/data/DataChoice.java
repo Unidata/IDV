@@ -523,7 +523,7 @@ public abstract class DataChoice {
      * that we had the getDataCategories and getCategories methods. These would
      * get used in wrting to a bundle and we'd end up clobbering any display categorie.
      *
-     * @deprecated
+     * deprecated
      * @return data categories
      */
     public List getDataCategories() {
@@ -563,7 +563,7 @@ public abstract class DataChoice {
      * for old bundles but the list of categories excluded any display categories
      * and would clobber the main categories list
      *
-     * @deprecated  Does nothing  now.
+     * deprecated  Does nothing  now.
      * @param categories        The list of data categories.
      */
     public void setDataCategories(List categories) {}

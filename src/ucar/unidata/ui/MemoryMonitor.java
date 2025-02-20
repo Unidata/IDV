@@ -26,7 +26,7 @@ package ucar.unidata.ui;
 
 /**
  * Class MemoryMonitor
- * @deprecated Use ucar.unidata.util.MemoryMonitor
+ * deprecated Use ucar.unidata.util.MemoryMonitor
  *
  *
  * @author Unidata development team

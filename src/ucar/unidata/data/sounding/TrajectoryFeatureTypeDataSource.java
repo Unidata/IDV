@@ -58,7 +58,7 @@ public class TrajectoryFeatureTypeDataSource extends TrackDataSource {
 
     /**
      * sonde locations
-     * @deprecated use ID_SONDESTARTLOCATIONS
+     * deprecated use ID_SONDESTARTLOCATIONS
      */
     public static final String ID_SONDELOCATIONS = "id.sondelocations";
 

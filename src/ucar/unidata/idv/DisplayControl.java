@@ -129,7 +129,7 @@ public interface DisplayControl extends Sharable {
      * @param properties         properties
      * @param dataSelection     specific data selection properties
      *
-     * @deprecated Use init that that takes a properties Hashtable
+     * deprecated Use init that that takes a properties Hashtable
      * @throws RemoteException  Java RMI error
      * @throws VisADException   VisAD error
      */

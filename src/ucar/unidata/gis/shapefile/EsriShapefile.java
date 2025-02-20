@@ -470,7 +470,7 @@ public class EsriShapefile {
 
     /**
      * @return number of features in shapefile
-     * @deprecated
+     * deprecated
      */
     public int numShapes() {
         return features.size();

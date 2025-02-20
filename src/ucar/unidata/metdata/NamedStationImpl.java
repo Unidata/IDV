@@ -189,7 +189,7 @@ public class NamedStationImpl implements NamedStation {
     /**
      * Have this method here for backward compatibility with bundles.
      *
-     * @deprecated
+     * deprecated
      *
      * @param v   new NamedLocationTuple
      */

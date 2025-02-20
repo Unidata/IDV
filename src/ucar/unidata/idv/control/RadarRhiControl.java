@@ -511,7 +511,7 @@ public class RadarRhiControl extends ColorCrossSectionControl {
      * @param az the azimuth of the RHI from radar location,
      *   360 degrees, cw from N
      *
-     * @deprecated use setBeamAzimuth
+     * deprecated use setBeamAzimuth
      */
     public void setCurrentAngle(float az) {
         currentAngle = az;

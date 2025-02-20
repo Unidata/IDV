@@ -136,7 +136,7 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
      * @param rangeLimits       limits of the color range
      * @exception VisADException   VisAD failure.
      * @exception RemoteException  Java RMI failure.
-     * @deprecated rangeLimits not needed
+     * deprecated rangeLimits not needed
      */
     public Contour2DDisplayable(String name, RealType c2dRealType,
                                 float[][] colorPalette, float[] rangeLimits)
@@ -350,7 +350,7 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
      * Get the color range
      *
      * @return an array of the low and high values for the range
-     * @deprecated use #getRangeForColor()
+     * deprecated use #getRangeForColor()
      */
     public double[] getRangeforColor() {
         return getRangeForColor();
@@ -383,7 +383,7 @@ public class Contour2DDisplayable extends ContourLines implements GridDisplayabl
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
-     * @deprecated Should use loadData now
+     * deprecated Should use loadData now
      */
     public void setGrid2D(FieldImpl field)
             throws RemoteException, VisADException {

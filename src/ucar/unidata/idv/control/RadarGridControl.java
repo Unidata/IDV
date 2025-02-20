@@ -1359,7 +1359,7 @@ public class RadarGridControl extends DisplayControlImpl implements ActionListen
      * Set the VerticalValue property.
      *
      * @param value The new value for VerticalValue
-     * @deprecated Keep this around for legacy bundles.
+     * deprecated Keep this around for legacy bundles.
      *
      * @throws RemoteException On badness
      * @throws VisADException On badness

@@ -2449,7 +2449,7 @@ public class DrawingControl extends DisplayControlImpl {
 
     /**
      * Set the line data.
-     * @deprecated
+     * deprecated
      * @param lines  set of lines to use
      */
     public void setLines(UnionSet lines) {}
@@ -2458,7 +2458,7 @@ public class DrawingControl extends DisplayControlImpl {
     /**
      * Enable/disable the drawing
      *
-     * @deprecated
+     * deprecated
      * @param b   true to enable
      */
     public void setActive(boolean b) {}

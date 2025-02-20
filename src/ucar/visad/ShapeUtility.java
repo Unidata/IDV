@@ -294,7 +294,7 @@ public class ShapeUtility {
      *
      * @param  s  shape to create
      *
-     * @deprecated Use create shape
+     * deprecated Use create shape
      * @return corresponding shape
      */
     public static VisADGeometryArray makeShape(String s) {

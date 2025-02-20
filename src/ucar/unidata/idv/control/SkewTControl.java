@@ -30,7 +30,7 @@ import java.rmi.RemoteException;
  * Abstract class for displaying an aerological Skew-T log p diagram of an
  * atmospheric sounding.
  *
- * @deprecated  Use AerologicalSoundingDisplay
+ * deprecated  Use AerologicalSoundingDisplay
  *
  * @author IDV Development Team
  * @version $Revision: 1.82 $Date: 2006/12/01 20:16:37 $

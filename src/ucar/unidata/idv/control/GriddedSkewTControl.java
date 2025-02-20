@@ -29,7 +29,7 @@ import java.rmi.RemoteException;
 /**
  * <p>Creates an aerological Skew-T diagram for soundings.  Adds a line probe
  * to the main display and uses its position to interpolate the data.</p>
- * @deprecated  use GriddedSoundingControl
+ * deprecated  use GriddedSoundingControl
  *
  * @author Unidata Development Team
  * @version $Revision: 1.33 $Date: 2006/12/01 20:16:33 $

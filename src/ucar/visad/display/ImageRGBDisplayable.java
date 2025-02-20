@@ -235,7 +235,7 @@ public class ImageRGBDisplayable extends DisplayableData implements GridDisplaya
      * Returns the RealTupleType of the RGB parameter.
      * @return                  The RealTupleType of the color parameter.  May
      *                          be <code>null</code>.
-     * @deprecated  use getColorTupleType()
+     * deprecated  use getColorTupleType()
      */
     public RealTupleType getRGBRealTupleType() {
         return colorTupleType;

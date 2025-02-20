@@ -1222,7 +1222,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      *
      * @param file   directory
      * @return  the most recent file in the directory
-     * @deprecated Use loadLatestFile
+     * deprecated Use loadLatestFile
      */
     protected File doDirectory(File file) {
         return loadLatestFile(file);
@@ -3655,7 +3655,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * noop. Keep around for legacy bundles.
      *
      * @param n   directory name
-     * @deprecated
+     * deprecated
      */
     public void setDirectory(String n) {}
 
@@ -3664,7 +3664,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * noop. Keep around for legacy bundles.
      *
      *  @param value The new value for PollLocation
-     * @deprecated
+     * deprecated
      */
     public void setPollLocation(String value) {}
 
@@ -3740,7 +3740,7 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
      * Set the AskToUpdate property.
      *
      * @param value The new value for AskToUpdate
-     * @deprecated Keep around for bundles
+     * deprecated Keep around for bundles
      */
     public void setAskToUpdate(boolean value) {}
 

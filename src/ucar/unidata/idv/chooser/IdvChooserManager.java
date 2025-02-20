@@ -511,7 +511,7 @@ public class IdvChooserManager extends IdvManager {
     /**
      * Get the chooser contents
      *
-     * @deprecated no longer in use
+     * deprecated no longer in use
      * @return null
      */
     public JComponent getChooserContents() {

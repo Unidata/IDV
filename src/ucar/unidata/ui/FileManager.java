@@ -42,7 +42,7 @@ import javax.swing.filechooser.*;
 
 /**
  * Wrapper cover for JFileChooser.
- * @deprecated Use ucar.unidata.util.FileManager
+ * deprecated Use ucar.unidata.util.FileManager
  * @author Unidata development staff
  * @version $Id: FileManager.java,v 1.59 2007/07/06 20:45:30 jeffmc Exp $
  */

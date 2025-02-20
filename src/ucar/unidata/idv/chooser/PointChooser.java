@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * @deprecated Use {@link ucar.unidata.idv.chooser.adde.AddePointDataChooser} directly
+ * deprecated Use {@link ucar.unidata.idv.chooser.adde.AddePointDataChooser} directly
  *
  * @author IDV development team
  * @version $Revision: 1.41 $Date: 2007/07/06 20:40:17 $

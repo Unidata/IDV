@@ -3136,7 +3136,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Get the component that holds the side legend
      *
      * @return side legend container
-     * @deprecated No longer called sideLegendContainer
+     * deprecated No longer called sideLegendContainer
      */
     public JSplitPane getSideLegendContainer() {
         return mainSplitPane;
@@ -5118,7 +5118,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * persistence.
      *
      * @param vd The new ViewDescriptor.
-     * @deprecated Use addViewDescriptor
+     * deprecated Use addViewDescriptor
      */
     public void setViewDescriptor(ViewDescriptor vd) {
         addViewDescriptor(vd);
@@ -7276,7 +7276,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /**
      * Toggle the animation string visibility.
      * @param visible  true to make it visible
-     * @deprecated Use setAniReadout now
+     * deprecated Use setAniReadout now
      */
     public void setAnimationStringVisible(boolean visible) {
         setAniReadout(visible);
@@ -7285,7 +7285,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /**
      * Get the animation string visibility.
      * @return visible  true to make it visible
-     * @deprecated Use getAniReadout now
+     * deprecated Use getAniReadout now
      */
     public boolean getAnimationStringVisible() {
         return getAniReadout();

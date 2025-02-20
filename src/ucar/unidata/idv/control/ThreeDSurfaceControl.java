@@ -90,7 +90,7 @@ public class ThreeDSurfaceControl extends GridDisplayControl {
     /**
      * Property for sharing transparency. Deprecated since
      * transparencey is now done through color table sharing.
-     * @deprecated
+     * deprecated
      */
     public static final String SHARE_TRANSPARENCY =
         "ThreeDSurfaceControl.SHARE_TRANSPARENCY";

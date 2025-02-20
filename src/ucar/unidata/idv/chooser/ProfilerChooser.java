@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * @deprecated Use {@link ucar.unidata.idv.chooser.adde.AddeProfilerDataChooser}
+ * deprecated Use {@link ucar.unidata.idv.chooser.adde.AddeProfilerDataChooser}
  *
  * @author IDV development team
  * @version $Revision: 1.38 $

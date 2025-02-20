@@ -1775,7 +1775,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.averageOverTime(FieldImpl, boolean)
+     * deprecated use GridMath.averageOverTime(FieldImpl, boolean)
      */
     public static FieldImpl averageOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
@@ -1792,7 +1792,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.timeStepDifference(FieldImpl, int)
+     * deprecated use GridMath.timeStepDifference(FieldImpl, int)
      */
     public static FieldImpl timeStepDifference(FieldImpl grid, int offset)
             throws VisADException {
@@ -1809,7 +1809,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.timeStepSum(FieldImpl, int)
+     * deprecated use GridMath.timeStepSum(FieldImpl, int)
      */
     public static FieldImpl timeStepSum(FieldImpl grid, int offset)
             throws VisADException {
@@ -1824,7 +1824,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.differenceFromBaseTime(FieldImpl)
+     * deprecated use GridMath.differenceFromBaseTime(FieldImpl)
      */
     public static FieldImpl differenceFromBaseTime(FieldImpl grid)
             throws VisADException {
@@ -1840,7 +1840,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.sumFromBaseTime(FieldImpl)
+     * deprecated use GridMath.sumFromBaseTime(FieldImpl)
      */
     public static FieldImpl sumFromBaseTime(FieldImpl grid)
             throws VisADException {
@@ -1860,7 +1860,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.timeStepFunc(FieldImpl, int, String)
+     * deprecated use GridMath.timeStepFunc(FieldImpl, int, String)
      */
     public static FieldImpl timeStepFunc(FieldImpl grid, int offset,
                                          String func)
@@ -1879,7 +1879,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.sumOverTime(FieldImpl, boolean)
+     * deprecated use GridMath.sumOverTime(FieldImpl, boolean)
      */
     public static FieldImpl sumOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
@@ -1897,7 +1897,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.minOverTime
+     * deprecated use GridMath.minOverTime
      */
     public static FieldImpl minOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
@@ -1915,7 +1915,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.maxOverTime(FieldImpl, boolean)
+     * deprecated use GridMath.maxOverTime(FieldImpl, boolean)
      */
     public static FieldImpl maxOverTime(FieldImpl grid, boolean makeTimes)
             throws VisADException {
@@ -1936,7 +1936,7 @@ public class GridUtil {
      * @return the new field
      *
      * @throws VisADException  On badness
-     * @deprecated use GridMath.applyFunctionOverTime(FieldImpl, String, boolean)
+     * deprecated use GridMath.applyFunctionOverTime(FieldImpl, String, boolean)
      */
     public static FieldImpl applyFunctionOverTime(FieldImpl grid,
             String function, boolean makeTimes)

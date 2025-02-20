@@ -1918,7 +1918,7 @@ abstract public class DisplayMaster {
     /**
      * Sets the "rebuild necessary" property.
      *
-     * @deprecated
+     * deprecated
      */
     public synchronized void setRebuildNecessary() {}
 
@@ -2043,7 +2043,7 @@ abstract public class DisplayMaster {
      *                          automatic rebuilds.
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
-     * @deprecated This will become private in the future. You should use
+     * deprecated This will become private in the future. You should use
      * {@link #setDisplayInactive()} and {@link #setDisplayActive()}
      */
     public void setActive(boolean newActiveValue)
@@ -2081,7 +2081,7 @@ abstract public class DisplayMaster {
      * <p>This implementation invokes {@link #setActive(boolean)}.</p>
      *
      * @return                  The previous value of the "active" property.
-     * @deprecated This will become private in the future. You should use
+     * deprecated This will become private in the future. You should use
      * {@link #setDisplayInactive()} and {@link #setDisplayActive()}
      */
     public synchronized boolean ensureInactive() {

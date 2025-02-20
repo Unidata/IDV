@@ -2059,7 +2059,7 @@ public class Misc {
      *              that is the highest common denominator
      *
      * @return  parsed value as a double
-     * @deprecated  replaced by {@link #parseNumber(String)}
+     * deprecated  replaced by {@link #parseNumber(String)}
      *
      * @throws NumberFormatException  unable to parse the value
      */
@@ -3091,7 +3091,7 @@ public class Misc {
     /**
      * @param filename The filename to check.
      * @return Is the filename a text file.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static boolean isTextFile(String filename) {
         return IOUtil.isTextFile(filename);
@@ -3101,7 +3101,7 @@ public class Misc {
     /**
      *  @param filename The filename to check.
      *  @return Is the filename an image file.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static boolean isImageFile(String filename) {
         return IOUtil.isImageFile(filename);
@@ -3110,7 +3110,7 @@ public class Misc {
     /**
      *  @param filenameOrUrl The filename to check.
      *  @return Is the filename an html file.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static boolean isHtmlFile(String filenameOrUrl) {
         return IOUtil.isHtmlFile(filenameOrUrl);
@@ -3125,7 +3125,7 @@ public class Misc {
      *
      * @throws FileNotFoundException     couldn't find the file
      * @throws IOException               problem opening stream
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static InputStream getInputStream(String filename)
             throws FileNotFoundException, IOException {
@@ -3140,7 +3140,7 @@ public class Misc {
      *
      * @throws FileNotFoundException     couldn't find the file
      * @throws IOException               problem opening stream
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static InputStream getInputStream(String filename, Class origin)
             throws FileNotFoundException, IOException {
@@ -3156,7 +3156,7 @@ public class Misc {
      *
      * @throws FileNotFoundException     couldn't find the file
      * @throws IOException               problem opening stream
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String readContents(File file)
             throws FileNotFoundException, IOException {
@@ -3168,7 +3168,7 @@ public class Misc {
      * @param contentName   URL or filename
      * @param dflt          default to return if a problem
      * @return  contents or default value
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String readContents(String contentName, String dflt) {
         return IOUtil.readContents(contentName, dflt);
@@ -3182,7 +3182,7 @@ public class Misc {
      *
      * @throws FileNotFoundException     couldn't find the file
      * @throws IOException               problem reading contents
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String readContents(String contentName)
             throws FileNotFoundException, IOException {
@@ -3199,7 +3199,7 @@ public class Misc {
      *
      * @throws FileNotFoundException     couldn't find the file
      * @throws IOException               problem reading contents
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String readContents(String contentName, Class origin)
             throws FileNotFoundException, IOException {
@@ -3213,7 +3213,7 @@ public class Misc {
      * @return  contents as a String
      *
      * @throws IOException  problem reading contents
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String readContents(InputStream is) throws IOException {
         return IOUtil.readContents(is);
@@ -3226,7 +3226,7 @@ public class Misc {
      * @return  bytes read
      *
      * @throws IOException  problem reading contents
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static byte[] readBytes(InputStream is) throws IOException {
         return IOUtil.readBytes(is);
@@ -3238,7 +3238,7 @@ public class Misc {
      * @return  bytes read
      *
      * @throws IOException  problem reading contents
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static byte[] readBytes(InputStream is, Object loadId)
             throws IOException {
@@ -3251,7 +3251,7 @@ public class Misc {
      *
      *  @param dir The directory to search in.
      *  @return The most recent file (or null if none found).
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static File getMostRecentFile(File dir) {
         return IOUtil.getMostRecentFile(dir);
@@ -3261,7 +3261,7 @@ public class Misc {
      *  @param dir The directory to search in.
      *  @param filter The {@link FileFilter} to be used to limit what files we look at (may be null).
      *  @return The most recent file (or null if none found).
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static File getMostRecentFile(File dir,
                                          java.io.FileFilter filter) {
@@ -3275,7 +3275,7 @@ public class Misc {
      * @param filter The filter
      * @param youngestFirst Ascending or descending
      *
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      * @return The sorted files
      */
     public static File[] sortFilesOnAge(File directory,
@@ -3291,7 +3291,7 @@ public class Misc {
      *
      * @param files The files
      * @param youngestFirst Ascending or descending
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      * @return Just return the given array
      */
     public static File[] sortFilesOnAge(File[] files,
@@ -3303,7 +3303,7 @@ public class Misc {
      * @param files List of files
      *
      * @return array of files
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static File[] toFiles(List files) {
         return IOUtil.toFiles(files);
@@ -3315,7 +3315,7 @@ public class Misc {
      * @param filter The filechooser file filter
      *
      * @return The javaio FileFilter.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static java.io.FileFilter wrapFilter(
             final javax.swing.filechooser.FileFilter filter) {
@@ -3328,7 +3328,7 @@ public class Misc {
      *  @param dir The directory to search in.
      *  @param filter The filter to be used to limit what files we look at (may be null).
      *  @return The most recent file (or null if none found).
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static File getMostRecentFile(
             File dir, final javax.swing.filechooser.FileFilter filter) {
@@ -3340,7 +3340,7 @@ public class Misc {
     /**
      *  @param f The file path.
      *  @return The file name.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String getFileTail(String f) {
         return IOUtil.getFileTail(f);
@@ -3350,7 +3350,7 @@ public class Misc {
     /**
      *  @param f The file path.
      *  @return The file name.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String getFileRoot(String f) {
         return IOUtil.getFileRoot(f);
@@ -3362,7 +3362,7 @@ public class Misc {
      *
      *  @param f The file path.
      *  @return The file name without the extension.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      *
      */
     public static String stripExtension(String f) {
@@ -3374,7 +3374,7 @@ public class Misc {
      *
      * @param name The filename to be cleaned up
      * @return The cleaned up filename
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String cleanFileName(String name) {
         return IOUtil.cleanFileName(name);
@@ -3385,7 +3385,7 @@ public class Misc {
      *
      *  @param f The file path.
      *  @return The file  extension or an empty string if none found.
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String getFileExtension(String f) {
         return IOUtil.getFileExtension(f);
@@ -3399,7 +3399,7 @@ public class Misc {
      *
      * @throws FileNotFoundException    if the file does not exist
      * @throws IOException              if there is a problem writing
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static void writeFile(String filename, String contents)
             throws FileNotFoundException, IOException {
@@ -3414,7 +3414,7 @@ public class Misc {
      *
      * @throws FileNotFoundException    if the file does not exist
      * @throws IOException              if there is a problem writing
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static void writeFile(File filename, String contents)
             throws FileNotFoundException, IOException {
@@ -3430,7 +3430,7 @@ public class Misc {
      *
      * @throws FileNotFoundException    if the file does not exist
      * @throws IOException              if there is a problem writing
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static void writeBytes(File filename, byte[] contents)
             throws FileNotFoundException, IOException {
@@ -3444,7 +3444,7 @@ public class Misc {
      * @param origin    anchor point for relative location of file
      * @param dflt      default to return
      * @return  contents as a String  or <code>dflt</code>
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String readFile(String filename, Class origin,
                                   String dflt) {
@@ -3459,7 +3459,7 @@ public class Misc {
      *
      * @throws FileNotFoundException    if the file does not exist
      * @throws IOException              if there is a problem writing
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String readFile(String filename, Class origin)
             throws FileNotFoundException, IOException {
@@ -3475,7 +3475,7 @@ public class Misc {
      *
      * @throws FileNotFoundException When we cannot find the file
      * @throws IOException When something untoward happens
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static void moveFile(File from, File to)
             throws FileNotFoundException, IOException {
@@ -3491,7 +3491,7 @@ public class Misc {
      *
      * @throws FileNotFoundException When we cannot find the file
      * @throws IOException When something untoward happens
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static void copyFile(File from, File to)
             throws FileNotFoundException, IOException {
@@ -3503,7 +3503,7 @@ public class Misc {
      * @param f1    directory path
      * @param f2    filename
      * @return  concatenated String with the appropriate file separator
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String joinDir(String f1, String f2) {
         return IOUtil.joinDir(f1, f2);
@@ -3515,7 +3515,7 @@ public class Misc {
      * @param f1          directory path
      * @param filename    filename
      * @return  concatenated String with the appropriate file separator
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String joinDir(File f1, String filename) {
         return IOUtil.joinDir(f1, filename);
@@ -3526,7 +3526,7 @@ public class Misc {
      *
      * @param path   directory to make
      * @return  the directory path
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String makeDir(String path) {
         return IOUtil.makeDir(path);
@@ -3537,7 +3537,7 @@ public class Misc {
      *
      * @param f   directory as a file
      * @return   directory path
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static String makeDir(File f) {
         return IOUtil.makeDir(f);
@@ -3551,7 +3551,7 @@ public class Misc {
      * @param recurse Do we recurse
      *
      * @return List of subdirs (File)
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static List getDirectories(File dir, boolean recurse) {
         return IOUtil.getDirectories(dir, recurse);
@@ -3564,7 +3564,7 @@ public class Misc {
      * @param recurse Do we recurse
      *
      * @return List of subdirs (File)
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static List getDirectories(List dirs, boolean recurse) {
         return IOUtil.getDirectories(dirs, recurse);
@@ -3574,7 +3574,7 @@ public class Misc {
     /**
      *
      * @param root Directory to prune
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     private static void pruneIfEmpty(File root) {
         IOUtil.pruneIfEmpty(root);
@@ -3585,7 +3585,7 @@ public class Misc {
     /**
      *
      * @param root Directory to prune
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      */
     public static void pruneEmptyDirectories(File root) {
         IOUtil.pruneEmptyDirectories(root);
@@ -3593,7 +3593,7 @@ public class Misc {
 
 
     /**
-     * @deprecated Use IOUtil
+     * deprecated Use IOUtil
      *
      * @param root root
      */
@@ -3615,7 +3615,7 @@ public class Misc {
      * @param source      Source String to match on.
      * @param patternList List of objects whose toString is the pattern.
      * @param dflt        The default if nothing matches.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return The Object whose toString matches the source or the
      *                    dflt if no matches found.
      */
@@ -3630,7 +3630,7 @@ public class Misc {
      * @param patternList   List of objects whose toString is the pattern.
      * @param results       The list of return objects.
      * @param dflt          The default if nothing matches.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return The return Object whose toString matches the source or the dflt if no matches found.
      */
     public static Object findMatch(String source, List patternList,
@@ -3645,7 +3645,7 @@ public class Misc {
     /**
      *
      * @param patternString   pattern string to check
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  true if it contains (^,*,$,+).
      */
     public static boolean containsRegExp(String patternString) {
@@ -3657,7 +3657,7 @@ public class Misc {
     /**
      * @param input           The input source string.
      * @param patternString   The regular expression pattern.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return                true if the pattern match the input.
      */
     public static boolean stringMatch(String input, String patternString) {
@@ -3670,7 +3670,7 @@ public class Misc {
      * @param patternString   The regular expression pattern.
      * @param substring Search for substrings
      * @param caseSensitive Is case sensitive
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return                true if the pattern match the input.
      */
     public static boolean stringMatch(String input, String patternString,
@@ -3683,7 +3683,7 @@ public class Misc {
 
     /**
      * @param  value  String to check
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return true if value starts with a, e, i, o, or u (but not sometimes y).
      *         Check is case insensitive.
      */
@@ -3698,7 +3698,7 @@ public class Misc {
      * @param insert string to insert
      * @param lineSize line size to insert at
      *
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return The text with added br tags.
      */
     public static String breakText(String text, String insert, int lineSize) {
@@ -3709,7 +3709,7 @@ public class Misc {
 
     /**
      *  @param html The source html string.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The raw text.
      */
     public static String stripTags(String html) {
@@ -3719,7 +3719,7 @@ public class Misc {
 
     /**
      *  @param inputString The string to remove the whitespace.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The whitespaceless result.
      */
     public static String removeWhitespace(String inputString) {
@@ -3730,7 +3730,7 @@ public class Misc {
 
     /**
      * @param value The value.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return The String  represenation of the value, padded with a
      *         leading "0" if value &lt; 10
      */
@@ -3742,7 +3742,7 @@ public class Misc {
     /**
      * @param value The value.
      * @param numDigits number of digits
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return The String  represenation of the value, padded with
      *         leading "0"-s if value &lt; 10E(numDigits-1)
      */
@@ -3754,7 +3754,7 @@ public class Misc {
     /**
      * @param s               String to pad
      * @param desiredLength   ending length
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  padded String
      */
     public static String padLeft(String s, int desiredLength) {
@@ -3766,7 +3766,7 @@ public class Misc {
      * @param s               String to pad
      * @param desiredLength   ending length
      * @param padString       String to pad with (e.g, " ")
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  padded String
      */
     public static String padLeft(String s, int desiredLength,
@@ -3779,7 +3779,7 @@ public class Misc {
     /**
      * @param s               String to pad
      * @param desiredLength   ending length
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  padded String
      */
     public static String padRight(String s, int desiredLength) {
@@ -3791,7 +3791,7 @@ public class Misc {
      * @param s               String to pad
      * @param desiredLength   ending length
      * @param padString       String to pad with (e.g, " ")
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  padded String
      */
     public static String padRight(String s, int desiredLength,
@@ -3802,7 +3802,7 @@ public class Misc {
 
     /**
      *  @param args An array of Strings to merge.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The given strings concatenated together with a
      *          space between each.
      */
@@ -3813,7 +3813,7 @@ public class Misc {
     /**
      *  @param delimiter The delimiter.
      *  @param args An array of Strings to merge.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The given strings concatenated together with the delimiter between each.
      */
     public static String join(String delimiter, Object[] args) {
@@ -3825,7 +3825,7 @@ public class Misc {
      *  @param delimiter The delimiter.
      *  @param args An array of Strings to merge.
      *  @param  ignoreEmptyStrings Don't join empty strings
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The given strings concatenated together with the delimiter between each.
      */
     public static String join(String delimiter, Object[] args,
@@ -3837,7 +3837,7 @@ public class Misc {
     /**
      *  @param delimiter The delimiter.
      *  @param args A List of objects whose toString value are merged.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The given object.toString values concatenated together with the delimiter between each.
      */
     public static String join(String delimiter, List args) {
@@ -3849,7 +3849,7 @@ public class Misc {
      *  @param delimiter The delimiter.
      *  @param args A List of objects whose toString value are merged.
      *  @param ignoreEmptyStrings Should ignore empty strings
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The given object.toString values concatenated together with the delimiter between each.
      */
     public static String join(String delimiter, List args,
@@ -3864,7 +3864,7 @@ public class Misc {
     /**
      * @param source The source object string.
      *
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return List of String tokens.
      */
     public static List split(Object source) {
@@ -3880,7 +3880,7 @@ public class Misc {
      *  @param commentString If non-null defines the comment String in the content.
      *  @param trimWords Do we trim each word.
      *
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return A list of String arrays  that holds the words.
      */
     public static List parseLineWords(String content, int[] indices,
@@ -3895,7 +3895,7 @@ public class Misc {
     /**
      * @param source     The source object string.
      * @param delimiter  The delimiter to break up the sourceString on.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return List of String tokens.
      */
     public static List split(Object source, String delimiter) {
@@ -3907,7 +3907,7 @@ public class Misc {
      * @param delimiter  The delimiter to break up the sourceString on.
      * @param trim       Do we string trim the tokens.
      *
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return List of String tokens.
      */
     public static List split(Object source, String delimiter, boolean trim) {
@@ -3920,7 +3920,7 @@ public class Misc {
      * @param trim               Do we string trim the tokens.
      * @param excludeZeroLength  If true then don't add in zero length strings.
      *
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return List of String tokens.
      */
     public static List split(Object source, String delimiter, boolean trim,
@@ -3933,7 +3933,7 @@ public class Misc {
      * @param s             String to split
      * @param delimiter     token delimeter
      * @param cnt           max number of tokens
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return array of strings or <code>null</code> if unable to split
      *         the string.
      */
@@ -3946,7 +3946,7 @@ public class Misc {
 
     /**
      *  @param  objectList The list of objects.
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      *  @return The array of the object string values.
      */
     public static String[] listToStringArray(List objectList) {
@@ -3957,7 +3957,7 @@ public class Misc {
     /**
      *
      * @param l   list of objects
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  semicolon separated String of Strings.
      */
     public static String listToString(List l) {
@@ -3966,7 +3966,7 @@ public class Misc {
 
     /**
      * @param l List of objects
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return List of strings.
      */
     public static List toString(List l) {
@@ -3978,7 +3978,7 @@ public class Misc {
      * @param string   string to munge
      * @param pattern  pattern to replace
      * @param value    replacement value
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  munged string
      */
     public static String replace(String string, String pattern,
@@ -3990,7 +3990,7 @@ public class Misc {
      * @param v            original String
      * @param patterns     patterns to match
      * @param values       replacement values
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  munged String
      */
     public static String replaceList(String v, String[] patterns,
@@ -4003,7 +4003,7 @@ public class Misc {
      * @param v            original String
      * @param patterns     patterns to match
      * @param values       replacement values
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  munged String
      */
     public static String replaceList(String v, List patterns, List values) {
@@ -4015,7 +4015,7 @@ public class Misc {
      * @param sourceList   original list of Strings
      * @param patterns     patterns to replace
      * @param values       replacement values
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  new list with replaced values
      */
     public static List replaceList(List sourceList, String[] patterns,
@@ -4027,7 +4027,7 @@ public class Misc {
     /**
      * @param sb  StringBuffer to append to (may be <code>null</code>)
      * @param s1  object to append
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  StringBuffer with appended object
      */
     public static StringBuffer append(StringBuffer sb, Object s1) {
@@ -4039,7 +4039,7 @@ public class Misc {
      * @param sb  StringBuffer to append to (may be <code>null</code>)
      * @param s1  first object to append
      * @param s2  second object to append
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  StringBuffer with appended objects
      * `
      */
@@ -4053,7 +4053,7 @@ public class Misc {
      * @param s1  first object to append
      * @param s2  second object to append
      * @param s3  third object to append
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  StringBuffer with appended objects
      */
     public static StringBuffer append(StringBuffer sb, Object s1, Object s2,
@@ -4068,7 +4068,7 @@ public class Misc {
      * @param s2  second object to append
      * @param s3  third object to append
      * @param s4  fourth object to append
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  StringBuffer with appended objects
      */
     public static StringBuffer append(StringBuffer sb, Object s1, Object s2,
@@ -4083,7 +4083,7 @@ public class Misc {
      * @param s3  third object to append
      * @param s4  fourth object to append
      * @param s5  fifth object to append
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  StringBuffer with appended objects
      */
     public static StringBuffer append(StringBuffer sb, Object s1, Object s2,
@@ -4096,7 +4096,7 @@ public class Misc {
      *
      * @param s             String to parse
      * @param skipFirst     true to skip the first value
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return   list of parsed Strings
      */
     public static List parseCsv(String s, boolean skipFirst) {
@@ -4109,7 +4109,7 @@ public class Misc {
      * @param s      String to shorten
      * @param length shortened length where elipses will start
      *
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return shortened string.
      */
     public static final String shorten(String s, int length) {
@@ -4120,7 +4120,7 @@ public class Misc {
     /**
      * @param array  array to print
      *
-     * @deprecated See StringUtil
+     * deprecated See StringUtil
      * @return  array as a String
      */
     public static String toString(Object[] array) {

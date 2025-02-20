@@ -90,7 +90,7 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /**
      * Sets the base label.
-     * @deprecated
+     * deprecated
      *
      * @param baseLabel the new base label
      */
@@ -118,7 +118,7 @@ public class LatLonAxisScaleInfo extends ucar.visad.display.AxisScaleInfo {
 
     /**
      * Sets the increment.
-     * @deprecated
+     * deprecated
      *
      * @param increment the new increment
      */

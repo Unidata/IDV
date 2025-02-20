@@ -569,7 +569,7 @@ public class AddePointDataSource extends PointDataSource {
      *
      * @param url  ADDE URL
      *
-     * @deprecated  Use setSource() instead.
+     * deprecated  Use setSource() instead.
      */
     public void setUrl(String url) {
         setSource(url);

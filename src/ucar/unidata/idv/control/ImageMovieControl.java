@@ -1921,7 +1921,7 @@ public class ImageMovieControl extends DisplayControlImpl {
      *  Set the AnimationMode property.
      *
      * @param value The new value for AnimationMode
-     * @deprecated Keep around for legacy bundles
+     * deprecated Keep around for legacy bundles
      */
     public void setAnimationMode(int value) {}
 

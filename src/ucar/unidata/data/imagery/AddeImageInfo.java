@@ -142,7 +142,7 @@ public class AddeImageInfo extends AddeImageURL {
     /**
      * Create the ADDE URL
      * @return a Adde URL
-     * @deprecated  use getURLString() instead
+     * deprecated  use getURLString() instead
      */
     public String makeAddeUrl() {
         return getURLString();

@@ -215,7 +215,7 @@ public class DataCategory {
      * ({@link visad.DateTime} -> ({@link visad.georef.EarthLocationTuple}
      * ->  ({@link ucar.visad.quantities.AirTemperature},
      * {@link ucar.visad.quantities.DewPoint}))).
-     * @deprecated use #GRID_3D_SOUNDING_CATEGORY
+     * deprecated use #GRID_3D_SOUNDING_CATEGORY
      */
     public static final DataCategory GRID_3D_SKEWT_CATEGORY =
         new DataCategory(CATEGORY_GRIDSKEWT, false);
@@ -227,7 +227,7 @@ public class DataCategory {
      * {@link ucar.visad.quantities.DewPoint},
      * {@link ucar.visad.quantities.PolarHorizontalWind},
      * {@link visad.georef.EarthLocationTuple})).
-     * @deprecated use #TRACK_SOUNDING_CATEGORY
+     * deprecated use #TRACK_SOUNDING_CATEGORY
      */
     public static final DataCategory TRACK_SKEWT_CATEGORY =
         new DataCategory(CATEGORY_TRACKSKEWT, false);
@@ -938,7 +938,7 @@ public class DataCategory {
      * @param source      source string
      * @param pattern     regular expression pattern
      * @return  true if there is a match
-     * @deprecated  use ucar.unidata.util.StringUtil.stringMatch(String, String) instead
+     * deprecated  use ucar.unidata.util.StringUtil.stringMatch(String, String) instead
      */
     public static boolean matchRegexp(String source, String pattern)
     //        throws MalformedPatternException 

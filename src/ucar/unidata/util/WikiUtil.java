@@ -40,7 +40,7 @@ import java.util.regex.*;
 
 /**
  *
- * @deprecated Any active development of this class should be in the ramadda version from SourceFroge
+ * deprecated Any active development of this class should be in the ramadda version from SourceFroge
  */
 public class WikiUtil {
 

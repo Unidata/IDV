@@ -683,7 +683,7 @@ public class PollingInfo implements Cloneable {
      * Set the filePath property.
      *
      * @param newValue The new vaue for the  filePath property.
-     * @deprecated Use setFilePaths
+     * deprecated Use setFilePaths
      */
     public void setFilePath(String newValue) {
         filePaths = Misc.newList(newValue);

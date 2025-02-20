@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * @deprecated Use {@link ucar.unidata.idv.chooser.adde.AddeRadarChooser} directly
+ * deprecated Use {@link ucar.unidata.idv.chooser.adde.AddeRadarChooser} directly
  *
  * @author IDV development team
  * @version $Revision: 1.31 $Date: 2007/07/06 20:40:17 $

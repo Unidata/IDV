@@ -1116,7 +1116,7 @@ public class AnimationWidget extends SharableImpl implements ActionListener {
      * Adds an <CODE>ucar.visad.display.Animation</CODE>
      * to be controlled by this widget.
      * @param anim ucar.visad.display.Animation to control  (must not be null)
-     * @deprecated  use setAnimation();
+     * deprecated  use setAnimation();
      */
     public void addAnimation(Animation anim) {
         setAnimation(anim);

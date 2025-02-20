@@ -399,7 +399,7 @@ public class CrossSectionSelector extends SelectorDisplayable {
 
     /**
      * set whether the start point can be moved or not by user; true=yes
-     * @deprecated Should use setStartPointFixed
+     * deprecated Should use setStartPointFixed
      *
      * @param value  true to be fixed
      *

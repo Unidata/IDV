@@ -2626,7 +2626,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * Set the foreground color
      *
      * @param color    new color
-     * @deprecated Keep this around for old bundles
+     * deprecated Keep this around for old bundles
      */
     public void setForeground(Color color) {
         this.foreground = color;
@@ -2637,7 +2637,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
      * Set the background color
      *
      * @param color   new color
-     * @deprecated Keep this around for old bundles
+     * deprecated Keep this around for old bundles
      */
     public void setBackground(Color color) {
         this.background = color;
@@ -2648,7 +2648,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
     /**
      *  Set the DisplayMatrix property.
      *  @param value The new value for DisplayMatrix
-     * @deprecated Keep this around for old bundles
+     * deprecated Keep this around for old bundles
      */
     public void setDisplayMatrix(double[] value) {
         displayMatrix = value;

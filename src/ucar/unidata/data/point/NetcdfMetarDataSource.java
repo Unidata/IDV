@@ -37,7 +37,7 @@ import java.util.Hashtable;
  * A data source for netCDF METAR data
  *
  * @author Don Murray
- * @deprecated  use NetcdfPointDataSource
+ * deprecated  use NetcdfPointDataSource
  */
 public class NetcdfMetarDataSource extends NetcdfPointDataSource {
 

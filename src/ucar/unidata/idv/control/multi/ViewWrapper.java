@@ -176,7 +176,7 @@ public class ViewWrapper extends DisplayComponent {
      * Set the DisplayControl property.
      *
      * @param value The new value for DisplayControl
-     * @deprecated Use setViewManager
+     * deprecated Use setViewManager
      */
     public void setMapViewManager(MapViewManager value) {
         viewManager = value;

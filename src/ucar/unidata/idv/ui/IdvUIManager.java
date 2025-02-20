@@ -3537,7 +3537,7 @@ public class IdvUIManager extends IdvManager {
      *
      * @param dataSource The data source
      * @param src Where to popup the dialog
-     * @deprecated Don't use this anymore
+     * deprecated Don't use this anymore
      */
     public void showTimeSelection(DataSource dataSource, Component src) {}
 
@@ -5546,7 +5546,7 @@ public class IdvUIManager extends IdvManager {
      * If there is a data selector window around then show it. Else
      * create a new one.
      *
-     * @deprecated Moving away from hard-coded windows
+     * deprecated Moving away from hard-coded windows
      */
     public void showOrCreateDataSelector() {
         if ( !dataSelectorToFront()) {
@@ -5556,7 +5556,7 @@ public class IdvUIManager extends IdvManager {
 
     /**
      * Show the data selector window if its ok with the user preference
-     * @deprecated Moving away from hard-coded windows
+     * deprecated Moving away from hard-coded windows
      */
     public void dataSelectorToFrontIfOk() {
         dataSelectorToFront();
@@ -5593,7 +5593,7 @@ public class IdvUIManager extends IdvManager {
 
     /**
      * Create the first data selector.
-     * @deprecated not used
+     * deprecated not used
      */
     public void createInitialDataSelector() {
         //NOOP
@@ -6143,7 +6143,7 @@ public class IdvUIManager extends IdvManager {
      * Capture an image from the first active view managers
      *
      * @param filename The image filename
-     * @deprecated Use ImageGenerator.captureImage
+     * deprecated Use ImageGenerator.captureImage
      */
     public void captureImage(String filename) {
         getImageGenerator().captureImage(filename);
@@ -6154,7 +6154,7 @@ public class IdvUIManager extends IdvManager {
      * Capture a movie from the first view manager
      *
      * @param filename The movie  filename
-     * @deprecated Use ImageGenerator.captureMovie
+     * deprecated Use ImageGenerator.captureMovie
      */
     public synchronized void captureMovie(String filename) {
         getImageGenerator().captureMovie(filename);

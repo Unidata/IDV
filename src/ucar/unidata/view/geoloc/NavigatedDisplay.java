@@ -513,7 +513,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * Toggle the animation string visibility..
      *
      * @param visible  true to make it visible
-     * @deprecated use #setAnimationStringVisible(boolean)
+     * deprecated use #setAnimationStringVisible(boolean)
      */
     public void setAnimationStringOn(boolean visible) {
         setAnimationStringVisible(visible);
@@ -523,7 +523,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * Return whether the animation string is visible or not.
      *
      * @return  true if visible
-     * @deprecated use #getAnimationStringVisible()
+     * deprecated use #getAnimationStringVisible()
      */
     public boolean getAnimationStringOn() {
         return getAnimationStringVisible();
@@ -1981,7 +1981,7 @@ public abstract class NavigatedDisplay extends DisplayMaster {
      * @param sx screen x
      * @param sy screen y
      * @param times How many time should we iterate on the move
-     * @deprecated dropped the times parameter.
+     * deprecated dropped the times parameter.
      */
     public void moveToScreen(double x, double y, int sx, int sy, int times) {
         moveToScreen(x, y, sx, sy);

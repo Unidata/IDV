@@ -568,7 +568,7 @@ public class GridDataInstance extends DataInstance {
      * (time -> (domain -> range)).  Does not make a copy.
      *
      * @return  the data in a FieldImpl
-     * @deprecated  Use getGrid() instead
+     * deprecated  Use getGrid() instead
      */
     public FieldImpl getFieldImpl() {
         return getGrid();

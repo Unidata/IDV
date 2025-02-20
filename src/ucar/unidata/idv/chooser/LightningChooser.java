@@ -29,7 +29,7 @@ import ucar.unidata.idv.chooser.adde.AddeLightningDataChooser;
 
 
 /**
- * @deprecated  Use  {@link ucar.unidata.idv.chooser.adde.AddeLightningDataChooser}
+ * deprecated  Use  {@link ucar.unidata.idv.chooser.adde.AddeLightningDataChooser}
  *
  * @author IDV development team
  * @version $Revision: 1.5 $Date: 2007/07/06 20:40:17 $

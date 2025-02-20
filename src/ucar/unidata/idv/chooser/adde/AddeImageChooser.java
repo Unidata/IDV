@@ -161,7 +161,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
 
     /**
      * Property for image default value line/ele
-     * @deprecated use PROP_LINELE
+     * deprecated use PROP_LINELE
      */
     protected static final String PROP_LINEELE = "LINELE";
 
@@ -1672,7 +1672,7 @@ public class AddeImageChooser extends AddeChooser implements ucar.unidata.ui
      * Get a description of the currently selected dataset
      *
      * @return  a description of the currently selected dataset
-     * @deprecated  use #getDatasetName()
+     * deprecated  use #getDatasetName()
      */
     public String getDatasetDescription() {
         return getDatasetName();

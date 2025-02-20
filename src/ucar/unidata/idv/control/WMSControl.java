@@ -1612,7 +1612,7 @@ public class WMSControl extends ImageControl implements ImageObserver {
      * Set the EnableClick property.
      *
      * @param value The new value for EnableClick
-     * @deprecated  use setEnableAutoFetch
+     * deprecated  use setEnableAutoFetch
      */
     public void setEnableClick(boolean value) {
         enableAutoFetch = value;

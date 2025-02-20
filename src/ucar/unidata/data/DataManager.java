@@ -527,7 +527,7 @@ public class DataManager {
      * Load the grib lookup tables
      *
      * @param resourceManager The resource manager
-     * @deprecated  use loadIOSPResources(IdvResourceManager) instead
+     * deprecated  use loadIOSPResources(IdvResourceManager) instead
      */
     protected void loadGribResources(IdvResourceManager resourceManager) {
         loadIospResources(resourceManager);

@@ -1142,7 +1142,7 @@ public class TimeHeightControl extends LineProbeControl {
      * Get whether the display is shown as an image.
      *
      * @param yesorno  <code>true</code> if want an image instead of contours.
-     * @deprecated  use #setShowAsContours(boolean) instead
+     * deprecated  use #setShowAsContours(boolean) instead
      */
     public void setShowAsImage(boolean yesorno) {
         showAsContours = !yesorno;

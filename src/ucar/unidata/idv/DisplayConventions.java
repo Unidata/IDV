@@ -398,7 +398,7 @@ public class DisplayConventions extends IdvManager {
      *
      * @param ll a double (such as a lat or lon in decimal degrees)
      * @return The formatted value
-     * @deprecated  use formatLatLon(double)
+     * deprecated  use formatLatLon(double)
      */
     public String formatLatOrLon(double ll) {
         return formatLatLon(ll);

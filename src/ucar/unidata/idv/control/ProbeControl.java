@@ -3178,7 +3178,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * Set the altitudes property, use for persistence
      *
      * @param l   list of altitudes
-     * @deprecated Keep around for legacy bundles
+     * deprecated Keep around for legacy bundles
      */
     public void setAltitudes(List l) {
         _altitudes = l;
@@ -3189,7 +3189,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * Get the list of levels; use by persistence
      *
      * @param l   list of levels for parameters
-     * @deprecated Keep around for legacy bundles
+     * deprecated Keep around for legacy bundles
      */
     public void setLevels(List l) {
         _levels = l;
@@ -3202,7 +3202,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * Used for persistence
      *
      * @param l  list of sampling methods
-     * @deprecated Keep around for legacy bundles
+     * deprecated Keep around for legacy bundles
      */
     public void setMethods(List l) {
         _methods = l;
@@ -3213,7 +3213,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * Set the list of display units for each parameter. Used by persistence
      *
      * @param l   list of units
-     * @deprecated Keep around for legacy bundles
+     * deprecated Keep around for legacy bundles
      */
     public void setUnits(List l) {
         _units = l;
@@ -3224,7 +3224,7 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
      * Set the list of display sounds for each parameter. Used by persistence
      *
      * @param l   list of sounds
-     * @deprecated Keep around for legacy bundles
+     * deprecated Keep around for legacy bundles
      */
     public void setSounds(List l) {
         _sounds = l;

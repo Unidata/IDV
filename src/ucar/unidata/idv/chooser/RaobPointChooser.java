@@ -30,7 +30,7 @@ import ucar.unidata.idv.chooser.adde.AddeRaobPointDataChooser;
 
 
 /**
- * @deprecated Use {@link ucar.unidata.idv.chooser.adde.AddeRaobPointDataChooser}
+ * deprecated Use {@link ucar.unidata.idv.chooser.adde.AddeRaobPointDataChooser}
  *
  * @author IDV development team
  * @version $Revision: 1.21 $Date: 2007/07/06 20:40:17 $

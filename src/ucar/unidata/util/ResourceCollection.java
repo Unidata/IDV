@@ -124,7 +124,7 @@ public class ResourceCollection {
      * @param id Resource id
      * @param resources List of resources
      * @param writable The writable resource
-     * @deprecated not good anymore
+     * deprecated not good anymore
      *
      */
     public ResourceCollection(String id, String writable, List resources) {
@@ -331,7 +331,7 @@ public class ResourceCollection {
      * Add in the given maps of path to label.
      *
      * @param labelMap Pat to label map
-     * @deprecated not used anymore
+     * deprecated not used anymore
      */
     public void addLabels(Hashtable labelMap) {}
 

@@ -181,7 +181,7 @@ public class NetcdfSweepfileAdapter implements RadarAdapter {
      * @param type  RealType of the moment
      *
      * @return  the representative data
-     * @deprecated  Use getData(DataChoice, DataSelection, Hashtable)
+     * deprecated  Use getData(DataChoice, DataSelection, Hashtable)
      */
     public DataImpl getField(RealType type) {
         DataImpl imp = null;

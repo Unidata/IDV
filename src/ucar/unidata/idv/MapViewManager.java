@@ -668,7 +668,7 @@ public class MapViewManager extends NavigatedViewManager {
 
     /**
      * Handle a vertical scale change
-     * @deprecated see {@link #verticalRangeChanged()}
+     * deprecated see {@link #verticalRangeChanged()}
      */
     protected void verticalScaleChanged() {
         verticalRangeChanged();
@@ -2694,7 +2694,7 @@ public class MapViewManager extends NavigatedViewManager {
 
     /**
      * Reset projection of display based on data.
-     * @deprecated  no substitute.  Use setMapProjection()
+     * deprecated  no substitute.  Use setMapProjection()
      *
      * @param data The data form the display
      * @param display The display
@@ -3430,7 +3430,7 @@ public class MapViewManager extends NavigatedViewManager {
 
     /**
      * Set the background color property.
-     * @deprecated  Keep this around for old bundles
+     * deprecated  Keep this around for old bundles
      * @param bgColor The value
      */
     public void setBgColor(boolean bgColor) {
@@ -3826,7 +3826,7 @@ public class MapViewManager extends NavigatedViewManager {
      *             the remote exception
      * @throws VisADException
      *             the VisAD exception
-     * @deprecated
+     * deprecated
      * public void setLatAxisScaleInfo(AxisScaleInfo axisScaleInfo)
      *       throws RemoteException, VisADException {
      *
@@ -3888,7 +3888,7 @@ public class MapViewManager extends NavigatedViewManager {
      *             the remote exception
      * @throws VisADException
      *             the vis ad exception
-     * @deprecated
+     * deprecated
      * public void setLonAxisScaleInfo(AxisScaleInfo axisScaleInfo)
      *       throws RemoteException, VisADException {
      *   setLonAxisScaleInfo((LatLonAxisScaleInfo) axisScaleInfo);

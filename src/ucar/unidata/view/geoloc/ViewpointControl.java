@@ -83,7 +83,7 @@ public class ViewpointControl implements ActionListener {
 
     /**
      * Action command
-     * @deprecated
+     * deprecated
      */
     private static final String CMD_SETVERTICALSCALE = "cmd.setverticalscale";
 
@@ -113,7 +113,7 @@ public class ViewpointControl implements ActionListener {
 
     /**
      * Icon for toolbar
-     * @deprecated
+     * deprecated
      */
     private static final String ICON_SETVERTICALSCALE =
         "/auxdata/ui/icons/Vert16.gif";
@@ -592,7 +592,7 @@ public class ViewpointControl implements ActionListener {
      * Add the vertical scale menu item to the menu
      *
      * @param viewMenu Menu to add item to
-     * @deprecated see {@link #makeVerticalRangeMenuItem(JMenu)}
+     * deprecated see {@link #makeVerticalRangeMenuItem(JMenu)}
      */
     public void makeVerticalScaleMenuItem(JMenu viewMenu) {
         makeVerticalRangeMenuItem(viewMenu);
@@ -898,7 +898,7 @@ public class ViewpointControl implements ActionListener {
      *
      * @param visible  true to be visible
      * @return vertical scale widget
-     * @deprecated see {@link #makeVerticalRangeWidget(boolean)}
+     * deprecated see {@link #makeVerticalRangeWidget(boolean)}
      */
     public VertScaleDialog makeVerticalScaleWidget(boolean visible) {
         return makeVerticalRangeWidget(visible);
@@ -921,7 +921,7 @@ public class ViewpointControl implements ActionListener {
      * Change the vertical scale
      *
      * @param transfer  vertical scale information
-     * @deprecated see {@link #changeVerticalRange(VertScaleInfo)}
+     * deprecated see {@link #changeVerticalRange(VertScaleInfo)}
      */
     public void changeVerticalScale(VertScaleInfo transfer) {
     	changeVerticalRange(transfer);
@@ -953,7 +953,7 @@ public class ViewpointControl implements ActionListener {
      * @param transfer The info
      *
      * @throws Exception On badness
-     * @deprecated see {@link #applyVerticalRange(VertScaleInfo)}
+     * deprecated see {@link #applyVerticalRange(VertScaleInfo)}
      */
     protected void applyVerticalScale(VertScaleInfo transfer)
             throws Exception {

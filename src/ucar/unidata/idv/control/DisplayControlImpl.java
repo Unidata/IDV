@@ -988,7 +988,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * @param dataSelection Holds any specifications of subsets of the data (e.g., times)
      * @throws VisADException the VisAD exception
      * @throws RemoteException the remote exception
-     * @deprecated use init that takes a properties Hashtable
+     * deprecated use init that takes a properties Hashtable
      */
     public final void init(String displayId, List categories, List choices,
                            ControlContext controlContext, String properties,
@@ -2204,7 +2204,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param cw the color table widget
      * @param items List of menu items
-     * @deprecated use #addToRangeMenu(RangeWidget)
+     * deprecated use #addToRangeMenu(RangeWidget)
      */
     public void addToRangeMenu(ColorTableWidget cw, List items) {
         //noop
@@ -2216,7 +2216,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      *
      * @param selectRangeWidget the range dialog that has the items
      * @param items List of menu items
-     * @deprecated use #addToRangeMenu(RangeWidget)
+     * deprecated use #addToRangeMenu(RangeWidget)
      */
     public void addToRangeMenu(RangeDialog selectRangeWidget, List items) {
         //noop
@@ -2840,7 +2840,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
     /**
      * Return the list of current {@link ucar.unidata.data.DataChoice}-s
      *
-     * @deprecated Use getDataChoices
+     * deprecated Use getDataChoices
      * @return List of data choices
      */
     public List getMyDataChoices() {
@@ -2882,7 +2882,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
      * No-op for legacy bundles
      *
      * @param l    List of data
-     * @deprecated
+     * deprecated
      */
     public void setPersistedVisadData(List l) {}
 
@@ -9772,7 +9772,7 @@ public abstract class DisplayControlImpl extends DisplayControlBase implements D
 
     /**
      * Deprecated, misspelled version of setDisplayVisibility.
-     * @deprecated
+     * deprecated
      *
      * @param d d
      * @param visible visible
