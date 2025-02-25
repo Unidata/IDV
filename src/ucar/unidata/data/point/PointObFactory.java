@@ -2866,7 +2866,7 @@ public class PointObFactory {
                     "found " + ismissing + "/" + missing
                             + " missing out of " + obIdx);
             //dataIterator.close();
-        }else {
+        } else if (fc instanceof StandardStationCollectionImpl) {
             PointFeatureIterator dataIterator =
                     //collection.getPointFeatureIterator(-1);
                     collection.getPointFeatureIterator();
@@ -2885,7 +2885,108 @@ public class PointObFactory {
                         : new String[numStrings]);
 
                 // make the VisAD data object
-                StructureData structure = po.getFeatureData();
+                StructureData structure = po.getDataAll();
+                int stringCnt = 0;
+                int realCnt = 0;
+                int realCnt1 = 0;
+                if (needToAddStationId) {
+                    StationObsDatatype sod = (StationObsDatatype) po;
+                    stringArray[stringCnt++] = sod.getStation().getName();
+                }
+                boolean allMissing = true;
+
+                // check for a missing flag
+                member = structure.findMember(_isMissing);
+                if (member != null) {
+                    value = structure.convertScalarInt(member);
+                    if (value == 1) {
+                        iammissing = true;
+                        ismissing++;
+                        missing++;
+                        continue;
+                    }
+                }
+
+                RealType[] rtypes = allTupleType.getRealComponents();
+                Unit[] aUnits = new Unit[structure.getMembers().size()];
+                int rsize = allTupleType.getRealComponents().length;
+                for (int rIdx = varIdxBase; rIdx < rsize; rIdx++) {
+                    RealType rtype = rtypes[rIdx];
+                    String vname = removeUnitString(rtype.getName());
+                    member = structure.findMember(vname);
+                    value = structure.convertScalarFloat(member);
+                    if (value == value) {
+                        allMissing = false;
+                    }
+                    realArray[rIdx] = value;
+                }
+
+                MathType[] mtypes = allTupleType.getComponents();
+                int msize = mtypes.length;
+                for (int rIdx = rsize; rIdx < msize; rIdx++) {
+                    TextType rtype = (TextType)mtypes[rIdx];
+                    String vname = removeUnitString(rtype.getName());
+                    member = structure.findMember(vname);
+                    svalue = structure.getScalarString(member);
+                    if (svalue.length() != 0) {
+                        allMissing = false;
+                    }
+                    stringArray[stringCnt++] = svalue;
+                }
+
+                /*
+                if (allMissing  && !iammissing) {
+                    System.out.println("has all missing, but not iammissing: " + el);
+                }
+                */
+                if (allMissing) {
+                    missing++;
+                    continue;
+                }
+
+                Tuple tuple = (allReals
+                        ? (Tuple) new DoubleTuple(
+                        (RealTupleType) allTupleType, realArray,
+                        allUnits)
+                        : new DoubleStringTuple(allTupleType,
+                        realArray, stringArray, allUnits));
+
+                tuples.add(tuple);
+                times.add(new DateTime(po.getNominalTimeAsCalendarDate().toDate()));
+                elts.add(elt);
+
+                if (obIdx % NUM == 0) {
+                    if (!JobManager.getManager().canContinue(loadId)) {
+                        LogUtil.message("");
+                        return null;
+                    }
+                    LogUtil.message("Read " + obIdx + " observations");
+                }
+            }
+            Trace.call2("FeatureDatasetPoint: iterating on PointFeatures",
+                    "found " + ismissing + "/" + missing
+                            + " missing out of " + obIdx);
+            dataIterator.close();
+        } else {
+            PointFeatureIterator dataIterator =
+                    //collection.getPointFeatureIterator(-1);
+                    collection.getPointFeatureIterator();
+            while (dataIterator.hasNext()) {
+                PointFeature po = (PointFeature) dataIterator.next();
+                iammissing = false;
+                obIdx++;
+                ucar.unidata.geoloc.EarthLocation el = po.getLocation();
+                elt = new EarthLocationLite(
+                        lat.cloneButValue(el.getLatitude()),
+                        lon.cloneButValue(el.getLongitude()),
+                        alt.cloneButValue(el.getAltitude()));
+                double[] realArray = new double[numReals];
+                String[] stringArray = ((numStrings == 0)
+                        ? null
+                        : new String[numStrings]);
+
+                // make the VisAD data object
+                StructureData structure = po.getDataAll();
                 int stringCnt = 0;
                 int realCnt = 0;
                 if (needToAddStationId) {
@@ -3002,6 +3103,13 @@ public class PointObFactory {
         return retField;
     }
 
+    static String removeUnitString(String name) {
+        if ((name.indexOf("[") > -1) && (name.indexOf("]") > -1)) {
+            return name.substring(0, name.indexOf("[")).trim();
+        } else {
+            return name;
+        }
+    }
     /**
      * _more_
      *
