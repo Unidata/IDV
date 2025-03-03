@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="8.0.11" transformSequenceNumber="8">
   <directoryPresets config="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV" />
-  <application name="Integrated Data Viewer" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" shrinkRuntime="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="https://www.unidata.ucar.edu/software/idv" version="5.1" macVolumeId="7d14a4bd08cc217e" javaMinVersion="1.8" javaMaxVersion="1.8" allowBetaVM="true">
+  <application name="Integrated Data Viewer" applicationId="5178-8833-6241-8128" mediaDir="/share/idv/installers" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.version}_${compiler:sys.platform}_installer" shrinkRuntime="false" shortName="idv" publisher="Unidata Program Center" publisherWeb="https://www.unidata.ucar.edu/software/idv" version="6.3" macVolumeId="7d14a4bd08cc217e" javaMinVersion="21" javaMaxVersion="21" allowBetaVM="true">
     <variables>
       <variable name="INSTALLDIR" value="IDV_${compiler:sys.version}" />
       <variable name="NOJRE" value="nojre" />
@@ -9,21 +9,18 @@
       <variable name="JREDIR" value="/share/idv" />
     </variables>
     <codeSigning macEnabled="true" macPkcs12File="/share/idv/Certificates/mac.p12" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk8/jdk8u422-b05" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk21/jdk-21.0.6+7" />
   </application>
   <files>
     <filesets>
-      <fileset name="Java 3D" id="695" />
       <fileset name="Mac OS-X" id="835" />
     </filesets>
     <roots>
-      <root id="696" fileset="695" />
       <root id="836" fileset="835" />
     </roots>
     <mountPoints>
       <mountPoint id="175" location="licenses" />
       <mountPoint id="1" />
-      <mountPoint id="697" root="696" />
       <mountPoint id="837" root="836" />
     </mountPoints>
     <entries>
@@ -40,13 +37,16 @@
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/visad.jar" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/jython.jar" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/ncIdv.jar" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/jogamp-all-2.5.0.jar" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/j3dcore.jar" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/j3dutils.jar" />
+      <fileEntry mountPoint="1" file="${compiler:SRCDIR}/lib/vecmath.jar" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/licenses/NOTICE" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/idv.gif" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV" overwriteMode="5" fileMode="755" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.bat" overwriteMode="5" fileMode="755" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/testIDV" overwriteMode="5" fileMode="755" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/runIDV.ico" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="697" file="${compiler:SRCDIR}/libsrc/j3d.zip" overwriteMode="2" overrideOverwriteMode="true" />
       <dirEntry mountPoint="837" file="${compiler:SRCDIR}/src/ucar/unidata/idv/release/installer/mac" overwriteMode="2" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" overrideDirMode="true" />
       <fileEntry mountPoint="837" file="${compiler:SRCDIR}/libsrc/sunjce_provider.jar" overwriteMode="2" overrideOverwriteMode="true" />
     </entries>
@@ -62,6 +62,10 @@
           <entry location="jython.jar" />
           <entry location="ncIdv.jar" />
           <entry location="simpleidv.jar" />
+          <entry location="jogamp-all-2.5.0.jar" />
+          <entry location="j3dcore.jar" />
+          <entry location="j3dutils.jar" />
+          <entry location="vecmath.jar" />
           <entry location="NOTICE" />
           <entry location="idv.gif" />
         </include>
@@ -77,11 +81,6 @@
         <dependencies>
           <component id="67" />
         </dependencies>
-      </component>
-      <component name="Java 3D" id="770">
-        <include>
-          <entry filesetId="695" />
-        </include>
       </component>
       <component name="Mac OS X" id="909">
         <include>
@@ -455,66 +454,6 @@ if (!context.isUpdateInstallation()) {
                     </element>
                   </property>
                   <property name="mode" type="string">777</property>
-                </serializedBean>
-              </action>
-              <action name="Windows Java 3D" id="704" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" actionElevationType="elevated">
-                <serializedBean>
-                  <property name="destinationDirectory">
-                    <object class="java.io.File">
-                      <string>./jre/lib/ext</string>
-                    </object>
-                  </property>
-                  <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
-                  <property name="zipFile">
-                    <object class="java.io.File">
-                      <string>j3d.zip</string>
-                    </object>
-                  </property>
-                </serializedBean>
-              </action>
-              <action name="Linux Java 3D" id="706" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" actionElevationType="elevated">
-                <serializedBean>
-                  <property name="destinationDirectory">
-                    <object class="java.io.File">
-                      <string>./jre/lib/ext</string>
-                    </object>
-                  </property>
-                  <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
-                  <property name="zipFile">
-                    <object class="java.io.File">
-                      <string>j3d.zip</string>
-                    </object>
-                  </property>
-                </serializedBean>
-              </action>
-              <action name="Mac OS X Java 3D" id="707" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" actionElevationType="elevated">
-                <serializedBean>
-                  <property name="destinationDirectory">
-                    <object class="java.io.File">
-                      <string>jre.bundle/Contents/Home/lib/ext</string>
-                    </object>
-                  </property>
-                  <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
-                  <property name="zipFile">
-                    <object class="java.io.File">
-                      <string>j3d.zip</string>
-                    </object>
-                  </property>
-                </serializedBean>
-              </action>
-              <action name="Sun Java 3D" id="709" beanClass="com.install4j.runtime.beans.actions.files.InstallExternalZipFileAction" actionElevationType="elevated">
-                <serializedBean>
-                  <property name="destinationDirectory">
-                    <object class="java.io.File">
-                      <string>./jre/lib/ext</string>
-                    </object>
-                  </property>
-                  <property name="overwriteMode" type="enum" class="com.install4j.api.context.OverwriteMode" value="ALWAYS" />
-                  <property name="zipFile">
-                    <object class="java.io.File">
-                      <string>j3d.zip</string>
-                    </object>
-                  </property>
                 </serializedBean>
               </action>
               <action name="Configure runIDV with OS X JRE" id="1019" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" actionElevationType="elevated">
