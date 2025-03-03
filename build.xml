@@ -78,9 +78,11 @@ argument -Dfoo=bar) -->
 
 
 
-        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/ncIdv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/jython.jar:{libsdir}/doclint.jar:${libsdir}/j2h.jar"/>
+        <property name="classpath" value="${libsdir}/javaproj.jar:${libsdir}/ncIdv.jar:${libsdir}/external.jar:${libsdir}/local-visad.jar:${libsdir}/visad.jar:${libsdir}/jython.jar:
+          ${libsdir}/j3dcore.jar:${libsdir}/j3dutils.jar:${libsdir}/vecmath.jar:${libsdir}/jogamp-all-2.5.0.jar"/>
 
 
+<!-- :{libsdir}/doclint.jar:${libsdir}/j2h.jar-->
 
         <!-- You can concatenate the calling process' classpath to the end (the
         default) or use "ignore" to just use the classpath defined here. -->
@@ -93,7 +95,7 @@ argument -Dfoo=bar) -->
         <property name="maxmemory" value="512m"/>
 
         <!-- Source verions -->
-        <property name="srcversion" value="1.8"/>
+        <property name="srcversion" value="21"/>
 
     </target>
 
@@ -247,6 +249,7 @@ argument -Dfoo=bar) -->
 
 
     <target name="idvjar" depends="init" description="Performs a clean before calling jaridv target.">
+        <echo>Generating docs:  ${java.class.path}</echo>
         <antcall target="clean"/>
         <antcall target="jaridv"/>
     </target>
@@ -736,7 +739,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.idv.DefaultIdv"/>
-              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
+              <attribute name="Class-Path" value="auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar j3dcore.jar j3dutils.jar vecmath.jar jogamp-all-2.5.0.jar"/>
             </manifest>
             <include name="ucar/**/*.class"/>
             <include name="ucar/**/*.properties"/>
@@ -759,6 +762,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/README*"/>
             <include name="ucar/**/VERSION*"/>
             <include name="ucar/**/INSTALL*"/>
+            <include name="org/**/*.class"/>
         </jar>
     </target>
 
@@ -776,7 +780,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
               <attribute name="Implementation-Version" value="${idv.version}"/>
               <attribute name="Implementation-Vendor" value="UCAR/Unidata"/>
               <attribute name="Main-class" value="ucar.unidata.data.point.TextPointDataSource"/>
-              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar"/>
+              <attribute name="Class-Path" value="idv.jar auxdata.jar local-visad.jar visad.jar jython.jar ncIdv.jar external.jar j3dcore.jar j3dutils.jar vecmath.jar jogamp-all-2.5.0.jar"/>
             </manifest>
             <include name="ucar/**/README*"/>
         </jar>
