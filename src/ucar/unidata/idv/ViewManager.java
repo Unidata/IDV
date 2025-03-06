@@ -1951,7 +1951,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             width = 0;
         } else {
             width =
-                new Integer(fullScreenWidthFld.getText().trim()).intValue();
+                Integer.parseInt(fullScreenWidthFld.getText().trim());
         }
 
         if (fullScreenHeightFld.getText().trim().equals("")
@@ -1959,7 +1959,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             height = 0;
         } else {
             height =
-                new Integer(fullScreenHeightFld.getText().trim()).intValue();
+                Integer.parseInt(fullScreenHeightFld.getText().trim());
         }
 
         if ((width != fullScreenWidth) || (height != fullScreenHeight)) {
@@ -3067,7 +3067,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             BooleanProperty bp = (BooleanProperty) iter.next();
 
             if (bp.hasValue()) {
-                tmp.put(bp.getId(), new Boolean(bp.getValue()));
+                tmp.put(bp.getId(), Boolean.valueOf(bp.getValue()));
             }
         }
 
@@ -5990,9 +5990,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
      */
     public void doSaveImage(boolean andSaveBundle) {
 
-        SecurityManager backup = System.getSecurityManager();
+        //SecurityManager backup = System.getSecurityManager();
 
-        System.setSecurityManager(null);
+        //System.setSecurityManager(null);
 
         try {
             if (hiBtn == null) {
@@ -6079,7 +6079,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                                 this, publishCbx);
                     }
 
-                    System.setSecurityManager(backup);
+                    //System.setSecurityManager(backup);
 
                     return;
                 }
@@ -6207,7 +6207,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
         // for webstart
-        System.setSecurityManager(backup);
+        //System.setSecurityManager(backup);
 
     }
 
@@ -6503,9 +6503,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void doPublishImage(final String props) {
 
         // user has requested saving display as an image
-        SecurityManager backup = System.getSecurityManager();
+       // SecurityManager backup = System.getSecurityManager();
 
-        System.setSecurityManager(null);
+        //System.setSecurityManager(null);
 
         try {
             Misc.run(new Runnable() {
@@ -6526,7 +6526,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
 
         // for webstart
-        System.setSecurityManager(backup);
+        //System.setSecurityManager(backup);
     }
 
     /**
@@ -6890,7 +6890,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
             return false;
         }
 
-        return new Boolean(prop).booleanValue();
+        return Boolean.parseBoolean(prop);
     }
 
     /**
