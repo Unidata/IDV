@@ -1004,7 +1004,30 @@ return console.askYesNo(message, true);
       </exclude>
       <jreBundle jreBundleSource="generated" />
     </windows>
-    <macosFolder name="Mac OS X" id="12" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32">
+    <macosFolder name="MacOS Intel" id="12" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_macos_intel_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32">
+      <excludedLaunchers>
+        <launcher id="2" />
+        <launcher id="7" />
+        <launcher id="4" />
+        <launcher id="9" />
+        <launcher id="49" />
+      </excludedLaunchers>
+      <excludedBeans>
+        <bean refId="704" />
+        <bean refId="706" />
+        <bean refId="709" />
+        <bean refId="1020" />
+        <bean refId="1036" />
+        <bean refId="1282" />
+        <bean refId="1504" />
+        <bean refId="1506" />
+      </excludedBeans>
+      <exclude>
+        <entry location="runIDV.bat" />
+      </exclude>
+      <jreBundle jreBundleSource="generated" />
+    </macosFolder>
+    <macosFolder name="MacOS ARM" id="1511" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_macos_arm_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" jreBitType="32" architecture="aarch64">
       <excludedLaunchers>
         <launcher id="2" />
         <launcher id="7" />
