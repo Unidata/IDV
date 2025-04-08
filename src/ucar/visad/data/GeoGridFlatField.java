@@ -268,7 +268,7 @@ public class GeoGridFlatField extends CachedFlatField {
                 try {
                     CoordinateAxis1DTime ccar = geoGrid.getCoordinateSystem().getRunTimeAxis();
                     CoordinateAxis1DTime cca = geoGrid.getCoordinateSystem().getTimeAxis1D();
-                    if(cca != null && cca.getCoordBoundsDate(timeIndex) != null)
+                    if(cca != null && cca.getCoordBounds(timeIndex) != null)
                         coordinateBounds = cca.getCoordBounds(timeIndex);
 
                     if(ccar != null) {
