@@ -75,4 +75,4 @@ fi
 
 
 # Sun OS users: To run in 64 bit mode, add -d64 before -Xmx.  
-${java} LIBEXT_INSTALL4J_VAR XDOCK_INSTALL4J_VAR -Xmx${idv_memory}m  -XX:+DisableExplicitGC -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
+${java} LIBEXT_INSTALL4J_VAR XDOCK_INSTALL4J_VAR -Xmx${idv_memory}m -Dsun.java2d.uiScale=1 -XX:+DisableExplicitGC -Dvisad.java3d.imageByRef=true -Dvisad.java3d.geometryByRef=true -Didv.enableStereo=false -jar ${dirname}/idv.jar $*

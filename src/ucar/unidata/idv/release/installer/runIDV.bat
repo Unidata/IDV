@@ -34,7 +34,7 @@ REM the line below and set to a value  in megabytes.
 REM set idv_memory=512
 
 @echo on    
-jre\bin\java -Xmx%idv_memory%m  -XX:+DisableExplicitGC -Didv.enableStereo=false -jar idv.jar %*
+jre\bin\java -Xmx%idv_memory%m -Dsun.java2d.uiScale=1 -XX:+DisableExplicitGC -Dvisad.java3d.imageByRef=true -Dvisad.java3d.geometryByRef=true -Didv.enableStereo=false -jar idv.jar %*
 @echo off
 
 REM Use the line below instead if you want to use the D3D version of Java 3D
