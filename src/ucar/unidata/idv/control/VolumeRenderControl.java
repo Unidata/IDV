@@ -487,10 +487,8 @@ public class VolumeRenderControl extends GridDisplayControl {
      */
     protected void applySkipFactor() {
         try {
-           /**
             showWaitCursor();
             loadVolumeData();
-           **/
         } catch (Exception exc) {
             logException("loading volume data", exc);
         } finally {
