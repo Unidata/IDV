@@ -1,3 +1,19 @@
+# These RGB functions were obtained from the JMA (Japan Meteorological
+# Agency) RGB Training Library:
+# https://www.jma.go.jp/jma/jma-eng/satellite/RGB_TL.html
+# Note that the interpretation of the output of these functions is
+# still ongoing and there is a possibility the functions may change.
+
+# Several of these functions were obtained from the following JMA resource:
+# https://www.jma.go.jp/jma/jma-eng/satellite/VLab/RGB_QG.html
+
+# Some of these functions include a line containing the "resampleGrid"
+# function.  This is done to resample the resolution of the red band
+# to the highest resolution band being passed through the composite.
+# The reason for this is that combineRGB returns a data object that
+# is the resolution of the red band.  Doing this resampleGrid allows
+# for a higher resolution display than would otherwise be available.
+
 # AHI Natural Color RGB
 def AHINaturalColorRGB(b3A, b4A, b5A):
     # red = band5; 0% to 100% rescalled to 0 to 255
@@ -305,4 +321,18 @@ def AHI24HrMicroRGB(b11T, b13T, b14T, b15T):
     red = rescale(b13TM-b15TM, 7.5, -3, 0, 255)
     grn = 255*(rescale(b14TM-b11TM, -0.4, 6.1, 0, 1)**0.9090909)
     blu = rescale(b13TM, 248.6, 303.2, 0, 255)
+    return combineRGB(red, grn, blu)
+
+# AHI Cloud Phase RGB
+def AHICloudPhaseRGB(b3A, b5A, b6A):
+    # https://resources.eumetrain.org/data/7/726/navmenu.php?tab=3&page=1.0.0
+    # red = band5; 0% to 50% rescalled to 0 to 255
+    # grn = band6; 0% to 50% rescalled to 0 to 255
+    # blu = band3; 0% to 100% rescalled to 0 to 255
+    time_steps = b3A.getLength()
+    for i in range(time_steps):
+        b5A.setSample(i, resampleGrid(b5A[i], b3A[i]))
+    red = rescale(b5A, 0, 50, 0, 255)
+    grn = rescale(b6A, 0, 50, 0, 255)
+    blu = rescale(b3A, 0, 100, 0, 255)
     return combineRGB(red, grn, blu)
