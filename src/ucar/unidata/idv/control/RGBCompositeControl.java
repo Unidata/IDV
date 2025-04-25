@@ -24,12 +24,7 @@ import java.awt.*;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.Iterator;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataSelection;
@@ -89,6 +84,8 @@ public class RGBCompositeControl extends DisplayControlImpl {
     private double redGamma = 1.0;
     private double grnGamma = 1.0;
     private double bluGamma = 1.0;
+
+    private JCheckBox matchFieldsCbox = null;
 
     private final JTextField gammaTxtFld =
             new JTextField(Float.toString(1.0f), 4);
@@ -357,6 +354,115 @@ public class RGBCompositeControl extends DisplayControlImpl {
         return gamma;
     }
 
+    /**
+     * TJJ - quick hack, just do something visually jarring to test path
+     */
+
+    /**
+     * Computes a Rayleigh scattering corrected 2D grid for visible range data.
+     *
+     * @param visibleField      2D grid of remote sensing data in the visible range
+     * (assuming it represents top-of-atmosphere radiance or reflectance).
+     * @param satelliteZenithField  2D grid of satellite zenith angles (in degrees).
+     * @param solarZenithField      2D grid of solar zenith angles (in degrees).
+     * @param satelliteAzimuthField 2D grid of satellite azimuth angles (in degrees).
+     * @param solarAzimuthField     2D grid of solar azimuth angles (in degrees).
+     * @param wavelengthVisible    Wavelength of the visible band (in micrometers).
+     * @param atmosphericPressure  Atmospheric pressure at the surface (in hPa).
+     * @return A 2D grid representing the Rayleigh scattering corrected data.
+     * @throws IllegalArgumentException if input grid dimensions are inconsistent.
+     */
+
+    public static FieldImpl correctRayleighVisible(FieldImpl visibleField,
+                                               FieldImpl satelliteZenithField,
+                                               FieldImpl solarZenithField,
+                                               FieldImpl satelliteAzimuthField,
+                                               FieldImpl solarAzimuthField,
+                                               double wavelengthVisible,
+                                               double atmosphericPressure)
+            throws VisADException, RemoteException {
+
+        double[][] visibleDataGrid = visibleField.getValues();
+        double[][] satelliteZenithGrid = satelliteZenithField.getValues();
+        double[][] solarZenithGrid = solarZenithField.getValues();
+        double[][] satelliteAzimuthGrid = satelliteAzimuthField.getValues();
+        double[][] solarAzimuthGrid = solarAzimuthField.getValues();
+
+        int rows = visibleDataGrid.length;
+        int cols = visibleDataGrid[0].length;
+
+        // float[][] correctedDataGrid = new float[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                float thetaV = (float) Math.toRadians(satelliteZenithGrid[i][j]);
+                float thetaS = (float) Math.toRadians(solarZenithGrid[i][j]);
+                float phiV = (float) Math.toRadians(satelliteAzimuthGrid[i][j]);
+                float phiS = (float) Math.toRadians(solarAzimuthGrid[i][j]);
+
+                double rhoRayleigh = calculateRayleighReflectance(wavelengthVisible, thetaS, thetaV, phiS, phiV, atmosphericPressure);
+                visibleDataGrid[i][j] = (float) (visibleDataGrid[i][j] - rhoRayleigh);
+            }
+        }
+        visibleField.setSamples(visibleDataGrid);
+
+        //logger.info("3141 - made it out");
+        return visibleField;
+    }
+
+    // Calculate Rayleigh reflectance - McIDAS Inquiry #3055-3141
+    private static double calculateRayleighReflectance(
+            double wavelength, double solarZenithRad, double satelliteZenithRad,
+            double solarAzimuthRad, double satelliteAzimuthRad, double pressureHPa) {
+
+        double tau_ro = (0.008569 / Math.pow(wavelength, 4))
+                        * (1 + (0.0113 / Math.pow(wavelength, 2)) + (0.00013 / Math.pow(wavelength, 4)));
+
+        // \tau_{ro} = \frac{0.008569}{\lambda^4} \cdot (1 + \frac{0.0113}{\lambda^2} + \frac{0.00013}{\lambda^4})
+
+        double pressure_rat = pressureHPa / 1013.25;
+        // P = \frac{pHPa}{atmP}
+
+        double tau = pressure_rat * tau_ro; // this is the only thing matters next
+        // \tau = P \cdot \tau_{ro}
+
+        double scattering_angle_cos = Math.cos(solarZenithRad) * Math.cos(satelliteZenithRad)
+                                    + Math.sin(solarZenithRad) * Math.sin(satelliteZenithRad)
+                                    * Math.cos(satelliteAzimuthRad - solarAzimuthRad);
+
+        // \cos (\Theta) = \cos (\theta_{sun})\cos (\theta_{sat}) + \sin (\theta_{sun})\sin (\theta_{sat}) \cdot \cos(\phi_{sat} - \phi_{sun})
+
+        double P_big_theta = 0.75 * (1 + Math.pow(scattering_angle_cos, 2)); // another important value
+        // P(\Theta) = 0.75 * (1 + (\cos(\Theta))^2)
+
+        double mu_1 = Math.cos(solarZenithRad);
+        double mu_2 = Math.cos(solarZenithRad);
+
+        return tau * P_big_theta * (1 / (4 * mu_1 * mu_2));
+        // \tau \cdot P(\Theta) \cdot (\frac{1}{4 \cdot \mu_1 \cdot \mu_2})
+    }
+
+    private void applyRayleighCorrection() {
+        float[][] newRedTbl = getZeroOutArray(redTable);
+        float[][] newGrnTbl = getZeroOutArray(grnTable);
+        float[][] newBluTbl = getZeroOutArray(bluTable);
+
+        for (int k = 0; k < redTable[0].length; k++) {
+            newRedTbl[0][k] = (float) Math.pow(redTable[0][k], 0.2);
+            newGrnTbl[1][k] = (float) Math.pow(grnTable[1][k], 0.2);
+            newBluTbl[2][k] = (float) Math.pow(bluTable[2][k], 0.2);
+        }
+        try {
+            displayMaster.setDisplayInactive();
+            ((BaseColorControl) redMap.getControl()).setTable(newRedTbl);
+            ((BaseColorControl) grnMap.getControl()).setTable(newGrnTbl);
+            ((BaseColorControl) bluMap.getControl()).setTable(newBluTbl);
+            displayMaster.setDisplayActive();
+        } catch (Exception e) {
+            LogUtil.logException("setDisplayInactive", e);
+        }
+    }
+
     private void updateGamma(double gamma) {
         setGamma(gamma);
         setRedGamma(gamma);
@@ -452,7 +558,34 @@ public class RGBCompositeControl extends DisplayControlImpl {
         return getDisplayConventions().getParamColorTable("image");
     }
 
+    void setAllFields(String txtl1, String txtl2) {
+        Double l1 = Double.valueOf(txtl1.trim());
+        Double l2 = Double.valueOf(txtl2.trim());
+        bluRange[0] = l1;
+        bluRange[1] = l2;
+        redRange[0] = l1;
+        redRange[1] = l2;
+        grnRange[0] = l1;
+        grnRange[1] = l2;
+        updateRedRange(redRange[0], redRange[1]);
+        updateBluRange(redRange[0], redRange[1]);
+        updateGrnRange(redRange[0], redRange[1]);
+
+        redLowTxtFld.setText(txtl1);
+        grnLowTxtFld.setText(txtl1);
+        bluLowTxtFld.setText(txtl1);
+
+        redHighTxtFld.setText(txtl2);
+        bluHighTxtFld.setText(txtl2);
+        grnHighTxtFld.setText(txtl2);
+    }
+
     public Container doMakeContents() {
+
+        JButton rayleighButton = new JButton("Apply Rayleigh Correction");
+        rayleighButton.addActionListener(e -> {
+            applyRayleighCorrection();
+        });
 
         JButton allGammaButton = new JButton("Apply to All Gamma Fields");
         allGammaButton.addActionListener(e -> {
@@ -466,18 +599,38 @@ public class RGBCompositeControl extends DisplayControlImpl {
         });
 
         redLowTxtFld.addActionListener(e -> {
-            String tmp = redLowTxtFld.getText().trim();
-            updateRedRange(Double.valueOf(tmp), redRange[1]);
+            if (matchFieldsCbox.isSelected())
+                setAllFields(redLowTxtFld.getText(),redHighTxtFld.getText());
+
+            Double l1 = Double.valueOf(redLowTxtFld.getText().trim());
+            Double l2 = Double.valueOf(redHighTxtFld.getText().trim());
+            redRange[0] = l1;
+            redRange[1] = l2;
+            updateRedRange(redRange[0], redRange[1]);
+
         });
 
         redHighTxtFld.addActionListener(e -> {
-            String tmp = redHighTxtFld.getText().trim();
-            updateRedRange(redRange[0], Double.valueOf(tmp));
+            if (matchFieldsCbox.isSelected())
+                setAllFields(redLowTxtFld.getText(),redHighTxtFld.getText());
+
+            Double l1 = Double.valueOf(redLowTxtFld.getText().trim());
+            Double l2 = Double.valueOf(redHighTxtFld.getText().trim());
+            redRange[0] = l1;
+            redRange[1] = l2;
+            updateRedRange(redRange[0], redRange[1]);
         });
 
         redGammaTxtFld.addActionListener(e -> {
             String tmp = redGammaTxtFld.getText().trim();
             updateRedGamma(Double.valueOf(tmp));
+
+            if (matchFieldsCbox.isSelected()) {
+                grnGammaTxtFld.setText(tmp);
+                bluGammaTxtFld.setText(tmp);
+                updateBluGamma(Double.valueOf(tmp));
+                updateGrnGamma(Double.valueOf(tmp));
+            }
         });
 
         JButton redReset = new JButton("Reset");
@@ -492,18 +645,37 @@ public class RGBCompositeControl extends DisplayControlImpl {
         });
 
         grnLowTxtFld.addActionListener(e -> {
-            String tmp = grnLowTxtFld.getText().trim();
-            updateGrnRange(Double.valueOf(tmp), grnRange[1]);
+            if (matchFieldsCbox.isSelected())
+                setAllFields(grnLowTxtFld.getText(),grnHighTxtFld.getText());
+
+            Double l1 = Double.valueOf(grnLowTxtFld.getText().trim());
+            Double l2 = Double.valueOf(grnHighTxtFld.getText().trim());
+            grnRange[0] = l1;
+            grnRange[1] = l2;
+            updateGrnRange(grnRange[0], grnRange[1]);
         });
 
         grnHighTxtFld.addActionListener(e -> {
-            String tmp = grnHighTxtFld.getText().trim();
-            updateGrnRange(grnRange[0], Double.valueOf(tmp));
+            if (matchFieldsCbox.isSelected())
+                setAllFields(grnLowTxtFld.getText(),grnHighTxtFld.getText());
+
+            Double l1 = Double.valueOf(grnLowTxtFld.getText().trim());
+            Double l2 = Double.valueOf(grnHighTxtFld.getText().trim());
+            grnRange[0] = l1;
+            grnRange[1] = l2;
+            updateGrnRange(grnRange[0], grnRange[1]);
         });
 
         grnGammaTxtFld.addActionListener(e -> {
             String tmp = grnGammaTxtFld.getText().trim();
             updateGrnGamma(Double.valueOf(tmp));
+
+            if (matchFieldsCbox.isSelected()) {
+                redGammaTxtFld.setText(tmp);
+                bluGammaTxtFld.setText(tmp);
+                updateRedGamma(Double.valueOf(tmp));
+                updateGrnGamma(Double.valueOf(tmp));
+            }
         });
 
         JButton grnReset = new JButton("Reset");
@@ -518,18 +690,37 @@ public class RGBCompositeControl extends DisplayControlImpl {
         });
 
         bluLowTxtFld.addActionListener(e -> {
-            String tmp = bluLowTxtFld.getText().trim();
-            updateBluRange(Double.valueOf(tmp), bluRange[1]);
+            if (matchFieldsCbox.isSelected())
+                setAllFields(bluLowTxtFld.getText(),bluHighTxtFld.getText());
+
+            Double l1 = Double.valueOf(bluLowTxtFld.getText().trim());
+            Double l2 = Double.valueOf(bluHighTxtFld.getText().trim());
+            bluRange[0] = l1;
+            bluRange[1] = l2;
+            updateBluRange(bluRange[0], bluRange[1]);
         });
 
         bluHighTxtFld.addActionListener(e -> {
-            String tmp = bluHighTxtFld.getText().trim();
-            updateBluRange(bluRange[0], Double.valueOf(tmp));
+            if (matchFieldsCbox.isSelected())
+                setAllFields(bluLowTxtFld.getText(),bluHighTxtFld.getText());
+
+            Double l1 = Double.valueOf(bluLowTxtFld.getText().trim());
+            Double l2 = Double.valueOf(bluHighTxtFld.getText().trim());
+            bluRange[0] = l1;
+            bluRange[1] = l2;
+            updateBluRange(bluRange[0], bluRange[1]);
         });
 
         bluGammaTxtFld.addActionListener(e -> {
             String tmp = bluGammaTxtFld.getText().trim();
             updateBluGamma(Double.valueOf(tmp));
+
+            if (matchFieldsCbox.isSelected()) {
+                grnGammaTxtFld.setText(tmp);
+                redGammaTxtFld.setText(tmp);
+                updateGrnGamma(Double.valueOf(tmp));
+                updateRedGamma(Double.valueOf(tmp));
+            }
         });
 
         JButton bluReset = new JButton("Reset");
@@ -563,15 +754,21 @@ public class RGBCompositeControl extends DisplayControlImpl {
             updateBluGamma(Double.valueOf(tmp));
         });
 
+        // McIDAS Inquiry #3193-3141
+        matchFieldsCbox = new JCheckBox();
+        matchFieldsCbox.setToolTipText("When enabled, changing a setting for one color changes the setting for all colors.");
+
         GuiUtils.tmpInsets = new Insets(4, 4, 4, 4);
         JPanel topPanel =  GuiUtils.doLayout(new Component[] {
+                GuiUtils.rLabel("Match fields: "), matchFieldsCbox, GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(),
                 GuiUtils.rLabel("Red range: "), redLowTxtFld, redHighTxtFld, GuiUtils.cLabel("Red Gamma: "),
                 redGammaTxtFld, redReset,
                 GuiUtils.rLabel("Green range: "), grnLowTxtFld, grnHighTxtFld, GuiUtils.cLabel("Green Gamma: "),
                 grnGammaTxtFld, grnReset,
                 GuiUtils.rLabel("Blue range: "), bluLowTxtFld, bluHighTxtFld, GuiUtils.cLabel("Blue Gamma: "),
                 bluGammaTxtFld,bluReset,
-                GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(), applyButton
+                GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler(), applyButton,
+                GuiUtils.rLabel("Common Gamma: "), gammaTxtFld, allGammaButton,GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler()
                 }, 6, GuiUtils.WT_N, GuiUtils.WT_N);
 
 
@@ -579,12 +776,9 @@ public class RGBCompositeControl extends DisplayControlImpl {
         //topPanel.add(applyButton, "wrap");
 
         JPanel bottomPanel = GuiUtils.doLayout(new Component[] {
-                GuiUtils.rLabel("Common Gamma: "), gammaTxtFld, allGammaButton,
-                GuiUtils.rLabel("Vertical Position: "), doMakeZPositionSlider(), GuiUtils.filler()
-        }, 3, GuiUtils.WT_N, GuiUtils.WT_N);
-
-
-
+                GuiUtils.rLabel("Vertical Position: "), doMakeZPositionSlider(), GuiUtils.filler(), GuiUtils.filler(),GuiUtils.filler(),GuiUtils.filler()
+        }, 6, GuiUtils.WT_N, GuiUtils.WT_N);
+        bottomPanel = GuiUtils.left(bottomPanel);
         JPanel mainPanel = GuiUtils.vbox(topPanel, bottomPanel);
         mainPanel = GuiUtils.topLeft(mainPanel);
 
