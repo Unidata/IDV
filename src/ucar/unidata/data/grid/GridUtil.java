@@ -6538,6 +6538,11 @@ public class GridUtil {
                     for (int j = 0; j < rTypes.length; j++) {
                         Variable v =
                             ncfile.findVariable(getVarName(rTypes[j]));
+                        if (v == null && getVarName(rTypes[j]).contains("/")) {
+                            String vname = getVarName(rTypes[j]);
+                            vname = vname.replaceAll("/", "_");
+                            v = ncfile.findVariable(vname);
+                        }
                         arr = Array.factory(DataType.FLOAT, sizes,
                                             samples[j]);
                         ncfile.write(v.getName(), origin, arr);
@@ -6546,7 +6551,14 @@ public class GridUtil {
             } else {
                 float[][] samples = ((FlatField) grid).getFloats();
                 for (int j = 0; j < rTypes.length; j++) {
-                    Variable v = ncfile.findVariable(getVarName(rTypes[j]));
+                    String vname = getVarName(rTypes[j]);
+                   // if(vname.contains("/"))
+                    //    vname = vname.replaceAll("/", "_");
+                    Variable v = ncfile.findVariable(vname);
+                    if(v == null && vname.contains("/")) {
+                        vname = vname.replaceAll("/", "_");
+                        v = ncfile.findVariable(vname);
+                    }
                     arr = Array.factory(DataType.FLOAT, sizes, samples[j]);
                     ncfile.write(v.getName(), arr);
                 }
@@ -6823,7 +6835,10 @@ public class GridUtil {
             String dimName) {
         Variable v = new Variable(ncfile, null, null, name);
         v.setDataType(DataType.FLOAT);
-        v.setDimensions(dimName);
+        if(dimName.equals(name))
+            v.setDimensions(v.getFullName());
+        else
+            v.setDimensions(dimName);
 
         if (unitName != null) {
             v.addAttribute(new Attribute("units", unitName));
