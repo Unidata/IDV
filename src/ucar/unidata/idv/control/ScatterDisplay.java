@@ -975,6 +975,10 @@ public class ScatterDisplay extends DisplayControlImpl {
                 statsTable.setFields(noUnit(X_field), noUnit(Y_field), 0);
             });
 
+        JButton reset = new JButton("Reset Selections");
+        reset.addActionListener(e -> resetAllScatterSelectors());
+
+        buttonPanel.add(reset);
         buttonPanel.add(computeStatsButton);
         buttonPanel.add(new JLabel("Background Color:"));
         buttonPanel.add(bgColorBlack);
@@ -985,6 +989,60 @@ public class ScatterDisplay extends DisplayControlImpl {
         container = GuiUtils.centerBottom(pane,
                 buttonPanel);
         return container;
+    }
+
+    /**
+     * Reset the state of all scatter display selections.
+     */
+    public void resetAllScatterSelectors() {
+        for (int i = 0; i < n_selectors; i++) {
+            resetScatterSelector(i);
+        }
+    }
+
+    /**
+     * Reset the state of a specific scatter display selection.
+     *
+     * @param idx Index of the scatter display selection within {@link #n_selectors}.
+     */
+    public void resetScatterSelector(int idx) {
+        try {
+            if (statsTable != null) {
+                statsTable.resetValues(idx);
+            }
+
+            ScatterBoxSelector boxSel = scatterBoxSelectors.get(idx);
+            ImageBoxSelector imageXbox = imageXBoxSelectors.get(idx);
+            ImageBoxSelector imageYbox = imageYBoxSelectors.get(idx);
+            ScatterCurveSelector curveSel = scatterCurveSelectors.get(idx);
+            ImageCurveSelector imageXcurve = imageXCurveSelectors.get(idx);
+            ImageCurveSelector imageYcurve = imageYCurveSelectors.get(idx);
+
+            boxSel.reset();
+            boxSel.setActive(false);
+            boxSel.setVisible(false);
+
+            imageXbox.reset();
+            imageXbox.setActive(false);
+            imageXbox.setVisible(false);
+
+            imageYbox.reset();
+            imageYbox.setActive(false);
+            imageYbox.setVisible(false);
+
+            curveSel.reset();
+            curveSel.setActive(false);
+            curveSel.setVisible(false);
+
+            imageXcurve.reset();
+            imageXcurve.setActive(false);
+            imageXcurve.setVisible(false);
+            imageYcurve.reset();
+            imageYcurve.setActive(false);
+            imageYcurve.setVisible(false);
+        } catch (Exception e) {
+            logger.error("Problem resetting selector at index " + idx, e);
+        }
     }
 
     /**
