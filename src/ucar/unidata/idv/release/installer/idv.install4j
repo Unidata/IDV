@@ -516,7 +516,6 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="replaceValue" type="string">-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/lib/ext/"</property>
                   <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
@@ -584,7 +583,6 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="replaceValue" type="string">-Djava.ext.dirs="${dirname}/jre.bundle/Contents/Home/lib/ext/"</property>
                   <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
