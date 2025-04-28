@@ -40,4 +40,4 @@ bundlefile=$(basename $bundle)
 
 testname="${bundlefile%.*}"
 
-${java} LIBEXT_INSTALL4J_VAR -Xmx2g  -Didv.enableStereo=false -XX:+DisableExplicitGC -jar ${dirname}/idv.jar -nodefault -noplugins -test $testname $dir $bundle
+${java} -Xmx2g  -Didv.enableStereo=false -XX:+DisableExplicitGC -jar ${dirname}/idv.jar -nodefault -noplugins -test $testname $dir $bundle
