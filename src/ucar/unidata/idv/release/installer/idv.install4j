@@ -507,7 +507,7 @@ if (!context.isUpdateInstallation()) {
                   <property name="searchValue" type="string">XDOCK_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
-              <action name="Configure runIDV with OS X libext option" id="1281" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" actionElevationType="elevated">
+              <action name="Configure runIDV with OS X no libext option" id="1281" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" actionElevationType="elevated">
                 <serializedBean>
                   <property name="files" type="array" class="java.io.File" length="1">
                     <element index="0">
@@ -516,7 +516,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
+
                 </serializedBean>
               </action>
               <action name="Configure runIDV with no libext option" id="1282" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" actionElevationType="elevated">
@@ -528,7 +528,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
+
                 </serializedBean>
               </action>
               <action name="Clean up zips" id="1075" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" actionElevationType="elevated">
@@ -574,7 +574,7 @@ if (!context.isUpdateInstallation()) {
                   <property name="searchValue" type="string">JRE_INSTALL4J_VAR</property>
                 </serializedBean>
               </action>
-              <action name="Configure testIDV with OS X libext option" id="1505" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" actionElevationType="elevated">
+              <action name="Configure testIDV with OS X no libext option" id="1505" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" actionElevationType="elevated">
                 <serializedBean>
                   <property name="files" type="array" class="java.io.File" length="1">
                     <element index="0">
@@ -583,7 +583,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
+
                 </serializedBean>
               </action>
               <action name="Configure testIDV with no libext option" id="1506" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" actionElevationType="elevated">
@@ -595,7 +595,7 @@ if (!context.isUpdateInstallation()) {
                       </object>
                     </element>
                   </property>
-                  <property name="searchValue" type="string">LIBEXT_INSTALL4J_VAR</property>
+
                 </serializedBean>
               </action>
             </actions>
