@@ -36,7 +36,7 @@ import java.util.*;
 
 
 public class GribVariableRenamer {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GribVariableRenamer.class);
+    //private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GribVariableRenamer.class);
 
     private static HashMap<String, Renamer> map1;
     private static HashMap<String, Renamer> map2;
@@ -257,7 +257,7 @@ public class GribVariableRenamer {
         java.util.List<VariableRenamerBean> beans = new ArrayList<>(1000);
         try (InputStream is = IOUtil.getInputStream(path, getClass())) {
             if (is == null) {
-                logger.warn("Cant read file " + path);
+                System.err.println("Cant read file " + path);
                 return null;
             }
 
