@@ -20,6 +20,7 @@
 package ucar.unidata.idv.control;
 
 import static ucar.unidata.util.CollectionHelpers.list;
+import static ucar.unidata.util.LogUtil.logException;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -27,8 +28,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import ucar.unidata.idv.IntegratedDataViewer;
 import ucar.unidata.util.LogUtil;
@@ -40,8 +41,8 @@ import ucar.unidata.util.LogUtil;
 public final class WebBrowser {
 
     /** Logging object. */
-    private static final Logger logger =
-            LoggerFactory.getLogger(ucar.unidata.idv.control.WebBrowser.class);
+    //private static final Logger logger =
+    //        LoggerFactory.getLogger(ucar.unidata.idv.control.WebBrowser.class);
 
     /** Probe Unix-like systems for these browsers, in this order. */
     private static final List<String> unixBrowsers =
@@ -108,10 +109,10 @@ public final class WebBrowser {
         try {
             openOldStyle(url);
         } catch (Exception e) {
-            logger.warn(String.format(ALL_METHODS_ERRMSG, url), e);
+            //logger.warn(String.format(ALL_METHODS_ERRMSG, url), e);
             IOException uhoh =
                     new IOException(String.format(ALL_METHODS_ERRMSG, url));
-            LogUtil.logException(THINGS_DUN_BROKE_ERRMSG, uhoh);
+            logException(THINGS_DUN_BROKE_ERRMSG, uhoh);
         }
     }
 
@@ -147,9 +148,9 @@ public final class WebBrowser {
                     // well... the assumption is that there was not a problem
                     retVal = true;
                 } catch (URISyntaxException e) {
-                    logger.warn("Bad syntax in URI: "+url, e);
+                    logException("Bad syntax in URI: "+url, e);
                 } catch (IOException e) {
-                    logger.warn("Problem accessing URI: "+url, e);
+                    logException("Problem accessing URI: "+url, e);
                 }
             }
         }
@@ -183,7 +184,7 @@ public final class WebBrowser {
                 throw new IOException(msg);
             }
         } catch (Exception e) {
-            logger.warn("Could not open URL '"+url+'\'', e);
+            logException("Could not open URL '"+url+'\'', e);
         }
     }
 
@@ -207,7 +208,7 @@ public final class WebBrowser {
                     Runtime.getRuntime().exec(browserPath+' '+url);
                     retVal = true;
                 } catch (Exception e) {
-                    logger.warn("Could not execute '"+browserPath+'\'', e);
+                    logException("Could not execute '"+browserPath+'\'', e);
                 }
             }
         }
