@@ -35,8 +35,8 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.Range;
 import org.jfree.data.statistics.HistogramType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.grid.GridUtil;
@@ -69,6 +69,8 @@ import java.util.List;
 
 import javax.swing.*;
 
+import static ucar.unidata.util.LogUtil.logException;
+
 
 /**
  * Wraps a JFreeChart histogram to ease working with VisAD data.
@@ -76,8 +78,8 @@ import javax.swing.*;
 public class McVHistogramWrapper extends HistogramWrapper {
 
     /** _more_ */
-    private static final Logger logger =
-        LoggerFactory.getLogger(McVHistogramWrapper.class);
+   // private static final Logger logger =
+    //    LoggerFactory.getLogger(McVHistogramWrapper.class);
 
     /** _more_ */
     private DisplayControl imageControl;
@@ -172,7 +174,7 @@ public class McVHistogramWrapper extends HistogramWrapper {
             imageControl.getViewManager().getPublishManager().publishContent(
                 filename, null, publishCbx);
         } catch (Exception exc) {
-            LogUtil.logException("Capturing image", exc);
+            logException("Capturing image", exc);
         }
     }
 
@@ -293,7 +295,7 @@ public class McVHistogramWrapper extends HistogramWrapper {
                                     ((DisplayControlImpl) imageControl).setRange(
                                         newRange);
                                 } catch (Exception e) {
-                                    logger.error("Cannot change range", e);
+                                    logException("Cannot change range", e);
                                 }
                             }
                         });
@@ -305,7 +307,7 @@ public class McVHistogramWrapper extends HistogramWrapper {
 
         } catch (Exception exc) {
             System.out.println("Exception exc=" + exc);
-            LogUtil.logException("Error creating data set", exc);
+            logException("Error creating data set", exc);
         }
     }
 
@@ -425,7 +427,7 @@ public class McVHistogramWrapper extends HistogramWrapper {
             try {
                 axis.setRange(low, high);
             } catch (Exception e) {
-                logger.warn(
+                logException(
                     "jfreechart does not like ranges to be high -> low", e);
             }
         }

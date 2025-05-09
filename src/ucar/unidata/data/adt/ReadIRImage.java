@@ -28,8 +28,8 @@ import java.lang.String;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.util.IOUtil;
@@ -37,9 +37,11 @@ import ucar.unidata.util.StringUtil;
 import visad.FlatField;
 import visad.VisADException;
 
+import static ucar.unidata.util.LogUtil.logException;
+
 public class ReadIRImage {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReadIRImage.class);
+    //private static final Logger logger = LoggerFactory.getLogger(ReadIRImage.class);
 
     public ReadIRImage() {
     }
@@ -121,7 +123,7 @@ public class ReadIRImage {
         int ly = lats[0].length;
         int ly0 = ly / 2;
         int lx = lats.length;
-        logger.debug("lenx: {}, leny: {}", lx, ly);
+        //logger.debug("lenx: {}, leny: {}", lx, ly);
         int lx0 = lx / 2;
         int ii = numx / 2, jj = numy / 2;
 
@@ -143,8 +145,8 @@ public class ReadIRImage {
         }
         int startx = ii - (numx / 2 - 1);
         int starty = jj - (numy / 2 - 1);
-        logger.debug("startx: {}, starty: {}", startx, starty);
-        logger.debug("numx: {}, numy: {}", numx, numy);
+        //logger.debug("startx: {}, starty: {}", startx, starty);
+        //logger.debug("numx: {}, numy: {}", numx, numy);
 
         if (startx < 0) {
             startx = 0;
@@ -217,7 +219,7 @@ public class ReadIRImage {
         try {
             s = IOUtil.readContents(fp);
         } catch (Exception re) {
-            logger.warn("Failed to read coefficient table", re);
+            logException("Failed to read coefficient table", re);
         }
 
         int i = 0;

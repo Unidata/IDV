@@ -28,8 +28,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 class IRHistoryRecord {
     int date;
@@ -79,7 +79,7 @@ class IRHistoryRecord {
 
 public class History {
 
-    private static final Logger logger = LoggerFactory.getLogger(History.class);
+    //private static final Logger logger = LoggerFactory.getLogger(History.class);
     public static int HistoryFileRecords;
     public static IRHistoryRecord HistoryFile[] = new IRHistoryRecord[1000];
     public static IRHistoryRecord IRCurrentRecord = new IRHistoryRecord();
@@ -167,7 +167,7 @@ public class History {
         double SatVZA;
         String CommentString = null;
 
-        logger.debug("outputstyle={} outputformattype={}", OutputStyle, OutputFormatTypeID);
+        //logger.debug("outputstyle={} outputformattype={}", OutputStyle, OutputFormatTypeID);
 
         if (OutputStyle == 0) {
             NumRecsHistory = HistoryNumberOfRecords(); // loop through history
@@ -332,7 +332,7 @@ public class History {
                 }
             }
 
-            logger.debug("here AA {} {}", OutputFormatTypeID, NumRecsHistory);
+            //logger.debug("here AA {} {}", OutputFormatTypeID, NumRecsHistory);
             if (OutputFormatTypeID == -1) {
                 /* original format history file listing */
                 String DateString = Functions.adt_julian2cmonth(DateValue);
@@ -568,13 +568,13 @@ public class History {
             double HistoryRecTime = Functions.calctime(RecDate, RecTime);
             if ((HistoryRecTime == CurrentTime) && (!FoundRecordTF)) {
                 /* OVERWRITE RECORD */
-                logger.debug("OVERWRITE RECORD {}", XInc);
+                //logger.debug("OVERWRITE RECORD {}", XInc);
                 HistoryFile[XInc] = IRCurrentRecord;
                 FoundRecordTF = true;
                 InsertOverwriteFlag = 1;
             } else if ((HistoryRecTime > CurrentTime) && !FoundRecordTF) {
                 /* INSERT RECORD */
-                logger.debug("INSERT RECORD");
+                //logger.debug("INSERT RECORD");
                 /* shift records after HistoryRecTime up one record */
                 NumRecsHistory++;
                 HistoryFileRecords++;
@@ -592,7 +592,7 @@ public class History {
                 InsertOverwriteFlag = 2;
             } else {
                 if (FoundRecordTF) {
-                    logger.debug("RECOMPUTING RECORD {}", XInc);
+                    //logger.debug("RECOMPUTING RECORD {}", XInc);
                     /*
                      * previously found records to insert, so all records
                      * following the inserted record must be recalculated
@@ -620,12 +620,12 @@ public class History {
         if (!FoundRecordTF) {
             if (XInc == 0) {
                 /* record will be placed at start of new history structure */
-                logger.debug("PLACE RECORD AT START OF NEW");
+                //logger.debug("PLACE RECORD AT START OF NEW");
                 HistoryFile[0] = IRCurrentRecord;
                 InsertOverwriteFlag = 3;
             } else {
                 /* record will be placed at end of history structure */
-                logger.debug("PLACE RECORD AT END OF EXISTING");
+                //logger.debug("PLACE RECORD AT END OF EXISTING");
                 HistoryFile[NumRecsHistory] = IRCurrentRecord;
                 InsertOverwriteFlag = 4;
             }
@@ -878,11 +878,11 @@ public class History {
         File historyfile = new File(filename);
         Scanner in = new Scanner(historyfile);
 
-        logger.debug("Opened history file {} SUCCESSFULY", filename);
+        //logger.debug("Opened history file {} SUCCESSFULY", filename);
         while (in.hasNextLine()) {
             HistoryFile[HistoryFileRecords] = new IRHistoryRecord();
             String historyRec = in.nextLine();
-            logger.debug("Parsing History file line: " + historyRec);
+            //logger.debug("Parsing History file line: " + historyRec);
             String[] tokens = historyRec.split(delims);
             /*
              * for(String histVals : tokens) { System.out.println(histVals); }
@@ -941,6 +941,6 @@ public class History {
             HistoryFileRecords++;
         }
         in.close();
-        logger.debug("Done reading History file, number of records: " + HistoryFileRecords);
+        //logger.debug("Done reading History file, number of records: " + HistoryFileRecords);
     }
 }

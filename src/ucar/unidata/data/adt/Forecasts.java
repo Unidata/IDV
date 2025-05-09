@@ -26,12 +26,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 public class Forecasts {
 
-    private static final Logger logger = LoggerFactory.getLogger(Forecasts.class);
+    //private static final Logger logger = LoggerFactory.getLogger(Forecasts.class);
 
     private static double ForecastLatitudes[] = new double[10];
 
@@ -87,7 +87,7 @@ public class Forecasts {
 
         ReturnFlagValue = 0;
 
-        logger.debug("ReadForecasts in...");
+        //logger.debug("ReadForecasts in...");
         System.out.printf("Forecast File Name=%s Type=%d\n", ForecastFileName, ForecastFileType);
         File forecastfile = new File(ForecastFileName);
         Scanner in = new Scanner(forecastfile);
@@ -1201,7 +1201,7 @@ public class Forecasts {
 
         /* McIDAS-V Conversion */
         ReturnLongitudeInterpolation = -1.0 * ReturnLongitudeInterpolation;
-        logger.debug("ReadForecasts out...");
+        //logger.debug("ReadForecasts out...");
 
         return new double[] { (double) ReturnFlagValue, ReturnLatitudeInterpolation,
                 ReturnLongitudeInterpolation, ReturnCurrentIntensity };

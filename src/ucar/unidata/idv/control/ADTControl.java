@@ -68,8 +68,8 @@ import ucar.unidata.data.adt.History;
 import ucar.unidata.data.adt.Main;
 import ucar.unidata.data.adt.ReadIRImage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
@@ -122,7 +122,7 @@ public class ADTControl extends DisplayControlImpl {
             "Eye", "Pinhole Eye", "Large Eye", "CDO", "Embedded Center",
             "Irregular CDO", "Curved Band", "Shear"
     };
-    private static final Logger logger = LoggerFactory.getLogger(ADTControl.class);
+    //private static final Logger logger = LoggerFactory.getLogger(ADTControl.class);
     // Tooltip strings for the various UI buttons and inputs
     private static final String TOOLTIP_LAND_FLAG_ON = "Apply ADT Land Interaction Rule";
     private static final String TOOLTIP_LAND_FLAG_OFF = "Do Not Apply ADT Land Interaction Rule";
@@ -229,7 +229,7 @@ public class ADTControl extends DisplayControlImpl {
 
     @Override public boolean init(DataChoice choice) throws VisADException,
             RemoteException {
-        logger.info("ADTControl constructor begin...");
+        //logger.info("ADTControl constructor begin...");
 
         if (!super.init(choice)) {
             return false;
@@ -258,7 +258,7 @@ public class ADTControl extends DisplayControlImpl {
         if (manButton.isSelected()) {
             if (d != null) {
                 EarthLocation el = d.getCenterPoint();
-                logger.debug("Initializing probe location to: {}, {}", el.getLatitude(), el.getLongitude());
+                //logger.debug("Initializing probe location to: {}, {}", el.getLatitude(), el.getLongitude());
                 probeLocation = el.getLatLonPoint();
                 probe.setVisible(true);
             }
@@ -290,9 +290,9 @@ public class ADTControl extends DisplayControlImpl {
                             elt = new EarthLocationTuple(latLonWidget.getLat(), latLonWidget.getLon(), Double.NaN);
                             // Make sure the new Earth location is within the bounds of our satellite IR image
                             LatLonRect bounds = d.getLatLonRect();
-                            logger.debug("Bounds min, max Lat: " + bounds.getLatMin() + ", " + bounds.getLatMax());
-                            logger.debug("Bounds min, max Lon: " + bounds.getLonMin() + ", " + bounds.getLonMax());
-                            logger.debug("ELT LatVal, LonVal: " + elt.getLatitude().getValue() + ", " + elt.getLongitude().getValue());
+                            //logger.debug("Bounds min, max Lat: " + bounds.getLatMin() + ", " + bounds.getLatMax());
+                            //logger.debug("Bounds min, max Lon: " + bounds.getLonMin() + ", " + bounds.getLonMax());
+                            //logger.debug("ELT LatVal, LonVal: " + elt.getLatitude().getValue() + ", " + elt.getLongitude().getValue());
                             if (bounds.contains(elt.getLatitude().getValue(), elt.getLongitude().getValue())) {
                                 probeLocation = elt.getLatLonPoint();
                                 updateProbeLocation();
@@ -361,7 +361,7 @@ public class ADTControl extends DisplayControlImpl {
         forecastBtn.setPreferredSize(new Dimension(200,30));
         forecastBtn.addActionListener(fbtn -> {
             GUIForecastFileName = selectForecastFile();
-            logger.trace("forecast file name={}", GUIForecastFileName);
+            //logger.trace("forecast file name={}", GUIForecastFileName);
             forecastLabel.setText(
                     GUIForecastFileName.substring(GUIForecastFileName.lastIndexOf(File.separatorChar) + 1)
             );
@@ -372,7 +372,7 @@ public class ADTControl extends DisplayControlImpl {
         forecastTypeBox.setPreferredSize(new Dimension(150,20));
         forecastTypeBox.addActionListener(ame -> {
             GUIForecastType = forecastTypeBox.getSelectedIndex();
-            logger.trace("forecast file type={}", GUIForecastType);
+            //logger.trace("forecast file type={}", GUIForecastType);
         });
 
         forecastTypeBox.setToolTipText("Select Forecast File Type.");
@@ -390,7 +390,7 @@ public class ADTControl extends DisplayControlImpl {
         historyBtn.setPreferredSize(new Dimension(200, 30));
         historyBtn.addActionListener(hbtn -> {
             GUIHistoryFileName = selectHistoryFile();
-            logger.debug("history file name={}", GUIHistoryFileName);
+            //logger.debug("history file name={}", GUIHistoryFileName);
 
             // TJJ Dec 2017
             // Do some cursory validation on History file before plowing ahead
@@ -414,7 +414,7 @@ public class ADTControl extends DisplayControlImpl {
         JButton listBtn = new JButton("List/Write History File");
         listBtn.setPreferredSize(new Dimension(250, 50));
         listBtn.addActionListener(ae -> {
-            logger.debug("listing history file name={}", GUIHistoryFileName);
+            //logger.debug("listing history file name={}", GUIHistoryFileName);
             try {
                 listHistoryFile();
             } catch (NumberFormatException nfe) {
@@ -800,7 +800,7 @@ public class ADTControl extends DisplayControlImpl {
         historySaveListingBtn.setPreferredSize(new Dimension(200, 20));
         historySaveListingBtn.addActionListener(ae -> {
             GUIHistoryFileListingName = selectHistoryFileOutput();
-            logger.debug("saving history listing file name={}", GUIHistoryFileListingName);
+            //logger.debug("saving history listing file name={}", GUIHistoryFileListingName);
             GUIHistoryListFormat = -1;
         });
         JButton historyWriteATCFBtn = new JButton("Write ATCF");
@@ -808,7 +808,7 @@ public class ADTControl extends DisplayControlImpl {
         historyWriteATCFBtn.addActionListener(ae -> {
             GUIATCFOutputTF = true;
             GUIHistoryListFormat = 0;
-            logger.debug("calling ATCFFileOutput");
+            //logger.debug("calling ATCFFileOutput");
             ATCFFileOutput(0);
         });
         historyLabelPanel.add(historyLabel);
@@ -978,14 +978,14 @@ public class ADTControl extends DisplayControlImpl {
         History CurrentHistory = new History();
 
         try {
-            logger.debug("trying to read history file {}", historyFileName);
+            //logger.debug("trying to read history file {}", historyFileName);
             CurrentHistory.ReadHistoryFile(historyFileName);
         } catch (IOException exception) {
-            logger.warn("History file %s is not valid", historyFileName);
+            //logger.warn("History file %s is not valid", historyFileName);
             seemsOk = false;
         }
 
-        logger.debug("Number of history records: {}", History.HistoryNumberOfRecords());
+        //logger.debug("Number of history records: {}", History.HistoryNumberOfRecords());
         if (History.HistoryNumberOfRecords() == 0) seemsOk = false;
         return seemsOk;
     }
@@ -1080,7 +1080,7 @@ public class ADTControl extends DisplayControlImpl {
                 GetImageData(CenterLatitude, CenterLongitude);
             } catch (Exception e) {
                 ErrorMessage = "Error reading IR data in getimagedata()\n";
-                logger.error(ErrorMessage.trim(), e);
+                //logger.error(ErrorMessage.trim(), e);
                 userMessage(ErrorMessage);
                 ExitADT();
                 return;
@@ -1135,11 +1135,11 @@ public class ADTControl extends DisplayControlImpl {
             }
 
             try {
-                logger.debug("RUNNING ADT ANALYSIS");
+                //logger.debug("RUNNING ADT ANALYSIS");
                 ADTRunOutput = StormADT.RunADTAnalysis(runFullADTAnalysis,GUIHistoryFileName);
             } catch (IOException exception) {
                 ErrorMessage = "Error with call to StormADT.RunADT()\n";
-                logger.error(ErrorMessage.trim(), exception);
+                //logger.error(ErrorMessage.trim(), exception);
                 userMessage(ErrorMessage);
                 ExitADT();
                 return;
@@ -1151,7 +1151,7 @@ public class ADTControl extends DisplayControlImpl {
                 overrideSceneFrame.setVisible(true);
                 ExitADT();
             } else {
-                logger.debug("done running ADT");
+                //logger.debug("done running ADT");
 
                 resultArea.setText(ADTRunOutput);
                 resultFrame.pack();
@@ -1240,16 +1240,16 @@ public class ADTControl extends DisplayControlImpl {
         }
 
         try {
-            logger.debug("trying to read history file {}", GUIHistoryFileName);
+            //logger.debug("trying to read history file {}", GUIHistoryFileName);
             CurrentHistory.ReadHistoryFile(GUIHistoryFileName);
         } catch (IOException exception) {
             String ErrorMessage = String.format("History file %s is not found",GUIHistoryFileName);
-            logger.warn(ErrorMessage);
+            //logger.warn(ErrorMessage);
             userMessage(ErrorMessage);
             return;
         }
 
-        logger.debug("Number of history records: {}", History.HistoryNumberOfRecords());
+        //logger.debug("Number of history records: {}", History.HistoryNumberOfRecords());
 
         HistoryListOutput = History.ListHistory(0, -1, "CIMS", "99X");
         historyLabel.setText(GUIHistoryFileName);
@@ -1264,20 +1264,20 @@ public class ADTControl extends DisplayControlImpl {
         if (GUIDeleteTF) {
             // delete records
             int DeleteReturn[] = History.DeleteHistoryRecords(runFullADTAnalysis,GUIHistoryFileName);
-            logger.debug("deleted {} records... modified {} records", DeleteReturn[1],DeleteReturn[0]);
+            //logger.debug("deleted {} records... modified {} records", DeleteReturn[1],DeleteReturn[0]);
         } else if( GUICommentAddTF) {
             //
             int CommentAddReturn = History.CommentHistoryRecords(GUICommentString);
-            logger.debug("added comment to {} records",CommentAddReturn);
+            //logger.debug("added comment to {} records",CommentAddReturn);
         } else {
             // invalid selection
-            logger.warn("entered invalid selection!");
+            //logger.warn("entered invalid selection!");
         }
 
         try {
             int HistoryFileRecords = History.WriteHistoryFile(GUIHistoryFileName);
             if (HistoryFileRecords >= 0) {
-                logger.debug("wrote {} records to '{}'", HistoryFileRecords, GUIHistoryFileName);
+                //logger.debug("wrote {} records to '{}'", HistoryFileRecords, GUIHistoryFileName);
             }
         } catch (IOException exception) {
             String ErrorMessage = String.format("error updating history file %s",GUIHistoryFileName);
@@ -1364,7 +1364,7 @@ public class ADTControl extends DisplayControlImpl {
                 outFile.close();
                 ErrorMessage = String.format("success writing history file output file %s\n",saveFile.toString());
             } catch (IOException ex) {
-                logger.error("problem writing to history file output", ex);
+                //logger.error("problem writing to history file output", ex);
                 ErrorMessage = String.format("error writing history file output file %s\n",saveFile.toString());
             }
             System.out.println(ErrorMessage);
@@ -1407,7 +1407,7 @@ public class ADTControl extends DisplayControlImpl {
                 // User has pressed cancel button
                 writefileTF = false;
             }
-            logger.debug("saving ATCF history listing file name={} writeTF={}", saveFile, writefileTF);
+            //logger.debug("saving ATCF history listing file name={} writeTF={}", saveFile, writefileTF);
         } else {
 
             GUIATCFStormID = ATCFEntryStormTextField.getText();
@@ -1440,20 +1440,20 @@ public class ADTControl extends DisplayControlImpl {
             }
 
             // call routine to generate ATCF file name for single analysis record
-            logger.debug("stormID={} siteID={}", GUIATCFStormID, GUIATCFSiteID);
+            //logger.debug("stormID={} siteID={}", GUIATCFStormID, GUIATCFSiteID);
             ATCFOutputFileName = Functions.adt_atcffilename(GUIATCFStormID,GUIATCFSiteID);
-            logger.debug("atcf output name={}*", ATCFOutputFileName);
+           // logger.debug("atcf output name={}*", ATCFOutputFileName);
             ATCFOutputFilePath = System.getenv("ODTOUTPUT");
             if (ATCFOutputFilePath == null) {
                 ATCFOutputFilePath = System.getenv("HOME");
             }
-            logger.debug("atcf output path={}*", ATCFOutputFilePath);
+            //logger.debug("atcf output path={}*", ATCFOutputFilePath);
             saveFile = new File(ATCFOutputFilePath + File.separator + ATCFOutputFileName);
-            logger.debug("atcf output name={}*", saveFile.toString());
+            //logger.debug("atcf output name={}*", saveFile.toString());
             writefileTF = true;
         }
         // call routine to output file
-        logger.info("Site ID: " + GUIATCFSiteID + ", Storm ID: " + GUIATCFStormID);
+        //logger.info("Site ID: " + GUIATCFSiteID + ", Storm ID: " + GUIATCFStormID);
         if ((GUIATCFSiteID == null) || (GUIATCFStormID == null)) {
             JOptionPane.showMessageDialog(historyFrame, "You must first activate ATCF output");
             return returnStatus;
@@ -1466,7 +1466,7 @@ public class ADTControl extends DisplayControlImpl {
                 outFile.close();
                 ATCFMessage = String.format("Success writing ATCF file %s",saveFile);
             } catch (IOException ex) {
-                logger.error("problem writing to ATCF file", ex);
+                //logger.error("problem writing to ATCF file", ex);
                 ATCFMessage = String.format("Error writing ATCF file %s",saveFile);
             }
             System.out.println(ATCFMessage);
@@ -1479,24 +1479,24 @@ public class ADTControl extends DisplayControlImpl {
 
         String fileNameReturn = null;
 
-        logger.debug("in selectForecastFile");
+        //logger.debug("in selectForecastFile");
         JFrame forecastFileFrame = new JFrame();
         JFileChooser forecastFileChooser = new JFileChooser();
         String forecastPath = System.getenv("ODTAUTO");
         if (forecastPath == null) {
             forecastPath = getLastPath("mcv.adt.lastforecastpath", System.getProperty("user.home"));
         }
-        logger.debug("forecast path={}", forecastPath);
+        //logger.debug("forecast path={}", forecastPath);
         forecastFileChooser.setCurrentDirectory(new File(forecastPath));
         forecastFileChooser.setDialogTitle("Select ADT Forecast File");
         int returnVal = forecastFileChooser.showOpenDialog(forecastFileFrame);
-        logger.debug("retVal={}", returnVal);
+        //logger.debug("retVal={}", returnVal);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = forecastFileChooser.getSelectedFile();
             fileNameReturn = file.getAbsolutePath();
             setLastPath("mcv.adt.lastforecastpath", file.getPath());
         } else {
-            logger.error("error with file chooser");
+            //logger.error("error with file chooser");
         }
         return fileNameReturn;
     }
@@ -1548,7 +1548,7 @@ public class ADTControl extends DisplayControlImpl {
     private void loadADTenvParameters() {
         /* Env GlobalVariables = new Env(); */
 
-        logger.debug("setting env parameters");
+        //logger.debug("setting env parameters");
 
         // send ADT Environmental parameters to Env prior to running ADT
         // boolean values
@@ -1584,7 +1584,7 @@ public class ADTControl extends DisplayControlImpl {
         Env.SelectedLatitude = GUIUserLatitude;
         Env.SelectedLongitude = GUIUserLongitude;
 
-        logger.debug("load forecast file name={}", GUIForecastFileName);
+        //logger.debug("load forecast file name={}", GUIForecastFileName);
         Env.ForecastFileName = GUIForecastFileName;   // needed?
         Env.ASCIIOutputFileName = GUIHistoryFileListingName;   // needed?
         Env.StormIDString = GUIATCFStormID;
@@ -1594,7 +1594,7 @@ public class ADTControl extends DisplayControlImpl {
 
     private int ReadGUIOverrideInputFile(String GUIOverrideFile) {
 
-        logger.debug("opening file '{}'", GUIOverrideFile);
+       // logger.debug("opening file '{}'", GUIOverrideFile);
 
         File GUIDataFile = new File(GUIOverrideFile);
         String delims = "[ ]+";
@@ -1703,9 +1703,9 @@ public class ADTControl extends DisplayControlImpl {
     }
 
     public void latLonWidgetChanged() {
-        logger.debug("latlonwidgetchanged called");
+       // logger.debug("latlonwidgetchanged called");
         try {
-            logger.debug("latlon widget changed");
+            //logger.debug("latlon widget changed");
             String message = latLonWidget.isValidValues();
             if (message != null) {
                 userMessage(message);
@@ -1762,13 +1762,13 @@ public class ADTControl extends DisplayControlImpl {
             try {
                 RealTuple position = probe.getPosition();
                 double[] loc = position.getValues();
-                logger.debug("Manual Position Selection loc={}", loc);
+                //logger.debug("Manual Position Selection loc={}", loc);
                 // note: loc[1] is apparently latitude, and loc[0] is longitude!
                 probeLocation =
                         makeEarthLocation(loc[1], loc[0], loc[2]).getLatLonPoint();
                 SwingUtilities.invokeLater(this::updatePositionWidget);
             } catch (VisADException | RemoteException ex) {
-                logger.error("Error updating probe location", ex);
+                //logger.error("Error updating probe location", ex);
             }
         } else {
             super.propertyChange(event);
@@ -1783,14 +1783,14 @@ public class ADTControl extends DisplayControlImpl {
     private void updatePositionWidget() {
         if (latLonWidget != null) {
             try {
-                logger.trace("attempting to update widget! lat={} lon={}", probeLocation.getLatitude(), probeLocation.getLongitude());
+               // logger.trace("attempting to update widget! lat={} lon={}", probeLocation.getLatitude(), probeLocation.getLongitude());
                 latLonWidget.setLat(getDisplayConventions().formatLatLon(probeLocation.getLatitude().getValue(CommonUnit.degree)));
                 latLonWidget.setLon(getDisplayConventions().formatLatLon(probeLocation.getLongitude().getValue(CommonUnit.degree)));
             } catch (VisADException ex) {
-                logger.error("Error updating GUI with probe position", ex);
+                //logger.error("Error updating GUI with probe position", ex);
             }
         } else {
-            logger.trace("no lat/lon widget to update!");
+            //logger.trace("no lat/lon widget to update!");
         }
     }
 
@@ -1807,7 +1807,7 @@ public class ADTControl extends DisplayControlImpl {
 
             GUIUserLatitude = lat;    // added TLO
             GUIUserLongitude = lon;    // added TLO
-            logger.debug("set lat/lon from probe at lat={} lon={}", GUIUserLatitude, GUIUserLongitude);
+            //logger.debug("set lat/lon from probe at lat={} lon={}", GUIUserLatitude, GUIUserLongitude);
             if (latLonWidget != null) {
                 latLonWidget.setLat(getDisplayConventions().formatLatLon(
                         probeLocation.getLatitude().getValue(CommonUnit.degree)));
@@ -1877,12 +1877,12 @@ public class ADTControl extends DisplayControlImpl {
             logException("Handling data", e);
             return;
         } catch (RemoteException f) {
-            logger.warn("Something went wrong!", f);
+            //logger.warn("Something went wrong!", f);
             return;
         }
 
         double curdate = dat.getValue();
-        logger.debug("curdate={}",curdate);
+       // logger.debug("curdate={}",curdate);
 
         Date datevalue = new Date((long)curdate*1000);
 
@@ -1900,11 +1900,11 @@ public class ADTControl extends DisplayControlImpl {
         Data.IRData_JulianDate = ImageDateInt;
         Data.IRData_HHMMSSTime = ImageTimeInt;
 
-        logger.debug("IMAGE DATE={} TIME={}", Data.IRData_JulianDate, Data.IRData_HHMMSSTime);
+        //logger.debug("IMAGE DATE={} TIME={}", Data.IRData_JulianDate, Data.IRData_HHMMSSTime);
     }
 
     private void GetImageData(float CenterLatitude, float CenterLongitude) {
-        logger.debug("creating ReadIRImage()...");
+        //logger.debug("creating ReadIRImage()...");
 
         // ReadIRImage IRImage = new ReadIRImage();
 
@@ -1914,7 +1914,7 @@ public class ADTControl extends DisplayControlImpl {
 
         List sources = new ArrayList();
 
-        logger.debug("entering getimagedata");
+        //logger.debug("entering getimagedata");
         boolean isTemp = false;
         choice.getDataSources(sources);
         try {
@@ -1948,7 +1948,7 @@ public class ADTControl extends DisplayControlImpl {
             logException("Handling data", e);
             return;
         } catch (RemoteException f) {
-            logger.warn("Something went wrong!", f);
+            //logger.warn("Something went wrong!", f);
             return;
         }
 
@@ -1957,7 +1957,7 @@ public class ADTControl extends DisplayControlImpl {
         Env.UserDefineDomain = 0; // automated
         // String sidName = Functions.adt_sattypes(SatelliteID);
 
-        logger.debug("SatelliteID={}", SatelliteID);
+        //logger.debug("SatelliteID={}", SatelliteID);
 
         try {
             ReadIRImage.ReadIRDataFile(ffield,
@@ -1968,7 +1968,7 @@ public class ADTControl extends DisplayControlImpl {
                     isTemp);
         }
         catch (Exception ex) {
-            logger.error("ReadIRImage failed", ex);
+            //logger.error("ReadIRImage failed", ex);
         }
     }
 }
