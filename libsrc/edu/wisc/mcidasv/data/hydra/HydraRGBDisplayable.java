@@ -1,31 +1,3 @@
-/*
- * This file is part of McIDAS-V
- *
- * Copyright 2007-2018
- * Space Science and Engineering Center (SSEC)
- * University of Wisconsin - Madison
- * 1225 W. Dayton Street, Madison, WI 53706, USA
- * http://www.ssec.wisc.edu/mcidas
- * 
- * All Rights Reserved
- * 
- * McIDAS-V is built on Unidata's IDV and SSEC's VisAD libraries, and
- * some McIDAS-V source code is based on IDV and VisAD source code.  
- * 
- * McIDAS-V is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * 
- * McIDAS-V is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser Public License
- * along with this program.  If not, see http://www.gnu.org/licenses.
- */
-
 package edu.wisc.ssec.mcidasv.data.hydra;
 
 import java.awt.Color;
@@ -159,14 +131,14 @@ public class HydraRGBDisplayable extends DisplayableData {
      * @throws VisADException   VisAD failure.
      * @throws RemoteException  Java RMI failure.
      */
-    public HydraRGBDisplayable(String name, RealType rgbRealType, RealType indexRealType, boolean alphaflag, 
-                 HydraControl multiSpecCntrl)
+    public HydraRGBDisplayable(String name, RealType rgbRealType, RealType indexRealType, boolean alphaflag,
+                               HydraControl multiSpecCntrl)
             throws VisADException, RemoteException {
         this(name, rgbRealType, indexRealType, null, alphaflag, null, multiSpecCntrl);
     }
 
     public HydraRGBDisplayable(String name, RealType rgbRealType, RealType indexRealType, float[][] colorPalette, boolean alphaflag, Range initRange,
-                   HydraControl multiSpecCntrl)
+                               HydraControl multiSpecCntrl)
             throws VisADException, RemoteException {
         this(name, rgbRealType, indexRealType, colorPalette, null, alphaflag, initRange, multiSpecCntrl);
     }
@@ -187,11 +159,11 @@ public class HydraRGBDisplayable extends DisplayableData {
      * @throws RemoteException  Java RMI failure.
      */
     public HydraRGBDisplayable(String name, RealType rgbRealType, RealType indexRealType, float[][] colorPalette, String colorPaletteName, boolean alphaflag, Range initRange,
-                   HydraControl multiSpecCntrl)
+                               HydraControl multiSpecCntrl)
             throws VisADException, RemoteException {
 
         super(name);
-        
+
         this.rgbRealType  = rgbRealType;
         this.selectRealType = rgbRealType;
         this.indexRealType  = indexRealType;
@@ -201,8 +173,8 @@ public class HydraRGBDisplayable extends DisplayableData {
         this.multiSpecCntrl = multiSpecCntrl;
 
         if (initRange != null) {
-          this.lowRange = initRange.getMin();
-          this.highRange = initRange.getMax();
+            this.lowRange = initRange.getMin();
+            this.highRange = initRange.getMax();
         }
 
         if (rgbRealType != null) {
@@ -215,12 +187,12 @@ public class HydraRGBDisplayable extends DisplayableData {
         }
 
         if (indexRealType != null) {
-          //-setAnimationMap();
-          setSelectMap();
+            //-setAnimationMap();
+            setSelectMap();
         }
 
         if (selectRealType != null) {
-          //setSelectMaps();
+            //setSelectMaps();
         }
     }
 
@@ -283,11 +255,11 @@ public class HydraRGBDisplayable extends DisplayableData {
     }
 
     public ScalarMap getColorMap() {
-      return colorMap;
+        return colorMap;
     }
 
     public ScalarMap getAnimationMap() {
-      return animMap;
+        return animMap;
     }
 
 
@@ -310,20 +282,20 @@ public class HydraRGBDisplayable extends DisplayableData {
     }
 
     protected DataRenderer getDataRenderer() throws VisADException {
-      if (useDefaultRenderer) {
-        return new DefaultRendererJ3D();
-      }
-      else {
-        return new ImageRendererJ3D();
-      }
+        if (useDefaultRenderer) {
+            return new DefaultRendererJ3D();
+        }
+        else {
+            return new ImageRendererJ3D();
+        }
     }
 
     public void setDefaultRenderer() {
-      useDefaultRenderer = true;
+        useDefaultRenderer = true;
     }
 
     public void setImageRenderer() {
-      useDefaultRenderer = false;
+        useDefaultRenderer = false;
     }
 
     /**
@@ -344,8 +316,8 @@ public class HydraRGBDisplayable extends DisplayableData {
 
         if (colorMap == null) {
             throw new BadMappingException(getClass().getName()
-                                          + ".setScalarMaps(ScalarMapSet): "
-                                          + "Color not yet set");
+                    + ".setScalarMaps(ScalarMapSet): "
+                    + "Color not yet set");
         }
 
         maps.add(colorMap);
@@ -419,12 +391,12 @@ public class HydraRGBDisplayable extends DisplayableData {
     public void setColor(Color color) throws RemoteException, VisADException {
         int       len   = 5;
         float[][] table = new float[(alphaflag == true)
-                                    ? 4
-                                    : 3][len];
+                ? 4
+                : 3][len];
         for (int m = 0; m < len; m++) {
-            table[0][m] = color.getRed() / 255.f;    // Red amount  
+            table[0][m] = color.getRed() / 255.f;    // Red amount
             table[1][m] = color.getGreen() / 255.f;  // Green
-            table[2][m] = color.getBlue() / 255.f;   // Blue  
+            table[2][m] = color.getBlue() / 255.f;   // Blue
         }
         setColorPalette(table);
     }
@@ -465,7 +437,7 @@ public class HydraRGBDisplayable extends DisplayableData {
      *
      * @param low    the minimun value
      * @param hi     the maximum value
-     * @deprecated   use setRangeForColor
+     * deprecated   use setRangeForColor
      *
      * @throws RemoteException  Java RMI error
      * @throws VisADException   problem creating VisAD object
@@ -503,7 +475,7 @@ public class HydraRGBDisplayable extends DisplayableData {
      * Get the color range
      *
      * @return an array of the low and high values for the range
-     * @deprecated  use #getRangeForColor()
+     * deprecated  use #getRangeForColor()
      */
     public double[] getRangeforColor() {
         return getRangeForColor();
@@ -630,7 +602,7 @@ public class HydraRGBDisplayable extends DisplayableData {
             throws VisADException, RemoteException {
         this.polygonMode = polygonMode;
         addConstantMap(new ConstantMap(convertToVisADPolygonMode(polygonMode),
-                                       Display.PolygonMode));
+                Display.PolygonMode));
     }
 
     /**
@@ -644,17 +616,17 @@ public class HydraRGBDisplayable extends DisplayableData {
         if (visad.util.Util.canDoJava3D()) {
             switch (myMode) {
 
-              case POLYGON_FILL :
-                  return visad.java3d.DisplayImplJ3D.POLYGON_FILL;
+                case POLYGON_FILL :
+                    return visad.java3d.DisplayImplJ3D.POLYGON_FILL;
 
-              case POLYGON_LINE :
-                  return visad.java3d.DisplayImplJ3D.POLYGON_LINE;
+                case POLYGON_LINE :
+                    return visad.java3d.DisplayImplJ3D.POLYGON_LINE;
 
-              case POLYGON_POINT :
-                  return visad.java3d.DisplayImplJ3D.POLYGON_POINT;
+                case POLYGON_POINT :
+                    return visad.java3d.DisplayImplJ3D.POLYGON_POINT;
 
-              default :
-                  return visad.java3d.DisplayImplJ3D.POLYGON_FILL;
+                default :
+                    return visad.java3d.DisplayImplJ3D.POLYGON_FILL;
             }
         } else {
             return 0;
@@ -725,7 +697,7 @@ public class HydraRGBDisplayable extends DisplayableData {
         applyUnit(colorMap, rgbRealType);
 
         if (hasRange()) {
-           colorMap.setRange(lowRange, highRange);
+            colorMap.setRange(lowRange, highRange);
         }
 
         colorMap.addScalarMapListener(new ScalarMapListener() {
@@ -752,10 +724,10 @@ public class HydraRGBDisplayable extends DisplayableData {
             public void mapChanged(ScalarMapEvent event)
                     throws RemoteException, VisADException {
                 if ((event.getId() == ScalarMapEvent.AUTO_SCALE) && hasRange()) {
-                  double[] rng = colorMap.getRange();
-                  if (multiSpecCntrl != null) {
-                    multiSpecCntrl.updateRange(new Range(rng));
-                  }
+                    double[] rng = colorMap.getRange();
+                    if (multiSpecCntrl != null) {
+                        multiSpecCntrl.updateRange(new Range(rng));
+                    }
                 }
             }
         });
@@ -765,10 +737,10 @@ public class HydraRGBDisplayable extends DisplayableData {
     }
 
     private void setSelectMap() throws RemoteException, VisADException {
-      animMap = new ScalarMap(indexRealType, Display.SelectValue);
-      ScalarMapSet maps = getScalarMapSet();
-      maps.add(animMap);
-      setScalarMapSet(maps);
+        animMap = new ScalarMap(indexRealType, Display.SelectValue);
+        ScalarMapSet maps = getScalarMapSet();
+        maps.add(animMap);
+        setScalarMapSet(maps);
     }
 
     /**
@@ -804,7 +776,7 @@ public class HydraRGBDisplayable extends DisplayableData {
      */
     public boolean hasSelectedRange() {
         return ( !Double.isNaN(lowSelectedRange)
-                 && !Double.isNaN(highSelectedRange));
+                && !Double.isNaN(highSelectedRange));
     }
 
     /**
@@ -886,7 +858,7 @@ public class HydraRGBDisplayable extends DisplayableData {
                     selectControl = (RangeControl) selectMap.getControl();
                     if (hasSelectedRange()) {
                         selectControl.setRange(new double[]{ lowSelectedRange,
-                                                             highSelectedRange });
+                                highSelectedRange });
                     }
                 }
             }

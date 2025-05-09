@@ -1,331 +1,280 @@
-/*
- * This file is part of McIDAS-V
- *
- * Copyright 2007-2018
- * Space Science and Engineering Center (SSEC)
- * University of Wisconsin - Madison
- * 1225 W. Dayton Street, Madison, WI 53706, USA
- * http://www.ssec.wisc.edu/mcidas
- * 
- * All Rights Reserved
- * 
- * McIDAS-V is built on Unidata's IDV and SSEC's VisAD libraries, and
- * some McIDAS-V source code is based on IDV and VisAD source code.  
- * 
- * McIDAS-V is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * 
- * McIDAS-V is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser Public License
- * along with this program.  If not, see http://www.gnu.org/licenses.
- */
-
 package edu.wisc.ssec.mcidasv.data.hydra;
 
 import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import visad.CoordinateSystem;
 import visad.FunctionType;
+import visad.Linear1DSet;
 import visad.Linear2DSet;
 import visad.RealTupleType;
 import visad.RealType;
 import visad.Set;
-import visad.Unit;
 
-public class SwathAdapter extends MultiDimensionAdapter {
+public class SwathAdapter extends GeoSfcAdapter {
 
-	  private static final Logger logger = LoggerFactory.getLogger(SwathAdapter.class);
-      String nav_type = "Interp";
-      boolean lon_lat_trusted = true;
+    String nav_type = "Interp";
+    boolean lon_lat_trusted = true;
 
-      private int TrackLen;
-      private int XTrackLen;
+    private int TrackLen;
+    private int XTrackLen;
 
-      static String longitude_name = "Longitude";
-      static String latitude_name  = "Latitude";
-      static String track_name  = "Track";
-      static String xtrack_name = "XTrack";
-      static String geo_track_name = "geo_Track";
-      static String geo_xtrack_name  = "geo_XTrack";
-      static String array_name = "array_name";
-      static String array_dimension_names = "array_dimension_names";
-      static String lon_array_name = "lon_array_name";
-      static String lat_array_name = "lat_array_name";
-      static String lon_array_dimension_names = "lon_array_dimension_names";
-      static String lat_array_dimension_names = "lat_array_dimension_names";
-      static String range_name = "range_name";
-      static String product_name = "product_name";
-      static String scale_name = "scale_name";
-      static String offset_name = "offset_name";
-      static String fill_value_name = "fill_value_name";
-      static String geo_track_offset_name  = "geoTrack_offset";
-      static String geo_xtrack_offset_name = "geoXTrack_offset";
-      static String geo_track_skip_name  = "geoTrack_skip";
-      static String geo_xtrack_skip_name = "geoXTrack_skip";
-      static String geo_scale_name = "geo_scale_name";
-      static String geo_offset_name = "geo_scale_name";
-      static String geo_fillValue_name = "geo_fillValue_name";
-      static String multiScaleDimensionIndex = "multiScaleDimensionIndex";
+    public static String longitude_name = "Longitude";
+    public static String latitude_name = "Latitude";
+    public static String track_name = "Track";
+    public static String xtrack_name = "XTrack";
+    public static String geo_track_name = "geo_Track";
+    public static String geo_xtrack_name = "geo_XTrack";
+    public static String array_dimension_names = "array_dimension_names";
+    public static String lon_array_name = "lon_array_name";
+    public static String lat_array_name = "lat_array_name";
+    public static String lon_array_dimension_names = "lon_array_dimension_names";
+    public static String lat_array_dimension_names = "lat_array_dimension_names";
+    public static String geo_track_offset_name = "geoTrack_offset";
+    public static String geo_xtrack_offset_name = "geoXTrack_offset";
+    public static String geo_track_skip_name = "geoTrack_skip";
+    public static String geo_xtrack_skip_name = "geoXTrack_skip";
+    public static String geo_scale_name = "geo_scale_name";
+    public static String geo_offset_name = "geo_offset_name";
+    public static String geo_fillValue_name = "geo_fillValue_name";
+    public static String multiScaleDimensionIndex = "multiScaleDimensionIndex";
+    public static String byteSegmentIndexName = "byteSegementIndexName";
 
-      String[] rangeName_s  = null;
-      Class[] arrayType_s = null;
-      Unit[] rangeUnit_s  = new Unit[] {null};
 
-      String rangeName = null;
+    RealType track = RealType.getRealType(track_name);
+    RealType xtrack = RealType.getRealType(xtrack_name);
+    RealType[] domainRealTypes = new RealType[2];
 
-      RealType track  = RealType.getRealType(track_name);
-      RealType xtrack = RealType.getRealType(xtrack_name);
-      RealType[] domainRealTypes = new RealType[2];
+    int track_idx = -1;
+    int xtrack_idx = -1;
+    int lon_track_idx = -1;
+    int lon_xtrack_idx = -1;
+    int lat_track_idx = -1;
+    int lat_xtrack_idx = -1;
+    int range_rank = -1;
 
-      int track_idx      = -1;
-      int xtrack_idx     = -1;
-      int lon_track_idx  = -1;
-      int lon_xtrack_idx = -1;
-      int lat_track_idx  = -1;
-      int lat_xtrack_idx = -1;
-      int range_rank     = -1;
+    int geo_track_offset = 0;
+    int geo_track_skip = 1;
+    int geo_xtrack_offset = 0;
+    int geo_xtrack_skip = 1;
 
-      int geo_track_offset = 0;
-      int geo_track_skip = 1;
-      int geo_xtrack_offset = 0;
-      int geo_xtrack_skip = 1;
+    int track_tup_idx;
+    int xtrack_tup_idx;
 
-      int track_tup_idx;
-      int xtrack_tup_idx;
+    private SwathNavigation navigation;
+    private MultiDimensionReader geoReader;
 
-      private SwathNavigation navigation;
+    private Linear2DSet swathDomain;
 
-      private Linear2DSet swathDomain;
-      private Linear2DSet domainSet_save;
+    protected Object last_subset;
 
-      private Map<String, double[]> last_subset;
+    int default_stride = 1;
 
-      int default_stride = 1;
+    private DomainSetCache domainSetCache;
 
-      public static Map<String, double[]> getEmptySubset() {
-        Map<String, double[]> subset = new HashMap<>();
+    public static HashMap getEmptySubset() {
+        HashMap<String, double[]> subset = new HashMap<String, double[]>();
         subset.put(track_name, new double[3]);
         subset.put(xtrack_name, new double[3]);
         return subset;
-      }
+    }
 
-      public static Map<String, Object> getEmptyMetadataTable() {
-    	  Map<String, Object> metadata = new HashMap<>();
-    	  metadata.put(array_name, null);
-    	  metadata.put(array_dimension_names, null);
-    	  metadata.put(track_name, null);
-    	  metadata.put(xtrack_name, null);
-    	  metadata.put(geo_track_name, null);
-    	  metadata.put(geo_xtrack_name, null);
-    	  metadata.put(lon_array_name, null);
-    	  metadata.put(lat_array_name, null);
-    	  metadata.put(lon_array_dimension_names, null);
-    	  metadata.put(lat_array_dimension_names, null);
-    	  metadata.put(scale_name, null);
-    	  metadata.put(offset_name, null);
-    	  metadata.put(fill_value_name, null);
-    	  metadata.put(range_name, null);
-    	  metadata.put(product_name, null);
-    	  metadata.put(geo_track_offset_name, null);
-    	  metadata.put(geo_xtrack_offset_name, null);
-    	  metadata.put(geo_track_skip_name, null);
-    	  metadata.put(geo_xtrack_skip_name, null);
-          metadata.put(multiScaleDimensionIndex, null);
-    	  return metadata;
-      }
+    public static HashMap<String, Object> getEmptyMetadataTable() {
+        HashMap<String, Object> metadata = new HashMap<String, Object>();
+        metadata.put(array_name, null);
+        metadata.put(array_dimension_names, null);
+        metadata.put(track_name, null);
+        metadata.put(xtrack_name, null);
+        metadata.put(geo_track_name, null);
+        metadata.put(geo_xtrack_name, null);
+        metadata.put(lon_array_name, null);
+        metadata.put(lat_array_name, null);
+        metadata.put(lon_array_dimension_names, null);
+        metadata.put(lat_array_dimension_names, null);
+        metadata.put(scale_name, null);
+        metadata.put(offset_name, null);
+        metadata.put(fill_value_name, null);
+        metadata.put(range_name, null);
+        metadata.put(product_name, null);
+        metadata.put(geo_track_offset_name, null);
+        metadata.put(geo_xtrack_offset_name, null);
+        metadata.put(geo_track_skip_name, null);
+        metadata.put(geo_xtrack_skip_name, null);
+        metadata.put(multiScaleDimensionIndex, null);
+        metadata.put(byteSegmentIndexName, null);
+        return metadata;
+    }
 
-      public SwathAdapter() {
-
-      }
-
-      public SwathAdapter(MultiDimensionReader reader, Map<String, Object> metadata) {
+    public SwathAdapter(MultiDimensionReader reader, HashMap metadata, MultiDimensionReader geoReader) {
         super(reader, metadata);
-        this.init();
-      }
-
-      private void init() {
-        for (int k=0; k<array_rank;k++) {
-          if ( ((String)metadata.get(track_name)).equals(array_dim_names[k]) ) {
-            track_idx = k;
-          }
-          if ( ((String)metadata.get(xtrack_name)).equals(array_dim_names[k]) ) {
-            xtrack_idx = k;
-          }
+        this.geoReader = reader;
+        if (geoReader != null) {
+            this.geoReader = geoReader;
         }
+        this.init();
+    }
+
+    public SwathAdapter(MultiDimensionReader reader, HashMap metadata) {
+        super(reader, metadata);
+        this.geoReader = reader;
+        this.init();
+    }
+
+    private void init() {
+        track_idx = getIndexOfDimensionName((String) metadata.get(track_name));
+        TrackLen = getDimensionLengthFromIndex(track_idx);
+
+        xtrack_idx = getIndexOfDimensionName((String) metadata.get(xtrack_name));
+        XTrackLen = getDimensionLengthFromIndex(xtrack_idx);
 
         int[] lengths = new int[2];
 
         if (track_idx < xtrack_idx) {
-          domainRealTypes[0] = xtrack;
-          domainRealTypes[1] = track;
-          lengths[0] = array_dim_lengths[xtrack_idx];
-          lengths[1] = array_dim_lengths[track_idx];
-          track_tup_idx = 1;
-          xtrack_tup_idx = 0;
-        }
-        else {
-          domainRealTypes[0] = track;
-          domainRealTypes[1] = xtrack;
-          lengths[0] = array_dim_lengths[track_idx];
-          lengths[1] = array_dim_lengths[xtrack_idx];
-          track_tup_idx = 0;
-          xtrack_tup_idx = 1;
+            domainRealTypes[0] = xtrack;
+            domainRealTypes[1] = track;
+            lengths[0] = XTrackLen;
+            lengths[1] = TrackLen;
+            track_tup_idx = 1;
+            xtrack_tup_idx = 0;
+        } else {
+            domainRealTypes[0] = track;
+            domainRealTypes[1] = xtrack;
+            lengths[0] = TrackLen;
+            lengths[1] = XTrackLen;
+            track_tup_idx = 0;
+            xtrack_tup_idx = 1;
         }
 
-        TrackLen  = array_dim_lengths[track_idx];
-        XTrackLen = array_dim_lengths[xtrack_idx];
-        
         setLengths();
 
-        lengths[track_tup_idx]  = TrackLen;
+        lengths[track_tup_idx] = TrackLen;
         lengths[xtrack_tup_idx] = XTrackLen;
 
-        if (metadata.get(range_name) != null) {
-          rangeName = (String)metadata.get(range_name);
-        } 
-        else {
-          rangeName = (String)metadata.get(array_name);
+        /* TODO: RangeProcessor works as a post-process but individual swaths in an aggregation
+                 may need separate processors so the logic below handles as a pre-process for
+                 individual swaths prior to aggregation - improve this (too complicated):
+                 the individual rangeProcessors are set into the aggregation reader.
+         */
+        try {
+            if (!(reader instanceof GranuleAggregation)) {
+                RangeProcessor rangeProcessor = RangeProcessor.createRangeProcessor(reader, metadata);
+                setRangeProcessor(rangeProcessor);
+            } else if (((GranuleAggregation) reader).getPreProcessor(arrayName) == null) {
+                RangeProcessor.createRangeProcessor(reader, metadata);
+            }
+        } catch (Exception e) {
+            System.out.println("RangeProcessor failed to create");
+            e.printStackTrace();
         }
-      
-        rangeType = RealType.getRealType(rangeName, rangeUnit_s[0]);
 
-        /** TODO could be a mis-match between supplied unit, and default
-            unit of an existing RealType with same name. */
-        if (rangeType == null) {
-          rangeType = RealType.getRealType(rangeName);
-        }
 
         try {
-          RangeProcessor rangeProcessor = RangeProcessor.createRangeProcessor(reader, metadata);
-          if ( !(reader instanceof GranuleAggregation) ) {
-            setRangeProcessor(rangeProcessor);
-          }
-        } 
-        catch (Exception e) {
-          System.out.println("RangeProcessor failed to create");
-          e.printStackTrace();
+            navigation = SwathNavigation.createNavigation(this);
+            RealTupleType domainTupType = new RealTupleType(domainRealTypes[0], domainRealTypes[1]);
+            swathDomain = new Linear2DSet(domainTupType, 0, lengths[0] - 1, lengths[0], 0, lengths[1] - 1, lengths[1]);
+        } catch (Exception e) {
+            System.out.println("Navigation failed to create");
+            e.printStackTrace();
         }
 
-        try {
-          navigation = SwathNavigation.createNavigation(this);
-          RealTupleType domainTupType = new RealTupleType(domainRealTypes[0], domainRealTypes[1]);
-          swathDomain = new Linear2DSet(domainTupType, 0, lengths[0]-1, lengths[0], 0, lengths[1]-1, lengths[1]);
-        }
-        catch (Exception e) {
-          System.out.println("Navigation failed to create");
-          e.printStackTrace();
+        if (XTrackLen <= 256) {
+            default_stride = 1;
+        } else {
+            default_stride = (int) XTrackLen / 256;
         }
 
-		if (XTrackLen <= 256) {
-			default_stride = 1;
-		} else {
-			default_stride = Math.round((float) XTrackLen / 256.0f);
-		}
-        
         /* force default stride even */
         if (default_stride > 1) {
-          default_stride = (default_stride/2)*2;
+            default_stride = (default_stride / 2) * 2;
         }
 
-      }
+        domainSetCache = new DomainSetCache();
+    }
 
-      protected void setLengths() {
-      }
+    protected void setLengths() {
+    }
 
-      public int getTrackLength() {
+    public int getTrackLength() {
         return TrackLen;
-      }
+    }
 
-      public int getXTrackLength() {
+    public int getXTrackLength() {
         return XTrackLen;
-      }
+    }
 
-      public SwathNavigation getNavigation() {
+    public SwathNavigation getNavigation() {
         return navigation;
-      }
+    }
 
-      protected void setTrackLength(int len) {
+    public MultiDimensionReader getGeoReader() {
+        return geoReader;
+    }
+
+    protected void setTrackLength(int len) {
         TrackLen = len;
-      }
+    }
 
-      protected void setXTrackLength(int len) {
+    protected void setXTrackLength(int len) {
         XTrackLen = len;
-      }
+    }
 
-      public Set makeDomain(Map<String, double[]> subset) throws Exception {
-        if (last_subset != null) {
-          if (spatialEquals(last_subset, subset)) return domainSet_save;
-        }
+    public String getArrayName() {
+        return rangeName;
+    }
+
+    public Set makeDomain(Object subset) throws Exception {
 
         double[] first = new double[2];
         double[] last = new double[2];
         int[] length = new int[2];
 
-        Map<String, double[]> domainSubset = new HashMap<>();
-        domainSubset.put(track_name, subset.get(track_name));
-        domainSubset.put(xtrack_name, subset.get(xtrack_name));
-
-        domainSubset.put(track_name, new double[] {0,0,0});
-        domainSubset.put(xtrack_name, new double[] {0,0,0});
-
         // compute coordinates for the Linear2D domainSet
-        for (int kk=0; kk<2; kk++) {
-          RealType rtype = domainRealTypes[kk];
-          String name = rtype.getName();
-          double[] coords = subset.get(name);
-          coords[0] = Math.ceil(coords[0]);
-          coords[1] = Math.floor(coords[1]);
-          first[kk] = coords[0];
-          last[kk] = coords[1];
-          length[kk] = (int) ((last[kk] - first[kk])/coords[2] + 1);
-          last[kk] = first[kk] + (length[kk]-1)*coords[2];
+        for (int kk = 0; kk < 2; kk++) {
+            RealType rtype = domainRealTypes[kk];
+            String name = rtype.getName();
+            double[] coords = (double[]) ((HashMap) subset).get(name);
+            // replace (in place) with integral swath coordinates
+            coords[0] = Math.ceil(coords[0]);
+            coords[1] = Math.floor(coords[1]);
 
-          double[] new_coords = domainSubset.get(name);
-          new_coords[0] = first[kk];
-          new_coords[1] = last[kk];
-          new_coords[2] = coords[2];
+            first[kk] = coords[0];
+            last[kk] = coords[1];
+            length[kk] = (int) ((last[kk] - first[kk]) / coords[2] + 1);
+            last[kk] = first[kk] + (length[kk] - 1) * coords[2];
         }
-        last_subset = subset;
 
-        Linear2DSet domainSet = new Linear2DSet(first[0], last[0], length[0], first[1], last[1], length[1]);
-        //CoordinateSystem cs = navigation.getVisADCoordinateSystem(domainSet, domainSubset);
-        CoordinateSystem cs = navigation.getVisADCoordinateSystem(domainSet, subset);
+        Linear2DSet domainSetnoCS = new Linear2DSet(first[0], last[0], length[0], first[1], last[1], length[1]);
 
-        RealTupleType domainTupType = new RealTupleType(domainRealTypes[0], domainRealTypes[1], cs, null);
-        domainSet_save = new Linear2DSet(domainTupType, first[0], last[0], length[0], first[1], last[1], length[1]);
+        Linear2DSet domainSet = domainSetCache.get(domainSetnoCS);
+        if (domainSet == null) {
+            CoordinateSystem coordSys = navigation.getVisADCoordinateSystem(subset);
+            RealTupleType domainTupType = new RealTupleType(domainRealTypes[0], domainRealTypes[1], coordSys, null);
+            domainSet = new Linear2DSet(domainTupType, first[0], last[0], length[0], first[1], last[1], length[1]);
+            domainSetCache.put(domainSet);
+        }
 
-        return domainSet_save;
-      }
+        return domainSet;
+    }
 
-      public String getArrayName() {
-        return rangeName;
-      }
-
-      public FunctionType getMathType() {
+    public FunctionType getMathType() {
         return null;
-      }
+    }
 
-      public RealType[] getDomainRealTypes() {
+    public RealType[] getDomainRealTypes() {
         return domainRealTypes;
-      }
+    }
 
-      public Linear2DSet getSwathDomain() {
+    public Linear2DSet getDatasetDomain() {
         return swathDomain;
-      }
-      
-      public boolean spatialEquals(Map<String, double[]> last_subset, Map<String, double[]> subset) {
-        double[] last_coords = last_subset.get(track_name);
-        double[] coords = subset.get(track_name);
+    }
+
+    public void setDomainSet(Linear2DSet domSet) {
+        domainSetCache.put(domSet);
+    }
+
+/*  Keep for now, but looks to be unused.
+        public boolean spatialEquals(Object last_subset, Object subset) {
+        double[] last_coords = (double[]) ((HashMap)last_subset).get(track_name);
+        double[] coords = (double[]) ((HashMap)subset).get(track_name);
 
         for (int k=0; k<coords.length; k++) {
           if (coords[k] != last_coords[k]) {
@@ -333,36 +282,87 @@ public class SwathAdapter extends MultiDimensionAdapter {
           }
         }
 
-        last_coords = last_subset.get(xtrack_name);
-        coords = subset.get(xtrack_name);
+        last_coords = (double[]) ((HashMap)last_subset).get(xtrack_name);
+        coords = (double[]) ((HashMap)subset).get(xtrack_name);
 
         for (int k=0; k<coords.length; k++) {
-          if (coords[k] != last_coords[k]) { 
+          if (coords[k] != last_coords[k]) {
              return false;
           }
         }
-      
+
         return true;
-      }
+      }*/
 
-      public void setDefaultStride(int stride) {
+    public void setDefaultStride(int stride) {
         default_stride = stride;
-      }
+    }
 
-      public Map<String, double[]> getDefaultSubset() {
-        Map<String, double[]> subset = SwathAdapter.getEmptySubset();
+    public HashMap getDefaultSubset() {
+        HashMap subset = SwathAdapter.getEmptySubset();
 
-        double[] coords = subset.get("Track");
+        double[] coords = (double[]) subset.get("Track");
         coords[0] = 0.0;
         coords[1] = TrackLen - 1;
-        coords[2] = (double)default_stride;
+        coords[2] = (double) default_stride;
         subset.put("Track", coords);
 
-        coords = subset.get("XTrack");
+        coords = (double[]) subset.get("XTrack");
         coords[0] = 0.0;
-        coords[1] = XTrackLen - 1 ;
-        coords[2] = (double)default_stride;
+        coords[1] = XTrackLen - 1;
+        coords[2] = (double) default_stride;
         subset.put("XTrack", coords);
         return subset;
-      }
+    }
+
+    public static boolean dimsEquals(Linear2DSet domA, Linear2DSet domB) {
+
+        Linear1DSet lsetA0 = domA.getLinear1DComponent(0);
+        Linear1DSet lsetA1 = domA.getLinear1DComponent(1);
+        double firstA0 = lsetA0.getFirst();
+        double lastA0 = lsetA0.getLast();
+        double stepA0 = lsetA0.getStep();
+        double firstA1 = lsetA1.getFirst();
+        double lastA1 = lsetA1.getLast();
+        double stepA1 = lsetA1.getStep();
+
+        Linear1DSet lsetB0 = domB.getLinear1DComponent(0);
+        Linear1DSet lsetB1 = domB.getLinear1DComponent(1);
+        double firstB0 = lsetB0.getFirst();
+        double lastB0 = lsetB0.getLast();
+        double stepB0 = lsetB0.getStep();
+        double firstB1 = lsetB1.getFirst();
+        double lastB1 = lsetB1.getLast();
+        double stepB1 = lsetB1.getStep();
+
+        if (firstA0 != firstB0 || firstA1 != firstB1 || lastA0 != lastB0 || lastA1 != lastB1 ||
+                stepA0 != stepB0 || stepA1 != stepB1) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+class DomainSetCache {
+    Linear2DSet domainSet0;
+    Linear2DSet domainSet1;
+
+    void put(Linear2DSet domSet) {
+        if (domainSet0 == null || SwathAdapter.dimsEquals(domSet, domainSet0)) {
+            domainSet0 = domSet;
+        } else {
+            domainSet1 = domSet;
+        }
+    }
+
+    Linear2DSet get(Linear2DSet domSet) {
+        if (domainSet0 != null && SwathAdapter.dimsEquals(domainSet0, domSet)) {
+            return domainSet0;
+        } else if (domainSet1 != null && SwathAdapter.dimsEquals(domainSet1, domSet)) {
+            return domainSet1;
+        } else {
+            return null;
+        }
+    }
 }

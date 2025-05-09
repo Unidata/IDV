@@ -38,8 +38,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import visad.AxisScale;
 import visad.BaseColorControl;
@@ -72,7 +70,7 @@ import visad.georef.MapProjection;
 import visad.georef.TrivialMapProjection;
 import visad.python.JPythonMethods;
 
-//import ucar.unidata.data.hydra.Statistics;
+import ucar.unidata.data.hydra.Statistics;
 
 public class StatsTable extends AbstractTableModel {
 

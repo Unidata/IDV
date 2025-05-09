@@ -1,31 +1,3 @@
-/*
- * This file is part of McIDAS-V
- *
- * Copyright 2007-2018
- * Space Science and Engineering Center (SSEC)
- * University of Wisconsin - Madison
- * 1225 W. Dayton Street, Madison, WI 53706, USA
- * http://www.ssec.wisc.edu/mcidas
- * 
- * All Rights Reserved
- * 
- * McIDAS-V is built on Unidata's IDV and SSEC's VisAD libraries, and
- * some McIDAS-V source code is based on IDV and VisAD source code.  
- * 
- * McIDAS-V is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * 
- * McIDAS-V is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser Public License
- * along with this program.  If not, see http://www.gnu.org/licenses.
- */
-
 package edu.wisc.ssec.mcidasv.data.hydra;
 
 import java.rmi.RemoteException;
@@ -128,9 +100,9 @@ public class CurveDrawer extends LineDrawing {
     public CurveDrawer(RealTupleType type, int mask)
             throws VisADException, RemoteException {
         this(new UnionSet(new Gridded2DSet[]{
-            new Gridded2DSet(type, new float[][] {
-            { 0.0f }, { 0.0f }
-        }, 1) }));
+                new Gridded2DSet(type, new float[][] {
+                        { 0.0f }, { 0.0f }
+                }, 1) }));
     }
 
 
@@ -216,7 +188,7 @@ public class CurveDrawer extends LineDrawing {
 
         if ( !((SetType) curves.getType()).getDomain().equals(type)) {
             throw new IllegalArgumentException("MathType of curve must be "
-                                               + type);
+                    + type);
         }
         setData(curves);
     }
@@ -266,11 +238,11 @@ public class CurveDrawer extends LineDrawing {
         LocalDisplay display = getDisplay();
 
         return isManipulable()
-               ? (display.getDisplayRenderer() instanceof DisplayRendererJ2D)
-                 ? (DataRenderer) new CurveManipulationRendererJ2D()
-                 : (DataRenderer) new CurveManipulationRendererJ3D()
-               : (display.getDisplayRenderer() instanceof DisplayRendererJ2D)
-                 ? (DataRenderer) new DefaultRendererJ2D()
-                 : (DataRenderer) new DefaultRendererJ3D();
+                ? (display.getDisplayRenderer() instanceof DisplayRendererJ2D)
+                ? (DataRenderer) new CurveManipulationRendererJ2D()
+                : (DataRenderer) new CurveManipulationRendererJ3D()
+                : (display.getDisplayRenderer() instanceof DisplayRendererJ2D)
+                ? (DataRenderer) new DefaultRendererJ2D()
+                : (DataRenderer) new DefaultRendererJ3D();
     }
 }

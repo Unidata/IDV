@@ -1,30 +1,3 @@
-/*
- * This file is part of McIDAS-V
- *
- * Copyright 2007-2018
- * Space Science and Engineering Center (SSEC)
- * University of Wisconsin - Madison
- * 1225 W. Dayton Street, Madison, WI 53706, USA
- * http://www.ssec.wisc.edu/mcidas
- * 
- * All Rights Reserved
- * 
- * McIDAS-V is built on Unidata's IDV and SSEC's VisAD libraries, and
- * some McIDAS-V source code is based on IDV and VisAD source code.  
- * 
- * McIDAS-V is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * 
- * McIDAS-V is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser Public License
- * along with this program.  If not, see http://www.gnu.org/licenses.
- */
 package edu.wisc.ssec.mcidasv.data.hydra;
 
 import visad.*;
@@ -49,8 +22,8 @@ public class HistogramField {
     public FlatField scatterDensityField;
 
     public HistogramField(FlatField field_0, FlatField field_1,
-            FlatField mask_field,
-            int n_bins, int bin_size)
+                          FlatField mask_field,
+                          int n_bins, int bin_size)
             throws Exception {
         this.field_0 = field_0;
         this.field_1 = field_1;
@@ -81,7 +54,7 @@ public class HistogramField {
 
 
         if (rangeType == Integer.TYPE) {
-          //Ghansham: Dont do any allocation here. Do based on the individual ranges of fieldX and fieldY respectively
+            //Ghansham: Dont do any allocation here. Do based on the individual ranges of fieldX and fieldY respectively
         } else {
             indexes = new int[n_bins * n_bins][1];
             count = new int[n_bins * n_bins];
@@ -230,15 +203,15 @@ public class HistogramField {
 
         Linear2DSet dSet = (Linear2DSet) histSet.changeMathType(new RealTupleType(RealType.XAxis, RealType.YAxis));
         scatterDensityField = new FlatField(
-            new FunctionType(((SetType)dSet.getType()).getDomain(), RealType.getRealType("ScatterDensity")), dSet);
+                new FunctionType(((SetType)dSet.getType()).getDomain(), RealType.getRealType("ScatterDensity")), dSet);
         float[][] fltCount = new float[1][count.length];
-        for (int i=0; i<count.length; i++) { 
+        for (int i=0; i<count.length; i++) {
             fltCount[0][i] = (float) count[i];
             if (count[i] == 0) {
-               fltCount[0][i] = Float.NaN;
+                fltCount[0][i] = Float.NaN;
             }
             else {
-               fltCount[0][i] = (float) java.lang.Math.log((double)fltCount[0][i]);
+                fltCount[0][i] = (float) java.lang.Math.log((double)fltCount[0][i]);
             }
         }
         scatterDensityField.setSamples(fltCount);
@@ -531,9 +504,9 @@ public class HistogramField {
     }
 
     private void reorder(byte maskVal) {
-       order[2] = order[1];
-       order[1] = order[0];
-       order[0] = maskVal;
+        order[2] = order[1];
+        order[1] = order[0];
+        order[0] = maskVal;
     }
 
     public void clearMaskField(float maskVal) {
@@ -543,18 +516,18 @@ public class HistogramField {
         }
 
         for (int t=0; t<order.length; t++) {
-           if (order[t] == (byte)maskVal) {
-               order[t] = Byte.MAX_VALUE;
-           }
+            if (order[t] == (byte)maskVal) {
+                order[t] = Byte.MAX_VALUE;
+            }
         }
 
         for (int t=order.length-1; t >=0; t--) {
             if (order[t] != Byte.MAX_VALUE) {
-               for (int k=0; k<maskRange[0].length; k++) {
-                   if (mask[order[t]][k] != Byte.MAX_VALUE) {
-                      maskRange[0][k] = (float) order[t];
-                   }
-               }
+                for (int k=0; k<maskRange[0].length; k++) {
+                    if (mask[order[t]][k] != Byte.MAX_VALUE) {
+                        maskRange[0][k] = (float) order[t];
+                    }
+                }
             }
         }
     }
