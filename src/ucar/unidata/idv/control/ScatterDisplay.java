@@ -33,8 +33,8 @@ import edu.wisc.ssec.mcidasv.data.hydra.SubsetRubberBandBox;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.fop.render.rtf.rtflib.tools.ImageUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import ucar.unidata.data.DataAlias;
 import ucar.unidata.data.DataChoice;
@@ -139,8 +139,8 @@ import static visad.python.JPythonMethods.createAreaField;
 public class ScatterDisplay extends DisplayControlImpl {
 
     /** _more_ */
-    private static final Logger logger =
-        LoggerFactory.getLogger(ScatterDisplay.class);
+    //private static final Logger logger =
+    //    LoggerFactory.getLogger(ScatterDisplay.class);
 
     /** _more_ */
     private Container container;
@@ -313,7 +313,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                     scatterMarkDsp.setColorPalette(
                         markPaletteBlackBackground);
                 } catch (Exception ex) {
-                    logger.error("could not change color palette", ex);
+                    logException("could not change color palette", ex);
                 }
             });
 
@@ -327,7 +327,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                     scatterMarkDsp.setColorPalette(
                         markPaletteWhiteBackground);
                 } catch (Exception ex) {
-                    logger.error("could not change color palette", ex);
+                    logException("could not change color palette", ex);
                 }
             });
 
@@ -555,7 +555,7 @@ public class ScatterDisplay extends DisplayControlImpl {
         try {
             scatterMarkDsp.setColorPalette(bgPalette);
         } catch (Exception ex) {
-            logger.error("could not change color palette", ex);
+            logException("could not change color palette", ex);
         }
         container.getComponent(0).setVisible(true);
         GuiUtils.toggleHeavyWeightComponents(container.getComponent(0), true);
@@ -582,7 +582,7 @@ public class ScatterDisplay extends DisplayControlImpl {
         List<DataChoice> choices = selectDataChoices(dialogMessage, from,
                                        multiples, categories);
         if ((choices == null) || (choices.size() == 0)) {
-            logger.debug("popupDataDialog, no data choice, user canceled");
+            System.out.println("popupDataDialog, no data choice, user canceled");
             cancel = true;
             return;
         }
@@ -1041,7 +1041,7 @@ public class ScatterDisplay extends DisplayControlImpl {
             imageYcurve.setActive(false);
             imageYcurve.setVisible(false);
         } catch (Exception e) {
-            logger.error("Problem resetting selector at index " + idx, e);
+            logException("Problem resetting selector at index " + idx, e);
         }
     }
 
