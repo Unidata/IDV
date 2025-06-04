@@ -93,6 +93,7 @@ import java.rmi.RemoteException;
 
 import java.util.*;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -284,6 +285,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
 
     float[][] latlonalt = null;
 
+    double [] majorTicks;
     /**
      * Default constructor.  Sets the appropriate attribute flags.
      */
@@ -3218,6 +3220,7 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         //yScale.setMinorTickSpacing(averageTickSpacing * (1.0f/step));
         yScale.setLabelTable(labelTable);
         yScale.setMajorTicks(values);
+        majorTicks = values;
         //xScale.setTitle("Time (" + dt.getFormatTimeZone().getDisplayName() + ")");
 
 
@@ -3234,14 +3237,26 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         String[] DEFAULT_PRESSURE_LABELS = new String[] {
                 "1000",  "700", "500",  "250",   "100"
         };
-
+        Range vrange = getDataVerticalRange();
+        if(vrange.max >= 80000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "100",   "10",   "1",   "0.1", "0.01"
+            };
+        else if(vrange.max >= 40000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "500", "200", "100",   "10"
+            };
+        else if(vrange.max >= 20000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "500", "200", "100",   "50"
+            };
         /** pressure labels being used */
         String[] pressureLabels = DEFAULT_PRESSURE_LABELS;
         Hashtable table = getPressureLabels(pressureLabels);
         AxisScale yScale = ((VerticalXSDisplay) crossSectionView.getXSDisplay()).getYAxisScale();
         RealType yAxisType = ((VerticalXSDisplay) crossSectionView.getXSDisplay()).getYAxisType();
         java.util.Set keys = table.keySet();
-        Iterator iterator = keys.iterator();
+
         double [] hkeys =  new double [keys.size()];
         int i = 0;
         for(Object d: keys){
