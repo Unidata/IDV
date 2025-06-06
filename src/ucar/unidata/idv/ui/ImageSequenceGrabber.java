@@ -1830,9 +1830,9 @@ public class ImageSequenceGrabber implements Runnable, ActionListener {
                     bounds = viewManager.getVisibleGeoBounds();
                 }
 
-                System.err.println("image sequence");
+                //System.err.println("image sequence");
                 if (alternateComponent != null) {
-                    System.err.println("image sequence - alt");
+                    //System.err.println("image sequence - alt");
                     GuiUtils.toFront(GuiUtils.getFrame(alternateComponent));
                     Misc.sleep(50);
                     ImageUtils.writeImageToFile(alternateComponent, path);
