@@ -82,12 +82,12 @@ Then (see below):
 
 Update the document page
 
-On robin:
+On ml19:
 
-cd /web/docs/idv
+cd /data/web/docs/idv
 
 change the current link to point to the new release.
-cd /web/docs/idv
+cd /data/web/docs/idv
    rm current
    ln -s <current IDV version> current
    rm nightly
@@ -97,8 +97,8 @@ cd /web/docs/idv
 
 Expand the javadoc
 
-On robin:
-    cd /web/docs/idv/<release>
+On ml19:
+    cd /data/web/docs/idv/<release>
     check javadoc, workshop, and userguide folders and contents
 
 if any folder missing go to fserv:
@@ -107,15 +107,15 @@ cd /share/idv/build*******/docs
 
     jar cf userguide.jar userguide
     jar cf workshop.jar workshop
-    scp userguide.jar robin:/web/docs/idv/<release>
-    scp workshop.jar robin:/web/docs/idv/<release>
+    scp userguide.jar ml19:/data/web/docs/idv/<release>
+    scp workshop.jar ml19:/data/web/docs/idv/<release>
 
-Or: scp -r javadoc robin:/web/docs/idv/<release>/.
-    scp -r  userguide robin:/web/docs/idv/<release>/.
-    scp -r workshop robin:/web/docs/idv/<release>/.
+Or: scp -r javadoc ml19:/data/web/docs/idv/<release>/.
+    scp -r  userguide ml19:/data/web/docs/idv/<release>/.
+    scp -r workshop ml19:/data/web/docs/idv/<release>/.
 
-On robin:
-    cd /we/docs/idv/<release>
+On ml19:
+    cd /data/we/docs/idv/<release>
     jar xvf userguide.jar
     jar xvf workshop.jar
 
@@ -130,7 +130,11 @@ Update the downloads page
     upload the release_info.json to artifact server
     curl -u yuanho:XXXXXXXXX --upload-file release_info.json  https://artifacts.unidata.ucar.edu/repository/downloads-idv/release_info.json
 
+    upload the Mac installer(notarization) to artifact server
+    curl -u yuanho:XXXXXXXXX --upload-file idv_6_3_macos_installer.dmg.stapled https://artifacts.unidata.ucar.edu/repository/downloads-idv/6.3/idv_6_3_macos_installer.dmg
 
+    upload the WINDOW installer(ONLY CODE SIGNED) to artifact server
+    curl -u yuanho:XXXXXXXXX --upload-file idv_6_3_windows64_installer_signed.exe https://artifacts.unidata.ucar.edu/repository/downloads-idv/6.3/idv_6_3_windows64_installer.exe
 ********************************************************************************
 Generate the PDFs
 
@@ -148,10 +152,10 @@ Note that ant may not be on your path. Look for it in
 
 Look at the ant output and you will see where these PDFs are located.
 
-Once this is done, copy them to robin:
+Once this is done, copy them to ml19:
 
-/web/docs/idv/<release>/userguide/userguide.pdf
-/web/docs/idv/<release>/workshop/workshop.pdf
+/data/web/docs/idv/<release>/userguide/userguide.pdf
+/data/web/docs/idv/<release>/workshop/workshop.pdf
 
 ********************************************************************************
 
