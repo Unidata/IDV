@@ -1,7 +1,7 @@
 /*
  * $Id: NamedThing.java,v 1.2 2007/06/28 14:42:03 jeffmc Exp $
  *
- * Copyright  1997-2024 Unidata Program Center/University Corporation for
+ * Copyright  1997-2025 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *

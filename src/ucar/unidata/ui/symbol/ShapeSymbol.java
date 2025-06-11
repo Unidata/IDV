@@ -1,7 +1,7 @@
 /*
  * $Id: ShapeSymbol.java,v 1.25 2007/05/22 20:00:23 jeffmc Exp $
  *
- * Copyright  1997-2024 Unidata Program Center/University Corporation for
+ * Copyright  1997-2025 Unidata Program Center/University Corporation for
  * Atmospheric Research, P.O. Box 3000, Boulder, CO 80307,
  * support@unidata.ucar.edu.
  *
