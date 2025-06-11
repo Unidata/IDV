@@ -75,4 +75,4 @@ fi
 
 
 # Sun OS users: To run in 64 bit mode, add -d64 before -Xmx.  
-${java}  XDOCK_INSTALL4J_VAR -Xmx${idv_memory}m UISCALE_INSTALL4J_VAR -XX:+DisableExplicitGC -Dvisad.java3d.imageByRef=true -Dvisad.java3d.geometryByRef=true -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
+${java}  XDOCK_INSTALL4J_VAR -Xmx${idv_memory}m UISCALE_INSTALL4J_VAR -XX:+DisableExplicitGC --add-exports java.desktop/sun.awt=ALL-UNNAME --add-exports java.desktop/sun.swing=ALL-UNNAMED -Dvisad.java3d.imageByRef=true -Dvisad.java3d.geometryByRef=true -Didv.enableStereo=false -jar ${dirname}/idv.jar $*
