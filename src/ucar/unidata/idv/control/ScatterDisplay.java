@@ -21,14 +21,15 @@
 package ucar.unidata.idv.control;
 
 
-import edu.wisc.ssec.mcidasv.data.hydra.StatsTable;
+
 
 import edu.wisc.ssec.mcidasv.data.hydra.CurveDrawer;
 import edu.wisc.ssec.mcidasv.data.hydra.HistogramField;
 import edu.wisc.ssec.mcidasv.data.hydra.HydraRGBDisplayable;
-import edu.wisc.ssec.mcidasv.data.hydra.LongitudeLatitudeCoordinateSystem;
 import edu.wisc.ssec.mcidasv.data.hydra.MultiSpectralData;
 import edu.wisc.ssec.mcidasv.data.hydra.SubsetRubberBandBox;
+import edu.wisc.ssec.mcidasv.data.hydra.LongitudeLatitudeCoordinateSystem;
+import edu.wisc.ssec.mcidasv.data.hydra.StatsTable;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -217,7 +218,8 @@ public class ScatterDisplay extends DisplayControlImpl {
     /** _more_ */
     JComponent ctwCompY;
 
-    /** _more_ */
+    ColorTableWidget ctw;
+
     int n_selectors = 3;
 
     /** _more_ */
@@ -283,17 +285,6 @@ public class ScatterDisplay extends DisplayControlImpl {
     /** _more_ */
     boolean selectByCurve = false;
 
-
-    JMenu viewMenu = null;
-
-    Component[] threeComps = null;
-
-    ImageControl dCntrlX = null;
-
-    ImageControl dCntrlY = null;
-    /**
-     * Construct a ScatterDisplay 
-     */
     public ScatterDisplay() {
         super();
         setHelpUrl("idv.controls.misc.scatteranalysiscontrol");
@@ -363,9 +354,7 @@ public class ScatterDisplay extends DisplayControlImpl {
 
         try {
             int binSize = ((lens[0] * lens[1] / (256 * 256)) * 4) / 10;
-            if (binSize < 2) {
-                binSize = 2;
-            }
+          if (binSize < 2) binSize = 2;
             histoField = new HistogramField(X_field, Y_field, mask_field,
                                             256, binSize);
         } catch (Exception e) {
@@ -377,19 +366,18 @@ public class ScatterDisplay extends DisplayControlImpl {
         ColorTable clrTableX = getColorTable(X_field);
         ColorTable clrTableY = getColorTable(Y_field);
 
-        dspMasterX = makeImageDisplay(getDataProjection(X_field), X_field,
-                                      mask_field, rangeX, clrTableX);
+        dspMasterX = makeImageDisplay(getDataProjection(X_field), X_field, mask_field,
+                         rangeX, clrTableX);
 
-        dspMasterY = makeImageDisplay(getDataProjection(Y_field), Y_field,
-                                      mask_field, rangeY, clrTableY);
+        dspMasterY = makeImageDisplay(getDataProjection(Y_field), Y_field, mask_field,
+                         rangeY, clrTableY);
 
         dspMasterX.addDisplayListener(
             e -> {
                 double[] xProjection = dspMasterX.getProjectionMatrix();
                 double[] yProjection = dspMasterY.getProjectionMatrix();
-                if (xProjection.equals(yProjection)) {
+            if (xProjection.equals(yProjection))
                     return;
-                }
 
                 try {
                     dspMasterY.setProjectionMatrix(xProjection);
@@ -402,9 +390,8 @@ public class ScatterDisplay extends DisplayControlImpl {
             e -> {
                 double[] xProjection = dspMasterX.getProjectionMatrix();
                 double[] yProjection = dspMasterY.getProjectionMatrix();
-                if (yProjection.equals(xProjection)) {
+            if (yProjection.equals(xProjection))
                     return;
-                }
 
                 try {
                     dspMasterX.setProjectionMatrix(yProjection);
@@ -420,9 +407,7 @@ public class ScatterDisplay extends DisplayControlImpl {
             ((((FunctionType) Y_field.getType()).getFlatRange()
             .getRealComponents())[0]).getName();
 
-        if (statsTable != null) {
-            statsTable.setNames(X_name, Y_name);
-        }
+        if (statsTable != null) statsTable.setNames(X_name, Y_name);
 
         Grid2DReadoutProbe probeX = new Grid2DReadoutProbe(X_field,
                                         dspMasterX);
@@ -431,22 +416,15 @@ public class ScatterDisplay extends DisplayControlImpl {
         probeX.doMakeProbe(Color.red, dspMasterX);
         probeY.doMakeProbe(Color.red, dspMasterY);
 
-        dCntrlX =
-            new ImageControl(
-                (HydraRGBDisplayable) dspMasterX.getDisplayables(0),
-                getDisplayConventions());
-        ColorTableWidget ctw1 = new ColorTableWidget(dCntrlX, ColorTableManager.getManager(),
-                                   clrTableX, rangeX);
-        ctwCompX   = ctw1.getLegendPanel(BOTTOM_LEGEND);
-        dCntrlX.ctw = ctw1;
+        ImageControl dCntrl = new ImageControl((HydraRGBDisplayable)dspMasterX.getDisplayables(0), getDisplayConventions());
+        ctw = new ColorTableWidget(dCntrl, ColorTableManager.getManager(), clrTableX, rangeX);
+        ctwCompX = ctw.getLegendPanel(BOTTOM_LEGEND);
+        dCntrl.ctw = ctw;
 
-        dCntrlY = new ImageControl(
-            (HydraRGBDisplayable) dspMasterY.getDisplayables(0),
-            getDisplayConventions());
-        ctw1 = new ColorTableWidget(dCntrlY, ColorTableManager.getManager(),
-                                   clrTableY, rangeY);
-        ctwCompY   = ctw1.getLegendPanel(BOTTOM_LEGEND);
-        dCntrlY.ctw = ctw1;
+        dCntrl = new ImageControl((HydraRGBDisplayable)dspMasterY.getDisplayables(0), getDisplayConventions());
+        ctw = new ColorTableWidget(dCntrl, ColorTableManager.getManager(), clrTableY, rangeY);
+        ctwCompY = ctw.getLegendPanel(BOTTOM_LEGEND);
+        dCntrl.ctw = ctw;
 
         return true;
 
@@ -461,21 +439,14 @@ public class ScatterDisplay extends DisplayControlImpl {
     public void setup() throws VisADException, RemoteException {
         dataSelectionX = getDataSelection();
         dataChoiceX    = getDataChoice();
-        Hashtable tt = getRequestProperties();
-        if(tt == null){
-            tt = new Hashtable();
-        }
-        tt.put("id", dataChoiceX.getId());
-        X_data         = dataChoiceX.getData(dataSelectionX, tt);
+        X_data = dataChoiceX.getData(dataSelectionX);
 
         if (X_data instanceof FlatField) {
             X_field = (FlatField) X_data;
         } else if (X_data instanceof FieldImpl) {
-            int idx = ((FieldImpl) X_data).getLength() - 1;
-            X_field = (FlatField) ((FieldImpl) X_data).getSample(idx);
+          X_field = (FlatField) ((FieldImpl)X_data).getSample(0);
         }
-//if(X_field instanceof MyAreaImageFlatField)
-  //  X_field = ((AreaImageFlatField)X_field);
+
         popupDataDialog("select Y Axis field", container, false, null);
 
         // if user canceled the popup, popupDataDialog will set the cancel flag
@@ -485,27 +456,22 @@ public class ScatterDisplay extends DisplayControlImpl {
 
         dataSelectionY = getDataSelection();
         dataChoiceY    = getDataChoice();
-        Hashtable tt1 = getRequestProperties();
-        if(tt1 == null){
-            tt1 = new Hashtable();
-        }
-        tt1.put("id", dataChoiceY.getId());
+
         dataSelectionY.setGeoSelection(dataSelectionX.getGeoSelection());
 
-        Y_data = dataChoiceY.getData(dataSelectionY, tt1);
+        Y_data = dataChoiceY.getData(dataSelectionY);
 
         if (Y_data instanceof FlatField) {
             Y_field = (FlatField) Y_data;
         } else if (Y_data instanceof FieldImpl) {
-            int idy = ((FieldImpl) Y_data).getLength() - 1;
-            Y_field = (FlatField) ((FieldImpl) Y_data).getSample(idy);
+          Y_field = (FlatField) ((FieldImpl)Y_data).getSample(0);
         }
 
         if ( !(X_field.getDomainSet().equals(Y_field.getDomainSet()))) {
             Y_field = resample(X_field, Y_field);
         }
 
-        Area_field = createAreaField(X_field);
+        Area_field = JPythonMethods.createAreaField(X_field);
         statsTable = new StatsTable();
     }
 
@@ -557,21 +523,6 @@ public class ScatterDisplay extends DisplayControlImpl {
         } catch (Exception ex) {
             logException("could not change color palette", ex);
         }
-        container.getComponent(0).setVisible(true);
-        GuiUtils.toggleHeavyWeightComponents(container.getComponent(0), true);
-        GuiUtils.showComponentInTabs(container);
-
-
-        dCntrlX.removePropertyChangeListener(this);
-
-        dCntrlY.removePropertyChangeListener(this);
-        scatterMaster.removePropertyChangeListener(this);
-        try{
-            dCntrlX.doRemove();
-            dCntrlY.doRemove();
-            scatterMaster.setDisplayInactive() ;
-        } catch (Exception ee){}
-
     }
 
     @Override
@@ -586,8 +537,18 @@ public class ScatterDisplay extends DisplayControlImpl {
             cancel = true;
             return;
         }
+        List<DataChoice> tempList = new ArrayList<>(1);
+        // TODO(jon): why is choices.get(0) now an arraylist!?
+        DataChoice firstChoice;
+        if (choices.get(0) instanceof List) {
+            List tmp = (List)choices.get(0);
+            firstChoice = (DataChoice)tmp.get(0);
+        } else {
+            firstChoice = (DataChoice)choices.get(0);
+        }
+        tempList.add(firstChoice);
         final List clonedList =
-            DataChoice.cloneDataChoices((List) choices.get(0));
+            DataChoice.cloneDataChoices(tempList);
         dataSelection = ((DataChoice) clonedList.get(0)).getDataSelection();
         //- don't do this in a separate thread like the IDV does.
         //- We want the dataChoice list updated before return.
@@ -603,23 +564,12 @@ public class ScatterDisplay extends DisplayControlImpl {
     public void initDone() {
 
         try {
-            scatterMaster = makeScatterDisplay();
-            scatterMaster.draw();
+         DisplayMaster master = makeScatterDisplay();
             for (int k = 0; k < n_selectors; k++) {
-                scatterBoxSelectors.add(new ScatterBoxSelector(scatterMaster,
-                        selectorColors[k],
-                        (float) k));
-                scatterCurveSelectors.add(new ScatterCurveSelector(scatterMaster,
-                        selectorColors[k],
-                        (float) k));
+           scatterBoxSelectors.add(new ScatterBoxSelector(master, selectorColors[k], (float)k));
+           scatterCurveSelectors.add(new ScatterCurveSelector(master, selectorColors[k], (float)k));
             }
-
-            threeComps[0] = dspMasterX.getComponent();
-            threeComps[1] = dspMasterY.getComponent();
-            threeComps[2] = scatterMaster.getComponent();
-            dspMasterX.draw();
-            dspMasterY.draw();
-            container.repaint();
+         master.draw();
 
             for (int k = 0; k < n_selectors; k++) {
                 SubsetRubberBandBox X_subsetBox =
@@ -715,9 +665,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                                     if (
                                      !selectorToggleButtons[i].isSelected()) {
 
-                                        if (statsTable != null) {
-                                            statsTable.resetValues(i);
-                                        }
+                      if (statsTable != null) statsTable.resetValues(i);
 
                                         boxSel.reset();
                                         boxSel.setActive(false);
@@ -759,9 +707,9 @@ public class ScatterDisplay extends DisplayControlImpl {
                                     imageXcurve.setVisible(
                                         getSelectByCurve());
                                     imageYcurve.setActive(getSelectByCurve());
-                                    imageYcurve.setVisible(
-                                        getSelectByCurve());
-                                } else {
+                                    imageYcurve.setVisible(getSelectByCurve());
+                                  }
+                                  else {
                                     selectorToggleButtons[i].setSelected(
                                         false);
                                     boxSel.setActive(false);
@@ -906,24 +854,24 @@ public class ScatterDisplay extends DisplayControlImpl {
     public Container doMakeContents() {
         JPanel      pane  = new JPanel(new GridLayout(1, 3));
 
-        threeComps = new Component[] { null, null, null };
-        threeComps[0] = dspMasterX.getComponent();
-        threeComps[1] = dspMasterY.getComponent();
-        threeComps[2] = getScatterTabComponent();
+        Component[] comps = new Component[] {null, null, null};
+        comps[0] = dspMasterX.getComponent();
+        comps[1] = dspMasterY.getComponent();
+        comps[2] = getScatterTabComponent();
 
         JPanel panelX = new JPanel(new BorderLayout());
         panelX.setBorder(new EmptyBorder(4, 4, 4, 4));
-        panelX.add(threeComps[0], BorderLayout.CENTER);
+        panelX.add(comps[0], BorderLayout.CENTER);
         panelX.add(ctwCompX, BorderLayout.SOUTH);
 
         JPanel panelY = new JPanel(new BorderLayout());
         panelY.setBorder(new EmptyBorder(4, 4, 4, 4));
-        panelY.add(threeComps[1], BorderLayout.CENTER);
+        panelY.add(comps[1], BorderLayout.CENTER);
         panelY.add(ctwCompY, BorderLayout.SOUTH);
 
         JPanel panelS = new JPanel(new BorderLayout());
         panelS.setBorder(new EmptyBorder(4, 4, 4, 4));
-        panelS.add(threeComps[2], BorderLayout.CENTER);
+        panelS.add(comps[2], BorderLayout.CENTER);
 
         pane.add(panelX);
         pane.add(panelY);
@@ -963,7 +911,7 @@ public class ScatterDisplay extends DisplayControlImpl {
 
         buttonPanel.add(toggleButtonPanel);
 
-        JButton computeStatsButton = new JButton("compute statistics");
+        JButton computeStatsButton = new JButton("Compute Statistics");
 
         computeStatsButton.addActionListener(
             e -> {
@@ -972,7 +920,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                 }
 
                 statsTable.setIsShowing();
-                statsTable.setFields(noUnit(X_field), noUnit(Y_field), 0);
+                statsTable.setFields(X_field, Y_field,0);
             });
 
         JButton reset = new JButton("Reset Selections");
@@ -986,8 +934,9 @@ public class ScatterDisplay extends DisplayControlImpl {
 
         //-container = pane;
         JPanel new_pane = new JPanel(new BorderLayout());
-        container = GuiUtils.centerBottom(pane,
-                buttonPanel);
+        new_pane.add(pane, BorderLayout.CENTER);
+        new_pane.add(buttonPanel, BorderLayout.SOUTH);
+        container = new_pane;
         return container;
     }
 
@@ -1441,15 +1390,11 @@ public class ScatterDisplay extends DisplayControlImpl {
             float[] hi = domSet.getHi();
             if (hi[0] <= 180f) {
                 for (int t = 0; t < Xsamples[0].length; t++) {
-                    if (Xsamples[0][t] > 180f) {
-                        Xsamples[0][t] -= 360;
-                    }
+                   if (Xsamples[0][t] > 180f) Xsamples[0][t] -=360;
                 }
             }
-
-            indexes =
-                ((SampledSet) Y_field.getDomainSet()).valueToIndex(Xsamples);
-        } else if ((X_domainRef == null) && (Y_domainRef == null)) {
+                indexes = ((SampledSet)Y_field.getDomainSet()).valueToIndex(Xsamples);
+        } else if (X_domainRef == null && Y_domainRef == null) {
             Gridded2DSet domSet = (Gridded2DSet) Y_field.getDomainSet();
             indexes = domSet.valueToIndex(Xsamples);
         }
@@ -1658,15 +1603,9 @@ public class ScatterDisplay extends DisplayControlImpl {
             this.maskVal   = maskVal;
             this.myTable   = mst;
             myTableIndex   = 0;
-            if (color == Color.magenta) {
-                myTableIndex = 1;
-            }
-            if (color == Color.green) {
-                myTableIndex = 2;
-            }
-            if (color == Color.blue) {
-                myTableIndex = 3;
-            }
+           if (color == Color.magenta) myTableIndex = 1;
+           if (color == Color.green) myTableIndex = 2;
+           if (color == Color.blue) myTableIndex = 3;
             dspMaster = master;
             dspMaster.addDisplayListener(this);
             domainSet = (Gridded2DSet) image.getDomainSet();
@@ -1682,9 +1621,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                 reference = ((SetType) domainSet.getType()).getDomain();
             }
             RealType[] rtypes = reference.getRealComponents();
-            if (rtypes[0].equals(RealType.Latitude)) {
-                imageLatLon = true;
-            }
+        if (rtypes[0].equals(RealType.Latitude)) imageLatLon = true;
             lastCurve = new LineDrawing("lastCurve");
             lastCurve.setColor(color);
             lastCurve.setLineWidth(2);
@@ -1697,9 +1634,7 @@ public class ScatterDisplay extends DisplayControlImpl {
 
             if ((de.getId() == DisplayEvent.MOUSE_RELEASED) && (active)) {
                 UnionSet uSet = curveDraw.getCurves();
-                if (uSet == last_uSet) {
-                    return;
-                }
+           if (uSet == last_uSet) return;
                 SampledSet[] sets  = uSet.getSets();
                 int          s_idx = sets.length - 1;
                 float[][]    crv;
@@ -1721,9 +1656,8 @@ public class ScatterDisplay extends DisplayControlImpl {
                 float[][] onImage = new float[2][crv[0].length];
                 int       cnt     = 0;
                 for (int i = 0; i < crv[0].length; i++) {
-                    if (((crv[0][i] >= 0) && (crv[0][i] <= domainLen_0))
-                            && ((crv[1][i] >= 0)
-                                && (crv[1][i] <= domainLen_1))) {
+             if ( ((crv[0][i] >= 0)&&(crv[0][i] <= domainLen_0)) &&
+                  ((crv[1][i] >= 0)&&(crv[1][i] <= domainLen_1)) ) {
                         onImage[0][cnt] = crv[0][i];
                         onImage[1][cnt] = crv[1][i];
                         cnt++;
@@ -1821,15 +1755,7 @@ public class ScatterDisplay extends DisplayControlImpl {
                     System.arraycopy(tmpsel, 0, selected, 0, len);
                     total_area = JPythonMethods.computeSum(Area_field,
                             selected);
-                    myTable.setPoints(markScatter, len, myTableIndex,
-                                      total_area);
-                } else if(statsTable != null){
-                    int[] selected = new int[len];
-                    System.arraycopy(tmpsel, 0, selected, 0, len);
-                    total_area = JPythonMethods.computeSum(Area_field,
-                            selected);
-                    statsTable.setPoints(markScatter, len, myTableIndex,
-                            total_area);
+             myTable.setPoints(markScatter, len, myTableIndex, total_area);
                 }
 
             }
@@ -2023,15 +1949,9 @@ public class ScatterDisplay extends DisplayControlImpl {
             super();
             this.myTable = mst;
             myTableIndex = 0;
-            if (color == Color.magenta) {
-                myTableIndex = 1;
-            }
-            if (color == Color.green) {
-                myTableIndex = 2;
-            }
-            if (color == Color.blue) {
-                myTableIndex = 3;
-            }
+            if (color == Color.magenta) myTableIndex = 1;
+            if (color == Color.green) myTableIndex = 2;
+            if (color == Color.blue) myTableIndex = 3;
             this.subsetBox   = subsetBox;
             this.imageDomain = imageDomain;
             int[] lens = ((Gridded2DSet) imageDomain).getLengths();
@@ -2136,9 +2056,6 @@ public class ScatterDisplay extends DisplayControlImpl {
             if (myTable != null) {
                 total_area = JPythonMethods.computeSum(Area_field, selected);
                 myTable.setPoints(markScatter, len, myTableIndex, total_area);
-            } else if (statsTable != null){
-                total_area = JPythonMethods.computeSum(Area_field, selected);
-                statsTable.setPoints(markScatter, len, myTableIndex, total_area);
             }
 
             updateBox();
@@ -2658,11 +2575,6 @@ public class ScatterDisplay extends DisplayControlImpl {
                 "firstInitializeViewMenu");
 
         viewMenu.setMnemonic(GuiUtils.charToKeyCode("V"));
-
-        if (this.viewMenu == null) {
-            this.viewMenu = viewMenu;
-        }
-
         return viewMenu;
     }
 
