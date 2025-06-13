@@ -58,6 +58,21 @@ import java.util.zip.ZipOutputStream;
  */
 public class IOUtil {
 
+    /** Maximum number of HTTP redirects to follow. */
+    public static final int MAX_REDIRECTS = 5;
+
+    /**
+     * Elements within this array are considered {@literal "valid redirect"}
+     * status codes.
+     */
+    public static final int[] HTTP_REDIRECT_STATUSES =
+        { 301, 302, 303, 307, 308 };
+
+    /** HTTP connection timeout (milliseconds). */
+    public static final int HTTP_TIMEOUT = 30000;
+
+    //private static final Logger logger = LoggerFactory.getLogger(IOUtil.class);
+
     /** Holds the filename/urls that we have checked if they are html */
     private static Hashtable isHtmlCache = new Hashtable();
 
@@ -593,6 +608,101 @@ public class IOUtil {
         URLConnection connection = url.openConnection();
         InputStream   is         = connection.getInputStream();
         return readContents(is);
+    }
+
+    /**
+     * Attempt to create a {@link URLConnection} to the given {@code url}.
+     *
+     * <p>This method <i>will</i> follow redirects, and will use
+     * {@link #HTTP_TIMEOUT}, {@link #MAX_REDIRECTS}, and
+     * {@link #HTTP_REDIRECT_STATUSES} as default values to pass to
+     * {@link #getUrlConnection(String, boolean, boolean, int, int, int[])}.
+     * </p>
+     *
+     * @param url Request URL.
+     *
+     * @return Connection to {@code url}.
+     *
+     * @throws IOException if there were any I/O errors while trying to
+     *                     connect.
+     *
+     * @see #HTTP_TIMEOUT
+     * @see #MAX_REDIRECTS
+     * @see #HTTP_REDIRECT_STATUSES
+     */
+    public static URLConnection getUrlConnection(String url)
+        throws IOException
+    {
+        return getUrlConnection(url,
+            true,
+            true,
+            HTTP_TIMEOUT,
+            MAX_REDIRECTS,
+            HTTP_REDIRECT_STATUSES);
+    }
+
+    /**
+     * Attempt to create a {@link URLConnection} to the given {@code url}.
+     *
+     * <p>If {@code followRedirects} is {@code true}, the maximum number of
+     * redirects is controlled via {@link #MAX_REDIRECTS}.
+     * If {@code followRedirects} is {@code false}, the method, predictably,
+     * will not follow any redirects.</p>
+     *
+     * @param url Request URL.
+     * @param allowUserInteraction Passed to {@link URLConnection#setAllowUserInteraction(boolean)}.
+     * @param followRedirects Whether or not HTTP redirect codes should be
+     *                        followed.
+     * @param timeout HTTP connection timeout (milliseconds).
+     * @param maxRedirects Maximum number of redirects to follow.
+     * @param redirectStatuses Status codes that are considered HTTP
+     *                         redirects.
+     *
+     * @return Connection to {@code url}.
+     *
+     * @throws IOException if there were any I/O errors while trying to
+     *                     connect.
+     */
+    public static URLConnection getUrlConnection(String url,
+                                                 boolean allowUserInteraction,
+                                                 boolean followRedirects,
+                                                 int timeout,
+                                                 int maxRedirects,
+                                                 int[] redirectStatuses)
+        throws IOException
+    {
+       // logger.trace("trying to read from '{}'", url);
+        URL from = new URL(url);
+        URLConnection connection = from.openConnection();
+        connection.setAllowUserInteraction(allowUserInteraction);
+        connection.setConnectTimeout(timeout);
+        if (connection instanceof HttpURLConnection) {
+            HttpURLConnection huc = (HttpURLConnection)connection;
+            int redirects = 0;
+            while (followRedirects && (redirects++ < maxRedirects)) {
+                int status = huc.getResponseCode();
+                // previously used ((status >= 300) && (status <= 399))
+                if (Arrays.binarySearch(redirectStatuses, status) >= 0) {
+                    String newUrl = huc.getHeaderField("Location");
+                    if ((newUrl != null) && !newUrl.isEmpty()) {
+                        boolean oldAllowUserInteraction =
+                            connection.getAllowUserInteraction();
+                        from = new URL(newUrl);
+                        connection = from.openConnection();
+                        connection.setAllowUserInteraction(oldAllowUserInteraction);
+                        connection.setConnectTimeout(timeout);
+                        huc = (HttpURLConnection)connection;
+                        continue;
+                    }
+                    // not much to be done if the server didn't provide a
+                    // location header. See the end of the following:
+                    // https://www.eff.org/https-everywhere/faq#why-use-a-whitelist-of-sites-that-support-https-why-cant-you-try-to-use-https-for-every-last-site-and-only-fall-back-to-http-if-it-isnt-available
+                }
+                // either we had a problem or we've arrived at the destination
+                break;
+            }
+        }
+        return connection;
     }
 
 
@@ -1289,9 +1399,9 @@ public class IOUtil {
                         }
                         //call this method recursively with the new URL
                         return getInputStream(newUrl, origin, tries+1);
-                        /* 
+                        /*
                            connection = new URL(newUrl).openConnection();
-                           connection.setReadTimeout(30000); 
+                           connection.setReadTimeout(30000);
                            connection.setAllowUserInteraction(true);
                            huc = (HttpURLConnection) connection;
                         */
