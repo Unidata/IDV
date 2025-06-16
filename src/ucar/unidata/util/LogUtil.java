@@ -663,6 +663,7 @@ public class LogUtil {
 
                 }
             });
+            /*
             JButton jsBtn = new JButton("run GEMINI");
             jsBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
@@ -674,6 +675,7 @@ public class LogUtil {
                     runGemini(filename);
                 }
             });
+             */
 
             JScrollPane sp =
                 new JScrollPane(
@@ -686,7 +688,8 @@ public class LogUtil {
                                   sp,
                                   LayoutUtil.wrap(
                                       LayoutUtil.hflow(
-                                          Misc.newList(clearBtn, writeBtn, jsBtn))));
+                                              Misc.newList(clearBtn, writeBtn))));
+                                       //   Misc.newList(clearBtn, writeBtn, jsBtn))));
             consoleWindow = GuiUtils.makeWindow("Console", contents, 10, 10);
         }
         consoleWindow.setVisible(true);
