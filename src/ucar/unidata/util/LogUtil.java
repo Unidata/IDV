@@ -695,28 +695,13 @@ public class LogUtil {
     public static void runGemini(String imagePath) {
         String apiKey = "key"; // Replace with your actual API key
         String baseUrl = "https://generative-ai.googleapis.com/v1beta/models/"; // Replace with the Gemini API base URL
-        String modelName = "gemini-2.0-flash-exp"; // Make sure this model supports image input
+        String modelName = "gemini-pro-vision"; //""gemini-2.0-flash-exp"; // Make sure this model supports image input
         //String imagePath = "path/to/your/image.jpg"; // Replace with the actual path to your image file
-        baseUrl = baseUrl + modelName + "/";
+        String apiEndpoint = baseUrl + modelName + "/generateContent";
 
-        GeminiClient client = new GeminiClient(apiKey, baseUrl);
+        GeminiService service = new GeminiService(apiKey, apiEndpoint);
 
         try {
-            client.getModels()
-                    .thenAccept(models -> System.out.println("Models: " + models.models()))
-                    .join();
-
-            GeminiRecords.GeminiRequest request = new GeminiRecords.GeminiRequest(List.of(
-                    new GeminiRecords.Content(List.of(new GeminiRecords.TextPart("What is the capital of France?")))
-            ));
-            client.countTokens("gemini-pro", request)
-                    .thenAccept(response -> System.out.println("Token count: " + response.totalTokens()))
-                    .join();
-
-            // Example: Generate content
-            client.getCompletion("gemini-pro", request)
-                    .thenAccept(response -> System.out.println("Generated content: " + response.candidates()))
-                    .join();
             // Read image and encode to Base64
             Path filePath = Paths.get(imagePath, "test.jpg");
             if (!Files.exists(filePath)) {
@@ -727,7 +712,16 @@ public class LogUtil {
             String base64Image = Base64.getEncoder().encodeToString(imageData);
 
             // Create GeminiRequestWithImage object
+            GeminiService.GeminiRequestWithImage request = new GeminiService.GeminiRequestWithImage();
+            request.setTextPrompt("Describe the content of this image");
+            //request.setImage(base64Image);
 
+            // Make API call
+            GeminiService.GeminiResponse response = service.getCompletionWithImage(request, modelName);
+
+            // Print the result
+            System.out.println("Generated Content: " + response.getContent());
+            consoleMessage("Generated Content: " + response.getContent());
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
         }
