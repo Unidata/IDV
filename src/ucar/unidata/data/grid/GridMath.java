@@ -2265,6 +2265,9 @@ public class GridMath {
                             result = Math.max(result, value);
                         } else if (doMin) {
                             result = Math.min(result, value);
+                        } else if (doAve) {
+                            result = result + value;
+                            numCount++;
                         } else {
                             if(value >= resultp0 && value <=resultp1 ) {
                                 result += value;
