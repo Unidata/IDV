@@ -2012,6 +2012,7 @@ public class GridMath {
      *
      * @throws VisADException  On badness
      */
+
     public static FieldImpl applyFunctionOverGrid2D(FieldImpl grid, String function, String statThreshold)
             throws VisADException {
 
@@ -2057,6 +2058,15 @@ public class GridMath {
                     "RemoteException in applyFunctionOverLevels");
         }
 
+    }
+
+    public static FieldImpl applyFunctionOverGrid2D(FieldImpl grid)
+            throws VisADException {
+        FieldImpl aveFI = applyFunctionOverGrid2D(grid, "average", "0");
+        FieldImpl maxFI = applyFunctionOverGrid2D(grid, "max", "0");
+        FieldImpl percentileFI = applyFunctionOverGrid2D(grid, "percentile", "95");
+
+        return aveFI;
     }
 
     /**
@@ -2950,13 +2960,14 @@ public class GridMath {
         if (length == 1) {
             return values[begin];  // always return single value for n = 1
         }
-        double  n      = length;
+        float [] valuesN = removeNaNFromArray(values);
+        double  n      = valuesN.length;
         double  pos    = p * (n + 1) / 100;
         double  fpos   = Math.floor(pos);
         int     intPos = (int) fpos;
         float   dif    = (float) (pos - fpos);
-        float[] sorted = new float[length];
-        System.arraycopy(values, begin, sorted, 0, length);
+        float[] sorted = new float[valuesN.length];
+        System.arraycopy(valuesN, begin, sorted, 0, valuesN.length);
         QuickSort.sort(sorted);
 
         if (pos < 1) {
@@ -2968,6 +2979,23 @@ public class GridMath {
         float lower = sorted[intPos - 1];
         float upper = sorted[intPos];
         return lower + dif * (upper - lower);
+    }
+
+    public static float[] removeNaNFromArray(float[] inputArray) {
+        List<Float> nonNaNList = new ArrayList<>();
+
+        for (float value : inputArray) {
+            if (!Float.isNaN(value)) { // Check if the value is NOT NaN
+                nonNaNList.add(value);
+            }
+        }
+
+        // Convert the List back to a double array
+        float[] resultArray = new float[nonNaNList.size()];
+        for (int i = 0; i < nonNaNList.size(); i++) {
+            resultArray[i] = nonNaNList.get(i);
+        }
+        return resultArray;
     }
 
     public static float evaluatePercentile(final float[][] values,
