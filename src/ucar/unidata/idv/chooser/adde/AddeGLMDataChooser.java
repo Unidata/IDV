@@ -153,9 +153,9 @@ public class AddeGLMDataChooser extends AddePointDataChooser {
      */
     protected TwoFacedObject[] getDefaultDatasets() {
         return new TwoFacedObject[] {
-            new TwoFacedObject("RTGOESR", "RTGOESR"),
-            new TwoFacedObject("RTGOESS", "RTGOESS"),
-            new TwoFacedObject("RTGOEST", "RTGOEST"),
+            //new TwoFacedObject("RTGOESR", "RTGOESR"),
+            //new TwoFacedObject("RTGOESS", "RTGOESS"),
+            //new TwoFacedObject("RTGOEST", "RTGOEST"),
             new TwoFacedObject("EAST", "EAST"),
             new TwoFacedObject("WEST", "WEST") };
     }
