@@ -600,7 +600,7 @@ public final class AddeUtil {
             }
             times = times + newHour0 + StringUtil.padZero(newMin0, 2) + "00" +
                     " " + newHour + StringUtil.padZero(newMin, 2) + "00";
-            System.out.println(times);
+            //System.out.println(times);
             LogUtil.consoleMessage(times);
             timesList.add(makeDateUrl(thisDate0, thisDate, times));
             utcCalendar.add(utcCalendar.MINUTE,  minInc + timeIndices[i] * minInc);
