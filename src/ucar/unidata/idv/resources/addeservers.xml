@@ -66,13 +66,13 @@ they essentially get it from their container type tag.
        names="RTWXTEXT"
        type="wxtext"/>
   </server>
-  <server name="lead.unidata.ucar.edu">
+  <!--server name="lead.unidata.ucar.edu">
     <group
         names="BLIZZARD,DDSTALL,EAST,EASTALL,GEOCALL,GLOBAL,GLOBALL,GOESRALL,GOESSALL,GOESTALL,IMAGEALL,L2GEALL,
         L2GEAST,L2GOESR,L2GOESS,L2GWALL,L2GWEST,NEXRCALL,NEXRCOMP,NPGEALL,NPGEAST,NPGOESR,NPGOESS,NPGRALL,
         NPGSALL,NPGWALL,NPGWEST,RTDDST,RTGEOC,RTGOESR,RTGOESS,RTGOEST,RTIMAGES,RTSNCL,SNCLALL,TOPO,WEST,WESTALL"
         type="image"/>
-  </server>
+  </server-->
 <!--
   <server name="weather2.admin.niu.edu">
     <group
