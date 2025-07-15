@@ -40,7 +40,7 @@ public class SystemMemoryManager {
      * themselves in the foot by manually adjusting higher via the
      * edit preferences menu.
      */
-    public static final long MAXIMUM_MEMORY = 1024 * 3;
+    public static final long MAXIMUM_MEMORY = 1024 * 5;
 
     /** Max heap for a 32 bit OS. */
     private static final long OS_32_MAX = 1536;
