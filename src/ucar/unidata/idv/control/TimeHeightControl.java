@@ -375,7 +375,11 @@ public class TimeHeightControl extends LineProbeControl {
                                        List preSelectedDataChoices) {
 
         super.initAfterUnPersistence(vc, properties, preSelectedDataChoices);
-
+        if(getAltUnit() != null && altUnit.isConvertible(CommonUnits.HECTOPASCAL)) {
+            try {
+                setYAxisPressureLabels();
+            } catch (Exception ee){}
+        }
 
         List choices = getDataChoices();
         if(choices.size() > 1) {
@@ -411,7 +415,9 @@ public class TimeHeightControl extends LineProbeControl {
                     }
                 });
 
+
             } catch (Exception ee){}
+
         }
     }
 
@@ -482,7 +488,7 @@ public class TimeHeightControl extends LineProbeControl {
             zUnit = cs
                 .getReferenceUnits()[cs.getReference().getIndex(RealType.Altitude)];
         }
-        altUnit = zUnit;
+        //altUnit = zUnit;
         setYAxisLabels(latlonalt[NN]);
         int        numTimes      = timeVals[0].length;
         int        numAlts       = ss.getLength();
@@ -626,7 +632,13 @@ public class TimeHeightControl extends LineProbeControl {
         }
     }
 
+    public Unit getAltUnit(){
+            return altUnit;
+    }
 
+    public void setAltUnit(Unit altUnit){
+        this.altUnit = altUnit;
+    }
     /**
      * make widgets for check box for latest data time on left of x axis.
      *
@@ -1400,6 +1412,7 @@ public class TimeHeightControl extends LineProbeControl {
      */
     protected void reSetTimeHeightAltitudeUnit(Unit aUnit) throws VisADException {
         if(aUnit.isConvertible(CommonUnits.HECTOPASCAL)){
+            setAltUnit(aUnit);
             setYAxisPressureLabels();
         } else{
             setYAxisLabels(latlonalt[2]);
