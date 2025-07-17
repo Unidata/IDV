@@ -27,13 +27,8 @@ import ucar.unidata.data.DataChoice;
 import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
-import ucar.unidata.idv.ControlContext;
+import ucar.unidata.idv.*;
 
-
-import ucar.unidata.idv.DisplayConventions;
-import ucar.unidata.idv.TimeHeightViewManager;
-import ucar.unidata.idv.ViewDescriptor;
-import ucar.unidata.idv.ViewManager;
 
 import ucar.unidata.ui.LatLonWidget;
 
@@ -159,6 +154,8 @@ public class TimeHeightControl extends LineProbeControl {
     public static String[] DEFAULT_PRESSURE_LABELS = new String[] {
             "1000", "700", "500", "300", "200", "100"
     };
+    /** _more_ */
+    Range dataVerticalRange = null;
     /** ScalarMap of Pressure to Display.YAxis */
     private ScalarMap pressureMap = null;
 
@@ -244,8 +241,50 @@ public class TimeHeightControl extends LineProbeControl {
         RealTuple ss = getGridCenterPosition();
         setProbePosition(ss);
         setXAxisLabels((SampledSet) fieldImpl.getDomainSet());
+        dataVerticalRange = getVerticalRange((GriddedSet)GridUtil.getSpatialDomain(fieldImpl));
         timeHeightView.setShowDisplayList(false);
         return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @param domainSet _more_
+     *
+     * @return _more_
+     *
+     * @throws VisADException _more_
+     */
+    public Range getVerticalRange(GriddedSet domainSet)
+            throws VisADException {
+
+        float[][] elp    = GridUtil.getEarthLocationPoints(domainSet);
+        float[]   values = null;
+        if (elp.length == 2) {
+            values = elp[1];
+        } else if (elp.length == 3) {
+            values = elp[2];
+        }
+
+        float pMin   = values[0];
+        float pMax   = values[0];
+
+        int   length = values.length;
+        for (int i = 0; i < length; i++) {
+            float value = values[i];
+            //Note: we don't check for Float.isNaN (value) because if value is a
+            //NaN then each test below is false;
+            if (pMax < value) {
+                pMax = value;
+            }
+            if (pMin > value) {
+                pMin = value;
+            }
+        }
+        Range result = new Range(pMin, pMax);
+
+        return result;
+
     }
 
     /**
@@ -443,6 +482,7 @@ public class TimeHeightControl extends LineProbeControl {
             zUnit = cs
                 .getReferenceUnits()[cs.getReference().getIndex(RealType.Altitude)];
         }
+        altUnit = zUnit;
         setYAxisLabels(latlonalt[NN]);
         int        numTimes      = timeVals[0].length;
         int        numAlts       = ss.getLength();
@@ -782,6 +822,7 @@ public class TimeHeightControl extends LineProbeControl {
         //yScale.setMinorTickSpacing(averageTickSpacing * (1.0f/step));
         yScale.setLabelTable(labelTable);
         yScale.setMajorTicks(values);
+        yScale.setTitle("Height " + " (" + altUnit + ")");
         //xScale.setTitle("Time (" + dt.getFormatTimeZone().getDisplayName() + ")");
 
 
@@ -798,6 +839,47 @@ public class TimeHeightControl extends LineProbeControl {
         String[] DEFAULT_PRESSURE_LABELS = new String[] {
                 "1000",  "700", "500",  "250",   "100"
         };
+        Range vrange = dataVerticalRange;
+        if(vrange.max >= 80000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "100",   "10",   "1",   "0.1", "0.01"
+            };
+        else if(vrange.max >= 45000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "300", "100", "10",   "1"
+            };
+        else if(vrange.max >= 30000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "500", "200", "100",   "10"
+            };
+        else if(vrange.max >= 20000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "500", "200", "100",   "50"
+            };
+        else if(vrange.max >= 16000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "700", "500", "300", "200", "100"
+            };
+        else if(vrange.max >= 10000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "700", "500", "350", "250"
+            };
+        else if(vrange.max >= 5000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "850", "700", "600", "500"
+            };
+        else if(vrange.max >= 3000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "900", "850", "800", "750", "700"
+            };
+        else if(vrange.max >= 2000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "900", "850", "800", "750"
+            };
+        else if(vrange.max >= 1400)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "975", "950","925", "900", "850"
+            };
 
         /** pressure labels being used */
         String[] pressureLabels = DEFAULT_PRESSURE_LABELS;
@@ -812,6 +894,7 @@ public class TimeHeightControl extends LineProbeControl {
         }
         yScale.setMajorTicks(hkeys);
         yScale.setLabelTable(table);
+        yScale.setTitle("Height " + " (" + CommonUnits.HECTOPASCAL + ")");
         //double averageTickSpacing = (end-start)/(double)(numSteps);
 
         //xScale.setTitle("Time (" + dt.getFormatTimeZone().getDisplayName() + ")");
