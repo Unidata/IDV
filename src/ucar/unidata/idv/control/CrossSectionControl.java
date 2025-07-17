@@ -3254,6 +3254,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
             DEFAULT_PRESSURE_LABELS = new String[] {
                     "1000",  "500", "200", "100",   "50"
             };
+        else if(vrange.max >= 16000)
+            DEFAULT_PRESSURE_LABELS = new String[] {
+                    "1000",  "700", "500", "300", "200", "100"
+            };
         else if(vrange.max >= 5000)
             DEFAULT_PRESSURE_LABELS = new String[] {
                     "1000",  "850", "700", "600", "500"
