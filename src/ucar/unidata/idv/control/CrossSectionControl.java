@@ -3218,8 +3218,10 @@ public abstract class CrossSectionControl extends GridDisplayControl implements 
         yScale.setMajorTickSpacing(averageTickSpacing);
 
         //yScale.setMinorTickSpacing(averageTickSpacing * (1.0f/step));
+        RealType yAxisType = ((VerticalXSDisplay) crossSectionView.getXSDisplay()).getYAxisType();
         yScale.setLabelTable(labelTable);
         yScale.setMajorTicks(values);
+        yScale.setTitle(yAxisType.toString() + " (" + altUnit + ")");
         majorTicks = values;
         //xScale.setTitle("Time (" + dt.getFormatTimeZone().getDisplayName() + ")");
 
