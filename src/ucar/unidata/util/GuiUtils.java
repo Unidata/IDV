@@ -7065,38 +7065,22 @@ public class GuiUtils extends LayoutUtil {
     {
         try
         {
-            JOptionPane pane = new JOptionPane(frame.getContentPane(), JOptionPane.PLAIN_MESSAGE,
-                    JOptionPane.NO_OPTION, null,
-                    new Object[]
-                            {
-                            }, null);
+            JOptionPane optionPane = new JOptionPane(frame.getContentPane(), JOptionPane.PLAIN_MESSAGE,
+                    JOptionPane.DEFAULT_OPTION);
 
-            pane.setComponentOrientation(((parentComponent == null)
-                    ? getRootFrame() : parentComponent).getComponentOrientation());
+            // Create a JDialog and put the JOptionPane inside it.
+            JDialog dialog = optionPane.createDialog(parentComponent, frame.getTitle());
 
-            int style = JRootPane.PLAIN_DIALOG;
+            // 3. (Optional but Recommended) Hide the original frame to avoid confusion.
+            //    The user is interacting with the dialog now, not the original frame.
+            frame.setVisible(false);
 
-            Method method = pane.getClass().getDeclaredMethod("createDialog", Component.class, String.class, int.class);
-            method.setAccessible(true);
-            Object objDialog = method.invoke(pane, parentComponent, frame.getTitle(), style);
+            // 4. Show the dialog and wait.
+            //    Because the dialog is modal, this line will BLOCK until the user
+            //    clicks "OK" or closes the dialog window.
+            dialog.setVisible(true);
 
-            JDialog dialog = (JDialog) objDialog;
-            if (frame.getWidth() > dialog.getWidth() || frame.getHeight() > dialog.getHeight())
-            {
-                dialog.setSize(frame.getWidth(), frame.getHeight());
-                dialog.setLocationRelativeTo(parentComponent);
-            }
-
-            frame.addWindowListener(new java.awt.event.WindowAdapter()
-            {
-                @Override
-                public void windowClosed(java.awt.event.WindowEvent windowEvent)
-                {
-                    dialog.dispose();
-                }
-            });
-
-            dialog.show();
+            // 5. Clean up the dialog's resources after it's been closed.
             dialog.dispose();
         } catch (Exception ex) {
             ex.printStackTrace();
