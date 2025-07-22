@@ -395,7 +395,8 @@ public class TimeHeightControl extends LineProbeControl {
                 myTimeHeightControl.setPosition(position);
                 myTimeHeightControl.initDone();
                 addDisplayable(myTimeHeightControl.contourDisplay, timeHeightView);
-                myTimeHeightControl.setMySmoothType(mySmoothingType);
+                if(mySmoothingType != null)
+                    myTimeHeightControl.setMySmoothType(mySmoothingType);
                 myTimeHeightControl.setMyColorTable(myColorTable);
                 myTimeHeightControl.setMyContourInfo(myContourInfo);
 
