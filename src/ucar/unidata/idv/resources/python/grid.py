@@ -526,7 +526,7 @@ def medianFilter(grid, user_missingValue=None, window_lenx=10, window_leny=10):
   if user_missingValue == None or user_missingValue =="":
     return GridUtil.medianFilter(grid, window_lenx, window_leny)
   else:
-    grid0 = substituteWithMissing(grid, missingValue)
+    grid0 = substituteWithMissing(grid, user_missingValue)
     return GridUtil.medianFilter(grid0, window_lenx, window_leny)
 
 def classifier(grid, classifierStr, outFileName):
@@ -651,7 +651,7 @@ def gridStandardScaler(grid,user_mean=None,user_std=None):
 
 def gridMinMaxScaler(grid,user_min,user_max):
   """ Rescale the grid values individually to a common range [user_min, user_max] linearly using statistics and
-      it is also known as min-max normalization. It doesn’t reduce the effect of outliers, but it linearly scales
+      it is also known as min-max normalization. It does not reduce the effect of outliers, but it linearly scales
       them down into a fixed range, where the largest occurring data point corresponds to the maximum value
       and the smallest one corresponds to the minimum value.
   """
