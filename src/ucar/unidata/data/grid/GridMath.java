@@ -3844,6 +3844,11 @@ public class GridMath {
 
     }
 
+    public static FlatField powerTransformerFF(FlatField grid, String lambda)
+            throws VisADException {
+        return powerTransformerFF(grid, Double.parseDouble(lambda));
+    }
+
     public static FlatField powerTransformerFF(FlatField grid, double lambda)
             throws VisADException {
 

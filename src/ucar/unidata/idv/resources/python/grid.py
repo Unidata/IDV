@@ -529,11 +529,11 @@ def medianFilter(grid, user_missingValue=None, window_lenx=10, window_leny=10):
     grid0 = substituteWithMissing(grid, user_missingValue)
     return GridUtil.medianFilter(grid0, window_lenx, window_leny)
 
-def classifier(grid, classifierStr, outFileName):
+def classifier(grid, classifierStr, user_outFileName):
   """ classifierStr is a string of a set of classifier info with format:
         "low1 high1 value1; low2 high2 value2; low3 high3 value3;..."
   """
-  return GridUtil.classifier(grid, classifierStr, outFileName)
+  return GridUtil.classifier(grid, classifierStr, user_outFileName)
 
 def applyFunctionOverGrid2D(grid, function, statThreshold):
   """  apply spatial Max, Min, Average, Percentile over 2D grid:

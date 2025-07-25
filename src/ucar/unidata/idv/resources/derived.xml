@@ -1524,7 +1524,7 @@ to the derived tag. This causes the FieldSelector to make sure the user selects 
     <operands categories=""/>
   </derived>
   <!-- Adding ML preprocessing functions  -->
-  <derived description="ML Classifier " formula="classifier(grid, classifierStr, outFileName)" id="classifierStr: low1 high1 value1; low2 high2 value2; low3 high3 value3;..." isdefault="false" isenduser="true">
+  <derived description="ML Classifier " formula="classifier(grid, user_classifierStr, file[type=file,isuser=true,label=netCDF File,filepattern=\.nc:netCDF Files])" id="classifierStr: low1 high1 value1; low2 high2 value2; low3 high3 value3;..." isdefault="false" isenduser="true">
     <categories>
       <category display="true" value="ML Preprocessing"/>
     </categories>

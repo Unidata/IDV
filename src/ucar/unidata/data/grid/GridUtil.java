@@ -9478,6 +9478,8 @@ public class GridUtil {
         List<String> classifyList = StringUtil.split(classifierStr, ";");
         for(String classifyItem: classifyList){
             List<String> itemList = StringUtil.split(classifyItem, " ");
+            if(classifyItem.length() == 0 || itemList.size() < 3)
+                break;
             float low = Float.parseFloat(itemList.get(0));
             float high = Float.parseFloat(itemList.get(1));
             float classify = Float.parseFloat(itemList.get(2));
