@@ -546,7 +546,10 @@ public class DataUtil {
             cols = Misc.newList("Time");
             MathType type = field.getType();
             String name = ((FunctionType) type).getRange().toString();
-            cols.add("name");
+            if(name != null)
+                cols.add(name);
+            else
+                cols.add("name");
 
             rows.add(cols);
 
