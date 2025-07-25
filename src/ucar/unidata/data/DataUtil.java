@@ -37,6 +37,7 @@ import ucar.nc2.time.CalendarDate;
 
 import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.util.NamedAnything;
+import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.control.ProbeControl;
 import ucar.unidata.idv.control.ProbeRowInfo;
 import ucar.unidata.util.*;
@@ -518,8 +519,12 @@ public class DataUtil {
      */
     public static void exportCsvAllTimes(FieldImpl field, String filename) {
         try {
-            List rows = fieldToRows(field);
-            writeCsv(filename, rows);
+            if(field.getSample(0) instanceof FlatField){
+                GridUtil.writeGridToCsv(field, filename);
+            } else{
+                List rows = fieldToRows(field);
+                writeCsv(filename, rows);
+            }
         } catch (Exception exc) {
             LogUtil.logException("Exporting to csv", exc);
         }
@@ -553,9 +558,10 @@ public class DataUtil {
                 Real real = null;
                 if (data instanceof Real) {
                     real = (Real) data;
+                } else if (data instanceof RealTuple) {
+                    real = (Real) ((RealTuple) data).getComponent(0);
                 } else {
-                    real = (Real) ((RealTuple) data).getComponent(
-                            0);
+                    real =new Real(0);
                 }
                 cols.add(real.getValue());
                 rows.add(cols);

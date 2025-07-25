@@ -127,7 +127,7 @@ import java.io.*;
 import java.rmi.RemoteException;
 
 import java.util.*;
-
+import java.util.stream.Collectors;
 import static ucar.unidata.util.LogUtil.logException;
 
 
@@ -6396,6 +6396,162 @@ public class GridUtil {
             JobManager.getManager().stopLoad(loadId);
         }
 
+    }
+    /**
+     * Write grid out to a CSV ascii file
+     *
+     * @param grid grid to write
+     * @param filename  filename
+     *
+     * @throws Exception  problem writing grid
+     */
+    public static void writeGridToCsv(FieldImpl grid, String filename)
+            throws Exception {
+
+        Object loadId =
+                JobManager.getManager().startLoad("Writing grid to csv", true);
+
+        // Use try-with-resources for automatic closing of the writer
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))) {
+
+            // --- This entire data extraction block is identical to the XLS version ---
+            List<DateTime> times = new ArrayList<>();
+            List<FlatField> fields = new ArrayList<>();
+
+            if (isTimeSequence(grid)) {
+                SampledSet timeSet = (SampledSet) getTimeSet(grid);
+                double[][] timeValues = timeSet.getDoubles(false);
+                Unit timeUnit = timeSet.getSetUnits()[0];
+                int numTimes = timeSet.getLength();
+                CalendarDateTimeSet cdt = null;
+                if (numTimes > 1) {
+                    cdt = (CalendarDateTimeSet) timeSet;
+                    for (int timeIdx = 0; timeIdx < numTimes; timeIdx++) {
+                        CalendarDateTime cdti =
+                                new CalendarDateTime(timeValues[0][timeIdx], cdt.getCalendar());
+                        JobManager.getManager().setDialogLabel1(loadId,
+                                "Reading grid time:" + (timeIdx + 1) + "/" + numTimes);
+                        FlatField ff = (FlatField) grid.getSample(timeIdx);
+                        if (ff == null) {
+                            continue;
+                        }
+                        times.add(cdti);
+                        fields.add(ff);
+                    }
+                } else {
+                    RealTuple ss = ((SingletonSet) timeSet).getData();
+                    if (ss != null) {
+                        visad.Data[] vdata = ss.getComponents();
+                        JobManager.getManager().setDialogLabel1(loadId,
+                                "Reading grid time:" + 1 + "/" + numTimes);
+                        FlatField ff = (FlatField) grid.getSample(0);
+                        if (ff != null) {
+                            times.add((CalendarDateTime) vdata[0]);
+                            fields.add(ff);
+                        }
+                    }
+                }
+            } else if (grid instanceof FlatField) {
+                fields.add((FlatField) grid);
+            } else {
+                System.err.println("Could not find any grid fields to write");
+                // Return early if there's nothing to write
+                return;
+            }
+
+            if (fields.isEmpty()) {
+                System.err.println("No valid fields found to write to CSV.");
+                return;
+            }
+            // --- End of data extraction block ---
+
+
+            // --- New CSV Writing Logic ---
+
+            // 1. Get spatial domain from the first field (assuming all fields share the same domain)
+            FlatField firstField = fields.get(0);
+            SampledSet ss = getSpatialDomain(firstField);
+            SampledSet latLonSet = null;
+            if (ss.getCoordinateSystem() != null) {
+                latLonSet = Util.convertDomain(ss, ss.getCoordinateSystem().getReference(), null);
+            } else {
+                latLonSet = ss;
+            }
+
+            float[][] domainVals = latLonSet.getSamples(false);
+            boolean latFirst = isLatLonOrder(latLonSet);
+            boolean hasAltitude = domainVals.length > 2;
+            int numSpatialPoints = domainVals[0].length;
+
+            // 2. Build and write the header row
+            List<String> header = new ArrayList<>();
+            header.add(latFirst ? "Latitude" : "Longitude");
+            header.add(latFirst ? "Longitude" : "Latitude");
+            if (hasAltitude) {
+                header.add("Altitude");
+            }
+            // Add a column header for each time step
+            for (DateTime dt : times) {
+                header.add(dt.toString());
+            }
+            // If there are no times, use the grid's name as the header for the single data column
+            if (times.isEmpty()) {
+                header.add(grid.getType().toString());
+            }
+            writer.println(toCsvRow(header));
+
+            // 3. Write data row by row
+            JobManager.getManager().setDialogLabel1(loadId, "Writing data rows...");
+
+            // Get all the range data first to avoid repeated calls inside the loop
+            List<float[][]> allRangeVals = new ArrayList<>();
+            for (FlatField ff : fields) {
+                allRangeVals.add(ff.getFloats(false));
+            }
+
+            for (int rowIdx = 0; rowIdx < numSpatialPoints; rowIdx++) {
+                List<String> dataRow = new ArrayList<>();
+                // Add coordinate values for the current row
+                dataRow.add(String.valueOf(domainVals[latFirst ? 0 : 1][rowIdx]));
+                dataRow.add(String.valueOf(domainVals[latFirst ? 1 : 0][rowIdx]));
+                if (hasAltitude) {
+                    dataRow.add(String.valueOf(domainVals[2][rowIdx]));
+                }
+
+                // Add the data value from each time step for the current spatial point
+                for (float[][] rangeVals : allRangeVals) {
+                    dataRow.add(String.valueOf(rangeVals[0][rowIdx]));
+                }
+
+                writer.println(toCsvRow(dataRow));
+            }
+
+        } catch (Exception exc) {
+            LogUtil.logException("Writing grid to CSV file: " + filename, exc);
+            // re-throw the exception so the caller knows something went wrong
+            throw exc;
+        } finally {
+            JobManager.getManager().stopLoad(loadId);
+        }
+    }
+
+    /**
+     * A helper method to convert a list of strings into a properly formatted CSV row.
+     * It handles values containing commas or quotes by enclosing them in double quotes.
+     *
+     * @param values The list of strings for one row.
+     * @return A single, comma-separated string for the row.
+     */
+    private static String toCsvRow(List<String> values) {
+        return values.stream()
+                .map(value -> {
+                    if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+                        // Enclose in double quotes and escape existing double quotes
+                        return "\"" + value.replace("\"", "\"\"") + "\"";
+                    }
+                    return value;
+                })
+                .collect(Collectors.joining(","));
     }
 
     /**
