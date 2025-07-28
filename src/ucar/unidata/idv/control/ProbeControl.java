@@ -3064,7 +3064,77 @@ public class ProbeControl extends DisplayControlImpl implements DisplayableData
         amExporting = false;
     }
 
+    public void exportToCsv(Real[] times, String filename) {
+        try {
 
+            if (filename == null) {
+                return;
+            }
+            amExporting = true;
+            List choices = getDataChoices();
+
+            if (times.length == 0) {
+                LogUtil.userMessage("No times to export");
+                return;
+            }
+
+            //Force the sampling. This sets the sample at the current location, time set, etc.
+            setData(times[0], 0);
+            List rows = new ArrayList();
+            List cols;
+            cols = Misc.newList("Time");
+            for (int row = 0; row < choices.size(); row++) {
+                ProbeRowInfo info = getRowInfo(row);
+                cols.add(getFieldName(row));
+            }
+            rows.add(cols);
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                cols = Misc.newList("" + aniValue);
+                rows.add(cols);
+            }
+
+            for (int timeIdx = 0; timeIdx < times.length; timeIdx++) {
+                Real aniValue = times[timeIdx];
+                for (int row = 0; row < choices.size(); row++) {
+                    cols = (List) rows.get(timeIdx + 1);
+                    ProbeRowInfo info    = getRowInfo(row);
+                    Set          timeSet = info.getTimeSet();
+                    Data         rt      = null;
+                    FieldImpl    sample  = info.getPointSample();
+                    if ((sample != null) && (timeSet != null)) {
+                        rt = sample.evaluate(aniValue,
+                                info.getSamplingMode(),
+                                Data.NO_ERRORS);
+                    } else {
+                        rt = info.getPointSample().getSample(0);
+                    }
+
+                    if (rt == null) {
+                        cols.add("missing");
+                    } else {
+                        if (info.getUnit() != null) {
+                            Real real = null;
+                            if (rt instanceof Real) {
+                                real = (Real) rt;
+                            } else {
+                                real = (Real) ((RealTuple) rt).getComponent(
+                                        0);
+                            }
+                            cols.add(real.getValue(info.getUnit()));
+                        } else {
+                            cols.add(rt.toString());
+                        }
+                    }
+                }
+            }
+            DataUtil.writeCsv(filename, rows);
+        } catch (Exception exc) {
+            logException("Exporting to csv", exc);
+        }
+        amExporting = false;
+    }
     /**
      *  Set the DataTemplate property.
      *
