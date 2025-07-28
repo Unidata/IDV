@@ -2868,7 +2868,6 @@ public class PointObFactory {
             //dataIterator.close();
         } else if (fc instanceof StandardStationCollectionImpl) {
             PointFeatureIterator dataIterator =
-                    //collection.getPointFeatureIterator(-1);
                     collection.getPointFeatureIterator();
             while (dataIterator.hasNext()) {
                 PointFeature po = (PointFeature) dataIterator.next();
@@ -2908,7 +2907,6 @@ public class PointObFactory {
                 }
 
                 RealType[] rtypes = allTupleType.getRealComponents();
-                Unit[] aUnits = new Unit[structure.getMembers().size()];
                 int rsize = allTupleType.getRealComponents().length;
                 for (int rIdx = varIdxBase; rIdx < rsize; rIdx++) {
                     RealType rtype = rtypes[rIdx];
