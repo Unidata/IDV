@@ -379,7 +379,7 @@ def substitute(data, low, high, newValue):
     return newData;
 
 def substituteMissing(data, newValue):
-    """change values in data  between low/high to newvalue """
+    """substitute the missing value Float.NaN to newValue """
     from java.lang import Float
     newData = data.clone();
     if (GridUtil.isTimeSequence(newData)):
@@ -402,7 +402,7 @@ def substituteMissing(data, newValue):
     return newData;
 
 def substituteWithMissing(data, missingValue):
-    """change values in data  between low/high to newvalue """
+    """change user defined missingValue to Float.NaN """
     from java.lang import Float
     newData = data.clone();
     if (GridUtil.isTimeSequence(newData)):
@@ -421,6 +421,29 @@ def substituteWithMissing(data, missingValue):
             for j in range(len(values[0])):
                 if (values[i][j] == missingValue):
                     values[i][i] = float("NaN");
+        rangeObject.setSamples(values,1);
+    return newData;
+
+def substituteToMissing(data, low, high):
+    """change values in data  between low/high to Float.NaN """
+    from java.lang import Float
+    newData = data.clone();
+    if (GridUtil.isTimeSequence(newData)):
+        for t in range(newData.getDomainSet().getLength()):
+            rangeObject = newData.getSample(t)
+            values = rangeObject.getFloats(0);
+            for i in range(len(values)):
+               for j in range(len(values[0])):
+		           if values[i][j]>=low:
+		             if values[i][j]<=high:  values[i][j] = float("NaN");
+            rangeObject.setSamples(values,1);
+    else:
+        rangeObject = newData;
+        values = rangeObject.getFloats(0);
+        for i in range(len(values)):
+          for j in range(len(values[0])):
+             if values[i][j]>=low:
+                if values[i][j]<=high: values[i][j] = float("NaN");
         rangeObject.setSamples(values,1);
     return newData;
 
