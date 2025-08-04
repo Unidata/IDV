@@ -2027,6 +2027,10 @@ public class GridMath {
                      timeStepIdx < sequenceDomain.getLength(); timeStepIdx++) {
                     FlatField sample = (FlatField)grid.getSample(timeStepIdx);
                     if (timeStepIdx == 0) {
+                        SampledSet spatialDomain = GridUtil.getSpatialDomain(grid);
+                        if(spatialDomain.getManifoldDimension() == 2) {
+                            grid = GridUtil.make2DGridFromSlice(grid);
+                        }
                         RealTuple point = GridUtil.getCenterPoint(grid);
                         Data sample1 =
                                 ((FlatField) grid.getSample(0)).evaluate(point,
