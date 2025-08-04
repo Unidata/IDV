@@ -1057,6 +1057,21 @@ return console.askYesNo(message, true);
       </exclude>
       <jreBundle jreBundleSource="generated" />
     </macosFolder>
+    <windows name="Windows 64 MSI" id="1513" mediaFileName="${compiler:sys.shortName}_${compiler:sys.version}_windows64_installer" installDir="${compiler:INSTALLDIR}" overridePrincipalLanguage="true" msi="true">
+      <excludedComponents>
+        <component id="909" />
+      </excludedComponents>
+      <excludedLaunchers>
+        <launcher id="2" />
+        <launcher id="4" />
+        <launcher id="9" />
+        <launcher id="49" />
+      </excludedLaunchers>
+      <exclude>
+        <entry filesetId="835" />
+      </exclude>
+      <jreBundle jreBundleSource="generated" />
+    </windows>
   </mediaSets>
   <buildIds>
     <mediaSet refId="12" />
