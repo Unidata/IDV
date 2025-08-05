@@ -489,8 +489,10 @@ public class TimeHeightControl extends LineProbeControl {
             zUnit = cs
                 .getReferenceUnits()[cs.getReference().getIndex(RealType.Altitude)];
         }
-        //altUnit = zUnit;
-        setYAxisLabels(latlonalt[NN]);
+        if(altUnit == null) {
+            altUnit = zUnit;
+            setYAxisLabels(latlonalt[NN]);
+        }
         int        numTimes      = timeVals[0].length;
         int        numAlts       = ss.getLength();
 
