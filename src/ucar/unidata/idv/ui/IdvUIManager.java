@@ -88,21 +88,7 @@ import visad.georef.EarthLocation;
 import visad.georef.LatLonPoint;
 
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -110,19 +96,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.net.URI;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.Vector;
 
+import javax.mail.*;
+import javax.mail.util.ByteArrayDataSource;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -154,6 +138,14 @@ import javax.swing.border.Border;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.text.JTextComponent;
+
+import javax.activation.DataHandler;
+//import javax.activation.DataSource;
+//import javax.activation.FileDataSource;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import static ucar.unidata.idv.IdvPersistenceManager.BUNDLES_DATA;
 
@@ -6248,6 +6240,7 @@ public class IdvUIManager extends IdvManager {
 
         StringBuffer extra    = getSystemInfo();
         List<HttpFormEntry> entries  = new ArrayList<>();
+        List<EmailAttachment> attachments  = new ArrayList<>();
         StringBuffer javaInfo = new StringBuffer();
         javaInfo.append("Java: home: " + System.getProperty("java.home"));
         javaInfo.append(" version: " + System.getProperty("java.version"));
@@ -6281,6 +6274,7 @@ public class IdvUIManager extends IdvManager {
         HttpFormEntry nameEntry;
         HttpFormEntry emailEntry;
         HttpFormEntry orgEntry;
+        HttpFormEntry subjectEntry;
 
         entries.add(nameEntry = new HttpFormEntry(HttpFormEntry.TYPE_INPUT,
                 "fullName", "Name:",
@@ -6291,7 +6285,7 @@ public class IdvUIManager extends IdvManager {
         entries.add(orgEntry = new HttpFormEntry(HttpFormEntry.TYPE_INPUT,
                 "organization", "Organization:",
                 getStore().get(PROP_HELP_ORG, (String) null)));
-        entries.add(new HttpFormEntry(HttpFormEntry.TYPE_INPUT, "subject",
+        entries.add(subjectEntry = new HttpFormEntry(HttpFormEntry.TYPE_INPUT, "subject",
                                       "Subject:"));
 
         String nag = getProperty("idv.supportform.message", "");
@@ -6371,36 +6365,60 @@ public class IdvUIManager extends IdvManager {
                         HttpFormEntry.TYPE_HIDDEN, "description",
                         "Description:", newDescription, 5, 30, true));
             }
+            String fromName = nameEntry.getValue();
+            String fromEmail = emailEntry.getValue();
+            String fromOrg = orgEntry.getValue();
+            String subject = subjectEntry.getValue();
+            String htmlBody = descriptionEntry.getValue();
 
+            if (!fromName.startsWith("\"") ) {
+                fromName = String.format("\"%s", fromName);
+            }
+            if (  !fromName.endsWith("\"")) {
+                fromName = String.format("%s\"", fromName);
+            }
+           //sendSupportEmail(fromName,  fromEmail,  subject,  htmlBody,  attachments);
             try {
-                entriesToPost.add(new HttpFormEntry("attachmentOne",
-                        "extra.html", extra.toString().getBytes()));
 
                 if (includeBundleCbx.isSelected()) {
+                    entriesToPost.add(new HttpFormEntry("attachmentOne",
+                            "extra.html", extra.toString().getBytes()));
+                    attachments.add(new EmailAttachment("extra.html", extra.toString().getBytes(), "text/html"));
                     entriesToPost.add(
                         new HttpFormEntry(
                             "attachmentTwo", "bundle.xidv",
                             getIdv().getPersistenceManager().getBundleXml(
                                 true).getBytes()));
+                    attachments.add(new EmailAttachment("bundle.xidv", getIdv().getPersistenceManager().getBundleXml(
+                            true).getBytes(), "text/xml"));
                 }
-
-                String[] results =
-                    HttpFormEntry.doPost(
-                        entriesToPost,
-                        "https://www.unidata.ucar.edu/support/requestSupport.jsp");
-                if (results[0] != null) {
+                boolean isSend = false;
+                if(attachments.size() > 0)
+                    isSend = sendSupportEmail(fromName,  fromEmail,  subject,  htmlBody,  attachments);
+                else
+                    isSend = sendEmail( fromName,  fromEmail,  subject,  htmlBody);
+                dialog.dispose();
+                //String[] results = null;
+                //    HttpFormEntry.doPost(
+                //        entriesToPost,
+                //        "https://www.unidata.ucar.edu/support/requestSupport.jsp");
+                //if (results[0] != null) {
+                if (!isSend) {
                     GuiUtils.showHtmlDialog(
-                        results[0], "Support Request Response - Error",
+                        null, "Support Request Response - Error",
                         "Support Request Response - Error", null, true);
                     continue;
-                }
-                String html = results[1];
-                if ((html.toLowerCase()
-                        .indexOf("your email has been sent") >= 0) || (html
-                        .toLowerCase()
-                        .indexOf("your request has been sent") >= 0)) {
+                } else {
                     LogUtil.userMessage("Your support request has been sent");
                     break;
+                }
+              //  String html = results[1];
+             //   if ((html.toLowerCase()
+             //           .indexOf("your email has been sent") >= 0) || (html
+              //          .toLowerCase()
+              //          .indexOf("your request has been sent") >= 0)) {
+             //       LogUtil.userMessage("Your support request has been sent");
+             //       break;
                     //                } else if (html.toLowerCase().indexOf("required fields")
                     //                           >= 0) {
                     //                    LogUtil.userErrorMessage(
@@ -6408,12 +6426,12 @@ public class IdvUIManager extends IdvManager {
                     //                    GuiUtils.showHtmlDialog(
                     //                        html, "Unknown Support Request Response",
                     //                        "Unknown Support Request Response", null, true);
-                } else {
-                    GuiUtils.showHtmlDialog(
-                        html, "Unknown Support Request Response",
-                        "Unknown Support Request Response<br>Note: This form is inactive",
-                        null, true);
-                }
+           //     } else {
+           //         GuiUtils.showHtmlDialog(
+           //             html, "Unknown Support Request Response",
+           //             "Unknown Support Request Response<br>Note: This form is inactive",
+           //             null, true);
+           //     }
             } catch (Exception exc) {
                 LogUtil.logException("Doing support request form", exc);
             }
@@ -6788,6 +6806,150 @@ public class IdvUIManager extends IdvManager {
             return centers;
         } catch (Exception exc) {
             throw new ucar.unidata.util.WrapperException(exc);
+        }
+    }
+
+    public static class EmailAttachment {
+        // ... (no changes here)
+        private final String filename;
+        private final byte[] data;
+        private final String mimeType;
+
+        public EmailAttachment(String filename, byte[] data, String mimeType) {
+            this.filename = filename;
+            this.data = data;
+            this.mimeType = mimeType;
+        }
+    }
+
+    /**
+     * Sends an email to the predefined support address.
+     *
+     * @param username  The user's name or identifier for the "From" field.
+     * @param fromEmail The actual "reply-to" or sender email address.
+     * @param subject   The subject line of the email.
+     * @param htmlBody  The body of the email, formatted as HTML.
+     * @return {@code true} if the email was sent successfully, {@code false} otherwise.
+     */
+    public static boolean sendEmail( String username,  String fromEmail,
+                                   String subject, String htmlBody) throws MessagingException {
+
+        try {
+            java.util.Properties properties = new java.util.Properties();
+            properties.put("mail.smtp.host", "smtp.unidata.ucar.edu");
+            properties.put("mail.smtp.port", 25);
+            properties.put("mail.smtp.auth", "false");
+            //properties.put("mail.smtp.starttls.enable", "true");
+            properties.put("mail.to.address", "support-idv@unidata.ucar.edu");
+            //properties.put("mail.to.address", "yuanho@ucar.edu");
+            //properties.put("mail.from.address", fromEmail);
+
+            Session session = Session.getInstance(properties);
+
+            // Create a MimeMessage
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(fromEmail, username));
+            //message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(properties.getProperty("mail.to.address")));
+            message.setSubject(subject);
+
+            // IMPORTANT: Set the Reply-To header so you can directly reply to the user.
+            message.setReplyTo(new Address[] { new InternetAddress(fromEmail, username) });
+            message.setSubject("[IDV Support] " + subject);
+
+            // Create a multipart message for text and attachments
+            Multipart multipart = new MimeMultipart();
+
+            // Part 1: The HTML body of the email
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(htmlBody, "text/html; charset=utf-8");
+            multipart.addBodyPart(messageBodyPart);
+
+            // Set the complete multipart content to the message
+            message.setContent(multipart);
+
+            // Send the message
+            System.out.println("Sending email...");
+            Transport.send(message);
+            return true;
+        } catch (MessagingException | java.io.UnsupportedEncodingException e) {
+            // Catch any exception related to messaging or encoding the "from" name.
+            System.err.println("Error sending email: " + e.getMessage());
+            e.printStackTrace(); // Very important for debugging the root cause!
+
+            // If an exception occurs, sending failed.
+            return false;
+        }
+    }
+
+    /**
+     * Sends an email to the predefined support address.
+     *
+     * @param username  The user's name or identifier for the "From" field.
+     * @param fromEmail The actual "reply-to" or sender email address.
+     * @param subject   The subject line of the email.
+     * @param htmlBody  The body of the email, formatted as HTML.
+     * @return {@code true} if the email was sent successfully, {@code false} otherwise.
+     */
+    public static boolean sendSupportEmail(String username, String fromEmail, String subject, String htmlBody, List<EmailAttachment> attachments) throws MessagingException , java.io.UnsupportedEncodingException{
+
+        try {
+            java.util.Properties properties = new java.util.Properties();
+            properties.put("mail.smtp.host", "smtp.unidata.ucar.edu");
+            properties.put("mail.smtp.port", 25);
+            properties.put("mail.smtp.auth", "false");
+            //properties.put("mail.smtp.starttls.enable", "true");
+            properties.put("mail.to.address", "support-idv@unidata.ucar.edu");
+            //properties.put("mail.to.address", "yuanho@ucar.edu");
+            properties.put("mail.from.address", fromEmail);
+
+            Session session = Session.getInstance(properties);
+
+            // Create a MimeMessage
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(fromEmail, username));
+            //message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(properties.getProperty("mail.to.address")));
+            message.setSubject(subject);
+
+            // IMPORTANT: Set the Reply-To header so you can directly reply to the user.
+            message.setReplyTo(new Address[] { new InternetAddress(fromEmail, username) });
+            message.setSubject("[IDV Support] " + subject);
+
+            // Create a multipart message for text and attachments
+            Multipart multipart = new MimeMultipart();
+
+            // Part 1: The HTML body of the email
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(htmlBody, "text/html; charset=utf-8");
+            multipart.addBodyPart(messageBodyPart);
+
+            // Part 2...N: The attachments
+            if (attachments != null) {
+                for (EmailAttachment attachment : attachments) {
+                    BodyPart attachmentBodyPart = new MimeBodyPart();
+                    javax.activation.DataSource source = new ByteArrayDataSource(attachment.data, attachment.mimeType);
+                    attachmentBodyPart.setDataHandler(new DataHandler(source));
+                    attachmentBodyPart.setFileName(attachment.filename);
+                    multipart.addBodyPart(attachmentBodyPart);
+                }
+            }
+
+            // Set the complete multipart content to the message
+            message.setContent(multipart);
+
+            // Send the message
+            System.out.println("Sending email...");
+            Transport.send(message);
+            return true;
+            //System.out.println("Email sent successfully!");
+        } catch (MessagingException | java.io.UnsupportedEncodingException e) {
+            // Catch any exception related to messaging or encoding the "from" name.
+            System.err.println("Error sending email: " + e.getMessage());
+            e.printStackTrace(); // Very important for debugging the root cause!
+
+            // If an exception occurs, sending failed.
+            return false;
         }
     }
 
