@@ -11,158 +11,91 @@ Version <%idv.version%>
 
 <hr>
 
-The items below reflect changes since the 6.2 release.
+The items below reflect changes since the 6.3 release.
 
 <faq qlabel=" " alabel=" ">
 
 <faqitem cat="System Changes"></faqitem>
 
-<faqitem  id="j8422" q="OpenJDK Java Version">
+<faqitem  id="j21067" q="OpenJDK Java Version">
 
   <p>
-    The AdoptOpenJDK provides prebuilt binaries from OpenJDK class libraries. All AdoptOpenJDK
-    binaries and scripts are open source licensed and available for free. The version of the
-    AdoptOpenJDK distributed with the IDV is 1.8.0_422. AdoptOpenJDK 1.8.0_422 introduces several
-    updates and enhancements, particularly targeting security, compatibility, and performance. See
-    the <a href=https://adoptopenjdk.net/> adoptOpenJDK Library</a> for a more details information.
+    The Adoptium provides high-performance, cross-platform, open-source prebuilt Java runtime Temurin JDK.
+    All Temurin JDK binaries and scripts are open source licensed and available for free. The version of the
+    Temurin JDK distributed with the IDV is jdk-21.0.6+7. This is a significant step forward in modernizing our
+    software ecosystem, as Java 21 offers many advantages in terms of performance, security, and long-term
+    support. See the <a href=https://adoptium.net/temurin> Temurin JDK Library</a> for more details information.
   </p>
 
 </faqitem>
+  <faqitem  id="j3du" q="Jave 3d libraries updated">
+    <p>
+      Updated the following Java 3D libraries to the latest versions: j3dcore, j3dutils, vecmath, and jogamp.
+      Replaced the lagacy Java Extension mechanism with the explicit classpath-based linking to ensure better
+      modularity, compatibility with modern Java versions, and ease of deployment across platforms.
+    </p>
+  </faqitem>
 
-<faqitem q="Latest netCDF-Java Version" id="nj465">
+  <faqitem id="cert1" q="IDV Certificates and Notarization">
+    <p>
+      Renewed code signing certificates for both Window and macOS platforms in compliance with Microsoft's tightened
+      security requirement. The Windows installer is now signed using the updated certificate to ensure compatibility with
+      Windows security policies. The macOS installer has been signed and notarized by Apply, allowing the IDV to run
+      on macOS without requiring users to bypass Gatekeeper warnings.
+    </p>
+  </faqitem>
 
-  <p>
-    The version of the netCDF-Java library currently distributed with the IDV is
-    the 5.5.3.  See
-    the <a href="https://github.com/Unidata/netcdf-java/releases/tag/v5.5.3">
-      netCDF-Java Library</a> for a more details information.
-  </p>
-</faqitem>
-
+  <faqitem q="Latest netCDF-Java Version" id="nj465">
+    <p>
+      The version of the netCDF-Java library currently distributed with the IDV is
+      5.9.0.  See
+      the <a href="https://github.com/Unidata/netcdf-java/releases/tag/v5.9.0">
+        netCDF-Java Library</a> for more details information.
+    </p>
+  </faqitem>
 
 
 <faqitem cat="Display Changes"></faqitem>
 
-<faqitem id="MLprepostprocess" q="Pre/Post process data for applications including ML">
-  <p>
-    The IDV provides a suite of tools for transforming raw datasets, making them suitable for applications
-    like machine learning. Users can apply various scalers (Standard, Robust, Min-Max), transformers (Quantile, Power),
-    and normalizers to improve data quality and align distributions with model requirements. The platform also
-    includes statistical tools for calculating averages, percentiles, and distribution transformations, helping
-    users visualize and refine data as needed.
-
-    Results can be exported in formats like CSV or netCDF, making it easy to integrate IDV-processed data into
-    workflows for machine learning, scientific modeling, and more. This flexibility allows users to efficiently
-    prepare data for diverse analytical needs.
-  </p>
-</faqitem>
-
-<faqitem id="radargriddisplay1" q="More with Level II Radar Grid Displays">
-  <p>
-    With the newly developed Level 2 radar grid display feature, we've expanded its capabilities by
-    incorporating derived formulas to calculate radar precipitation rates. These calculations are based
-    on two key approaches: the Marshall-Palmer drop size distribution and dual polarization radar data.
-    The Marshall-Palmer method provides a traditional estimate of precipitation rates using reflectivity,
-    while the dual polarization approach enhances accuracy by factoring in both reflectivity and
-    differential reflectivity. These advancements allow for more precise and varied precipitation rate
-    calculations, improving radar data interpretation and weather analysis.
-
-  </p>
-</faqitem>
-
-<faqitem id="multiVarsCrossSection" q="Multi Variables Cross-Section Display" >
-  <p>
-    After creating the first vertical cross-sections display, you can add a contour cross-section display
-    for a second variable as well as a wind vector cross-section display for a derived variable. When
-    working multi variables cross-section displays, we recommend using a color-filled contour display or
-    a color-shaded display, and contour displays for the second or the third variables. Multi-variable cross-section
-    displays offer several advantages in data visualization and analysis, such as enhanced data comparisons,
-    comprehensive analysis, and efficient use of screen space. Additionally, you can now switch the vertical
-    coordinate scale from meters to pressure in hPa, providing greater flexibility in interpreting the data.
-  </p>
-</faqitem>
-
-<faqitem id="timeheightdisplay" q="Two Variables Time Height Display" >
-  <p>
-    A time-height display shows samples of a 3D parameter along a vertical profile from top to bottom of
-    the available data, with time as the independent coordinate (x-axis). You can choose between contour,
-    color-filled, and color-shaded time-height displays. After creating the time-height display for the
-    first variable, you can add a contour time-height display for a second variable. This setup allows
-    for a more detailed and layered analysis of vertical atmospheric data over time. Additionally, you can
-    now switch the vertical coordinate scale from meters to pressure in hPa, providing greater flexibility
-    in interpreting the data.
-  </p>
-</faqitem>
-
-<faqitem id="zoomenhancement" q="Zoom Enhancement">
-  <p>
-    We have updated the algorithm responsible for calculating the clip distance during zoom operations in
-    both map and globe views. This enhancement ensures that users can now zoom in to street level without
-    experiencing the disappearance of 3D objects, improving the overall user experience. The refined
-    algorithm dynamically adjusts the clip distance based on zoom levels, allowing for seamless and
-    detailed visualization at various scales. This update is particularly beneficial for users requiring
-    precise close-up views in 3D environments, making the zoom functionality more reliable and effective.
-  </p>
-</faqitem>
-
 
 <faqitem cat="Jython Changes"></faqitem>
+  <faqitem q="New grid diagnostics for applications including AI/ML" id="MLprepostprocess">
+    The IDV provides a suite of grid data transformation tools for processing raw datasets, making them suitable for applications
+    like machine learning:
 
-  <faqitem id="scalerformulas" q="Scalers">
+    <ul>
+      <li> Scalers -  Standard, Robust, and Min-Max
+      <li> Transformer - Quantile, Power, Normalizer, Uniform Distribution and Normal Distribution
+      <li> Classifier
+      <li> Median Filter
+      <li> 2D Grid functions - Grid Min, Grid Max, Average, and Percentile
+    </ul>
+
+    These functions integrate IDV’s diverse data access capabilities into workflows for machine learning, scientific modeling,
+    and more, giving users the flexibility to efficiently prepare data for a wide range of analytical needs.
+  </faqitem>
+  <faqitem q="ML pre postprocess Document" id="MLDoc">
+    <ul>
+      <li>Added an online document with Jython functions for ML pre/post-processing.
+      <li>Designed a new workflow including:
+      <ul>
+        <li>Time aggregation of dataset from TDS server
+        <li>Spatial subsetting (via shapefiles or polygon XGRF files)
+        <li>Jython formula pre processing datasets
+      </ul>
+      <li>Enabled export of results to CSV or netCDF, making it easy to integrate IDV-processed data into workflows
+      for machine learning, scientific modeling, and other applications.
+    </ul>
+
+    This flexibility allows users to efficiently prepare data for diverse analytical needs.
+  </faqitem>
+
+  <faqitem id="jyupdate" q="updated jython">
     <p>
-      Scalers are applied as linear transformers to standardize or normalize dataset distributions. The
-      available scalers: Standard Scaler, Robust Scaler, and Min-Max Scaler—offer tailored solutions for
-      different data types and characteristics. The Standard Scaler standardizes features by removing the mean
-      and scaling to unit variance, which is effective for data that generally follows a normal distribution.
-      The Robust Scaler, on the other hand, is ideal for datasets with outliers as it scales based on the median
-      and interquartile range, reducing the influence of extreme values. Min-Max Scaler scales features to a
-      specified range, typically [0, 1], which is helpful for algorithms that require normalized data within
-      bounded values. These scaling options provide flexibility for preparing datasets and ensuring that feature
-      distributions align with model assumptions and can improve algorithm performance.
+      Updated Jython from version to 2.7.4.
     </p>
   </faqitem>
 
-  <faqitem id="transformerformulas" q="Transformers">
-    <p>
-      Transformers provides non-linear transformations to a dataset into a representation that is more suitable
-      for the downstream applications. The available transformers: Quantile Transformer, Power Transformer, and
-      Normalizer tailored solutions for different data types and characteristics. Quantile Transformer provides
-      non-linear transformations in which distances between marginal outliers and inliers are shrunk. Power
-      transforms are a family of parametric transformations that aim to map data from any distribution to as
-      close to a Gaussian distribution. These transformers add versatility to data preprocessing workflows,
-      helping to align feature distributions with model assumptions, improving algorithmic performance in
-      areas such as machine learning.
-    </p>
-  </faqitem>
-
-<faqitem id="classifierformulas" q="Classifier">
-  <p>
-    Data classification helps in organizing data into categories based on sensitivity, importance, or other
-    criteria. In machine learning, classification involves assigning a class label to a given input data example.
-    The Jython Classifier formula provides a simple method to label 2D gridded data values with numbers.
-    This basic classification algorithm is used to sort data points into different classes, allowing machine
-    learning applications to train on existing data and predict the classification of new data points.
-  </p>
-</faqitem>
-
-<faqitem id="medianfilterformulas" q="Median Filter">
-  <p>
-    A median filter is a non-linear digital filtering technique widely used in image processing to reduce noise.
-    It works by replacing the center pixel in a neighborhood with the median value of that surrounding window.
-    This technique is particularly effective at removing Gaussian, random, and salt-and-pepper noise from images.
-    Due to its effectiveness, the median filter is commonly used in the data preprocessing stage of machine
-    learning applications.
-  </p>
-</faqitem>
-
-<faqitem id="2dfunctiongrid" q="2D function over grid">
-  <p>
-    Applying spatial functions like Max, Min, Average, and Percentile over a 2D grid allows you to generate
-    a new time series point field. By applying these functions to the 2D grid, you transform spatial data into
-    a time series that reflects specific statistical properties, offering new insights into the data’s temporal
-    dynamics and preprocessing the data of machine learning applications.
-  </p>
-</faqitem>
 
 <faqitem cat="Bug Fixes/Known Problems"></faqitem>
 
@@ -173,7 +106,7 @@ The items below reflect changes since the 6.2 release.
 
 <faqitem q="Known Problems" id="problems">
   <p>
-    For a list of outstanding known problems, see the
+    For a list of outstanding-known problems, see the
     <a href="Bugs.html">Known Problems</a> page.
   </p>
 </faqitem>
