@@ -1171,11 +1171,18 @@ public class PointObFactory {
                 double temp1 = 0.0;
                 double dew = 0.0;
                 double speed = 0.0;
-                if(rhType != null) {
-                    temp = ((Real) ob.getComponent(tempIndex)).getValue(DataUtil.parseUnit("Celsius"));
-                    temp1 = ((Real) ob.getComponent(tempIndex)).getValue(DataUtil.parseUnit("Fahrenheit"));
-                    dew = ((Real) ob.getComponent(dewIndex)).getValue(DataUtil.parseUnit("Celsius"));
-                    speed = ((Real) ob.getComponent(speedIndex)).getValue(Speed.MILES_PER_HOUR);
+
+                if (rhType != null) {
+                    if (tempIndex >= 0) {
+                        temp = ((Real) ob.getComponent(tempIndex)).getValue(DataUtil.parseUnit("Celsius"));
+                        temp1 = ((Real) ob.getComponent(tempIndex)).getValue(DataUtil.parseUnit("Fahrenheit"));
+                    }
+                    if (dewIndex >= 0) {
+                        dew = ((Real) ob.getComponent(dewIndex)).getValue(DataUtil.parseUnit("Celsius"));
+                    }
+                    if (speedIndex >= 0) {
+                        speed = ((Real) ob.getComponent(speedIndex)).getValue(Speed.MILES_PER_HOUR);
+                    }
                 }
                 // now make data
                 if (allReals && tupleType != null) {
