@@ -44,13 +44,15 @@ import org.jdom2.input.SAXBuilder;
 
 import thredds.catalog.*;
 
+import ucar.nc2.constants.CDM;
 import ucar.nc2.dt.DataIterator;
 import ucar.nc2.dt.RadialDatasetSweep;
+import ucar.nc2.units.DateRange;
 import ucar.nc2.units.DateType;
 import ucar.nc2.thredds.ThreddsDataFactory;
 import ucar.nc2.units.DateUnit;
+import ucar.nc2.units.TimeDuration;
 
-import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.Station;
 import ucar.unidata.geoloc.StationImpl;
@@ -96,7 +98,7 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
     /** _more_ */
     protected static final Namespace defNS =
         Namespace.getNamespace(
-            thredds.catalog.XMLEntityResolver.DQC_NAMESPACE_04);
+                XMLEntityResolver.CATALOG_NAMESPACE_10);
 
     /** the original document URI */
     private URI docURI;
@@ -137,13 +139,19 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
     static public TDSRadarDatasetCollection factory(String desc,
             String dsc_location, StringBuffer errlog)
             throws IOException {
-        // super();
-        SAXBuilder        builder;
+
+        SAXBuilder builder = null;
         Document          doc  = null;
+        Element qcElem = null;
+        Namespace ns = null;
         XMLEntityResolver jaxp = new XMLEntityResolver(true);
         builder = jaxp.getSAXBuilder();
 
-        //from tommy Jasmin to keep bundles working
+        synchronized (builder) {
+
+            // TJJ Nov 2019 - hack to keep bundles working with THREDDS
+            // See: https://mcidas.ssec.wisc.edu/inquiry-v/?inquiry=2857
+
         if (dsc_location != null) {
             dsc_location = dsc_location.replace("http:", "https:");
         }
@@ -154,8 +162,9 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
             errlog.append(e.toString());
         }
 
-        Element   qcElem = doc.getRootElement();
-        Namespace ns     = qcElem.getNamespace();
+            qcElem = doc.getRootElement();
+            ns = qcElem.getNamespace();
+        }
 
 
         return new TDSRadarDatasetCollection(desc, dsc_location, qcElem, ns,
@@ -238,12 +247,13 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
      */
     public HashMap<String,Station> readRadarStations(String stsXML_location)
             throws IOException {
-        SAXBuilder        builder;
+        SAXBuilder builder = null;
         Document          doc  = null;
         XMLEntityResolver jaxp = new XMLEntityResolver(true);
         builder = jaxp.getSAXBuilder();
         HashMap<String,Station> stations = new HashMap<String,Station>();
 
+        synchronized (builder) {
         try {
             doc = builder.build(stsXML_location);
         } catch (JDOMException e) {
@@ -257,6 +267,7 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
             if (null != (s = readStation(child))) {
                 stations.put(s.getName(), s);
             }
+        }
         }
 
         return stations;
@@ -318,25 +329,9 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
      * @return _more_
      */
     public LatLonRect readSelectRegion(Element elem, Namespace ns) {
-        Element region = elem.getChild("LatLonBox", ns);
-        //lat, lon
-        Element north = region.getChild("north", ns);
-        String  nv    = north.getValue();
-        Element south = region.getChild("south", ns);
-        String  sv    = south.getValue();
-        Element east  = region.getChild("east", ns);
-        String  ev    = east.getValue();
-        Element west  = region.getChild("west", ns);
-        String  wv    = west.getValue();
-
-        LatLonPointImpl p1 = new LatLonPointImpl(Double.valueOf(sv),
-                                 Double.valueOf(wv));
-        LatLonPointImpl p2 = new LatLonPointImpl(Double.valueOf(nv),
-                                 Double.valueOf(ev));
-        LatLonRect llr = new LatLonRect(p1, p2);
-
-
-        return llr;
+        Element geospatialCoverage = elem.getChild("geospatialCoverage", ns);
+        ThreddsMetadata.GeospatialCoverage coverage = readGeospatialCoverage(geospatialCoverage);
+        return coverage.getBoundingBox();
     }
 
     /**
@@ -348,20 +343,12 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
      * @return list of times
      */
     public List<String> readSelectTime(Element elem, Namespace ns) {
-        // look for stations
-
-        Element        region     = elem.getChild("TimeSpan", ns);
-
-        java.util.List regionInfo = region.getChildren();
-        //lat, lon
-        Element      start = region.getChild("start", ns);
-        String       sv    = start.getValue();
-        Element      end   = region.getChild("end", ns);
-        String       ev    = end.getValue();
-
-        List<String> ll    = new ArrayList<String>();
-        ll.add(sv);
-        ll.add(ev);
+        // look for time coverage
+        Element        timespan     = elem.getChild("timeCoverage", ns);
+        DateRange timeCoverage = readTimeCoverage(timespan, ns);
+        List<String> ll    = new ArrayList<>(2);
+        ll.add(timeCoverage.getStart().getCalendarDate().toString());
+        ll.add(timeCoverage.getEnd().getCalendarDate().toString());
         return ll;
     }
 
@@ -376,7 +363,7 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
     public List<Product> readSelectVariable(Element elem, Namespace ns) {
         // look for stations
         List<Product> varlist = new ArrayList<Product>();
-        Element       v       = elem.getChild("Variables", ns);
+        Element       v       = elem.getChild("variables", ns);
 
         List<Element> varInfo = v.getChildren();
         for (Element p : varInfo) {
@@ -411,6 +398,110 @@ public class TDSRadarDatasetCollection extends StationRadarCollectionImpl {
 
     }
 
+    // begin wholesale theft of code from thredds.catalog.parser.jdom.InvCatalogFactory10
+    protected ThreddsMetadata.GeospatialCoverage readGeospatialCoverage(Element gcElem) {
+        if (gcElem == null)
+            return null;
+
+        String zpositive = gcElem.getAttributeValue("zpositive");
+
+        ThreddsMetadata.Range northsouth = readGeospatialRange(gcElem.getChild("northsouth", defNS), CDM.LAT_UNITS);
+        ThreddsMetadata.Range eastwest = readGeospatialRange(gcElem.getChild("eastwest", defNS), CDM.LON_UNITS);
+        ThreddsMetadata.Range updown = readGeospatialRange(gcElem.getChild("updown", defNS), "m");
+
+        // look for names
+        List<ThreddsMetadata.Vocab> names = new ArrayList<>();
+        java.util.List<Element> list = gcElem.getChildren("name", defNS);
+        for (Element e : list) {
+            ThreddsMetadata.Vocab name = readControlledVocabulary(e);
+            names.add(name);
+        }
+
+        return new ThreddsMetadata.GeospatialCoverage(eastwest, northsouth, updown, names, zpositive);
+    }
+
+    protected ThreddsMetadata.Range readGeospatialRange(Element spElem, String defUnits) {
+        if (spElem == null)
+            return null;
+
+        double start = readDouble(spElem.getChild("start", defNS));
+        double size = readDouble(spElem.getChild("size", defNS));
+        double resolution = readDouble(spElem.getChild("resolution", defNS));
+
+        String units = spElem.getChildText("units", defNS);
+        if (units == null)
+            units = defUnits;
+
+        return new ThreddsMetadata.Range(start, size, resolution, units);
+    }
+
+    protected double readDouble(Element elem) {
+        if (elem == null)
+            return Double.NaN;
+        String text = elem.getText();
+        try {
+            return Double.parseDouble(text);
+        } catch (NumberFormatException e) {
+//            factory.appendErr(" ** Parse error: Bad double format = " + text + "\n");
+            return Double.NaN;
+        }
+    }
+
+    protected ThreddsMetadata.Vocab readControlledVocabulary(Element elem) {
+        if (elem == null)
+            return null;
+        return new ThreddsMetadata.Vocab(elem.getText(), elem.getAttributeValue("vocabulary"));
+    }
+
+    protected DateRange readTimeCoverage(Element tElem, Namespace ns) {
+        if (tElem == null)
+            return null;
+
+        DateType start = readDate(tElem.getChild("start", defNS));
+        DateType end = readDate(tElem.getChild("end", defNS));
+        TimeDuration duration = readDuration(tElem.getChild("duration", defNS));
+        TimeDuration resolution = readDuration(tElem.getChild("resolution", defNS));
+
+        try {
+            return new DateRange(start, end, duration, resolution);
+        } catch (java.lang.IllegalArgumentException e) {
+            // factory.appendWarning(" ** warning: TimeCoverage error = " + e.getMessage() + "\n");
+            return null;
+        }
+    }
+
+    protected DateType readDate(Element elem) {
+        if (elem == null)
+            return null;
+        String format = elem.getAttributeValue("format");
+        String type = elem.getAttributeValue("type");
+        return makeDateType(elem.getText(), format, type);
+    }
+
+    protected DateType makeDateType(String text, String format, String type) {
+        if (text == null)
+            return null;
+        try {
+            return new DateType(text, format, type);
+        } catch (java.text.ParseException e) {
+            // factory.appendErr(" ** Parse error: Bad date format = " + text + "\n");
+            return null;
+        }
+    }
+
+    protected TimeDuration readDuration(Element elem) {
+        if (elem == null)
+            return null;
+        String text = null;
+        try {
+            text = elem.getText();
+            return new TimeDuration(text);
+        } catch (java.text.ParseException e) {
+            // factory.appendErr(" ** Parse error: Bad duration format = " + text + "\n");
+            return null;
+        }
+    }
+    // end wholesale theft of code from thredds.catalog.parser.jdom.InvCatalogFactory10
 
     /**
      * _more_

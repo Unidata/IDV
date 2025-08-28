@@ -24,6 +24,7 @@ package ucar.unidata.idv.chooser;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.input.DOMBuilder;
 import org.jdom2.input.SAXBuilder;
 
 
@@ -31,6 +32,7 @@ import org.w3c.dom.*;
 
 import org.w3c.dom.Element;
 
+import org.xml.sax.SAXException;
 import thredds.catalog.XMLEntityResolver;
 
 //import ucar.nc2.thredds.TDSRadarDatasetCollection;
@@ -41,6 +43,7 @@ import ucar.unidata.data.DataUtil;
 import ucar.unidata.data.DataSelection;
 
 import ucar.unidata.data.radar.RadarQuery;
+import ucar.unidata.data.radar.TDSRadarDatasetCollection;
 import ucar.unidata.geoloc.StationImpl;
 import ucar.unidata.idv.DisplayControl;
 import ucar.unidata.idv.ViewManager;
@@ -77,6 +80,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.swing.*;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
@@ -93,7 +100,7 @@ public class TDSRadarChooser extends TimesChooser {
     private JComponent outerContents;
 
     /** The collection */
-    private IdvRadarDatasetCollection collection;
+    private TDSRadarDatasetCollection collection;
 
     /** The currently selected station */
     private NamedStation selectedStation;
@@ -481,20 +488,19 @@ public class TDSRadarChooser extends TimesChooser {
      * @return  a map of the collection names to URL
      */
     private List getRadarCollections(String radarServerURL) {
+
         SAXBuilder        builder;
         Document          doc  = null;
         XMLEntityResolver jaxp = new XMLEntityResolver(true);
         builder = jaxp.getSAXBuilder();
-        List<TwoFacedObject> collections = new ArrayList<TwoFacedObject>();
+        List<TwoFacedObject> collections = new ArrayList<>();
 
         try {
             doc = builder.build(radarServerURL);
         } catch (JDOMException e) {
             userMessage("Invalid catalog");
-            //e.printStackTrace();
         } catch (IOException e) {
             userMessage("Unable to open catalog");
-            //e.printStackTrace();
         }
 
         org.jdom2.Element rootElem    = doc.getRootElement();
@@ -522,7 +528,6 @@ public class TDSRadarChooser extends TimesChooser {
 
         return collections;
     }
-
     /**
      * Read the elements
      *
@@ -555,12 +560,12 @@ public class TDSRadarChooser extends TimesChooser {
         try {
             StringBuffer errlog = new StringBuffer();
             try {
-                collection = IdvRadarDatasetCollection.factory("test", url,
+                collection = TDSRadarDatasetCollection.factory("test", url,
                         errlog);
             } catch (Exception exc) {
                 userMessage("Invalid catalog");
 
-                return;
+                //return;
             }
             List tdsStations = collection.getRadarStations();
             for (int i = 0; i < tdsStations.size(); i++) {
@@ -604,11 +609,11 @@ public class TDSRadarChooser extends TimesChooser {
         try {
             StringBuffer errlog = new StringBuffer();
             try {
-                collection = IdvRadarDatasetCollection.factory("test", url,
+                collection = TDSRadarDatasetCollection.factory("test", url,
                         errlog);
             } catch (Exception exc) {
                 userMessage("Invalid catalog");
-                return;
+                //return;
             }
             products = collection.getRadarProducts();
             List tdsStations = collection.getRadarStations();
@@ -625,8 +630,7 @@ public class TDSRadarChooser extends TimesChooser {
 
             }
             productComboBox.removeAllItems();
-            List<TwoFacedObject> productNames =
-                new ArrayList<TwoFacedObject>();
+            List<TwoFacedObject> productNames = new ArrayList();
             productNames.add(SELECT_OBJECT);
             for (Product product : products) {
                 // if ( !product.getID().contains("DPA")
@@ -702,65 +706,23 @@ public class TDSRadarChooser extends TimesChooser {
                         pid = TwoFacedObject.getIdString(
                             productComboBox.getSelectedItem());
                     }
-                    List<Date> allTimes;
-                    URI uri = collection.getQueryRadarStationURI(
-                                  selectedStation.getID(), pid, fromDate,
-                                  toDate);
+                    List allTimes =
+                            collection.getRadarStationTimes(selectedStation.getID(),
+                                    pid, fromDate, toDate);
+
 
 
                     // Trace.call1("getXml");
                     LogUtil.message("Reading radar catalog from server");
-                    String xml;
-                    try {
-                        xml = IOUtil.readContents(uri.toString(), getClass());
-                    } finally {
-                        LogUtil.message("");
-                    }
-                    // LogUtil.message("Processing radar catalog");
-                    // Trace.call2("getXml"," xml.length=" + xml.length());
 
-                    // Trace.call1("getRoot");
-                    Element root = XmlUtil.getRoot(xml);
-                    // Trace.call2("getRoot");
-
-
-                    Element topDatasetNode = XmlUtil.findChild(root,
-                                                 CatalogUtil.TAG_DATASET);
-                    if (topDatasetNode == null) {
-                        throw new IllegalStateException(
-                            "Could not find dataset node in radar catalog");
-                    }
-
-                    List children = XmlUtil.findChildren(topDatasetNode,
-                                        CatalogUtil.TAG_DATASET);
-                    allTimes = new ArrayList<Date>();
-                    if ((children == null) || children.isEmpty()) {
-                        String message = "No data available";
-                        if (isLevel3) {
-                            message +=
-                                " for "
-                                + productComboBox.getSelectedItem()
-                                    .toString();
+                    for (int timeIdx = 0; timeIdx < allTimes.size(); timeIdx++) {
+                        Object timeObj = allTimes.get(timeIdx);
+                        Date   date;
+                        if (timeObj instanceof Date) {
+                            date = (Date) timeObj;
+                        } else {
+                            date = DateUnit.getStandardOrISO(timeObj.toString());
                         }
-                        message += " at " + selectedStation.getID();
-                        userMessage(message);
-                    }
-                    SimpleDateFormat sdf =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    sdf.setTimeZone(DateUtil.TIMEZONE_GMT);
-                    for (int i = 0; i < children.size(); i++) {
-                        Element child = (Element) children.get(i);
-                        String dttmTxt = XmlUtil.getGrandChildText(child,
-                                             CatalogUtil.TAG_DATE,
-                                             (String) null);
-                        if (dttmTxt == null) {
-                            continue;
-                        }
-                        Date dttm = sdf.parse(dttmTxt);
-                        allTimes.add(dttm);
-                    }
-
-                    for (Date date : allTimes) {
                         times.add(new DateTime(date));
                     }
 
@@ -781,81 +743,6 @@ public class TDSRadarChooser extends TimesChooser {
 
     }
 
-    /**
-     * _more_
-     *
-     * @param id _more_
-     */
-    public void updatetimelineOld(TwoFacedObject id) {
-        super.updatetimeline(id);
-        String collectionUrl =
-            TwoFacedObject.getIdString(collectionSelector.getSelectedItem());
-        DateSelection dateSelection = new DateSelection();
-        String        pid           = null;
-        RadarQuery    radarQuery;
-        if (isLevel3) {
-            pid = TwoFacedObject.getIdString(
-                productComboBox.getSelectedItem());
-            radarQuery = new RadarQuery(collectionUrl,
-                                        selectedStation.getID(), pid,
-                                        dateSelection);
-        } else {
-            radarQuery = new RadarQuery(collectionUrl,
-                                        selectedStation.getID(),
-                                        dateSelection);
-        }
-
-        DateTime[] driverTimes = (DateTime[]) id.getId();
-
-
-        List<DateTime> dtimes = new ArrayList<DateTime>();
-
-        for (int i = 0; i < driverTimes.length; i++) {
-            dtimes.add(driverTimes[i]);
-        }
-        Collections.sort(dtimes);
-        int n = driverTimes.length;
-
-        Date fromDate = DateUnit.getStandardOrISO(driverTimes[0].dateString()
-                            + "T" + driverTimes[0].timeString());
-        Date toDate =
-            DateUnit.getStandardOrISO(driverTimes[n - 1].dateString() + "T"
-                                      + driverTimes[n - 1].timeString());
-
-
-        List collectionTimes = null;
-        List selectedTimes   = null;
-
-        try {
-            collectionTimes =
-                collection.getRadarStationTimes(radarQuery.getStation(),
-                    radarQuery.getProduct(), fromDate, toDate);
-            selectedTimes = DataUtil.selectTimesFromList(collectionTimes,
-                    dtimes);
-
-            List newAbsoluteTimes = makeDatedObjects(selectedTimes);
-
-            int size = newAbsoluteTimes.size();
-            Date endDate, startDate;
-            if(size > 1) {
-                endDate =
-                        ((DatedThing) newAbsoluteTimes.get(size-1)).getDate();
-                int index = Math.max(0, size
-                                     - getNumTimesToSelect());
-                startDate =
-                    ((DatedThing) newAbsoluteTimes.get(index)).getDate();
-                getTimeLine().setDateSelection(new Date[]{startDate, endDate});
-                   
-            }
-            
-
-            setSelectedAbsoluteTimes(selectedTimes);
-            setDoTimeDrivers(true);
-            absoluteTimesSelectionChanged();
-            timeDriverEnabled = true;
-        } catch (Exception e) {}
-
-    }
 
     /**
      * Load the data
