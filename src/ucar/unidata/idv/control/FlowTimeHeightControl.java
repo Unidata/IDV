@@ -353,8 +353,15 @@ public class FlowTimeHeightControl extends TimeHeightControl implements FlowDisp
         FunctionType newFieldType = new FunctionType(newDomainType, parmType);
 
         SampledSet   ss           = GridUtil.getSpatialDomain(fi);
-        RealType height =
-                (RealType) ((SetType) ss.getType()).getDomain().getComponent(NN);
+        RealType height = null;
+        if(GridUtil.is2D(fi)) {
+             ss      = GridUtil.getSpatialDomain(fieldImpl);
+            height =
+                    (RealType) ((SetType) ss.getType()).getDomain().getComponent(NN);
+        } else {
+            height =
+                    (RealType) ((SetType) ss.getType()).getDomain().getComponent(NN);
+        }
         float[][] latlonalt = ss.getSamples();
         Unit      zUnit     = ss.getSetUnits()[NN];
         if ( !height.equals(RealType.Altitude)) {
@@ -366,7 +373,9 @@ public class FlowTimeHeightControl extends TimeHeightControl implements FlowDisp
 
         int        numTimes      = timeVals[0].length;
         int        numAlts       = ss.getLength();
-
+        if(GridUtil.is2D(fi)) {
+            numAlts = 1;
+        }
         double[][] newDomainVals = new double[2][numTimes * numAlts];
         int        l             = 0;
         for (int j = 0; j < numTimes; j++) {

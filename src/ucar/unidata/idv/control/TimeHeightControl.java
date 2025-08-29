@@ -849,56 +849,60 @@ public class TimeHeightControl extends LineProbeControl {
      * @throws VisADException   VisAD error
      */
     private void setYAxisPressureLabels() throws VisADException {
-       // try {
-            /** default pressure labels */
-        String[] DEFAULT_PRESSURE_LABELS = new String[] {
-                "1000",  "700", "500",  "250",   "100"
-        };
+        // try {
+        /** default pressure labels */
+        String[] DEFAULT_PRESSURE_LABELS = null;
+
         Range vrange = dataVerticalRange;
-        if(vrange.max >= 80000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "100",   "10",   "1",   "0.1", "0.01"
+        if (vrange.max >= 80000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "100", "10", "1", "0.1", "0.01"
             };
-        else if(vrange.max >= 45000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "300", "100", "10",   "1"
+        else if (vrange.max >= 45000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "300", "100", "10", "1"
             };
-        else if(vrange.max >= 30000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "500", "200", "100",   "10"
+        else if (vrange.max >= 30000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "500", "200", "100", "10"
             };
-        else if(vrange.max >= 20000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "500", "200", "100",   "50"
+        else if (vrange.max >= 20000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "500", "200", "100", "50"
             };
-        else if(vrange.max >= 16000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "700", "500", "300", "200", "100"
+        else if (vrange.max >= 16000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "700", "500", "300", "200", "100"
             };
-        else if(vrange.max >= 10000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "700", "500", "350", "250"
+        else if (vrange.max >= 10000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "700", "500", "350", "250"
             };
-        else if(vrange.max >= 5000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "850", "700", "600", "500"
+        else if (vrange.max >= 5000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "850", "700", "600", "500"
             };
-        else if(vrange.max >= 3000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "900", "850", "800", "750", "700"
+        else if (vrange.max >= 3000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "900", "850", "800", "750", "700"
             };
-        else if(vrange.max >= 2000)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "900", "850", "800", "750"
+        else if (vrange.max >= 2000)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "900", "850", "800", "750"
             };
-        else if(vrange.max >= 1400)
-            DEFAULT_PRESSURE_LABELS = new String[] {
-                    "1000",  "975", "950","925", "900", "850"
+        else if (vrange.max >= 1400)
+            DEFAULT_PRESSURE_LABELS = new String[]{
+                    "1000", "975", "950", "925", "900", "850"
             };
 
         /** pressure labels being used */
-        String[] pressureLabels = DEFAULT_PRESSURE_LABELS;
-        Hashtable table = getPressureLabels(pressureLabels);
+        Hashtable table = null;
+        if (DEFAULT_PRESSURE_LABELS != null) {
+            String[] pressureLabels = DEFAULT_PRESSURE_LABELS;
+            table = getPressureLabels(pressureLabels);
+        } else {
+            table = getPressureLabels0(vrange.asArray());
+        }
         AxisScale yScale = profileDisplay.getYAxisScale();
         java.util.Set keys = table.keySet();
         Iterator iterator = keys.iterator();
@@ -945,6 +949,24 @@ public class TimeHeightControl extends LineProbeControl {
 
         for (int i = 0; i < numLabels; i++) {
             labelTable.put(Double.valueOf(heights[i]), labels[i]);
+        }
+
+        return labelTable;
+        // set the field here in case there was an error.
+
+    }
+
+    public Hashtable getPressureLabels0(double[] heights) throws VisADException {
+        Hashtable labelTable = new Hashtable();
+        double[] press =
+                AirPressure.getStandardAtmosphereCS().fromReference(new double[][] {
+                        heights
+                })[0];
+
+        for (int i = 0; i < heights.length; i++) {
+            String label = getDisplayConventions().format(press[i]);
+            //String label = String.valueOf(press[i]);
+            labelTable.put(Double.valueOf(heights[i]), label);
         }
 
         return labelTable;
@@ -1417,6 +1439,8 @@ public class TimeHeightControl extends LineProbeControl {
         if(aUnit.isConvertible(CommonUnits.HECTOPASCAL)){
             setAltUnit(aUnit);
             setYAxisPressureLabels();
+        } else if (latlonalt == null) {
+            setYAxisLabels(dataVerticalRange.asFloatArray());
         } else{
             setYAxisLabels(latlonalt[2]);
         }
