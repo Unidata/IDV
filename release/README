@@ -37,6 +37,7 @@ in auxdata/docs/userguide/content/ReleaseNotes.html
 ********************************************************
 
 When you are ready to make a release, run:
+(may need to log in ML19, cd /data/web/docs/idv and  /mnt/downloads/idv/, mkdir <current IDV version> before run the script)
 
 cd /share/idv/release
 svn update build.xml
@@ -55,28 +56,7 @@ To start the server on license.unidata.ucar.edu the startup script is/etc/rc5.d/
 and the install at /opt/ejtserver.
 
 The above buildIdv command  will run the build, generate the installers, move all
-relevant files (installers, docs, webstart) to conan.  The following directories
-will be created:
-
-/content/software/idv/<release_dir>
-/content/downloads/idv/<release_dir>
-
-where <release_dir> is the version number with underscores (e.g. version 2.8 will be
-in <release_dir> 2_8).
-
-Then (see below):
-
-  Update the downloads/idv/toc.xml (see below)
-
-  Expand the javadoc (see below).
-
-  Generate the User Guide and Workshop PDFs (see below)
-
-  Update the index.html page (see below).
-
-  branch the git repository
-
-  change the /content/software/idv/current to point to the new release.
+relevant files (installers, docs, webstart) to ML19.
 
 ********************************************************************************
 
@@ -95,7 +75,8 @@ cd /data/web/docs/idv
 
 ********************************************************************************
 
-Expand the javadoc
+On ML19 check and expand the javadoc, if the build scirpt failed to copy we need
+to manually do the following:
 
 On ml19:
     cd /data/web/docs/idv/<release>
