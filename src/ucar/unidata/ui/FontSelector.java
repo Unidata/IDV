@@ -21,17 +21,14 @@
 package ucar.unidata.ui;
 
 
+import ucar.unidata.idv.DefaultIdv;
+
 import ucar.unidata.util.GuiUtils;
+import ucar.unidata.util.IOUtil;
 
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
+
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -39,16 +36,16 @@ import java.awt.event.WindowEvent;
 
 import java.beans.PropertyChangeListener;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
+import java.util.Arrays;
 
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -110,6 +107,81 @@ public class FontSelector implements ItemListener, ListSelectionListener {
     /** the component for selecting the font size */
     private JComponent sizeSelector;
 
+    private static final List<String> MCV_DEFAULT_FONTS = List.of(
+            "/ucar/unidata/idv/resources/defaultfont/SourceCodePro_Black.ttf",
+            "/ucar/unidata/idv/resources/defaultfont/SourceCodePro_Bold.ttf",
+            "/ucar/unidata/idv/resources/defaultfont/SourceCodePro_ExtraLight.ttf",
+          "/ucar/unidata/idv/resources/defaultfont/SourceCodePro_Light.ttf",
+          "/ucar/unidata/idv/resources/defaultfont/SourceCodePro_Medium.ttf",
+          "/ucar/unidata/idv/resources/defaultfont/SourceCodePro_Regular.ttf",
+          "/ucar/unidata/idv/resources/defaultfont/SourceCodePro_Semibold.ttf"
+    );
+
+
+    private static final String DEFAULT_FONT_FAMILY = "Source Code Pro";
+
+    private static volatile boolean addedFonts = false;
+
+    private static GraphicsEnvironment graphicsEnv = null;
+
+    private static Font defaultFont = null;
+
+    private static final Object registerLock = new Object();
+
+    //private static final Logger logger = LoggerFactory.getLogger(FontSelector.class);
+
+    public static final Comparator<String> FontNameComparator = new Comparator<String>() {
+        @Override public int compare(String o1, String o2) {
+            boolean s1Prefixed = o1.startsWith(DEFAULT_FONT_FAMILY);
+            boolean s2Prefixed = o2.startsWith(DEFAULT_FONT_FAMILY);
+            if (s1Prefixed && !s2Prefixed) {
+                return -1;
+            } else if (!s1Prefixed && s2Prefixed) {
+                return 1;
+            } else {
+                return o1.compareTo(o2);
+            }
+        }
+    };
+
+    private static GraphicsEnvironment registerFonts() {
+        if (!addedFonts) {
+            synchronized (registerLock) {
+                GraphicsEnvironment gEnv =
+                    GraphicsEnvironment.getLocalGraphicsEnvironment();
+                //ClassLoader sysLoader = ClassLoader.getSystemClassLoader();
+                try {
+                    for (String fontPath : MCV_DEFAULT_FONTS) {
+                        //URL ff = Misc.getURL(fontPath, DefaultIdv.class);
+                        InputStream fontStream = IOUtil.getInputStream(fontPath, DefaultIdv.class);
+                        //sysLoader.getResourceAsStream(fontPath);
+
+                        if (fontStream != null) {
+                            Font f = Font.createFont(Font.TRUETYPE_FONT, fontStream);
+                            gEnv.registerFont(f);
+                            if (f.getFontName().equals("Source Code Pro Medium")) {
+                                defaultFont = f;
+                            }
+                        }
+                    }
+                } catch (FontFormatException | IOException e) {
+                    //logger.error("Problem loading McV default fonts", e);
+                }
+                graphicsEnv = gEnv;
+                addedFonts = true;
+            }
+        }
+        return graphicsEnv;
+    }
+
+    public static Font getDefaultFont() {
+        // just in case...
+        GraphicsEnvironment gEnv = registerFonts();
+        if(defaultFont == null)
+            defaultFont = DEFAULT_FONT;
+        return defaultFont.deriveFont(14f);
+    }
+
     /**
      * Create a Font selector using the defaults.
      */
@@ -130,15 +202,19 @@ public class FontSelector implements ItemListener, ListSelectionListener {
         this.showLabels = showLabels;
         this.showSample = showSample;
 
-        GraphicsEnvironment gEnv =
-            GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsEnvironment gEnv = registerFonts();
         String envfonts[] = gEnv.getAvailableFontFamilyNames();
-        Vector fonts      = new Vector();
-        for (int i = 1; i < envfonts.length; i++) {
+        Arrays.sort(envfonts, FontNameComparator);
+
+        int longest = -1;
+        String longstr = "";
+        Vector<String> fonts = new Vector<>(envfonts.length);
+        for (int i = 0; i < envfonts.length; i++) {
+            if (envfonts[i].length() > longest) {
+                longest = envfonts[i].length();
+                longstr = envfonts[i];
+            }
             fonts.addElement(envfonts[i]);
-        }
-        if ( !fonts.contains(DEFAULT_NAME)) {
-            fonts.insertElementAt(DEFAULT_NAME, 0);
         }
         JComboBox box;
         JList     list;
@@ -148,7 +224,8 @@ public class FontSelector implements ItemListener, ListSelectionListener {
             box.setMaximumRowCount(9);
             Dimension d     = box.getPreferredSize();
             int       width = 6 * d.height;
-            GuiUtils.setPreferredWidth(box, Math.min(d.width, width));
+//            GuiUtils.setPreferredWidth(box, Math.min(d.width, width));
+            box.setPrototypeDisplayValue(longstr);
             box.addItemListener(this);
             fontSelector = box;
         } else {
@@ -314,7 +391,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
      */
     public void setFont(Font f) {
         if (f == null) {
-            f = DEFAULT_FONT;
+            f = getDefaultFont();
         }
         String name = f.getName();
         if ( !name.equals(DEFAULT_NAME)) {
@@ -418,7 +495,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
     class FontPanel extends JPanel {
 
         /** my font */
-        Font thisFont = DEFAULT_FONT;
+        Font thisFont = getDefaultFont();
 
         /**
          * Create a new FontPanel
