@@ -283,6 +283,42 @@ public class AccountManager implements CredentialsProvider,
         return userInfo;
     }
 
+    /**
+     * _more_
+     */
+    public UserInfo getAppKey(String key, String label) {
+        UserInfo userInfo = getTable().get(key);
+
+        if (userInfo != null) {
+            if (currentlyUsedOnes.get(userInfo) != null) {
+                return userInfo;
+            }
+        }
+
+        if (userInfo == null) {
+            if (dialog == null) {
+                makeKeyDialog(key);
+            }
+            serverLabel.setText(label);
+            ok = false;
+            dialog.pack();
+            //nameFld.requestFocus();
+            dialog.setVisible(true);
+            if ( !ok) {
+                return null;
+            }
+            userInfo =
+                    new UserInfo(key, key.trim(),
+                            new String(passwdFld.getPassword()).trim());
+            if (saveCbx.isSelected()) {
+                table.put(key, userInfo);
+                writeTable();
+            }
+        }
+
+        return userInfo;
+    }
+
 
     /**
      * _more_
@@ -426,5 +462,53 @@ public class AccountManager implements CredentialsProvider,
         dialog.setLocation(200, 200);
     }
 
+    /**
+     * _more_
+     */
+    private void makeKeyDialog(String id) {
+        serverLabel =
+                new JLabel("                                                ");
+        //nameFld   = new JTextField("", 10);
+        passwdFld = new JPasswordField("", 40);
+        saveCbx   = new JCheckBox("Save Key");
+        JButton        okBtn      = new JButton("OK");
+        ActionListener okListener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                ok = true;
+                dialog.dispose();
+            }
+        };
+        //nameFld.addActionListener(okListener);
+        passwdFld.addActionListener(okListener);
+        okBtn.addActionListener(okListener);
+        JButton cancelBtn = new JButton("Cancel");
+        cancelBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(
+                    ActionEvent ae) {
+                ok = false;
+                dialog.dispose();
+            }
+        });
+
+
+        GuiUtils.tmpInsets = GuiUtils.INSETS_5;
+        JPanel contents = GuiUtils.doLayout(new Component[] {
+                GuiUtils.rLabel("Name:"), GuiUtils.lLabel(id), GuiUtils.rLabel("Key:"),
+                passwdFld, GuiUtils.filler(), saveCbx
+        }, 2, GuiUtils.WT_N, GuiUtils.WT_N);
+
+
+        contents = GuiUtils.topCenterBottom(
+                serverLabel, contents,
+                GuiUtils.wrap(GuiUtils.doLayout(new Component[] { okBtn,
+                                new JLabel(" "), cancelBtn },
+                        3,
+                        GuiUtils.WT_N,
+                        GuiUtils.WT_N)));
+        dialog = GuiUtils.createDialog("APP KEY", true);
+        dialog.getContentPane().add(GuiUtils.inset(contents, 5));
+        dialog.pack();
+        dialog.setLocation(200, 200);
+    }
 
 }
