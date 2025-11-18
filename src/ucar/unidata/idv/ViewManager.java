@@ -4729,7 +4729,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JButton historyButton = new JButton("History");
         if(geminiInstructionHistory.size() == 0) {
-            String item1str = " You are an expert meteorologist with 20 years of experience analyzing synoptic weather charts. Please analyze the image and identify as many atmospheric features as possible and the weather that they may be causing. For each statement below, cite you source and provide a confidence score from 1 (low confidence, speculative) to 5 (high confidence, verifiable fact). Explain your reasoning for any score below 4.\n";
+            String item1str = " You are an expert meteorologist with 20 years of experience analyzing synoptic weather charts. \n" +
+                    "Please analyze the image and identify as many atmospheric features as possible and the weather that they may be causing. \n" +
+                    "For each statement below, cite you source and provide a confidence score from 1 (low confidence, speculative) to 5 (high confidence, verifiable fact). \n" +
+                    "Explain your reasoning for any score below 4.\n";
             geminiInstructionHistory.add(item1str);
             String item2str = "Analyze the provided weather map and identify the following key features: \n" +
                     "Major Pressure Systems: Locate and describe any significant high-pressure (H) and low-pressure (L) systems. Mention their approximate central pressure in millibars (mb) if visible. \n" +
