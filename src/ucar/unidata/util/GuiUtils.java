@@ -1168,8 +1168,6 @@ public class GuiUtils extends LayoutUtil {
         return getImage(file, c, true);
     }
 
-
-
     /**
      * Create an  Image from the given image file name.
      * The filename may be a file, a java resource or a url.
@@ -1558,7 +1556,16 @@ public class GuiUtils extends LayoutUtil {
         return sp;
     }
 
-
+    public static JScrollPane makeScrollPaneHN(Component c, int xdim,
+                                             int ydim) {
+        JScrollPane sp =
+                new JScrollPane(
+                        c, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JViewport vp = sp.getViewport();
+        vp.setViewSize(new Dimension(xdim, ydim));
+        return sp;
+    }
     /**
      * Set the size and preferred size of the component and return it
      *
