@@ -4729,15 +4729,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JButton historyButton = new JButton("History");
         if(geminiInstructionHistory.size() == 0) {
-            String item1str = " You are an expert meteorologist with 20 years of experience analyzing synoptic weather charts. \n" +
-                    "Please analyze the image and identify as many atmospheric features as possible and the weather that they may be causing. \n" +
-                    "For each statement below, cite you source and provide a confidence score from 1 (low confidence, speculative) to 5 (high confidence, verifiable fact). \n" +
+            String item1str = " You are an expert meteorologist with 20 years of experience analyzing synoptic weather charts. " +
+                    "Please analyze the image and identify as many atmospheric features as possible and the weather that they may be causing. " +
+                    "For each statement below, cite you source and provide a confidence score from 1 (low confidence, speculative) to 5 (high confidence, verifiable fact). " +
                     "Explain your reasoning for any score below 4.\n";
             geminiInstructionHistory.add(item1str);
-            String item2str = "Analyze the provided weather map and identify the following key features: \n" +
-                    "Major Pressure Systems: Locate and describe any significant high-pressure (H) and low-pressure (L) systems. Mention their approximate central pressure in millibars (mb) if visible. \n" +
-                    "Fronts: Identify all types of fronts (cold, warm, occluded, stationary). Describe their location and the direction they are moving. \n" +
-                    "Precipitation: Describe the areas of precipitation (rain, snow, mixed). Note their intensity if indicated by color codes. \n" +
+            String item2str = "Analyze the provided weather map and identify the following key features: " +
+                    "Major Pressure Systems: Locate and describe any significant high-pressure (H) and low-pressure (L) systems. Mention their approximate central pressure in millibars (mb) if visible. " +
+                    "Fronts: Identify all types of fronts (cold, warm, occluded, stationary). Describe their location and the direction they are moving. " +
+                    "Precipitation: Describe the areas of precipitation (rain, snow, mixed). Note their intensity if indicated by color codes. " +
                     "Overall Summary: Provide a 2-3 sentence narrative summary of the weather conditions and what to expect in the next 12-24 hours for a key region (e.g., the US Midwest).";
             geminiInstructionHistory.add(item2str);
         }
