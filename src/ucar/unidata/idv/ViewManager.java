@@ -90,25 +90,7 @@ import visad.java3d.DisplayImplJ3D;
 import visad.java3d.DisplayRendererJ3D;
 
 
-import java.awt.AWTException;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -124,26 +106,19 @@ import java.awt.print.PrinterJob;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 
 import java.rmi.RemoteException;
 
 import java.text.DecimalFormat;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.imageio.ImageIO;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Group;
 
@@ -779,6 +754,16 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * this ViewManager.
      */
     protected Rectangle windowBounds;
+
+    /**
+     * Displays an input dialog to get an instruction from the user,
+     * and then calls the doGemini method with that instruction.
+     */
+    static String weatherMape1 = null;
+    static String weatherAnalysis1 = null;
+
+    /** The history of gemini instructions */
+    private List<String> geminiInstructionHistory = new ArrayList<>();
 
     /**
      *  A parameter-less ctor for the XmlEncoder based decoding.
@@ -4686,6 +4671,14 @@ public class ViewManager extends SharableImpl implements ActionListener,
         captureMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Print...",
                 this, "doPrintImage", null,
                 true), "/auxdata/ui/icons/printer.png"));
+
+        JMenu geminiMenu = new JMenu("RunGemini");
+        viewMenu.add(geminiMenu);
+        geminiMenu.add(GuiUtils.setIcon(GuiUtils.makeMenuItem("Run Gemini...",
+                        this, "promptAndRunGemini", null,
+                       true), "/auxdata/ui/icons/gemini.jpg")
+                );
+
         viewMenu.add(makeShowMenu());
 
         if (this.viewMenu == null) {
@@ -4693,6 +4686,173 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
+    /**
+     * Make the run gemini views menu
+     */
+    public void promptAndRunGemini() throws AWTException {
+        String instruction = null; //"what is the current weather in Denver";
+        JTextArea textArea = new JTextArea(10, 50);
+        textArea.setLineWrap(true);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
+        JPanel textPanel = new JPanel(new BorderLayout(0, 5));
+        textPanel.add(new JLabel("Enter the instruction for Gemini:"), BorderLayout.NORTH);
+        textPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JButton imageButton = new JButton("Archived weather Map file");
+        imageButton.setEnabled(false);
+        imageButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Select Archived Weather Map File");
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                weatherMape1 = selectedFile.getAbsolutePath();
+                // You can add logic here to process the selected file
+                System.out.println("Selected history file: " + weatherMape1);
+            }
+        });
+
+        JButton analysisButton = new JButton("Archived weather analysis files");
+        analysisButton.setEnabled(false);
+        analysisButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Select Archived Weather Map File");
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                weatherAnalysis1 = selectedFile.getAbsolutePath();
+                // You can add logic here to process the selected file
+                System.out.println("Selected history file: " + weatherAnalysis1);
+            }
+        });
+
+        JButton historyButton = new JButton("History");
+        if(geminiInstructionHistory.size() == 0) {
+            String item1str = " You are an expert meteorologist with 20 years of experience analyzing synoptic weather charts. Please analyze the image and identify as many atmospheric features as possible and the weather that they may be causing. For each statement below, cite you source and provide a confidence score from 1 (low confidence, speculative) to 5 (high confidence, verifiable fact). Explain your reasoning for any score below 4.\n";
+            geminiInstructionHistory.add(item1str);
+            String item2str = "Analyze the provided weather map and identify the following key features: \n" +
+                    "Major Pressure Systems: Locate and describe any significant high-pressure (H) and low-pressure (L) systems. Mention their approximate central pressure in millibars (mb) if visible. \n" +
+                    "Fronts: Identify all types of fronts (cold, warm, occluded, stationary). Describe their location and the direction they are moving. \n" +
+                    "Precipitation: Describe the areas of precipitation (rain, snow, mixed). Note their intensity if indicated by color codes. \n" +
+                    "Overall Summary: Provide a 2-3 sentence narrative summary of the weather conditions and what to expect in the next 12-24 hours for a key region (e.g., the US Midwest).";
+            geminiInstructionHistory.add(item2str);
+        }
+        historyButton.addActionListener(e -> {
+            JPopupMenu historyMenu = new JPopupMenu();
+            if (geminiInstructionHistory.isEmpty()) {
+                JMenuItem emptyItem = new JMenuItem("No history available");
+                emptyItem.setEnabled(false);
+                historyMenu.add(emptyItem);
+            } else {
+                for (int i = 0; i < geminiInstructionHistory.size(); i++) {
+                    String historyItem  = geminiInstructionHistory.get(i);
+                    JMenuItem menuItem = null;
+                    if(i == 0 || i == 1)
+                        menuItem = new JMenuItem("Master Promp Example " + i+1);
+                    else
+                        menuItem = new JMenuItem(historyItem.substring(0, 39) + "...");
+                    menuItem.setToolTipText(historyItem.toString());
+                    menuItem.addActionListener(menuEvent -> {
+                        if (textArea.getText().length() > 0 && !textArea.getText().endsWith("\n")) {
+                            textArea.append("\n");
+                        }
+                        textArea.append(historyItem);
+                    });
+                    historyMenu.add(menuItem);
+                }
+            }
+            historyMenu.show(historyButton, 0, historyButton.getHeight());
+        });
+
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(imageButton);
+        buttonPanel.add(analysisButton);
+
+        JPanel historyButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        historyButtonPanel.add(historyButton);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(0, 10));
+        mainPanel.add(buttonPanel, BorderLayout.NORTH);
+        mainPanel.add(textPanel, BorderLayout.CENTER);
+        mainPanel.add(historyButtonPanel, BorderLayout.SOUTH);
+
+        Object[] message = {mainPanel}; //, "Enter the instruction for Gemini:"  };
+        int option = JOptionPane.showConfirmDialog(
+                LogUtil.getCurrentWindow(), // Assumes 'this' is the parent Frame or Component
+                message,
+                "Run Gemini with Instruction",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+        if (option == JOptionPane.OK_OPTION) {
+            instruction = textArea.getText();
+            if (instruction != null && !instruction.trim().isEmpty() && !geminiInstructionHistory.contains(instruction)) {
+                int i = geminiInstructionHistory.size();
+                TwoFacedObject tfo = new TwoFacedObject("Instruction ", instruction);
+                geminiInstructionHistory.add(instruction);
+            }
+        }
+        //System.out.println("Instruction11: " + instruction);
+        // JOptionPane.showInputDialog returns null if the user hits "Cancel" or closes the dialog.
+        // We only proceed if the user provided some input.
+        if (instruction != null) {
+            final String finalInstruction = instruction;
+            // Call your original method, but now pass the instruction to it.
+            Misc.run(new Runnable() {
+                public void run() {
+                    try {
+                        getIdv().showWaitCursor();
+                        doGemini(finalInstruction);
+                        getIdv().showNormalCursor();
+                    } catch (Throwable exc) {
+                        logException(
+                                "Creating data source from history",
+                                exc);
+                    }
+                }
+            });
+
+        }
+
+        System.out.println("Instruction: " + instruction);
+    }
+
+    public String selectFile(String title) {
+        // tile to be image or analysis
+        String fileNameReturn = null;
+
+        JFrame fileFrame = new JFrame();
+        JFileChooser historyFileChooser = new JFileChooser();
+        String filePath = System.getenv("ODTHISTORY");
+        if (filePath == null) {
+            filePath =  System.getProperty("user.home");
+        }
+        historyFileChooser.setCurrentDirectory(new File(filePath));
+        historyFileChooser.setDialogTitle(title);
+        int returnVal = historyFileChooser.showOpenDialog(fileFrame);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = historyFileChooser.getSelectedFile();
+            fileNameReturn = file.getAbsolutePath();
+        }
+
+        return fileNameReturn;
+    }
+
+    public void doGemini()
+            throws AWTException {
+        try {
+            LogUtil.runGemini(this.getMaster().getImage(false), null);
+        } catch (Exception e){}
+    }
+
+    public void doGemini(String instruction)
+            throws AWTException {
+        try {
+            LogUtil.runGemini(this.getMaster().getImage(false), instruction);
+        } catch (Exception e){}
+    }
     /**
      * Make the saved views menu
      *

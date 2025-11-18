@@ -27,9 +27,14 @@
 package ucar.unidata.util;
 
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 import java.awt.*;
 import java.awt.event.*;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 import java.lang.management.*;
@@ -47,13 +52,24 @@ import java.lang.management.*;
 import java.lang.reflect.InvocationTargetException;
 
 
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
 
 /**
@@ -109,8 +125,11 @@ public class LogUtil {
     /** The text area that shows the errors in the error console */
     private static JTextArea consoleText;
 
-
-
+    private static JFrame resultFrame;
+    private static JTextArea resultArea;
+    private static final int MAX_RETRIES = 5;
+    private static final long INITIAL_WAIT_MILLIS = 1000; // 1 second
+    private static final Random random = new Random();
 
     /**
      * private ctor so no one can instantiate a LogUtil
@@ -555,8 +574,8 @@ public class LogUtil {
     public static JPanel getMultiExceptionsPanel(List errorMessages,
             List exceptions) {
         final JTextArea tv = new JTextArea(15, 60);
-        //        final JScrollPane sp = new JScrollPane (tv, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
-        final JScrollPane sp    = new JScrollPane(tv);
+        final JScrollPane sp = new JScrollPane (tv, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER );
+       // final JScrollPane sp    = new JScrollPane(tv);
         ArrayList         comps = new ArrayList();
         for (int i = 0; i < exceptions.size(); i++) {
             Throwable exc     = (Throwable) exceptions.get(i);
@@ -604,6 +623,7 @@ public class LogUtil {
                                         2, LayoutUtil.WT_NY, LayoutUtil.WT_N);
         JScrollPane jpScroll = GuiUtils.makeScrollPane(LayoutUtil.top(jp),
                                    100, 100);
+        jpScroll.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         jpScroll.setPreferredSize(new Dimension(100, 100));
         jpScroll.setSize(new Dimension(100, 100));
         JPanel contents = LayoutUtil.topCenter(jpScroll, sp);
@@ -681,7 +701,7 @@ public class LogUtil {
                 new JScrollPane(
                     consoleText,
                     ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    HORIZONTAL_SCROLLBAR_NEVER);
             JViewport vp = sp.getViewport();
             vp.setViewSize(new Dimension(300, 400));
             JPanel contents = LayoutUtil.centerBottom(
@@ -695,40 +715,718 @@ public class LogUtil {
         consoleWindow.setVisible(true);
     }
 
-    public static void runGemini(String imagePath) {
-        String apiKey = "key"; // Replace with your actual API key
-        String baseUrl = "https://generative-ai.googleapis.com/v1beta/models/"; // Replace with the Gemini API base URL
-        String modelName = "gemini-pro-vision"; //""gemini-2.0-flash-exp"; // Make sure this model supports image input
-        //String imagePath = "path/to/your/image.jpg"; // Replace with the actual path to your image file
-        String apiEndpoint = baseUrl + modelName + "/generateContent";
+    /**
+     * Sends an image to the Gemini API for analysis and returns the result.
+     * Note: This is a hypothetical implementation and requires a valid Gemini API endpoint and key.
+     *
+     * @param image The local path to the image file.
+     * @return A string containing the analysis from the Gemini API, or an error message.
+     */
+    public static String runGemini(BufferedImage image) {
+        if (image == null) {
+            String errorMsg = "Input BufferedImage cannot be null.";
+            // log_.error(errorMsg);
+            System.err.println(errorMsg);
+            return errorMsg;
+        }
+        /* set up ADT Bulletin display area */
+        if(resultArea == null) {
+            resultArea = new JTextArea();
+            resultArea.setEditable(false);
+            JButton clearBtn = new JButton("Clear");
+            clearBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    resultArea.setText("");
+                }
+            });
+            Font c = new Font("Courier", Font.BOLD, 12);
 
-        GeminiService service = new GeminiService(apiKey, apiEndpoint);
-
-        try {
-            // Read image and encode to Base64
-            Path filePath = Paths.get(imagePath, "test.jpg");
-            if (!Files.exists(filePath)) {
-                System.out.println("File does not exist: " + filePath);
-                return;
-            }
-            byte[] imageData = Files.readAllBytes(filePath);
-            String base64Image = Base64.getEncoder().encodeToString(imageData);
-
-            // Create GeminiRequestWithImage object
-            GeminiService.GeminiRequestWithImage request = new GeminiService.GeminiRequestWithImage();
-            request.setTextPrompt("Describe the content of this image");
-            //request.setImage(base64Image);
-
-            // Make API call
-            GeminiService.GeminiResponse response = service.getCompletionWithImage(request, modelName);
-
-            // Print the result
-            System.out.println("Generated Content: " + response.getContent());
-            consoleMessage("Generated Content: " + response.getContent());
-        } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            resultFrame = new JFrame("GEMINI Results");
+            resultFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JScrollPane resultScroller = new JScrollPane(resultArea);
+            resultScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            JPanel contents = LayoutUtil.centerBottom(
+                    resultScroller,
+                    LayoutUtil.wrap(
+                            LayoutUtil.hflow(
+                                    Misc.newList(clearBtn))));
+            resultFrame.add(contents, BorderLayout.CENTER);
+            resultFrame.setPreferredSize(new Dimension(400, 600));
+            resultFrame.setFont(c);
         }
 
+        try {
+            // 1. Read image bytes and encode to Base64
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpeg", baos); // Using JPEG format
+            byte[] imageBytes = baos.toByteArray();
+
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            // 2. IMPORTANT: Replace with your actual Gemini API key.
+            String apiKey = " ";
+            // Updated to use the Gemini 2.5 Pro model
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
+
+            // 3. Construct the JSON payload based on the Gemini REST API documentation
+            String jsonPayload = "{" +
+                    "  \"contents\": [{" +
+                    "    \"parts\": [" +
+                    "      {\"text\": \"What is in this picture?\"}," +
+                    "      {\"inline_data\": {" +
+                    "        \"mime_type\": \"image/jpeg\"," +
+                    "        \"data\": \"" + base64Image + "\"" +
+                    "      }}" +
+                    "    ]" +
+                    "  }]" +
+                    "}";
+
+            // 4. Use Java's HttpClient to send the request
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 5. Process the response
+            if (response.statusCode() == 200) {
+                // NOTE: This is a simplified parser. For production, use a JSON library (e.g., Gson, Jackson).
+                String responseBody = response.body();
+                String out = extractTextFromGeminiResponse(responseBody);
+                consoleMessage(out);
+                return out;
+            } else {
+                String errorMsg = "Error from Gemini API: " + response.statusCode() + " " + response.body();
+                log_.error(errorMsg);
+                return errorMsg;
+            }
+
+        } catch (IOException | InterruptedException e) {
+            logException("Failed to run Gemini analysis on " + image, e);
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            return "Failed to process image for Gemini analysis.";
+        }
+    }
+
+    /**
+     * Analyzes an image using the Gemini API, with a robust retry mechanism for transient errors.
+     *
+     * @param image       The image to be analyzed.
+     * @param instruction The prompt for the analysis.
+     * @return The text result from Gemini or an error message.
+     */
+    public static String runGeminiOld(BufferedImage image, String instruction) {
+        if (image == null) {
+            String errorMsg = "Input BufferedImage cannot be null.";
+            // log_.error(errorMsg);
+            System.err.println(errorMsg);
+            return errorMsg;
+        }
+
+        if(resultArea == null) {
+            resultArea = new JTextArea();
+            resultArea.setEditable(false);
+            resultArea.setLineWrap(true);
+            Font c = new Font("Courier", Font.BOLD, 12);
+            JButton clearBtn = new JButton("Clear");
+            clearBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    resultArea.setText("");
+                }
+            });
+            resultFrame = new JFrame("GEMINI Results");
+            resultFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JScrollPane resultScroller = new JScrollPane(resultArea);
+            resultScroller.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+            resultScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            JPanel contents = LayoutUtil.centerBottom(
+                    resultScroller,
+                    LayoutUtil.wrap(
+                            LayoutUtil.hflow(
+                                    Misc.newList(clearBtn))));
+            resultFrame.add(contents, BorderLayout.CENTER);
+            //resultFrame.add(resultScroller, BorderLayout.CENTER);
+            resultFrame.setPreferredSize(new Dimension(400, 600));
+            resultFrame.setFont(c);
+        }
+
+        consoleMessage(". ");
+        consoleMessage(". ");
+        consoleMessage("INSTRUCTION: " + instruction);
+        consoleMessage("> ");
+        String msg = Msg.msg(instruction);
+        resultArea.append(msg + "\n");
+        resultArea.append("> "+ "\n");
+
+        try {
+            // 1. Convert BufferedImage to a byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpeg", baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            // 2. Encode to Base64
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            // 3. Set API Key and URL (The URL does not change)
+            String apiKey = " ";
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
+
+            // 4. Prepare the instruction for the JSON payload
+            String prompt = (instruction == null || instruction.trim().isEmpty())
+                    ? "Please Provide Summary of this weather map?" // Default instruction
+                    : instruction;
+            // Escape quotes in the instruction to prevent breaking the JSON structure.
+            String escapedPrompt = prompt.replace("\"", "\\\"");
+
+            // 5. Construct the JSON payload with the dynamic instruction
+            String jsonPayload = "{" +
+                    "  \"contents\": [{" +
+                    "    \"parts\": [" +
+                    // The user's instruction is placed here
+                    "      {\"text\": \"" + escapedPrompt + "\"}," +
+                    "      {\"inline_data\": {" +
+                    "        \"mime_type\": \"image/jpeg\"," +
+                    "        \"data\": \"" + base64Image + "\"" +
+                    "      }}" +
+                    "    ]" +
+                    "  }]," +
+                    "  \"generationConfig\": {" +
+                    "    \"temperature\": 0.3," +
+                    "    \"topK\": 32," +
+                    "    \"topP\": 1.0," +
+                    "    \"maxOutputTokens\": 8192," +
+                    "    \"stopSequences\": []" +
+                    "  }" +
+                    "}";
+
+            // 6. Send the request
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 7. Process the response
+            if (response.statusCode() == 200) {
+                String responseBody = response.body();
+                String out = extractTextFromGeminiResponse(responseBody);
+                consoleMessage(out);
+                msg = Msg.msg(out);
+                resultArea.append(msg + "\n");
+                resultFrame.pack();
+                resultFrame.setVisible(true);
+                return out;
+            } else {
+                String errorMsg = "Error from Gemini API: " + response.statusCode() + " " + response.body();
+                consoleMessage(errorMsg);
+                msg = Msg.msg(errorMsg);
+                resultArea.append(msg + "\n");
+                resultFrame.pack();
+                resultFrame.setVisible(true);
+                System.err.println(errorMsg);
+                return errorMsg;
+            }
+
+        } catch (IOException | InterruptedException e) {
+            // logException("Failed to run Gemini analysis on the image.", e);
+            System.err.println("Failed to process image for Gemini analysis: " + e.getMessage());
+            Thread.currentThread().interrupt();
+            return "Failed to process image for Gemini analysis.";
+        }
+    }
+    /**
+     * Analyzes an image using the Gemini API, with a robust retry mechanism for transient errors.
+     *
+     * @param image       The image to be analyzed.
+     * @param instruction The prompt for the analysis.
+     * @return The text result from Gemini or an error message.
+     */
+    public static String runGemini(BufferedImage image, String instruction) {
+        if (image == null) {
+            String errorMsg = "Input BufferedImage cannot be null.";
+            System.err.println(errorMsg);
+            return errorMsg;
+        }
+
+        initializeUI(); // Encapsulated UI setup for clarity
+        updateUIWithMessage("INSTRUCTION: " + instruction + "\n> ");
+
+        try {
+            // 1. Prepare image data
+            // 1. Convert BufferedImage to a byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpeg", baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            // 2. Encode to Base64
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            // 2. Prepare API details
+            String VALIDATION_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+            HttpClient client = HttpClient.newHttpClient();
+
+            UserInfo userInfo = GeminiKeyValidator( VALIDATION_URL);
+
+            String apiKey = userInfo.getPassword();
+            //" "; // IMPORTANT: Do not hardcode keys in production
+            // NOTE: The official public model is 'gemini-1.5-pro-latest'.
+            // Using your string in case you have private access.
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
+
+            // 3. Construct JSON payload safely using a library
+            String jsonPayload = buildJsonPayload(instruction, base64Image);
+
+            // 4. Send request with retry logic
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            return sendRequestWithRetry(client, request);
+
+        } catch (IOException e) {
+            System.err.println("Failed to process image for Gemini analysis: " + e.getMessage());
+            return "Failed to process image for Gemini analysis.";
+        }
+    }
+
+    /**
+     * A utility function to validate a Google Gemini API key.
+     */
+    public static UserInfo GeminiKeyValidator(String VALIDATION_URL) {
+        HttpClient client = HttpClient.newHttpClient();
+        AccountManager userAccountManager =
+                AccountManager.getGlobalAccountManager();
+        UserInfo userInfo = null;
+        if (userAccountManager != null) {
+            String host = "GOOGLE";
+            userInfo =
+                    userAccountManager.getAppKey("gemini", "<html>The server: <i>" + host
+                            + "<i> requires a APP Key</html>") ;
+            if (userInfo == null) {
+                return null;
+            }
+            // 2. Construct the request URI
+            URI validationUri = URI.create(VALIDATION_URL + "?key=" + userInfo.getPassword());
+            // 3. Build the HTTP GET request
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(validationUri)
+                    .GET()
+                    .timeout(Duration.ofSeconds(10))
+                    .build();
+            try {
+                // 4. Send the request and get the response
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                // 5. Interpret the response status code
+                int statusCode = response.statusCode();
+                if (statusCode == 200) {
+                    // 200 OK is a definitive success
+                    //return ValidationStatus.VALID;
+                } else if (statusCode == 400) {
+                    // 400 Bad Request is what Gemini often returns for invalid keys.
+                    // We can check the response body for a more specific message.
+                    if (response.body() != null && response.body().contains("API key not valid")) {
+                        //need to remove this invalid key
+                        userAccountManager.getTable().remove("gemini");
+                        return null;
+                    }
+                } else {
+                    // Any other non-200 code is considered an API or configuration error.
+                    return null;
+                }
+            } catch (IOException | InterruptedException e) {
+                // 6. Handle network or interruption errors
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt(); // Restore the interrupted status
+                }
+                System.err.println("Validation failed due to a network or interruption error: " + e.getMessage());
+                return null;
+            }
+        }
+
+        return userInfo;
+    }
+
+    /**
+     * A utility function to call Google Gemini API.
+     */
+
+    private static String sendRequestWithRetry(HttpClient client, HttpRequest request) {
+        long waitMillis = INITIAL_WAIT_MILLIS;
+        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                consoleMessage(String.format("Attempt %d of %d...", attempt + 1, MAX_RETRIES));
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200) {
+                    String extractedText = extractTextFromGeminiResponse(response.body());
+                    updateUIWithMessage(extractedText);
+                    return extractedText;
+                }
+
+                // Check for retriable server errors (5xx)
+                if (response.statusCode() >= 500 && response.statusCode() < 600) {
+                    consoleMessage(String.format("Received server error %d. Retrying in ~%dms.", response.statusCode(), waitMillis));
+                    // This is a retriable error, continue to the sleep and retry logic
+                } else {
+                    // Non-retriable error (e.g., 400 Bad Request, 401 Auth error). Stop immediately.
+                    String errorMsg = "Error from Gemini API: " + response.statusCode() + " " + response.body();
+                    System.err.println(errorMsg);
+                    updateUIWithMessage(errorMsg);
+                    return errorMsg;
+                }
+
+            } catch (IOException | InterruptedException e) {
+                consoleMessage("Request failed due to network error or interruption. Retrying...");
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt(); // Restore the interrupted status
+                }
+            }
+
+            // If we are not on the last attempt, wait before retrying
+            if (attempt < MAX_RETRIES - 1) {
+                try {
+                    // Exponential backoff with jitter
+                    long jitter = random.nextInt(500);
+                    TimeUnit.MILLISECONDS.sleep(waitMillis + jitter);
+                    waitMillis *= 2; // Double the wait time for the next attempt
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    String errorMsg = "Retry wait was interrupted. Aborting.";
+                    System.err.println(errorMsg);
+                    updateUIWithMessage(errorMsg);
+                    return errorMsg;
+                }
+            }
+        }
+
+        String finalErrorMsg = "Failed to get a response from Gemini after " + MAX_RETRIES + " attempts.";
+        System.err.println(finalErrorMsg);
+        updateUIWithMessage(finalErrorMsg);
+        return finalErrorMsg;
+    }
+
+    /**
+     * A utility function to output a Google Gemini result.
+     */
+    private static void updateUIWithMessage(String message) {
+        //consoleMessage(message); // Log to console
+        String msg = message; // Your Msg.msg() can go here if needed
+        SwingUtilities.invokeLater(() -> {
+            resultArea.append(msg + "\n");
+            resultFrame.pack();
+            resultFrame.setVisible(true);
+        });
+    }
+
+    /**
+     * A utility function to init a run Gemini UI.
+     */
+    private static void initializeUI() {
+        if (resultArea == null) {
+            resultArea = new JTextArea();
+            resultArea.setEditable(false);
+            resultArea.setLineWrap(true);
+            Font c = new Font("Courier", Font.BOLD, 12);
+            JButton clearBtn = new JButton("Clear");
+            clearBtn.addActionListener(ae -> resultArea.setText(""));
+            resultFrame = new JFrame("GEMINI Results");
+            resultFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JScrollPane resultScroller = new JScrollPane(resultArea);
+            resultScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            resultScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+            JPanel contents = new JPanel(new BorderLayout()); // Simplified layout
+            contents.add(resultScroller, BorderLayout.CENTER);
+
+            JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            bottomPanel.add(clearBtn);
+            contents.add(bottomPanel, BorderLayout.SOUTH);
+
+            resultFrame.add(contents);
+            resultFrame.setPreferredSize(new Dimension(400, 600));
+            resultFrame.setFont(c);
+            resultFrame.pack(); // Pack after adding components
+        }
+    }
+
+    /**
+     * A utility function to process Gemini response.
+     */
+    private static String extractTextFromGeminiResponse(String responseBody) {
+        JSONParser parser = new JSONParser();
+        try {
+            // Step 1: Parse the string into a generic object
+            Object obj = parser.parse(responseBody);
+
+            // Step 2: Cast the object to a JSONObject
+            JSONObject jsonResponse = (JSONObject) obj;
+
+            // Step 3: Navigate the structure, casting each element as you go
+            JSONArray candidates = (JSONArray) jsonResponse.get("candidates");
+            JSONObject candidate = (JSONObject) candidates.get(0);
+            JSONObject content = (JSONObject) candidate.get("content");
+            JSONArray parts = (JSONArray) content.get("parts");
+            JSONObject firstPart = (JSONObject) parts.get(0);
+
+            return (String) firstPart.get("text");
+        } catch (Exception e) {
+            System.err.println("Failed to parse Gemini response: " + e.getMessage());
+            return "Error: Could not parse the response from Gemini. Response Body: " + responseBody;
+        }
+    }
+
+    /**
+     * A utility function to generate JSON structure for Gemini API.
+     */
+    private static String buildJsonPayload(String instruction, String base64Image) {
+        String prompt = (instruction == null || instruction.trim().isEmpty())
+                ? "Please Provide Summary of this weather map?"
+                : instruction;
+
+        // --- Create the main payload object ---
+        JSONObject payload = new JSONObject();
+
+        // --- Create the 'contents' array ---
+        JSONObject textPart = new JSONObject();
+        textPart.put("text", prompt);
+
+        JSONObject inlineData = new JSONObject();
+        inlineData.put("mime_type", "image/jpeg");
+        inlineData.put("data", base64Image);
+
+        JSONObject imagePart = new JSONObject();
+        imagePart.put("inline_data", inlineData);
+
+        JSONArray parts = new JSONArray();
+        // Use .add() for older org.json library versions
+        parts.add(textPart);
+        parts.add(imagePart);
+
+        JSONObject content = new JSONObject();
+        content.put("parts", parts);
+
+        JSONArray contentsArray = new JSONArray();
+        // Use .add() for older org.json library versions
+        contentsArray.add(content);
+
+        // Add the 'contents' array to the main payload
+        payload.put("contents", contentsArray);
+
+        // --- Create the 'generationConfig' object ---
+        JSONObject generationConfig = new JSONObject();
+        generationConfig.put("temperature", 0.3);
+        generationConfig.put("topK", 32);
+        generationConfig.put("topP", 1.0);
+        generationConfig.put("maxOutputTokens", 8192);
+        generationConfig.put("stopSequences", new JSONArray()); // An empty JSON array
+
+        // Add the 'generationConfig' object to the main payload
+        payload.put("generationConfig", generationConfig);
+
+        // Return the final JSON string
+        return payload.toString();
+    }
+
+    /**
+     * Analyzes an image using the Gemini API, with a robust retry mechanism for transient errors.
+     *
+     * @param image       The image to be analyzed.
+     * @param instruction The prompt for the analysis.
+     * @return The text result from Gemini or an error message.
+     */
+    public static String runGemini(BufferedImage image, String instruction,BufferedImage exampleImage1, String example1Analysis,
+                                   BufferedImage exampleImage2, String example2Analysis) {
+        if (image == null) {
+            String errorMsg = "Input BufferedImage cannot be null.";
+            // log_.error(errorMsg);
+            System.err.println(errorMsg);
+            return errorMsg;
+        }
+
+        if(resultArea == null) {
+            resultArea = new JTextArea();
+            resultArea.setEditable(false);
+            resultArea.setLineWrap(true);
+            Font c = new Font("Courier", Font.BOLD, 12);
+            JButton clearBtn = new JButton("Clear");
+            clearBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    resultArea.setText("");
+                }
+            });
+            resultFrame = new JFrame("GEMINI Results");
+            resultFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JScrollPane resultScroller = new JScrollPane(resultArea);
+            resultScroller.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+            resultScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            JPanel contents = LayoutUtil.centerBottom(
+                    resultScroller,
+                    LayoutUtil.wrap(
+                            LayoutUtil.hflow(
+                                    Misc.newList(clearBtn))));
+            resultFrame.add(contents, BorderLayout.CENTER);
+            //resultFrame.add(resultScroller, BorderLayout.CENTER);
+            resultFrame.setPreferredSize(new Dimension(400, 600));
+            resultFrame.setFont(c);
+        }
+
+        consoleMessage(". ");
+        consoleMessage(". ");
+        consoleMessage("INSTRUCTION: " + instruction);
+        consoleMessage("> ");
+        String msg = Msg.msg(instruction);
+        resultArea.append(msg + "\n");
+        resultArea.append("> "+ "\n");
+
+        try {
+            // 3. Set API Key and URL (The URL does not change)
+            String apiKey = " ";
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
+
+            StringBuilder contentsJson = new StringBuilder();
+            contentsJson.append("[");
+            boolean hasPreviousContent = false;
+
+            // Example 1
+            if (exampleImage1 != null && example1Analysis != null && !example1Analysis.trim().isEmpty()) {
+                ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+                ImageIO.write(exampleImage1, "jpeg", baos1);
+                String base64Image1 = Base64.getEncoder().encodeToString(baos1.toByteArray());
+                String escapedAnalysis1 = example1Analysis.replace("\"", "\\\"");
+
+                contentsJson.append("{ \"role\": \"user\", \"parts\": [");
+                contentsJson.append("{\"text\": \"What is in this picture?\"},");
+                contentsJson.append("{\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"").append(base64Image1).append("\"}}");
+                contentsJson.append("]},");
+                contentsJson.append("{ \"role\": \"model\", \"parts\": [");
+                contentsJson.append("{\"text\": \"").append(escapedAnalysis1).append("\"}");
+                contentsJson.append("]}");
+                hasPreviousContent = true;
+            }
+
+            // Example 2
+            if (exampleImage2 != null && example2Analysis != null && !example2Analysis.trim().isEmpty()) {
+                if (hasPreviousContent) {
+                    contentsJson.append(",");
+                }
+                ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+                ImageIO.write(exampleImage2, "jpeg", baos2);
+                String base64Image2 = Base64.getEncoder().encodeToString(baos2.toByteArray());
+                String escapedAnalysis2 = example2Analysis.replace("\"", "\\\"");
+
+                contentsJson.append("{ \"role\": \"user\", \"parts\": [");
+                contentsJson.append("{\"text\": \"What is in this picture?\"},");
+                contentsJson.append("{\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"").append(base64Image2).append("\"}}");
+                contentsJson.append("]},");
+                contentsJson.append("{ \"role\": \"model\", \"parts\": [");
+                contentsJson.append("{\"text\": \"").append(escapedAnalysis2).append("\"}");
+                contentsJson.append("]}");
+                hasPreviousContent = true;
+            }
+
+
+            // 1. Convert BufferedImage to a byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpeg", baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            // 2. Encode to Base64
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            // 4. Prepare the instruction for the JSON payload
+            String prompt = (instruction == null || instruction.trim().isEmpty())
+                    ? "Please Provide Summary of this weather map?" // Default instruction
+                    : instruction;
+            // Escape quotes in the instruction to prevent breaking the JSON structure.
+            String escapedPrompt = prompt.replace("\"", "\\\"");
+
+            if (hasPreviousContent) {
+                contentsJson.append(",");
+            }
+
+            contentsJson.append("{ \"role\": \"user\", \"parts\": [");
+            // The user's instruction is placed here
+            contentsJson.append("{\"text\": \"").append(escapedPrompt).append("\"},");
+            contentsJson.append("{\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"").append(base64Image).append("\"}}");
+            contentsJson.append("]}");
+
+            contentsJson.append("]");
+
+            // 5. Construct the JSON payload with the dynamic instruction
+            String jsonPayload = "{\"contents\": " + contentsJson.toString() + "}";
+
+            // 6. Send the request
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 7. Process the response
+            if (response.statusCode() == 200) {
+                String responseBody = response.body();
+                String out = extractTextFromGeminiResponse(responseBody);
+                consoleMessage(out);
+                msg = Msg.msg(out);
+                resultArea.append(msg + "\n");
+                resultFrame.pack();
+                resultFrame.setVisible(true);
+                return out;
+            } else {
+                String errorMsg = "Error from Gemini API: " + response.statusCode() + " " + response.body();
+                consoleMessage(errorMsg);
+                msg = Msg.msg(errorMsg);
+                resultArea.append(msg + "\n");
+                resultFrame.pack();
+                resultFrame.setVisible(true);
+                System.err.println(errorMsg);
+                return errorMsg;
+            }
+
+        } catch (IOException | InterruptedException e) {
+            // logException("Failed to run Gemini analysis on the image.", e);
+            System.err.println("Failed to process image for Gemini analysis: " + e.getMessage());
+            Thread.currentThread().interrupt();
+            return "Failed to process image for Gemini analysis.";
+        }
+    }
+
+    /**
+     * A helper to extract text from a simplified Gemini API JSON response.
+     * For production, a proper JSON parsing library should be used.
+     * @param jsonResponse The JSON string from the API.
+     * @return The extracted text content.
+     */
+    private static String extractTextFromGeminiResponse1(String jsonResponse) {
+        try {
+            // This is a very brittle way to parse JSON. Avoid in production code.
+            String searchText = "\"text\": \"";
+            int startIndex = jsonResponse.indexOf(searchText);
+            if (startIndex != -1) {
+                startIndex += searchText.length();
+                int endIndex = jsonResponse.indexOf("\"", startIndex);
+                if (endIndex != -1) {
+                    return jsonResponse.substring(startIndex, endIndex).replace("\\n", "\n");
+                }
+            }
+            log_.warn("Could not parse text from Gemini response: " + jsonResponse);
+            return "Could not parse text from Gemini response.";
+        } catch (Exception e) {
+            logException("Error parsing Gemini JSON response", e);
+            return "Error parsing response.";
+        }
     }
 
     /**
@@ -737,6 +1435,7 @@ public class LogUtil {
     private static void checkConsole() {
         if (consoleText == null) {
             consoleText = new JTextArea(10, 30);
+            consoleText.setLineWrap(true);
             consoleText.setEditable(false);
         }
     }
