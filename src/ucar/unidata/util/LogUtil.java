@@ -30,6 +30,7 @@ package ucar.unidata.util;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -68,6 +69,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
@@ -126,7 +131,7 @@ public class LogUtil {
     private static JTextArea consoleText;
 
     private static JFrame resultFrame;
-    private static JTextArea resultArea;
+    private static JEditorPane resultArea;
     private static final int MAX_RETRIES = 5;
     private static final long INITIAL_WAIT_MILLIS = 1000; // 1 second
     private static final Random random = new Random();
@@ -731,7 +736,7 @@ public class LogUtil {
         }
         /* set up ADT Bulletin display area */
         if(resultArea == null) {
-            resultArea = new JTextArea();
+            resultArea = new JEditorPane();
             resultArea.setEditable(false);
             JButton clearBtn = new JButton("Clear");
             clearBtn.addActionListener(new ActionListener() {
@@ -827,9 +832,13 @@ public class LogUtil {
         }
 
         if(resultArea == null) {
-            resultArea = new JTextArea();
+            resultArea = new JEditorPane();
             resultArea.setEditable(false);
-            resultArea.setLineWrap(true);
+            resultArea.setContentType("text/html");
+            resultArea.setText("<html><head></head><body id='body' style='font-family:sans-serif;'>"
+                    + "<h3>Gemini Analysis Result</h3>"
+                    + "</body></html>");
+            //resultArea.setLineWrap(true);
             Font c = new Font("Courier", Font.BOLD, 12);
             JButton clearBtn = new JButton("Clear");
             clearBtn.addActionListener(new ActionListener() {
@@ -858,8 +867,9 @@ public class LogUtil {
         consoleMessage("INSTRUCTION: " + instruction);
         consoleMessage("> ");
         String msg = Msg.msg(instruction);
-        resultArea.append(msg + "\n");
-        resultArea.append("> "+ "\n");
+
+        appendHtml(resultArea, msg);
+        appendHtml(resultArea, msg);
 
         try {
             // 1. Convert BufferedImage to a byte array
@@ -918,7 +928,8 @@ public class LogUtil {
                 String out = extractTextFromGeminiResponse(responseBody);
                 consoleMessage(out);
                 msg = Msg.msg(out);
-                resultArea.append(msg + "\n");
+                //resultArea.append(msg + "\n");
+                appendHtml(resultArea, msg);
                 resultFrame.pack();
                 resultFrame.setVisible(true);
                 return out;
@@ -926,7 +937,7 @@ public class LogUtil {
                 String errorMsg = "Error from Gemini API: " + response.statusCode() + " " + response.body();
                 consoleMessage(errorMsg);
                 msg = Msg.msg(errorMsg);
-                resultArea.append(msg + "\n");
+                appendHtml(resultArea, msg);
                 resultFrame.pack();
                 resultFrame.setVisible(true);
                 System.err.println(errorMsg);
@@ -940,6 +951,35 @@ public class LogUtil {
             return "Failed to process image for Gemini analysis.";
         }
     }
+
+    /**
+     * Appends a string of HTML to a JEditorPane.
+     * This is the robust and recommended method.
+     */
+    public static void appendHtml(JEditorPane editorPane, String html) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                HTMLDocument doc = (HTMLDocument) editorPane.getDocument();
+                HTMLEditorKit kit = (HTMLEditorKit) editorPane.getEditorKit();
+
+                // Find the body element. More robust than searching for the length.
+                Element body = doc.getElement("body");
+                if (body != null) {
+                    // Insert HTML before the closing tag of the body element
+                    kit.insertHTML(doc, body.getEndOffset() - 1, html, 0, 0, null);
+                } else {
+                    // Fallback to inserting at the end if no body tag found
+                    kit.insertHTML(doc, doc.getLength(), html, 0, 0, null);
+                }
+
+                // Scroll to the end to make the new text visible
+                editorPane.setCaretPosition(doc.getLength());
+            } catch (BadLocationException | IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     /**
      * Analyzes an image using the Gemini API, with a robust retry mechanism for transient errors.
      *
@@ -955,7 +995,8 @@ public class LogUtil {
         }
 
         initializeUI(); // Encapsulated UI setup for clarity
-        updateUIWithMessage("INSTRUCTION: " + instruction + "\n> ");
+        String htmlstr = convertMarkdownToHtmlManually("**INSTRUCTION** \n" + instruction);
+        updateUIWithMessage(htmlstr);
 
         try {
             // 1. Prepare image data
@@ -1069,7 +1110,8 @@ public class LogUtil {
 
                 if (response.statusCode() == 200) {
                     String extractedText = extractTextFromGeminiResponse(response.body());
-                    updateUIWithMessage(extractedText);
+                    String htmlstr = convertMarkdownToHtmlManually(extractedText);
+                    updateUIWithMessage(htmlstr);
                     return extractedText;
                 }
 
@@ -1122,7 +1164,7 @@ public class LogUtil {
         //consoleMessage(message); // Log to console
         String msg = message; // Your Msg.msg() can go here if needed
         SwingUtilities.invokeLater(() -> {
-            resultArea.append(msg + "\n");
+            appendHtml(resultArea, msg);
             resultFrame.pack();
             resultFrame.setVisible(true);
         });
@@ -1133,9 +1175,9 @@ public class LogUtil {
      */
     private static void initializeUI() {
         if (resultArea == null) {
-            resultArea = new JTextArea();
+            resultArea = new JEditorPane();
             resultArea.setEditable(false);
-            resultArea.setLineWrap(true);
+            resultArea.setContentType("text/html");
             Font c = new Font("Courier", Font.BOLD, 12);
             JButton clearBtn = new JButton("Clear");
             clearBtn.addActionListener(ae -> resultArea.setText(""));
@@ -1178,9 +1220,13 @@ public class LogUtil {
             JSONObject firstPart = (JSONObject) parts.get(0);
 
             return (String) firstPart.get("text");
-        } catch (Exception e) {
+        }catch (ParseException e) {
             System.err.println("Failed to parse Gemini response: " + e.getMessage());
-            return "Error: Could not parse the response from Gemini. Response Body: " + responseBody;
+            return "<b>Error:</b> Could not parse the response from Gemini. The response was not valid JSON.";
+        } catch (Exception e) {
+            // Catch other potential errors like NullPointerException if the structure is unexpected
+            System.err.println("Failed to navigate the Gemini JSON structure: " + e.getMessage());
+            return "<b>Error:</b> The response from Gemini had an unexpected format.";
         }
     }
 
@@ -1253,9 +1299,9 @@ public class LogUtil {
         }
 
         if(resultArea == null) {
-            resultArea = new JTextArea();
+            resultArea = new JEditorPane();
             resultArea.setEditable(false);
-            resultArea.setLineWrap(true);
+            resultArea.setContentType("text/html");
             Font c = new Font("Courier", Font.BOLD, 12);
             JButton clearBtn = new JButton("Clear");
             clearBtn.addActionListener(new ActionListener() {
@@ -1284,8 +1330,8 @@ public class LogUtil {
         consoleMessage("INSTRUCTION: " + instruction);
         consoleMessage("> ");
         String msg = Msg.msg(instruction);
-        resultArea.append(msg + "\n");
-        resultArea.append("> "+ "\n");
+        appendHtml(resultArea, msg);
+        //resultArea.append("> "+ "\n");
 
         try {
             // 3. Set API Key and URL (The URL does not change)
@@ -1380,7 +1426,7 @@ public class LogUtil {
                 String out = extractTextFromGeminiResponse(responseBody);
                 consoleMessage(out);
                 msg = Msg.msg(out);
-                resultArea.append(msg + "\n");
+                appendHtml(resultArea, msg);
                 resultFrame.pack();
                 resultFrame.setVisible(true);
                 return out;
@@ -1388,7 +1434,7 @@ public class LogUtil {
                 String errorMsg = "Error from Gemini API: " + response.statusCode() + " " + response.body();
                 consoleMessage(errorMsg);
                 msg = Msg.msg(errorMsg);
-                resultArea.append(msg + "\n");
+                appendHtml(resultArea, msg);
                 resultFrame.pack();
                 resultFrame.setVisible(true);
                 System.err.println(errorMsg);
@@ -1402,7 +1448,50 @@ public class LogUtil {
             return "Failed to process image for Gemini analysis.";
         }
     }
+    /**
+     * Manually converts a simple subset of Markdown to HTML using string replacements.
+     * WARNING: This is a brittle approach and not recommended for production.
+     * @param markdownText The text from Gemini.
+     * @return An HTML formatted string.
+     */
+    private static String convertMarkdownToHtmlManually(String markdownText) {
+        if (markdownText == null) return "";
 
+        // 1. Escape basic HTML characters first to prevent XSS
+        String safeText = markdownText
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+
+        // 2. Process line-by-line for headings
+        StringBuilder htmlBuilder = new StringBuilder();
+        String[] lines = safeText.split("\n");
+
+        for (String line : lines) {
+            if (line.startsWith("### ")) {
+                htmlBuilder.append("<h3>").append(line.substring(4)).append("</h3>");
+            } else if (line.startsWith("## ")) {
+                htmlBuilder.append("<h2>").append(line.substring(3)).append("</h2>");
+            } else if (line.startsWith("# ")) {
+                htmlBuilder.append("<h1>").append(line.substring(2)).append("</h1>");
+            } else {
+                htmlBuilder.append(line);
+            }
+            // Add a <br> tag for all newlines, which will be inside paragraphs later
+            htmlBuilder.append("<br>");
+        }
+
+        String processedText = htmlBuilder.toString();
+
+        // 3. Use regex for inline elements like bold and italics
+        // Process bold first, as it contains the italic marker (*)
+        processedText = processedText.replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>");
+        // Process italics
+        processedText = processedText.replaceAll("\\*(.*?)\\*", "<i>$1</i>");
+
+        // Optional: Wrap the whole thing in a paragraph tag for better spacing
+        return "<p>" + processedText + "</p>";
+    }
     /**
      * A helper to extract text from a simplified Gemini API JSON response.
      * For production, a proper JSON parsing library should be used.
