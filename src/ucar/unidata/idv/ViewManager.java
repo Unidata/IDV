@@ -764,6 +764,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
     /** The history of gemini instructions */
     private List<String> geminiInstructionHistory = new ArrayList<>();
+    private List<String> geminiMasterPrompt = new ArrayList<>();
 
     /**
      *  A parameter-less ctor for the XmlEncoder based decoding.
@@ -4701,6 +4702,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JButton imageButton = new JButton("Archived weather Map file");
         imageButton.setEnabled(false);
+        imageButton.setVisible(false);
         imageButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Select Archived Weather Map File");
@@ -4715,6 +4717,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         JButton analysisButton = new JButton("Archived weather analysis files");
         analysisButton.setEnabled(false);
+        analysisButton.setVisible(false);
         analysisButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Select Archived Weather Map File");
@@ -4726,21 +4729,68 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 System.out.println("Selected history file: " + weatherAnalysis1);
             }
         });
-
-        JButton historyButton = new JButton("History");
-        if(geminiInstructionHistory.size() == 0) {
+        JButton examplePromptButton = new JButton("Master Prompt Examples");
+        if(geminiMasterPrompt.size() == 0) {
             String item1str = " You are an expert meteorologist with 20 years of experience analyzing synoptic weather charts. " +
                     "Please analyze the image and identify as many atmospheric features as possible and the weather that they may be causing. " +
                     "For each statement below, cite you source and provide a confidence score from 1 (low confidence, speculative) to 5 (high confidence, verifiable fact). " +
                     "Explain your reasoning for any score below 4.\n";
-            geminiInstructionHistory.add(item1str);
+            geminiMasterPrompt.add(item1str);
             String item2str = "Analyze the provided weather map and identify the following key features: " +
                     "Major Pressure Systems: Locate and describe any significant high-pressure (H) and low-pressure (L) systems. Mention their approximate central pressure in millibars (mb) if visible. " +
                     "Fronts: Identify all types of fronts (cold, warm, occluded, stationary). Describe their location and the direction they are moving. " +
                     "Precipitation: Describe the areas of precipitation (rain, snow, mixed). Note their intensity if indicated by color codes. " +
                     "Overall Summary: Provide a 2-3 sentence narrative summary of the weather conditions and what to expect in the next 12-24 hours for a key region (e.g., the US Midwest).";
-            geminiInstructionHistory.add(item2str);
+            geminiMasterPrompt.add(item2str);
+            String item3str = "You are an expert meteorologist with 20 years of experience performing synoptic-scale analysis. The provided image is a surface " + "" +
+                    " weather chart. Your task is to conduct a thorough analysis. For each statement, provide a confidence score from 1 (low confidence) to 5 (high confidence) " +
+                    " and explain your reasoning for any score below 4.\n" +
+                    "Major Pressure Systems: Locate all significant high (H) and low (L) pressure centers. State their approximate geographic location and central pressure in millibars (mb) if depicted.\n" +
+                    "Frontal Boundaries: Identify all cold, warm, occluded, and stationary fronts. Describe their location, orientation, and inferred direction of movement.\n" +
+                    "Wind and Pressure Gradient: Analyze the isobar patterns. Identify areas with a tight pressure gradient and describe the expected wind conditions (speed and direction) in those regions. Reference any wind barbs shown on the map.\n" +
+                    "Airmass Characteristics: Based on station plots (if visible), describe the characteristics of the airmasses ahead of and behind the primary fronts (e.g., \"warm and moist,\" \"cold and dry\").\n" +
+                    "Narrative Summary: Provide a 2-3 sentence summary explaining how these features are interacting to create the overall weather pattern across a major region (e.g., the Eastern United States).";
+            geminiMasterPrompt.add(item3str);
+            String item4str = "The provided image is a Doppler radar reflectivity scan. Your task is to perform a detailed tactical analysis. " +
+                    "For each statement, provide a confidence score from 1 (low confidence) to 5 (high confidence) and explain your reasoning for any score below 4.\n" +
+                    "Precipitation Location and Intensity: Identify the geographic areas experiencing precipitation. Describe the intensity using the color legend (e.g., moderate to heavy rain, corresponding to red/orange shades).\n" +
+                    "Precipitation Type: Infer the likely precipitation type (rain, snow, sleet, or hail) based on the season, location, and radar signatures (e.g., bright-banding for melting snow).\n" +
+                    "Storm Structure and Organization: Describe the organization of the precipitation. Identify any significant structures such as squall lines, supercell thunderstorms, or mesoscale convective systems (MCS). Note any classic radar signatures like hook echoes or bow echoes.\n" +
+                    "Storm Motion: Based on the storm structure and organization, infer the primary direction of movement for the main precipitation areas.\n" +
+                    "Hazard Assessment: Based on the observed structures and intensity, provide a brief assessment of the potential weather hazards (e.g., High potential for flash flooding,Moderate risk of strong winds associated with the bow echo).";
+            geminiMasterPrompt.add(item4str);
+            String item5str = "You are an expert in satellite meteorology, skilled at inferring atmospheric dynamics from cloud and moisture patterns. The provided image is a satellite scan (Infrared or Water Vapor). Your task is to perform a large-scale analysis. For each statement, provide a confidence score from 1 (low confidence) to 5 (high confidence) and explain your reasoning for any score below 4.\n" +
+                    "Cloud Patterns and Systems: Identify and locate major cloud systems. Describe their patterns (e.g., \"comma-shaped cloud head of a mid-latitude cyclone,\" \"frontal cloud band,\" \"pop-up afternoon thunderstorms\").\n" +
+                    "Atmospheric Dynamics: Infer the location of key upper-level features. This includes the approximate position of the jet stream, upper-level troughs/ridges, and any circulation centers (e.g., tropical cyclones, cutoff lows). Colder cloud tops (brighter whites in IR) should be noted as areas of deep convection.\n" +
+                    "Moisture Transport (especially for Water Vapor imagery): Identify any significant plumes of moisture, such as atmospheric rivers or tropical moisture feeds, and describe their source and destination.\n" +
+                    "Areas of Interest: Point out any specific areas that warrant future monitoring, such as regions of rapidly developing convection or potential tropical cyclone formation.";
+            geminiMasterPrompt.add(item5str);
+            String item6str = "You are an expert in atmospheric dynamics and numerical weather prediction (NWP) model interpretation. The provided image is a forecast map from a weather model, showing [State the variable, e.g., '500 hPa geopotential heights and wind speeds']. Your task is to analyze the model's depiction of the atmospheric state. For each statement, provide a confidence score from 1 (low confidence) to 5 (high confidence) and explain your reasoning for any score below 4.\n" +
+                    "Major Upper-Level Features: Identify the locations of significant upper-level troughs and ridges. Describe their amplitude and orientation (e.g., \"deep, negatively-tilted trough\").\n" +
+                    "Jet Stream Analysis: Locate the main axis of the jet stream. Identify any \"jet streaks\" (pockets of exceptionally high wind speed) and describe their location relative to the trough/ridge axes.\n" +
+                    "Dynamical Forcing: Explain what the upper-level pattern implies for surface weather. Specifically, describe where the model indicates regions of upper-level divergence (which supports rising air and surface storms) and convergence (which supports sinking air and fair weather).\n" +
+                    "Connection to Surface Weather: If you were to look at a corresponding surface map, where would you expect to find the primary surface low-pressure system in relation to the upper-level trough identified in this forecast?";
+            geminiMasterPrompt.add(item6str);
         }
+        examplePromptButton.addActionListener(e -> {
+            JPopupMenu promptMenu = new JPopupMenu();
+            for (int i = 0; i < geminiMasterPrompt.size(); i++) {
+                String promptItem  = geminiMasterPrompt.get(i);
+                JMenuItem menuItem = null;
+                menuItem = new JMenuItem("Master Promp Example " + i);
+                menuItem.setToolTipText(promptItem.toString());
+                menuItem.addActionListener(menuEvent -> {
+                    if (textArea.getText().length() > 0 && !textArea.getText().endsWith("\n")) {
+                        textArea.append("\n");
+                    }
+                    textArea.append(promptItem);
+                });
+                promptMenu.add(menuItem);
+            }
+
+            promptMenu.show(examplePromptButton, 0, examplePromptButton.getHeight());
+        });
+        JButton historyButton = new JButton("History");
         historyButton.addActionListener(e -> {
             JPopupMenu historyMenu = new JPopupMenu();
             if (geminiInstructionHistory.isEmpty()) {
@@ -4748,13 +4798,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 emptyItem.setEnabled(false);
                 historyMenu.add(emptyItem);
             } else {
-                for (int i = 0; i < geminiInstructionHistory.size(); i++) {
-                    String historyItem  = geminiInstructionHistory.get(i);
-                    JMenuItem menuItem = null;
-                    if(i == 0 || i == 1)
-                        menuItem = new JMenuItem("Master Promp Example " + i+1);
-                    else
-                        menuItem = new JMenuItem(historyItem.substring(0, 39) + "...");
+                for (String historyItem : geminiInstructionHistory) {
+                    JMenuItem menuItem = new JMenuItem(historyItem.substring(0, 39) + "...");
                     menuItem.setToolTipText(historyItem.toString());
                     menuItem.addActionListener(menuEvent -> {
                         if (textArea.getText().length() > 0 && !textArea.getText().endsWith("\n")) {
@@ -4774,6 +4819,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         buttonPanel.add(analysisButton);
 
         JPanel historyButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        historyButtonPanel.add(examplePromptButton);
         historyButtonPanel.add(historyButton);
 
         JPanel mainPanel = new JPanel(new BorderLayout(0, 10));
@@ -4819,7 +4865,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         }
 
-        System.out.println("Instruction: " + instruction);
+        //System.out.println("Instruction: " + instruction);
     }
 
     public String selectFile(String title) {
