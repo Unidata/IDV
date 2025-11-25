@@ -4700,6 +4700,15 @@ public class ViewManager extends SharableImpl implements ActionListener,
         textPanel.add(new JLabel("Enter the instruction for Gemini:"), BorderLayout.NORTH);
         textPanel.add(scrollPane, BorderLayout.CENTER);
 
+        String knowledge = null; //"what is the current weather in Denver";
+        JTextArea textAreak = new JTextArea(10, 50);
+        textAreak.setLineWrap(true);
+        JScrollPane scrollPanek = new JScrollPane(textAreak);
+
+        JPanel textPanelk = new JPanel(new BorderLayout(0, 5));
+        textPanelk.add(new JLabel("Enter the knowledge context of key information for Gemini:"), BorderLayout.NORTH);
+        textPanelk.add(scrollPanek, BorderLayout.CENTER);
+
         JButton imageButton = new JButton("Archived weather Map file");
         imageButton.setEnabled(false);
         imageButton.setVisible(false);
@@ -4821,11 +4830,12 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JPanel historyButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         historyButtonPanel.add(examplePromptButton);
         historyButtonPanel.add(historyButton);
-
+        textPanel.add(historyButtonPanel, BorderLayout.SOUTH);
         JPanel mainPanel = new JPanel(new BorderLayout(0, 10));
         mainPanel.add(buttonPanel, BorderLayout.NORTH);
         mainPanel.add(textPanel, BorderLayout.CENTER);
-        mainPanel.add(historyButtonPanel, BorderLayout.SOUTH);
+        mainPanel.add(textPanelk, BorderLayout.SOUTH);
+
 
         Object[] message = {mainPanel}; //, "Enter the instruction for Gemini:"  };
         int option = JOptionPane.showConfirmDialog(
@@ -4837,6 +4847,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         );
         if (option == JOptionPane.OK_OPTION) {
             instruction = textArea.getText();
+            knowledge = textAreak.getText();
             if (instruction != null && !instruction.trim().isEmpty() && !geminiInstructionHistory.contains(instruction)) {
                 int i = geminiInstructionHistory.size();
                 TwoFacedObject tfo = new TwoFacedObject("Instruction ", instruction);
@@ -4848,12 +4859,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
         // We only proceed if the user provided some input.
         if (instruction != null) {
             final String finalInstruction = instruction;
+            final String finalKnowledge = knowledge;
             // Call your original method, but now pass the instruction to it.
             Misc.run(new Runnable() {
                 public void run() {
                     try {
                         getIdv().showWaitCursor();
-                        doGemini(finalInstruction);
+                        if (finalKnowledge != null && !finalKnowledge.trim().isEmpty()) {
+                            doGemini(finalInstruction, finalKnowledge);
+                        } else {
+                            doGemini(finalInstruction);
+                        }
                         getIdv().showNormalCursor();
                     } catch (Throwable exc) {
                         logException(
@@ -4900,6 +4916,13 @@ public class ViewManager extends SharableImpl implements ActionListener,
             throws AWTException {
         try {
             LogUtil.runGemini(this.getMaster().getImage(false), instruction);
+        } catch (Exception e){}
+    }
+
+    public void doGemini(String instruction, String knowledge)
+            throws AWTException {
+        try {
+            LogUtil.runGemini(this.getMaster().getImage(false), instruction, knowledge);
         } catch (Exception e){}
     }
     /**

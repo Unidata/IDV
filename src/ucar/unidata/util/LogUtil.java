@@ -1039,6 +1039,58 @@ public class LogUtil {
         }
     }
 
+    public static String runGemini(BufferedImage image, String instruction, String knowledge) {
+        if (image == null) {
+            String errorMsg = "Input BufferedImage cannot be null.";
+            System.err.println(errorMsg);
+            return errorMsg;
+        }
+
+        initializeUI(); // Encapsulated UI setup for clarity
+        String htmlstr = convertMarkdownToHtmlManually("**INSTRUCTION** \n" + instruction);
+        updateUIWithMessage(htmlstr);
+
+        try {
+            // 1. Prepare image data
+            // 1. Convert BufferedImage to a byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpeg", baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            // 2. Encode to Base64
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            // 2. Prepare API details
+            String VALIDATION_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+            HttpClient client = HttpClient.newHttpClient();
+
+            UserInfo userInfo = GeminiKeyValidator( VALIDATION_URL);
+
+            String apiKey = userInfo.getPassword();
+            //" "; // IMPORTANT: Do not hardcode keys in production
+            // NOTE: The official public model is 'gemini-1.5-pro-latest'.
+            // Using your string in case you have private access.
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
+
+            // 3. Construct JSON payload safely using a library
+            String jsonPayload = buildJsonPayload(instruction, base64Image, knowledge);
+
+            // 4. Send request with retry logic
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            return sendRequestWithRetry(client, request);
+
+        } catch (IOException e) {
+            System.err.println("Failed to process image for Gemini analysis: " + e.getMessage());
+            return "Failed to process image for Gemini analysis.";
+        }
+    }
+
     /**
      * A utility function to validate a Google Gemini API key.
      */
@@ -1229,7 +1281,80 @@ public class LogUtil {
             return "<b>Error:</b> The response from Gemini had an unexpected format.";
         }
     }
+    /**
+     * Builds the JSON payload for a Gemini API request, including a dynamic instruction,
+     * an optional knowledge context, and a Base64 encoded image.
+     *
+     * @param instruction      The main prompt or task for the model.
+     * @param knowledgeContext Optional. A string containing contextual information (like an article)
+     *                         that the model should use to inform its analysis. Can be null or empty.
+     * @param base64Image      The Base64 encoded string of the image to be analyzed.
+     * @return A JSON formatted string ready to be sent to the Gemini API.
+     */
+    private static String buildJsonPayload(String instruction, String base64Image,  String knowledgeContext) {
+        // --- 1. Construct the final combined prompt ---
+        StringBuilder promptBuilder = new StringBuilder();
 
+        // Add the knowledge context block ONLY if it's provided and not empty.
+        if (knowledgeContext != null && !knowledgeContext.trim().isEmpty()) {
+            promptBuilder.append("### CONTEXT ###\n");
+            promptBuilder.append("Use the following document as the primary source of truth for your analysis:\n\n");
+            promptBuilder.append(knowledgeContext);
+            promptBuilder.append("\n\n"); // Add spacing for clarity
+        }
+
+        // Add the main instruction or task.
+        promptBuilder.append("### TASK ###\n");
+        String taskInstruction = (instruction == null || instruction.trim().isEmpty())
+                ? "Please provide a summary of this weather map."
+                : instruction;
+        promptBuilder.append(taskInstruction);
+
+        String finalPrompt = promptBuilder.toString();
+
+        // --- 2. Build the JSON structure (same as before) ---
+        JSONObject payload = new JSONObject();
+
+        // --- Create the 'contents' array ---
+        JSONObject textPart = new JSONObject();
+        textPart.put("text", finalPrompt);
+
+        JSONObject inlineData = new JSONObject();
+        inlineData.put("mime_type", "image/jpeg");
+        inlineData.put("data", base64Image);
+
+        JSONObject imagePart = new JSONObject();
+        imagePart.put("inline_data", inlineData);
+
+        JSONArray parts = new JSONArray();
+        // Use .add() for your older org.json library version
+        parts.add(textPart);
+        parts.add(imagePart);
+
+        JSONObject content = new JSONObject();
+        content.put("parts", parts);
+
+        JSONArray contentsArray = new JSONArray();
+        // Use .add() for your older org.json library version
+        contentsArray.add(content);
+
+        // Add the 'contents' array to the main payload
+        payload.put("contents", contentsArray);
+
+        // --- Create the 'generationConfig' object ---
+        JSONObject generationConfig = new JSONObject();
+        generationConfig.put("temperature", 0.3);
+        generationConfig.put("topK", 32);
+        generationConfig.put("topP", 1.0);
+        generationConfig.put("maxOutputTokens", 8192);
+        generationConfig.put("stopSequences", new JSONArray());
+
+        // Add the 'generationConfig' object to the main payload
+        payload.put("generationConfig", generationConfig);
+
+        // Return the final JSON string
+        return payload.toString();
+    }
     /**
      * A utility function to generate JSON structure for Gemini API.
      */
