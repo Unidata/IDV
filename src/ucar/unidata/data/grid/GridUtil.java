@@ -4462,6 +4462,13 @@ public class GridUtil {
         int index = 0;
         if (isSinglePointDomain(spatialDomain)) {
             index = spatialDomain.getLength() / 2;
+        } else if (spatialDomain.getManifoldDimension() == 2) {
+            Gridded2DSet new2DDomainSet = GridUtil.makeDomain2D((Gridded3DSet)spatialDomain);
+            float[][]  values1 = new float[2][1];
+            values1[0][0] = values[0][0];
+            values1[1][0] = values[1][0];
+            int[] indices = new2DDomainSet.valueToIndex(values1);
+            index =  indices[0];
         } else {
             int[] indices = spatialDomain.valueToIndex(values);
             index = indices[0];
