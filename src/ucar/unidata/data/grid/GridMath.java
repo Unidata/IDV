@@ -21,6 +21,7 @@
 package ucar.unidata.data.grid;
 
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
 import ucar.unidata.util.Trace;
@@ -31,6 +32,9 @@ import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 import visad.*;
 
+import visad.georef.EarthLocation;
+import visad.georef.EarthLocationLite;
+import visad.georef.LatLonPoint;
 import visad.georef.MapProjection;
 
 import visad.python.JPythonMethods;
@@ -45,6 +49,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static ucar.unidata.data.grid.GridUtil.DEFAULT_ERROR_MODE;
+import static ucar.unidata.data.grid.GridUtil.NEAREST_NEIGHBOR;
 
 
 /**
@@ -2064,14 +2069,73 @@ public class GridMath {
 
     }
 
-    public static FieldImpl applyFunctionOverGrid2D(FieldImpl grid)
-            throws VisADException {
-        FieldImpl aveFI = applyFunctionOverGrid2D(grid, "average", "0");
-        FieldImpl maxFI = applyFunctionOverGrid2D(grid, "max", "0");
-        FieldImpl percentileFI = applyFunctionOverGrid2D(grid, "percentile", "95");
+    /**
+     * Apply the function to the 2D grid.
+     * The function is one of the FUNC_ enums
+     *
+     * @param grid   grid to average
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
+     *
+     * @param function One of the FUNC_ enums
+     *
+     * @return the new time series point field
+     *
+     * @throws VisADException  On badness
+     */
 
-        return aveFI;
+    public static FieldImpl applyFunctionOverGrid2D(FieldImpl grid, FieldImpl grid1, String function, String statThreshold)
+            throws VisADException {
+
+        FieldImpl sampledFI = null;
+        try {
+            if (GridUtil.isTimeSequence(grid)) {
+
+                TupleType    rangeType  = null;
+                Gridded2DSet newDomain  = null;
+                Set sequenceDomain = Util.getDomainSet(grid);
+                FlatField sampleA = (FlatField)grid1.getSample(0);
+                for (int timeStepIdx = 0;
+                     timeStepIdx < sequenceDomain.getLength(); timeStepIdx++) {
+                    FlatField sample = (FlatField)grid.getSample(timeStepIdx);
+                    if (timeStepIdx == 0) {
+                        SampledSet spatialDomain = GridUtil.getSpatialDomain(grid);
+                        if(spatialDomain.getManifoldDimension() == 2) {
+                            grid = GridUtil.make2DGridFromSlice(grid);
+                        }
+                        RealTuple point = GridUtil.getCenterPoint(grid);
+                        Data sample1 =
+                                ((FlatField) grid.getSample(0)).evaluate(point,
+                                        Data.NEAREST_NEIGHBOR, DEFAULT_ERROR_MODE);// set up the functiontype
+                        if(!(sample1 instanceof RealTuple) && (sample1 instanceof Real)){
+                            sample1 = new RealTuple(new Real[] { (Real) sample1 });
+                        }
+                        FunctionType sampledType1 =
+                                new FunctionType(
+                                        ((SetType) sequenceDomain.getType()).getDomain(),
+                                        sample1.getType());
+                        sampledFI = new FieldImpl(sampledType1,
+                                sequenceDomain);
+                    }
+
+                    Data   funcFF0 = applyFunctionOverGrid2DFF((FlatField) sample, sampleA, function, statThreshold);
+
+                    if (funcFF0 == null) {
+                        continue;
+                    }
+                    sampledFI.setSample(timeStepIdx, funcFF0, false);
+                }
+            } else {
+                sampledFI = null;
+            }
+            return sampledFI;
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverLevels");
+        }
+
     }
+
+
 
     /**
      * Evaluate the function of the grid and the function1 to the grid1.
@@ -2292,6 +2356,112 @@ public class GridMath {
                     }
                     if (doAve) {
                         result = result / numCount;
+                    }
+                }
+            }
+
+            Real real = new Real(newRangeType.getRealComponents()[0], (double)result);
+            data = new RealTuple(new Real[] { (Real) real });
+            //newField = new FlatField(newFT, newDomain);
+            //newField.setSamples(newValues, false);
+
+        } catch (RemoteException re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return data;
+
+    }
+    /**
+     * Apply the function to the 2D grid.
+     *
+     * @param grid   grid to average
+     * @param statThreshold percent for FUNC_PRCNTL, probability threshold for FUNC_UPROB
+     *
+     * @param function One of the FUNC_ enums
+     *
+     * @return the new time series point field
+     *
+     * @throws VisADException  On badness
+     */
+    private static Data applyFunctionOverGrid2DFF(FlatField grid, FlatField grid1, String function, String statThreshold)
+            throws VisADException {
+        final boolean doMax = function.equals(FUNC_MAX);
+        final boolean doMin = function.equals(FUNC_MIN);
+        final boolean doAve = function.equals(FUNC_AVERAGE);
+        final boolean doPer = function.equals(FUNC_PRCNTL) || function.equals(PRCNTL);
+
+        TupleType    newRangeType = GridUtil.getParamType(grid);
+
+        Data data = null;
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            FieldImpl latGrid = DerivedGridFactory.createLatitudeGrid(grid);
+            FieldImpl lonGrid = DerivedGridFactory.createLongitudeGrid(grid);
+            float[][] latVals   = latGrid.getFloats(false);
+            float[][] lonVals   = lonGrid.getFloats(false);
+
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[0];
+            int   sizeY   = lengths[1];
+            float[][] samples   = grid.getFloats(false);
+
+            float result = 0.0f;
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = samples[np];
+
+                int len = paramVals.length;
+                if(false){
+                    float percent = Float.valueOf(statThreshold);
+                    result = evaluatePercentile(paramVals,0, len,percent);
+                } else {
+                    result = 0.0f;
+                    int numCount = 0;
+                    float resultp0 = evaluatePercentile(paramVals,0, len,25);
+                    float resultp1 = evaluatePercentile(paramVals,0, len,75);
+                    List<Float> params = new ArrayList();
+                    for (int k = 0; k < len; k++) {
+                        float value = paramVals[k];
+                        if (value != value) {
+                            continue;
+                        }
+                        float lat = latVals[0][k];
+                        float lon = lonVals[0][k];
+                        EarthLocation elt = new EarthLocationLite(
+                                new Real(RealType.Latitude, lat),
+                                new Real(RealType.Longitude, lon),
+                                new Real(RealType.Altitude,0));
+                        //ucar.unidata.geoloc.LatLonPoint llp = new LatLonPointImpl(lat, lon);
+                        Real pointV = (Real)(GridUtil.sample(grid1, elt.getLatLonPoint(), NEAREST_NEIGHBOR)).getSample(0);
+                        if(pointV.getValue() > 10)   {
+                            continue;
+                        }
+
+                        if (doMax) {
+                            result = Math.max(result, value);
+                        } else if (doMin) {
+                            result = Math.min(result, value);
+                        } else if (doAve) {
+                            result = result + value;
+                            numCount++;
+                        } else {
+                            params.add(value);
+                            numCount++;
+                        }
+
+                    }
+                    if (doAve) {
+                        result = result / numCount;
+                    }
+                    if(doPer){
+                        float percent = Float.valueOf(statThreshold);
+                        float[] floatArray = new float[numCount];
+                        int i=0;
+                        for (Float f : params) {
+                            floatArray[i++] = (f != null ? f : Float.NaN); // Or whatever default you want.
+                        }
+
+                        result = evaluatePercentile(floatArray,0, numCount-1, percent);
                     }
                 }
             }
