@@ -152,15 +152,14 @@ public class FontSelector implements ItemListener, ListSelectionListener {
                 //ClassLoader sysLoader = ClassLoader.getSystemClassLoader();
                 try {
                     for (String fontPath : MCV_DEFAULT_FONTS) {
-                        System.out.println("Loading font: " + fontPath);
+                        //System.out.println("Loading font: " + fontPath);
                         //URL ff = Misc.getURL(fontPath, DefaultIdv.class);
-                        InputStream fontStream = IOUtil.getInputStream(fontPath, DefaultIdv.class);
+                        InputStream fontStream = IOUtil.getInputStream(fontPath, IOUtil.class);
                         //sysLoader.getResourceAsStream(fontPath);
-
                         if (fontStream != null) {
                             Font f = Font.createFont(Font.TRUETYPE_FONT, fontStream);
                             gEnv.registerFont(f);
-                            System.out.println("Default font: " + f.getFontName());
+                            //System.out.println("Default font: " + f.getFontName());
                             if (f.getFontName().equals("Source Code Pro Medium")) {
                                 defaultFont = f;
                             }
