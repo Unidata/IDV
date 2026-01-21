@@ -39,6 +39,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -154,8 +155,10 @@ public class FontSelector implements ItemListener, ListSelectionListener {
                     for (String fontPath : MCV_DEFAULT_FONTS) {
                         //System.out.println("Loading font: " + fontPath);
                         //URL ff = Misc.getURL(fontPath, DefaultIdv.class);
+                        URL url = IOUtil.getURL(fontPath, null);
+                        System.out.println("Default: " + url.toString());
                         InputStream fontStream = IOUtil.getInputStream(fontPath);
-                        //sysLoader.getResourceAsStream(fontPath);
+                        //InputStream fontStream = sysLoader.getResourceAsStream(fontPath);
                         if (fontStream != null) {
                             Font f = Font.createFont(Font.TRUETYPE_FONT, fontStream);
                             gEnv.registerFont(f);
