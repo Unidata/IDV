@@ -154,10 +154,10 @@ public class FontSelector implements ItemListener, ListSelectionListener {
                 try {
                     for (String fontPath : MCV_DEFAULT_FONTS) {
                         //System.out.println("Loading font: " + fontPath);
-                        //URL ff = Misc.getURL(fontPath, DefaultIdv.class);
+                        //URL ff = Misc.getURL(fontPath, DefaultIdv.class); getResourcePath(String path)
                         URL url = IOUtil.getURL(fontPath, null);
                         System.out.println("Default: " + url.toString());
-                        InputStream fontStream = IOUtil.getInputStream(fontPath);
+                        InputStream fontStream = IOUtil.getInputStream(url.toString());
                         //InputStream fontStream = sysLoader.getResourceAsStream(fontPath);
                         if (fontStream != null) {
                             Font f = Font.createFont(Font.TRUETYPE_FONT, fontStream);
