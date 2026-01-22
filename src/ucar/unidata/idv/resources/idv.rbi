@@ -455,13 +455,13 @@
   </resources>
 <!-- Default font   -->
   <resources name="idv.resource.defaultfont">
-    <resource location=location="%IDVPATH%/defaultfont/SourceCodePro_Black.ttf"/>
-    <resource location=location="%IDVPATH%/defaultfont/SourceCodePro_Bold.ttf"/>
-    <resource location=location="%IDVPATH%/defaultfont/SourceCodePro_ExtraLight.ttf"/>
-    <resource location=location="%IDVPATH%/defaultfont/SourceCodePro_Light.ttf"/>
-    <resource location=location="%IDVPATH%/defaultfont/SourceCodePro_Medium.ttf"/>
-    <resource location=location="%IDVPATH%/defaultfont/SourceCodePro_Regular.ttf"/>
-    <resource location=location="%IDVPATH%/defaultfont/SourceCodePro_Semibold.ttf"/>
+    <resource  location="%IDVPATH%/defaultfont/SourceCodePro_Black.ttf"/>
+    <resource  location="%IDVPATH%/defaultfont/SourceCodePro_Bold.ttf"/>
+    <resource  location="%IDVPATH%/defaultfont/SourceCodePro_ExtraLight.ttf"/>
+    <resource  location="%IDVPATH%/defaultfont/SourceCodePro_Light.ttf"/>
+    <resource  location="%IDVPATH%/defaultfont/SourceCodePro_Medium.ttf"/>
+    <resource  location="%IDVPATH%/defaultfont/SourceCodePro_Regular.ttf"/>
+    <resource  location="%IDVPATH%/defaultfont/SourceCodePro_Semibold.ttf"/>
   </resources>
 <!-- Python libraries    -->
   <resources name="idv.resource.jython">
