@@ -156,7 +156,7 @@ public class FontSelector implements ItemListener, ListSelectionListener {
                         //System.out.println("Loading font: " + fontPath);
                         //URL ff = Misc.getURL(fontPath, DefaultIdv.class); getResourcePath(String path)
                         URL url = IOUtil.getURL(fontPath, null);
-                        System.out.println("Default: " + url.toString());
+                        //System.out.println("Default: " + url.toString());
                         InputStream fontStream = IOUtil.getInputStream(url.toString());
                         //InputStream fontStream = sysLoader.getResourceAsStream(fontPath);
                         if (fontStream != null) {
