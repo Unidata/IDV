@@ -323,6 +323,7 @@ argument -Dfoo=bar) -->
             <include name="ucar/unidata/util/**"/>
             <!-- needed for old bundles -->
             <include name="ucar/unidata/view/geoloc/AxisScaleInfo.java"/>
+            <!--include name="edu/wisc/ssec/mcidasv/data/**"/-->
 <!--
             <include name="ucar/unidata/geoloc/**"/>
 -->
@@ -745,6 +746,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
             <include name="ucar/**/*.properties"/>
             <include name="ucar/**/*.xml"/>
             <include name="ucar/**/*.ncml"/>
+            <include name="ucar/**/*.ttf"/>
             <include name="ucar/**/*.html"/>
             <include name="ucar/**/*.rbi"/>
             <include name="ucar/**/*.defaults"/>
@@ -804,6 +806,7 @@ TODO: Do we really want the full source base htmlized. It ends up being huge!
                   <include name="ucar/**/*.properties"/>
                   <include name="ucar/**/*.xml"/>
                   <include name="ucar/**/*.ncml"/>
+                  <include name="ucar/**/*.ttf"/>
                   <include name="ucar/**/*.rbi"/>
                   <include name="ucar/**/*.defaults"/>
                   <include name="ucar/**/*.txt"/>
