@@ -302,6 +302,7 @@ public class AccountManager implements CredentialsProvider,
             serverLabel.setText(label);
             ok = false;
             dialog.pack();
+            saveCbx.setVisible(true);
             //nameFld.requestFocus();
             dialog.setVisible(true);
             if ( !ok) {
@@ -319,6 +320,37 @@ public class AccountManager implements CredentialsProvider,
         return userInfo;
     }
 
+    /**
+     * _more_
+     */
+    public void resetAppKey(String key, String label) {
+        UserInfo userInfo = getTable().get(key);
+
+        if (dialog == null) {
+            makeKeyDialog(key);
+        }
+        serverLabel.setText(label);
+        ok = false;
+        dialog.pack();
+        saveCbx.setVisible(false);
+        //nameFld.requestFocus();
+        dialog.setVisible(true);
+        if ( !ok) {
+            return;
+        }
+
+        if(passwdFld.getPassword().length > 0) {
+            UserInfo userInfoNew =
+                    new UserInfo(key, key.trim(),
+                            new String(passwdFld.getPassword()).trim());
+            boolean validKey = LogUtil.GeminiKeyValidator(userInfoNew);
+            if (validKey) {
+                table.remove(key, userInfo);
+                table.put(key, userInfoNew);
+                writeTable();
+            }
+        }
+    }
 
     /**
      * _more_
