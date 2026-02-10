@@ -4691,6 +4691,17 @@ public class ViewManager extends SharableImpl implements ActionListener,
      * Make the run gemini views menu
      */
     public void promptAndRunGemini() throws AWTException {
+        // reset gemini app key
+        JButton resetAppKeyButton = new JButton("Reset Gemini App Key");
+        resetAppKeyButton.setEnabled(true);
+        resetAppKeyButton.setVisible(true);
+        resetAppKeyButton.addActionListener(e -> {
+            AccountManager userAccountManager =
+                    AccountManager.getGlobalAccountManager();
+            userAccountManager.resetAppKey("gemini", "Enter new gemini app key");
+        });
+
+
         String instruction = null; //"what is the current weather in Denver";
         JTextArea textArea = new JTextArea(10, 50);
         textArea.setLineWrap(true);
@@ -4859,8 +4870,11 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.add(imageButton);
-        buttonPanel.add(analysisButton);
+        JPanel buttonPanel0 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel0.add(imageButton);
+        buttonPanel0.add(analysisButton);
+        buttonPanel.add(resetAppKeyButton, BorderLayout.NORTH);
+        buttonPanel.add(buttonPanel0, BorderLayout.SOUTH);
 
         JPanel historyButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         historyButtonPanel.add(examplePromptButton);
