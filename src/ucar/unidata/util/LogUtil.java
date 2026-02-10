@@ -1017,8 +1017,8 @@ public class LogUtil {
             String apiKey = userInfo.getPassword();
             //" "; // IMPORTANT: Do not hardcode keys in production
             // NOTE: The official public model is 'gemini-1.5-pro-latest'.
-            // Using your string in case you have private access.
-            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
+            // Using your string in case you have private access. models/gemini-3-pro-preview models/gemini-2.5-pro
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=" + apiKey;
 
             // 3. Construct JSON payload safely using a library
             String jsonPayload = buildJsonPayload(instruction, base64Image);
@@ -1149,6 +1149,58 @@ public class LogUtil {
         return userInfo;
     }
 
+    /**
+     * A utility function to validate a Google Gemini API key.
+     */
+    public static boolean GeminiKeyValidator(UserInfo userInfo) {
+        HttpClient client = HttpClient.newHttpClient();
+        String VALIDATION_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+
+        if (userInfo != null) {
+            String host = "GOOGLE";
+
+            if (userInfo == null) {
+                return false;
+            }
+            // 2. Construct the request URI
+            URI validationUri = URI.create(VALIDATION_URL + "?key=" + userInfo.getPassword());
+            // 3. Build the HTTP GET request
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(validationUri)
+                    .GET()
+                    .timeout(Duration.ofSeconds(10))
+                    .build();
+            try {
+                // 4. Send the request and get the response
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                // 5. Interpret the response status code
+                int statusCode = response.statusCode();
+                if (statusCode == 200) {
+                    // 200 OK is a definitive success
+                    //return ValidationStatus.VALID;
+                    return true;
+                } else if (statusCode == 400) {
+                    // 400 Bad Request is what Gemini often returns for invalid keys.
+                    // We can check the response body for a more specific message.
+                    System.err.println("Validation failed due to a invalid key: ");
+                    return false;
+                } else {
+                    // Any other non-200 code is considered an API or configuration error.
+                    return false;
+                }
+            } catch (IOException | InterruptedException e) {
+                // 6. Handle network or interruption errors
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt(); // Restore the interrupted status
+                }
+                System.err.println("Validation failed due to a network or interruption error: " + e.getMessage());
+
+            }
+        }
+        return false;
+
+    }
     /**
      * A utility function to call Google Gemini API.
      */
