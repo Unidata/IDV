@@ -50,6 +50,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 
+import static ucar.unidata.data.grid.GridUtil.DEFAULT_ERROR_MODE;
+
 
 /**
  * DerivedGridFactory has static methods for creating various derived
@@ -7925,6 +7927,776 @@ public class DerivedGridFactory {
         FieldImpl newField = GridUtil.setParamType(field, newType, false);
 
         return newField;
+    }
+
+
+    /**
+     * Computes streamfunction from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  uFI  grid or time sequence of grids of positive-X wind comp.
+     * @param  vFI  grid or time sequence of grids of positive-Y wind comp.
+     *
+     * @return computed streamfunction.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createStreamfunction(FieldImpl uFI, FieldImpl vFI) throws Exception{
+
+        try {
+            FieldImpl    streamfunctionFI        = null;
+            Set timeSet = GridUtil.getTimeSet(uFI);
+            FieldImpl vortFI = createRelativeVorticity(uFI, vFI);
+
+            for (int timeStepIdx = 0;
+                 timeStepIdx < timeSet.getLength(); timeStepIdx++) {
+                FlatField sampleVort = (FlatField) vortFI.getSample(timeStepIdx);
+                Unit     uUnit = GridUtil.getParamUnits(uFI)[0].multiply(GridUtil.getParamUnits(vFI)[0]).multiply(timeSet.getSetUnits()[0]);
+                FlatField streamfunctionFF = createStreamfunctionFF(sampleVort, uUnit);
+                if (timeStepIdx == 0) {
+                    // first time through, set up rvFI
+                    // make the VisAD FunctionType for the rel vort; several steps
+                    FunctionType functionType =
+                            new FunctionType(
+                                    ((FunctionType) uFI.getType()).getDomain(),
+                                    streamfunctionFF.getType());
+
+                    // System.out.println ("       rvFI func type = "+functionType);
+                    // make the new FieldImpl (but as yet empty of data)
+                    streamfunctionFI = new FieldImpl(functionType, timeSet);
+                }
+
+                // set this time's grid
+                streamfunctionFI.setSample(timeStepIdx, streamfunctionFF, false);
+            }
+
+            return streamfunctionFI;
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in createStreamfunction");
+        }
+
+    }
+
+    /**
+     * Computes velocity potential from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  vortFI
+     *
+     * @return computed velocitypotential.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FlatField createStreamfunctionFF(FlatField vortFI, Unit uUnit) throws Exception{
+        SampledSet domain = GridUtil.getSpatialDomain(vortFI);
+        GriddedSet griddedSet = (GriddedSet) domain;
+        double scale = 1.0;
+        int latIndex = GridUtil.isLatLonOrder(domain)
+                ? 0
+                : 1;
+        int lonIndex = GridUtil.isLatLonOrder(domain)
+                ? 1
+                : 0;
+        float[][]   latLons  = GridUtil.getEarthLocationPoints(griddedSet);
+        float[]     lats     = latLons[latIndex];
+        double[] latsRad  = new double[lats.length];
+
+        for (int i = 0; i < lats.length; i++) {
+            latsRad[i] = Math.toRadians(lats[i]);
+        }
+
+        double[][] vort = vortFI.getValues();
+        Unit[] pUnit = GridUtil.getParamUnits(vortFI);
+        if(pUnit[0] instanceof ScaledUnit) {
+            ScaledUnit su = (ScaledUnit) pUnit[0];
+            scale = su.getAmount();
+        }
+
+        // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+        int nlats = ((GriddedSet) domain).getLength(latIndex);
+        int nlons = ((GriddedSet) domain).getLength(lonIndex);
+        double[] dx  = new double[nlats];
+        int totalSize = nlats * nlons;
+        double dLat = Math.PI / (nlats - 1);
+        double dLon = (2 * Math.PI) / (nlons - 1);
+        for (int i = 0; i < nlats; i++) {
+            int j = i * nlons;
+            dx[i] = 6371000.0* Math.cos(latsRad[j]) * dLon;
+        }
+
+        double dy = 6371000.0 * dLat;
+        double[][] psi = new double[1][];
+        psi[0] = solvePoissonCartesian(vort[0], nlats, nlons, dx, dy, scale);
+        FlatField newPsiField = null;
+
+        RealType rvRT   = DataUtil.makeRealType("streamfunction", uUnit);
+        FunctionType newUFT =
+                new FunctionType(((SetType) domain.getType()).getDomain(),
+                        rvRT);
+
+        newPsiField = new FlatField(newUFT, domain);
+        newPsiField.setSamples(psi, false);
+
+        return newPsiField;
+    }
+
+    /**
+     * Computes velocity potential from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  uFI  grid or time sequence of grids of positive-X wind comp.
+     * @param  vFI  grid or time sequence of grids of positive-Y wind comp.
+     *
+     * @return computed velocitypotential.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl createVelocityPotential(FieldImpl uFI, FieldImpl vFI) throws Exception{
+        try {
+            FieldImpl    velocitypotentialFI        = null;
+            Set timeSet = GridUtil.getTimeSet(uFI);
+            FieldImpl divFI = createHorizontalDivergence(uFI, vFI);
+
+            for (int timeStepIdx = 0;
+                 timeStepIdx < timeSet.getLength(); timeStepIdx++) {
+                FlatField sampleU = (FlatField) uFI.getSample(timeStepIdx);
+                FlatField sampleV = (FlatField) vFI.getSample(timeStepIdx);
+                FlatField sampleVort = (FlatField) divFI.getSample(timeStepIdx);
+                Unit timeUnit = timeSet.getSetUnits()[0];
+                Unit     uUnit = GridUtil.getParamUnits(uFI)[0].multiply(GridUtil.getParamUnits(vFI)[0]).multiply(timeUnit);
+                FlatField velocitypotentialFF = createVelocityPotentialFF(sampleVort, uUnit);
+                if (timeStepIdx == 0) {
+                    // first time through, set up rvFI
+                    // make the VisAD FunctionType for the rel vort; several steps
+                    FunctionType functionType =
+                            new FunctionType(
+                                    ((FunctionType) uFI.getType()).getDomain(),
+                                    velocitypotentialFF.getType());
+
+                    // System.out.println ("       rvFI func type = "+functionType);
+                    // make the new FieldImpl (but as yet empty of data)
+                    velocitypotentialFI = new FieldImpl(functionType, timeSet);
+                }
+
+                // set this time's grid
+                velocitypotentialFI.setSample(timeStepIdx, velocitypotentialFF, false);
+            }
+
+            return velocitypotentialFI;
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in createVelocityPotential");
+        }
+
+
+    }
+
+    /**
+     * Computes velocity potential from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  divFF
+     *
+     * @return computed velocitypotential.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FlatField createVelocityPotentialFF(FlatField divFF, Unit  uUnit) throws Exception{
+        SampledSet domain = GridUtil.getSpatialDomain(divFF);
+        GriddedSet griddedSet = (GriddedSet) domain;
+        double scale = 1.0;
+        int latIndex = GridUtil.isLatLonOrder(domain)
+                ? 0
+                : 1;
+        int lonIndex = GridUtil.isLatLonOrder(domain)
+                ? 1
+                : 0;
+        float[][]   latLons  = GridUtil.getEarthLocationPoints(griddedSet);
+        float[]     lats     = latLons[latIndex];
+        double[] latsRad  = new double[lats.length];
+
+        for (int i = 0; i < lats.length; i++) {
+            latsRad[i] = Math.toRadians(lats[i]);
+        }
+
+        //FieldImpl divFI = createHorizontalDivergence(uFI, vFI);
+
+        //double[][] div = ((FlatField)(divFI.getSample(0))).getValues();
+        double[][] div = divFF.getValues();
+        Unit[] pUnit = GridUtil.getParamUnits(divFF);
+        if(pUnit[0] instanceof ScaledUnit) {
+            ScaledUnit su = (ScaledUnit) pUnit[0];
+            scale = su.getAmount();
+        }
+        // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+
+        int nlats = ((GriddedSet) domain).getLength(latIndex);
+        int nlons = ((GriddedSet) domain).getLength(lonIndex);
+        double[] dx  = new double[nlats];
+        int totalSize = nlats * nlons;
+        double dLat = Math.PI / (nlats - 1);
+        double dLon = (2 * Math.PI) / (nlons - 1);
+        for (int i = 0; i < nlats; i++) {
+            int j = i * nlons;
+            dx[i] = 6371000.0* Math.cos(latsRad[j]) * dLon;
+        }
+
+        double dy = 6371000.0 * dLat;
+
+        double[][] chi = new double[1][];
+        chi[0] = solvePoissonCartesian(div[0], nlats, nlons, dx, dy, scale);
+        FlatField newChiField = null;
+
+        RealType rvRT   = DataUtil.makeRealType("streamfunction", uUnit);
+        FunctionType newUFT =
+                new FunctionType(((SetType) domain.getType()).getDomain(),
+                        rvRT);
+
+        newChiField = new FlatField(newUFT, domain);
+        newChiField.setSamples(chi, false);
+
+        return newChiField;
+
+    }
+
+    /**
+     * Computes Irrotational Wind Vector from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  uFI  grid or time sequence of grids of positive-X wind comp.
+     * @param  vFI  grid or time sequence of grids of positive-Y wind comp.
+     *
+     * @return computed IrrotationalVector.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl decomposeToIrrotationalVector(FieldImpl uFI, FieldImpl vFI) throws Exception{
+
+        try {
+            Set timeSet = GridUtil.getTimeSet(uFI);
+            FieldImpl divFI = createHorizontalDivergence(uFI, vFI);
+
+            FieldImpl u = new FieldImpl((FunctionType) uFI.getType(), timeSet);
+            FieldImpl v = new FieldImpl((FunctionType) vFI.getType(), timeSet);
+
+            for (int timeStepIdx = 0;
+                 timeStepIdx < timeSet.getLength(); timeStepIdx++) {
+                FlatField sampleU = (FlatField) uFI.getSample(timeStepIdx);
+                FlatField sampleV = (FlatField) vFI.getSample(timeStepIdx);
+                FlatField sampleDiv = (FlatField) divFI.getSample(timeStepIdx);
+
+                FlatField[] samples = decomposeToIrrotationalVectorFF(sampleDiv, sampleU, sampleV);
+                u.setSample(timeStepIdx, samples[0], false);
+                v.setSample(timeStepIdx, samples[1], false);
+
+            }
+
+            return createTrueFlowVectors(u, v);
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverLevels");
+        }
+
+    }
+
+    /**
+     * Computes Irrotational Wind Vector from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  divFF
+     * @param  uFF
+     * @param  vFF
+     *
+     * @return computed IrrotationalVector.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FlatField[] decomposeToIrrotationalVectorFF(FlatField divFF, FlatField uFF, FlatField vFF) throws Exception{
+        SampledSet domain = GridUtil.getSpatialDomain(uFF);
+        GriddedSet griddedSet = (GriddedSet) domain;
+        double scale = 1.0;
+        int latIndex = GridUtil.isLatLonOrder(domain)
+                ? 0
+                : 1;
+        int lonIndex = GridUtil.isLatLonOrder(domain)
+                ? 1
+                : 0;
+        float[][]   latLons  = GridUtil.getEarthLocationPoints(griddedSet);
+        float[]     lats     = latLons[latIndex];
+        double[] latsRad  = new double[lats.length];
+
+        for (int i = 0; i < lats.length; i++) {
+            latsRad[i] = Math.toRadians(lats[i]);
+        }
+
+        //FieldImpl divFI = createHorizontalDivergence(uFI, vFI);
+
+        //double[][] div = ((FlatField)(divFI.getSample(0))).getValues();
+        double[][] div = divFF.getValues();
+        Unit[] pUnit = GridUtil.getParamUnits(divFF);
+        if(pUnit[0] instanceof ScaledUnit) {
+            ScaledUnit su = (ScaledUnit) pUnit[0];
+            scale = su.getAmount();
+        }
+        // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+
+        int nlats = ((GriddedSet) domain).getLength(latIndex);
+        int nlons = ((GriddedSet) domain).getLength(lonIndex);
+        double[] dx  = new double[nlats];
+        int totalSize = nlats * nlons;
+        double dLat = Math.PI / (nlats - 1);
+        double dLon = (2 * Math.PI) / (nlons - 1);
+        for (int i = 0; i < nlats; i++) {
+            int j = i * nlons;
+            dx[i] = 6371000.0* Math.cos(latsRad[j]) * dLon;
+        }
+
+        double dy = 6371000.0 * dLat;
+        //double[] chi = solvePoisson(div[0], lats, nlats, nlons, dLat, dLon);
+        double[][] chi = new double[1][];
+        //psi[0] = solvePoisson(vort[0], lats, nlats, nlons,1.0, 1.0);
+        chi[0] = solvePoissonCartesian(div[0], nlats, nlons, dx, dy, scale);
+        //double[][] psi = solvePoisson(vort, lats, dLat, dLon);
+        double[][] uChi = new double[1][totalSize];
+        double[][] vChi = new double[1][totalSize];
+
+
+        for (int i = 1; i < nlats - 1; i++) {
+            int row = i * nlons;
+            int northRow = (i - 1) * nlons;
+            int southRow = (i + 1) * nlons;
+
+            double cosLat = Math.max(Math.cos(lats[i]), 0.01);
+            double invRcosLon = 1.0 / (EARTH_RADIUS.getValue() * cosLat * 2 * dLon);
+            double invRLat = 1.0 / (EARTH_RADIUS.getValue() * 2 * dLat);
+            for (int j = 0; j < nlons; j++) {
+                int k = row + j;
+                int kE = row + ((j + 1) % nlons);
+                int kW = row + ((j - 1 + nlons) % nlons);
+                int kN = northRow + j;
+                int kS = southRow + j;
+
+                // Irrotational Component: U_chi = grad(Chi)
+                uChi[0][k] = (chi[0][kE] - chi[0][kW]) * invRcosLon;
+                vChi[0][k] = (chi[0][kN] - chi[0][kS]) * invRLat;
+
+                // Non-Divergent Component: U_psi = k x grad(Psi)
+                // u = -dPsi/dy, v = dPsi/dx
+                //uPsi[k] = -(psi[kN] - psi[kS]) * invRLat;
+                //vPsi[k] = (psi[kE] - psi[kW]) * invRcosLon;
+            }
+        }
+        FlatField newUField = null;
+        FlatField newVField = null;
+        TupleType    newRangeTypeU = GridUtil.getParamType(uFF);
+        TupleType    newRangeTypeV = GridUtil.getParamType(vFF);
+        FunctionType newUFT =
+                new FunctionType(((SetType) domain.getType()).getDomain(),
+                        newRangeTypeU);
+        FunctionType newVFT =
+                new FunctionType(((SetType) domain.getType()).getDomain(),
+                        newRangeTypeV);
+        newUField = new FlatField(newUFT, domain);
+        newUField.setSamples(uChi, false);
+        newVField = new FlatField(newVFT, domain);
+        newVField.setSamples(vChi, false);
+
+        //FieldImpl uvGrid      = combineGrids(uGrid, vGrid,
+        //        true /* flatten */);
+        return new FlatField[]{newUField, newVField};
+    }
+
+    /**
+     * Computes NonDivergent Wind Vector from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  uFI  grid or time sequence of grids of positive-X wind comp.
+     * @param  vFI  grid or time sequence of grids of positive-Y wind comp.
+     *
+     * @return computed NonDivergentVector.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl decomposeToNonDivergentVector(FieldImpl uFI, FieldImpl vFI) throws Exception{
+        try {
+            Set timeSet = GridUtil.getTimeSet(uFI);
+            FieldImpl vortFI = createAbsoluteVorticity(uFI, vFI);
+
+
+            FieldImpl u = new FieldImpl((FunctionType) uFI.getType(), timeSet);
+            FieldImpl v = new FieldImpl((FunctionType) vFI.getType(), timeSet);
+
+            for (int timeStepIdx = 0;
+                 timeStepIdx < timeSet.getLength(); timeStepIdx++) {
+                FlatField sampleU = (FlatField) uFI.getSample(timeStepIdx);
+                FlatField sampleV = (FlatField) vFI.getSample(timeStepIdx);
+                FlatField sampleVort = (FlatField) vortFI.getSample(timeStepIdx);
+
+                FlatField[] samples = decomposeToNonDivergentVectorFF(sampleVort, sampleU, sampleV);
+                u.setSample(timeStepIdx, samples[0], false);
+                v.setSample(timeStepIdx, samples[1], false);
+
+            }
+
+            return createTrueFlowVectors(u, v);
+        } catch (RemoteException re) {
+            throw new VisADException(
+                    "RemoteException in applyFunctionOverLevels");
+        }
+    }
+
+    /**
+     * Computes NonDivergent Wind Vector from grid-relative wind components.  The
+     * first and second components of the range of the input
+     * {@link visad.FieldImpl} are assumed to be the velocity of the wind
+     * in the direction of increasing first and second dimension of the
+     * domain, respectively.
+     *
+     * @param  vortFF
+     * @param  uFF
+     * @param  vFF
+     *
+     * @return computed NonDivergentVector.
+     *
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FlatField[] decomposeToNonDivergentVectorFF(FlatField vortFF, FlatField uFF, FlatField vFF) throws Exception{
+        SampledSet domain = GridUtil.getSpatialDomain(uFF);
+        GriddedSet griddedSet = (GriddedSet) domain;
+        double scale = 1.0;
+        int latIndex = GridUtil.isLatLonOrder(domain)
+                ? 0
+                : 1;
+        int lonIndex = GridUtil.isLatLonOrder(domain)
+                ? 1
+                : 0;
+        float[][]   latLons  = GridUtil.getEarthLocationPoints(griddedSet);
+        float[]     lats     = latLons[latIndex];
+        double[] latsRad  = new double[lats.length];
+
+        for (int i = 0; i < lats.length; i++) {
+            latsRad[i] = Math.toRadians(lats[i]);
+        }
+
+        //FieldImpl divFI = createHorizontalDivergence(uFI, vFI);
+
+        //double[][] div = ((FlatField)(divFI.getSample(0))).getValues();
+        double[][] vort = vortFF.getValues();
+        Unit[] pUnit = GridUtil.getParamUnits(vortFF);
+        if(pUnit[0] instanceof ScaledUnit) {
+            ScaledUnit su = (ScaledUnit) pUnit[0];
+            scale = su.getAmount();
+        }
+        // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+
+        int nlats = ((GriddedSet) domain).getLength(latIndex);
+        int nlons = ((GriddedSet) domain).getLength(lonIndex);
+        double[] dx  = new double[nlats];
+        int totalSize = nlats * nlons;
+        double dLat = Math.PI / (nlats - 1);
+        double dLon = (2 * Math.PI) / (nlons - 1);
+        for (int i = 0; i < nlats; i++) {
+            int j = i * nlons;
+            dx[i] = 6371000.0* Math.cos(latsRad[j]) * dLon;
+        }
+
+        double dy = 6371000.0 * dLat;
+        //double[] chi = solvePoisson(div[0], lats, nlats, nlons, dLat, dLon);
+        double[][] psi = new double[1][];
+        //psi[0] = solvePoisson(vort[0], lats, nlats, nlons,1.0, 1.0);
+        psi[0] = solvePoissonCartesian(vort[0], nlats, nlons, dx, dy, scale);
+        //double[][] uChi = new double[1][totalSize];
+        //double[][] vChi = new double[1][totalSize];
+        double[][] uPsi = new double[1][totalSize];
+        double[][] vPsi = new double[1][totalSize];
+
+        for (int i = 1; i < nlats - 1; i++) {
+            int row = i * nlons;
+            int northRow = (i - 1) * nlons;
+            int southRow = (i + 1) * nlons;
+
+            double cosLat = Math.max(Math.cos(lats[i]), 0.01);
+            double invRcosLon = 1.0 / (EARTH_RADIUS.getValue() * cosLat * 2 * dLon);
+            double invRLat = 1.0 / (EARTH_RADIUS.getValue() * 2 * dLat);
+            for (int j = 0; j < nlons; j++) {
+                int k = row + j;
+                int kE = row + ((j + 1) % nlons);
+                int kW = row + ((j - 1 + nlons) % nlons);
+                int kN = northRow + j;
+                int kS = southRow + j;
+
+                // Irrotational Component: U_chi = grad(Chi)
+                //uChi[0][k] = (chi[kE] - chi[kW]) * invRcosLon;
+                //vChi[0][k] = (chi[kN] - chi[kS]) * invRLat;
+
+                // Non-Divergent Component: U_psi = k x grad(Psi)
+                // u = -dPsi/dy, v = dPsi/dx
+                uPsi[0][k] = -(psi[0][kN] - psi[0][kS]) * invRLat;
+                vPsi[0][k] = (psi[0][kE] - psi[0][kW]) * invRcosLon;
+            }
+        }
+        FlatField newUField = null;
+        FlatField newVField = null;
+        TupleType    newRangeTypeU = GridUtil.getParamType(uFF);
+        TupleType    newRangeTypeV = GridUtil.getParamType(vFF);
+        FunctionType newUFT =
+                new FunctionType(((SetType) domain.getType()).getDomain(),
+                        newRangeTypeU);
+        FunctionType newVFT =
+                new FunctionType(((SetType) domain.getType()).getDomain(),
+                        newRangeTypeV);
+        newUField = new FlatField(newUFT, domain);
+        newUField.setSamples(uPsi, false);
+        newVField = new FlatField(newVFT, domain);
+        newVField.setSamples(vPsi, false);
+
+        //FieldImpl uvGrid      = combineGrids(uGrid, vGrid,
+        //        true /* flatten */);
+        return new FlatField[]{newUField, newVField};
+    }
+    /**
+     * Solves Del^2(Phi) = Source using SOR iteration
+     */
+    public static double[] solvePoisson(double[] source, float[] latsDeg, int nlats, int nlons, double dLatDeg, double dLonDeg) {
+        int totalSize = nlats * nlons;
+        double[] phi = new double[totalSize];
+        double[] cleanSource = new double[totalSize];
+        // 1. Convert to Radians (Essential for physics)
+        double dLat = Math.toRadians(dLatDeg);
+        double dLon = Math.toRadians(dLonDeg);
+        double R = 6371000.0;
+        double R2 = R * R;
+
+        for (int k = 0; k < totalSize; k++) {
+            cleanSource[k] = Double.isNaN(source[k]) ? 0.0 : source[k];
+        }
+        // 2. Pre-calculate Cosines with a "Floor" to prevent Infinity
+        double[] cosLat = new double[nlats];
+        for (int i = 0; i < nlats; i++) {
+            // We cap the cosine so dx never gets smaller than 100 meters
+            // This stops the 10^11 explosion
+            cosLat[i] = Math.max(Math.cos(Math.toRadians(latsDeg[i*nlons])), 0.00001);
+        }
+
+        double omega = 1.2;
+        int maxIter = 1000;
+
+        for (int iter = 0; iter < maxIter; iter++) {
+            double maxDiff = 0;
+
+            // Start at i=1 to skip the singularity at the North Pole
+            for (int i = 1; i < nlats - 1; i++) {
+                int row = i * nlons;
+                double cL = cosLat[i];
+
+                // Spherical Coefficients
+                double zonalCoeff = 1.0 / (R2 * cL * cL * dLon * dLon);
+                double meridCoeff = 1.0 / (R2 * dLat * dLat);
+
+                // The denominator for the center point
+                double denom = 2.0 * (zonalCoeff + meridCoeff);
+
+                for (int j = 0; j < nlons; j++) {
+                    int k = row + j;
+                    int kE = row + ((j + 1) % nlons);
+                    int kW = row + ((j - 1 + nlons) % nlons);
+                    int kN = (i - 1) * nlons + j;
+                    int kS = (i + 1) * nlons + j;
+
+                    // Spherical Finite Difference Stencil
+                    double stencil = (phi[kE] + phi[kW]) * zonalCoeff +
+                            (phi[kN] + phi[kS]) * meridCoeff;
+
+                    double target = (stencil - cleanSource[k]) / denom;
+                    double diff = target - phi[k];
+                    phi[k] += omega * diff;
+
+                    if (Math.abs(diff) > maxDiff) maxDiff = Math.abs(diff);
+                }
+            }
+
+            // --- THE MOST IMPORTANT PART FOR GLOBAL DATA ---
+            // Force the Pole rows to be uniform (The "Pole Filter")
+            // Since all points at the pole are physically the same place,
+            // they must have the same value.
+            double northPoleVal = 0;
+            double southPoleVal = 0;
+            for(int j=0; j<nlons; j++) {
+                northPoleVal += phi[nlons + j]; // Average of row below
+                southPoleVal += phi[(nlats-2)*nlons + j]; // Average of row above
+            }
+            northPoleVal /= nlons;
+            southPoleVal /= nlons;
+            for(int j=0; j<nlons; j++) {
+                phi[j] = northPoleVal;
+                phi[(nlats-1)*nlons + j] = southPoleVal;
+            }
+
+            // Center the field to keep numbers small
+            if (iter % 20 == 0) {
+                double mean = 0;
+                for (double p : phi) mean += p;
+                mean /= totalSize;
+                for (int k = 0; k < totalSize; k++) phi[k] -= mean;
+            }
+
+            if (maxDiff < 1) {
+                double u = (phi[200] - phi[199])/111194.0;
+                System.out.println(" at u = " + u);
+                break;
+            }
+        }
+        return phi;
+    }
+    /**
+     * Solves Del^2(Phi) = Source using SOR iteration
+     */
+    public static double[] solvePoissonCartesian(double[] source, int nlats, int nlons, double[] dx, double dy, double scale) {
+        int totalSize = nlats * nlons;
+        double[] phi = new double[totalSize];
+        double[] cleanSource = new double[totalSize];
+
+        double omega = 1.2; // Relaxation factor
+        int maxIter = 1000;
+        double tolerance = 1e-4;
+
+        // --- STEP 1: BALANCE THE SOURCE (Critical for Global Data) ---
+        // The sum of vorticity over the globe must be zero.
+        double totalSum = 0;
+        for (double s : source) if (!Double.isNaN(s)) totalSum += s;
+        double avgSource = totalSum / totalSize;
+        for (int k = 0; k < totalSize; k++) {
+            cleanSource[k] = Double.isNaN(source[k]) ? 0.0 : source[k];
+        }
+        //double maxZ = 0, rmsZ = 0;
+        //int count = 0;
+
+        //for (double s : cleanSource) {
+        //    if (!Double.isNaN(s)) {
+        //        maxZ = Math.max(maxZ, Math.abs(s));
+        //        rmsZ += s * s;
+        //        count++;
+        //    }
+        //}
+        //rmsZ = Math.sqrt(rmsZ / count);
+
+        //System.out.println("zeta max = " + maxZ);
+        //System.out.println("zeta rms = " + rmsZ);
+
+        // 1. UNIT SANITY CHECK
+        // If your source is 10^-5 and your grid is 10^5, phi should be 10^7.
+        // If you are getting 10^11, your source is likely too large.
+        double maxS = 0;
+        for (double s : cleanSource) if (Math.abs(s) > maxS) maxS = Math.abs(s);
+
+
+        // Pre-calculate fixed geometric factors
+
+        double invDy2 = 1.0 / (dy * dy);
+
+
+        for (int iter = 0; iter < maxIter; iter++) {
+            double maxDiff = 0;
+
+            // Loop through internal points (skipping edges/boundaries)
+            for (int i = 1; i < nlats - 1; i++) {
+                int row = i * nlons;
+                // --- POLE PROTECTION ---
+                // If dx is too small (near pole), cap it.
+                // 1000 meters is a safe minimum for global grids.
+                double safeDx = Math.max(dx[i], dy*0.01);
+                double invDx2 = 1.0 / (safeDx * safeDx);
+                double denom = 2.0 * (invDx2 + invDy2);
+                for (int j = 0; j < nlons; j++) {
+                    int k = row + j;
+                    int kE = row + ((j + 1) % nlons);
+                    int kW = row + ((j - 1 + nlons) % nlons);
+                    int kN = (i - 1) * nlons + j;
+                    int kS = (i + 1) * nlons + j;
+
+
+
+                    // 1. Calculate the stencil (neighbor contribution)
+                    double stencil = (phi[kE] + phi[kW]) * invDx2 +
+                            (phi[kN] + phi[kS]) * invDy2;
+
+                    // 2. Solve for target value
+                    double target = (stencil - cleanSource[k]) / denom;
+
+                    // 3. SOR update
+                    double diff = target - phi[k];
+                    phi[k] += omega * diff;
+
+                    if (Math.abs(diff) > maxDiff) maxDiff = Math.abs(diff);
+                }
+            }
+            // REMOVE FLOATING DRIFT (The 10^11 Killer)
+            // We MUST force the mean to 0 to keep the values in the 10^7 range.
+            if (iter % 20 == 0) {
+                double mean = 0;
+                for (double p : phi) mean += p;
+                mean /= totalSize;
+                for (int k = 0; k < totalSize; k++) phi[k] -= mean;
+            }
+
+            if (maxDiff < tolerance) break;
+        }
+
+        // 3. Re-mask (Optional)
+        // Note: Usually we DON'T re-mask streamfunctions because the
+        // streamlines are meant to be continuous even if data is missing.
+        for (int i = 0; i < totalSize; i++) {
+            if (Double.isNaN(source[i]) )
+                phi[i] = Double.NaN;
+            else phi[i] *= scale;
+        }
+
+        //double rmsPsi = 0;
+        //for (double p : phi) rmsPsi += p * p;
+        //rmsPsi = Math.sqrt(rmsPsi / totalSize);
+
+        //double L = Math.sqrt(rmsPsi / rmsZ);
+        //System.out.println("Effective L (m): " + L);
+
+        return phi;
     }
 
 }
