@@ -805,3 +805,19 @@ def ComputePrecipRatesZZDR(reflectivity, DifferentialReflectivity):
   z1000 = getSliceAtAltitude(reflectivity, 1000)
   zdr1000 = getSliceAtAltitude(DifferentialReflectivity, 1000)
   return DerivedGridFactory.ComputePrecipRatesZZDR(z1000, zdr1000)
+
+def computeStreamFunction(U,V):
+  """ Make a vector from 2 components
+  <div class=jython>
+      computeStreamFunction(U,V) = [U,V]
+  </div>
+  """
+  return DerivedGridFactory.createStreamfunction(U,V)
+
+def computeVelocityPotential(U,V):
+  """ Make a vector from 2 components
+  <div class=jython>
+      computeVelocityPotential(U,V) = [U,V]
+  </div>
+  """
+  return DerivedGridFactory.createVelocityPotential(U,V)
