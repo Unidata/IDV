@@ -7952,6 +7952,7 @@ public class DerivedGridFactory {
             FieldImpl    streamfunctionFI        = null;
             Set timeSet = GridUtil.getTimeSet(uFI);
             FieldImpl vortFI = createRelativeVorticity(uFI, vFI);
+            //FieldImpl vortFI = createAbsoluteVorticity(uFI, vFI);
 
             for (int timeStepIdx = 0;
                  timeStepIdx < timeSet.getLength(); timeStepIdx++) {
@@ -8010,10 +8011,20 @@ public class DerivedGridFactory {
                 : 0;
         float[][]   latLons  = GridUtil.getEarthLocationPoints(griddedSet);
         float[]     lats     = latLons[latIndex];
+        float[]     lons     = latLons[lonIndex];
+        int nlats = ((GriddedSet) domain).getLength(latIndex);
+        int nlons = ((GriddedSet) domain).getLength(lonIndex);
+        double[] dx  = new double[nlons];
+
         double[] latsRad  = new double[lats.length];
+        double[] lonsRad  = new double[lons.length];
 
         for (int i = 0; i < lats.length; i++) {
             latsRad[i] = Math.toRadians(lats[i]);
+        }
+
+        for (int i = 0; i < lons.length; i++) {
+            lonsRad[i] = Math.toRadians(lons[i]);
         }
 
         double[][] vort = vortFI.getValues();
@@ -8023,21 +8034,37 @@ public class DerivedGridFactory {
             scale = su.getAmount();
         }
 
-        // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
-        int nlats = ((GriddedSet) domain).getLength(latIndex);
-        int nlons = ((GriddedSet) domain).getLength(lonIndex);
-        double[] dx  = new double[nlats];
-        int totalSize = nlats * nlons;
-        double dLat = Math.PI / (nlats - 1);
-        double dLon = (2 * Math.PI) / (nlons - 1);
-        for (int i = 0; i < nlats; i++) {
-            int j = i * nlons;
-            dx[i] = 6371000.0* Math.cos(latsRad[j]) * dLon;
+        double dy = 0.0;
+        Unit[] dunit = domain.getSetUnits();
+
+        double[][] psi = new double[1][];
+        if(dunit[0].isConvertible(CommonUnits.KILOMETER)) {
+            float[][] dsample = domain.getSamples();
+            double scale0 = 1.0;
+            if(dunit[0] instanceof ScaledUnit) {
+                ScaledUnit du = (ScaledUnit) dunit[0];
+                scale0 = du.getAmount();
+            }
+            double dx0 = (dsample[1][ nlats ] - dsample[1][0])*scale0;
+            dy = (dsample[0][ 1] - dsample[0][0]) * scale0;
+            // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+            psi[0] = solvePoissonCartesian(vort[0], nlats, nlons, dx0, dy, scale);
+        } else {
+            double dLat = Math.abs(latsRad[nlons] - latsRad[0]);
+            double dLon = Math.abs(lonsRad[1] - lonsRad[0]);
+            //double dLon = (2 * Math.PI) / (nlons - 1);
+            for (int i = 0; i < nlats; i++) {
+                int j = i * nlons;
+                //System.out.println("i=" + i + " j=" + j + " lats=" + lats[j] + "\n");
+                dx[i] = 6371000.0 * Math.cos(latsRad[j]) * dLon;
+            }
+
+            dy = 6371000.0 * dLat;
+            // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+            psi[0] = solvePoissonCartesian(vort[0], nlats, nlons, dx, dy, scale);
         }
 
-        double dy = 6371000.0 * dLat;
-        double[][] psi = new double[1][];
-        psi[0] = solvePoissonCartesian(vort[0], nlats, nlons, dx, dy, scale);
+        //psi[0] = solvePoissonCartesian(vort[0], nlats, nlons, dx, dy, scale);
         FlatField newPsiField = null;
 
         RealType rvRT   = DataUtil.makeRealType("streamfunction", uUnit);
@@ -8134,15 +8161,15 @@ public class DerivedGridFactory {
                 : 0;
         float[][]   latLons  = GridUtil.getEarthLocationPoints(griddedSet);
         float[]     lats     = latLons[latIndex];
+        float[]     lons     = latLons[lonIndex];
         double[] latsRad  = new double[lats.length];
+        int nlats = ((GriddedSet) domain).getLength(latIndex);
+        int nlons = ((GriddedSet) domain).getLength(lonIndex);
 
         for (int i = 0; i < lats.length; i++) {
             latsRad[i] = Math.toRadians(lats[i]);
         }
 
-        //FieldImpl divFI = createHorizontalDivergence(uFI, vFI);
-
-        //double[][] div = ((FlatField)(divFI.getSample(0))).getValues();
         double[][] div = divFF.getValues();
         Unit[] pUnit = GridUtil.getParamUnits(divFF);
         if(pUnit[0] instanceof ScaledUnit) {
@@ -8150,22 +8177,40 @@ public class DerivedGridFactory {
             scale = su.getAmount();
         }
         // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
-
-        int nlats = ((GriddedSet) domain).getLength(latIndex);
-        int nlons = ((GriddedSet) domain).getLength(lonIndex);
+        double dy = 0.0;
         double[] dx  = new double[nlats];
-        int totalSize = nlats * nlons;
-        double dLat = Math.PI / (nlats - 1);
-        double dLon = (2 * Math.PI) / (nlons - 1);
-        for (int i = 0; i < nlats; i++) {
-            int j = i * nlons;
-            dx[i] = 6371000.0* Math.cos(latsRad[j]) * dLon;
-        }
-
-        double dy = 6371000.0 * dLat;
+        Unit[] dunit = domain.getSetUnits();
 
         double[][] chi = new double[1][];
-        chi[0] = solvePoissonCartesian(div[0], nlats, nlons, dx, dy, scale);
+
+        if(dunit[0].isConvertible(CommonUnits.KILOMETER)) {
+            float[][] dsample = domain.getSamples();
+            double scale0 = 1.0;
+            if(dunit[0] instanceof ScaledUnit) {
+                ScaledUnit du = (ScaledUnit) dunit[0];
+                scale0 = du.getAmount();
+            }
+            double dx0 = (dsample[1][ nlats ] - dsample[1][0])*scale0;
+            dy = (dsample[0][ 1] - dsample[0][0]) * scale0;
+            // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+            chi[0] = solvePoissonCartesian(div[0], nlats, nlons, dx0, dy, scale);
+        } else {
+            double dLat = Math.abs(latsRad[nlons] - latsRad[0]);
+            double lonsRad1 = Math.toRadians(lons[1]);
+            double lonsRad0 = Math.toRadians(lons[0]);
+            double dLon = Math.abs(lonsRad1 - lonsRad0);
+
+            for (int i = 0; i < nlats; i++) {
+                int j = i * nlons;
+                //System.out.println("i=" + i + " j=" + j + " lats=" + lats[j] + "\n");
+                dx[i] = 6371000.0 * Math.cos(latsRad[j]) * dLon;
+            }
+
+            dy = 6371000.0 * dLat;
+            // Solve Poisson: Del^2(chi) = div  AND  Del^2(psi) = vort
+            chi[0] = solvePoissonCartesian(div[0], nlats, nlons, dx, dy, scale);
+        }
+
         FlatField newChiField = null;
 
         RealType rvRT   = DataUtil.makeRealType("streamfunction", uUnit);
@@ -8699,4 +8744,112 @@ public class DerivedGridFactory {
         return phi;
     }
 
+    public static double[] solvePoissonCartesian(double[] source, int nlats, int nlons, double dx, double dy, double scale) {
+        int totalSize = nlats * nlons;
+        double[] phi = new double[totalSize];
+        double[] cleanSource = new double[totalSize];
+
+        double omega = 1.2; // Relaxation factor
+        int maxIter = 1000;
+        double tolerance = 1e-4;
+
+        // --- STEP 1: BALANCE THE SOURCE (Critical for Global Data) ---
+        // The sum of vorticity over the globe must be zero.
+        double totalSum = 0;
+        for (double s : source) if (!Double.isNaN(s)) totalSum += s;
+        double avgSource = totalSum / totalSize;
+        for (int k = 0; k < totalSize; k++) {
+            cleanSource[k] = Double.isNaN(source[k]) ? 0.0 : source[k];
+        }
+        //double maxZ = 0, rmsZ = 0;
+        //int count = 0;
+
+        //for (double s : cleanSource) {
+        //    if (!Double.isNaN(s)) {
+        //        maxZ = Math.max(maxZ, Math.abs(s));
+        //        rmsZ += s * s;
+        //        count++;
+        //    }
+        //}
+        //rmsZ = Math.sqrt(rmsZ / count);
+
+        //System.out.println("zeta max = " + maxZ);
+        //System.out.println("zeta rms = " + rmsZ);
+
+        // 1. UNIT SANITY CHECK
+        // If your source is 10^-5 and your grid is 10^5, phi should be 10^7.
+        // If you are getting 10^11, your source is likely too large.
+        double maxS = 0;
+        for (double s : cleanSource) if (Math.abs(s) > maxS) maxS = Math.abs(s);
+
+
+        // Pre-calculate fixed geometric factors
+
+        double invDy2 = 1.0 / (dy * dy);
+
+        for (int iter = 0; iter < maxIter; iter++) {
+            double maxDiff = 0;
+
+            // Loop through internal points (skipping edges/boundaries)
+            for (int i = 1; i < nlons - 1; i++) {
+                int row = i * nlats;
+                // --- POLE PROTECTION ---
+                // If dx is too small (near pole), cap it.
+                // 1000 meters is a safe minimum for global grids.
+                double safeDx = Math.max(dx, dy*0.01);
+                double invDx2 = 1.0 / (safeDx * safeDx);
+                double denom = 2.0 * (invDx2 + invDy2);
+                for (int j = 0; j < nlats; j++) {
+                    int k = row + j;
+                    int kE = row + ((j + 1) % nlats);
+                    int kW = row + ((j - 1 + nlats) % nlats);
+                    int kN = (i - 1) * nlats + j;
+                    int kS = (i + 1) * nlats + j;
+
+
+
+                    // 1. Calculate the stencil (neighbor contribution)
+                    double stencil = (phi[kE] + phi[kW]) * invDx2 +
+                            (phi[kN] + phi[kS]) * invDy2;
+
+                    // 2. Solve for target value
+                    double target = (stencil - cleanSource[k]) / denom;
+
+                    // 3. SOR update
+                    double diff = target - phi[k];
+                    phi[k] += omega * diff;
+
+                    if (Math.abs(diff) > maxDiff) maxDiff = Math.abs(diff);
+                }
+            }
+            // REMOVE FLOATING DRIFT (The 10^11 Killer)
+            // We MUST force the mean to 0 to keep the values in the 10^7 range.
+            if (iter % 20 == 0) {
+                double mean = 0;
+                for (double p : phi) mean += p;
+                mean /= totalSize;
+                for (int k = 0; k < totalSize; k++) phi[k] -= mean;
+            }
+
+            if (maxDiff < tolerance) break;
+        }
+
+        // 3. Re-mask (Optional)
+        // Note: Usually we DON'T re-mask streamfunctions because the
+        // streamlines are meant to be continuous even if data is missing.
+        for (int i = 0; i < totalSize; i++) {
+            if (Double.isNaN(source[i]) )
+                phi[i] = Double.NaN;
+            else phi[i] *= scale;
+        }
+
+        //double rmsPsi = 0;
+        //for (double p : phi) rmsPsi += p * p;
+        //rmsPsi = Math.sqrt(rmsPsi / totalSize);
+
+        //double L = Math.sqrt(rmsPsi / rmsZ);
+        //System.out.println("Effective L (m): " + L);
+
+        return phi;
+    }
 }
