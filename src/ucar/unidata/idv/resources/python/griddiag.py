@@ -807,7 +807,7 @@ def ComputePrecipRatesZZDR(reflectivity, DifferentialReflectivity):
   return DerivedGridFactory.ComputePrecipRatesZZDR(z1000, zdr1000)
 
 def computeStreamFunction(U,V):
-  """ Make a vector from 2 components
+  """ Make a stream function from U and V components
   <div class=jython>
       computeStreamFunction(U,V) = [U,V]
   </div>
@@ -815,7 +815,7 @@ def computeStreamFunction(U,V):
   return DerivedGridFactory.createStreamfunction(U,V)
 
 def computeVelocityPotential(U,V):
-  """ Make a vector from 2 components
+  """ Make a velocity potential from U and V components
   <div class=jython>
       computeVelocityPotential(U,V) = [U,V]
   </div>
