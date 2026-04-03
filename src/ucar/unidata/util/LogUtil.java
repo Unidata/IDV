@@ -136,6 +136,9 @@ public class LogUtil {
     private static final long INITIAL_WAIT_MILLIS = 1000; // 1 second
     private static final Random random = new Random();
 
+    private static JFrame chatbotFrame;
+    private static JEditorPane chatResultArea;
+    JTextArea questionArea = new JTextArea(12, 60);
     /**
      * private ctor so no one can instantiate a LogUtil
      */
@@ -720,6 +723,13 @@ public class LogUtil {
         consoleWindow.setVisible(true);
     }
 
+    public static void showAIConsole() {
+        JFrame frame = new JFrame("IDV AI Assistant");
+        frame.add(createChatBotPanel()); // Call the function here
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
     /**
      * Sends an image to the Gemini API for analysis and returns the result.
      * Note: This is a hypothetical implementation and requires a valid Gemini API endpoint and key.
@@ -1466,97 +1476,20 @@ public class LogUtil {
      * @param instruction The prompt for the analysis.
      * @return The text result from Gemini or an error message.
      */
-    public static String runGemini(BufferedImage image, String instruction,BufferedImage exampleImage1, String example1Analysis,
-                                   BufferedImage exampleImage2, String example2Analysis) {
+    public static String runGemini(BufferedImage image, String instruction,String[] exampleImages, String[] exampleAnalysis) {
         if (image == null) {
             String errorMsg = "Input BufferedImage cannot be null.";
-            // log_.error(errorMsg);
             System.err.println(errorMsg);
             return errorMsg;
         }
 
-        if(resultArea == null) {
-            resultArea = new JEditorPane();
-            resultArea.setEditable(false);
-            resultArea.setContentType("text/html");
-            Font c = new Font("Courier", Font.BOLD, 12);
-            JButton clearBtn = new JButton("Clear");
-            clearBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    resultArea.setText("");
-                }
-            });
-            resultFrame = new JFrame("GEMINI Results");
-            resultFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            JScrollPane resultScroller = new JScrollPane(resultArea);
-            resultScroller.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
-            resultScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            JPanel contents = LayoutUtil.centerBottom(
-                    resultScroller,
-                    LayoutUtil.wrap(
-                            LayoutUtil.hflow(
-                                    Misc.newList(clearBtn))));
-            resultFrame.add(contents, BorderLayout.CENTER);
-            //resultFrame.add(resultScroller, BorderLayout.CENTER);
-            resultFrame.setPreferredSize(new Dimension(400, 600));
-            resultFrame.setFont(c);
-        }
+        initializeUI(); // Encapsulated UI setup for clarity
+        String htmlstr = convertMarkdownToHtmlManually("**INSTRUCTION** \n" + instruction);
+        updateUIWithMessage(htmlstr);
 
-        consoleMessage(". ");
-        consoleMessage(". ");
-        consoleMessage("INSTRUCTION: " + instruction);
-        consoleMessage("> ");
-        String msg = Msg.msg(instruction);
-        appendHtml(resultArea, msg);
-        //resultArea.append("> "+ "\n");
 
         try {
-            // 3. Set API Key and URL (The URL does not change)
-            String apiKey = " ";
-            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
-
-            StringBuilder contentsJson = new StringBuilder();
-            contentsJson.append("[");
-            boolean hasPreviousContent = false;
-
-            // Example 1
-            if (exampleImage1 != null && example1Analysis != null && !example1Analysis.trim().isEmpty()) {
-                ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
-                ImageIO.write(exampleImage1, "jpeg", baos1);
-                String base64Image1 = Base64.getEncoder().encodeToString(baos1.toByteArray());
-                String escapedAnalysis1 = example1Analysis.replace("\"", "\\\"");
-
-                contentsJson.append("{ \"role\": \"user\", \"parts\": [");
-                contentsJson.append("{\"text\": \"What is in this picture?\"},");
-                contentsJson.append("{\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"").append(base64Image1).append("\"}}");
-                contentsJson.append("]},");
-                contentsJson.append("{ \"role\": \"model\", \"parts\": [");
-                contentsJson.append("{\"text\": \"").append(escapedAnalysis1).append("\"}");
-                contentsJson.append("]}");
-                hasPreviousContent = true;
-            }
-
-            // Example 2
-            if (exampleImage2 != null && example2Analysis != null && !example2Analysis.trim().isEmpty()) {
-                if (hasPreviousContent) {
-                    contentsJson.append(",");
-                }
-                ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-                ImageIO.write(exampleImage2, "jpeg", baos2);
-                String base64Image2 = Base64.getEncoder().encodeToString(baos2.toByteArray());
-                String escapedAnalysis2 = example2Analysis.replace("\"", "\\\"");
-
-                contentsJson.append("{ \"role\": \"user\", \"parts\": [");
-                contentsJson.append("{\"text\": \"What is in this picture?\"},");
-                contentsJson.append("{\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"").append(base64Image2).append("\"}}");
-                contentsJson.append("]},");
-                contentsJson.append("{ \"role\": \"model\", \"parts\": [");
-                contentsJson.append("{\"text\": \"").append(escapedAnalysis2).append("\"}");
-                contentsJson.append("]}");
-                hasPreviousContent = true;
-            }
-
-
+            // 1. Prepare image data
             // 1. Convert BufferedImage to a byte array
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(image, "jpeg", baos);
@@ -1565,66 +1498,104 @@ public class LogUtil {
             // 2. Encode to Base64
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
-            // 4. Prepare the instruction for the JSON payload
+            // 2. Prepare API details
+            String VALIDATION_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+            HttpClient client = HttpClient.newHttpClient();
+
+            UserInfo userInfo = GeminiKeyValidator( VALIDATION_URL);
+
+            String apiKey = userInfo.getPassword();
+            //" "; // IMPORTANT: Do not hardcode keys in production
+            // NOTE: The official public model is 'gemini-1.5-pro-latest'.
+            // Using your string in case you have private access. models/gemini-3-pro-preview models/gemini-2.5-pro
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=" + apiKey;
+
+
+            StringBuilder contentsJson = new StringBuilder();
+            contentsJson.append("[");
+            boolean hasPreviousContent = false;
+
+            // Examples
+            if (exampleImages != null && exampleAnalysis != null) {
+                for (int i = 0; i < exampleImages.length; i++) {
+                    // Add comma BEFORE every item except the very first one
+                    if (i > 0) contentsJson.append(",");
+
+                    File file = new File(exampleImages[i]);
+                    BufferedImage exampleImage = ImageIO.read(file);
+                    ByteArrayOutputStream baosEx = new ByteArrayOutputStream();
+                    ImageIO.write(exampleImage, "jpeg", baosEx);
+                    String base64Ex = Base64.getEncoder().encodeToString(baosEx.toByteArray());
+
+                    // Use a helper method for proper JSON escaping
+                    String escapedAnalysis = escapeJson(exampleAnalysis[i]);
+
+                    // User Turn
+                    contentsJson.append("{ \"role\": \"user\", \"parts\": [");
+                    contentsJson.append("{\"text\": \"What is in this picture?\"},");
+                    contentsJson.append("{\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"").append(base64Ex).append("\"}}");
+                    contentsJson.append("]},"); // Comma between user and model turns
+
+                    // Model Turn
+                    contentsJson.append("{ \"role\": \"model\", \"parts\": [");
+                    contentsJson.append("{\"text\": \"").append(escapedAnalysis).append("\"}");
+                    contentsJson.append("]}");
+                }
+            }
+
+
+            /// 4. Add Current Instruction
+            // Check if we need a comma if examples were added
+            if (exampleImages != null && exampleImages.length > 0) {
+                contentsJson.append(",");
+            }
+
             String prompt = (instruction == null || instruction.trim().isEmpty())
                     ? "Please Provide Summary of this weather map?" // Default instruction
                     : instruction;
             // Escape quotes in the instruction to prevent breaking the JSON structure.
-            String escapedPrompt = prompt.replace("\"", "\\\"");
-
-            if (hasPreviousContent) {
-                contentsJson.append(",");
-            }
+            String escapedPrompt = escapeJson(prompt);
 
             contentsJson.append("{ \"role\": \"user\", \"parts\": [");
-            // The user's instruction is placed here
             contentsJson.append("{\"text\": \"").append(escapedPrompt).append("\"},");
             contentsJson.append("{\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"").append(base64Image).append("\"}}");
             contentsJson.append("]}");
 
             contentsJson.append("]");
 
-            // 5. Construct the JSON payload with the dynamic instruction
+            // 5. Final Payload
             String jsonPayload = "{\"contents\": " + contentsJson.toString() + "}";
 
             // 6. Send the request
-            HttpClient client = HttpClient.newHttpClient();
+            //HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return sendRequestWithRetry(client, request);
 
-            // 7. Process the response
-            if (response.statusCode() == 200) {
-                String responseBody = response.body();
-                String out = extractTextFromGeminiResponse(responseBody);
-                consoleMessage(out);
-                msg = Msg.msg(out);
-                appendHtml(resultArea, msg);
-                resultFrame.pack();
-                resultFrame.setVisible(true);
-                return out;
-            } else {
-                String errorMsg = "Error from Gemini API: " + response.statusCode() + " " + response.body();
-                consoleMessage(errorMsg);
-                msg = Msg.msg(errorMsg);
-                appendHtml(resultArea, msg);
-                resultFrame.pack();
-                resultFrame.setVisible(true);
-                System.err.println(errorMsg);
-                return errorMsg;
-            }
-
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             // logException("Failed to run Gemini analysis on the image.", e);
             System.err.println("Failed to process image for Gemini analysis: " + e.getMessage());
             Thread.currentThread().interrupt();
             return "Failed to process image for Gemini analysis.";
         }
     }
+
+    /**
+     * Helper method to manually escape strings for JSON
+     */
+    private static String escapeJson(String text) {
+        if (text == null) return "";
+        return text.replace("\\", "\\\\") // Escape backslashes first
+                .replace("\"", "\\\"") // Escape quotes
+                .replace("\n", "\\n")  // Escape newlines
+                .replace("\r", "\\r")  // Escape carriage returns
+                .replace("\t", "\\t"); // Escape tabs
+    }
+
     /**
      * Manually converts a simple subset of Markdown to HTML using string replacements.
      * WARNING: This is a brittle approach and not recommended for production.
@@ -2424,7 +2395,88 @@ public class LogUtil {
         return longSB;
     }
 
+    public static JPanel createChatBotPanel() {
+        // 1. Create the Main Container
+        JPanel chatPanel = new JPanel(new BorderLayout(10, 10));
+        chatPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // 2. Chat History Area (Output - Read Only)
+        JTextArea historyArea = new JTextArea(15, 50);
+        historyArea.setEditable(false);
+        historyArea.setLineWrap(true);
+        historyArea.setWrapStyleWord(true);
+        historyArea.setBackground(new Color(245, 245, 250));
+        JScrollPane historyScroll = new JScrollPane(historyArea);
+        historyScroll.setBorder(BorderFactory.createTitledBorder("Chat History"));
+
+        // 3. User Input Area
+        JTextArea inputArea = new JTextArea(5, 50);
+        inputArea.setLineWrap(true);
+        inputArea.setWrapStyleWord(true);
+        JScrollPane inputScroll = new JScrollPane(inputArea);
+        inputScroll.setBorder(BorderFactory.createTitledBorder("Your Question"));
+
+        // 4. Buttons
+        JButton submitBtn = new JButton("Submit Message");
+        JButton clearBtn = new JButton("Clear Chat");
+
+        // Layout the bottom section (Input + Buttons)
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(clearBtn);
+        buttonPanel.add(submitBtn);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(inputScroll, BorderLayout.CENTER);
+        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Add everything to the main container
+        chatPanel.add(historyScroll, BorderLayout.CENTER);
+        chatPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // --- Action Logic ---
+
+        // Submit Action
+        ActionListener submitAction = e -> {
+            String question = inputArea.getText().trim();
+            if (question.isEmpty()) return;
+
+            // Display user question
+            historyArea.append("[YOU]: " + question + "\n\n");
+            inputArea.setText("");
+
+            // Disable UI while thinking
+            submitBtn.setEnabled(false);
+            submitBtn.setText("Thinking...");
+
+            // Run your Gemini logic in a background thread so UI doesn't freeze
+            new Thread(() -> {
+                try {
+                    // CALL YOUR API HERE: String response = doGemini(question);
+                    String response = "Gemini Response: Analysis of your weather question completed.";
+
+                    // Update UI on the main Swing thread
+                    SwingUtilities.invokeLater(() -> {
+                        historyArea.append("[GEMINI]: " + response + "\n\n");
+                        historyArea.setCaretPosition(historyArea.getDocument().getLength()); // Scroll to bottom
+                        submitBtn.setEnabled(true);
+                        submitBtn.setText("Submit Message");
+                    });
+                } catch (Exception ex) {
+                    SwingUtilities.invokeLater(() -> historyArea.append("[ERROR]: " + ex.getMessage() + "\n\n"));
+                }
+            }).start();
+        };
+
+        submitBtn.addActionListener(submitAction);
+
+        // Clear Action
+        clearBtn.addActionListener(e -> {
+            historyArea.setText("");
+            inputArea.setText("");
+        });
+
+        return chatPanel;
+    }
 
 
 }
