@@ -272,6 +272,10 @@
        action="action:help.showconsole"
        mnemonic="C"/>
      <menuitem
+       label="Show AI Assistant"
+       action="action:help.showAIassistant"
+       mnemonic="A"/>
+     <menuitem
        label="Show Help Tips"
        action="action:help.showhelptips"
        mnemonic="T"/>

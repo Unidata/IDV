@@ -275,6 +275,11 @@
      group="Help"
      action="jython:idv.showConsole ();"/>
   <action
+     id="help.showAIassistant"
+     description="Show AI Assistant"
+     group="Help"
+     action="jython:idv.showAIConsole ();"/>
+  <action
      id="help.showhelptips"
      description="Show Help Tips"
      group="Help"

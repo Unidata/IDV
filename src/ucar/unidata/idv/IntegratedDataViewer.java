@@ -3046,7 +3046,9 @@ Misc.run(new Runnable() {
         LogUtil.showConsole();
     }
 
-
+    public void showAIConsole() {
+        LogUtil.showAIConsole();
+    }
 
     /**
      *  Helper method that calls LogUtil.printException
