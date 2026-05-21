@@ -543,4 +543,7 @@ public class AccountManager implements CredentialsProvider,
         dialog.setLocation(200, 200);
     }
 
+    public File getStateDir() {
+        return stateDir;
+    }
 }
