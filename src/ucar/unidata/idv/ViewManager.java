@@ -32,14 +32,7 @@ import ucar.unidata.data.GeoLocationInfo;
 import ucar.unidata.data.gis.KmlDataSource;
 import ucar.unidata.idv.control.DisplayControlImpl;
 import ucar.unidata.idv.publish.PublishManager;
-import ucar.unidata.idv.ui.BottomLegend;
-import ucar.unidata.idv.ui.IdvComponentGroup;
-import ucar.unidata.idv.ui.IdvComponentHolder;
-import ucar.unidata.idv.ui.IdvLegend;
-import ucar.unidata.idv.ui.IdvUIManager;
-import ucar.unidata.idv.ui.IdvWindow;
-import ucar.unidata.idv.ui.ImageSequenceGrabber;
-import ucar.unidata.idv.ui.SideLegend;
+import ucar.unidata.idv.ui.*;
 import ucar.unidata.java3d.LightInfo;
 import ucar.unidata.ui.Command;
 import ucar.unidata.ui.CommandManager;
@@ -767,7 +760,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
     /** The history of gemini instructions */
     private List<String> geminiInstructionHistory = new ArrayList<>();
     private Hashtable<String, String> geminiMasterPrompt =  new Hashtable();
-
+    private Object MUTEX_GeminiHISTORY = new Object();
     /**
      *  A parameter-less ctor for the XmlEncoder based decoding.
      */
@@ -4689,260 +4682,56 @@ public class ViewManager extends SharableImpl implements ActionListener,
         }
     }
 
-    /**
-     * Make the run gemini views menu
-     */
-    public void promptAndRunGemini11() throws AWTException {
-        // reset gemini app key
-        JButton resetAppKeyButton = new JButton("Reset Gemini App Key");
-        resetAppKeyButton.setEnabled(true);
-        resetAppKeyButton.setVisible(true);
-        resetAppKeyButton.addActionListener(e -> {
-            AccountManager userAccountManager =
-                    AccountManager.getGlobalAccountManager();
-            userAccountManager.resetAppKey("gemini", "Enter new gemini app key");
-        });
-
-
-        String instruction = null; //"what is the current weather in Denver";
-        JTextArea textArea = new JTextArea(10, 50);
-        textArea.setLineWrap(true);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-
-        JPanel textPanel = new JPanel(new BorderLayout(0, 5));
-        textPanel.add(new JLabel("Enter the instruction for Gemini:"), BorderLayout.NORTH);
-        textPanel.add(scrollPane, BorderLayout.CENTER);
-
-        String knowledge = null; //"what is the current weather in Denver";
-        JTextArea textAreak = new JTextArea(10, 50);
-        textAreak.setLineWrap(true);
-        JScrollPane scrollPanek = new JScrollPane(textAreak);
-
-        JPanel textPanelk = new JPanel(new BorderLayout(0, 5));
-        textPanelk.add(new JLabel("Enter the knowledge context of key information for Gemini:"), BorderLayout.NORTH);
-        textPanelk.add(scrollPanek, BorderLayout.CENTER);
-
-        JButton imageButton = new JButton("Archived weather Map file");
-        imageButton.setEnabled(true);
-        imageButton.setVisible(true);
-        imageButton.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setMultiSelectionEnabled(true);
-            fileChooser.setDialogTitle("Select Archived Weather Map or Maps");
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File[] selectedFiles = fileChooser.getSelectedFiles();
-                weatherMape1 = new String[selectedFiles.length];
-                for(int i =0; i < selectedFiles.length; i++) {
-                    weatherMape1[i] = selectedFiles[i].getAbsolutePath();
-                }
-                //weatherMape1 = selectedFile.getAbsolutePath();
-                // You can add logic here to process the selected file
-                System.out.println("Selected history file: " + weatherMape1);
-            }
-        });
-
-        JButton analysisButton = new JButton("Archived weather analysis files");
-        analysisButton.setEnabled(true);
-        analysisButton.setVisible(true);
-        analysisButton.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setMultiSelectionEnabled(true);
-            fileChooser.setDialogTitle("Select Archived Weather Map File");
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File[] selectedFiles = fileChooser.getSelectedFiles();
-                weatherAnalysis1 = new String[selectedFiles.length];
-                for(int i = 0; i < selectedFiles.length; i++ ) {
-                    weatherAnalysis1[i] = selectedFiles[i].getAbsolutePath();
-                }
-                // weatherAnalysis1 = selectedFile.getAbsolutePath();
-                // You can add logic here to process the selected file
-                //System.out.println("Selected history file: " + weatherAnalysis1);
-            }
-        });
-        JButton examplePromptButton = new JButton("Master Prompt Examples");
-        if(geminiMasterPrompt.size() == 0) {
-            String item1str = " You are an expert meteorologist with 20 years of experience analyzing synoptic weather charts. " +
-                    "Please analyze the image and identify as many atmospheric features as possible and the weather that they may be causing. " +
-                    "For each statement below, cite you source and provide a confidence score from 1 (low confidence, speculative) to 5 " +
-                    "(high confidence, verifiable fact). Explain your reasoning for any score below 4.\n";
-            geminiMasterPrompt.put("Gengeal request for weather map", item1str);
-            String item2str = "Analyze the provided weather map and identify the following key features: " +
-                    "Major Pressure Systems: Locate and describe any significant high-pressure (H) and low-pressure (L) systems. "+
-                    "Mention their approximate central pressure in millibars (mb) if visible. " +
-                    "Fronts: Identify all types of fronts (cold, warm, occluded, stationary). Describe their location and the direction they are moving. " +
-                    "Precipitation: Describe the areas of precipitation (rain, snow, mixed). Note their intensity if indicated by color codes. " +
-                    "Overall Summary: Provide a 2-3 sentence narrative summary of the weather conditions and what to expect in the " +
-                    "next 12-24 hours for a key region (e.g., the US Midwest).";
-            geminiMasterPrompt.put("With upper and lower GeoHeight, and front, reflectivity", item2str);
-            String item3str = "You are an expert meteorologist with 20 years of experience performing synoptic-scale analysis. The provided image is a surface " +
-                    " weather chart. Your task is to conduct a thorough analysis. For each statement, provide a confidence score from 1 (low confidence) to " +
-                    "5 (high confidence) and explain your reasoning for any score below 4.\n" +
-                    "Major Pressure Systems: Locate all significant high (H) and low (L) pressure centers. State their approximate " +
-                    "geographic location and central pressure in millibars (mb) if depicted.\n" +
-                    "Frontal Boundaries: Identify all cold, warm, occluded, and stationary fronts. Describe their location, orientation, " +
-                    "and inferred direction of movement.\n" +
-                    "Wind and Pressure Gradient: Analyze the isobar patterns. Identify areas with a tight pressure gradient and " +
-                    "describe the expected wind conditions (speed and direction) in those regions. Reference any wind barbs shown on the map.\n" +
-                    "Airmass Characteristics: Based on station plots (if visible), describe the characteristics of the airmasses ahead of " +
-                    "and behind the primary fronts (e.g., \"warm and moist,\" \"cold and dry\").\n" +
-                    "Narrative Summary: Provide a 2-3 sentence summary explaining how these features are interacting to create the overall " +
-                    "weather pattern across a major region (e.g., the Eastern United States).";
-            geminiMasterPrompt.put("Pressure, Frontal, Wind, Airmass", item3str);
-            String item4str = "The provided image is a Doppler radar reflectivity scan. Your task is to perform a detailed tactical analysis. " +
-                    "For each statement, provide a confidence score from 1 (low confidence) to 5 (high confidence) and explain your reasoning for any score below 4.\n" +
-                    "Precipitation Location and Intensity: Identify the geographic areas experiencing precipitation. Describe the intensity using the color legend (e.g., " +
-                    "moderate to heavy rain, corresponding to red/orange shades).\n" +
-                    "Precipitation Type: Infer the likely precipitation type (rain, snow, sleet, or hail) based on the season, location, and radar signatures" +
-                    " (e.g., bright-banding for melting snow).\n" +
-                    "Storm Structure and Organization: Describe the organization of the precipitation. Identify any significant structures such as squall lines, " +
-                    "supercell thunderstorms, or mesoscale convective systems (MCS). Note any classic radar signatures like hook echoes or bow echoes.\n" +
-                    "Storm Motion: Based on the storm structure and organization, infer the primary direction of movement for the main precipitation areas.\n" +
-                    "Hazard Assessment: Based on the observed structures and intensity, provide a brief assessment of the potential weather hazards " +
-                    "(e.g., High potential for flash flooding,Moderate risk of strong winds associated with the bow echo).";
-            geminiMasterPrompt.put("Doppler radar reflectivity",item4str);
-            String item5str = "You are an expert in satellite meteorology, skilled at inferring atmospheric dynamics from cloud and moisture patterns." +
-                    " The provided image is a satellite scan (Infrared or Water Vapor). Your task is to perform a large-scale analysis. For each statement, " +
-                    "provide a confidence score from 1 (low confidence) to 5 (high confidence) and explain your reasoning for any score below 4.\n" +
-                    "Cloud Patterns and Systems: Identify and locate major cloud systems. Describe their patterns (e.g., \"comma-shaped cloud head of a " +
-                    "mid-latitude cyclone,\" \"frontal cloud band,\" \"pop-up afternoon thunderstorms\").\n" +
-                    "Atmospheric Dynamics: Infer the location of key upper-level features. This includes the approximate position of the jet stream, " +
-                    "upper-level troughs/ridges, and any circulation centers (e.g., tropical cyclones, cutoff lows). Colder cloud tops (brighter whites in IR)" +
-                    " should be noted as areas of deep convection.\n" +
-                    "Moisture Transport (especially for Water Vapor imagery): Identify any significant plumes of moisture, such as atmospheric rivers " +
-                    "or tropical moisture feeds, and describe their source and destination.\n" +
-                    "Areas of Interest: Point out any specific areas that warrant future monitoring, such as regions of rapidly developing convection" +
-                    " or potential tropical cyclone formation.";
-            geminiMasterPrompt.put("Satellite imagery (IR/WV, and GeoColor",item5str);
-            String item6str = "You are an expert in atmospheric dynamics and numerical weather prediction (NWP) model interpretation. .\n" +
-                    "The provided image is a forecast map from a weather model, showing [State the variable, e.g., '500 hPa geopotential." +
-                    " heights and wind speeds']. Your task is to analyze the model's depiction of the atmospheric state. " +
-                    "Major Upper-Level Features: Identify the locations of significant upper-level troughs and ridges. Describe their amplitude." +
-                    " and orientation (e.g., \"deep, negatively-tilted trough\"). Jet Stream Analysis: Locate the main axis of the jet stream." +
-                    " Identify any \"jet streaks\" (pockets of exceptionally high wind speed) and describe their location relative to the trough/ridge axes.\n" +
-                    "Dynamical Forcing: Explain what the upper-level pattern implies for surface weather. Specifically, describe where the model." +
-                    " indicates regions of upper-level divergence (which supports rising air and surface storms) and convergence (which supports " +
-                    "sinking air and fair weather).\n" +
-                    "Connection to Surface Weather: You are looking at a corresponding surface map, where would you expect to find the primary." +
-                    " surface low-pressure system in relation to the upper-level trough identified in this forecast?";
-            geminiMasterPrompt.put("Uper level feature with wind speed and surface map", item6str);
-            String item7str = "You are an expert in atmospheric dynamics and numerical weather prediction (NWP) model interpretation. " +
-                    "The provided image is an output a weather model and observation, showing upper level [e.g., '500 hPa geopotential heights]," +
-                    "the surface pressure reduced to mean sea level pressure, surface frontal drawings and radar reflectivity. \n" +
-                    "In Paragraph one you should identify the overall upper level pattern. This comes first because it drives everything at the surface. \n" +
-                    "In Paragraph two: identify lows and fronts, as the circulations around the lows are responsible for the fronts, relationship " +
-                    "between the lows and the upper level features. \n"+
-                    "In Paragraph three: identify the precipitation. This results from the analysis in the first two paragraphs. \n" +
-                    "In Paragraph four: provide the prediction for how the features would evolve. You should focused more on precipitation";
-            geminiMasterPrompt.put("Uper level feature and surface map2", item7str);
-
-        }
-        examplePromptButton.addActionListener(e -> {
-            JPopupMenu promptMenu = new JPopupMenu();
-            for (int i = 0; i < geminiMasterPrompt.size(); i++) {
-                String promptItemKey= geminiMasterPrompt.keySet().toArray()[i].toString();
-                String promptItem  = geminiMasterPrompt.get(promptItemKey);
-                JMenuItem menuItem = null;
-                menuItem = new JMenuItem(promptItemKey);
-                menuItem.setToolTipText(formatToolTipAsHtml(promptItem.toString()));
-                menuItem.addActionListener(menuEvent -> {
-                    if (textArea.getText().length() > 0 && !textArea.getText().endsWith("\n")) {
-                        textArea.append("\n");
+    public List getHistory() {
+        synchronized (MUTEX_GeminiHISTORY) {
+            if (geminiInstructionHistory == null || geminiInstructionHistory.size() == 0) {
+                try {
+                    List tmp = (List) getStore().getEncodedFile("instructionHistory.xml");
+                    geminiInstructionHistory = new ArrayList();
+                    if (tmp == null) {
+                        tmp = new ArrayList();
                     }
-                    textArea.append(promptItem);
-                });
-                promptMenu.add(menuItem);
-            }
-
-            promptMenu.show(examplePromptButton, 0, examplePromptButton.getHeight());
-        });
-        JButton historyButton = new JButton("History");
-        historyButton.addActionListener(e -> {
-            JPopupMenu historyMenu = new JPopupMenu();
-            if (geminiInstructionHistory.isEmpty()) {
-                JMenuItem emptyItem = new JMenuItem("No history available");
-                emptyItem.setEnabled(false);
-                historyMenu.add(emptyItem);
-            } else {
-                for (String historyItem : geminiInstructionHistory) {
-                    JMenuItem menuItem = new JMenuItem(historyItem.substring(0, 39) + "...");
-                    menuItem.setToolTipText(formatToolTipAsHtml(historyItem.toString()));
-                    menuItem.addActionListener(menuEvent -> {
-                        if (textArea.getText().length() > 0 && !textArea.getText().endsWith("\n")) {
-                            textArea.append("\n");
+                    //We had a case where the history list held a null value.
+                    //Not sure how that happened but put this check in
+                    for (Object o : tmp) {
+                        if (o != null) {
+                            geminiInstructionHistory.add(o.toString());
                         }
-                        textArea.append(historyItem);
-                    });
-                    historyMenu.add(menuItem);
-                }
-            }
-            historyMenu.show(historyButton, 0, historyButton.getHeight());
-        });
-
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JPanel buttonPanel0 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel0.add(imageButton);
-        buttonPanel0.add(analysisButton);
-        buttonPanel.add(resetAppKeyButton, BorderLayout.NORTH);
-        buttonPanel.add(buttonPanel0, BorderLayout.SOUTH);
-
-        JPanel historyButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        historyButtonPanel.add(examplePromptButton);
-        historyButtonPanel.add(historyButton);
-        textPanel.add(historyButtonPanel, BorderLayout.SOUTH);
-        JPanel mainPanel = new JPanel(new BorderLayout(0, 10));
-        mainPanel.add(buttonPanel, BorderLayout.NORTH);
-        mainPanel.add(textPanel, BorderLayout.CENTER);
-        mainPanel.add(textPanelk, BorderLayout.SOUTH);
-
-
-        Object[] message = {mainPanel}; //, "Enter the instruction for Gemini:"  };
-        int option = JOptionPane.showConfirmDialog(
-                LogUtil.getCurrentWindow(), // Assumes 'this' is the parent Frame or Component
-                message,
-                "Run Gemini with Instruction",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
-        );
-        if (option == JOptionPane.OK_OPTION) {
-            instruction = textArea.getText();
-            knowledge = textAreak.getText();
-            if (instruction != null && !instruction.trim().isEmpty() && !geminiInstructionHistory.contains(instruction)) {
-                int i = geminiInstructionHistory.size();
-                TwoFacedObject tfo = new TwoFacedObject("Instruction ", instruction);
-                geminiInstructionHistory.add(instruction);
-            }
-        }
-        //System.out.println("Instruction11: " + instruction);
-        // JOptionPane.showInputDialog returns null if the user hits "Cancel" or closes the dialog.
-        // We only proceed if the user provided some input.
-        if (instruction != null) {
-            final String finalInstruction = instruction;
-            final String finalKnowledge = knowledge;
-            // Call your original method, but now pass the instruction to it.
-            Misc.run(new Runnable() {
-                public void run() {
-                    try {
-                        getIdv().showWaitCursor();
-                        if (finalKnowledge != null && !finalKnowledge.trim().isEmpty()) {
-                            doGemini(finalInstruction, finalKnowledge);
-                        } else {
-                            doGemini(finalInstruction);
-                        }
-                        getIdv().showNormalCursor();
-                    } catch (Throwable exc) {
-                        logException(
-                                "Creating data source from history",
-                                exc);
                     }
+                } catch (Exception exc) {
+                    logException("Creating history list", exc);
                 }
-            });
-
+            }
+            return geminiInstructionHistory;
         }
+    }
 
-        //System.out.println("Instruction: " + instruction);
+    public void writeHistoryList() {
+        synchronized (MUTEX_GeminiHISTORY) {
+            getStore().putEncodedFile("instructionHistory.xml", geminiInstructionHistory);
+        }
+    }
+
+    public void clearHistoryList() {
+        synchronized (MUTEX_GeminiHISTORY) {
+            geminiInstructionHistory = new ArrayList();
+            writeHistoryList();
+        }
+    }
+
+    private JButton createClearHistoryButton() {
+        JButton clearHistoryBtn = new JButton("Clear History");
+
+        clearHistoryBtn.addActionListener(e -> {
+            // Clear the ArrayList managing the history
+            if (geminiInstructionHistory != null) {
+                geminiInstructionHistory.clear();
+                writeHistoryList();
+                System.out.println("History has been cleared."); // Optional: Console log for testing
+            }
+        });
+
+        return clearHistoryBtn;
     }
 
     public void promptAndRunGemini() throws AWTException {
@@ -5032,6 +4821,10 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JPanel helperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         helperPanel.add(createMasterPromptButton(instructionArea));
         helperPanel.add(createHistoryButton(instructionArea));
+        // Create and add the Clear History radio button
+        JButton clearHistoryRadioButton = createClearHistoryButton();
+
+        helperPanel.add(clearHistoryRadioButton);
         gbc.gridy = currentRow++;
         mainPanel.add(helperPanel, gbc);
 
@@ -5063,6 +4856,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
                 int i = geminiInstructionHistory.size();
                 TwoFacedObject tfo = new TwoFacedObject("Instruction ", instruction);
                 geminiInstructionHistory.add(instruction);
+                writeHistoryList();
             }
             executeGeminiTask(instruction, knowledge);
         }
@@ -5074,7 +4868,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         historyBtn.addActionListener(e -> {
             JPopupMenu historyMenu = new JPopupMenu();
-
+            geminiInstructionHistory = getHistory();
             if (geminiInstructionHistory == null || geminiInstructionHistory.isEmpty()) {
                 JMenuItem emptyItem = new JMenuItem("No history available");
                 emptyItem.setEnabled(false);
