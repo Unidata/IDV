@@ -721,7 +721,8 @@ public class ProjectionManager implements ActionListener {
     }
 
     private boolean isPreviewSupported(ProjectionImpl proj) {
-        return !(proj instanceof LatLonProjection);
+        return !(proj instanceof LatLonProjection)
+                || (proj instanceof EditableLatLon);
     }
 
     /**
@@ -1047,10 +1048,7 @@ public class ProjectionManager implements ActionListener {
 
                     setProjection(proj);
 
-                    boolean showPreview =
-                        !(proj instanceof LatLonProjection);
-
-                    previewButton.setVisible(showPreview);
+                    previewButton.setVisible(isPreviewSupported(proj));
 
                 }
             });
@@ -1093,13 +1091,10 @@ public class ProjectionManager implements ActionListener {
             }
 
             setProjectionClass(pc, proj);
-            previewButton.setVisible(!(proj instanceof LatLonProjection));
+            previewButton.setVisible(isPreviewSupported(proj));
             npEditControl.setProjectionImpl(proj);
 
             lastSelectedRegion = mapEditPanel.getSelectedRegion();
-
-            previewButton.setVisible(
-                !(proj instanceof LatLonProjection));
 
             startingName = new String(proj.getName());
         }
