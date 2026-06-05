@@ -26,8 +26,6 @@ import ucar.unidata.geoloc.projection.*;
 
 
 import ucar.unidata.gis.maps.MapData;
-import ucar.unidata.ui.PersistentDataDialog;
-import ucar.unidata.ui.PersistentDataManager;
 import ucar.unidata.ui.PersistentObject;
 
 import ucar.unidata.util.FileManager;
@@ -114,6 +112,8 @@ public class ProjectionManager implements ActionListener {
         if (defaultProjections.size() == 0) {
             defaultProjections.add(
                 "ucar.unidata.geoloc.projection.LatLonProjection");
+            defaultProjections.add(
+                    "ucar.unidata.view.geoloc.EditableLatLon");
             defaultProjections.add(
                 "ucar.unidata.geoloc.projection.LambertConformal");
             defaultProjections.add(
@@ -720,6 +720,10 @@ public class ProjectionManager implements ActionListener {
         return newDialog;
     }
 
+    private boolean isPreviewSupported(ProjectionImpl proj) {
+        return !(proj instanceof LatLonProjection);
+    }
+
     /**
      * Set the working projection.
      *
@@ -788,6 +792,12 @@ public class ProjectionManager implements ActionListener {
         /** border for panel */
         private Border standardBorder = new EtchedBorder();
 
+        /** preview button */
+        private JButton previewButton;
+
+        /** last selected region, used to determine whether user drew a box */
+        private ProjectionRect lastSelectedRegion;
+
         /**
          * Create a new projection editor
          *
@@ -798,6 +808,8 @@ public class ProjectionManager implements ActionListener {
             super(parent, true, "Define/Edit Projection");
             makeUI();
             setLocation(100, 100);
+            setSize(650, 350);
+            setSize(800, 400);
         }
 
         /**
@@ -810,6 +822,8 @@ public class ProjectionManager implements ActionListener {
             super(parent, true, "Define/Edit Projection");
             makeUI();
             setLocation(100, 100);
+            setSize(650, 350);
+            setSize(800, 400);
         }
 
         /**
@@ -822,6 +836,8 @@ public class ProjectionManager implements ActionListener {
             super(parent, true, "Define/Edit Projection");
             makeUI();
             setLocation(100, 100);
+            setSize(650, 350);
+            setSize(800, 400);
         }
 
 
@@ -839,6 +855,55 @@ public class ProjectionManager implements ActionListener {
             }
         }
 
+        /**
+         * Used to apply bounding box corner point lat/lon values to the
+		 * applicable text fields when creating an Editable Lat/Lon projection
+         */
+        private void syncEditableLatLonFieldsFromSelection() {
+
+            if (!(editProjection instanceof EditableLatLon)) {
+                return;
+            }
+
+            ProjectionRect r = mapEditPanel.getSelectedRegion();
+
+            if (r == null) {
+                return;
+            }
+
+            double minLon = r.getMinX();
+            double maxLon = r.getMaxX();
+
+            double minLat = r.getMinY();
+            double maxLat = r.getMaxY();
+
+            ProjectionClass projClass = findProjectionClass(editProjection);
+
+            if (projClass == null) {
+                return;
+            }
+
+            for (int i = 0; i < projClass.paramList.size(); i++) {
+
+                ProjectionParam pp =
+                    (ProjectionParam) projClass.paramList.get(i);
+
+                String name = pp.name;
+
+                if (name.equals("upperLeftLatitude")) {
+                    pp.getTextField().setText(Double.toString(maxLat));
+                }
+                else if (name.equals("lowerRightLatitude")) {
+                    pp.getTextField().setText(Double.toString(minLat));
+                }
+                else if (name.equals("upperLeftLongitude")) {
+                    pp.getTextField().setText(Double.toString(minLon));
+                }
+                else if (name.equals("lowerRightLongitude")) {
+                    pp.getTextField().setText(Double.toString(maxLon));
+                }
+            }
+        }
 
         /**
          * Create the UI for this editor
@@ -853,6 +918,7 @@ public class ProjectionManager implements ActionListener {
             npEditControl = new NPController();
             mapEditPanel = npEditControl.getNavigatedPanel();  // here's where the map will be drawn
             mapEditPanel.setPreferredSize(new Dimension(250, 250));
+            mapEditPanel.setPreferredSize(new Dimension(400, 400));
             mapEditPanel.setSelectRegionMode(true);
             JToolBar navToolbar = mapEditPanel.getNavToolBar();
             navToolbar.setFloatable(false);
@@ -940,41 +1006,68 @@ public class ProjectionManager implements ActionListener {
             // the bottom button panel
             JPanel  buttPanel     = new JPanel();
             JButton acceptButton  = new JButton("Save");
-            JButton previewButton = new JButton("Preview");
+            previewButton         = new JButton("Preview");
             JButton cancelButton  = new JButton("Cancel");
             buttPanel.add(acceptButton, null);
             buttPanel.add(previewButton, null);
             buttPanel.add(cancelButton, null);
 
-            JPanel mainBox = GuiUtils.topCenterBottom(topPanel, paramPanel,
+            //JPanel mainBox = GuiUtils.topCenterBottom(topPanel, paramPanel,
+            // JPanel mainBox = GuiUtils.topCenterBottom(topPanel, paramPanel,
+            //                      buttPanel);
+            // mainPanel.add(mainBox, BorderLayout.CENTER);
+            // pack();
+
+            JPanel mainBox = GuiUtils.topCenterBottom(topPanel,
+                                 paramPanel,
                                  buttPanel);
             mainPanel.add(mainBox, BorderLayout.CENTER);
+
+            JSplitPane splitPane =
+                new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                               mapSide,
+                               mainBox);
+
+            splitPane.setDividerLocation(400);
+            splitPane.setResizeWeight(0.4);
+
+            mainPanel.add(splitPane, BorderLayout.CENTER);
+
             pack();
 
             //enable event listeners when we're done constructing the UI
             projClassCB.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+
                     ProjectionClass selectClass =
                         (ProjectionClass) projClassCB.getSelectedItem();
-                    setProjection(selectClass.makeDefaultProjection());
+
+                    ProjectionImpl proj =
+                        selectClass.makeDefaultProjection();
+
+                    setProjection(proj);
+
+                    boolean showPreview =
+                        !(proj instanceof LatLonProjection);
+
+                    previewButton.setVisible(showPreview);
+
                 }
             });
 
             acceptButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
+                    ProjectionClass projClass = findProjectionClass(editProjection);
+
+                    if (projClass != null) {
+                        setProjFromDialog(projClass, editProjection);
+                    }
+
+                    preview();
                     accept();
                 }
             });
-            previewButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    ProjectionClass projClass =
-                        findProjectionClass(editProjection);
-                    if (null != projClass) {
-                        setProjFromDialog(projClass, editProjection);
-                        setProjection(editProjection);
-                    }
-                }
-            });
+            previewButton.addActionListener(e -> preview());
             cancelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
                     NewProjectionDialog.this.setVisible(false);
@@ -1000,7 +1093,14 @@ public class ProjectionManager implements ActionListener {
             }
 
             setProjectionClass(pc, proj);
+            previewButton.setVisible(!(proj instanceof LatLonProjection));
             npEditControl.setProjectionImpl(proj);
+
+            lastSelectedRegion = mapEditPanel.getSelectedRegion();
+
+            previewButton.setVisible(
+                !(proj instanceof LatLonProjection));
+
             startingName = new String(proj.getName());
         }
 
@@ -1055,43 +1155,104 @@ public class ProjectionManager implements ActionListener {
         /**
          * user has hit the "accept/save" button
          */
-        private void accept() {
-            ProjectionClass projClass = findProjectionClass(editProjection);
-            if (null == projClass) {
-                System.out.println(
-                    "Projection Manager accept: findProjectionClass failed"
-                    + editProjection);
+        private void preview() {
+            ProjectionClass projClass =
+                    findProjectionClass(editProjection);
+
+
+            if (projClass == null) {
                 return;
             }
+
+            if (editProjection instanceof EditableLatLon) {
+
+                ProjectionRect currentRegion =
+                    mapEditPanel.getSelectedRegion();
+
+                boolean regionChanged =
+                    (lastSelectedRegion == null && currentRegion != null)
+                    || (lastSelectedRegion != null && currentRegion == null)
+                    || (lastSelectedRegion != null
+                        && currentRegion != null
+                        && !lastSelectedRegion.equals(currentRegion));
+
+                if (regionChanged) {
+                    syncEditableLatLonFieldsFromSelection();
+                }
+
+                lastSelectedRegion =
+                    (currentRegion == null)
+                        ? null
+                        : new ProjectionRect(currentRegion);
+            }
+
             setProjFromDialog(projClass, editProjection);
+            setProjection(editProjection);
+        }
+
+        private void accept() {
+            ProjectionClass projClass = findProjectionClass(editProjection);
+
+            if (projClass == null) {
+                System.out.println(
+                    "Projection Manager accept: findProjectionClass failed "
+                    + editProjection
+                );
+                return;
+            }
+
+            // validate name
+            if (nameTF.getText() == null
+                    || nameTF.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "The name cannot be blank"
+                );
+                return;
+            }
+
+            syncEditableLatLonFieldsFromSelection();
+            // push UI values into projection
+            setProjFromDialog(projClass, editProjection);
+
+            // EditableLatLon needs a projection refresh so the
+            // entered lat/lon bounds become the real map area.
+            // Other projections must NOT do this or their
+            // selected region gets reset to full domain.
+            if (editProjection instanceof EditableLatLon) {
+                npEditControl.setProjectionImpl(editProjection);
+            }
+
+            // use selected region if available
             ProjectionRect mapArea = mapEditPanel.getSelectedRegion();
+
+            // otherwise fall back to full displayed area
             if (mapArea == null) {
                 mapArea = mapEditPanel.getMapArea();
             }
-            editProjection.setDefaultMapArea(mapArea);
 
-            if (debug) {
-                System.out.println("Projection Manager accept bb ="
-                                   + editProjection.getDefaultMapArea());
+            // save map area
+            if (mapArea != null) {
+                editProjection.setDefaultMapArea(
+                    new ProjectionRect(mapArea)
+                );
             }
+
+            // create final projection copy
             ProjectionImpl newProj =
-                (ProjectionImpl) editProjection.constructCopy();  // use a copy
+                (ProjectionImpl) editProjection.constructCopy();
 
-            if (viewDialog != null) {
-                //                if ( !viewDialog.checkSaveOK(startingName,
-                //                                             newProj.getName())) {
-                //                    return;
-                //                }
-            }
-
+            // update table
             if (ProjectionManager.this.contains(newProj.getName())) {
                 projTable.replaceProjection(newProj);
             } else {
                 projTable.addProjection(newProj);
             }
 
-            // set new projection to working projection and exit this Dialog
+            // activate projection
             setWorkingProjection(newProj);
+
+            // close dialog
             NewProjectionDialog.this.setVisible(false);
         }
 
@@ -1249,32 +1410,61 @@ public class ProjectionManager implements ActionListener {
          * @param projClass  projection class
          * @param proj       projection
          */
-        private void setProjFromDialog(ProjectionClass projClass,
+        private ArrayList setProjFromDialog(ProjectionClass projClass,
                                        ProjectionImpl proj) {
             proj.setName(nameTF.getText().trim());
+
+            ArrayList<String> fix = new ArrayList<>();
 
             for (int i = 0; i < projClass.paramList.size(); i++) {
                 ProjectionParam pp =
                     (ProjectionParam) projClass.paramList.get(i);
-                // fetch the value from the projection object
+
                 try {
-                    String   valstr = pp.getTextField().getText();
-                    Double   valdub = Double.valueOf(Double.parseDouble(valstr));
-                    Object[] args   = { valdub };
+                    String valstr = pp.getTextField().getText();
+                    fix.add(valstr);
+
+                    Double valdub = Double.valueOf(valstr);
+                    Object[] args = { valdub };
+
                     if (debugBeans) {
                         System.out.println(
                             "Projection setProjFromDialog invoke writer on "
                             + pp);
                     }
+
                     pp.writer.invoke(proj, args);
+
                 } catch (Exception ee) {
-                    System.err.println(
-                        "ProjectionManager: setProjParams failed "
-                        + " invoking write " + pp.name + " class "
-                        + projClass);
-                    continue;
+
+                    Throwable cause = ee.getCause();
+
+                    if (cause instanceof IllegalArgumentException) {
+
+                        JOptionPane.showMessageDialog(
+                            this,
+                            cause.getMessage(),
+                            "Invalid Projection Value",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+
+                    } else {
+
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Invalid value for " + pp.name,
+                            "Projection Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+
+                        ee.printStackTrace();
+                    }
+
+                    return fix;
                 }
             }
+
+            return fix;
         }
 
     }  // end NewProjectionDialog
