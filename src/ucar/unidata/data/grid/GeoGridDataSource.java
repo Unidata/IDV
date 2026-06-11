@@ -28,11 +28,8 @@ import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
 
-import ucar.nc2.Attribute;
-import ucar.nc2.Group;
-import ucar.nc2.NetcdfFileWriter;
+import ucar.nc2.*;
 import ucar.nc2.NetcdfFileWriter.Version;
-import ucar.nc2.Variable;
 import ucar.nc2.dataset.*;
 import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
@@ -1234,6 +1231,10 @@ public class GeoGridDataSource extends GridDataSource {
                 file = "file:" + file;
                 NetcdfDataset ncd = NcMLReader.readNcML(file, null);
                 GridDataset gds = new GridDataset(ncd);
+            } else if (file.startsWith("cdms3:")) {
+                NetcdfDataset nds = NetcdfDatasets.openDataset(file, true, null);//; ).enhance(ncf, NetcdfDataset.getDefaultEnhanceMode(), null);
+                GridDataset gds1 = new ucar.nc2.dt.grid.GridDataset(nds);
+                return gds1;
             }
             if (file.contains(":443")) {
                 file = file.replace(":443","");
