@@ -220,7 +220,6 @@ public class ProjectionManager implements ActionListener {
         //Another dummy fow now
     }
 
-
     /**
      * Create a new ProjectionManager
      *
@@ -437,7 +436,6 @@ public class ProjectionManager implements ActionListener {
         for (int i = 0; i < items.length; i++) {
             selected.add(items[i]);
         }
-
         String xml      = (new XmlEncoder()).toXml(selected);
         String filename = FileManager.getWriteFile(FileManager.FILTER_XML,
                               FileManager.SUFFIX_XML);
@@ -449,15 +447,7 @@ public class ProjectionManager implements ActionListener {
         } catch (Exception exc) {
             LogUtil.logException("Writing projection file: " + filename, exc);
         }
-
-
-
-
     }
-
-
-
-
 
     /**
      * Make the default projections from the internal list of classes.
@@ -837,7 +827,6 @@ public class ProjectionManager implements ActionListener {
             super(parent, true, "Define/Edit Projection");
             makeUI();
             setLocation(100, 100);
-            setSize(650, 350);
             setSize(800, 400);
         }
 
@@ -856,6 +845,15 @@ public class ProjectionManager implements ActionListener {
             }
         }
 
+        private double normalizeLon(double lon) {
+            return ((lon + 180) % 360 + 360) % 360 - 180;
+        }
+
+        private double displayLon(double lon) {
+            lon = normalizeLon(lon);
+            return lon;
+        }
+
         /**
          * Used to apply bounding box corner point lat/lon values to the
 		 * applicable text fields when creating an Editable Lat/Lon projection
@@ -867,19 +865,23 @@ public class ProjectionManager implements ActionListener {
             }
 
             ProjectionRect r = mapEditPanel.getSelectedRegion();
-
             if (r == null) {
                 return;
             }
 
-            double minLon = r.getMinX();
-            double maxLon = r.getMaxX();
+            // EditableLatLon case:
+            // In this projection ONLY: X=lon, Y=lat
 
             double minLat = r.getMinY();
             double maxLat = r.getMaxY();
+            double minLon = r.getMinX();
+            double maxLon = r.getMaxX();
+
+            // normalize longitudes
+            minLon = normalizeLon(minLon);
+            maxLon = normalizeLon(maxLon);
 
             ProjectionClass projClass = findProjectionClass(editProjection);
-
             if (projClass == null) {
                 return;
             }
@@ -918,7 +920,6 @@ public class ProjectionManager implements ActionListener {
             // the map and associated toolbar
             npEditControl = new NPController();
             mapEditPanel = npEditControl.getNavigatedPanel();  // here's where the map will be drawn
-            mapEditPanel.setPreferredSize(new Dimension(250, 250));
             mapEditPanel.setPreferredSize(new Dimension(400, 400));
             mapEditPanel.setSelectRegionMode(true);
             JToolBar navToolbar = mapEditPanel.getNavToolBar();
@@ -1013,7 +1014,6 @@ public class ProjectionManager implements ActionListener {
             buttPanel.add(previewButton, null);
             buttPanel.add(cancelButton, null);
 
-            //JPanel mainBox = GuiUtils.topCenterBottom(topPanel, paramPanel,
             // JPanel mainBox = GuiUtils.topCenterBottom(topPanel, paramPanel,
             //                      buttPanel);
             // mainPanel.add(mainBox, BorderLayout.CENTER);
@@ -1049,7 +1049,6 @@ public class ProjectionManager implements ActionListener {
                     setProjection(proj);
 
                     previewButton.setVisible(isPreviewSupported(proj));
-
                 }
             });
 
@@ -1098,7 +1097,6 @@ public class ProjectionManager implements ActionListener {
 
             startingName = new String(proj.getName());
         }
-
 
         /**
          * Set whether this a new projection
@@ -1153,7 +1151,6 @@ public class ProjectionManager implements ActionListener {
         private void preview() {
             ProjectionClass projClass =
                     findProjectionClass(editProjection);
-
 
             if (projClass == null) {
                 return;
