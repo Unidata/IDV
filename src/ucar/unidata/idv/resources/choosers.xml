@@ -105,6 +105,20 @@ If using the tree panel you can define components that are displayed when a cate
        anchor="nw"/>
   </panel>
   <panel
+      title="ObjectStore"
+      category="General"
+      layout="border"
+      tabTooltip="For accessing cloud object store"
+      mnemonic="U">
+  <chooser
+      id="chooser.aws"
+      title="Object Store"
+      menutitle="From a Cloud Server"
+      helppath="idv.data.choosers.Cdms3UriChooser"
+      class="ucar.unidata.idv.chooser.Cdms3UriChooser"
+      anchor="nw"/>
+</panel>
+  <panel
      title="Catalogs"
      category="General"
      layout="border"
