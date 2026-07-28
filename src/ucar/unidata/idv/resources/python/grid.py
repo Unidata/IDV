@@ -828,3 +828,15 @@ def gridNormalizer(grid, user_norm="Max"):
       return scalerG
   else:
       return fillNormalizer(grid)
+
+def findLocalMaxMinAsPointObs2D(grid, radius, function):
+  """ find max/min within the radius for 2d grid, for example we want to
+      find all the H/L of sfc pressure at a moment.
+  """
+  return GridMath.getLocalMaxMinAsPointObs(grid, radius, function)
+
+def findLocalMaxMinAsPointObs3D(grid, level, radius, function):
+  """ find max/min within the radius and level for 3d grid, for example we want to
+            find all the H/L of sfc pressure at a moment.
+  """
+  return GridMath.getLocalMaxMinAsPointObs(grid, level, radius, function)
