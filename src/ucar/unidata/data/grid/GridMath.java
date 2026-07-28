@@ -20,7 +20,10 @@
 
 package ucar.unidata.data.grid;
 
+import ucar.nc2.time.Calendar;
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.point.PointOb;
+import ucar.unidata.data.point.PointObTuple;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.Range;
@@ -28,10 +31,13 @@ import ucar.unidata.util.Trace;
 
 import ucar.visad.Util;
 
+import ucar.visad.data.CalendarDateTime;
+import ucar.visad.data.CalendarDateTimeSet;
 import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.CommonUnits;
 import visad.*;
 
+import visad.Set;
 import visad.georef.EarthLocation;
 import visad.georef.EarthLocationLite;
 import visad.georef.LatLonPoint;
@@ -43,9 +49,7 @@ import edu.wisc.ssec.mcidasv.data.hydra.Statistics;
 
 import java.rmi.RemoteException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static ucar.unidata.data.grid.GridUtil.DEFAULT_ERROR_MODE;
@@ -4106,4 +4110,321 @@ public class GridMath {
         }
         return sum;
     }
+    /**
+     * Find min and max of range data in any VisAD FieldImpl
+     *
+     * @param grid0       a VisAD FlatField.  Cannot be null
+     * @param radius      int
+     * @return  the range of the data as point obs
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl getLocalMaxMinAsPointObs(FieldImpl grid0, int radius, String function)
+            throws VisADException {
+        if (grid0 == null) {
+            return null;
+        }
+        FieldImpl grid = GridUtil.make2DGridFromSlice(grid0, false);;
+
+        //RealType  index    = RealType.getRealType("index");
+        FieldImpl retField = null;
+        TupleType tt = GridUtil.getParamType(grid);
+        //Integer1DSet points = new Integer1DSet(RealType.getRealType("index"),
+        //        4);
+        TupleType rangeType0 = new TupleType(new MathType[] {
+                RealTupleType.LatitudeLongitudeAltitude,
+                RealType.Time,
+                tt});
+
+        List<PointOb> pointObsList = new ArrayList<>();
+        try {
+            if (GridUtil.isTimeSequence(grid)) {
+                SampledSet   timeSet      = (SampledSet) GridUtil.getTimeSet(grid);
+                FunctionType retFieldType = null;
+                double[][]   times        = timeSet.getDoubles(false);
+                Unit         timeUnit     = timeSet.getSetUnits()[0];
+                if ( !timeUnit.equals(CommonUnit.secondsSinceTheEpoch)) {
+                    Unit.convertTuple(
+                            times, timeSet.getSetUnits(),
+                            new Unit[] { CommonUnit.secondsSinceTheEpoch }, true);
+                }
+                Calendar cal = null;
+                if (timeSet instanceof CalendarDateTimeSet) {
+                    cal = ((CalendarDateTimeSet) timeSet).getCalendar();
+                }
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    CalendarDateTime dt = new CalendarDateTime(times[0][i],
+                            cal);
+                    PointOb[] pointObs =
+                            getLocalMaxMinAsPointObsFF((FlatField) grid.getSample(i), dt, function, radius);
+                    if(pointObs != null && pointObs.length > 1) {
+                        for(PointOb pob: pointObs)
+                            pointObsList.add(pob);
+                    }
+                }
+                int ssize = pointObsList.size();
+                PointOb[] finalPointOb =  new PointOb[ssize];
+                for(int i = 0; i < ssize; i++)
+                    finalPointOb[i] = pointObsList.get(i);
+
+                Integer1DSet points = new Integer1DSet(RealType.getRealType("index"),
+                        ssize);
+                FieldImpl ff = new FieldImpl(
+                        new FunctionType(
+                                ((SetType) points.getType()).getDomain(),
+                                rangeType0), points);
+                ff.setSamples(finalPointOb, false, false);
+                return ff;
+            }
+        } catch (RemoteException re) {}
+        return retField;
+    }
+
+    /**
+     * Find min and max of range data in any VisAD FieldImpl
+     *
+     * @param grid0       a VisAD FlatField.  Cannot be null
+     * @param level      level value
+     * @param radius      int
+     * @return  the range of the data as point obs
+     *
+     * @throws RemoteException  Java RMI error
+     * @throws VisADException   VisAD Error
+     */
+    public static FieldImpl getLocalMaxMinAsPointObs(FieldImpl grid0, int level, int radius, String function)
+            throws VisADException {
+        if (grid0 == null) {
+            return null;
+        }
+        FieldImpl grid = null;
+        if(GridUtil.canSliceAtLevel(grid0, new Real(level))){
+            grid = GridUtil.sliceAtLevel(grid0, new Real(level));
+            grid = GridUtil.make2DGridFromSlice(grid, false);
+        } else {
+            grid = GridUtil.make2DGridFromSlice(grid0, false);;
+        }
+        //RealType  index    = RealType.getRealType("index");
+        FieldImpl retField = null;
+        TupleType tt = GridUtil.getParamType(grid);
+        //Integer1DSet points = new Integer1DSet(RealType.getRealType("index"),
+        //        4);
+        TupleType rangeType0 = new TupleType(new MathType[] {
+                RealTupleType.LatitudeLongitudeAltitude,
+                RealType.Time,
+                tt});
+
+        List<PointOb> pointObsList = new ArrayList<>();
+        try {
+            if (GridUtil.isTimeSequence(grid)) {
+                SampledSet   timeSet      = (SampledSet) GridUtil.getTimeSet(grid);
+                FunctionType retFieldType = null;
+                double[][]   times        = timeSet.getDoubles(false);
+                Unit         timeUnit     = timeSet.getSetUnits()[0];
+                if ( !timeUnit.equals(CommonUnit.secondsSinceTheEpoch)) {
+                    Unit.convertTuple(
+                            times, timeSet.getSetUnits(),
+                            new Unit[] { CommonUnit.secondsSinceTheEpoch }, true);
+                }
+                Calendar cal = null;
+                if (timeSet instanceof CalendarDateTimeSet) {
+                    cal = ((CalendarDateTimeSet) timeSet).getCalendar();
+                }
+                for (int i = 0; i < timeSet.getLength(); i++) {
+                    CalendarDateTime dt = new CalendarDateTime(times[0][i],
+                            cal);
+                    PointOb[] pointObs =
+                            getLocalMaxMinAsPointObsFF((FlatField) grid.getSample(i), dt, function, radius);
+                    if(pointObs != null && pointObs.length > 1) {
+                        for(PointOb pob: pointObs)
+                            pointObsList.add(pob);
+                    }
+                }
+                int ssize = pointObsList.size();
+                PointOb[] finalPointOb =  new PointOb[ssize];
+                for(int i = 0; i < ssize; i++)
+                    finalPointOb[i] = pointObsList.get(i);
+
+                Integer1DSet points = new Integer1DSet(RealType.getRealType("index"),
+                        ssize);
+                FieldImpl ff = new FieldImpl(
+                        new FunctionType(
+                                ((SetType) points.getType()).getDomain(),
+                                rangeType0), points);
+                ff.setSamples(finalPointOb, false, false);
+                return ff;
+            }
+        } catch (RemoteException re) {}
+        return retField;
+    }
+
+    private static PointOb[] getLocalMaxMinAsPointObsFF(FlatField grid, DateTime dt,
+                                                     String function, int radius)
+            throws VisADException {
+        final boolean doMax = function.equals(FUNC_MAX);
+        final boolean doMin = function.equals(FUNC_MIN);
+        List<PointObTuple> POTarrays       = new ArrayList<PointObTuple>();
+        PointOb[] obs = null;
+
+        try {
+            GriddedSet domainSet =
+                    (GriddedSet) GridUtil.getSpatialDomain(grid);
+            float[][] geoVals  = GridUtil.getEarthLocationPoints(domainSet);
+            boolean   isLatLon = GridUtil.isLatLonOrder(domainSet);
+            TupleType tt = GridUtil.getParamType(grid);
+
+            TupleType rangeType0 = new TupleType(new MathType[] {
+                    RealTupleType.LatitudeLongitudeAltitude,
+                    RealType.Time,
+                    tt});
+            RealTupleType rtt =
+                    new RealTupleType(tt.getRealComponents()[0]);
+            boolean   haveAlt  = geoVals.length > 2;
+            int       latIndex = isLatLon
+                    ? 0
+                    : 1;
+            int       lonIndex = isLatLon
+                    ? 1
+                    : 0;
+
+            int[] lengths = domainSet.getLengths();
+            int   sizeX   = lengths[lonIndex];
+            int   sizeY   = lengths[latIndex];
+
+            float[][] samples   = grid.getFloats(false);
+            float[][] newValues = grid.getFloats(false);
+            List<MaxPoint> candidatesMaxMin = new ArrayList<>();
+
+            for (int np = 0; np < samples.length; np++) {
+                float[] paramVals = newValues[np];
+
+                for (int j = radius; j < sizeY - radius; j++) {
+                    for (int i = radius; i < sizeX - radius; i++) {
+                        int   index = j * sizeX + i;
+                        float value = paramVals[index];
+                        if (value != value) {
+                            continue;
+                        }
+
+                        boolean isMaxMin = true;
+                        //boolean isMin = true;
+                        for (int dj = -radius; dj <= radius && isMaxMin; dj++) {
+                            for (int di = -radius; di <= radius; di++) {
+                                if (di == 0 && dj == 0) {
+                                    continue;
+                                }
+                                int ii = i + di;
+                                int jj = j + dj;
+                                int dindex = jj * sizeX + ii;
+                                float q = paramVals[dindex];
+
+                                if (Float.isNaN(q)) {
+                                    continue;
+                                }
+                                if (doMax) {
+                                    if (q > value) {
+                                        isMaxMin = false;
+                                        break;
+                                    }
+                                } else {
+                                    if (q < value) {
+                                        isMaxMin = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                        }
+                        if(isMaxMin) {
+                            //System.out.println("max found at i = " + i + ", j = " + j + ", value = " + value);
+                            candidatesMaxMin.add(new MaxPoint(i, j, value));
+                            float lat0 = geoVals[latIndex][index];
+                            float lon0 = geoVals[lonIndex][index];
+                            float alt0  = haveAlt
+                                    ? geoVals[2][index]
+                                    : 0;
+                            //System.out.println("max found at i = " + c.i + ", j = " + c.j + ", value = " + c.value);
+                            PointObTuple top = getPointObValTuple(lat0, lon0, alt0, value, rtt, rangeType0, dt);
+                            POTarrays.add(top);
+                        }
+                    }
+                }
+                /**
+                System.out.println("max/min size   = " + candidatesMaxMin.size());
+                Collections.sort(candidatesMaxMin, new Comparator<MaxPoint>() {
+                    public int compare(MaxPoint a, MaxPoint b) {
+                        return Float.compare(b.value, a.value);
+                    }
+                });
+                List<MaxPoint> kept = new ArrayList<>();
+                int r2 = radius * radius;
+
+                for (MaxPoint c : candidatesMaxMin) {
+                    boolean suppressed = false;
+
+                    for (MaxPoint k : kept) {
+                        int dx = c.i - k.i;
+                        int dy = c.j - k.j;
+                        int dist2 = dx * dx + dy * dy;
+
+                        if (dist2 <= r2) {
+                            suppressed = true;
+                            break;
+                        }
+                    }
+
+                    if (!suppressed) {
+                        kept.add(c);
+                        int   index = c.j * sizeX + c.i;
+                        float lat0 = geoVals[latIndex][index];
+                        float lon0 = geoVals[lonIndex][index];
+                        float alt0  = haveAlt
+                                ? geoVals[2][index]
+                                : 0;
+                        System.out.println("max found at i = " + c.i + ", j = " + c.j + ", value = " + c.value);
+                        PointObTuple top = getPointObValTuple(lat0, lon0, alt0, c.value, rtt, rangeType0, dt);
+                        POTarrays.add(top);
+                    }
+                }
+                System.out.println("Keep max/min size   = " + kept.size());
+                 **/
+            }
+
+
+            int ssize = POTarrays.size();
+            obs =  new PointOb[ssize];
+            for(int i = 0; i < ssize; i++)
+                obs[i] = POTarrays.get(i);
+
+        } catch (Exception re) {
+            throw new VisADException("RemoteException checking missing data");
+        }
+        return obs;
+
+    }
+
+    static class MaxPoint {
+        int i;
+        int j;
+        float value;
+
+        MaxPoint(int i, int j, float value) {
+            this.i = i;
+            this.j = j;
+            this.value = value;
+        }
+    }
+
+    public static PointObTuple getPointObValTuple(float lat, float lon, float alt, float value,
+                                                  RealTupleType rtt, TupleType rangeType0, DateTime dt)
+            throws VisADException, RemoteException {
+        EarthLocation el1 = new EarthLocationLite(lat, lon, alt);
+
+        double[] mm = new double[]{value};
+        Data sample = new RealTuple(rtt, mm);
+        PointObTuple pot11 = new PointObTuple(el1, dt, sample, rangeType0);
+
+        return pot11;
+    }
+
 }
