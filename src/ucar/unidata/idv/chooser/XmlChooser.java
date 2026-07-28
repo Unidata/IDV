@@ -27,9 +27,6 @@ import org.w3c.dom.Element;
 import ucar.unidata.data.DataSource;
 
 
-
-
-import ucar.unidata.idv.*;
 import ucar.unidata.idv.ui.DataSelector;
 import ucar.unidata.ui.DatasetUI;
 import ucar.unidata.ui.XmlTree;
@@ -50,15 +47,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.*;
-
 
 
 /**
@@ -484,6 +477,8 @@ public class XmlChooser extends IdvChooser implements ActionListener {
             return;
         } else if (tagName.equals(CatalogUtil.TAG_CATALOG)) {
             handler = new ThreddsHandler(this, xmlRoot, path);
+        } else if (tagName.equals("ListBucketResult")) {
+            handler = new ObjectStoreHandler(this, xmlRoot, path);
         } else if (tagName.equals("menus")) {
             handler = new MenuHandler(this, xmlRoot, path);
         } else {
@@ -715,6 +710,8 @@ public class XmlChooser extends IdvChooser implements ActionListener {
             Object handler = handlers.get(historyIdx);
             if (handler instanceof ThreddsHandler) {
                 ((ThreddsHandler) handler).doLoad();
+            } else if (handler instanceof ObjectStoreHandler) {
+                ((ObjectStoreHandler) handler).doLoad();
             } else if (handler instanceof WmsHandler) {
                 ((WmsHandler) handler).doLoad();
             } else if (handler instanceof DatasetUI) {
