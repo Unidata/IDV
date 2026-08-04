@@ -37,11 +37,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.List;
-
-
 
 
 /**
@@ -72,6 +69,8 @@ public class ObjectStoreHandler extends XmlHandler {
     private ImageIcon folderIcon;
     private ImageIcon fileIcon;
     private String bucketName;
+    private final Map<String, Boolean> reverseOrderMap = new HashMap<String, Boolean>();
+
 
     private PrefixNode makeDummyNode() {
         PrefixNode node = new PrefixNode("Loading...", null, false, false);
@@ -176,8 +175,28 @@ public class ObjectStoreHandler extends XmlHandler {
                     chooser.setHaveData(false);
                     return;
                 }
+
                 PrefixNode node = (PrefixNode) tp.getLastPathComponent();
                 chooser.setHaveData(!node.isPrefix());
+
+                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1) {
+                    if (node.isPrefix()) {
+                        String prefix = node.getFullPath();
+                        boolean newOrder = !isReverseOrder(prefix);
+                        reverseOrderMap.put(prefix, newOrder);
+
+                        node.removeAllChildren();
+                        node.setLoaded(false);
+                        treeModel.nodeStructureChanged(node);
+
+                        if (objectTree.isExpanded(tp)) {
+                            loadChildren(node);
+                        } else {
+                            objectTree.expandPath(tp);
+                        }
+                        return;
+                    }
+                }
 
                 if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
                     if (!node.isPrefix()) {
@@ -208,6 +227,11 @@ public class ObjectStoreHandler extends XmlHandler {
         return (nameNode != null) ? XmlUtil.getChildText(nameNode) : null;
     }
 
+    private boolean isReverseOrder(String prefix) {
+        Boolean b = reverseOrderMap.get(prefix);
+        return b != null && b.booleanValue();
+    }
+
     /**
      *  Process the xml
      *
@@ -234,6 +258,13 @@ public class ObjectStoreHandler extends XmlHandler {
                     List<PrefixNode> deferred = parent.getDeferredChildren();
                     if (deferred == null) {
                         return new ArrayList<PrefixNode>();
+                    }
+
+                    deferred = new ArrayList<PrefixNode>(deferred);
+
+                    String prefix = parent.getFullPath();
+                    if (isReverseOrder(prefix)) {
+                        Collections.reverse(deferred);
                     }
                     return deferred;
                 }
@@ -267,7 +298,6 @@ public class ObjectStoreHandler extends XmlHandler {
                     }
 
                     parent.removeAllChildren();
-
                     insertBatch(parent, kids, 0);
                     parent.setLoaded(true);
                     treeModel.nodeStructureChanged(parent);
@@ -295,6 +325,7 @@ public class ObjectStoreHandler extends XmlHandler {
         if (doc == null) {
             throw new IllegalStateException("Could not load: " + listingUrl);
         }
+
         Element docRoot = doc.getDocumentElement();
         String currentPrefix = getDocumentPrefix(docRoot);
 
@@ -317,6 +348,11 @@ public class ObjectStoreHandler extends XmlHandler {
                 results.add(n);
             }
         }
+
+        if (isReverseOrder(prefix)) {
+            Collections.reverse(results);
+        }
+
         return results;
     }
 
