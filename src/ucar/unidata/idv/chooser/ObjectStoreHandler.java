@@ -22,9 +22,11 @@ package ucar.unidata.idv.chooser;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;import ucar.unidata.data.DataManager;
+import org.w3c.dom.NodeList;
+import ucar.unidata.data.DataManager;
 import ucar.unidata.io.s3.CdmS3Uri;
-import ucar.unidata.util.GuiUtils;import ucar.unidata.xml.XmlUtil;
+import ucar.unidata.util.GuiUtils;
+import ucar.unidata.xml.XmlUtil;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -462,6 +464,9 @@ public class ObjectStoreHandler extends XmlHandler {
 
     private String stripQuery1(String url) {
         int idx = url.indexOf("/?");
+        if(idx <= 0){
+            idx = url.indexOf("?");
+        }
         String surl = (idx >= 0) ? url.substring(0, idx) : url;
         idx = surl.indexOf("://");
         String url0 = (idx >= 0) ? surl.substring(idx+3) : surl;
