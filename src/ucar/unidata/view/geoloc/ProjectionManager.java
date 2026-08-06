@@ -348,7 +348,7 @@ public class ProjectionManager implements ActionListener {
         if (null != (current = projTable.getSelected())) {
             setWorkingProjection(current);
             projTable.setCurrentProjection(current);
-            mapLabel.setText(current.toString());
+            mapLabel.setText(current.getName());
         }
 
         /* listen for new working Projections from projTable */
@@ -734,7 +734,7 @@ public class ProjectionManager implements ActionListener {
         }
 
         if (current != null) {
-            mapLabel.setText(current.toString());
+            mapLabel.setText(current.getName());
         }
         npViewControl.setProjectionImpl(current);
     }
