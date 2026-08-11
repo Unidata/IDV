@@ -256,17 +256,16 @@ public class ObjectStoreHandler extends XmlHandler {
             protected List<PrefixNode> doInBackground() throws Exception {
                 if (parent.isMoreNode()) {
                     List<PrefixNode> deferred = parent.getDeferredChildren();
+
                     if (deferred == null) {
                         return new ArrayList<PrefixNode>();
                     }
 
-                    deferred = new ArrayList<PrefixNode>(deferred);
-
-                    String prefix = parent.getFullPath();
-                    if (isReverseOrder(prefix)) {
-                        Collections.reverse(deferred);
-                    }
-                    return deferred;
+                    /*
+                     * The entire list was already sorted by fetchChildren().
+                     * Return the remaining items exactly as stored.
+                     */
+                    return new ArrayList<PrefixNode>(deferred);
                 }
 
                 return fetchChildren(parent.getFullPath());
@@ -320,42 +319,111 @@ public class ObjectStoreHandler extends XmlHandler {
      */
     private List<PrefixNode> fetchChildren(String prefix) throws Exception {
         List<PrefixNode> results = new ArrayList<PrefixNode>();
-        String listingUrl = makePrefixUrl(path, prefix);
-        Document doc = XmlUtil.getDocument(listingUrl, getClass());
-        if (doc == null) {
-            throw new IllegalStateException("Could not load: " + listingUrl);
-        }
+        String continuationToken = null;
 
-        Element docRoot = doc.getDocumentElement();
-        String currentPrefix = getDocumentPrefix(docRoot);
+        do {
+            String listingUrl = makeV2PrefixUrl(prefix, continuationToken);
+            Document doc = XmlUtil.getDocument(listingUrl, getClass());
 
-        NodeList children = XmlUtil.getElements(docRoot);
-        for (int i = 0; i < children.getLength(); i++) {
-            Element child = (Element) children.item(i);
-            String tag = XmlUtil.getLocalName(child);
-
-            if ("CommonPrefixes".equals(tag)) {
-                String childPrefix = XmlUtil.getChildText(XmlUtil.findChild(child, "Prefix"));
-                String label = getRelativePrefixLabel(childPrefix, currentPrefix);
-                PrefixNode n = new PrefixNode(label, childPrefix, true, true);
-                results.add(n);
-            } else if ("Contents".equals(tag)) {
-                String key = XmlUtil.getChildText(XmlUtil.findChild(child, "Key"));
-                if (key == null || key.equals(currentPrefix)) {
-                    continue;
-                }
-                PrefixNode n = new PrefixNode(getLeafName(key), key, false, false);
-                results.add(n);
+            if (doc == null) {
+                throw new IllegalStateException(
+                        "Could not load object-store listing: " + listingUrl);
             }
-        }
 
-        if (isReverseOrder(prefix)) {
-            Collections.reverse(results);
-        }
+            Element docRoot = doc.getDocumentElement();
+            String currentPrefix = getDocumentPrefix(docRoot);
+
+            NodeList children = XmlUtil.getElements(docRoot);
+
+            for (int i = 0; i < children.getLength(); i++) {
+                Element child = (Element) children.item(i);
+                String tag = XmlUtil.getLocalName(child);
+
+                if ("CommonPrefixes".equals(tag)) {
+                    String childPrefix = XmlUtil.getChildText(
+                            XmlUtil.findChild(child, "Prefix"));
+
+                    if (childPrefix == null) {
+                        continue;
+                    }
+
+                    String label = getRelativePrefixLabel(
+                            childPrefix, currentPrefix);
+
+                    results.add(new PrefixNode(
+                            label, childPrefix, true, true));
+
+                } else if ("Contents".equals(tag)) {
+                    String key = XmlUtil.getChildText(
+                            XmlUtil.findChild(child, "Key"));
+
+                    if (key == null || key.equals(currentPrefix)) {
+                        continue;
+                    }
+
+                    results.add(new PrefixNode(
+                            getLeafName(key), key, false, false));
+                }
+            }
+
+            String isTruncated = XmlUtil.getChildText(
+                    XmlUtil.findChild(docRoot, "IsTruncated"));
+
+            if ("true".equalsIgnoreCase(isTruncated)) {
+                continuationToken = XmlUtil.getChildText(
+                        XmlUtil.findChild(docRoot, "NextContinuationToken"));
+
+                if (continuationToken == null
+                        || continuationToken.trim().length() == 0) {
+                    throw new IllegalStateException(
+                            "S3 listing is truncated but has no "
+                                    + "NextContinuationToken: " + listingUrl);
+                }
+            } else {
+                continuationToken = null;
+            }
+
+        } while (continuationToken != null);
+
+        final boolean reverse = isReverseOrder(prefix);
+
+        Collections.sort(results, new Comparator<PrefixNode>() {
+            public int compare(PrefixNode a, PrefixNode b) {
+                /*
+                 * Keep folders before files in both normal and reverse order.
+                 */
+                if (a.isPrefix() && !b.isPrefix()) {
+                    return -1;
+                }
+
+                if (!a.isPrefix() && b.isPrefix()) {
+                    return 1;
+                }
+
+                int result = a.toString().compareToIgnoreCase(b.toString());
+
+                return reverse ? -result : result;
+            }
+        });
 
         return results;
     }
 
+    private String makeV2PrefixUrl(String prefix, String continuationToken) {
+        String base = stripQuery(path);
+
+        StringBuilder url = new StringBuilder(base);
+        url.append("?list-type=2");
+        url.append("&prefix=").append(encodePrefix(prefix));
+        url.append("&delimiter=/");
+
+        if (continuationToken != null) {
+            url.append("&continuation-token=")
+                    .append(encodeQueryValue(continuationToken));
+        }
+
+        return url.toString();
+    }
     /**
      *  Process the xml
      *
@@ -472,8 +540,27 @@ public class ObjectStoreHandler extends XmlHandler {
         }
         return fullPrefix;
     }
+    private String makePrefixUrl(String prefix, String continuationToken) {
+        String base = stripQuery(path);
 
-    private String makePrefixUrl(String listingUrl, String prefix) {
+        StringBuilder url = new StringBuilder(base);
+        url.append("?list-type=2");
+        url.append("&prefix=").append(encodePrefix(prefix));
+        url.append("&delimiter=/");
+
+        if (continuationToken != null) {
+            url.append("&continuation-token=")
+                    .append(encodeQueryValue(continuationToken));
+        }
+
+        return url.toString();
+    }
+
+    private String encodeQueryValue(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private String makePrefixUrl1(String listingUrl, String prefix) {
         String base = stripQuery(listingUrl);
         return base + "?prefix=" + encodePrefix(prefix) + "&delimiter=/";
     }
@@ -529,6 +616,24 @@ public class ObjectStoreHandler extends XmlHandler {
         }
         int idx = tmp.lastIndexOf('/');
         return (idx >= 0) ? tmp.substring(idx + 1) : tmp;
+    }
+
+    private void sortChildren(List<PrefixNode> children, final boolean reverse) {
+        Collections.sort(children, new Comparator<PrefixNode>() {
+            public int compare(PrefixNode a, PrefixNode b) {
+                if (a.isPrefix() && !b.isPrefix()) {
+                    return -1;
+                }
+
+                if (!a.isPrefix() && b.isPrefix()) {
+                    return 1;
+                }
+
+                int result = a.toString().compareToIgnoreCase(b.toString());
+
+                return reverse ? -result : result;
+            }
+        });
     }
 
     private void insertBatch(PrefixNode parent, List<PrefixNode> kids, int startIndex) {
