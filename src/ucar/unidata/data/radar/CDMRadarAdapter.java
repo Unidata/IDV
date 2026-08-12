@@ -30,12 +30,14 @@ import ucar.nc2.Attribute;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.NetcdfDatasets;
 import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.RadialDatasetSweep;
 //import ucar.nc2.dt.TypedDatasetFactory;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridCoordSys;
+import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.units.DateUnit;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.unidata.data.*;
@@ -344,7 +346,10 @@ public class CDMRadarAdapter implements RadarAdapter {
                 rds = (RadialDatasetSweep) FeatureDatasetFactoryManager.open(
                     ucar.nc2.constants.FeatureType.RADIAL, DODSNetcdfFile.canonicalURL(swpFileName), null,
                         new Formatter());
-            else
+            else if (swpFileName.startsWith("cdms3")) {
+                NetcdfDataset nds = NetcdfDatasets.openDataset(swpFileName, true, null);
+                rds = new ucar.nc2.dt.radial.Nexrad2RadialAdapter(nds);
+            } else
                 rds = (RadialDatasetSweep) FeatureDatasetFactoryManager.open(
                         ucar.nc2.constants.FeatureType.RADIAL, swpFileName, null,
                         new Formatter());
