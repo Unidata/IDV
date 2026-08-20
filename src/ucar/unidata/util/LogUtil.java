@@ -997,7 +997,7 @@ public class LogUtil {
      * @param instruction The prompt for the analysis.
      * @return The text result from Gemini or an error message.
      */
-    public static String runGemini(BufferedImage image, String instruction) {
+    public static String runGemini(BufferedImage image, String instruction, String modelversion) {
         if (image == null) {
             String errorMsg = "Input BufferedImage cannot be null.";
             System.err.println(errorMsg);
@@ -1028,7 +1028,7 @@ public class LogUtil {
             //" "; // IMPORTANT: Do not hardcode keys in production
             // NOTE: The official public model is 'gemini-1.5-pro-latest'.
             // Using your string in case you have private access. models/gemini-3-pro-preview models/gemini-2.5-pro
-            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=" + apiKey;
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + modelversion + ":generateContent?key=" + apiKey;
 
             // 3. Construct JSON payload safely using a library
             String jsonPayload = buildJsonPayload(instruction, base64Image);
@@ -1049,7 +1049,7 @@ public class LogUtil {
         }
     }
 
-    public static String runGemini(BufferedImage image, String instruction, String knowledge) {
+    public static String runGemini(BufferedImage image, String instruction, String knowledge, String modelversion) {
         if (image == null) {
             String errorMsg = "Input BufferedImage cannot be null.";
             System.err.println(errorMsg);
@@ -1080,7 +1080,7 @@ public class LogUtil {
             //" "; // IMPORTANT: Do not hardcode keys in production
             // NOTE: The official public model is 'gemini-1.5-pro-latest'.
             // Using your string in case you have private access.
-            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + apiKey;
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + modelversion + ":generateContent?key=" + apiKey;
 
             // 3. Construct JSON payload safely using a library
             String jsonPayload = buildJsonPayload(instruction, base64Image, knowledge);
@@ -1476,7 +1476,7 @@ public class LogUtil {
      * @param instruction The prompt for the analysis.
      * @return The text result from Gemini or an error message.
      */
-    public static String runGemini(BufferedImage image, String instruction,String[] exampleImages, String[] exampleAnalysis) {
+    public static String runGemini(BufferedImage image, String instruction,String[] exampleImages, String[] exampleAnalysis, String modelVersion) {
         if (image == null) {
             String errorMsg = "Input BufferedImage cannot be null.";
             System.err.println(errorMsg);
@@ -1508,7 +1508,7 @@ public class LogUtil {
             //" "; // IMPORTANT: Do not hardcode keys in production
             // NOTE: The official public model is 'gemini-1.5-pro-latest'.
             // Using your string in case you have private access. models/gemini-3-pro-preview models/gemini-2.5-pro
-            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=" + apiKey;
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + modelVersion + ":generateContent?key=" + apiKey;
 
 
             StringBuilder contentsJson = new StringBuilder();
