@@ -4743,6 +4743,8 @@ public class ViewManager extends SharableImpl implements ActionListener,
         setupTextArea(instructionArea);
         setupTextArea(knowledgeArea);
 
+        JTextField modelVersionField = new JTextField("gemini-3.5-flash", 18);
+
         // 2. Setup the Main Panel with GridBagLayout
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -4754,15 +4756,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
 
         // --- ROW: Settings/Keys ---
         JPanel settingsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        settingsPanel.add(new JLabel("Gemini Model Version"));
+        settingsPanel.add(modelVersionField);
         settingsPanel.add(createActionButton("Reset Gemini Key", e -> {
-            AccountManager.getGlobalAccountManager().resetAppKey("gemini", "Enter new gemini app key");
+            AccountManager.getGlobalAccountManager().resetAppKey(
+                    "gemini", "Enter new gemini app key");
         }));
         gbc.gridy = currentRow++;
         mainPanel.add(settingsPanel, gbc);
 
         // --- ROW: First Solid Line ---
         gbc.gridy = currentRow++;
-        gbc.insets = new Insets(10, 0, 5, 0); // Extra padding for the line
+        gbc.insets = new Insets(10, 0, 5, 0);
         mainPanel.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
 
         // --- ROW: Archived File Buttons ---
@@ -4778,12 +4783,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File[] selectedFiles = fileChooser.getSelectedFiles();
                 weatherMape1 = new String[selectedFiles.length];
-                for(int i =0; i < selectedFiles.length; i++) {
+                for (int i = 0; i < selectedFiles.length; i++) {
                     weatherMape1[i] = selectedFiles[i].getAbsolutePath();
                 }
-                //weatherMape1 = selectedFile.getAbsolutePath();
-                // You can add logic here to process the selected file
-                //System.out.println("Selected history file: " + weatherMape1);
             }
         });
 
@@ -4798,12 +4800,9 @@ public class ViewManager extends SharableImpl implements ActionListener,
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File[] selectedFiles = fileChooser.getSelectedFiles();
                 weatherAnalysis1 = new String[selectedFiles.length];
-                for(int i = 0; i < selectedFiles.length; i++ ) {
+                for (int i = 0; i < selectedFiles.length; i++) {
                     weatherAnalysis1[i] = selectedFiles[i].getAbsolutePath();
                 }
-                // weatherAnalysis1 = selectedFile.getAbsolutePath();
-                // You can add logic here to process the selected file
-                //System.out.println("Selected history file: " + weatherAnalysis1);
             }
         });
         archivePanel.add(imageButton);
@@ -4821,23 +4820,23 @@ public class ViewManager extends SharableImpl implements ActionListener,
         JPanel helperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         helperPanel.add(createMasterPromptButton(instructionArea));
         helperPanel.add(createHistoryButton(instructionArea));
-        // Create and add the Clear History radio button
         JButton clearHistoryRadioButton = createClearHistoryButton();
-
         helperPanel.add(clearHistoryRadioButton);
         gbc.gridy = currentRow++;
         mainPanel.add(helperPanel, gbc);
 
         // --- ROW: Instruction Input Area (Expanding) ---
         gbc.gridy = currentRow++;
-        gbc.weighty = 0.6; // Takes most of the space
+        gbc.weighty = 0.6;
         gbc.fill = GridBagConstraints.BOTH;
-        mainPanel.add(createLabeledComponent("Instruction for Gemini Agent:", instructionArea), gbc);
+        mainPanel.add(createLabeledComponent(
+                "Instruction for Gemini Agent:", instructionArea), gbc);
 
         // --- ROW: Knowledge Input Area (Smaller Expanding) ---
         gbc.gridy = currentRow++;
         gbc.weighty = 0.3;
-        mainPanel.add(createLabeledComponent("Knowledge Context / Key Info:", knowledgeArea), gbc);
+        mainPanel.add(createLabeledComponent(
+                "Knowledge Context / Key Info:", knowledgeArea), gbc);
 
         // 3. Display Dialog
         int option = JOptionPane.showConfirmDialog(
@@ -4851,14 +4850,19 @@ public class ViewManager extends SharableImpl implements ActionListener,
         if (option == JOptionPane.OK_OPTION) {
             String instruction = instructionArea.getText();
             String knowledge = knowledgeArea.getText();
+            String modelVersion = modelVersionField.getText();
+            if (modelVersion == null || modelVersion.trim().isEmpty()) {
+                modelVersion = "gemini-3.5-flash";
+            } else {
+                modelVersion = modelVersion.trim();
+            }
 
-            if (instruction != null && !instruction.trim().isEmpty() && !geminiInstructionHistory.contains(instruction)) {
-                int i = geminiInstructionHistory.size();
-                TwoFacedObject tfo = new TwoFacedObject("Instruction ", instruction);
+            if (instruction != null && !instruction.trim().isEmpty()
+                    && !geminiInstructionHistory.contains(instruction)) {
                 geminiInstructionHistory.add(instruction);
                 writeHistoryList();
             }
-            executeGeminiTask(instruction, knowledge);
+            executeGeminiTask(instruction, knowledge, modelVersion);
         }
 
     }
@@ -5030,18 +5034,18 @@ public class ViewManager extends SharableImpl implements ActionListener,
         area.append(text);
     }
 
-    private void executeGeminiTask(String instr, String know) {
+    private void executeGeminiTask(String instr, String know, String modelVersion) {
         Misc.run(() -> {
             try {
                 getIdv().showWaitCursor();
                 if (weatherMape1 != null && weatherMape1.length > 0) {
                     if(weatherAnalysis1 != null && weatherAnalysis1.length > 0) {
-                        doGemini(instr, weatherMape1, weatherAnalysis1);
+                        doGemini(instr, weatherMape1, weatherAnalysis1, modelVersion);
                     }
                 } else if (know != null && !know.trim().isEmpty()) {
-                    doGemini(instr, know);
+                    doGemini(instr, know, modelVersion);
                 } else {
-                    doGemini(instr);
+                    doGemini(instr, modelVersion);
                 }
                 getIdv().showNormalCursor();
             } catch (Throwable exc) {
@@ -5081,28 +5085,28 @@ public class ViewManager extends SharableImpl implements ActionListener,
     public void doGemini()
             throws AWTException {
         try {
-            LogUtil.runGemini(this.getMaster().getImage(false), null);
+            LogUtil.runGemini(this.getMaster().getImage(false), null, null);
         } catch (Exception e){}
     }
 
-    public void doGemini(String instruction)
+    public void doGemini(String instruction, String modelversion)
             throws AWTException {
         try {
-            LogUtil.runGemini(this.getMaster().getImage(false), instruction);
+            LogUtil.runGemini(this.getMaster().getImage(false), instruction, modelversion);
         } catch (Exception e){}
     }
 
-    public void doGemini(String instruction, String[] weatherMapes, String[] weatherAnalysis)
+    public void doGemini(String instruction, String[] weatherMapes, String[] weatherAnalysis, String modelversion)
             throws AWTException {
         try {
-            LogUtil.runGemini(this.getMaster().getImage(false), instruction, weatherMapes, weatherAnalysis);
+            LogUtil.runGemini(this.getMaster().getImage(false), instruction, weatherMapes, weatherAnalysis, modelversion);
         } catch (Exception e){}
     }
 
-    public void doGemini(String instruction, String knowledge)
+    public void doGemini(String instruction, String knowledge, String modelversion)
             throws AWTException {
         try {
-            LogUtil.runGemini(this.getMaster().getImage(false), instruction, knowledge);
+            LogUtil.runGemini(this.getMaster().getImage(false), instruction, knowledge, modelversion);
         } catch (Exception e){}
     }
     /**
