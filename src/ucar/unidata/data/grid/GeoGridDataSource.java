@@ -1165,7 +1165,60 @@ public class GeoGridDataSource extends GridDataSource {
 
 
         //Make sythetic data ncml file
-        if (sources.size() > 1) {
+        if (sources.size() > 1 && sources.get(0).toString().startsWith("cdms3")) {
+            String       timeName = getProperty(PROP_TIMEVAR, "time");
+            List<VariableSimpleIF> lsv = null;
+            boolean hasTimeDimension = false;
+            if(timeName.equals("time")){
+                try {
+                    file = sources.get(0).toString();
+                    NetcdfDataset nds = NetcdfDatasets.openDataset(file, true, null);//; ).enhance(ncf, NetcdfDataset.getDefaultEnhanceMode(), null);
+                    GridDataset gds1 = new ucar.nc2.dt.grid.GridDataset(nds);
+                    lsv = gds1.getDataVariables();
+                    List grids = gds1.getGrids();
+                    GeoGrid geoGrid0 = (GeoGrid)grids.get(0);
+                    if(geoGrid0.getTimeDimension() != null){
+                        timeName = geoGrid0.getTimeDimension().getName();
+                        hasTimeDimension = true;
+                    } else if(geoGrid0.getCoordinateSystem() != null)
+                        timeName = geoGrid0.getCoordinateSystem().getTimeAxis().getOriginalName();
+
+                } catch (Exception ddd){}
+            }
+
+            StringBuffer sb       = new StringBuffer();
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            sb.append(
+                    "<netcdf xmlns=\"https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2\">\n");
+            if(hasTimeDimension) {
+                sb.append("<aggregation type=\"joinExisting\" dimName=\""
+                        + timeName + "\" timeUnitsChange=\"true\">\n");
+            } else {
+                sb.append("<aggregation type=\"joinNew\" dimName=\""
+                        + timeName + "\" >\n");
+            }
+
+            for(VariableSimpleIF vsf: lsv){
+                String nn = vsf.getShortName();
+                sb.append("<variableAgg name=\"" + nn + "\" />\n");
+            }
+
+
+            for (int i = 0; i < sources.size(); i++) {
+                String s = sources.get(i).toString();
+                sb.append("<netcdf location=\"" + s + "\" />\n");
+            }
+            sb.append("</aggregation>\n</netcdf>\n");
+            file = getDataContext().getObjectStore().getUniqueTmpFile(
+                    "multigrid_" + UUID.randomUUID().toString(), ".ncml");
+            try {
+                IOUtil.writeFile(file, sb.toString());
+            } catch (IOException ioe) {
+                logException("Unable to write file: " + file, ioe);
+                return null;
+            }
+            log_.debug("" + sb);
+        } else if (sources.size() > 1) {
             String       timeName = getProperty(PROP_TIMEVAR, "time");
             if(timeName.equals("time")){
                 try {
@@ -1229,8 +1282,10 @@ public class GeoGridDataSource extends GridDataSource {
                 file = file.replace("dods:","https:");
             } else if(file.endsWith("ncml")){
                 file = "file:" + file;
-                NetcdfDataset ncd = NcMLReader.readNcML(file, null);
-                GridDataset gds = new GridDataset(ncd);
+                //NetcdfDataset ncd = NcMLReader.readNcML(file, null);
+                NetcdfDataset ncd = NetcdfDatasets.openDataset(file);
+                GridDataset gds = new ucar.nc2.dt.grid.GridDataset(ncd);
+                return gds;
             } else if (file.startsWith("cdms3:")) {
                 NetcdfDataset nds = NetcdfDatasets.openDataset(file, true, null);//; ).enhance(ncf, NetcdfDataset.getDefaultEnhanceMode(), null);
                 GridDataset gds1 = new ucar.nc2.dt.grid.GridDataset(nds);
