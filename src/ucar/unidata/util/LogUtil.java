@@ -1113,7 +1113,7 @@ public class LogUtil {
             String host = "GOOGLE";
             userInfo =
                     userAccountManager.getAppKey("gemini", "<html>The server: <i>" + host
-                            + "<i> requires a APP Key</html>") ;
+                            + "<i> requires a API Key</html>") ;
             if (userInfo == null) {
                 return null;
             }
