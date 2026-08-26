@@ -4760,7 +4760,7 @@ public class ViewManager extends SharableImpl implements ActionListener,
         settingsPanel.add(modelVersionField);
         settingsPanel.add(createActionButton("Reset Gemini Key", e -> {
             AccountManager.getGlobalAccountManager().resetAppKey(
-                    "gemini", "Enter new gemini app key");
+                    "gemini", "Enter new gemini API key");
         }));
         gbc.gridy = currentRow++;
         mainPanel.add(settingsPanel, gbc);
