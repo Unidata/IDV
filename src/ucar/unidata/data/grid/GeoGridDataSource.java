@@ -23,7 +23,11 @@ package ucar.unidata.data.grid;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+//import org.jdom2.Document;
+//import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
@@ -96,6 +100,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -1186,38 +1191,43 @@ public class GeoGridDataSource extends GridDataSource {
                 } catch (Exception ddd){}
             }
 
-            StringBuffer sb       = new StringBuffer();
-            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            sb.append(
-                    "<netcdf xmlns=\"https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2\">\n");
-            if(hasTimeDimension) {
-                sb.append("<aggregation type=\"joinExisting\" dimName=\""
-                        + timeName + "\" timeUnitsChange=\"true\">\n");
+            Namespace ns = Namespace.getNamespace(
+                    "https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
+            org.jdom2.Element netcdf = new org.jdom2.Element("netcdf", ns);
+
+            org.jdom2.Element aggregation = new org.jdom2.Element("aggregation", ns);
+            aggregation.setAttribute("dimName", timeName);
+            if (hasTimeDimension) {
+                aggregation.setAttribute("type", "joinExisting");
+                aggregation.setAttribute("timeUnitsChange", "true");
             } else {
-                sb.append("<aggregation type=\"joinNew\" dimName=\""
-                        + timeName + "\" >\n");
+                aggregation.setAttribute("type", "joinNew");
             }
 
-            for(VariableSimpleIF vsf: lsv){
-                String nn = vsf.getShortName();
-                sb.append("<variableAgg name=\"" + nn + "\" />\n");
+            if (lsv != null) {
+                for (VariableSimpleIF vsf : lsv) {
+                    org.jdom2.Element variableAgg = new org.jdom2.Element("variableAgg", ns);
+                    variableAgg.setAttribute("name", vsf.getShortName());
+                    aggregation.addContent(variableAgg);
+                }
             }
-
 
             for (int i = 0; i < sources.size(); i++) {
-                String s = sources.get(i).toString();
-                sb.append("<netcdf location=\"" + s + "\" />\n");
+                org.jdom2.Element nested = new org.jdom2.Element("netcdf", ns);
+                nested.setAttribute("location", sources.get(i).toString());
+                aggregation.addContent(nested);
             }
-            sb.append("</aggregation>\n</netcdf>\n");
+            netcdf.addContent(aggregation);
             file = getDataContext().getObjectStore().getUniqueTmpFile(
                     "multigrid_" + UUID.randomUUID().toString(), ".ncml");
             try {
-                IOUtil.writeFile(file, sb.toString());
+                new XMLOutputter(Format.getPrettyFormat())
+                        .output(new org.jdom2.Document(netcdf), new FileOutputStream(file));
             } catch (IOException ioe) {
                 logException("Unable to write file: " + file, ioe);
                 return null;
             }
-            log_.debug("" + sb);
+            log_.debug(new XMLOutputter(Format.getPrettyFormat()).outputString(netcdf));
         } else if (sources.size() > 1) {
             String       timeName = getProperty(PROP_TIMEVAR, "time");
             if(timeName.equals("time")){
