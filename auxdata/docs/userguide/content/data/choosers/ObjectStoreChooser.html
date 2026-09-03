@@ -1,0 +1,40 @@
+<html><head>
+  <title> Choose an Object Store Object</title>
+  <link href="../idv.css" rel="stylesheet" title="Style" type="text/css">
+</head>
+
+<body>
+
+The [ug::chooser ObjectStore] chooser allows you to specify the Object Store Object
+as data source. A cloud object can be specified the same way as an OpenDAP URL. The form
+lets you set the data source type, choose a host such as Amazon, optionally supply
+a profile and custom endpoint, then pick a bucket and object key. Pressing Add Source loads
+that object into IDV without downloading the archive first. This feature has been tested mostly
+in Amazon S3 bucket and can be extended to include Google, Microsoft, and others.
+
+
+[ht::cimg images/ObjectStore.png {ObjectStore Chooser}]
+
+To select an Object:
+<ol>
+
+<li> Select Data Source Type, currently IDV support Level2 radar type and Grid file type.
+
+<li> Select a host from the list.
+
+<li> Profile text field is user name that is optional if the data is open to public.
+
+<li> Endpoint host is also optional.
+
+<li> Endpoint Segments is also optional.
+
+<li> Bucket is required field, every object is contained in a bucket
+
+<li> Key is also required field that includes a prefix string at the beginning of the object key name.
+
+
+</ol>
+
+
+</body>
+</html>
