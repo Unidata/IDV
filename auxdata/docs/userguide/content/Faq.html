@@ -364,6 +364,20 @@ menu to remove and re-add the display that you want to be transparent
 so it is last.
 </faqitem>
 
+<faqitem id="wsconsole" q="How to run GEMINI in the IDV to get the weather analysis?">
+    <ol>
+        <li>Load the bundle or create the display.</li>
+        <li>Choose <b>View > RunGemini</b> to open the dialog.</li>
+        <li>Keep or change <b>Gemini Model Version</b>.</li>
+        <li>Enter or reset the API key if one is not already stored.</li>
+        <li>Optional, attach archived weather maps and analysis files.</li>
+        <li>Pick a master prompt and edit it or type an instruction according to the view window weather map.
+            Add knowledge context if needed.</li>
+        <li>Press <b>OK</b>. The IDV calls
+            <code>executeGeminiTask</code> with the instruction, knowledge
+            text, and model version.</li>
+    </ol>
+</faqitem>
 
 <faqitem cat="Data"></faqitem>
 
