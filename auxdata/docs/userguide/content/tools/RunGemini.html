@@ -1,0 +1,76 @@
+<html><head>
+    <title> Run Gemini</title>
+    <link href="../idv.css" rel="stylesheet" title="Style" type="text/css">
+</head>
+
+<body>
+
+
+<p>
+The <b>Run Gemini</b> feature sends a weather-analysis request to
+Google Gemini from inside the IDV. Select the [ug::menu View RunGemini] menu item. A dialog will
+popup where you can enter an instruction for the current view window image or select a prompt
+example and edit it according to the view weather maps contents. In the <b>Gemini Agentic Vision - IDV Weather Analysis</b>
+dialog. it attaches weather maps, combine with an instruction, and run a Gemini model on those
+images without leaving the application.
+</p>
+
+
+[ht::cimg images/RunGeminiUI.png {Gemini Agentic Vision}]
+
+
+<ul>
+    [ug::menuDesc {Gemini Model Version} {
+    The default is
+    <code>gemini-3.5-flash</code>. For newer agentic work try
+    <code>gemini-3.7-flash</code>.
+    }]
+
+    [ug::menuDesc {Reset Gemini Key} {
+    You must enter your own Gemini API key. The IDV does not ship a shared
+    key. Create a prepaid key in
+    <a href="https://aistudio.google.com/apikey">Google AI Studio</a>
+    and set up
+    <a href="https://ai.google.dev/gemini-api/docs/billing#prepay">prepaid billing</a>
+    . Use <b>Reset Gemini Key</b> to enter or replace a stored
+    key.
+    }]
+
+    [ug::menuDesc {Archive Weather Maps} {
+    Select one or more archived weather-map images as example inputs. User can provide
+    high quality and diverse examples (case studies) within the prompt. The Gemini uses these examples
+    as a template and quick learning for its own response.
+    }]
+
+    [ug::menuDesc {Archived Analysis files} {
+    Select the corresponding weather analysis files of archived weather maps as extra context. Provide
+    examples of different weather scenarios (e.g., one with a strong winter storm,
+    one with a calm high-pressure system).
+    }]
+
+    [ug::menuDesc {Master Prompt Examples} {
+    Set of prompt examples with the quality and specificity of instructions to the model for different weather
+    maps.
+    }]
+
+    [ug::menuDesc {History} {
+    IDV saves a list of instruction prompts that have been used in the past.
+    }]
+
+    [ug::menuDesc {Clear History} {
+    Remove saved instructions from the history list.
+    }]
+
+    [ug::menuDesc {Instruction for Gemini Agent} {
+    Either select a master prompt and edit it or type an instruction according to the view window weather map.This
+    is Required. Non-empty text is saved to history when you press OK.
+    }]
+
+    [ug::menuDesc {Knowledge Context} {
+    Optional extra facts (knowledge, valid time, products) sent with
+    the instruction.
+    }]
+
+</ul>
+
+</body>
