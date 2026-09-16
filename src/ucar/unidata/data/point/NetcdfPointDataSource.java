@@ -21,6 +21,9 @@
 package ucar.unidata.data.point;
 
 
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.NetcdfDatasets;
+import ucar.nc2.ft.FeatureDataset;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.ft.FeatureDatasetPoint;
 
@@ -29,11 +32,7 @@ import ucar.unidata.data.*;
 
 import ucar.unidata.geoloc.LatLonRect;
 
-import ucar.unidata.util.DateSelection;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.Trace;
-import ucar.unidata.util.WrapperException;
+import ucar.unidata.util.*;
 
 import visad.*;
 
@@ -267,13 +266,19 @@ public class NetcdfPointDataSource extends PointDataSource {
         FeatureDatasetPoint pods    = null;
         Exception           toThrow = new Exception("Datset is null");
         try {
-            file = convertSourceFile(file);
-            //pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
-            //    ucar.nc2.constants.FeatureType.POINT, file, null, buf);
-            if (pods == null) {  // try as ANY_POINT
-                pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager
-                    .open(ucar.nc2.constants.FeatureType.ANY_POINT, file,
-                          null, buf);
+            if(file.startsWith("cdms3")) {
+                file = convertSourceFile(file);
+                NetcdfDataset nds = NetcdfDatasets.openDataset(file);
+                pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.wrap(ucar.nc2.constants.FeatureType.ANY_POINT, nds, null, null);
+            } else {
+                file = convertSourceFile(file);
+                //pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(
+                //    ucar.nc2.constants.FeatureType.POINT, file, null, buf);
+                if (pods == null) {  // try as ANY_POINT
+                    pods = (FeatureDatasetPoint) FeatureDatasetFactoryManager
+                            .open(ucar.nc2.constants.FeatureType.ANY_POINT, file,
+                                    null, buf);
+                }
             }
         } catch (Exception exc) {
             pods = null;
