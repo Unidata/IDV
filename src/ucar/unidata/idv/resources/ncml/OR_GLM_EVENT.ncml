@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ncml:netcdf xmlns:ncml="https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" location="%location%">
-    <ncml:remove name="number_of_groups" type="dimension" />
-    <ncml:remove name="number_of_flashes" type="dimension" />
+
 
     <ncml:attribute name="Conventions" value="CF-1.6" />
     <ncml:attribute name="featureType" value="point" />
