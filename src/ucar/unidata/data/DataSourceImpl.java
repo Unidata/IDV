@@ -371,7 +371,11 @@ public class DataSourceImpl extends SharableImpl implements DataSource,
                               getClass());
             String file = getDataContext().getObjectStore().getUniqueTmpFile(
                               "ncmltemplate", ".ncml");
-            ncml = ncml.replace("%location%",
+            if(source.startsWith("cdms3"))
+                ncml = ncml.replace("%location%",
+                        "" + source);
+            else
+                ncml = ncml.replace("%location%",
                                 "" + IOUtil.getURL(source, getClass()));
             //            System.err.println ("ncml" + ncml);
             IOUtil.writeFile(file, ncml);
