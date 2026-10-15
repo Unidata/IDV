@@ -957,6 +957,8 @@ public class FileManager {
     /** Suffix for JAR files */
     public static final String SUFFIX_SHP = ".shp";
 
+    /** Suffix for JSON files */
+    public static final String SUFFIX_JSON = ".json";
     /** null accessory */
     private static final JComponent NULL_ACCESSORY = null;
 
@@ -1055,6 +1057,9 @@ public class FileManager {
     public static final PatternFileFilter FILTER_LOG =
         new PatternFileFilter(".+\\.log", "Log files (*.log)");
 
+    /** Filter for json files */
+    public static final PatternFileFilter FILTER_JSON =
+            new PatternFileFilter(".+\\.json", "Json files (*.json)");
 
     /** Filter for kmz files */
     public static final PatternFileFilter FILTER_KMZ =
