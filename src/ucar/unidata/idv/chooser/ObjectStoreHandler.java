@@ -179,6 +179,8 @@ public class ObjectStoreHandler extends XmlHandler {
                 PrefixNode node = (PrefixNode) tp.getLastPathComponent();
                 chooser.setHaveData(!node.isPrefix());
 
+                // folderIcon action 1 (left button): unchanged -- reverse this
+                // folder's sort order and reload its children.
                 if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1) {
                     if (node.isPrefix()) {
                         String prefix = node.getFullPath();
@@ -205,8 +207,15 @@ public class ObjectStoreHandler extends XmlHandler {
                 }
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    objectTree.setSelectionPath(tp);
-                    showPopup(node, e);
+                    // folderIcon action 2 (right button, new): select every Nth
+                    // file under this folder instead of the usual popup. File-node
+                    // right-click is untouched -- still shows the popup as before.
+                    if (node.isPrefix()) {
+                        selectEveryNthFile(node, tp);
+                    } else {
+                        objectTree.setSelectionPath(tp);
+                        showPopup(node, e);
+                    }
                 }
             }
         });
@@ -217,6 +226,71 @@ public class ObjectStoreHandler extends XmlHandler {
         return GuiUtils.inset(GuiUtils.topCenter(dsComp, treeScroller), 5);
     }
 
+    /**
+     * Prompts for N, then selects every Nth file (not subfolder) child of
+     * folderNode. If the user already had a file in this same folder selected
+     * (from an earlier click) when they right-clicked, that file is treated as
+     * the first pick and every Nth file *after* it is selected -- e.g. if file
+     * #5 was already selected and N=3, this selects #5, #8, #11, ... Otherwise
+     * it falls back to counting from the top: the Nth, 2*Nth, 3*Nth, ... file.
+     * Loads the folder's children first if they haven't been loaded yet, since
+     * there's nothing to select otherwise.
+     */
+    private void selectEveryNthFile(PrefixNode folderNode, TreePath folderPath) {
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("N:"));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(3, 1, 9999, 1));
+        panel.add(spinner);
+
+        int result = JOptionPane.showConfirmDialog(objectTree, panel,
+                "Select every Nth file", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) {
+            return; // user cancelled
+        }
+        int n = (Integer) spinner.getValue();
+
+        if (!folderNode.isLoaded()) {
+            loadChildren(folderNode);
+        }
+
+        // This folder's file (not subfolder) children, in order.
+        List<PrefixNode> fileChildren = new ArrayList<PrefixNode>();
+        for (int i = 0; i < folderNode.getChildCount(); i++) {
+            PrefixNode child = (PrefixNode) folderNode.getChildAt(i);
+            if (!child.isPrefix()) {
+                fileChildren.add(child);
+            }
+        }
+
+        // Was a file in this same folder already selected before the right-click?
+        // If so, anchor the Nth-counting there instead of at the top.
+        int anchorIndex = -1;
+        TreePath currentSelection = objectTree.getSelectionPath();
+        if ((currentSelection != null) && folderPath.equals(currentSelection.getParentPath())) {
+            anchorIndex = fileChildren.indexOf(currentSelection.getLastPathComponent());
+        }
+
+        List<TreePath> toSelect = new ArrayList<TreePath>();
+        if (anchorIndex >= 0) {
+            for (int i = anchorIndex; i < fileChildren.size(); i += n) {
+                toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
+            }
+        } else {
+            for (int i = n - 1; i < fileChildren.size(); i += n) {
+                toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
+            }
+        }
+
+        if (!objectTree.isExpanded(folderPath)) {
+            objectTree.expandPath(folderPath);
+        }
+        objectTree.setSelectionPaths(toSelect.toArray(new TreePath[0]));
+
+        // The right-click itself ran chooser.setHaveData(!node.isPrefix()) against
+        // the folder (isPrefix() == true), so it's currently forced to false --
+        // correct it now that we know how many files are actually selected.
+        chooser.setHaveData(!toSelect.isEmpty());
+    }
     /**
      *  Process the Bucketname
      *
