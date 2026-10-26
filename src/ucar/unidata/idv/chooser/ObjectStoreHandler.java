@@ -227,27 +227,42 @@ public class ObjectStoreHandler extends XmlHandler {
     }
 
     /**
-     * Prompts for N, then selects every Nth file (not subfolder) child of
-     * folderNode. If the user already had a file in this same folder selected
-     * (from an earlier click) when they right-clicked, that file is treated as
-     * the first pick and every Nth file *after* it is selected -- e.g. if file
-     * #5 was already selected and N=3, this selects #5, #8, #11, ... Otherwise
-     * it falls back to counting from the top: the Nth, 2*Nth, 3*Nth, ... file.
+     * Prompts for a mode (every Nth file, or the latest N files) and a count N,
+     * then selects accordingly among folderNode's file (not subfolder) children.
+     *
+     * Every Nth: if a file in this same folder was already selected before the
+     * right-click, that file anchors the count and every Nth file *after* it is
+     * selected (e.g. file #5 already selected, N=3 -> #5, #8, #11, ...).
+     * Otherwise counts from the top: the Nth, 2*Nth, 3*Nth, ... file.
+     *
+     * Latest N: filenames carry a timestamp and are generally already in time
+     * order, so "latest" is just one end of the file list -- whichever end
+     * depends on this folder's current sort direction (isReverseOrder).
+     *
      * Loads the folder's children first if they haven't been loaded yet, since
      * there's nothing to select otherwise.
      */
     private void selectEveryNthFile(PrefixNode folderNode, TreePath folderPath) {
-        JPanel panel = new JPanel();
-        panel.add(new JLabel("N:"));
+        JRadioButton everyNthRadio = new JRadioButton("Every Nth file", true);
+        JRadioButton latestRadio   = new JRadioButton("Latest N files");
+        ButtonGroup group = new ButtonGroup();
+        group.add(everyNthRadio);
+        group.add(latestRadio);
+
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(3, 1, 9999, 1));
-        panel.add(spinner);
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(everyNthRadio);
+        panel.add(latestRadio);
+        panel.add(GuiUtils.hbox(new JLabel("N:"), spinner));
 
         int result = JOptionPane.showConfirmDialog(objectTree, panel,
-                "Select every Nth file", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                "Select files", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result != JOptionPane.OK_OPTION) {
             return; // user cancelled
         }
         int n = (Integer) spinner.getValue();
+        boolean latestMode = latestRadio.isSelected();
 
         if (!folderNode.isLoaded()) {
             loadChildren(folderNode);
@@ -262,22 +277,32 @@ public class ObjectStoreHandler extends XmlHandler {
             }
         }
 
-        // Was a file in this same folder already selected before the right-click?
-        // If so, anchor the Nth-counting there instead of at the top.
-        int anchorIndex = -1;
-        TreePath currentSelection = objectTree.getSelectionPath();
-        if ((currentSelection != null) && folderPath.equals(currentSelection.getParentPath())) {
-            anchorIndex = fileChildren.indexOf(currentSelection.getLastPathComponent());
-        }
-
         List<TreePath> toSelect = new ArrayList<TreePath>();
-        if (anchorIndex >= 0) {
-            for (int i = anchorIndex; i < fileChildren.size(); i += n) {
-                toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
+
+        if (latestMode) {
+            boolean newestFirst = isReverseOrder(folderNode.getFullPath());
+            int count = Math.min(n, fileChildren.size());
+            List<PrefixNode> latest = newestFirst
+                    ? fileChildren.subList(0, count)
+                    : fileChildren.subList(fileChildren.size() - count, fileChildren.size());
+            for (PrefixNode f : latest) {
+                toSelect.add(folderPath.pathByAddingChild(f));
             }
         } else {
-            for (int i = n - 1; i < fileChildren.size(); i += n) {
-                toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
+            int anchorIndex = -1;
+            TreePath currentSelection = objectTree.getSelectionPath();
+            if ((currentSelection != null) && folderPath.equals(currentSelection.getParentPath())) {
+                anchorIndex = fileChildren.indexOf(currentSelection.getLastPathComponent());
+            }
+
+            if (anchorIndex >= 0) {
+                for (int i = anchorIndex; i < fileChildren.size(); i += n) {
+                    toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
+                }
+            } else {
+                for (int i = n - 1; i < fileChildren.size(); i += n) {
+                    toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
+                }
             }
         }
 
@@ -286,9 +311,6 @@ public class ObjectStoreHandler extends XmlHandler {
         }
         objectTree.setSelectionPaths(toSelect.toArray(new TreePath[0]));
 
-        // The right-click itself ran chooser.setHaveData(!node.isPrefix()) against
-        // the folder (isPrefix() == true), so it's currently forced to false --
-        // correct it now that we know how many files are actually selected.
         chooser.setHaveData(!toSelect.isEmpty());
     }
     /**
