@@ -29,6 +29,8 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.xml.XmlUtil;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.*;
@@ -227,43 +229,27 @@ public class ObjectStoreHandler extends XmlHandler {
     }
 
     /**
-     * Prompts for a mode (every Nth file, or the latest N files) and a count N,
-     * then selects accordingly among folderNode's file (not subfolder) children.
+     * Prompts for a mode (every Nth file, or the latest N files), a count N,
+     * and (for "every Nth" only) a total-to-select cap, then selects
+     * accordingly among folderNode's file (not subfolder) children.
      *
      * Every Nth: if a file in this same folder was already selected before the
      * right-click, that file anchors the count and every Nth file *after* it is
      * selected (e.g. file #5 already selected, N=3 -> #5, #8, #11, ...).
-     * Otherwise counts from the top: the Nth, 2*Nth, 3*Nth, ... file.
+     * Otherwise counts from the top: the Nth, 2*Nth, 3*Nth, ... file. Stops
+     * early once "total to select" files have been picked, regardless of how
+     * many more would otherwise match.
      *
      * Latest N: filenames carry a timestamp and are generally already in time
      * order, so "latest" is just one end of the file list -- whichever end
-     * depends on this folder's current sort direction (isReverseOrder).
+     * depends on this folder's current sort direction (isReverseOrder). N
+     * directly is the count here, so the total-to-select cap isn't applied —
+     * a second field meaning almost the same thing would just be confusing.
      *
      * Loads the folder's children first if they haven't been loaded yet, since
      * there's nothing to select otherwise.
      */
     private void selectEveryNthFile(PrefixNode folderNode, TreePath folderPath) {
-        JRadioButton everyNthRadio = new JRadioButton("Every Nth file", true);
-        JRadioButton latestRadio   = new JRadioButton("Latest N files");
-        ButtonGroup group = new ButtonGroup();
-        group.add(everyNthRadio);
-        group.add(latestRadio);
-
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(3, 1, 9999, 1));
-
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(everyNthRadio);
-        panel.add(latestRadio);
-        panel.add(GuiUtils.hbox(new JLabel("N:"), spinner));
-
-        int result = JOptionPane.showConfirmDialog(objectTree, panel,
-                "Select files", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result != JOptionPane.OK_OPTION) {
-            return; // user cancelled
-        }
-        int n = (Integer) spinner.getValue();
-        boolean latestMode = latestRadio.isSelected();
-
         if (!folderNode.isLoaded()) {
             loadChildren(folderNode);
         }
@@ -277,6 +263,41 @@ public class ObjectStoreHandler extends XmlHandler {
             }
         }
 
+        // Was a file in this same folder already selected before the right-click?
+        int anchorIndex = -1;
+        TreePath currentSelection = objectTree.getSelectionPath();
+        if ((currentSelection != null) && folderPath.equals(currentSelection.getParentPath())) {
+            anchorIndex = fileChildren.indexOf(currentSelection.getLastPathComponent());
+        }
+
+        JRadioButton everyNthRadio = new JRadioButton("Every Nth file", true);
+        JRadioButton latestRadio   = new JRadioButton("Latest N files");
+        ButtonGroup group = new ButtonGroup();
+        group.add(everyNthRadio);
+        group.add(latestRadio);
+
+        int maxCount = Math.max(1, fileChildren.size());
+        JSpinner nSpinner = new JSpinner(new SpinnerNumberModel(1, 1, maxCount, 1));
+        // User-specified cap for "every Nth" mode: defaults to the full file
+        // count (i.e. no practical limit) so it never truncates unless the
+        // user deliberately lowers it.
+        JSpinner totalSpinner = new JSpinner(new SpinnerNumberModel(maxCount, 1, maxCount, 1));
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(everyNthRadio);
+        panel.add(latestRadio);
+        panel.add(GuiUtils.hbox(new JLabel("N:"), nSpinner));
+        panel.add(GuiUtils.hbox(new JLabel("Total to select (every Nth mode only):"), totalSpinner));
+
+        int result = JOptionPane.showConfirmDialog(objectTree, panel,
+                "Select files", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) {
+            return; // user cancelled
+        }
+        int n = (Integer) nSpinner.getValue();
+        int total = (Integer) totalSpinner.getValue();
+        boolean latestMode = latestRadio.isSelected();
+
         List<TreePath> toSelect = new ArrayList<TreePath>();
 
         if (latestMode) {
@@ -289,20 +310,9 @@ public class ObjectStoreHandler extends XmlHandler {
                 toSelect.add(folderPath.pathByAddingChild(f));
             }
         } else {
-            int anchorIndex = -1;
-            TreePath currentSelection = objectTree.getSelectionPath();
-            if ((currentSelection != null) && folderPath.equals(currentSelection.getParentPath())) {
-                anchorIndex = fileChildren.indexOf(currentSelection.getLastPathComponent());
-            }
-
-            if (anchorIndex >= 0) {
-                for (int i = anchorIndex; i < fileChildren.size(); i += n) {
-                    toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
-                }
-            } else {
-                for (int i = n - 1; i < fileChildren.size(); i += n) {
-                    toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
-                }
+            int startIndex = (anchorIndex >= 0) ? anchorIndex : (n - 1);
+            for (int i = startIndex; (i < fileChildren.size()) && (toSelect.size() < total); i += n) {
+                toSelect.add(folderPath.pathByAddingChild(fileChildren.get(i)));
             }
         }
 
@@ -312,6 +322,15 @@ public class ObjectStoreHandler extends XmlHandler {
         objectTree.setSelectionPaths(toSelect.toArray(new TreePath[0]));
 
         chooser.setHaveData(!toSelect.isEmpty());
+    }
+
+    /** How many files "every Nth" would select, counting from the anchor (or N-1 if none). */
+    private int countEveryNth(int totalFiles, int anchorIndex, int n) {
+        int startIndex = (anchorIndex >= 0) ? anchorIndex : (n - 1);
+        if (startIndex >= totalFiles) {
+            return 0;
+        }
+        return ((totalFiles - 1 - startIndex) / n) + 1;
     }
     /**
      *  Process the Bucketname
