@@ -4719,8 +4719,9 @@ public class DerivedGridFactory {
                 (FlatField) grid2.getSample(0));;
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
-        GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(alt);
+        //boolean isDecrese = (dataAP[1][1][0] > dataAP[1][1][1])? true : false;
+        boolean isDecrese = isDecreasingOuterDimension(dataAP);
+                GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(alt);
 
         TupleType paramType = GridUtil.getParamType(grid2);
         FunctionType rangeFT =
@@ -4826,7 +4827,8 @@ public class DerivedGridFactory {
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
         float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        //boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false; //
+        boolean isDecrese =  isDecreasingOuterDimension(dataAA);
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
@@ -4937,7 +4939,70 @@ public class DerivedGridFactory {
 
         return newFieldImpl;
     }
+    /**
+     * Determines whether dataAA trends decreasing along the outer (third)
+     * dimension, by comparing index 0 vs index 1 there -- same check as
+     * dataAA[i][j][0] > dataAA[i][j][1], just not hardcoded to a single [i][j]
+     * that might land on a NaN near the array's boundary. Tries the middle of
+     * the first two dimensions first (most likely to hold real data), and falls
+     * back to scanning every other position if the middle itself is NaN.
+     *
+     * @param dataAA  a [dim0][dim1][dim2] array, each dim2 row having at least 2 entries
+     * @return true if decreasing (value at index 0 > value at index 1)
+     * @throws IllegalArgumentException if no [i][j] position anywhere has
+     *         non-NaN values at both index 0 and 1 along the outer dimension
+     */
+    public static boolean isDecreasingOuterDimension(float[][][] dataAA) {
+        int dim0 = dataAA.length;
+        int dim1 = (dim0 > 0) ? dataAA[0].length : 0;
 
+        int midI = dim0 / 2;
+        int midJ = dim1 / 2;
+        Boolean result = checkDecreaseAt(dataAA, midI, midJ);
+        if (result != null) {
+            return result;
+        }
+
+        for (int i = midI; i < dim0; i++) {
+            for (int j = midJ; j < dataAA[i].length; j++) {
+                if ((i == midI) && (j == midJ)) {
+                    continue; // already checked
+                }
+                result = checkDecreaseAt(dataAA, i, j);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
+        throw new IllegalArgumentException(
+                "No non-NaN pair found along the outer dimension anywhere in dataAA");
+    }
+
+    /**
+     * @return TRUE/FALSE if dataAA[i][j][0] and dataAA[i][j][1] are both
+     *         non-NaN, or null if either is NaN (or the position is out of range)
+     */
+    public static  Boolean checkDecreaseAt(float[][][] dataAA, int i, int j) {
+        if ((i < 0) || (i >= dataAA.length) || (j < 0) || (j >= dataAA[i].length)
+                || (dataAA[i][j].length < 2)) {
+            return null;
+        }
+        int dim2 = dataAA[i][j].length;
+        if (dim2 < 2) {
+            return null;
+        }
+        int mid = dim2 / 2;
+        if (mid >= dim2 - 1) {
+            mid = dim2 - 2; // guard: dim2 == 2 would otherwise put mid+1 out of range
+        }
+        float v0 = dataAA[i][j][mid];
+        float v1 = dataAA[i][j][mid + 1];
+        if (Float.isNaN(v0) || Float.isNaN(v1)) {
+            return null;
+        }
+        return (v0 > v1);
+    }
     /**
      * Every data grid with pressure as the z coord can be used
      * to make a grid with altitude with the constant grid value
@@ -4979,7 +5044,8 @@ public class DerivedGridFactory {
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
         float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        //boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        boolean isDecrese =  isDecreasingOuterDimension(dataAA);
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
@@ -5168,7 +5234,8 @@ public class DerivedGridFactory {
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
         float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        //boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        boolean isDecrese =  isDecreasingOuterDimension(dataAA);
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
@@ -5349,7 +5416,8 @@ public class DerivedGridFactory {
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
         float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
-        boolean isDecrese = (dataAA[1][1][1] > dataAA[1][1][3])? true : false;
+       // boolean isDecrese = (dataAA[1][1][1] > dataAA[1][1][3])? true : false;
+        boolean isDecrese = isDecreasingOuterDimension(dataAA);
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
@@ -5654,6 +5722,14 @@ public class DerivedGridFactory {
                     jdx = i;
                 }
             } */
+        }
+
+        if(Float.isNaN(theta[idx + 1]) || Float.isNaN(theta[idx])){
+            return Float.NaN;
+        }
+
+        if(Float.isNaN(other[idx + 1]) || Float.isNaN(other[idx])){
+            return Float.NaN;
         }
 
         float deltheta = theta[idx + 1] - theta[idx];
@@ -7213,7 +7289,8 @@ public class DerivedGridFactory {
         FieldImpl hPI = DerivedGridFactory.convertPressureToHeight(pFI);
         float[][][] dataAA = convert3Darray((FlatField) theta.getSample(0), 0);
         float[][][] dataAP = convert3Darray((FlatField) hPI, 0);
-        boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        //boolean isDecrese = (dataAA[1][1][0] > dataAA[1][1][1])? true : false;
+        boolean isDecrese =  isDecreasingOuterDimension(dataAA);
         GriddedSet domainSet = (GriddedSet) GridUtil.getSpatialDomain(theta);
         if ((domainSet.getDimension() != 3)) {
             throw new VisADException("slice is not 3D ");
