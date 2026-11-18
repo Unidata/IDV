@@ -125,6 +125,11 @@ public class SoundingTable extends JTable {
         }
     }
 
+    public Field[] getSoundings()
+            throws VisADException, RemoteException {
+        return this.soundings;
+    }
+
     /**
      * Set the current sounding to be displayed
      *
@@ -192,7 +197,7 @@ public class SoundingTable extends JTable {
             transformWinds = (showUAndV && !haveUV)
                              || ( !showUAndV && haveUV);
             if ( !transformWinds) {
-                for (int i = 2; i < 4; i++) {
+                for (int i = 2; i < rangeComps.length; i++) {
                     columnNames[numDomainCols + i] =
                         makeColumnName(rangeComps[i],
                                        rangeComps[i].getDefaultUnit());
@@ -257,7 +262,7 @@ public class SoundingTable extends JTable {
                     rangeComps[i].getDefaultUnit());
         }
         // wind
-        if (rangeComps.length > 2) {
+        if (rangeComps.length > 3) {
             csUnits = new Unit[] { rangeComps[2].getDefaultUnit(),
                                    rangeComps[3].getDefaultUnit() };
             haveUV = (Unit.canConvert(csUnits[0], CommonUnit.meterPerSecond)
