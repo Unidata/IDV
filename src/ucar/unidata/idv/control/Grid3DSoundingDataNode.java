@@ -322,7 +322,7 @@ abstract class Grid3DSoundingDataNode extends SoundingDataNode {
      * Class ProfileMaker
      *
      */
-    private static final class ProfileMaker {
+    public static final class ProfileMaker {
 
         /** output domain set */
         private final Set outDom;
@@ -510,5 +510,10 @@ abstract class Grid3DSoundingDataNode extends SoundingDataNode {
 
             return field;
         }
+
+        public Set getOutDom(){
+            return outDom;
+        }
+
     }
 }

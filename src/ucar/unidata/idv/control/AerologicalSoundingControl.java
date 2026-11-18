@@ -21,7 +21,10 @@
 package ucar.unidata.idv.control;
 
 
+import ucar.unidata.data.DataChoice;
+import ucar.unidata.data.DataInstance;
 import ucar.unidata.data.DataUtil;
+import ucar.unidata.data.grid.GridDataInstance;
 import ucar.unidata.data.grid.GridUtil;
 import ucar.unidata.idv.DisplayConventions;
 import ucar.unidata.idv.HodographViewManager;
@@ -33,6 +36,7 @@ import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.util.ObjectListener;
 import ucar.unidata.view.sounding.AerologicalCellNetwork;
 import ucar.unidata.view.sounding.AerologicalCoordinateSystem;
 import ucar.unidata.view.sounding.AerologicalDisplay;
@@ -60,6 +64,7 @@ import visad.*;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 
+import visad.georef.LatLonTuple;
 import visad.util.DataUtility;
 
 
@@ -154,6 +159,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
     /** the temperature profiles */
     private Field[] tempProfiles;
 
+    Field[] baseSoundings;
+
     /** the dewpoint profiles */
     private Field[] dewProfiles;
 
@@ -171,6 +178,8 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
 
     /** display type */
     private String displayType = SKEWT_DISPLAY;
+    private Field[] tmpProfiles;
+    private List<Field[]> extraParamProfilesList = new ArrayList<Field[]>();
 
     /** wind sampling modes */
     private static float[] MANDATORY_LEVEL_VALUES = {
@@ -769,6 +778,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         dewProRef       = null;
         windProRef      = null;
         tempProfiles    = null;
+        tmpProfiles    = null;
         dewProfiles     = null;
         windProfiles    = null;
     }
@@ -969,7 +979,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      * @throws VisADException  if a VisAD failure occurs.
      * @throws RemoteException if a Java RMI failure occurs.
      */
-    protected synchronized void setSoundings(Field[] tempPros,
+    protected synchronized void setSoundings(final Field[] tempPros,
                                              Field[] dewPros,
                                              Field[] windPros)
             throws VisADException, RemoteException {
@@ -988,7 +998,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
             System.arraycopy(dewPros, 0, dewProfiles, 0, n);
             System.arraycopy(windPros, 0, windProfiles, 0, n);
         }
-        Field[] tableSoundings = new Field[n];
+        final Field[] tableSoundings = new Field[n];
         hodoDisplay.clear();
 
         for (int i = 0; i < n; i++) {
@@ -996,10 +1006,10 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 // assumes that if the first one is null, they are all null
                 haveWinds = true;
                 RealTupleType windTuple =
-                    DataUtility.getFlatRangeType(windProfiles[i]);
+                        DataUtility.getFlatRangeType(windProfiles[i]);
                 if (Unit.canConvert(((RealType) windTuple.getComponent(0))
                         .getDefaultUnit(), CommonUnit.meterPerSecond) && Unit
-                            .canConvert(((RealType) windTuple.getComponent(1))
+                        .canConvert(((RealType) windTuple.getComponent(1))
                                 .getDefaultUnit(), CommonUnit
                                 .meterPerSecond)) {
                     haveUAndVWinds = true;
@@ -1013,23 +1023,23 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                 showUVCbx.setEnabled(haveWinds);
             }
             aeroDisplay.addProfile(i, tempProfiles[i], dewProfiles[i],
-                                   windProfiles[i]);
+                    windProfiles[i]);
             if (haveWinds) {
                 hodoDisplay.addProfile(i, windProfiles[i]);
             }
             if ( !haveWinds) {
                 if (haveDewpoints == false) {
                     tableSoundings[i] = FieldImpl.combine(new Field[] {
-                        tempProfiles[i] }, true);
+                            tempProfiles[i] }, true);
                 } else {
                     tableSoundings[i] = FieldImpl.combine(new Field[] {
-                        tempProfiles[i],
-                        dewProfiles[i] }, true);
+                            tempProfiles[i],
+                            dewProfiles[i] }, true);
                 }
             } else {
                 tableSoundings[i] = FieldImpl.combine(new Field[] {
-                    tempProfiles[i],
-                    dewProfiles[i], windProfiles[i] }, true);
+                        tempProfiles[i],
+                        dewProfiles[i], windProfiles[i] }, true);
             }
         }
         for (int i = 0; i < n; i++) {
@@ -1037,24 +1047,119 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
         }
         aeroDisplay.setProfileVisible(currIndex, true);
 
-
         if (haveWinds) {
             hodoDisplay.setProfileVisible(currIndex, true);
         }
-        soundingTable.setSoundings(tableSoundings);
-        soundingTable.setCurrentSounding(currIndex);
-        //calculate BLH here and update sounding Table
-        float blh = computeBLH((FlatField) tempPros[0]);
+        baseSoundings = tableSoundings; // stable base
+        // Everything below touches a Swing component -- soundingTable directly,
+        // readoutTable, viewTabs, and setSounding(currIndex) (which itself calls
+        // soundingTable.setCurrentSounding again). Deferred onto the EDT as one
+        // block, same fix as setSoundingsAdd, so this can't interleave with that
+        // or any other probeMoved()-driven table update.
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    soundingTable.setSoundings(tableSoundings);
+                    soundingTable.setCurrentSounding(currIndex);
 
-        readoutTable.setBlh(new Real(blh));
+                    float blh = computeBLH((FlatField) tempPros[0]);
+                    readoutTable.setBlh(new Real(blh));
 
-        if (viewTabs != null) {
-            viewTabs.setEnabledAt(viewTabs.indexOfTab(HODOGRAPH_DISPLAY),
-                                  haveWinds);
+                    if (viewTabs != null) {
+                        viewTabs.setEnabledAt(viewTabs.indexOfTab(HODOGRAPH_DISPLAY),
+                                haveWinds);
+                    }
+
+                    setSounding(currIndex);
+                } catch (Exception exc) {
+                    logException("Updating sounding table", exc);
+                }
+            }
+        });
+    }
+
+
+
+    /**
+     * Sets the set of soundings -- completely replacing the previous set.
+     *
+     * @param tmpPros         The temp profiles.
+     *
+     * @throws VisADException  if a VisAD failure occurs.
+     * @throws RemoteException if a Java RMI failure occurs.
+     */
+    protected synchronized void setSoundingsAdd(Field[] tmpPros, int slot)
+            throws VisADException, RemoteException {
+
+        while (extraParamProfilesList.size() <= slot) {
+            extraParamProfilesList.add(null);
+        }
+        extraParamProfilesList.set(slot, tmpPros);
+        int n = baseSoundings.length;
+        final Field[] tableSoundings = new Field[n];
+        for (int i = 0; i < n; i++) {
+            List<Field> combineFields = new ArrayList<Field>();
+            combineFields.add(baseSoundings[i]);
+            for (Field[] extra : extraParamProfilesList) {
+                if (extra != null) {
+                    combineFields.add(extra[i]);
+                }
+            }
+            tableSoundings[i] = FieldImpl.combine(combineFields.toArray(new Field[0]), true);
         }
 
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    soundingTable.setSoundings(tableSoundings);
+                    soundingTable.setCurrentSounding(currIndex);
+                    setSounding(currIndex);
+                } catch (Exception exc) {
+                    logException("Updating sounding table", exc);
+                }
+            }
+        });
+    }
+    /**
+     * Remove the set of soundings -- completely remove the  set.
+     *
+     * @param slot         The position of column
+     *
+     * @throws VisADException  if a VisAD failure occurs.
+     * @throws RemoteException if a Java RMI failure occurs.
+     */
+    protected synchronized void setSoundingsRemove(int slot)
+            throws VisADException, RemoteException {
 
-        setSounding(currIndex);
+        if ((slot < 0) || (slot > extraParamProfilesList.size())) {
+            return; // nothing there to remove
+        }
+        extraParamProfilesList.remove(slot-1);
+
+        int n = baseSoundings.length;
+        final Field[] tableSoundings = new Field[n];
+        for (int i = 0; i < n; i++) {
+            List<Field> combineFields = new ArrayList<Field>();
+            combineFields.add(baseSoundings[i]);
+            for (Field[] extra : extraParamProfilesList) {
+                if (extra != null) {
+                    combineFields.add(extra[i]);
+                }
+            }
+            tableSoundings[i] = FieldImpl.combine(combineFields.toArray(new Field[0]), true);
+        }
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    soundingTable.setSoundings(tableSoundings);
+                    soundingTable.setCurrentSounding(currIndex);
+                    setSounding(currIndex);
+                } catch (Exception exc) {
+                    logException("Updating sounding table", exc);
+                }
+            }
+        });
     }
 
     /**
@@ -1752,7 +1857,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
      *
      * @param index index of the profile to reset
      */
-    private void resetProfile(int index) {
+    protected void resetProfile(int index) {
         try {
             aeroDisplay.setOriginalProfiles(index);
             if (haveWinds) {

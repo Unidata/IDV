@@ -37,6 +37,7 @@ import ucar.unidata.idv.ViewManager;
 import ucar.unidata.util.GuiUtils;
 import ucar.unidata.util.Misc;
 
+import ucar.unidata.util.ObjectListener;
 import ucar.unidata.view.geoloc.NavigatedDisplay;
 import ucar.visad.GeoUtils;
 import ucar.visad.Util;
@@ -48,6 +49,7 @@ import ucar.visad.display.LineDrawing;
 import ucar.visad.display.LineProbe;
 import ucar.visad.display.SelectorDisplayable;
 import ucar.visad.functiontypes.AirTemperatureProfile;
+import ucar.visad.quantities.AirPressure;
 import ucar.visad.quantities.Altitude;
 
 import visad.*;
@@ -56,7 +58,7 @@ import visad.georef.EarthLocation;
 import visad.georef.EarthLocationTuple;
 import visad.georef.LatLonPoint;
 import visad.georef.LatLonTuple;
-
+import visad.util.DataUtility;
 
 
 import java.awt.Component;
@@ -72,9 +74,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
+import javax.swing.*;
 
 
 /**
@@ -452,15 +452,79 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
                 throw new IllegalArgumentException(
                     "Can't convert position to navigable point");
             }
-
-            if (llp != null) {
-                dataNode.setLocation(llp);  // invokes super.setLocation(llp)
+            synchronized (this) {
+                if (llp != null) {
+                    dataNode.setLocation(llp);  // invokes super.setLocation(llp)
+                    List<DataChoice> dcs = getDataChoices();
+                    if (dcs.size() > 1) {
+                        for (int i = 1; i < dcs.size(); i++) {
+                            DataChoice dc = dcs.get(i);
+                            DataInstance inst = super.doMakeDataInstance(dc);
+                            Field[] p = getOutputProfiles((FieldImpl) inst.getData(), llp);
+                            setSoundingsAdd(p, i - 1);
+                        }
+                    }
+                    //get getDataChoices()
+                }
             }
         } catch (Exception ex) {
             logException("probeMoved", ex);
         }
     }
 
+    Field [] getOutputProfiles(FieldImpl param, LatLonPoint llp) throws VisADException, RemoteException {
+
+        Field pPro = null;
+        Field grid3d = null;
+        Boolean ensble = GridUtil.hasEnsemble((FieldImpl)param);
+        if(ensble) {
+            FieldImpl sample =
+                    (FieldImpl)((FieldImpl) param).getSample(0);
+            grid3d = (Field)sample.getSample(0, false);
+        } else
+            grid3d = (Field) ((Field) param).getSample(0);
+        FunctionType type = new FunctionType(AirPressure.getRealTupleType(), DataUtility.getRangeType(grid3d));
+        Grid3DSoundingDataNode.ProfileMaker pMaker =
+                new Grid3DSoundingDataNode.ProfileMaker(type,
+                        (Gridded3DSet) grid3d.getDomainSet(),
+                        grid3d.getDefaultRangeUnits()[0]);
+        synchronized (this) {
+            if ((llp != null) && (param != null)) {
+                Field tpp = (Field) GridUtil.getProfileAtLatLonPoint(
+                        (FieldImpl) param, llp,
+                        Data.NEAREST_NEIGHBOR).getSample(
+                        0);
+                float[][] values = tpp.getFloats();
+                FunctionType funcType = (FunctionType)tpp.getType();
+
+                Set outDom = pMaker.getOutDom();
+                if (values != null) {
+                    pPro = makeProfile(values[0], type,  outDom, grid3d.getDefaultRangeUnits());
+                }
+            }
+
+            if (pPro != null) {
+                return new Field[]{pPro};
+            }
+        }
+        return null;
+    }
+
+    Field makeProfile(float[] values, FunctionType funcType, Set outDom, Unit[] rangeUnits)
+            throws VisADException, RemoteException {
+
+        //FlatField field = new FlatField(AirTemperatureProfile.instance(),
+        FlatField field = new FlatField(funcType, outDom,
+                (CoordinateSystem[]) null,
+                (Set[]) null, rangeUnits);
+
+        field.setSamples(new float[][] {
+                values
+        });
+
+        return field;
+
+    }
 
     /**
      * Provides support for receiving output from a {@link SoundingDataNode}.
@@ -879,6 +943,142 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
     public boolean hasMapProjection() {
 
         return true;
+
+    }
+
+    protected String getChangeParameterLabel() {
+        return "Add Parameter to Table...";
+    }
+
+    protected void getViewMenuItems(List menus, boolean forMenuBar) {
+        super.getViewMenuItems(menus, forMenuBar);
+
+        if (forMenuBar) {
+            menus.add(GuiUtils.MENU_SEPARATOR);
+            List paramItems = new ArrayList();
+
+            paramItems.add(doMakeChangeParameterMenuItem());
+            List choices = getDataChoices();
+            for (int i = 1; i < choices.size(); i++) {
+                paramItems.addAll(getParameterMenuItems(i));
+            }
+            menus.add(GuiUtils.makeMenu("Parameters", paramItems));
+        }
+
+    }
+
+    private List getParameterMenuItems(final int row) {
+        List  items     = new ArrayList();
+        JMenu paramMenu = new JMenu("Parameter: " + getFieldName(row));
+        items.add(paramMenu);
+
+
+        // change unit choice
+        JMenuItem jmi;
+        //jmi = new JMenuItem("Change Unit...");
+        //paramMenu.add(jmi);
+        //jmi.addActionListener(new ObjectListener(Integer.valueOf(row)) {
+           // public void actionPerformed(
+           //         ActionEvent ev) {
+
+            //}
+        //});
+
+
+        // Remove this parameter
+        jmi = new JMenuItem("Remove");
+        paramMenu.add(jmi);
+        jmi.addActionListener(new ObjectListener(Integer.valueOf(row)) {
+            public void actionPerformed(
+                    ActionEvent ev) {
+                removeField(
+                        ((Integer) theObject).intValue());
+            }
+        });
+
+        return items;
+
+    }
+
+    protected void addNewData(List newChoices) throws VisADException, RemoteException {
+        //super.addNewData(newChoices);
+        processNewData(newChoices);
+        doShare(SHARE_CHOICES, newChoices);
+        parameterAdded();
+    }
+
+    protected void processNewData(List newChoices)
+            throws VisADException, RemoteException {
+
+        showWaitCursor();
+        for (int i = 0; i < newChoices.size(); i++) {
+            DataChoice dc = (DataChoice) newChoices.get(i);
+            GridDataInstance dataInstance =  new GridDataInstance(dc,
+                    getDataSelection(),
+                    getRequestProperties());
+
+        }
+        showNormalCursor();
+        appendDataChoices(newChoices);
+        resetData();
+    }
+
+    private void parameterAdded() {
+        try {
+            List<DataChoice> dcs = getDataChoices();
+            RealTuple pos = getPosition();
+            LatLonPoint   llp    = null;
+            RealTupleType rttype = (RealTupleType) pos.getType();
+
+            if (rttype.equals(RealTupleType.SpatialCartesian2DTuple)
+                    || rttype.equals(RealTupleType.SpatialCartesian3DTuple)) {
+                llp = latLon(pos);
+            } else if (rttype.equals(RealTupleType.SpatialEarth2DTuple)
+                    || rttype.equals(RealTupleType.SpatialEarth3DTuple)) {
+                Real[] reals = pos.getRealComponents();
+
+                llp = new LatLonTuple(reals[1], reals[0]);
+            } else if (rttype.equals(RealTupleType.LatitudeLongitudeTuple)
+                    || rttype.equals(
+                    RealTupleType.LatitudeLongitudeAltitude)) {
+                Real[] reals = pos.getRealComponents();
+
+                llp = new LatLonTuple(reals[0], reals[1]);
+            } else {
+                throw new IllegalArgumentException(
+                        "Can't convert position to navigable point");
+            }
+
+            if (dcs.size() > 1) {
+                for (int i = 1; i < dcs.size(); i++) {
+                    DataChoice dc = dcs.get(i);
+                    DataInstance inst = super.doMakeDataInstance(dc);
+                    Field[] p = getOutputProfiles((FieldImpl) inst.getData(), llp);
+                    setSoundingsAdd(p, i-1);
+                }
+            }
+        } catch (Exception e) {
+            logException("lineProbeWasMoved", e);
+        }
+    }
+
+    String getFieldName(int row) {
+        List dcs = getDataChoices();
+        return ((DataChoice)(dcs.get(row))).getName();
+    }
+
+    private void removeField(int row) {
+        List dcs = getDataChoices();
+        if (row < 0 || row > (dcs.size() -1)) {
+            return;
+        }
+        removeDataChoice(((DataChoice)(dcs.get(row))));
+
+        try {
+            setSoundingsRemove(row);
+        } catch (Exception e) {
+            logException("lineProbeWasMoved", e);
+        }
 
     }
 }
