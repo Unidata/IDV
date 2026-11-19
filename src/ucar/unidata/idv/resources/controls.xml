@@ -1316,7 +1316,7 @@ Since this is confusing and needs more work lets remove this for now
      properties="windowVisible=true;displayType=emagram;"/>
   <control
      id="grid_skewt"
-     categories="GRID_SOUNDING"
+     categories="GRID_SOUNDING;GRID-3D-*;"
      class="ucar.unidata.idv.control.GriddedSoundingControl"
      description="Skew-T for grids"
      label="Grid Skew-T"
