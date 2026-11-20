@@ -473,41 +473,67 @@ public class GriddedSoundingControl extends AerologicalSoundingControl {
     }
 
     Field [] getOutputProfiles(FieldImpl param, LatLonPoint llp) throws VisADException, RemoteException {
-
+        Field[] pPros = null;
         Field pPro = null;
         Field grid3d = null;
         Boolean ensble = GridUtil.hasEnsemble((FieldImpl)param);
+        int timeCount = param.getLength();
         if(ensble) {
             FieldImpl sample =
                     (FieldImpl)((FieldImpl) param).getSample(0);
             grid3d = (Field)sample.getSample(0, false);
-        } else
+        } else {
             grid3d = (Field) ((Field) param).getSample(0);
+        }
+
+        if(ensble){
+            FieldImpl sample =
+                    (FieldImpl) param.getSample(0);
+            Set ensDomain = sample.getDomainSet();
+            int len = ensDomain.getLength();
+            pPros = new FlatField[timeCount*len];
+        } else {
+            pPros = new FlatField[timeCount];
+        }
         FunctionType type = new FunctionType(AirPressure.getRealTupleType(), DataUtility.getRangeType(grid3d));
         Grid3DSoundingDataNode.ProfileMaker pMaker =
                 new Grid3DSoundingDataNode.ProfileMaker(type,
                         (Gridded3DSet) grid3d.getDomainSet(),
                         grid3d.getDefaultRangeUnits()[0]);
-        synchronized (this) {
-            if ((llp != null) && (param != null)) {
+
+        for (int i = 0; i < timeCount; i++) {
+
+            if(ensble){
+                grid3d = (FieldImpl) param.getSample(i);
+                Set ensDomain = param.getDomainSet();
+                int len = ensDomain.getLength();
+
+                for (int j = 0; j < len; j++) {
+                    Field tpp = (Field) GridUtil.getProfileAtLatLonPoint(
+                            (FieldImpl) param, llp,
+                            Data.NEAREST_NEIGHBOR).getSample(
+                            i);
+                    Set outDom = pMaker.getOutDom();
+                    float[][] values = tpp.getFloats();
+                    pPros[i] = makeProfile(values[0], type,  outDom, grid3d.getDefaultRangeUnits());
+
+                }
+            } else {
+                grid3d = (Field) ((Field) param).getSample(i);
                 Field tpp = (Field) GridUtil.getProfileAtLatLonPoint(
                         (FieldImpl) param, llp,
                         Data.NEAREST_NEIGHBOR).getSample(
-                        0);
+                        i);
                 float[][] values = tpp.getFloats();
-                FunctionType funcType = (FunctionType)tpp.getType();
 
                 Set outDom = pMaker.getOutDom();
                 if (values != null) {
-                    pPro = makeProfile(values[0], type,  outDom, grid3d.getDefaultRangeUnits());
+                    pPros[i] = makeProfile(values[0], type,  outDom, grid3d.getDefaultRangeUnits());
                 }
             }
-
-            if (pPro != null) {
-                return new Field[]{pPro};
-            }
         }
-        return null;
+
+        return pPros;
     }
 
     Field makeProfile(float[] values, FunctionType funcType, Set outDom, Unit[] rangeUnits)
