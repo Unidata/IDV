@@ -1105,7 +1105,7 @@ public abstract class AerologicalSoundingControl extends DisplayControlImpl impl
                     combineFields.add(extra[i]);
                 }
             }
-            tableSoundings[i] = FieldImpl.combine(combineFields.toArray(new Field[i]), true);
+            tableSoundings[i] = FieldImpl.combine(combineFields.toArray(new Field[0]), true);
         }
 
         SwingUtilities.invokeLater(new Runnable() {
