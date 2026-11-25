@@ -267,6 +267,8 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
     /** _more_ */
     static public String bundleIdvVersion;
 
+    /** _more_ */
+    static public String xmlFile;
     /**
      * The ctor
      *
@@ -2793,7 +2795,12 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
      * @return success
      */
     public boolean decodeXmlFile(String xmlFile, boolean checkToRemove) {
+        this.xmlFile = xmlFile;
         return decodeXmlFile(xmlFile, checkToRemove, false);
+    }
+
+    public String getBundleFile(){
+        return this.xmlFile;
     }
 
     /**
@@ -2880,7 +2887,7 @@ public class IdvPersistenceManager extends IdvManager implements PrototypeManage
                                  boolean checkToRemove,
                                  boolean letUserChangeData,
                                  Hashtable bundleProperties) {
-
+        this.xmlFile = xmlFile;
         String  name         = ((label != null)
                                 ? label
                                 : IOUtil.getFileTail(xmlFile));
